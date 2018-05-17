@@ -708,7 +708,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected Map<Integer, BatchWindowConfiguration> historyCleanupBatchWindows = new HashMap<Integer, BatchWindowConfiguration>();
 
-  //shotcuts for batch windows configuration available to be configured from XML
+  //shortcuts for batch windows configuration available to be configured from XML
   protected String mondayHistoryCleanupBatchWindowStartTime;
   protected String mondayHistoryCleanupBatchWindowEndTime;
   protected String tuesdayHistoryCleanupBatchWindowStartTime;

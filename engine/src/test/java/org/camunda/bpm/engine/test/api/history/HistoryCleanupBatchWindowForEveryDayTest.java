@@ -45,7 +45,7 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class HistoryCleanupBatchWindowTest {
+public class HistoryCleanupBatchWindowForEveryDayTest {
 
   protected String defaultStartTime;
   protected String defaultEndTime;
@@ -111,7 +111,6 @@ public class HistoryCleanupBatchWindowTest {
     historyService = engineRule.getHistoryService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     managementService = engineRule.getManagementService();
-    testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/dmn/Example.dmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithHistoryTimeToLive.cmmn");
 
     defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
     defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
@@ -136,42 +135,9 @@ public class HistoryCleanupBatchWindowTest {
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
         }
 
-        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
-        for (HistoricIncident historicIncident : historicIncidents) {
-          commandContext.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
-        }
-
-        commandContext.getMeterLogManager().deleteAll();
-
         return null;
       }
     });
-
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-    for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
-      historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
-    }
-
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-    for (HistoricDecisionInstance historicDecisionInstance: historicDecisionInstances) {
-      historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
-    }
-
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery().list();
-    for (HistoricCaseInstance historicCaseInstance: historicCaseInstances) {
-      historyService.deleteHistoricCaseInstance(historicCaseInstance.getId());
-    }
-
-    clearMetrics();
-
-  }
-
-  protected void clearMetrics() {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
-    for (Meter meter : meters) {
-      meter.getAndClear();
-    }
-    managementService.deleteMetrics(null);
   }
 
   @Test

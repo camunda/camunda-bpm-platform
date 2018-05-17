@@ -1139,20 +1139,16 @@ public class HistoryCleanupTest {
 
   @Test
   public void testConfigurationFailureWrongDayOfTheWeekStartTime() throws ParseException {
-    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23", "01:00"));
-    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T10:00:00"));
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("startTime");
-    historyService.cleanUpHistoryAsync(false);
+    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23", "01:00"));
   }
 
   @Test
   public void testConfigurationFailureWrongDayOfTheWeekEndTime() throws ParseException {
-    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23:00", "01"));
-    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T10:00:00"));
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("endTime");
-    historyService.cleanUpHistoryAsync(false);
+    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23:00", "01"));
   }
 
   @Test

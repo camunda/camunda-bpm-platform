@@ -55,7 +55,7 @@ public class DefaultBatchWindowManager implements BatchWindowManager {
     }
 
     //check next week
-    for (int i=1; i<7; i++ ) {
+    for (int i=1; i<=7; i++ ) {
       Date dateToCheck = addDays(date, i);
       final BatchWindow batchWindowForDate = getBatchWindowForDate(dateToCheck, configuration);
       if (batchWindowForDate != null) {
@@ -73,7 +73,7 @@ public class DefaultBatchWindowManager implements BatchWindowManager {
       return currentDayBatchWindow;
     } else {
       //check next week
-      for (int i=1; i<7; i++ ) {
+      for (int i=1; i<=7; i++ ) {
         Date dateToCheck = addDays(date, i);
         final BatchWindow batchWindowForDate = getBatchWindowForDate(dateToCheck, configuration);
         if (batchWindowForDate != null) {

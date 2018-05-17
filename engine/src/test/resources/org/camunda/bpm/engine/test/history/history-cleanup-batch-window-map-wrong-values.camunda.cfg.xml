@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+
+    <property name="jdbcUrl" value="${database.url}" />
+    <property name="jdbcDriver" value="${database.driver}" />
+    <property name="jdbcUsername" value="${database.username}" />
+    <property name="jdbcPassword" value="${database.password}" />
+
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="true" />
+
+    <!-- Empty beans map to for testing purpose -->
+    <property name="beans">
+      <map/>
+    </property>
+
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+
+    <property name="bpmnStacktraceVerbose" value="false" />
+
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+
+    <!-- mail server configurations -->
+    <property name="mailServerPort" value="${mail.server.port}" />
+    <property name="history" value="${history.level}" />
+
+    <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+
+    <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+
+    <property name="historyCleanupBatchWindows">
+      <map>
+        <entry key="2" value-ref="mondayBatchWindow"/>
+      </map>
+    </property>
+
+  </bean>
+
+  <bean id="mondayBatchWindow" class="org.camunda.bpm.engine.impl.cfg.BatchWindowConfiguration">
+    <property name="startTime" value="wrongValueForStartTime"/>
+    <property name="endTime" value="01:00"/>
+  </bean>
+
+</beans>

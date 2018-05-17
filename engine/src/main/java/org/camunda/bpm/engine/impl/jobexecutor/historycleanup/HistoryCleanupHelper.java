@@ -29,6 +29,9 @@ public abstract class HistoryCleanupHelper {
   public static boolean isWithinBatchWindow(Date date, ProcessEngineConfigurationImpl configuration) {
     if (configuration.getBatchWindowManager().isBatchWindowConfigured(configuration)) {
       BatchWindow batchWindow = configuration.getBatchWindowManager().getCurrentOrNextBatchWindow(date, configuration);
+      if (batchWindow == null) {
+        return false;
+      }
       return batchWindow.isWithin(date);
     } else {
       return false;

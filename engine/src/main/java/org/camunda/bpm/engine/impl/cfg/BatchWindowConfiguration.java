@@ -11,18 +11,39 @@ public class BatchWindowConfiguration {
 
   protected final static ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
 
-  protected String startTime;
+  private String startTime;
 
   private Date startTimeAsDate;
 
-  protected String endTime = "00:00";
+  private String endTime = "00:00";
 
   private Date endTimeAsDate;
 
+  public BatchWindowConfiguration() {
+  }
+
   public BatchWindowConfiguration(String startTime, String endTime) {
     this.startTime = startTime;
+    initStartTimeAsDate();
     if (endTime != null) {
       this.endTime = endTime;
+    }
+    initEndTimeAsDate();
+  }
+
+  private void initStartTimeAsDate() {
+    try {
+      startTimeAsDate = HistoryCleanupHelper.parseTimeConfiguration(startTime);
+    } catch (ParseException e) {
+      throw LOG.invalidPropertyValue("startTime", startTime);
+    }
+  }
+
+  private void initEndTimeAsDate() {
+    try {
+      endTimeAsDate = HistoryCleanupHelper.parseTimeConfiguration(endTime);
+    } catch (ParseException e) {
+      throw LOG.invalidPropertyValue("endTime", endTime);
     }
   }
 
@@ -32,6 +53,7 @@ public class BatchWindowConfiguration {
 
   public void setStartTime(String startTime) {
     this.startTime = startTime;
+    initStartTimeAsDate();
   }
 
   public String getEndTime() {
@@ -40,28 +62,15 @@ public class BatchWindowConfiguration {
 
   public void setEndTime(String endTime) {
     this.endTime = endTime;
+    initEndTimeAsDate();
   }
 
   public Date getStartTimeAsDate() {
-    try {
-      if (startTimeAsDate == null) {
-        startTimeAsDate = HistoryCleanupHelper.parseTimeConfiguration(startTime);
-      }
-      return startTimeAsDate;
-    } catch (ParseException e) {
-      throw LOG.invalidPropertyValue("startTime", startTime);
-    }
+    return startTimeAsDate;
   }
 
   public Date getEndTimeAsDate() {
-    try {
-      if (endTimeAsDate == null) {
-        endTimeAsDate = HistoryCleanupHelper.parseTimeConfiguration(endTime);
-      }
-      return endTimeAsDate;
-    } catch (ParseException e) {
-      throw LOG.invalidPropertyValue("endTime", endTime);
-    }
+    return endTimeAsDate;
   }
 
   @Override

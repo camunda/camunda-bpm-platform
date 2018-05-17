@@ -1,7 +1,9 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.util.Date;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -14,6 +16,8 @@ import org.camunda.bpm.engine.impl.util.json.JSONObject;
  * @author Svetlana Dorokhova
  */
 public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHandlerConfiguration> {
+
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public static final String TYPE = "history-cleanup";
 
@@ -70,8 +74,14 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
   }
 
   private void rescheduleRegularCall(CommandContext commandContext, JobEntity jobEntity) {
-    commandContext.getJobManager().reschedule(jobEntity, commandContext.getProcessEngineConfiguration().getBatchWindowManager()
-      .getNextBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration()).getStart());
+    final BatchWindow nextBatchWindow = commandContext.getProcessEngineConfiguration().getBatchWindowManager()
+      .getNextBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration());
+    if (nextBatchWindow != null) {
+      commandContext.getJobManager().reschedule(jobEntity, nextBatchWindow.getStart());
+    } else {
+      LOG.warnHistoryCleanupBatchWindowNotFound();
+      suspendJob(jobEntity);
+    }
   }
 
   private void suspendJob(JobEntity jobEntity) {

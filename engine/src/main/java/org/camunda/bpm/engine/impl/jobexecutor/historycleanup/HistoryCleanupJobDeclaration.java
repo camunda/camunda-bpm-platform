@@ -63,8 +63,13 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
     if (isImmediatelyDue) {
       return ClockUtil.getCurrentTime();
     } else {
-      return commandContext.getProcessEngineConfiguration().getBatchWindowManager()
-        .getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration()).getStart();
+      final BatchWindow currentOrNextBatchWindow = commandContext.getProcessEngineConfiguration().getBatchWindowManager()
+        .getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration());
+      if (currentOrNextBatchWindow != null) {
+        return currentOrNextBatchWindow.getStart();
+      } else {
+        return null;
+      }
     }
   }
 }

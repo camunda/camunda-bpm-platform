@@ -174,4 +174,10 @@ public class JobExecutorLogger extends ProcessEngineLogger {
         "027", "Falling back to default retry strategy. Exception while executing job {}: {}", jobId, exceptionMessage);
   }
 
+  public void warnHistoryCleanupBatchWindowNotFound() {
+    logWarn(
+      "028",
+      "Batch window for history cleanup was not calculated. History cleanup job(s) will be suspended.");
+  }
+
 }
