@@ -1205,4 +1205,15 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals("Hello World!", variableInstance.getValue());
   }
 
+  @Deployment
+  public void testOutputPlainTask() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var").singleResult();
+    assertNotNull(variable);
+    assertEquals("baroque", variable.getValue());
+    assertEquals(pi.getId(), variable.getExecutionId());
+  }
 }
