@@ -1,11 +1,16 @@
 # camunda commons
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.commons/camunda-commons-bom/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.commons/camunda-commons-bom)
+
+
 camunda commons is a collection of shared libraries used by camunda open source projects.
 
 ## List of libraries
 
 * [camunda commons logging][logging]
 * [camunda commons utils][utils]
+* [camunda commons typed values][typed-values]
+
 
 ## Getting started
 
@@ -18,7 +23,7 @@ This will ensure that your project uses all commons libraries in the same versio
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-bom</artifactId>
-      <version>1.0.0</version>
+      <version>${version}</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -47,4 +52,5 @@ Apache License 2.0.
 
 [logging]: logging/
 [utils]: utils/
+[typed-values]: typed-values/
 
