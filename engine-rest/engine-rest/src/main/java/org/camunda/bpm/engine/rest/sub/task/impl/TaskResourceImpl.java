@@ -126,6 +126,10 @@ public class TaskResourceImpl implements TaskResource {
 
     } catch (AuthorizationException e) {
       throw e;
+    
+    } catch (FormFieldValidationException e) {
+      String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
