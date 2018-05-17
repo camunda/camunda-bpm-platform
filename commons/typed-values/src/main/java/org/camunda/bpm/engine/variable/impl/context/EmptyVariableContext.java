@@ -29,7 +29,7 @@ public class EmptyVariableContext implements VariableContext {
 
   public final static EmptyVariableContext INSTANCE = new EmptyVariableContext();
 
-  EmptyVariableContext() {
+  private EmptyVariableContext() {
     // hidden
   }
 
