@@ -26,21 +26,22 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.client.util.RecordingInvocationHandler;
 import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
-import org.camunda.bpm.client.variable.impl.value.DeferredFileValue;
+import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,9 @@ public class FileSerializationIT {
   protected static final byte[] VARIABLE_VALUE_FILE_VALUE = "ABC".getBytes();
   protected static final String VARIABLE_VALUE_FILE_ENCODING = "UTF-8";
   protected static final String VARIABLE_VALUE_FILE_MIME_TYPE = "text/plain";
+
+  protected static final String ANOTHER_VARIABLE_NAME_FILE = "anotherFileVariable";
+  protected static final byte[] ANOTHER_VARIABLE_VALUE_FILE = "DEF".getBytes();
 
   protected static final FileValueBuilder VARIABLE_BUILDER =
     Variables.fileValue(VARIABLE_VALUE_FILE_NAME);
@@ -107,43 +111,20 @@ public class FileSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     // then
-    assertThat((Object) task.getVariable(VARIABLE_NAME_FILE)).isNull();
     assertThat(task.getAllVariables().size()).isEqualTo(1);
-  }
-
-  @Test
-  public void shouldGet_Loaded() {
-    // given
-    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
-
-    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
-
-    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
-
-    ExternalTask task = handler.getHandledTasks().get(0);
-
-    DeferredFileValue deferredFileValue = task.getVariableTyped(VARIABLE_NAME_FILE);
-
-    // assume
-    assertThat(deferredFileValue.isLoaded()).isFalse();
-
-    // when
-    deferredFileValue.load();
-
-    // then
-    assertThat(deferredFileValue.isLoaded()).isTrue();
     assertThat(IoUtil.inputStreamAsString(task.getVariable(VARIABLE_NAME_FILE)))
       .isEqualTo(new String(VARIABLE_VALUE_FILE_VALUE));
   }
 
   @Test
-  @Ignore("Unhandled Exception")
-  public void shouldGet_Null() {
+  public void shouldGetAll() {
     // given
-    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_BUILDER.create());
+    Map<String, TypedValue> variables = new HashMap<>();
+    variables.put(VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
+    variables.put(ANOTHER_VARIABLE_NAME_FILE, VARIABLE_BUILDER.file(ANOTHER_VARIABLE_VALUE_FILE).create());
+    engineRule.startProcessInstance(processDefinition.getId(), variables);
 
+    // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
       .handler(handler)
       .open();
@@ -152,21 +133,16 @@ public class FileSerializationIT {
 
     ExternalTask task = handler.getHandledTasks().get(0);
 
-    DeferredFileValue deferredFileValue = task.getVariableTyped(VARIABLE_NAME_FILE);
-
-    // assume
-    assertThat(deferredFileValue.isLoaded()).isFalse();
-
-    // when
-    deferredFileValue.load();
-
     // then
-    assertThat(deferredFileValue.isLoaded()).isTrue();
-    assertThat((Object) task.getVariable(VARIABLE_NAME_FILE)).isNull();
+    assertThat(task.getAllVariables().size()).isEqualTo(2);
+    assertThat(IoUtil.inputStreamAsString((InputStream) task.getAllVariables().get(VARIABLE_NAME_FILE)))
+      .isEqualTo(new String(VARIABLE_VALUE_FILE_VALUE));
+    assertThat(IoUtil.inputStreamAsString((InputStream) task.getAllVariables().get(ANOTHER_VARIABLE_NAME_FILE)))
+      .isEqualTo(new String(ANOTHER_VARIABLE_VALUE_FILE));
   }
 
   @Test
-  public void shouldGetTyped() {
+  public void shouldGetTyped_Deferred() {
     // given
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
 
@@ -280,6 +256,99 @@ public class FileSerializationIT {
   }
 
   @Test
+  public void shouldSetTyped_Encoding() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    FileValue fileValue = Variables
+      .fileValue(VARIABLE_VALUE_FILE_NAME)
+      .file(VARIABLE_VALUE_FILE_VALUE)
+      .encoding(VARIABLE_VALUE_FILE_ENCODING)
+      .create();
+
+    fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, fileValue));
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    DeferredFileValue deferredFileValue = task.getVariableTyped(VARIABLE_NAME_FILE);
+
+    // assume
+    assertThat(deferredFileValue.isLoaded()).isFalse();
+
+    // then
+    DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
+
+    assertThat(typedValue.isLoaded()).isTrue();
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
+    assertThat(typedValue.getType()).isEqualTo(FILE);
+    assertThat(typedValue.getEncoding()).isEqualTo(VARIABLE_VALUE_FILE_ENCODING);
+    assertThat(typedValue.getMimeType()).isNull();
+  }
+
+  @Test
+  public void shouldSetTyped_MimeType() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    FileValue fileValue = Variables
+      .fileValue(VARIABLE_VALUE_FILE_NAME)
+      .file(VARIABLE_VALUE_FILE_VALUE)
+      .mimeType(VARIABLE_VALUE_FILE_MIME_TYPE)
+      .create();
+    fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, fileValue));
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    DeferredFileValue deferredFileValue = task.getVariableTyped(VARIABLE_NAME_FILE);
+
+    // assume
+    assertThat(deferredFileValue.isLoaded()).isFalse();
+
+    // then
+    DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
+
+    assertThat(typedValue.isLoaded()).isTrue();
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
+    assertThat(typedValue.getType()).isEqualTo(FILE);
+    assertThat(typedValue.getEncoding()).isNull();
+    assertThat(typedValue.getMimeType()).isEqualTo(VARIABLE_VALUE_FILE_MIME_TYPE);
+  }
+
+  @Test
   public void shouldSet_Bytes() {
     // given
     engineRule.startProcessInstance(processDefinition.getId());
@@ -299,9 +368,7 @@ public class FileSerializationIT {
       .open();
 
     // when
-    Map<String, Object> variables = Variables.createVariables();
-    variables.put(VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
-    fooService.complete(fooTask, variables);
+    fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE));
 
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
@@ -345,11 +412,8 @@ public class FileSerializationIT {
       .open();
 
     // when
-    Map<String, Object> variables = Variables.createVariables();
-    variables.put(VARIABLE_NAME_FILE, VARIABLE_BUILDER
-      .file(new ByteArrayInputStream(VARIABLE_VALUE_FILE_VALUE))
-      .create());
-    fooService.complete(fooTask, variables);
+    FileValue fileValue = VARIABLE_BUILDER.file(new ByteArrayInputStream(VARIABLE_VALUE_FILE_VALUE)).create();
+    fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, fileValue));
 
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
@@ -393,10 +457,8 @@ public class FileSerializationIT {
       .open();
 
     // when
-    Map<String, Object> variables = Variables.createVariables();
-    variables.put(VARIABLE_NAME_FILE, VARIABLE_BUILDER
-      .file(new File("src/it/resources/aFileName.txt")).create());
-    fooService.complete(fooTask, variables);
+    FileValue fileValue = VARIABLE_BUILDER.file(new File("src/it/resources/aFileName.txt")).create();
+    fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, fileValue));
 
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
@@ -421,42 +483,9 @@ public class FileSerializationIT {
   }
 
   @Test
-  public void shouldSet_Transient() {
+  public void shouldNotSet_DeferredFileValue() {
     // given
-    BpmnModelInstance process = createProcessWithExclusiveGateway(PROCESS_KEY_2,
-      "${" + VARIABLE_NAME_FILE + " != null}");
-    ProcessDefinitionDto definition = engineRule.deploy(process).get(0);
-    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
-
-    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
-      Map<String, Object> variables = new HashMap<>();
-      variables.put(VARIABLE_NAME_FILE, VARIABLE_BUILDER.setTransient(true).create());
-      client.complete(task, variables);
-    });
-
-    // when
-    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
-
-    // then
-    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
-
-    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
-    assertThat(task).isNotNull();
-    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
-    assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
-
-    List<VariableInstanceDto> variables = engineRule
-      .getVariablesByProcessInstanceIdAndVariableName(processInstance.getId(), "fileVariable");
-    assertThat(variables).isEmpty();
-  }
-
-  @Test
-  @Ignore("Unhandled Exception")
-  public void shouldSet_Null() {
-    // given
-    engineRule.startProcessInstance(processDefinition.getId());
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
 
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
       .handler(invocationHandler)
@@ -473,30 +502,94 @@ public class FileSerializationIT {
       .open();
 
     // when
-    Map<String, Object> variables = Variables.createVariables();
-    variables.put(VARIABLE_NAME_FILE, VARIABLE_BUILDER.create());
+    Map<String, Object> variables = new HashMap<>();
+    DeferredFileValue deferredFileValue = fooTask.getVariableTyped(VARIABLE_NAME_FILE);
+    variables.put("deferredFile", deferredFileValue);
+    variables.put(ANOTHER_VARIABLE_NAME_FILE, ANOTHER_VARIABLE_VALUE_FILE);
     fooService.complete(fooTask, variables);
 
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
-    ExternalTask task = handler.getHandledTasks().get(0);
-    DeferredFileValue deferredFileValue = task.getVariableTyped(VARIABLE_NAME_FILE);
+    // then
+    List<VariableInstanceDto> variableInstances = engineRule.getVariablesByProcessInstanceIdAndVariableName(processInstance.getId(), null);
+    assertThat(variableInstances.size()).isEqualTo(2);
 
-    // assume
-    assertThat(deferredFileValue.isLoaded()).isFalse();
+    List<String> variableNames = new ArrayList<>();
+    for (VariableInstanceDto variableInstance : variableInstances) {
+      variableNames.add(variableInstance.getName());
+    }
 
+    assertThat(variableNames).containsExactlyInAnyOrder(VARIABLE_NAME_FILE, ANOTHER_VARIABLE_NAME_FILE); // contains not "deferredFile"
+  }
+
+  @Test
+  public void shouldSet_LoadedFileValue() {
+    // given
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = new HashMap<>();
+    DeferredFileValue deferredFileValue = fooTask.getVariableTyped(VARIABLE_NAME_FILE);
     deferredFileValue.load();
+    variables.put("deferredFile", deferredFileValue);
+    variables.put(ANOTHER_VARIABLE_NAME_FILE, ANOTHER_VARIABLE_VALUE_FILE);
+    fooService.complete(fooTask, variables);
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     // then
-    DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
+    List<VariableInstanceDto> variableInstances = engineRule.getVariablesByProcessInstanceIdAndVariableName(processInstance.getId(), null);
+    assertThat(variableInstances.size()).isEqualTo(3);
 
-    assertThat(typedValue.isLoaded()).isTrue();
-    assertThat(IoUtil.inputStreamAsString(typedValue.getValue()))
-      .isEqualTo(new String(VARIABLE_VALUE_FILE_VALUE));
-    assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
-    assertThat(typedValue.getType()).isEqualTo(FILE);
-    assertThat(typedValue.getEncoding()).isNull();
-    assertThat(typedValue.getMimeType()).isNull();
+    List<String> variableNames = new ArrayList<>();
+    for (VariableInstanceDto variableInstance : variableInstances) {
+      variableNames.add(variableInstance.getName());
+    }
+
+    assertThat(variableNames).containsExactlyInAnyOrder(VARIABLE_NAME_FILE, ANOTHER_VARIABLE_NAME_FILE, "deferredFile");
+  }
+
+  @Test
+  public void shouldSet_Transient() {
+    // given
+    BpmnModelInstance process = createProcessWithExclusiveGateway(PROCESS_KEY_2,
+      "${" + VARIABLE_NAME_FILE + " != null}");
+    ProcessDefinitionDto definition = engineRule.deploy(process).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      client.complete(task, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, VARIABLE_BUILDER.setTransient(true).create()));
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
+
+    List<VariableInstanceDto> variables = engineRule.getVariablesByProcessInstanceIdAndVariableName(processInstance.getId(), VARIABLE_NAME_FILE);
+    assertThat(variables).isEmpty();
   }
 
 }

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
+import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
@@ -46,13 +47,15 @@ public class TypedValues {
           variableValue = variables.get(variableName);
         }
 
-        try {
-          TypedValue typedValue = createTypedValue(variableValue);
-          TypedValueField typedValueField = toTypedValueField(typedValue);
-          result.put(variableName, typedValueField);
-        }
-        catch (Throwable e) {
-          throw LOG.cannotSerializeVariable(variableName, e);
+        if (!isDeferred(variableValue)) {
+          try {
+            TypedValue typedValue = createTypedValue(variableValue);
+            TypedValueField typedValueField = toTypedValueField(typedValue);
+            result.put(variableName, typedValueField);
+          }
+          catch (Throwable e) {
+            throw LOG.cannotSerializeVariable(variableName, e);
+          }
         }
       }
 
@@ -116,5 +119,9 @@ public class TypedValues {
     }
 
     return typedValue;
+  }
+
+  protected boolean isDeferred(Object variableValue) {
+    return variableValue instanceof DeferredFileValue && !((DeferredFileValue) variableValue).isLoaded();
   }
 }

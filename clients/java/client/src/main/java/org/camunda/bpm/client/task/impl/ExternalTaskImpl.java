@@ -20,7 +20,8 @@ import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
 import org.camunda.bpm.client.variable.impl.VariableValue;
-import org.camunda.bpm.client.variable.impl.value.DeferredFileValue;
+import org.camunda.bpm.client.variable.impl.value.DeferredFileValueImpl;
+import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
@@ -215,6 +216,11 @@ public class ExternalTaskImpl implements ExternalTask {
     return priority;
   }
 
+  @Override
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
   @JsonIgnore
   @Override
   public Map<String, Object> getAllVariables() {
@@ -235,6 +241,15 @@ public class ExternalTaskImpl implements ExternalTask {
 
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
+
+      TypedValue typedValue = variableValue.getTypedValue();
+      if (isLazyFile(typedValue)) {
+        DeferredFileValue deferredFileValue = new DeferredFileValueImpl((FileValue) typedValue, variableName, getProcessInstanceId(), engineClient);
+        variableValue.setCachedValue(deferredFileValue);
+
+        deferredFileValue.load();
+      }
+
       value = (T) variableValue.getValue();
     }
 
@@ -273,9 +288,10 @@ public class ExternalTaskImpl implements ExternalTask {
     if (variableValue != null) {
       typedValue = variableValue.getTypedValue(deserializeObjectValues);
 
-      if (typedValue.getType().equals(PrimitiveValueType.FILE) && !(typedValue instanceof DeferredFileValue)){
-        DeferredFileValue deferredFileValue = new DeferredFileValue((FileValue) typedValue, variableName, getProcessInstanceId(), engineClient);
+      if (isLazyFile(typedValue)) {
+        DeferredFileValue deferredFileValue = new DeferredFileValueImpl((FileValue) typedValue, variableName, getProcessInstanceId(), engineClient);
         variableValue.setCachedValue(deferredFileValue);
+
         typedValue = deferredFileValue;
       }
     }
@@ -283,9 +299,9 @@ public class ExternalTaskImpl implements ExternalTask {
     return (T) typedValue;
   }
 
-  @Override
-  public String getBusinessKey() {
-    return businessKey;
+  @JsonIgnore
+  protected boolean isLazyFile(TypedValue typedValue) {
+    return typedValue.getType().equals(PrimitiveValueType.FILE) && !(typedValue instanceof DeferredFileValue);
   }
 
 }

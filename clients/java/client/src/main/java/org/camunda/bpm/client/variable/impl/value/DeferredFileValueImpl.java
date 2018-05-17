@@ -15,6 +15,7 @@ package org.camunda.bpm.client.variable.impl.value;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
+import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -22,7 +23,7 @@ import org.camunda.bpm.engine.variable.value.FileValue;
 /**
  * @author Tassilo Weidner
  */
-public class DeferredFileValue extends FileValueImpl {
+public class DeferredFileValueImpl extends FileValueImpl implements DeferredFileValue {
 
   protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
@@ -32,7 +33,7 @@ public class DeferredFileValue extends FileValueImpl {
   protected String processInstanceId;
   protected EngineClient engineClient;
 
-  public DeferredFileValue(FileValue fileValue, String variableName, String processInstanceId, EngineClient engineClient) {
+  public DeferredFileValueImpl(FileValue fileValue, String variableName, String processInstanceId, EngineClient engineClient) {
     super(PrimitiveValueType.FILE, fileValue.getFilename());
 
     setValue(null); // deferred
