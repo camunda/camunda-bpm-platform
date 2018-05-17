@@ -107,12 +107,6 @@ public class HistoryCleanupCmd implements Command<Job> {
     return immediatelyDue || HistoryCleanupHelper.isBatchWindowConfigured(commandContext);
   }
 
-  protected boolean isWithinBatchWindow(JobEntity job) {
-    CommandContext commandContext = Context.getCommandContext();
-    Date duedate = job.getDuedate();
-    return !immediatelyDue && duedate != null && HistoryCleanupHelper.isWithinBatchWindow(duedate, commandContext);
-  }
-
   protected List<Job> createJobs(int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
 
@@ -151,11 +145,7 @@ public class HistoryCleanupCmd implements Command<Job> {
 
       HISTORY_CLEANUP_JOB_DECLARATION.reconfigure(historyCleanupContext, historyCleanupJob);
 
-      // don't set a new due date if the current one is already within the batch window
-      Date newDueDate = historyCleanupJob.getDuedate();
-      if (!isWithinBatchWindow(historyCleanupJob)) {
-        newDueDate = HISTORY_CLEANUP_JOB_DECLARATION.resolveDueDate(historyCleanupContext);
-      }
+      Date newDueDate = HISTORY_CLEANUP_JOB_DECLARATION.resolveDueDate(historyCleanupContext);
 
       jobManager.reschedule(historyCleanupJob, newDueDate);
     }

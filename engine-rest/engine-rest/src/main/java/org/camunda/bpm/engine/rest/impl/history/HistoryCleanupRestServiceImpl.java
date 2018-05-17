@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.BatchWindow;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.history.HistoryCleanupConfigurationDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
@@ -56,18 +56,15 @@ public class HistoryCleanupRestServiceImpl implements HistoryCleanupRestService 
 
   public HistoryCleanupConfigurationDto getHistoryCleanupConfiguration() {
     HistoryCleanupConfigurationDto configurationDto = new HistoryCleanupConfigurationDto();
-    Date startTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
-        .getHistoryCleanupBatchWindowStartTimeAsDate();
-    Date endTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
-        .getHistoryCleanupBatchWindowEndTimeAsDate();
-    if (startTime == null || endTime == null) {
+    final ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    Date now = ClockUtil.getCurrentTime();
+    final BatchWindow batchWindow = processEngineConfiguration.getBatchWindowManager()
+      .getCurrentOrNextBatchWindow(now, processEngineConfiguration);
+    if (batchWindow == null) {
       return configurationDto;
     }
-    Date now = ClockUtil.getCurrentTime();
-    Date startDate = HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(now, startTime, endTime);
-    Date endDate = HistoryCleanupHelper.getNextBatchWindowEndTime(now, endTime);
-    configurationDto.setBatchWindowStartTime(startDate);
-    configurationDto.setBatchWindowEndTime(endDate);
+    configurationDto.setBatchWindowStartTime(batchWindow.getStart());
+    configurationDto.setBatchWindowEndTime(batchWindow.getEnd());
     return configurationDto;
   }
 }

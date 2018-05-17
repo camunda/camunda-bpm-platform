@@ -604,12 +604,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       this.caseExecutionId = this.caseExecution.getId();
       this.caseInstanceId = this.caseExecution.getCaseInstanceId();
       this.caseDefinitionId = this.caseExecution.getCaseDefinitionId();
+      this.tenantId = this.caseExecution.getTenantId();
 
     } else {
       this.caseExecution = null;
       this.caseExecutionId = null;
       this.caseInstanceId = null;
       this.caseDefinitionId = null;
+      this.tenantId = null;
+
     }
   }
 

@@ -349,6 +349,35 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   }
 
   @Test
+  public void testProcessDefinitionKeysList() {
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+            MockProvider.mockDefinition().key(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY).build(),
+            MockProvider.mockDefinition().key(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY).build());
+    mockedQuery = setUpMockDefinitionQuery(processDefinitions);
+
+    Response response = given()
+            .queryParam("keysIn", MockProvider.EXAMPLE_KEY_LIST)
+            .then().expect()
+            .statusCode(Status.OK.getStatusCode())
+            .when()
+            .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionKeysIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY,
+            MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedKey1 = from(content).getString("[0].key");
+    String returnedKey2 = from(content).getString("[1].key");
+
+    assertThat(returnedKey1).isEqualTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    assertThat(returnedKey2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY);
+  }
+
+  @Test
   public void testProcessDefinitionWithoutTenantId() {
     Response response = given()
       .queryParam("withoutTenantId", true)

@@ -29,7 +29,7 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
 
     if (configuration.isImmediatelyDue()
         || (HistoryCleanupHelper.isBatchWindowConfigured(commandContext)
-            && HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) ) {
+            && HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration())) ) {
       //find data to delete
       final HistoryCleanupBatch nextBatch = HistoryCleanupHelper.getNextBatch(commandContext, configuration);
       if (nextBatch.size() >= getBatchSizeThreshold(commandContext)) {
@@ -47,10 +47,10 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
           nextBatch.performCleanup();
         }
         //not enough data for cleanup was found
-        if (HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) {
+        if (HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration())) {
           //reschedule after some delay
           Date nextRunDate = configuration.getNextRunWithDelay(ClockUtil.getCurrentTime());
-          if (HistoryCleanupHelper.isWithinBatchWindow(nextRunDate, commandContext)) {
+          if (HistoryCleanupHelper.isWithinBatchWindow(nextRunDate, commandContext.getProcessEngineConfiguration())) {
             commandContext.getJobManager().reschedule(jobEntity, nextRunDate);
             rescheduled = true;
             incrementCountEmptyRuns(configuration, jobEntity);
@@ -70,7 +70,8 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
   }
 
   private void rescheduleRegularCall(CommandContext commandContext, JobEntity jobEntity) {
-    commandContext.getJobManager().reschedule(jobEntity, HistoryCleanupHelper.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext));
+    commandContext.getJobManager().reschedule(jobEntity, commandContext.getProcessEngineConfiguration().getBatchWindowManager()
+      .getNextBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration()).getStart());
   }
 
   private void suspendJob(JobEntity jobEntity) {

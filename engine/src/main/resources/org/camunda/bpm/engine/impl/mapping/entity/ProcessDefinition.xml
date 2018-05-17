@@ -229,6 +229,13 @@
           #{item}
         </foreach>
       </if>
+      <if test="keys != null &amp;&amp; keys.length > 0">
+        and RES.KEY_ in
+        <foreach item="item" index="index" collection="keys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="category != null">
         and RES.CATEGORY_ = #{category}
       </if>

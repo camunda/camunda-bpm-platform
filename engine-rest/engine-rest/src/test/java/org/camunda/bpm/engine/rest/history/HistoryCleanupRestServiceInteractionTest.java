@@ -15,11 +15,13 @@ package org.camunda.bpm.engine.rest.history;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.DefaultBatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
+import org.camunda.bpm.engine.rest.util.DateTimeUtils;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.Job;
 import org.junit.Before;
@@ -149,8 +151,9 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Date startDate = HistoryCleanupHelper.parseTimeConfiguration("23:59+0200");
     Date endDate = HistoryCleanupHelper.parseTimeConfiguration("00:00+0200");
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn("23:59+0200");
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn("00:00+0200");
+    when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
 
     SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
     Date now = sdf.parse("2017-09-01T22:00:00.000+0200");
@@ -159,10 +162,10 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Calendar today = Calendar.getInstance();
     today.setTime(now);
     Calendar tomorrow = Calendar.getInstance();
-    tomorrow.setTime(HistoryCleanupHelper.addDays(now, 1));
+    tomorrow.setTime(DateTimeUtils.addDays(now, 1));
 
-    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), startDate);
-    Date dateTomorrow = HistoryCleanupHelper.updateTime(tomorrow.getTime(), endDate);
+    Date dateToday = DateTimeUtils.updateTime(today.getTime(), startDate);
+    Date dateTomorrow = DateTimeUtils.updateTime(tomorrow.getTime(), endDate);
 
     given()
       .contentType(ContentType.JSON)
@@ -173,8 +176,6 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     .when()
       .get(CONFIGURATION_URL);
 
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
   @Test
@@ -183,8 +184,9 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Date startDate = HistoryCleanupHelper.parseTimeConfiguration("22:00+0200");
     Date endDate = HistoryCleanupHelper.parseTimeConfiguration("23:00+0200");
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn("22:00+0200");
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn("23:00+0200");
+    when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
 
     SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
     Date now = sdf.parse("2017-09-01T22:00:00.000+0200");
@@ -193,8 +195,8 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Calendar today = Calendar.getInstance();
     today.setTime(now);
 
-    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), startDate);
-    Date dateTomorrow = HistoryCleanupHelper.updateTime(today.getTime(), endDate);
+    Date dateToday = DateTimeUtils.updateTime(today.getTime(), startDate);
+    Date dateTomorrow = DateTimeUtils.updateTime(today.getTime(), endDate);
 
     given()
       .contentType(ContentType.JSON)
@@ -205,16 +207,15 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     .when()
       .get(CONFIGURATION_URL);
 
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
   @Test
   public void testHistoryConfigurationWhenBatchNotDefined() {
     ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(null);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(null);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn(null);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn(null);
+    when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
 
     given()
       .contentType(ContentType.JSON)
@@ -225,8 +226,6 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     .when()
       .get(CONFIGURATION_URL);
 
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
 }

@@ -447,6 +447,18 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
     assertThat(variableInstance.getTenantId(), is(TENANT_ID));
   }
 
+  public void testPropagateTenantIdToTaskOnCreateCaseInstance() {
+    deploymentForTenant(TENANT_ID, CMMN_FILE);
+
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+    caseService.createCaseInstanceById(caseDefinition.getId());
+
+    Task task = taskService.createTaskQuery().taskName("A HumanTask").singleResult();
+    assertThat(task, is(notNullValue()));
+    // inherit the tenant id from case instance
+    assertThat(task.getTenantId(), is(TENANT_ID));
+  }
+
   public static class SetVariableTask implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {

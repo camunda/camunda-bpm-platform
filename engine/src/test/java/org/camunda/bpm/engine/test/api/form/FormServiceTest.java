@@ -1206,6 +1206,24 @@ public class FormServiceTest {
     assertEquals(deployedStartFormAsString, fileAsString);
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedFormsCase.cmmn11.xml",
+    "org/camunda/bpm/engine/test/api/form/task.form" })
+  @Test
+  public void testGetDeployedTaskForm_Case() {
+    // given
+    caseService.createCaseInstanceByKey("Case_1");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    InputStream deployedTaskForm = formService.getDeployedTaskForm(taskId);
+
+    // then
+    assertNotNull(deployedTaskForm);
+    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/task.form");
+    String deployedStartFormAsString = IoUtil.inputStreamAsString(deployedTaskForm);
+    assertEquals(deployedStartFormAsString, fileAsString);
+  }
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/EmbeddedDeployedFormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/start.form",
       "org/camunda/bpm/engine/test/api/form/task.form" })

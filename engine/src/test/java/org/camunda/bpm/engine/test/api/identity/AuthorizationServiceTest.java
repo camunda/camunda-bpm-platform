@@ -23,6 +23,8 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.NONE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Resources.DASHBOARD;
+import static org.camunda.bpm.engine.authorization.Resources.REPORT;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,10 +40,9 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.slf4j.Logger;
+import org.camunda.bpm.engine.test.api.authorization.MyResourceAuthorizationProvider;
 
 /**
  * @author Daniel Meyer
@@ -49,7 +50,8 @@ import org.slf4j.Logger;
  */
 public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  protected String userId = "test";
+  protected String groupId = "accounting";
 
   @Override
   protected void tearDown() throws Exception {
@@ -642,6 +644,32 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       executorService.awaitTermination(10, TimeUnit.SECONDS);
     }
 
+  }
+
+  public void testReportResourceAuthorization() {
+    MyResourceAuthorizationProvider.clearProperties();
+
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId(userId);
+    authorization.addPermission(ALL);
+    authorization.setResource(REPORT);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, REPORT));
+  }
+
+  public void testDashboardResourceAuthorization() {
+    MyResourceAuthorizationProvider.clearProperties();
+
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId(userId);
+    authorization.addPermission(ALL);
+    authorization.setResource(DASHBOARD);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, DASHBOARD));
   }
 
   protected void cleanupAfterTest() {
