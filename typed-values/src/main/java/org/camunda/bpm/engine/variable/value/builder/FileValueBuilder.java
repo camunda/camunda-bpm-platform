@@ -28,7 +28,7 @@ public interface FileValueBuilder extends TypedValueBuilder<FileValue> {
   /**
    * Saves the MIME type of a file in the value infos.
    *
-   * @param type
+   * @param mimeType
    *          the MIME type as string
    */
   FileValueBuilder mimeType(String mimeType);
