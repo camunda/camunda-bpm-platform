@@ -231,10 +231,10 @@
         RES.ID_ = #{variableId}
       </if>
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="caseInstanceId != null">
-        RES.CASE_INST_ID_ = #{caseInstanceId}
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}

@@ -1558,8 +1558,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
     String caseInstanceId = caseInstance.getId();
 
-    String humanTask = caseService
-        .createCaseExecutionQuery()
+    caseService.createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
@@ -1567,6 +1566,9 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
     caseService.setVariable(caseInstanceId, "aVariable", "aValue");
     taskService.setVariableLocal(taskId, "aLocalVariable", "anotherValue");
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().caseInstanceIdIn(caseInstanceId).variableName("aVariable").singleResult();
+    assertNotNull(variable);
 
     // when (1)
     HistoricVariableInstance instance = historyService
@@ -1576,14 +1578,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
         .singleResult();
 
     // then (1)
-    assertNotNull(instance.getCaseDefinitionKey());
-    assertEquals(key, instance.getCaseDefinitionKey());
-
-    assertNotNull(instance.getCaseDefinitionId());
-    assertEquals(caseInstance.getCaseDefinitionId(), instance.getCaseDefinitionId());
-
-    assertNull(instance.getProcessDefinitionKey());
-    assertNull(instance.getProcessDefinitionId());
+    assertCaseVariable(key, caseInstance, instance);
 
     // when (2)
     instance = historyService
@@ -1593,6 +1588,21 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
         .singleResult();
 
     // then (2)
+    assertCaseVariable(key, caseInstance, instance);
+
+    // when (3)
+    instance = historyService
+        .createHistoricVariableInstanceQuery()
+        .caseInstanceId(caseInstanceId)
+        .variableId(variable.getId())
+        .singleResult();
+
+    // then (4)
+    assertNotNull(instance);
+    assertCaseVariable(key, caseInstance, instance);
+  }
+
+  protected void assertCaseVariable(String key, CaseInstance caseInstance, HistoricVariableInstance instance) {
     assertNotNull(instance.getCaseDefinitionKey());
     assertEquals(key, instance.getCaseDefinitionKey());
 
@@ -2302,5 +2312,25 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(variable);
     assertEquals("initial", variable.getName());
     assertEquals("foo", variable.getValue());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByProcessInstanceIdAndVariableId() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables().putValue("initial", "bar"));
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("initial").singleResult();
+    assertNotNull(variable);
+
+    // when
+    HistoricVariableInstance historyVariable = historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .variableId(variable.getId())
+        .singleResult();
+
+    // then
+    assertNotNull(historyVariable);
+    assertEquals("initial", historyVariable.getName());
+    assertEquals("bar", historyVariable.getValue());
   }
 }
