@@ -4470,7 +4470,7 @@ public class BpmnParse extends Parse {
   protected boolean checkActivityInputOutputSupported(Element activityElement, ActivityImpl activity, IoMapping inputOutput) {
     String tagName = activityElement.getTagName();
 
-    if (!(tagName.toLowerCase().contains("Task")
+    if (!(tagName.toLowerCase().contains("task")
         || tagName.contains("Event")
         || tagName.equals("transaction")
         || tagName.equals("subProcess")
