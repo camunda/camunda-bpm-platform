@@ -69,6 +69,7 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -120,6 +121,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
@@ -908,6 +910,26 @@ public class TaskRestServiceInteractionTest extends
     .when()
       .post(SUBMIT_FORM_URL);
   }
+
+  @Test
+  public void testSubmitTaskFormThrowsFormFieldValidationException() {
+    String message = "expected exception";
+    doThrow(new FormFieldValidationException("form-exception", message)).when(formServiceMock).submitTaskForm(anyString(), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot submit task form " + EXAMPLE_TASK_ID + ": " + message))
+    .when()
+      .post(SUBMIT_FORM_URL);
+  }
+
 
   @Test
   public void testGetTaskFormVariables() {

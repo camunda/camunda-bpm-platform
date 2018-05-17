@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -121,6 +122,10 @@ public class TaskResourceImpl implements TaskResource {
 
     } catch (AuthorizationException e) {
       throw e;
+    
+    } catch (FormFieldValidationException e) {
+      String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
