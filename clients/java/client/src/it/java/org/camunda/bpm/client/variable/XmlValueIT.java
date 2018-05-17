@@ -257,7 +257,6 @@ public class XmlValueIT {
   }
 
   @Test
-  @Ignore("CAM-9000")
   public void shoudSetTransientVariable() {
     // given
     BpmnModelInstance process = createProcessWithExclusiveGateway(PROCESS_KEY_2, "${XML(" + VARIABLE_NAME_XML + ").attr('attrName').value() == 'attrValue'}");

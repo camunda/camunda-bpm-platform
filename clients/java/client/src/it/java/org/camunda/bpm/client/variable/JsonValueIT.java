@@ -258,7 +258,6 @@ public class JsonValueIT {
   }
 
   @Test
-  @Ignore("CAM-9000")
   public void shoudSetTransientVariable() {
     // given
     BpmnModelInstance process = createProcessWithExclusiveGateway(PROCESS_KEY_2, "${S(" + VARIABLE_NAME_JSON + ").prop(\"foo\").stringValue() == \"bar\"}");
