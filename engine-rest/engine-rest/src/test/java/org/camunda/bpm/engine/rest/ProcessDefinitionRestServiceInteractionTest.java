@@ -807,6 +807,23 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
+  public void testSubmitFormByIdThrowsFormFieldValidationExceptionWithJsonMessage() {
+    String message = "{\"somekey\":\"somevalue\"}";
+    doThrow(new FormFieldValidationException("json-validation", message)).when(formServiceMock).submitStartForm(any(String.class), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SUBMIT_FORM_URL);
+  }
+
+  @Test
   public void testGetStartFormVariables() {
 
     given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
@@ -3057,6 +3074,25 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .when()
       .post(SUBMIT_FORM_BY_KEY_URL);
   }
+
+  @Test
+  public void testSubmitFormByKeyThrowsFormFieldValidationExceptionWithJsonMessage() {
+    String message = "{\"somekey\":\"somevalue\"}";
+    doThrow(new FormFieldValidationException("json-validation", message)).when(formServiceMock).submitStartForm(any(String.class), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SUBMIT_FORM_BY_KEY_URL);
+  }
+
+
 
   @Test
   public void testSimpleProcessInstantiation_ByKey() {
