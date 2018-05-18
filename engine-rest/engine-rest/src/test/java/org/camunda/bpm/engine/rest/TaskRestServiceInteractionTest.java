@@ -930,6 +930,25 @@ public class TaskRestServiceInteractionTest extends
       .post(SUBMIT_FORM_URL);
   }
 
+  @Test
+  public void testSubmitTaskFormThrowsFormFieldValidationExceptionWithJsonMessage() {
+    String message = "{\"somekey\":\"somevalue\"}";
+    doThrow(new FormFieldValidationException("json-validation", message)).when(formServiceMock).submitTaskForm(anyString(), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SUBMIT_FORM_URL);
+  }
+
 
   @Test
   public void testGetTaskFormVariables() {
