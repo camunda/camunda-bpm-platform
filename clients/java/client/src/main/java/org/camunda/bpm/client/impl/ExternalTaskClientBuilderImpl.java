@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
-import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
@@ -41,10 +41,10 @@ import org.camunda.bpm.client.variable.impl.mapper.DateValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.DoubleValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.FileValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.IntegerValueMapper;
-import org.camunda.bpm.client.variable.impl.mapper.ObjectValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.JsonValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.LongValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.NullValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.ObjectValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.ShortValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.StringValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.XmlValueMapper;
@@ -163,8 +163,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     initBaseUrl();
     initWorkerId();
     initObjectMapper();
-    initVariableMappers();
     initEngineClient();
+    initVariableMappers();
     initTopicSubscriptionManager();
 
     return new ExternalTaskClientImpl(topicSubscriptionManager);
@@ -209,6 +209,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   protected void initVariableMappers() {
     valueMappers = new DefaultValueMappers(defaultSerializationFormat);
 
@@ -235,15 +236,16 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     valueMappers.addMapper(new XmlValueMapper());
 
     // file
-    valueMappers.addMapper(new FileValueMapper());
+    valueMappers.addMapper(new FileValueMapper(engineClient));
 
     typedValues = new TypedValues(valueMappers);
+    engineClient.setTypedValues(typedValues);
   }
 
   protected void initEngineClient() {
     RequestInterceptorHandler requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
     RequestExecutor requestExecutor = new RequestExecutor(requestInterceptorHandler, objectMapper);
-    engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestExecutor, typedValues);
+    engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestExecutor);
   }
 
   protected void initTopicSubscriptionManager() {

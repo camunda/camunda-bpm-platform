@@ -12,31 +12,35 @@
  */
 package org.camunda.bpm.client.variable.impl.mapper;
 
-import org.apache.commons.codec.binary.Base64;
-import org.camunda.bpm.client.variable.impl.AbstractTypedValueMapper;
-import org.camunda.bpm.client.variable.impl.TypedValueField;
-import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
-import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
-import org.camunda.bpm.engine.variable.value.FileValue;
-import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.camunda.bpm.engine.variable.type.FileValueType.VALUE_INFO_FILE_ENCODING;
 import static org.camunda.bpm.engine.variable.type.FileValueType.VALUE_INFO_FILE_MIME_TYPE;
 import static org.camunda.bpm.engine.variable.type.FileValueType.VALUE_INFO_FILE_NAME;
 import static org.camunda.bpm.engine.variable.type.ValueType.FILE;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.codec.binary.Base64;
+import org.camunda.bpm.client.impl.EngineClient;
+import org.camunda.bpm.client.variable.impl.AbstractTypedValueMapper;
+import org.camunda.bpm.client.variable.impl.TypedValueField;
+import org.camunda.bpm.client.variable.impl.value.DeferredFileValueImpl;
+import org.camunda.bpm.client.variable.value.DeferredFileValue;
+import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.value.FileValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Tassilo Weidner
  */
 public class FileValueMapper extends AbstractTypedValueMapper<FileValue> {
 
-  public FileValueMapper() {
+  protected EngineClient engineClient;
+
+  public FileValueMapper(EngineClient engineClient) {
     super(FILE);
+    this.engineClient = engineClient;
   }
 
   public FileValue convertToTypedValue(UntypedValueImpl untypedValue) {
@@ -46,19 +50,20 @@ public class FileValueMapper extends AbstractTypedValueMapper<FileValue> {
   public FileValue readValue(TypedValueField value, boolean deserializeValue) {
     Map<String, Object> valueInfo = value.getValueInfo();
 
-    FileValueBuilder builder = Variables.fileValue((String) valueInfo.get(VALUE_INFO_FILE_NAME));
+    String filename = (String) valueInfo.get(VALUE_INFO_FILE_NAME);
+    DeferredFileValueImpl fileValue = new DeferredFileValueImpl(filename, engineClient);
 
     String mimeType = (String) valueInfo.get(VALUE_INFO_FILE_MIME_TYPE);
     if (mimeType != null) {
-      builder.mimeType(mimeType);
+      fileValue.setMimeType(mimeType);
     }
 
     String encoding = (String) valueInfo.get(VALUE_INFO_FILE_ENCODING);
     if (encoding != null) {
-      builder.encoding(encoding);
+      fileValue.setEncoding(encoding);
     }
 
-    return builder.create();
+    return fileValue;
   }
 
   public void writeValue(FileValue fileValue, TypedValueField typedValueField) {
@@ -80,6 +85,7 @@ public class FileValueMapper extends AbstractTypedValueMapper<FileValue> {
     if (bytes != null) {
       typedValueField.setValue(Base64.encodeBase64String(bytes));
     }
+
   }
 
   protected boolean canWriteValue(TypedValue typedValue) {
@@ -87,12 +93,16 @@ public class FileValueMapper extends AbstractTypedValueMapper<FileValue> {
       // untyped value
       return false;
     }
-    return typedValue.getType().getName().equals(valueType.getName());
+    return typedValue.getType().getName().equals(valueType.getName()) && !isDeferred(typedValue);
   }
 
   protected boolean canReadValue(TypedValueField typedValueField) {
     Object value = typedValueField.getValue();
     return value == null || value instanceof String;
+  }
+
+  protected boolean isDeferred(Object variableValue) {
+    return variableValue instanceof DeferredFileValue && !((DeferredFileValue) variableValue).isLoaded();
   }
 
 }

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
-import org.camunda.bpm.client.variable.value.DeferredFileValue;
+import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
@@ -47,16 +47,15 @@ public class TypedValues {
           variableValue = variables.get(variableName);
         }
 
-        if (!isDeferred(variableValue)) {
-          try {
-            TypedValue typedValue = createTypedValue(variableValue);
-            TypedValueField typedValueField = toTypedValueField(typedValue);
-            result.put(variableName, typedValueField);
-          }
-          catch (Throwable e) {
-            throw LOG.cannotSerializeVariable(variableName, e);
-          }
+        try {
+          TypedValue typedValue = createTypedValue(variableValue);
+          TypedValueField typedValueField = toTypedValueField(typedValue);
+          result.put(variableName, typedValueField);
         }
+        catch (Throwable e) {
+          throw LOG.cannotSerializeVariable(variableName, e);
+        }
+
       }
 
     }
@@ -64,7 +63,10 @@ public class TypedValues {
     return result;
   }
 
-  public Map<String, VariableValue> wrapVariables(Map<String, TypedValueField> variables) {
+  @SuppressWarnings("rawtypes")
+  public Map<String, VariableValue> wrapVariables(ExternalTask externalTask, Map<String, TypedValueField> variables) {
+    String processInstanceId = externalTask.getProcessInstanceId();
+
     Map<String, VariableValue> result = new HashMap<>();
 
     if (variables != null) {
@@ -74,7 +76,7 @@ public class TypedValues {
         typeName = Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
         variableValue.setType(typeName);
 
-        VariableValue value = new VariableValue(variableValue, serializers);
+        VariableValue value = new VariableValue(processInstanceId, variableName, variableValue, serializers);
         result.put(variableName, value);
       });
     }
@@ -82,7 +84,6 @@ public class TypedValues {
     return result;
   }
 
-  @SuppressWarnings("unchecked")
   protected <T extends TypedValue> TypedValueField toTypedValueField(T typedValue) {
     ValueMapper<T> serializer = findSerializer(typedValue);
 
@@ -104,6 +105,7 @@ public class TypedValues {
     return typedValueField;
   }
 
+  @SuppressWarnings("unchecked")
   protected <T extends TypedValue> ValueMapper<T> findSerializer(T typedValue) {
     return serializers.findMapperForTypedValue(typedValue);
   }
@@ -121,7 +123,4 @@ public class TypedValues {
     return typedValue;
   }
 
-  protected boolean isDeferred(Object variableValue) {
-    return variableValue instanceof DeferredFileValue && !((DeferredFileValue) variableValue).isLoaded();
-  }
 }

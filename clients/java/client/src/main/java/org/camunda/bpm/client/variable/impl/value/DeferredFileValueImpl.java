@@ -12,42 +12,36 @@
  */
 package org.camunda.bpm.client.variable.impl.value;
 
+import java.io.InputStream;
+
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
-import org.camunda.bpm.engine.variable.value.FileValue;
 
 /**
  * @author Tassilo Weidner
  */
 public class DeferredFileValueImpl extends FileValueImpl implements DeferredFileValue {
 
+  private static final long serialVersionUID = 1L;
+
   protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
-  protected boolean isLoaded;
+  protected boolean isLoaded = false;
 
   protected String variableName;
   protected String processInstanceId;
   protected EngineClient engineClient;
 
-  public DeferredFileValueImpl(FileValue fileValue, String variableName, String processInstanceId, EngineClient engineClient) {
-    super(PrimitiveValueType.FILE, fileValue.getFilename());
-
-    setValue(null); // deferred
-    setEncoding(fileValue.getEncoding());
-    setMimeType(fileValue.getMimeType());
-
-    this.isLoaded = false;
-
-    this.variableName = variableName;
-    this.processInstanceId = processInstanceId;
+  public DeferredFileValueImpl(String filename, EngineClient engineClient) {
+    super(PrimitiveValueType.FILE, filename);
     this.engineClient = engineClient;
   }
 
-  public void load() {
+  protected void load() {
     try {
       byte[] bytes = engineClient.getLocalBinaryVariable(variableName, processInstanceId);
       setValue(bytes);
@@ -61,6 +55,28 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
 
   public boolean isLoaded() {
     return isLoaded;
+  }
+
+  @Override
+  public InputStream getValue() {
+    if (!isLoaded()) {
+      load();
+    }
+
+    return super.getValue();
+  }
+
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
+
+  public void setVariableName(String variableName) {
+    this.variableName = variableName;
+  }
+
+  @Override
+  public String toString() {
+    return "DeferredFileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + ", isTransient=" + isTransient + ", isLoaded=" + isLoaded + "]";
   }
 
 }

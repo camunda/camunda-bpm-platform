@@ -54,13 +54,12 @@ public class EngineClient {
   protected RequestExecutor engineInteraction;
   protected TypedValues typedValues;
 
-  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction, TypedValues typedValues) {
+  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction) {
     this.workerId = workerId;
     this.asyncResponseTimeout = asyncResponseTimeout;
     this.maxTasks = maxTasks;
     this.engineInteraction = engineInteraction;
     this.baseUrl = baseUrl;
-    this.typedValues = typedValues;
   }
 
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) throws EngineClientException {
@@ -123,4 +122,7 @@ public class EngineClient {
     return workerId;
   }
 
+  public void setTypedValues(TypedValues typedValues) {
+    this.typedValues = typedValues;
+  }
 }

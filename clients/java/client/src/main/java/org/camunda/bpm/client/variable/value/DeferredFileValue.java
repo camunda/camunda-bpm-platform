@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.client.variable.value;
 
-import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.engine.variable.value.FileValue;
 
 /**
@@ -24,13 +23,6 @@ import org.camunda.bpm.engine.variable.value.FileValue;
  * @author Tassilo Weidner
  */
 public interface DeferredFileValue extends FileValue {
-
-  /**
-   * File value has been loaded on invocation
-   *
-   * @throws ExternalTaskClientException if variable could not be retrieved from the engine
-   */
-  void load();
 
   /**
    * Indicates whether the file value has been loaded

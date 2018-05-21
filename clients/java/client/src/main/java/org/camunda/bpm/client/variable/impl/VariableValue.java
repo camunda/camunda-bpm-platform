@@ -12,24 +12,27 @@
  */
 package org.camunda.bpm.client.variable.impl;
 
+import org.camunda.bpm.client.variable.impl.value.DeferredFileValueImpl;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class VariableValue<T extends TypedValue> {
 
-  protected ValueMappers mappers;
-
+  protected String processInstanceId;
+  protected String variableName;
   protected TypedValueField typedValueField;
+  protected ValueMappers mappers;
 
   protected ValueMapper<T> serializer;
   protected T cachedValue;
 
-  public VariableValue(TypedValueField typedValueField, ValueMappers mappers) {
+  public VariableValue(String processInstanceId, String variableName, TypedValueField typedValueField, ValueMappers mappers) {
+    this.processInstanceId = processInstanceId;
+    this.variableName = variableName;
     this.typedValueField = typedValueField;
     this.mappers = mappers;
   }
 
-  @SuppressWarnings("unchecked")
   public Object getValue() {
     TypedValue typedValue = getTypedValue();
     if (typedValue != null) {
@@ -43,11 +46,6 @@ public class VariableValue<T extends TypedValue> {
     return getTypedValue(true);
   }
 
-  public void setCachedValue(T cachedValue) {
-    this.cachedValue = cachedValue;
-  }
-
-  @SuppressWarnings("unchecked")
   public T getTypedValue(boolean deserializeValue) {
     if (cachedValue != null && cachedValue instanceof SerializableValue) {
       SerializableValue serializableValue = (SerializableValue) cachedValue;
@@ -56,13 +54,20 @@ public class VariableValue<T extends TypedValue> {
       }
     }
 
-    if (cachedValue == null ) {
+    if (cachedValue == null) {
       cachedValue = getSerializer().readValue(typedValueField, deserializeValue);
+
+      if (cachedValue instanceof DeferredFileValueImpl) {
+        DeferredFileValueImpl fileValue = (DeferredFileValueImpl) cachedValue;
+        fileValue.setProcessInstanceId(processInstanceId);
+        fileValue.setVariableName(variableName);
+      }
     }
 
     return cachedValue;
   }
 
+  @SuppressWarnings("unchecked")
   public ValueMapper<T> getSerializer() {
     if (serializer == null) {
       serializer = mappers.findMapperForTypedValueField(typedValueField);

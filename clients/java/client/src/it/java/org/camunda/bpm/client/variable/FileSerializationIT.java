@@ -14,11 +14,29 @@
 
 package org.camunda.bpm.client.variable;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
+import static org.camunda.bpm.client.util.ProcessModels.PROCESS_KEY_2;
+import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_ID;
+import static org.camunda.bpm.client.util.ProcessModels.createProcessWithExclusiveGateway;
+import static org.camunda.bpm.engine.variable.type.ValueType.FILE;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.dto.TaskDto;
 import org.camunda.bpm.client.dto.VariableInstanceDto;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -30,30 +48,13 @@ import org.camunda.bpm.client.variable.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
-import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
-import static org.camunda.bpm.client.util.ProcessModels.PROCESS_KEY_2;
-import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
-import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_ID;
-import static org.camunda.bpm.client.util.ProcessModels.createProcessWithExclusiveGateway;
-import static org.camunda.bpm.engine.variable.type.ValueType.FILE;
 
 public class FileSerializationIT {
 
@@ -66,9 +67,6 @@ public class FileSerializationIT {
   protected static final String ANOTHER_VARIABLE_NAME_FILE = "anotherFileVariable";
   protected static final byte[] ANOTHER_VARIABLE_VALUE_FILE = "DEF".getBytes();
 
-  protected static final FileValueBuilder VARIABLE_BUILDER =
-    Variables.fileValue(VARIABLE_VALUE_FILE_NAME);
-
   protected static final FileValue VARIABLE_VALUE_FILE = Variables
     .fileValue(VARIABLE_VALUE_FILE_NAME)
     .file(VARIABLE_VALUE_FILE_VALUE)
@@ -76,9 +74,10 @@ public class FileSerializationIT {
 
   protected ClientRule clientRule = new ClientRule();
   protected EngineRule engineRule = new EngineRule();
+  protected ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(clientRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(clientRule).around(thrown);
 
   protected ExternalTaskClient client;
 
@@ -121,7 +120,7 @@ public class FileSerializationIT {
     // given
     Map<String, TypedValue> variables = new HashMap<>();
     variables.put(VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
-    variables.put(ANOTHER_VARIABLE_NAME_FILE, VARIABLE_BUILDER.file(ANOTHER_VARIABLE_VALUE_FILE).create());
+    variables.put(ANOTHER_VARIABLE_NAME_FILE, Variables.fileValue(VARIABLE_VALUE_FILE_NAME).file(ANOTHER_VARIABLE_VALUE_FILE).create());
     engineRule.startProcessInstance(processDefinition.getId(), variables);
 
     // when
@@ -157,7 +156,6 @@ public class FileSerializationIT {
 
     // then
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
-    assertThat(typedValue.getValue()).isEqualTo(null);
     assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
     assertThat(typedValue.getType()).isEqualTo(FILE);
     assertThat(typedValue.isLoaded()).isFalse();
@@ -183,7 +181,7 @@ public class FileSerializationIT {
     assertThat(deferredFileValue.isLoaded()).isFalse();
 
     // when
-    deferredFileValue.load();
+    deferredFileValue.getValue();
 
     // then
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
@@ -291,7 +289,6 @@ public class FileSerializationIT {
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
 
     assertThat(typedValue.isLoaded()).isFalse();
-    assertThat(typedValue.getValue()).isNull();
     assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
     assertThat(typedValue.getType()).isEqualTo(FILE);
     assertThat(typedValue.getEncoding()).isEqualTo(VARIABLE_VALUE_FILE_ENCODING);
@@ -333,7 +330,6 @@ public class FileSerializationIT {
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
 
     assertThat(typedValue.isLoaded()).isFalse();
-    assertThat(typedValue.getValue()).isNull();
     assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
     assertThat(typedValue.getType()).isEqualTo(FILE);
     assertThat(typedValue.getEncoding()).isNull();
@@ -370,7 +366,7 @@ public class FileSerializationIT {
     // assume
     assertThat(deferredFileValue.isLoaded()).isFalse();
 
-    deferredFileValue.load();
+    deferredFileValue.getValue();
 
     // then
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
@@ -404,7 +400,7 @@ public class FileSerializationIT {
       .open();
 
     // when
-    FileValue fileValue = VARIABLE_BUILDER.file(new ByteArrayInputStream(VARIABLE_VALUE_FILE_VALUE)).create();
+    FileValue fileValue = Variables.fileValue(VARIABLE_VALUE_FILE_NAME).file(new ByteArrayInputStream(VARIABLE_VALUE_FILE_VALUE)).create();
     fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, fileValue));
 
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -415,7 +411,7 @@ public class FileSerializationIT {
     // assume
     assertThat(deferredFileValue.isLoaded()).isFalse();
 
-    deferredFileValue.load();
+    deferredFileValue.getValue();
 
     // then
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
@@ -449,7 +445,7 @@ public class FileSerializationIT {
       .open();
 
     // when
-    FileValue fileValue = VARIABLE_BUILDER.file(new File("src/it/resources/aFileName.txt")).create();
+    FileValue fileValue = Variables.fileValue(VARIABLE_VALUE_FILE_NAME).file(new File("src/it/resources/aFileName.txt")).create();
     fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, fileValue));
 
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -460,7 +456,7 @@ public class FileSerializationIT {
     // assume
     assertThat(deferredFileValue.isLoaded()).isFalse();
 
-    deferredFileValue.load();
+    deferredFileValue.getValue();
 
     // then
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
@@ -475,7 +471,7 @@ public class FileSerializationIT {
   }
 
   @Test
-  public void shouldNotSet_DeferredFileValue() {
+  public void shouldFailWhenCompletingWihtDeferredFileValue() {
     // given
     ProcessInstanceDto processInstance = engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_FILE, VARIABLE_VALUE_FILE);
 
@@ -492,6 +488,9 @@ public class FileSerializationIT {
     client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
       .handler(handler)
       .open();
+
+    // then
+    thrown.expect(ValueMapperException.class);
 
     // when
     Map<String, Object> variables = new HashMap<>();
@@ -536,7 +535,7 @@ public class FileSerializationIT {
     // when
     Map<String, Object> variables = new HashMap<>();
     DeferredFileValue deferredFileValue = fooTask.getVariableTyped(VARIABLE_NAME_FILE);
-    deferredFileValue.load();
+    deferredFileValue.getValue();
     variables.put("deferredFile", deferredFileValue);
     variables.put(ANOTHER_VARIABLE_NAME_FILE, ANOTHER_VARIABLE_VALUE_FILE);
     fooService.complete(fooTask, variables);
@@ -563,22 +562,25 @@ public class FileSerializationIT {
     ProcessDefinitionDto definition = engineRule.deploy(process).get(0);
     ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
 
-    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
-      client.complete(task, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, VARIABLE_BUILDER.setTransient(true).create()));
-    });
-
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
+      .handler(invocationHandler)
       .open();
 
     // then
-    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
 
-    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
-    assertThat(task).isNotNull();
-    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
-    assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    FileValue transientFileValue = Variables.fileValue(VARIABLE_VALUE_FILE_NAME).file(new File("src/it/resources/aFileName.txt")).setTransient(true).create();
+    fooService.complete(fooTask, Variables.createVariables().putValueTyped(VARIABLE_NAME_FILE, transientFileValue));
+
+    TaskDto nextTask = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(nextTask).isNotNull();
+    assertThat(nextTask.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(nextTask.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
 
     List<VariableInstanceDto> variables = engineRule.getVariablesByProcessInstanceIdAndVariableName(processInstance.getId(), VARIABLE_NAME_FILE);
     assertThat(variables).isEmpty();

@@ -31,12 +31,12 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
+import org.camunda.commons.utils.IoUtil;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.commons.utils.IoUtil;
 
 /**
  * @author Tassilo Weidner
@@ -98,6 +98,7 @@ public class RequestExecutor {
 
   protected <T> ResponseHandler<T> handleResponse(final Class<T> responseClass) {
     return new AbstractResponseHandler<T>() {
+      @SuppressWarnings("unchecked")
       public T handleEntity(HttpEntity responseEntity) throws IOException {
         T response = null;
         if (responseClass.isAssignableFrom(byte[].class)) {
