@@ -21,7 +21,6 @@
     <version.httpclient>4.5.5</version.httpclient>
     <version.jackson>2.9.5</version.jackson>
 
-    <version.plugin.license>1.14</version.plugin.license>
     <version.plugin.surefire>2.16</version.plugin.surefire>
     <version.plugin.failsafe>2.20</version.plugin.failsafe>
     <version.plugin.helper>3.0.0</version.plugin.helper>
@@ -124,13 +123,6 @@
 
   <build>
     <plugins>
-
-      <!-- LICENSE PLUGIN -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${version.plugin.license}</version>
-      </plugin>
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
