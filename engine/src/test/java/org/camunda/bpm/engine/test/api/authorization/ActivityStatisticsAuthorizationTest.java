@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
+import java.util.List;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
@@ -23,6 +26,10 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -180,6 +187,36 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNull(statistics);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
+  public void testManyInstancesManyAuthorizationsActivityStatisticsQuery() {
+
+    startProcessAndExecuteJob("ExampleProcess");
+    startProcessAndExecuteJob("ExampleProcess");
+    startProcessAndExecuteJob("ExampleProcess");
+
+    createGrantAuthorization(PROCESS_DEFINITION, "ExampleProcess", userId, READ, READ_INSTANCE);
+    createGrantAuthorizationGroup(PROCESS_DEFINITION, "ExampleProcess", groupId, READ, READ_INSTANCE);
+
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
+      .processDefinitionKey("ExampleProcess").singleResult();
+
+    List<ActivityStatistics> statistics =
+      managementService
+        .createActivityStatisticsQuery(definition.getId())
+        .includeFailedJobs()
+        .includeIncidents()
+        .list();
+
+    Assert.assertEquals(1, statistics.size());
+
+    ActivityStatistics activityResult = statistics.get(0);
+    Assert.assertEquals(3, activityResult.getInstances());
+    Assert.assertEquals("theTask", activityResult.getId());
+    Assert.assertEquals(0, activityResult.getFailedJobs());
+    assertTrue(activityResult.getIncidentStatistics().isEmpty());
   }
 
   public void testQueryIncludingFailedJobsWithReadPermissionOnOneProcessInstance() {
