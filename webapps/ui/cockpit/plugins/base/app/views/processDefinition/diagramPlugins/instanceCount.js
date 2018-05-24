@@ -2,23 +2,63 @@
 
 var instanceCount = require('../../common/diagramPlugins/instanceCount');
 
+var fs = require('fs');
+var template = fs.readFileSync(__dirname + '/overlayAction.html', 'utf8');
+
 module.exports = ['ViewsProvider',  function(ViewsProvider) {
-  ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.plugin', {
+  ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.action', {
     id: 'activity-instance-statistics-overlay',
-    overlay: [
-      '$scope', 'control', 'processData', 'processDiagram', 'Loaders', 'get', '$filter', '$rootScope', '$translate',
-      function($scope, control, processData, processDiagram, Loaders, get, $filter, $rootScope, $translate) {
-        var callbacks = {
-          observe: observe,
-          getData: getInstancesCountsForElement,
-          updateOverlayNodes: updateOverlayNodes,
-          isActive: isActive
+    template:template,
+    controller: [
+      '$scope', 'Loaders', 'get','$filter', '$rootScope', '$translate','configuration',
+      function($scope, Loaders, get, $filter, $rootScope, $translate, configuration
+      ) {
+
+        $scope.toggle = configuration.getRuntimeActivityInstanceMetrics();
+        $scope.isLoading = false;
+
+        showOverlays();
+        $scope.toggleOverlay = function() {
+          $scope.toggle = !$scope.toggle;
+          if($scope.toggle) {
+            showOverlays();
+          } else {
+            removeOverlays();
+          }
         };
 
-        instanceCount($scope, control, processData, processDiagram, Loaders, $rootScope, callbacks);
+        function toggleIsLoading() {
+          $scope.isLoading = !$scope.isLoading;
+        }
+
+        function showOverlays() {
+          $scope.isLoading = true;
+
+          var callbacks = {
+            observe: observe,
+            getData: getInstancesCountsForElement,
+            updateOverlayNodes: updateOverlayNodes,
+            isActive: isActive,
+            toggleIsLoading: toggleIsLoading
+          };
+
+          if(!$scope.processDiagram) {
+            $scope.processData.observe('processDiagram', function(processDiagram) {
+              $scope.processDiagram = processDiagram;
+              instanceCount($scope, $scope.viewer, $scope.processData, $scope.processDiagram, Loaders, $rootScope, callbacks);
+            });
+          } else {
+            instanceCount($scope, $scope.viewer, $scope.processData, $scope.processDiagram, Loaders, $rootScope, callbacks);
+          }
+        }
+
+        function removeOverlays() {
+          Array.from(document.getElementsByClassName('djs-overlay')).forEach( function(element) { element.remove(); });
+        }
+
 
         function observe(callback) {
-          processData.observe(['activityInstanceStatistics'], function(activityInstanceStatistics) {
+          $scope.processData.observe(['activityInstanceStatistics'], function(activityInstanceStatistics) {
             callback([activityInstanceStatistics]);
           });
         }

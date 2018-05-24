@@ -6,7 +6,7 @@ var angular = require('angular');
 var template = fs.readFileSync(__dirname + '/instanceCount.html', 'utf8');
 
 module.exports = function($scope, control, processData, processDiagram, Loaders, $rootScope, callbacks) {
-  var viewer = control.getViewer();
+  var viewer = callbacks.toggleIsLoading ? control : control.getViewer();
   var overlays = viewer.get('overlays');
   var elementRegistry = viewer.get('elementRegistry');
   var stopLoading = Loaders.startLoading();
@@ -46,7 +46,7 @@ module.exports = function($scope, control, processData, processDiagram, Loaders,
         callbacks.updateOverlayNodes(overlaysNodes[element.id], data);
       }
     });
-
+    callbacks.toggleIsLoading && callbacks.toggleIsLoading();
     $rootScope.$broadcast('cockpit.plugin.base.views:diagram-plugins:instance-plugin-loaded');
   });
 

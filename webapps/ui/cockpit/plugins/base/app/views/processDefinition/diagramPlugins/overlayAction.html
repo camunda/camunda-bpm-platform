@@ -1,0 +1,11 @@
+<a
+  class="overlay-link"
+  ng-click="toggleOverlay()"
+  ng-disabled="isLoading"
+  tooltip="Toggle Activity Instance Statistics"
+  tooltip-placement="bottom">
+  Activity Instance Statistics:
+  <span ng-if="toggle && !isLoading">on <input type="radio" checked="" class="toggle" ></span>
+  <span ng-if="!toggle && !isLoading">off <input type="radio" class="toggle"> </span>
+  <span ng-if="isLoading">loading...</span>
+</a>

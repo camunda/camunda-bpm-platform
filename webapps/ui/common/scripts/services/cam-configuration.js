@@ -19,6 +19,9 @@ var defaultConfig = {
     'default': true,
     'hidden': false
   },
+  'runtimeActivityInstanceMetrics': {
+    'display': true
+  },
   'historicActivityInstanceMetrics': {
     'adjustablePeriod': true,
     'period': {
@@ -77,6 +80,12 @@ module.exports = function(config, app) {
 
     this.getSkipCustomListeners = function() {
       return angular.extend({}, defaultConfig.skipCustomListeners, config.skipCustomListeners);
+    };
+
+    this.getRuntimeActivityInstanceMetrics = function() {
+      var param = 'runtimeActivityInstanceMetrics';
+      return config[param] && config[param].display ?
+        config[param].display : defaultConfig[param].display;
     };
 
     this.getActivityInstancePeriod = function() {
