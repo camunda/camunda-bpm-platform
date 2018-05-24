@@ -51,7 +51,7 @@ module.exports = function(config, app) {
     };
 
     this.getFallbackLocale = function() {
-      if(config.locales && config.locales.fallbackLocale) {
+      if (config.locales && config.locales.fallbackLocale) {
         return config.locales.fallbackLocale;
       } else {
         return defaultConfig.locales.fallbackLocale;
@@ -59,7 +59,7 @@ module.exports = function(config, app) {
     };
 
     this.getAvailableLocales = function() {
-      if(config.locales && config.locales.availableLocales) {
+      if (config.locales && config.locales.availableLocales) {
         return config.locales.availableLocales;
       } else {
         return defaultConfig.locales.availableLocales;
@@ -89,17 +89,15 @@ module.exports = function(config, app) {
     };
 
     this.getActivityInstancePeriod = function() {
-      return config.historicActivityInstanceMetrics &&
-      config.historicActivityInstanceMetrics.period?
-        config.historicActivityInstanceMetrics.period:
-        defaultConfig.historicActivityInstanceMetrics.period;
+      var param = 'historicActivityInstanceMetrics';
+      return config[param] && config[param].period ?
+        config[param].period: defaultConfig[param].period;
     };
 
     this.getActivityInstanceAdjustable = function() {
-      return  config.historicActivityInstanceMetrics &&
-      config.historicActivityInstanceMetrics.adjustablePeriod?
-        config.historicActivityInstanceMetrics.adjustablePeriod:
-        defaultConfig.historicActivityInstanceMetrics.adjustablePeriod;
+      var param = 'historicActivityInstanceMetrics';
+      return  config[param] && config[param].adjustablePeriod ?
+        config[param].adjustablePeriod : defaultConfig[param].adjustablePeriod;
     };
 
     this.$get = function() {
