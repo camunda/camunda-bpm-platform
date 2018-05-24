@@ -360,11 +360,11 @@ var Controller = [
 
     // INITIALIZE PLUGINS
     var processPlugins = (
-        Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' })).concat(
-        Views.getProviders({ component: 'cockpit.processDefinition.runtime.action' })).concat(
-        Views.getProviders({ component: 'cockpit.processDefinition.view' })).concat(
-        Views.getProviders({ component: 'cockpit.processDefinition.diagram.overlay' })).concat(
-        Views.getProviders({ component: 'cockpit.jobDefinition.action' }));
+      Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' })).concat(
+      Views.getProviders({ component: 'cockpit.processDefinition.runtime.action' })).concat(
+      Views.getProviders({ component: 'cockpit.processDefinition.view' })).concat(
+      Views.getProviders({ component: 'cockpit.processDefinition.diagram.overlay' })).concat(
+      Views.getProviders({ component: 'cockpit.jobDefinition.action' }));
 
     var initData = {
       processDefinition : processDefinition,
@@ -463,27 +463,27 @@ var RouteConfig = [
   ) {
 
     $routeProvider
-    .when('/process-definition/:id', {
-      redirectTo: routeUtil.redirectToRuntime
-    })
-    .when('/process-definition/:id/runtime', {
-      template: template,
+      .when('/process-definition/:id', {
+        redirectTo: routeUtil.redirectToRuntime
+      })
+      .when('/process-definition/:id/runtime', {
+        template: template,
 
-      controller: Controller,
-      authentication: 'required',
-      resolve: {
-        processDefinition: [ 'ResourceResolver', 'ProcessDefinitionResource',
-          function(ResourceResolver, ProcessDefinitionResource) {
-            return ResourceResolver.getByRouteParam('id', {
-              name: 'process definition',
-              resolve: function(id) {
-                return ProcessDefinitionResource.get({ id : id });
-              }
-            });
-          }]
-      },
-      reloadOnSearch: false
-    });
+        controller: Controller,
+        authentication: 'required',
+        resolve: {
+          processDefinition: [ 'ResourceResolver', 'ProcessDefinitionResource',
+            function(ResourceResolver, ProcessDefinitionResource) {
+              return ResourceResolver.getByRouteParam('id', {
+                name: 'process definition',
+                resolve: function(id) {
+                  return ProcessDefinitionResource.get({ id : id });
+                }
+              });
+            }]
+        },
+        reloadOnSearch: false
+      });
   }];
 
 var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
@@ -503,7 +503,7 @@ var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
 }];
 
 ngModule
-    .config(RouteConfig)
-    .config(ViewConfig);
+  .config(RouteConfig)
+  .config(ViewConfig);
 
 module.exports = ngModule;
