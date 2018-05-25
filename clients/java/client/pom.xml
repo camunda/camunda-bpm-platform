@@ -14,9 +14,9 @@
   </parent>
 
   <properties>
-    <version.camunda.platform>7.9.0</version.camunda.platform>
-    <version.camunda.commons>1.5.0</version.camunda.commons>
-    <version.camunda.spin>1.5.0</version.camunda.spin>
+    <!--<version.camunda.platform>7.9.0</version.camunda.platform>-->
+    <!--<version.camunda.commons>1.5.0</version.camunda.commons>-->
+    <!--<version.camunda.spin>1.5.1</version.camunda.spin>-->
 
     <version.httpclient>4.5.5</version.httpclient>
     <version.jackson>2.9.5</version.jackson>
@@ -39,13 +39,13 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <version>${version.camunda.commons}</version>
+      <!--<version>${version.camunda.commons}</version>-->
     </dependency>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
-      <version>${version.camunda.commons}</version>
+      <!--<version>${version.camunda.commons}</version>-->
     </dependency>
 
     <dependency>
@@ -86,7 +86,7 @@
     <dependency>
       <groupId>org.camunda.bpm.model</groupId>
       <artifactId>camunda-bpmn-model</artifactId>
-      <version>${version.camunda.platform}</version>
+      <!--<version>${version.camunda.platform}</version>-->
       <scope>test</scope>
     </dependency>
 
@@ -107,7 +107,6 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-all</artifactId>
-      <version>${version.camunda.spin}</version>
       <scope>test</scope>
     </dependency>
 
@@ -206,7 +205,7 @@
         <dependency>
           <groupId>org.camunda.bpm.tomcat</groupId>
           <artifactId>camunda-tomcat-assembly</artifactId>
-          <version>${version.camunda.platform}</version>
+          <version>${camunda.version}</version>
           <type>tar.gz</type>
           <scope>test</scope>
           <exclusions>
@@ -220,7 +219,7 @@
         <dependency>
           <groupId>org.camunda.bpm.webapp</groupId>
           <artifactId>camunda-webapp-tomcat</artifactId>
-          <version>${version.camunda.platform}</version>
+          <version>${camunda.version}</version>
           <type>war</type>
           <scope>test</scope>
         </dependency>
@@ -231,7 +230,7 @@
           <scope>test</scope>
           <type>war</type>
           <classifier>tomcat</classifier>
-          <version>${version.camunda.platform}</version>
+          <version>${camunda.version}</version>
         </dependency>
 
         <dependency>
@@ -261,7 +260,7 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.tomcat</groupId>
                       <artifactId>camunda-tomcat-assembly</artifactId>
-                      <version>${version.camunda.platform}</version>
+                      <version>${camunda.version}</version>
                       <type>tar.gz</type>
                       <outputDirectory>${engine.runtime}</outputDirectory>
                       <overWrite>true</overWrite>
