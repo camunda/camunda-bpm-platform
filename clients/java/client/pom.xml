@@ -14,7 +14,7 @@
   </parent>
 
   <properties>
-    <version.camunda.platform>7.9.0-SNAPSHOT</version.camunda.platform>
+    <version.camunda.platform>7.9.0</version.camunda.platform>
     <version.camunda.commons>1.5.0</version.camunda.commons>
     <version.camunda.spin>1.5.0</version.camunda.spin>
 
