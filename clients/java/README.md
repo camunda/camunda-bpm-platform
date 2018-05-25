@@ -6,10 +6,6 @@ The **Camunda External Task Client (Java)** allows to set up remote Service Task
 * [Documentation](https://docs.camunda.org/manual/develop/user-guide/ext-client/)
 * [Examples](https://github.com/camunda/camunda-external-task-client-java/tree/master/examples)
 
-> **Heads Up!** 
->
-> This project is under heavy development and is not meant to be used as part of production environments.
-
 ## Features
 * Complete External Tasks
 * Extend the lock duration of External Tasks
