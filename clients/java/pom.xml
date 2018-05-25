@@ -24,7 +24,7 @@
   </modules>
 
   <properties>
-    <camunda.version>7.9.0-SNAPSHOT</camunda.version>
+    <camunda.version>7.9.0</camunda.version>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
 
