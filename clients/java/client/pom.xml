@@ -14,9 +14,7 @@
   </parent>
 
   <properties>
-    <!--<version.camunda.platform>7.9.0</version.camunda.platform>-->
-    <!--<version.camunda.commons>1.5.0</version.camunda.commons>-->
-    <!--<version.camunda.spin>1.5.1</version.camunda.spin>-->
+    <camunda.version>7.9.0</camunda.version>
 
     <version.httpclient>4.5.5</version.httpclient>
     <version.jackson>2.9.5</version.jackson>
@@ -39,13 +37,11 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <!--<version>${version.camunda.commons}</version>-->
     </dependency>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
-      <!--<version>${version.camunda.commons}</version>-->
     </dependency>
 
     <dependency>
@@ -86,7 +82,6 @@
     <dependency>
       <groupId>org.camunda.bpm.model</groupId>
       <artifactId>camunda-bpmn-model</artifactId>
-      <!--<version>${version.camunda.platform}</version>-->
       <scope>test</scope>
     </dependency>
 
