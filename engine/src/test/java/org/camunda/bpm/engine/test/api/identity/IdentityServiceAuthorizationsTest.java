@@ -277,7 +277,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       identityService.unlockUser(lockedUser.getId());
       fail("expected exception");
     } catch (AuthorizationException e) {
-      assertTrue(e.getMessage().contains("Required authenticated group 'camunda-admin'."));
+      assertTrue(e.getMessage().contains("ENGINE-03029 Required admin authenticated group."));
     }
 
     // return to god-mode

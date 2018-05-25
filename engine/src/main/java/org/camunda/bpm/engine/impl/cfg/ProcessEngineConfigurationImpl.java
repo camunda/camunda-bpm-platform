@@ -70,6 +70,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
@@ -677,6 +678,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<CommandChecker> commandCheckers = null;
 
+  protected List<String> adminGroups;
+
   // Migration
   protected MigrationActivityMatcher migrationActivityMatcher;
 
@@ -816,6 +819,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initCommandCheckers();
     initDefaultUserPermissionForTask();
     initHistoryCleanup();
+    initAdminGroups();
     invokePostInit();
   }
 
@@ -2269,6 +2273,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       } else {
         throw LOG.invalidConfigDefaultUserPermissionNameForTask(defaultUserPermissionNameForTask, new String[]{Permissions.UPDATE.getName(), Permissions.TASK_WORK.getName()});
       }
+    }
+  }
+
+  protected void initAdminGroups() {
+    if (adminGroups == null) {
+      adminGroups = new ArrayList<String>();
+    }
+    if (adminGroups.isEmpty() || !(adminGroups.contains(Groups.CAMUNDA_ADMIN))) {
+      adminGroups.add(Groups.CAMUNDA_ADMIN);
     }
   }
 
@@ -4112,4 +4125,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.loginDelayBase = loginInitialDelay;
   }
 
+  public List<String> getAdminGroups() {
+    return adminGroups;
+  }
+
+  public void setAdminGroups(List<String> adminGroups) {
+    this.adminGroups = adminGroups;
+  }
 }

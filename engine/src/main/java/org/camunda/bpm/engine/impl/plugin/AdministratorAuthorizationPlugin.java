@@ -51,6 +51,9 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
 
   public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     authorizationEnabled = processEngineConfiguration.isAuthorizationEnabled();
+    if (administratorGroupName != null && administratorGroupName.length() > 0) {
+      processEngineConfiguration.getAdminGroups().add(administratorGroupName);
+    }
   }
 
   public void postProcessEngineBuild(ProcessEngine processEngine) {

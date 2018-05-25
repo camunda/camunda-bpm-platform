@@ -493,10 +493,15 @@ public class AuthorizationManager extends AbstractManager {
   public boolean isCamundaAdmin(Authentication authentication) {
     List<String> groupIds = authentication.getGroupIds();
     if (groupIds != null) {
-      return groupIds.contains(Groups.CAMUNDA_ADMIN);
-    } else {
-      return false;
+      CommandContext commandContext = Context.getCommandContext();
+      List<String> adminGroups = commandContext.getProcessEngineConfiguration().getAdminGroups();
+      for (String adminGroup : adminGroups) {
+        if (groupIds.contains(adminGroup)) {
+          return true;
+        }
+      }
     }
+    return false;
   }
 
   /* QUERIES */
