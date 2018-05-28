@@ -6,7 +6,8 @@ var angular = require('angular');
 var template = fs.readFileSync(__dirname + '/instanceCount.html', 'utf8');
 
 module.exports = function($scope, control, processData, processDiagram, Loaders, $rootScope, callbacks) {
-  var viewer = callbacks.toggleIsLoading ? control : control.getViewer();
+  // the getViewer() method only exists in the instance context, but not in the definition context.
+  var viewer = control.getViewer ? control.getViewer() : control;
   var overlays = viewer.get('overlays');
   var elementRegistry = viewer.get('elementRegistry');
   var stopLoading = Loaders.startLoading();
