@@ -617,6 +617,16 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTaskProcess.bpmn20.xml")
+  public void testSetJobDuedateNonTimerJob(){
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Job job = managementService.createJobQuery().processDefinitionKey("oneTaskProcess").singleResult();
+    assertNotNull(job);
+    managementService.setJobDuedate(job.getId(), new Date());
+    job = managementService.createJobQuery().processDefinitionKey("oneTaskProcess").singleResult();
+    assertNotNull(job.getDuedate());
+  }
+
   public void testGetProperties() {
     Map<String, String> properties = managementService.getProperties();
     assertNotNull(properties);
