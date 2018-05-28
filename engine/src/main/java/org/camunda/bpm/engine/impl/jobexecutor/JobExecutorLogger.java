@@ -64,7 +64,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   }
 
   public void debugAddingNewExclusiveJobToJobExecutorCOntext(String jobId) {
-    logInfo(
+    logDebug(
         "008",
         "Adding new exclusive job to job executor context. Job Id='{}'", jobId);
   }
