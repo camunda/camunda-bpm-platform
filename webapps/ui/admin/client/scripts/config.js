@@ -13,6 +13,15 @@ window.camAdminConf = {
   //     'custom-ui': 'custom-ui/scripts'
   //   }
   // },
+  // 'runtimeActivityInstanceMetrics': {
+  //   'display': true
+  // },
+  // 'historicActivityInstanceMetrics': {
+  //   'adjustablePeriod': true,
+  //   'period': {
+  //     'unit': 'day'
+  //   }
+  // },
   // 'locales': {
   //   'availableLocales': ['en', 'de'],
   //   'fallbackLocale': 'en'
