@@ -33,13 +33,9 @@ public class JacksonJsonDataFormatMapper implements DataFormatMapper {
   }
 
   public boolean canMap(Object parameter) {
-    ObjectMapper objectMapper = format.getObjectMapper();
-    if(parameter != null) {
-      return objectMapper.canSerialize(parameter.getClass());
-    }
-    else {
-      return false;
-    }
+    // Jackson ObjectMapper#canSerialize() method was removed
+    // due to causing performance issues in high load scenarios
+    return parameter != null;
   }
 
   public String getCanonicalTypeName(Object object) {
