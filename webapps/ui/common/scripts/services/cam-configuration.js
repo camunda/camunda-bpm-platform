@@ -84,11 +84,7 @@ module.exports = function(config, app) {
 
     this.getRuntimeActivityInstanceMetrics = function() {
       var param = 'runtimeActivityInstanceMetrics';
-      if(config[param] && config[param].display) {
-        return config[param].display;
-      } else {
-        return defaultConfig[param].display;
-      }
+      return angular.extend({}, defaultConfig[param], config[param]);
     };
 
     this.getActivityInstancePeriod = function() {
