@@ -41,20 +41,18 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
             isActive: isActive,
             toggleIsLoading: toggleIsLoading
           };
-
-          if(!$scope.processDiagram) {
-            $scope.processData.observe('processDiagram', function(processDiagram) {
-              $scope.processDiagram = processDiagram;
-              instanceCount($scope, $scope.viewer, $scope.processData, $scope.processDiagram, Loaders, $rootScope, callbacks);
-            });
-          } else {
-            instanceCount($scope, $scope.viewer, $scope.processData, $scope.processDiagram, Loaders, $rootScope, callbacks);
-          }
+          
+          instanceCount($scope, $scope.viewer, $scope.processData, $scope.processDiagram, Loaders, $rootScope, callbacks);
         }
 
         function removeOverlays() {
           Array.from(document.getElementsByClassName('djs-overlay')).forEach( function(element) { element.remove(); });
         }
+
+        $scope.processData.observe('processDiagram', function(processDiagram) {
+          $scope.processDiagram = processDiagram;
+          showOverlays();
+        });
 
 
         function observe(callback) {
