@@ -171,7 +171,7 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    * <code>
    * historyService.createHistoricDetailQuery()<br>
    * &nbsp;&nbsp;.variableInstanceId("myVariableInstId")<br>
-   * &nbsp;&nbsp;.orderBySequenceCounter()<br>
+   * &nbsp;&nbsp;.orderPartiallyByOccurrence()<br>
    * &nbsp;&nbsp;.asc()<br>
    * &nbsp;&nbsp;.list()
    * </code>
