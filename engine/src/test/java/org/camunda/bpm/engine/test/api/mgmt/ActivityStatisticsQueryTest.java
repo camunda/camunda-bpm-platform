@@ -239,7 +239,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
-  public void testParallelMultiInstanceActivityStatisticsQuery() {
+  public void testParallelMultiInstanceActivityStatisticsQueryIncludingFailedJobIncidents() {
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("MIExampleProcess").singleResult();
@@ -249,6 +249,27 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
         .createActivityStatisticsQuery(definition.getId())
         .includeFailedJobs()
         .includeIncidents()
+        .list();
+
+    Assert.assertEquals(1, statistics.size());
+
+    ActivityStatistics activityResult = statistics.get(0);
+    Assert.assertEquals(3, activityResult.getInstances());
+    Assert.assertEquals("theTask", activityResult.getId());
+    Assert.assertEquals(0, activityResult.getFailedJobs());
+    assertTrue(activityResult.getIncidentStatistics().isEmpty());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
+  public void testParallelMultiInstanceActivityStatisticsQuery() {
+    runtimeService.startProcessInstanceByKey("MIExampleProcess");
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("MIExampleProcess").singleResult();
+
+    List<ActivityStatistics> statistics =
+        managementService
+        .createActivityStatisticsQuery(definition.getId())
         .list();
 
     Assert.assertEquals(1, statistics.size());
