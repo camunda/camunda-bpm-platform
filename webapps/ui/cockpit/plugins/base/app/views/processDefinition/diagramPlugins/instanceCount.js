@@ -17,7 +17,6 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
         $scope.toggle = configuration.getRuntimeActivityInstanceMetrics();
         $scope.isLoading = false;
 
-        showOverlays();
         $scope.toggleOverlay = function() {
           $scope.toggle = !$scope.toggle;
           if($scope.toggle) {
@@ -41,7 +40,7 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
             isActive: isActive,
             toggleIsLoading: toggleIsLoading
           };
-          
+   
           instanceCount($scope, $scope.viewer, $scope.processData, $scope.processDiagram, Loaders, $rootScope, callbacks);
         }
 
