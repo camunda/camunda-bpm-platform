@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import my.own.custom.spring.boot.project.SampleCamundaRestApplication;
 
@@ -81,6 +82,26 @@ public class SampleCamundaRestApplicationIT {
         .singleResult();
     ByteArrayInputStream byteArrayInputStream = (ByteArrayInputStream) variableInstance.getValue();
     assertTrue(byteArrayInputStream.available() > 0);
+  }
+
+  @Test
+  public void fetchAndLockExternalTaskWithLongPollingIsRunning() throws Exception {
+
+    String requestJson = "{"
+      + "  \"workerId\":\"aWorkerId\","
+      + "  \"maxTasks\":2,"
+      + "  \"topics\":"
+      + "      [{\"topicName\": \"aTopicName\","
+      + "      \"lockDuration\": 10000"
+      + "      }]"
+      + "}";
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpEntity<String> requestEntity = new HttpEntity<String>(requestJson, headers);
+    ResponseEntity<String> entity = testRestTemplate.postForEntity("/rest/engine/{enginename}/external-task/fetchAndLock", requestEntity, String.class,
+      camundaBpmProperties.getProcessEngineName());
+    assertEquals(HttpStatus.OK, entity.getStatusCode());
+    assertEquals("[]", entity.getBody());
   }
 
 }
