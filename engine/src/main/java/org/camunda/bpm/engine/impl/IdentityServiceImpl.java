@@ -15,7 +15,9 @@ package org.camunda.bpm.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
@@ -59,6 +61,7 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
 
 /**
@@ -90,7 +93,15 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public void saveUser(User user) {
-    commandExecutor.execute(new SaveUserCmd(user));
+
+    try {
+      commandExecutor.execute(new SaveUserCmd(user));
+    } catch (ProcessEngineException ex) {
+      if (ExceptionUtil.checkConstraintViolationException(ex)) {
+        throw new BadUserRequestException("The user already exists", ex);
+      }
+      throw ex;
+    }
   }
 
   public void saveTenant(Tenant tenant) {

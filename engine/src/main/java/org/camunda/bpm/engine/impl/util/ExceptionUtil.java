@@ -86,6 +86,20 @@ public class ExceptionUtil {
     return false;
   }
 
+  public static boolean checkConstraintViolationException(ProcessEngineException exception) {
+    List<SQLException> sqlExceptionList = findRelatedSqlExceptions(exception);
+    for (SQLException ex: sqlExceptionList) {
+      if (ex.getMessage().contains("constraint")
+        || ex.getMessage().contains("violat")
+        || ex.getMessage().toLowerCase().contains("duplicate")
+        || ex.getMessage().contains("ORA-00001")
+        || ex.getMessage().contains("SQLCODE=-803, SQLSTATE=23505")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static List<SQLException> findRelatedSqlExceptions(Throwable exception) {
     List<SQLException> sqlExceptionList = new ArrayList<SQLException>();
     Throwable cause = exception;

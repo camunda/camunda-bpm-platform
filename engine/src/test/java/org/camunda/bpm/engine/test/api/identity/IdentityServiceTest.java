@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.AuthenticationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -175,9 +176,14 @@ public class IdentityServiceTest {
 
     User secondUser = identityService.newUser("testuser");
 
-    thrown.expect(ProcessEngineException.class);
-
-    identityService.saveUser(secondUser);
+    try {
+      identityService.saveUser(secondUser);
+    } catch (Exception ex) {
+      if (!(ex instanceof BadUserRequestException)) {
+        fail("BadUserRequestException is expected, but another exception was received:  " + ex);
+      }
+      assertEquals("The user already exists", ex.getMessage());
+    }
   }
 
   @Test
