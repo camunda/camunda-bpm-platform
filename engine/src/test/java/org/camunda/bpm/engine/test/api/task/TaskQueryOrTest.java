@@ -30,6 +30,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -750,6 +751,48 @@ public class TaskQueryOrTest {
 
     // then
     assertEquals(2, tasks.size());
+  }
+
+  @Test
+  @Ignore("CAM-9114")
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void shouldReturnTasksWithCaseInstanceBusinessKeyOrProcessInstanceBusinessKey() {
+    String businessKey = "aBusinessKey";
+
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
+      .startEvent()
+        .userTask()
+      .endEvent()
+      .done();
+
+    repositoryService
+      .createDeployment()
+      .addModelInstance("foo.bpmn", aProcessDefinition)
+      .deploy();
+
+    runtimeService.startProcessInstanceByKey("aProcessDefinition", businessKey);
+
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .businessKey(businessKey)
+      .create();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query
+    .processInstanceBusinessKey(businessKey)
+      .or()
+        .caseInstanceBusinessKey(businessKey)
+        .processInstanceBusinessKey(businessKey)
+      .endOr();
+
+    assertEquals(2, query.list().size());
   }
 
   @Test
