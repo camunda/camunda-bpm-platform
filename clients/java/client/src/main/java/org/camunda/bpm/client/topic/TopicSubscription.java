@@ -24,7 +24,9 @@ import java.util.List;
 public interface TopicSubscription {
 
   /**
-   * The client has been unsubscribed from the topic
+   * The client has been unsubscribed from the topic.
+   * NB! It can happen, that the changes are not applied immediately, in case the client is currently iterating over the bunch of fetched and locked external tasks.
+   * The changes will have affect starting from the next bunch only.
    */
   void close();
 
