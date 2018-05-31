@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <camunda.version.old>7.8.0</camunda.version.old>
+    <camunda.version.old>7.9.0</camunda.version.old>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
