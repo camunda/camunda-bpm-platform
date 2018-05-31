@@ -29,7 +29,7 @@ public class CreateProcessInstanceWithJsonVariablesScenario {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
         // given
-        ProcessInstance processInstance = engine.getRuntimeService().startProcessInstanceByKey("Process", "processWithJsonVariables");
+        ProcessInstance processInstance = engine.getRuntimeService().startProcessInstanceByKey("Process", "processWithJsonVariables79");
         // when
         Execution execution = engine.getRuntimeService().createExecutionQuery().processInstanceId(processInstance.getId()).singleResult();
         engine.getRuntimeService().setVariable(execution.getId(), "objectVariable", createObjectVariable());

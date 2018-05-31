@@ -36,7 +36,7 @@ public class CreateProcessInstanceWithJsonVariablesTest {
   @Test
   public void testCreateProcessInstanceWithVariable() {
     // then
-    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().processInstanceBusinessKey("processWithJsonVariables").singleResult();
+    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().processInstanceBusinessKey("processWithJsonVariables79").singleResult();
     List<VariableInstance> variables = engineRule.getRuntimeService().createVariableInstanceQuery().processInstanceIdIn(processInstance.getId()).list();
     assertEquals(4, variables.size());
 

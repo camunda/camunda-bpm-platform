@@ -11,8 +11,6 @@
     <property name="jdbcUsername" value="${database.username}" />
     <property name="jdbcPassword" value="${database.password}" />
 
-    <property name="serializationDataFormat" value="application/json"/>
-    
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="false" />
     
