@@ -13,6 +13,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 var pagesModule = require('./pages/main');
 var directivesModule = require('./directives/main');
 var servicesModule = require('./services/main');
+var pluginsModule = require('./plugins/main');
 
 module.exports = function(pluginDependencies) {
 
@@ -23,7 +24,8 @@ module.exports = function(pluginDependencies) {
     commons.name,
     pagesModule.name,
     directivesModule.name,
-    servicesModule.name
+    servicesModule.name,
+    pluginsModule.name
   ].concat(pluginDependencies.map(function(el) {
     return el.ngModuleName;
   }));
