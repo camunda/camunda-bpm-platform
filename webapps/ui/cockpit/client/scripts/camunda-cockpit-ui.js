@@ -60,6 +60,7 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace(':appName', 'cockpit');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
+      UriProvider.replace('tasklistbase://', getUri('app-root') + '/app/tasklist/');
       UriProvider.replace('cockpit://', getUri('cockpit-api'));
       UriProvider.replace('admin://', getUri('admin-api') || (getUri('cockpit-api') + '../admin/'));
       UriProvider.replace('plugin://', getUri('cockpit-api') + 'plugin/');

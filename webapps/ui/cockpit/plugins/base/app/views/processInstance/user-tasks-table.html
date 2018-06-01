@@ -43,7 +43,7 @@
         </td>
         <td class="task-id uuid"
             cam-widget-clipboard="userTask.id">
-          {{ userTask.id }}
+          <a ng-href="{{ getTasklistHref(userTask) }}">{{ userTask.id }}</a>
         </td>
 
         <td class="action">

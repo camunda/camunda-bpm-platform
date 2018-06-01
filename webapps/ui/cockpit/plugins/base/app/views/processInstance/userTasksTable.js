@@ -59,8 +59,8 @@ module.exports = function(ngModule) {
   }
 
   ngModule.controller('UserTaskController', [
-    '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal', '$translate', 'localConf',
-    function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal, $translate, localConf) {
+    '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal', '$translate', 'localConf', 'Uri',
+    function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal, $translate, localConf, Uri) {
 
       // input: processInstance, processData
 
@@ -184,6 +184,10 @@ module.exports = function(ngModule) {
         }
 
         return '';
+      };
+
+      $scope.getTasklistHref = function(userTask) {
+        return Uri.appUri('tasklistbase://:engine/#/?task=' + userTask.id);
       };
 
       $scope.submitAssigneeChange = function(editForm, cb) {
