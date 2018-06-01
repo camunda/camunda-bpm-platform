@@ -27,6 +27,7 @@ module.exports = [ function() {
       'Notifications',
       'Views',
       'search',
+      'Uri',
       function(
         $scope,
         $q,
@@ -36,27 +37,35 @@ module.exports = [ function() {
         camAPI,
         Notifications,
         Views,
-        search
+        search,
+        Uri
       ) {
 
         // setup /////////////////////////////////////////////////////////////////////
 
         var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
 
-        function setLink() {
-          var task = $scope.task;
-          var url =  '../../cockpit/default/#/';
+        function setLink(task) {
+          var resource = '';
+          var resourceId = '';
 
-          if(task.processInstanceId) {
-            url += ('process-instance/'+ task.processInstanceId);
-          } else if (task.caseInstanceId) {
-            url += ('case-instance/'+ task.caseInstanceId);
-          } else {
-            url = '';
+          if (task.processInstanceId) {
+            resource = 'process-instance';
+            resourceId = task.processInstanceId;
+          }
+          else if (task.caseInstanceId) {
+            resource = 'case-instance';
+            resourceId = task.caseInstanceId;
+          }
+          else {
+            // standalone task
+            $scope.instanceLink = undefined;
+            return;
           }
 
-          $scope.instanceLink = url;
+          $scope.instanceLink = Uri.appUri('cockpitbase://:engine/#/' + resource + '/' + resourceId);
         }
+
         // error handling //////////////////////////////////////////////////////////////
 
         function errorNotification(src, err) {
@@ -207,7 +216,7 @@ module.exports = [ function() {
          */
         $scope.taskState = taskData.observe('task', function(task) {
           $scope.task = task;
-          task && setLink();
+          task && setLink(task);
         });
 
         taskData.observe('isAssignee', function(isAssignee) {
