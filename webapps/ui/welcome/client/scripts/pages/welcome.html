@@ -55,11 +55,15 @@
   </div>
 
 
-  <section class="col-sm-4 col-xs-12"
+  <section ng-if="profilePlugins.length"
+           class="col-sm-4 col-xs-12"
            id="user-profile">
     <div class="inner">
-      <div user-profile
-           username="$root.authentication.name"></div>
+      <view ng-repeat="plugin in profilePlugins"
+            class="plugin"
+            ng-class="plugin.id"
+            data-plugin-id="{{ plugin.id }}"
+            provider="plugin"></view>
     </div>
   </section>
 

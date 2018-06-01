@@ -18,6 +18,10 @@ var RouteConfig = [ '$routeProvider', function($routeProvider) {
         return 12 / (auth.authorizedApps.length - 1);
       };
 
+      $scope.profilePlugins = Views.getProviders({
+        component: 'welcome.profile'
+      });
+
       $scope.plugins = Views.getProviders({
         component: 'welcome.dashboard'
       });
