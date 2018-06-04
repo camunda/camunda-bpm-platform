@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.spin</groupId>
     <artifactId>camunda-spin-bom</artifactId>
-    <version>1.5.2</version>
+    <version>1.5.3-SNAPSHOT</version>
     <relativePath>bom</relativePath>
   </parent>
 
@@ -146,7 +146,7 @@
     <url>https://github.com/camunda/camunda-spin</url>
     <connection>scm:git:git@github.com:camunda/camunda-spin.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-spin.git</developerConnection>
-    <tag>1.5.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
 </project>
