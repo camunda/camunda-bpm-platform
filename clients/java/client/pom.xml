@@ -14,6 +14,7 @@
   </parent>
 
   <properties>
+    <!-- should be updated during a release together with the camunda.version tag in the project pom -->
     <camunda.version>7.9.0</camunda.version>
 
     <version.httpclient>4.5.5</version.httpclient>
