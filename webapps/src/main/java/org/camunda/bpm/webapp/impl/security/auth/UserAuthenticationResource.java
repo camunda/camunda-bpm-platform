@@ -96,8 +96,9 @@ public class UserAuthenticationResource {
       return forbidden();
     }
 
-    final Authentications authentications = Authentications.getCurrent();
-    authentications.addAuthentication(authentication);
+    if (request != null) {
+      Authentications.revalidateSession(request, authentication);
+    }
 
     return Response.ok(AuthenticationDto.fromAuthentication(authentication)).build();
   }

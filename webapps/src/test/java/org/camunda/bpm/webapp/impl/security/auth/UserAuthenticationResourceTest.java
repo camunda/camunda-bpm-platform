@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Thorben Lindhauer
@@ -89,6 +90,44 @@ public class UserAuthenticationResourceTest {
 
     // then
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testSessionRevalidationOnAuthorization() {
+    // given
+    User jonny = identityService.newUser("jonny");
+    jonny.setPassword("jonnyspassword");
+    identityService.saveUser(jonny);
+
+    Authorization authorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.APPLICATION);
+    authorization.setResourceId("tasklist");
+    authorization.setPermissions(new Permissions[] {Permissions.ACCESS});
+    authorization.setUserId(jonny.getId());
+    authorizationService.saveAuthorization(authorization);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
+
+    // when
+    UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
+    String oldSessionId = authResource.request.getSession().getId();
+
+    // first login session
+    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    String newSessionId = authResource.request.getSession().getId();
+
+    authResource.doLogout("UserAuthenticationResourceTest-engine");
+
+    // second login session
+    response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    String newestSessionId = authResource.request.getSession().getId();
+
+    // then
+    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertNotEquals(oldSessionId, newSessionId);
+    Assert.assertNotEquals(newSessionId, newestSessionId);
   }
 
   @Test
