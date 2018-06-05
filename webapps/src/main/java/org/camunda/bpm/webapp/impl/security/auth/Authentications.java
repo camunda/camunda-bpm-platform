@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -146,6 +147,32 @@ public class Authentications implements Serializable {
       session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
     }
     return authentications;
+  }
+
+  /**
+   * Invalidates the old {@link HttpSession} of the current request and creates
+   * a new one. Additionally transfers the existing authentications to the new
+   * session and adds a new one.
+   *
+   * @param request
+   *          the {@link HttpServletRequest} instance from which the session
+   *          is obtained and a new {@link HttpSession} created.
+   * @param authentication
+   *          the new {@link Authentication} instance that is created
+   *          through user login. It is added to the existing authentications.
+   */
+  public static void revalidateSession(HttpServletRequest request, Authentication authentication) {
+    HttpSession session = request.getSession();
+    Authentications authentications = getFromSession(session);
+
+    // invalidate old & create new session
+    session.invalidate();
+    session = request.getSession(true);
+
+    if (authentication != null) {
+      authentications.addAuthentication(authentication);
+      session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
+    }
   }
 
   public static void updateSession(HttpSession session, Authentications authentications) {
