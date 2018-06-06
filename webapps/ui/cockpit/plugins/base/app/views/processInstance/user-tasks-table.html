@@ -43,7 +43,8 @@
         </td>
         <td class="task-id uuid"
             cam-widget-clipboard="userTask.id">
-          <a ng-href="{{ getTasklistHref(userTask) }}">{{ userTask.id }}</a>
+          <a ng-href="{{ getTasklistHref(userTask) }}"
+             tooltip="{{ 'PLUGIN_USER_TASKS_LINK_TO_TASKLIST' | translate }}">{{ userTask.id }}</a>
         </td>
 
         <td class="action">
