@@ -673,6 +673,7 @@
   "PLUGIN_USER_TASKS_ACTION" : "Action",
   "PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP" : "Manage group(s) for '{{value}}'",
   "PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP" : "Manage user(s) for '{{value}}'",
+  "PLUGIN_USER_TASKS_LINK_TO_TASKLIST" : "Link to Tasklist",
 
   "PLUGIN_UPDATE_DIALOG_STATUS_FINISHED" : "Finished",
   "PLUGIN_UPDATE_DIALOG_MESSAGES_1" : "Updated the suspension state of the process instance.",
