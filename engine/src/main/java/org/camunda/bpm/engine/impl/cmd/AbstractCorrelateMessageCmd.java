@@ -50,7 +50,7 @@ public abstract class AbstractCorrelateMessageCmd {
   protected void triggerExecution(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
     String executionId = correlationResult.getExecutionEntity().getId();
 
-    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.isExclusiveCorrelation());
+    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.getPayloadProcessInstanceVariablesLocal(), builder.isExclusiveCorrelation());
     command.execute(commandContext);
   }
 
@@ -59,6 +59,9 @@ public abstract class AbstractCorrelateMessageCmd {
 
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
     ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), messageStartEvent);
+
+    processInstance.setVariablesLocal(builder.getPayloadProcessInstanceVariablesLocal());
+
     processInstance.start(builder.getPayloadProcessInstanceVariables());
 
     return processInstance;

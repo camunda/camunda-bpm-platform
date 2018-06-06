@@ -39,17 +39,23 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
 
   protected final String executionId;
   protected final Map<String, Object> processVariables;
+  protected final Map<String, Object> processVariablesLocal;
   protected final String messageName;
   protected boolean exclusive = false;
 
   public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
+    this(messageName, executionId, processVariables, null);
+  }
+
+  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal) {
     this.executionId = executionId;
     this.messageName = messageName;
     this.processVariables = processVariables;
+    this.processVariablesLocal = processVariablesLocal;
   }
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, boolean exclusive) {
-    this(messageName, executionId, processVariables);
+  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal, boolean exclusive) {
+    this(messageName, executionId, processVariables, processVariablesLocal);
     this.exclusive = exclusive;
   }
 
@@ -79,7 +85,7 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
       checker.checkUpdateProcessInstanceById(processInstanceId);
     }
 
-    eventSubscriptionEntity.eventReceived(processVariables, false);
+    eventSubscriptionEntity.eventReceived(processVariables, processVariablesLocal, null, false);
 
     return null;
   }

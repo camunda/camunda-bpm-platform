@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.variables.FailingJavaSerializable;
@@ -50,11 +51,13 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -1582,6 +1585,104 @@ public class MessageCorrelationTest {
     } catch (BadUserRequestException e){
       testRule.assertTextPresent("Cannot specify correlation variables ", e.getMessage());
     }
+  }
+
+  @Test
+  public void testCorrelationWithResultBySettingLocalVariables() {
+    // given
+    String outputVarName = "localVar";
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+          .intermediateCatchEvent("message_1")
+            .message("1")
+            .camundaOutputParameter(outputVarName, "${testLocalVar}")
+          .userTask("UserTask_1")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<String, Object>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    MessageCorrelationResult messageCorrelationResult = runtimeService
+        .createMessageCorrelation("1")
+        .setVariablesLocal(messageLocalPayload)
+        .correlateWithResult();
+
+    // then
+    checkExecutionMessageCorrelationResult(messageCorrelationResult, processInstance, "message_1");
+
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(outputVarName)
+        .singleResult();
+    assertNotNull(variable);
+    assertEquals(outpuValue, variable.getValue());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
+
+    VariableInstance variableNonExisting = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .singleResult();
+    assertNull(variableNonExisting);
+  }
+
+  @Test
+  public void testCorrelationBySettingLocalVariables() {
+    // given
+    String outputVarName = "localVar";
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+          .intermediateCatchEvent("message_1")
+            .message("1")
+            .camundaOutputParameter(outputVarName, "${testLocalVar}")
+          .userTask("UserTask_1")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("processInstanceVar", "processInstanceVarValue");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
+
+    Map<String, Object> messageLocalPayload = new HashMap<String, Object>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messageLocalPayload.put(localVarName, outpuValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("1")
+        .setVariablesLocal(messageLocalPayload)
+        .correlate();
+
+    // then
+    VariableInstance variable = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(outputVarName)
+        .singleResult();
+    assertNotNull(variable);
+    assertEquals(outpuValue, variable.getValue());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
+
+    VariableInstance variableNonExisting = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId())
+        .variableName(localVarName)
+        .singleResult();
+    assertNull(variableNonExisting);
   }
 
 }
