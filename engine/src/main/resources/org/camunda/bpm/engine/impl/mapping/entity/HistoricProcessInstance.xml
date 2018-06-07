@@ -584,4 +584,62 @@
 
   </sql>
 
+  <select id="selectCompletedHistoricProcessInstancePage" resultMap="historicProcessInstanceResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+
+    select RES.*
+    from (
+      ${optimizeLimitBeforeWithoutOffset}
+      SELECT ${limitBeforeWithoutOffset} SELF.*, DEF.NAME_, DEF.VERSION_
+      FROM ${prefix}ACT_HI_PROCINST SELF
+
+      LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
+      ON SELF.PROC_DEF_ID_ = DEF.ID_
+
+      <where>
+        <if test="parameter.finishedAfter != null">
+          and SELF.END_TIME_ &gt;= #{parameter.finishedAfter}
+        </if>
+        <if test="test=parameter.finishedAt != null">
+          and SELF.END_TIME_ = #{parameter.finishedAt}
+        </if>
+        <if test="parameter.finishedAfter == null and parameter.finishedAt == null">
+          and SELF.END_TIME_ is not null
+        </if>
+      </where>
+
+      ORDER BY SELF.END_TIME_ ASC
+      ${optimizeLimitAfterWithoutOffset}
+    ) RES
+
+  </select>
+
+  <select id="selectRunningHistoricProcessInstancePage" resultMap="historicProcessInstanceResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+    select RES.*
+    from (
+      ${optimizeLimitBeforeWithoutOffset}
+      SELECT ${limitBeforeWithoutOffset} SELF.*, DEF.NAME_, DEF.VERSION_
+      FROM ${prefix}ACT_HI_PROCINST SELF
+
+      LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
+      ON SELF.PROC_DEF_ID_ = DEF.ID_
+
+      <where>
+        <if test="parameter.startedAfter != null">
+          and SELF.START_TIME_ &gt;= #{parameter.startedAfter}
+        </if>
+        <if test="test=parameter.startedAt != null">
+          and SELF.START_TIME_ = #{parameter.startedAt}
+        </if>
+        and SELF.END_TIME_ is null
+      </where>
+
+      ORDER BY SELF.START_TIME_ ASC
+      ${optimizeLimitAfterWithoutOffset}
+
+    ) RES
+
+  </select>
+
 </mapper>

@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.optimize.OptimizeManager;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 
 import java.util.*;
@@ -578,5 +579,9 @@ public class CommandContext {
 
   public void setOperationId(String operationId) {
     this.operationId = operationId;
+  }
+  
+  public OptimizeManager getOptimizeManager() {
+    return getSession(OptimizeManager.class);
   }
 }

@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.VariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
+import org.camunda.bpm.engine.rest.impl.optimize.OptimizeRestService;
 
 @Path(DefaultProcessEngineRestServiceImpl.PATH)
 public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRestServiceImpl {
@@ -195,6 +196,11 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
   @Path(ConditionRestService.PATH)
   public ConditionRestService getConditionRestService() {
     return super.getConditionRestService(null);
+  }
+
+  @Path(OptimizeRestService.PATH)
+  public OptimizeRestService getOptimizeRestService() {
+    return super.getOptimizeRestService(null);
   }
 
   @Override

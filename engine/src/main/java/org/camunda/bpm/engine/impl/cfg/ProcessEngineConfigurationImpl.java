@@ -83,6 +83,7 @@ import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.ModificationBatchJobHandler;
+import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.PriorityProvider;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
@@ -194,10 +195,10 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -254,6 +255,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.SameBehavior
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventTypeValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.UpdateEventTriggersValidator;
+import org.camunda.bpm.engine.impl.optimize.OptimizeManager;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CacheFactory;
@@ -378,6 +380,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected FilterService filterService = new FilterServiceImpl();
   protected ExternalTaskService externalTaskService = new ExternalTaskServiceImpl();
   protected DecisionService decisionService = new DecisionServiceImpl();
+  protected OptimizeService optimizeService = new OptimizeService();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -1129,6 +1132,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(filterService);
     initService(externalTaskService);
     initService(decisionService);
+    initService(optimizeService);
   }
 
   protected void initService(Object service) {
@@ -1357,6 +1361,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("limitAfter", DbSqlSessionFactory.databaseSpecificLimitAfterStatements.get(databaseType));
       properties.put("limitBeforeWithoutOffset", DbSqlSessionFactory.databaseSpecificLimitBeforeWithoutOffsetStatements.get(databaseType));
       properties.put("limitAfterWithoutOffset", DbSqlSessionFactory.databaseSpecificLimitAfterWithoutOffsetStatements.get(databaseType));
+
+      properties.put("optimizeLimitBeforeWithoutOffset", DbSqlSessionFactory.optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.get(databaseType));
+      properties.put("optimizeLimitAfterWithoutOffset", DbSqlSessionFactory.optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.get(databaseType));
       properties.put("innerLimitAfter", DbSqlSessionFactory.databaseSpecificInnerLimitAfterStatements.get(databaseType));
       properties.put("limitBetween", DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
       properties.put("limitBetweenFilter", DbSqlSessionFactory.databaseSpecificLimitBetweenFilterStatements.get(databaseType));
@@ -1457,6 +1464,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(DecisionDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(DecisionRequirementsDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricDecisionInstanceManager.class));
+
+      addSessionFactory(new GenericManagerFactory(OptimizeManager.class));
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 
@@ -2483,6 +2492,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public DecisionService getDecisionService() {
     return decisionService;
+  }
+
+  public OptimizeService getOptimizeService() {
+    return optimizeService;
   }
 
   public void setDecisionService(DecisionService decisionService) {

@@ -386,4 +386,23 @@
     </if>
   </sql>
 
+  <select id="selectHistoricVariableUpdatePage" resultMap="historicVariableUpdateResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_DETAIL RES
+    <where>
+      <if test="parameter.occurredAfter != null">
+        RES.TIME_ &gt;= #{parameter.occurredAfter}
+      </if>
+      <if test="parameter.occurredAt != null">
+        and RES.TIME_ = #{parameter.occurredAt}
+      </if>
+
+      and RES.TYPE_ = 'VariableUpdate'
+    </where>
+
+    ORDER BY RES.TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
 </mapper>
