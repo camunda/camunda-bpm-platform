@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.camunda.bpm.engine.delegate.ExecutionListener.EVENTNAME_START;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -226,29 +227,33 @@ public class GetCompletedHistoricActivityInstancesForOptimizeTest {
      // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent("startEvent")
-      .scriptTask("Script1")
-        .scriptFormat("groovy")
-        .scriptText("sleep(10);")
-      .scriptTask("Script2")
-        .scriptFormat("groovy")
-        .scriptText("sleep(10);")
-      .scriptTask("Script3")
-        .scriptFormat("groovy")
-        .scriptText("sleep(10);")
+      .serviceTask("ServiceTask1")
+        .camundaExpression("${true}")
+        .camundaExecutionListenerClass(EVENTNAME_START, ShiftTimeByOneMinuteListener.class.getName())
+      .serviceTask("ServiceTask2")
+        .camundaExpression("${true}")
+        .camundaExecutionListenerClass(EVENTNAME_START, ShiftTimeByOneMinuteListener.class.getName())
+      .serviceTask("ServiceTask3")
+        .camundaExpression("${true}")
+        .camundaExecutionListenerClass(EVENTNAME_START, ShiftTimeByOneMinuteListener.class.getName())
       .endEvent("endEvent")
+        .camundaExecutionListenerClass(EVENTNAME_START, ShiftTimeByOneMinuteListener.class.getName())
       .done();
     testHelper.deploy(simpleDefinition);
+    ClockUtil.setCurrentTime(new Date());
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ClockUtil.reset();
 
     // when
     List<HistoricActivityInstance> completedHistoricActivityInstances =
-      optimizeService.getCompletedHistoricActivityInstances(pastDate(), null, 3);
+      optimizeService.getCompletedHistoricActivityInstances(pastDate(), null, 4);
 
     // then
-    assertThat(completedHistoricActivityInstances.size(), is(3));
+    assertThat(completedHistoricActivityInstances.size(), is(4));
     assertThat(completedHistoricActivityInstances.get(0).getActivityId(), is("startEvent"));
-    assertThat(completedHistoricActivityInstances.get(1).getActivityId(), is("Script1"));
-    assertThat(completedHistoricActivityInstances.get(2).getActivityId(), is("Script2"));
+    assertThat(completedHistoricActivityInstances.get(1).getActivityId(), is("ServiceTask1"));
+    assertThat(completedHistoricActivityInstances.get(2).getActivityId(), is("ServiceTask2"));
+    assertThat(completedHistoricActivityInstances.get(3).getActivityId(), is("ServiceTask3"));
   }
 
   @Test

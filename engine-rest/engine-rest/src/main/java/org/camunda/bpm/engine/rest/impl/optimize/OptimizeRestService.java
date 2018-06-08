@@ -129,7 +129,8 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
 
     List<HistoricVariableUpdateDto> result = new ArrayList<HistoricVariableUpdateDto>();
     for (HistoricVariableUpdate instance : historicVariableUpdates) {
-      HistoricVariableUpdateDto dto = HistoricVariableUpdateDto.fromHistoricVariableUpdate(instance);
+      HistoricVariableUpdateDto dto =
+        (HistoricVariableUpdateDto) HistoricVariableUpdateDto.fromHistoricDetail(instance);
       result.add(dto);
     }
     return result;
