@@ -200,6 +200,23 @@
                   </srcFiles>
                 </configuration>
               </execution>
+              <!-- example: patch-current-schema
+              <execution>
+                <id>patch-current-schema</id>
+                <phase>test-compile</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    // now patch current version of the schema
+                    // example for aggregate patching of current version
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              -->
             </executions>
           </plugin>
         </plugins>
