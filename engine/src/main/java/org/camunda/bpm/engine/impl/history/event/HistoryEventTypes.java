@@ -176,7 +176,15 @@ public enum HistoryEventTypes implements HistoryEventType {
    *
    * @since 7.7
    */
-  EXTERNAL_TASK_DELETE("external-task", "delete");
+  EXTERNAL_TASK_DELETE("external-task", "delete"),
+
+
+  /**
+   * fired when used operation log is created.
+   *
+   * @since 7.10, 7.9.1, 7.8.7
+   */
+  USER_OPERATION_LOG("user-operation-log", "create");
 
   private HistoryEventTypes(String entityType, String eventName) {
     this.entityType = entityType;

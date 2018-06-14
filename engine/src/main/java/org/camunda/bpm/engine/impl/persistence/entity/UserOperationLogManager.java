@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -298,7 +299,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public boolean isUserOperationLogEnabled() {
-    return isHistoryLevelFullEnabled() &&
+    return Context.getProcessEngineConfiguration().getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.USER_OPERATION_LOG, null) &&
         ((isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) ||
             !writeUserOperationLogOnlyWithLoggedInUser());
   }
