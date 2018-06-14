@@ -705,6 +705,8 @@
                      the same except for the whole unit test suite -->
                 <exclude>**/DatabaseTablePrefixTest.java</exclude>
                 <exclude>**/DeploymentTest.java</exclude>
+                <exclude>**/CustomHistoryLevelUserOperationLogTest.java</exclude>
+                <exclude>**/CustomHistoryLevelWithoutUserOperationLogTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
