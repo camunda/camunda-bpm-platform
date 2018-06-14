@@ -13,6 +13,7 @@
 package org.camunda.bpm.client;
 
 import org.camunda.bpm.client.backoff.BackoffStrategy;
+import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 
@@ -54,7 +55,7 @@ public interface ExternalTaskClientBuilder {
 
   /**
    * Specifies the maximum amount of tasks that can be fetched within one request.
-   * This information is optional.
+   * This information is optional. Default is 10.
    *
    * @param maxTasks which are supposed to be fetched within one request
    * @return the builder
@@ -109,7 +110,7 @@ public interface ExternalTaskClientBuilder {
 
   /**
    * Adds a custom strategy to the client for defining the org.camunda.bpm.client.backoff between two requests.
-   * This information is optional.
+   * This information is optional. Default is {@link ExponentialBackoffStrategy}
    *
    * @param backoffStrategy which realizes a custom org.camunda.bpm.client.backoff strategy
    * @return the builder

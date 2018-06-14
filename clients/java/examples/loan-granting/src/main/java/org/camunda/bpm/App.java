@@ -39,8 +39,6 @@ public class App {
         System.out.println("The External Task " + externalTask.getId() + " has been completed!");
 
       }).open();
-
-    Thread.sleep(1000 * 60 * 5);
   }
 
 }

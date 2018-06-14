@@ -46,8 +46,6 @@ public class App {
           " has been completed!");
 
       }).open();
-
-    Thread.sleep(1000 * 60 * 5);
   }
 
 }

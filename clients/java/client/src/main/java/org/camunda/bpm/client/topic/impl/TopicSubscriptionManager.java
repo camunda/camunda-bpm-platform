@@ -123,6 +123,7 @@ public class TopicSubscriptionManager implements Runnable {
     List<ExternalTask> externalTasks = Collections.emptyList();
 
     try {
+      LOG.fetchAndLock(subscriptions);
       externalTasks = engineClient.fetchAndLock(subscriptions);
     } catch (EngineClientException e) {
       LOG.exceptionWhilePerformingFetchAndLock(e);
