@@ -273,6 +273,15 @@ public abstract class ProcessEngineConfiguration {
   protected String authorizationCheckRevokes = AUTHORIZATION_CHECK_REVOKE_AUTO;
 
   /**
+   * A parameter used for defining acceptable values for the User, Group
+   * and Tenant IDs. The pattern can be defined by using the standard
+   * Java Regular Expression syntax should be used.
+   *
+   * <p>By default only alphanumeric values will be accepted.</p>
+   */
+  protected String resourceWhitelistPattern =  "\\w+";
+
+  /**
    * If the value of this flag is set <code>true</code> then the process engine
    * throws {@link ProcessEngineException} when no catching boundary event was
    * defined for an error event.
@@ -729,6 +738,14 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setTenantCheckEnabled(boolean isTenantCheckEnabled) {
     this.tenantCheckEnabled = isTenantCheckEnabled;
     return this;
+  }
+
+  public String getResourceWhitelistPattern() {
+    return resourceWhitelistPattern;
+  }
+
+  public void setResourceWhitelistPattern(String resourceWhitelistPattern) {
+    this.resourceWhitelistPattern = resourceWhitelistPattern;
   }
 
   public int getDefaultNumberOfRetries() {

@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -44,6 +45,8 @@ public class IdentityServiceTenantTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
+
+  protected static final String INVALID_ID_MESSAGE = "Tenant has an invalid id: id cannot be ";
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -101,6 +104,29 @@ public class IdentityServiceTenantTest {
   }
 
   @Test
+  public void testInvalidTenantId() {
+    try {
+      identityService.newTenant("john's tenant");
+      fail("Invalid tenant id exception expected!");
+    } catch (ProcessEngineException ex) {
+      assertEquals(INVALID_ID_MESSAGE + "john's tenant.", ex.getMessage());
+    }
+  }
+
+  @Test
+  public void testInvalidTenantIdOnUpdate() {
+    try {
+      Tenant updatedTenant = identityService.newTenant("john");
+      updatedTenant.setId("john's tenant");
+      identityService.saveTenant(updatedTenant);
+
+      fail("Invalid tenant id exception expected!");
+    } catch (ProcessEngineException ex) {
+      assertEquals(INVALID_ID_MESSAGE + "john's tenant.", ex.getMessage());
+    }
+  }
+
+  @Test
   public void deleteTenant() {
     // create
     Tenant tenant = identityService.newTenant(TENANT_ONE);
@@ -138,12 +164,15 @@ public class IdentityServiceTenantTest {
 
   @Test
   public void createTenantWithGenericResourceId() {
-    Tenant tenant = identityService.newTenant("*");
+    try {
+      Tenant tenant = identityService.newTenant("*");
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("has an invalid id: id cannot be *. * is a reserved identifier.");
+      fail("Expected exception: Tenant has an invalid id: id cannot be *.");
 
-    identityService.saveTenant(tenant);
+      identityService.saveTenant(tenant);
+    } catch (ProcessEngineException ex) {
+      assertEquals(INVALID_ID_MESSAGE + "*.", ex.getMessage());
+    }
   }
 
   @Test

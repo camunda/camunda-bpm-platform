@@ -35,6 +35,7 @@ public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> imple
   
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("group", group);
+    ensureValidResourceId(commandContext, "Group", group.getId());
 
     commandContext
       .getWritableIdentityProvider()
