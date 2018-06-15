@@ -279,7 +279,7 @@ public abstract class ProcessEngineConfiguration {
    *
    * <p>By default only alphanumeric values will be accepted.</p>
    */
-  protected String resourceWhitelistPattern =  "\\w+";
+  protected String resourceWhitelistPattern =  "[\\w-]+";
 
   /**
    * If the value of this flag is set <code>true</code> then the process engine
