@@ -137,7 +137,7 @@ public class GetCompletedHistoricActivityInstancesForOptimizeTest {
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     completeAllUserTasks();
     List<HistoricActivityInstance> completedHistoricActivityInstances =
-      optimizeService.getCompletedHistoricActivityInstances(nowPlus2Seconds, null, 10);
+      optimizeService.getCompletedHistoricActivityInstances(now, null, 10);
 
     // then
     Set<String> allowedActivityIds = new HashSet<String>(Arrays.asList("userTask", "endEvent"));
@@ -192,8 +192,7 @@ public class GetCompletedHistoricActivityInstancesForOptimizeTest {
       optimizeService.getCompletedHistoricActivityInstances(now, now, 10);
 
     // then
-    assertThat(completedHistoricActivityInstances.size(), is(1));
-    assertThat(completedHistoricActivityInstances.get(0).getActivityId(), is("startEvent"));
+    assertThat(completedHistoricActivityInstances.size(), is(0));
   }
 
   @Test

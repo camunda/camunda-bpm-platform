@@ -129,6 +129,8 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     testHelper.deploy(simpleDefinition);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("stringVar", "value1");
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("process", variables);
     Date nowPlus2Seconds = new Date(new Date().getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
@@ -137,7 +139,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(nowPlus2Seconds, null, 10);
+      optimizeService.getHistoricVariableUpdates(now, null, 10);
 
     // then
     assertThat(variableUpdates.size(), is(1));
@@ -195,8 +197,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       optimizeService.getHistoricVariableUpdates(now, now, 10);
 
     // then
-    assertThat(variableUpdates.size(), is(1));
-    assertThat(variableUpdates.get(0).getValue().toString(), is("value1"));
+    assertThat(variableUpdates.size(), is(0));
   }
 
   @Test
@@ -233,6 +234,8 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       .done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
+    Date nowPlus1Second = new Date(now.getTime() + 1000L);
+    ClockUtil.setCurrentTime(nowPlus1Second);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("var1", "value1");
       runtimeService.startProcessInstanceByKey("process", variables);

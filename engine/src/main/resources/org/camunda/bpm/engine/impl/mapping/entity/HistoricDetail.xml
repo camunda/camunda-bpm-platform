@@ -392,7 +392,7 @@
     select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_DETAIL RES
     <where>
       <if test="parameter.occurredAfter != null">
-        RES.TIME_ &gt;= #{parameter.occurredAfter}
+        RES.TIME_ &gt; #{parameter.occurredAfter}
       </if>
       <if test="parameter.occurredAt != null">
         and RES.TIME_ = #{parameter.occurredAt}

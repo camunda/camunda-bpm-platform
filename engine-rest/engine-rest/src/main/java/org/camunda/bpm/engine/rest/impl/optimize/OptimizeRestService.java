@@ -17,8 +17,10 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricOptimizeVariableUpdateDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableUpdateDto;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
@@ -115,9 +117,9 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
 
   @GET
   @Path("/variable-update")
-  public List<HistoricVariableUpdateDto> getHistoricVariableUpdates(@QueryParam("occurredAfter") String occurredAfterAsString,
-                                                                    @QueryParam("occurredAt") String occurredAtAsString,
-                                                                    @QueryParam("maxResults") int maxResults) {
+  public List<HistoricOptimizeVariableUpdateDto> getHistoricVariableUpdates(@QueryParam("occurredAfter") String occurredAfterAsString,
+                                                                            @QueryParam("occurredAt") String occurredAtAsString,
+                                                                            @QueryParam("maxResults") int maxResults) {
     Date occurredAfter = dateConverter.convertQueryParameterToType(occurredAfterAsString);
     Date occurredAt = dateConverter.convertQueryParameterToType(occurredAtAsString);
     maxResults = ensureValidMaxResults(maxResults);
@@ -127,10 +129,10 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
     List<HistoricVariableUpdate> historicVariableUpdates =
       config.getOptimizeService().getHistoricVariableUpdates(occurredAfter, occurredAt, maxResults);
 
-    List<HistoricVariableUpdateDto> result = new ArrayList<HistoricVariableUpdateDto>();
+    List<HistoricOptimizeVariableUpdateDto> result = new ArrayList<HistoricOptimizeVariableUpdateDto>();
     for (HistoricVariableUpdate instance : historicVariableUpdates) {
-      HistoricVariableUpdateDto dto =
-        (HistoricVariableUpdateDto) HistoricVariableUpdateDto.fromHistoricDetail(instance);
+      HistoricOptimizeVariableUpdateDto dto =
+        HistoricOptimizeVariableUpdateDto.fromHistoricVariableUpdate(instance);
       result.add(dto);
     }
     return result;

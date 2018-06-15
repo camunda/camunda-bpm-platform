@@ -124,14 +124,16 @@ public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
       .endEvent()
       .done();
     testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Date nowPlus2Seconds = new Date(new Date().getTime() + 2000L);
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
     List<HistoricProcessInstance> runningHistoricProcessInstances =
-      optimizeService.getRunningHistoricProcessInstances(nowPlus2Seconds, null, 10);
+      optimizeService.getRunningHistoricProcessInstances(now, null, 10);
 
     // then
     assertThat(runningHistoricProcessInstances.size(), is(1));
@@ -185,8 +187,7 @@ public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
       optimizeService.getRunningHistoricProcessInstances(now, now, 10);
 
     // then
-    assertThat(runningHistoricProcessInstances.size(), is(1));
-    assertThat(runningHistoricProcessInstances.get(0).getId(), is(processInstance.getId()));
+    assertThat(runningHistoricProcessInstances.size(), is(0));
   }
 
   @Test
@@ -222,6 +223,8 @@ public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
       .done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
+    Date nowPlus1Second = new Date(now.getTime() + 1000L);
+    ClockUtil.setCurrentTime(nowPlus1Second);
     ProcessInstance processInstance1 =
       runtimeService.startProcessInstanceByKey("process");
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
@@ -235,7 +238,7 @@ public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
     // when
     List<HistoricProcessInstance> runningHistoricProcessInstances =
-      optimizeService.getRunningHistoricProcessInstances(now, null, 10);
+      optimizeService.getRunningHistoricProcessInstances(new Date(now.getTime()), null, 10);
 
     // then
     assertThat(runningHistoricProcessInstances.size(), is(3));

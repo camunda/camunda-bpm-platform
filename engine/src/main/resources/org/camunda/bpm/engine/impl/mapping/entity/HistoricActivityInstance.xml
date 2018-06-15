@@ -264,7 +264,7 @@
 
     <where>
       <if test="parameter.finishedAfter != null">
-        and RES.END_TIME_ &gt;= #{parameter.finishedAfter}
+        and RES.END_TIME_ &gt; #{parameter.finishedAfter}
       </if>
       <if test="parameter.finishedAt != null">
         and RES.END_TIME_ = #{parameter.finishedAt}

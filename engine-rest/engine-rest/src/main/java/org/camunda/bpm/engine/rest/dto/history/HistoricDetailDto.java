@@ -119,6 +119,11 @@ public abstract class HistoricDetailDto {
       dto = HistoricVariableUpdateDto.fromHistoricVariableUpdate(historicVariableUpdate);
     }
 
+    fromHistoricDetail(historicDetail, dto);
+    return dto;
+  }
+
+  protected static void fromHistoricDetail(HistoricDetail historicDetail, HistoricDetailDto dto) {
     dto.id = historicDetail.getId();
     dto.processDefinitionKey = historicDetail.getProcessDefinitionKey();
     dto.processDefinitionId = historicDetail.getProcessDefinitionId();
@@ -133,8 +138,7 @@ public abstract class HistoricDetailDto {
     dto.tenantId = historicDetail.getTenantId();
     dto.userOperationId = historicDetail.getUserOperationId();
     dto.time = historicDetail.getTime();
-
-    return dto;
   }
+
 
 }

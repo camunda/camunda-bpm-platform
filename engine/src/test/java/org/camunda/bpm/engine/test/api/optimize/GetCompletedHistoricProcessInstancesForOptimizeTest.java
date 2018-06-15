@@ -122,14 +122,16 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
       .endEvent()
       .done();
     testHelper.deploy(simpleDefinition);
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("process");
-    Date nowPlus2Seconds = new Date(new Date().getTime() + 2000L);
+    Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
     List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(nowPlus2Seconds, null, 10);
+      optimizeService.getCompletedHistoricProcessInstances(now, null, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(1));
@@ -181,8 +183,7 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
       optimizeService.getCompletedHistoricProcessInstances(now, now, 10);
 
     // then
-    assertThat(completedHistoricProcessInstances.size(), is(1));
-    assertThat(completedHistoricProcessInstances.get(0).getId(), is(processInstance.getId()));
+    assertThat(completedHistoricProcessInstances.size(), is(0));
   }
 
   @Test
@@ -216,6 +217,8 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
       .done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
+    Date nowPlus1Second = new Date(now.getTime() + 1000L);
+    ClockUtil.setCurrentTime(nowPlus1Second);
     ProcessInstance processInstance1 =
       runtimeService.startProcessInstanceByKey("process");
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);

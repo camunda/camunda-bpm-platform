@@ -66,7 +66,12 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
   public static HistoricVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
 
     HistoricVariableUpdateDto dto = new HistoricVariableUpdateDto();
+    fromHistoricVariableUpdate(dto, historicVariableUpdate);
+    return dto;
+  }
 
+  protected static void fromHistoricVariableUpdate(HistoricVariableUpdateDto dto,
+                                                   HistoricVariableUpdate historicVariableUpdate) {
     dto.revision = historicVariableUpdate.getRevision();
     dto.variableName = historicVariableUpdate.getVariableName();
     dto.variableInstanceId = historicVariableUpdate.getVariableInstanceId();
@@ -81,8 +86,6 @@ public class HistoricVariableUpdateDto extends HistoricDetailDto {
       dto.errorMessage = historicVariableUpdate.getErrorMessage();
       dto.variableType = VariableValueDto.toRestApiTypeName(historicVariableUpdate.getTypeName());
     }
-
-    return dto;
   }
 
 }

@@ -598,7 +598,7 @@
 
       <where>
         <if test="parameter.finishedAfter != null">
-          and SELF.END_TIME_ &gt;= #{parameter.finishedAfter}
+          and SELF.END_TIME_ &gt; #{parameter.finishedAfter}
         </if>
         <if test="test=parameter.finishedAt != null">
           and SELF.END_TIME_ = #{parameter.finishedAt}
@@ -627,7 +627,7 @@
 
       <where>
         <if test="parameter.startedAfter != null">
-          and SELF.START_TIME_ &gt;= #{parameter.startedAfter}
+          and SELF.START_TIME_ &gt; #{parameter.startedAfter}
         </if>
         <if test="test=parameter.startedAt != null">
           and SELF.START_TIME_ = #{parameter.startedAt}
