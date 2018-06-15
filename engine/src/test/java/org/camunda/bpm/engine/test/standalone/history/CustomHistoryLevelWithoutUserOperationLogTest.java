@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.EntityTypes.JOB;
 import static org.camunda.bpm.engine.EntityTypes.JOB_DEFINITION;
 import static org.camunda.bpm.engine.EntityTypes.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.EntityTypes.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -67,6 +68,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
       configuration.setJdbcUrl("jdbc:h2:mem:CustomHistoryLevelWithoutUserOperationLogTest");
       configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelFull));
       configuration.setHistory("aCustomHistoryLevelWUOL");
+      configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
       return configuration;
     }
   };
