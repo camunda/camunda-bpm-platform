@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -53,7 +55,7 @@ import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
  * userguide.
  * </p>
  *
- * <p>The second option is great for testing: {@link #createStandalonInMemeProcessEngineConfiguration()}
+ * <p>The second option is great for testing: {@link #createStandaloneInMemProcessEngineConfiguration()}
  * <pre>ProcessEngine processEngine = ProcessEngineConfiguration
  *   .createStandaloneInMemProcessEngineConfiguration()
  *   .buildProcessEngine();
@@ -277,9 +279,27 @@ public abstract class ProcessEngineConfiguration {
    * and Tenant IDs. The pattern can be defined by using the standard
    * Java Regular Expression syntax should be used.
    *
-   * <p>By default only alphanumeric values will be accepted.</p>
+   * <p>By default only alphanumeric values (or 'camunda-admin') will be accepted.</p>
    */
-  protected String resourceWhitelistPattern =  "[\\w-]+";
+  protected String generalResourceWhitelistPattern =  "[a-zA-Z0-9]+|camunda-admin";
+
+  /**
+   * A map containing the:
+   *
+   * <li>
+   *   <ul>userResourceWhitelistPattern</ul>
+   *   <ul>groupResourceWhitelistPattern</ul>
+   *   <ul>tenantResourceWhitelistPattern</ul>
+   * </li>
+   *
+   * parameters used for defining acceptable values for the User, Group
+   * and Tenant IDs. The parameters allow for defining separate custom patterns
+   * for each resource type. The patterns can be defined by using the standard
+   * Java Regular Expression syntax should be used.
+   *
+   * <p>By default only alphanumeric values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected Map<String, String> resourceWhitelistPatterns = new HashMap<String, String>(3);
 
   /**
    * If the value of this flag is set <code>true</code> then the process engine
@@ -740,12 +760,44 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public String getResourceWhitelistPattern() {
-    return resourceWhitelistPattern;
+  public String getGeneralResourceWhitelistPattern() {
+    return generalResourceWhitelistPattern;
   }
 
-  public void setResourceWhitelistPattern(String resourceWhitelistPattern) {
-    this.resourceWhitelistPattern = resourceWhitelistPattern;
+  public void setGeneralResourceWhitelistPattern(String generalResourceWhitelistPattern) {
+    this.generalResourceWhitelistPattern = generalResourceWhitelistPattern;
+  }
+
+  public String getUserResourceWhitelistPattern() {
+    return getResourceWhitelistPattern("user");
+  }
+
+  public void setUserResourceWhitelistPattern(String userResourceWhitelistPattern) {
+    this.resourceWhitelistPatterns.put("user", userResourceWhitelistPattern);
+  }
+
+  public String getGroupResourceWhitelistPattern() {
+    return getResourceWhitelistPattern("group");
+  }
+
+  public void setGroupResourceWhitelistPattern(String groupResourceWhitelistPattern) {
+    this.resourceWhitelistPatterns.put("group", groupResourceWhitelistPattern);
+  }
+
+  public String getTenantResourceWhitelistPattern() {
+    return getResourceWhitelistPattern("tenant");
+  }
+
+  public void setTenantResourceWhitelistPattern(String tenantResourceWhitelistPattern) {
+    this.resourceWhitelistPatterns.put("tenant", tenantResourceWhitelistPattern);
+  }
+
+  public String getResourceWhitelistPattern(String resourceType) {
+    if (this.resourceWhitelistPatterns.containsKey(resourceType)) {
+      return this.resourceWhitelistPatterns.get(resourceType);
+    } else {
+      return getGeneralResourceWhitelistPattern();
+    }
   }
 
   public int getDefaultNumberOfRetries() {

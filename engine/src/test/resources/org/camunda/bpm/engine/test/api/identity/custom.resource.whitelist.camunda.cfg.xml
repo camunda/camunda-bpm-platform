@@ -35,7 +35,8 @@
 
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
 
-    <property name="resourceWhitelistPattern" value="\d+"/>
+    <property name="userResourceWhitelistPattern" value="[a-zA-Z]+"/>
+    <property name="groupResourceWhitelistPattern" value="\d+"/>
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 

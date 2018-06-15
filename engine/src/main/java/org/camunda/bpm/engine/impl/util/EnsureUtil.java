@@ -372,7 +372,7 @@ public final class EnsureUtil {
   }
 
   public static void ensureValidResourceId(CommandContext commandContext, String resourceType, String resourceId) {
-    String resourcePattern = commandContext.getProcessEngineConfiguration().getResourceWhitelistPattern();
+    String resourcePattern = commandContext.getProcessEngineConfiguration().getResourceWhitelistPattern(resourceType.toLowerCase());
     Pattern PATTERN = Pattern.compile(resourcePattern);
 
     if (!PATTERN.matcher(resourceId).matches()) {
