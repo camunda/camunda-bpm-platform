@@ -250,7 +250,7 @@ public class CamundaExtensionsTest {
 
   @Test
   public void testIsStartableInTasklist() {
-    assertThat(process.isStartableInTasklist()).isEqualTo(true);
+    assertThat(process.isCamundaStartableInTasklist()).isEqualTo(false);
   }
 
   @Test

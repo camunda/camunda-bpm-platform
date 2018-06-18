@@ -101,7 +101,7 @@ public interface Process extends CallableElement {
 
   void setCamundaHistoryTimeToLiveString(String historyTimeToLive);
 
-  Boolean isStartableInTasklist();
+  Boolean isCamundaStartableInTasklist();
 
-  void setStartableInTasklist(Boolean startableInTasklist);
+  void setCamundaIsStartableInTasklist(Boolean isStartableInTasklist);
 }

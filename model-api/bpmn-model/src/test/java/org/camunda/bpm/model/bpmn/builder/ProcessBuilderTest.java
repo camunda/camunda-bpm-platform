@@ -425,6 +425,7 @@ public class ProcessBuilderTest {
       .camundaJobPriority("${somePriority}")
       .camundaTaskPriority(TEST_PROCESS_TASK_PRIORITY)
       .camundaHistoryTimeToLive(TEST_HISTORY_TIME_TO_LIVE)
+      .camundaStartableInTasklist(TEST_STARTABLE_IN_TASKLIST)
       .startEvent()
       .endEvent()
       .done();
@@ -433,6 +434,18 @@ public class ProcessBuilderTest {
     assertThat(process.getCamundaJobPriority()).isEqualTo("${somePriority}");
     assertThat(process.getCamundaTaskPriority()).isEqualTo(TEST_PROCESS_TASK_PRIORITY);
     assertThat(process.getCamundaHistoryTimeToLive()).isEqualTo(TEST_HISTORY_TIME_TO_LIVE);
+    assertThat(process.isCamundaStartableInTasklist()).isEqualTo(TEST_STARTABLE_IN_TASKLIST);
+  }
+
+  @Test
+  public void testProcessStartableInTasklist() {
+    modelInstance = Bpmn.createProcess(PROCESS_ID)
+      .startEvent()
+      .endEvent()
+      .done();
+
+    Process process = modelInstance.getModelElementById(PROCESS_ID);
+    assertThat(process.isCamundaStartableInTasklist()).isEqualTo(true);
   }
 
   @Test

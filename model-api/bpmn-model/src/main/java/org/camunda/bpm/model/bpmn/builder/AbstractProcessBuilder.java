@@ -66,7 +66,7 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
    * Set the camunda task priority attribute.
    * The priority is only used for service tasks which have as type value
    * <code>external</code>
-   * 
+   *
    * @param taskPriority the task priority which should used for the external tasks
    * @return the builder object
    */
@@ -86,4 +86,13 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
     return myself;
   }
 
+  /**
+   * Set whenever the process is startable in Tasklist
+   * @param isStartableInTasklist default value is true
+   * @return the builder object
+   */
+  public B camundaStartableInTasklist(Boolean isStartableInTasklist) {
+    element.setCamundaIsStartableInTasklist(isStartableInTasklist);
+    return myself;
+  }
 }

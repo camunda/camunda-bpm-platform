@@ -62,7 +62,7 @@ public class ProcessImpl extends CallableElementImpl implements Process {
   protected static Attribute<String> camundaJobPriorityAttribute;
   protected static Attribute<String> camundaTaskPriorityAttribute;
   protected static Attribute<String> camundaHistoryTimeToLiveAttribute;
-  protected static Attribute<Boolean> camundaIsStartableInTasklist;
+  protected static Attribute<Boolean> camundaIsStartableInTasklistAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Process.class, BPMN_ELEMENT_PROCESS)
@@ -139,7 +139,8 @@ public class ProcessImpl extends CallableElementImpl implements Process {
       .namespace(CAMUNDA_NS)
       .build();
 
-    camundaIsStartableInTasklist = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_IS_STARTABLE_IN_TASKLIST)
+    camundaIsStartableInTasklistAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_IS_STARTABLE_IN_TASKLIST)
+      .defaultValue(true)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -304,12 +305,12 @@ public class ProcessImpl extends CallableElementImpl implements Process {
   }
 
   @Override
-  public Boolean isStartableInTasklist() {
-    return camundaIsStartableInTasklist.getValue(this);
+  public Boolean isCamundaStartableInTasklist() {
+    return camundaIsStartableInTasklistAttribute.getValue(this);
   }
 
   @Override
-  public void setStartableInTasklist(Boolean startableInTasklist) {
-    camundaIsStartableInTasklist.setValue(this, startableInTasklist);
+  public void setCamundaIsStartableInTasklist(Boolean isStartableInTasklist) {
+    camundaIsStartableInTasklistAttribute.setValue(this, isStartableInTasklist);
   }
 }
