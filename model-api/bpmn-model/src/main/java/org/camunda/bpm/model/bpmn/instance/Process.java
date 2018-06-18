@@ -86,9 +86,9 @@ public interface Process extends CallableElement {
   String getCamundaJobPriority();
 
   void setCamundaJobPriority(String jobPriority);
-  
+
   String getCamundaTaskPriority();
-  
+
   void setCamundaTaskPriority(String taskPriority);
 
   @Deprecated
@@ -100,4 +100,8 @@ public interface Process extends CallableElement {
   String getCamundaHistoryTimeToLiveString();
 
   void setCamundaHistoryTimeToLiveString(String historyTimeToLive);
+
+  Boolean isStartableInTasklist();
+
+  void setStartableInTasklist(Boolean startableInTasklist);
 }

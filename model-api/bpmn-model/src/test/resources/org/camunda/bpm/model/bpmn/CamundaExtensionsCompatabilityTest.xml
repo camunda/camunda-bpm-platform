@@ -11,7 +11,8 @@
       camunda:candidateStarterUsers="user1, ${user2(a, b)}, user3"
       camunda:jobPriority="15"
       camunda:taskPriority="13"
-      camunda:historyTimeToLive="5">
+      camunda:historyTimeToLive="5"
+      camunda:isStartableInTasklist="true">
     <extensionElements>
       <camunda:executionListener event="start" class="org.camunda.test.Test"/>
     </extensionElements>

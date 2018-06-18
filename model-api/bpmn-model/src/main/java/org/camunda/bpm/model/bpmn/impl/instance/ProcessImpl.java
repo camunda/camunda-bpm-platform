@@ -62,6 +62,7 @@ public class ProcessImpl extends CallableElementImpl implements Process {
   protected static Attribute<String> camundaJobPriorityAttribute;
   protected static Attribute<String> camundaTaskPriorityAttribute;
   protected static Attribute<String> camundaHistoryTimeToLiveAttribute;
+  protected static Attribute<Boolean> camundaIsStartableInTasklist;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Process.class, BPMN_ELEMENT_PROCESS)
@@ -129,12 +130,16 @@ public class ProcessImpl extends CallableElementImpl implements Process {
     camundaJobPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_JOB_PRIORITY)
       .namespace(CAMUNDA_NS)
       .build();
-    
+
     camundaTaskPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TASK_PRIORITY)
       .namespace(CAMUNDA_NS)
       .build();
 
     camundaHistoryTimeToLiveAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaIsStartableInTasklist = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_IS_STARTABLE_IN_TASKLIST)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -266,7 +271,7 @@ public class ProcessImpl extends CallableElementImpl implements Process {
 
   @Override
   public String getCamundaTaskPriority() {
-    return camundaTaskPriorityAttribute.getValue(this);    
+    return camundaTaskPriorityAttribute.getValue(this);
   }
 
   @Override
@@ -296,5 +301,15 @@ public class ProcessImpl extends CallableElementImpl implements Process {
   @Override
   public void setCamundaHistoryTimeToLiveString(String historyTimeToLive) {
     camundaHistoryTimeToLiveAttribute.setValue(this, historyTimeToLive);
+  }
+
+  @Override
+  public Boolean isStartableInTasklist() {
+    return camundaIsStartableInTasklist.getValue(this);
+  }
+
+  @Override
+  public void setStartableInTasklist(Boolean startableInTasklist) {
+    camundaIsStartableInTasklist.setValue(this, startableInTasklist);
   }
 }

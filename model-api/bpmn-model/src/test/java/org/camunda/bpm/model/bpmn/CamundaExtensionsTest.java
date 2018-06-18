@@ -249,6 +249,11 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testIsStartableInTasklist() {
+    assertThat(process.isStartableInTasklist()).isEqualTo(true);
+  }
+
+  @Test
   public void testServiceTaskPriority() {
     assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }

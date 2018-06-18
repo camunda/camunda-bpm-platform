@@ -59,7 +59,8 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterUsers"),
       new AttributeAssumption(CAMUNDA_NS, "jobPriority"),
       new AttributeAssumption(CAMUNDA_NS, "taskPriority"),
-      new AttributeAssumption(CAMUNDA_NS, "historyTimeToLive")
+      new AttributeAssumption(CAMUNDA_NS, "historyTimeToLive"),
+      new AttributeAssumption(CAMUNDA_NS, "isStartableInTasklist")
     );
   }
 
@@ -72,7 +73,7 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
 
     assertThat(process.getCamundaJobPriority()).isEqualTo("15");
   }
-  
+
   @Test
   public void testCamundaTaskPriority() {
     //given
@@ -81,7 +82,7 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
     //when
     proc.setCamundaTaskPriority(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);
     //then
-    assertThat(proc.getCamundaTaskPriority()).isEqualTo(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);    
+    assertThat(proc.getCamundaTaskPriority()).isEqualTo(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);
   }
 
   @Test
