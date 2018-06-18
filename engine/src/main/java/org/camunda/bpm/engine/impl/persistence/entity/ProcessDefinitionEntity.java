@@ -68,6 +68,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
   protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
+  protected boolean isStartableInTasklist;
 
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
@@ -457,5 +458,13 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   public void setHistoryTimeToLive(Integer historyTimeToLive) {
     this.historyTimeToLive = historyTimeToLive;
+  }
+
+  public boolean isStartableInTasklist() {
+    return isStartableInTasklist;
+  }
+
+  public void setStartableInTasklist(boolean isStartableInTasklist) {
+    this.isStartableInTasklist = isStartableInTasklist;
   }
 }

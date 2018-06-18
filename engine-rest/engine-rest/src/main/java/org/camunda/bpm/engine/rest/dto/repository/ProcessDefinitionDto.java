@@ -29,6 +29,7 @@ public class ProcessDefinitionDto {
   protected String tenantId;
   protected String versionTag;
   protected Integer historyTimeToLive;
+  protected boolean isStartableInTasklist;
 
   public String getId() {
     return id;
@@ -82,6 +83,10 @@ public class ProcessDefinitionDto {
     return historyTimeToLive;
   }
 
+  public boolean isStartableInTasklist() {
+    return isStartableInTasklist;
+  }
+
   public static ProcessDefinitionDto fromProcessDefinition(ProcessDefinition definition) {
     ProcessDefinitionDto dto = new ProcessDefinitionDto();
     dto.id = definition.getId();
@@ -97,6 +102,7 @@ public class ProcessDefinitionDto {
     dto.tenantId = definition.getTenantId();
     dto.versionTag = definition.getVersionTag();
     dto.historyTimeToLive = definition.getHistoryTimeToLive();
+    dto.isStartableInTasklist = definition.isStartableInTasklist();
     return dto;
   }
 

@@ -264,6 +264,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME = "aResourceName";
   public static final String EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME = "aResourceName.png";
   public static final boolean EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED = true;
+  public static final boolean EXAMPLE_PROCESS_DEFINITION_IS_STARTABLE = true;
 
   public static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID = "aProcessDefinitionId:2";
   public static final String EXAMPLE_PROCESS_DEFINTION_ID_LIST = EXAMPLE_PROCESS_DEFINITION_ID + "," + ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID;

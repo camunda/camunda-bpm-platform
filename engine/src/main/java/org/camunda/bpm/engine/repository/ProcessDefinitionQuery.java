@@ -180,6 +180,16 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery includeProcessDefinitionsWithoutTenantId();
 
+  /**
+   * Select process definitions which could be started in Tasklist.
+   */
+  ProcessDefinitionQuery startableInTasklist();
+
+  /**
+   * Select process definitions which could not be started in Tasklist.
+   */
+  ProcessDefinitionQuery notStartableInTasklist();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the process definitions (needs to be followed by {@link #asc()} or {@link #desc()}). */

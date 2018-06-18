@@ -44,4 +44,7 @@ public interface ProcessDefinition extends ResourceDefinition {
   /** Version tag of the process definition. */
   String getVersionTag();
 
+
+  /** Returns true if the process definition is startable in Tasklist. */
+  boolean isStartableInTasklist();
 }

@@ -78,6 +78,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String versionTag;
   protected String versionTagLike;
 
+  protected boolean isStartableInTasklist = false;
+  protected boolean isNotStartableInTasklist = false;
+
   public ProcessDefinitionQueryImpl() {
   }
 
@@ -256,6 +259,16 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     ensureNotNull("versionTagLike", versionTagLike);
     this.versionTagLike = versionTagLike;
 
+    return this;
+  }
+
+  public ProcessDefinitionQuery startableInTasklist() {
+    this.isStartableInTasklist = true;
+    return this;
+  }
+
+  public ProcessDefinitionQuery notStartableInTasklist() {
+    this.isNotStartableInTasklist = true;
     return this;
   }
 

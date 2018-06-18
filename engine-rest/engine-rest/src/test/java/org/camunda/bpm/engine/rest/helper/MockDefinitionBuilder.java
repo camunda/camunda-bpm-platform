@@ -32,6 +32,7 @@ public class MockDefinitionBuilder {
   private boolean startFormKey = false;
   private String tenantId = null;
   private String versionTag = null;
+  private boolean isStartableInTasklist = true;
 
   public MockDefinitionBuilder id(String id) {
     this.id = id;
@@ -98,6 +99,11 @@ public class MockDefinitionBuilder {
     return this;
   }
 
+  public MockDefinitionBuilder isStartableInTasklist(boolean isStartableInTasklist) {
+    this.isStartableInTasklist = isStartableInTasklist;
+    return this;
+  }
+
   public ProcessDefinition build() {
     ProcessDefinition mockDefinition = mock(ProcessDefinition.class);
     when(mockDefinition.getId()).thenReturn(id);
@@ -113,6 +119,7 @@ public class MockDefinitionBuilder {
     when(mockDefinition.hasStartFormKey()).thenReturn(startFormKey);
     when(mockDefinition.getTenantId()).thenReturn(tenantId);
     when(mockDefinition.getVersionTag()).thenReturn(versionTag);
+    when(mockDefinition.isStartableInTasklist()).thenReturn(isStartableInTasklist);
     return mockDefinition;
   }
 }

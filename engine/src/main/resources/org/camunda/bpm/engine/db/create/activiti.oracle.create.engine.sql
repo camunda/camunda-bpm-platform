@@ -122,6 +122,7 @@ create table ACT_RE_PROCDEF (
     TENANT_ID_ NVARCHAR2(64),
     VERSION_TAG_ NVARCHAR2(64),
     HISTORY_TTL_ integer,
+    STARTABLE_ NUMBER(1,0) CHECK (STARTABLE_ IN (1,0)),
     primary key (ID_)
 );
 

@@ -156,6 +156,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     String returnedDeploymentId  = from(content).getString("[0].deploymentId");
     String returnedDiagramResourceName = from(content).getString("[0].diagram");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
+    Boolean returnedIsStartedInTasklist = from(content).getBoolean("[0].startableInTasklist");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedDefinitionKey);
@@ -167,6 +168,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, returnedDeploymentId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, returnedDiagramResourceName);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, returnedIsSuspended);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_STARTABLE, returnedIsStartedInTasklist);
   }
 
   @Test
@@ -289,6 +291,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     verify(mockedQuery).incidentMessageLike(queryParameters.get("incidentMessageLike"));
     verify(mockedQuery).versionTag(queryParameters.get("versionTag"));
     verify(mockedQuery).versionTagLike(queryParameters.get("versionTagLike"));
+    verify(mockedQuery).startableInTasklist();
     verify(mockedQuery).list();
   }
 
@@ -316,6 +319,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     parameters.put("incidentMessageLike", "incMessageLike");
     parameters.put("versionTag", "semVer");
     parameters.put("versionTagLike", "semVerLike");
+    parameters.put("startableInTasklist", "true");
 
     return parameters;
   }
@@ -434,7 +438,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
       MockProvider.mockDefinition().id(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).versionTag(MockProvider.ANOTHER_EXAMPLE_VERSION_TAG).build());
     mockedQuery = setUpMockDefinitionQuery(processDefinitions);
 
-    Response response = given()
+    given()
       .queryParam("versionTag", MockProvider.EXAMPLE_VERSION_TAG)
       .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -442,6 +446,23 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
       .get(PROCESS_DEFINITION_QUERY_URL);
 
     verify(mockedQuery).versionTag(MockProvider.EXAMPLE_VERSION_TAG);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testNotStartableInTasklist() {
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+      MockProvider.mockDefinition().isStartableInTasklist(false).build());
+    mockedQuery = setUpMockDefinitionQuery(processDefinitions);
+
+    given()
+      .queryParam("notStartableInTasklist", true)
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).notStartableInTasklist();
     verify(mockedQuery).list();
   }
 

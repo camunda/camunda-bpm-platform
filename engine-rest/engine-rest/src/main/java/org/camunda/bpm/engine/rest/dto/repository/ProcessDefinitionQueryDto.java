@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
@@ -80,6 +81,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private String versionTag;
   private String versionTagLike;
   private List<String> keys;
+  private Boolean startableInTasklist;
+  private Boolean notStartableInTasklist;
 
   public ProcessDefinitionQueryDto() {
 
@@ -238,6 +241,16 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.versionTagLike = versionTagLike;
   }
 
+  @CamundaQueryParam(value = "startableInTasklist", converter = BooleanConverter.class)
+  public void setStartableInTasklist(Boolean startableInTasklist) {
+    this.startableInTasklist = startableInTasklist;
+  }
+
+  @CamundaQueryParam(value = "notStartableInTasklist", converter = BooleanConverter.class)
+  public void setNotStartableInTasklist(Boolean notStartableInTasklist) {
+    this.notStartableInTasklist = notStartableInTasklist;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -329,6 +342,13 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     if( versionTagLike != null) {
       query.versionTagLike(versionTagLike);
     }
+    if (TRUE.equals(startableInTasklist)) {
+      query.startableInTasklist();
+    }
+    if (TRUE.equals(notStartableInTasklist)) {
+      query.notStartableInTasklist();
+    }
+
   }
 
   @Override

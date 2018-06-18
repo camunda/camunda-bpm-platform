@@ -7,7 +7,7 @@
   <!-- PROCESSDEFINITION INSERT -->
 
   <insert id="insertProcessDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
-    insert into ${prefix}ACT_RE_PROCDEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, HAS_START_FORM_KEY_, SUSPENSION_STATE_, TENANT_ID_, VERSION_TAG_, HISTORY_TTL_, REV_)
+    insert into ${prefix}ACT_RE_PROCDEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, HAS_START_FORM_KEY_, SUSPENSION_STATE_, TENANT_ID_, VERSION_TAG_, HISTORY_TTL_, STARTABLE_, REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -21,6 +21,7 @@
             #{tenantId, jdbcType=VARCHAR},
             #{versionTag, jdbcType=VARCHAR},
             #{historyTimeToLive, jdbcType=INTEGER},
+            #{isStartableInTasklist, jdbcType=BOOLEAN},
             1
            )
   </insert>
@@ -86,6 +87,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="versionTag" column="VERSION_TAG_" jdbcType="VARCHAR" />
     <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="INTEGER" />
+    <result property="isStartableInTasklist" column="STARTABLE_" jdbcType="BOOLEAN" />
   </resultMap>
 
   <!-- PROCESSDEFINITION SELECT -->
@@ -315,6 +317,12 @@
       </if>
       <if test="versionTagLike != null">
         and RES.VERSION_TAG_ like #{versionTagLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="isStartableInTasklist">
+        and RES.STARTABLE_ = ${trueConstant}
+      </if>
+      <if test="isNotStartableInTasklist">
+        and RES.STARTABLE_ = ${falseConstant}
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

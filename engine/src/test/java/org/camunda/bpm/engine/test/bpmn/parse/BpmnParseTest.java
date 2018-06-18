@@ -796,6 +796,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
     assertNotNull(timeToLive);
     assertEquals(5, timeToLive.intValue());
+
+    assertTrue(processDefinitions.get(0).isStartableInTasklist());
   }
 
   @Deployment
@@ -859,4 +861,12 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment
+  public void testParseProcessDefinitionStartable() {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    assertNotNull(processDefinitions);
+    assertEquals(1, processDefinitions.size());
+
+    assertFalse(processDefinitions.get(0).isStartableInTasklist());
+  }
 }
