@@ -24,7 +24,6 @@ import java.util.Map;
 
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
 public class OptimizeManager extends AbstractManager {
 
@@ -44,7 +43,6 @@ public class OptimizeManager extends AbstractManager {
 
   private void checkAuthorization() {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION);
-    getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_INSTANCE);
   }
 
   @SuppressWarnings("unchecked")

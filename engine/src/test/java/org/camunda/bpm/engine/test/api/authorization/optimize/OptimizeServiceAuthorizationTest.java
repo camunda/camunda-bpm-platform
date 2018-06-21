@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -88,7 +87,6 @@ public class OptimizeServiceAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey("process");
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
-    createGrantAuthorization(PROCESS_INSTANCE, "*", userId, READ_HISTORY);
 
     // when
     List<HistoricActivityInstance> completedHistoricActivityInstances =
@@ -119,7 +117,6 @@ public class OptimizeServiceAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey("process");
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
-    createGrantAuthorization(PROCESS_INSTANCE, "*", userId, READ_HISTORY);
 
     // when
     List<HistoricProcessInstance> completedHistoricProcessInstances =
@@ -150,7 +147,6 @@ public class OptimizeServiceAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey("process");
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
-    createGrantAuthorization(PROCESS_INSTANCE, "*", userId, READ_HISTORY);
 
     // when
     List<HistoricProcessInstance> runningHistoricProcessInstances =
@@ -181,7 +177,6 @@ public class OptimizeServiceAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey("process");
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
-    createGrantAuthorization(PROCESS_INSTANCE, "*", userId, READ_HISTORY);
 
     // when
     List<HistoricVariableUpdate> historicVariableUpdates =
@@ -191,47 +186,10 @@ public class OptimizeServiceAuthorizationTest extends AuthorizationTest {
     assertThat(historicVariableUpdates.size(), is(0));
   }
 
-  public void testAuthorizationsOnProcessDefinitionOnlyIsNotEnough() {
-    // given
-    startProcessInstanceByKey("process");
-    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
-
-    try {
-      // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
-      fail("Exception expected: It should not be possible to retrieve the activities");
-    } catch (AuthorizationException e) {
-      // then
-      String exceptionMessage = e.getMessage();
-      assertTextPresent(userId, exceptionMessage);
-      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), exceptionMessage);
-    }
-  }
-
-  public void testAuthorizationsOnProcessInstanceOnlyIsNotEnough() {
-    // given
-    startProcessInstanceByKey("process");
-    createGrantAuthorization(PROCESS_INSTANCE, "*", userId, READ_HISTORY);
-
-    try {
-      // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
-      fail("Exception expected: It should not be possible to retrieve the activities");
-    } catch (AuthorizationException e) {
-      // then
-      String exceptionMessage = e.getMessage();
-      assertTextPresent(userId, exceptionMessage);
-      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
-    }
-  }
-
   public void testAuthorizationsOnSingleProcessDefinitionIsNotEnough() {
     // given
     startProcessInstanceByKey("process");
     createGrantAuthorization(PROCESS_DEFINITION, "process", userId, READ_HISTORY);
-    createGrantAuthorization(PROCESS_INSTANCE, "*", userId, READ_HISTORY);
 
     try {
       // when
@@ -243,25 +201,6 @@ public class OptimizeServiceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(userId, exceptionMessage);
       assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
-    }
-  }
-
-  public void testAuthorizationsOnSingleProcessInstanceIsNotEnough() {
-    // given
-    ProcessInstance processInstance = startProcessInstanceByKey("process");
-    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
-    createGrantAuthorization(PROCESS_INSTANCE, processInstance.getId(), userId, READ_HISTORY);
-
-    try {
-      // when
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
-      fail("Exception expected: It should not be possible to retrieve the activities");
-    } catch (AuthorizationException e) {
-      // then
-      String exceptionMessage = e.getMessage();
-      assertTextPresent(userId, exceptionMessage);
-      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), exceptionMessage);
     }
   }
 
