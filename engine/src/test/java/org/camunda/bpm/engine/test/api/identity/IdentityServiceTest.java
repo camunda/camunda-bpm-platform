@@ -996,7 +996,7 @@ public class IdentityServiceTest {
       assertEquals("Group" + INVALID_ID_MESSAGE + "johnsGroup.", ex.getMessage());
     }
 
-    // left as general pattern: [a-zA-Z0-9]+|camunda-admin
+    // new general pattern (used for tenant whitelisting): [a-zA-Z0-9]+
     try {
       processEngine.getIdentityService().newTenant("!@##$%");
       fail("Invalid tenant id exception expected!");

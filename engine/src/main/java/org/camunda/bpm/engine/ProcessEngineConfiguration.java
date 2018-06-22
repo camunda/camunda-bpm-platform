@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -281,25 +282,17 @@ public abstract class ProcessEngineConfiguration {
    *
    * <p>By default only alphanumeric values (or 'camunda-admin') will be accepted.</p>
    */
-  protected String generalResourceWhitelistPattern =  "[a-zA-Z0-9]+|camunda-admin";
+  protected String defaultResourceWhitelistPattern =  "[a-zA-Z0-9]+|camunda-admin";
 
   /**
-   * A map containing the:
-   *
-   * <li>
-   *   <ul>userResourceWhitelistPattern</ul>
-   *   <ul>groupResourceWhitelistPattern</ul>
-   *   <ul>tenantResourceWhitelistPattern</ul>
-   * </li>
-   *
-   * parameters used for defining acceptable values for the User, Group
-   * and Tenant IDs. The parameters allow for defining separate custom patterns
-   * for each resource type. The patterns can be defined by using the standard
-   * Java Regular Expression syntax should be used.
+   * A map containing the Whitelist Patterns for defining acceptable values for the User,
+   * Group and Tenant IDs. The parameters allow for defining separate custom patterns
+   * for each resource type. The patterns can be defined by using the standard Java
+   * Regular Expression syntax should be used.
    *
    * <p>By default only alphanumeric values (or 'camunda-admin') will be accepted.</p>
    */
-  protected Map<String, String> resourceWhitelistPatterns = new HashMap<String, String>(3);
+  protected Map<String, String> resourceWhitelistPatterns = new HashMap<String, String>(4);
 
   /**
    * If the value of this flag is set <code>true</code> then the process engine
@@ -761,35 +754,23 @@ public abstract class ProcessEngineConfiguration {
   }
 
   public String getGeneralResourceWhitelistPattern() {
-    return generalResourceWhitelistPattern;
+    if (this.resourceWhitelistPatterns.containsKey("general")) {
+      return this.resourceWhitelistPatterns.get("general");
+    } else {
+      return defaultResourceWhitelistPattern;
+    }
   }
 
   public void setGeneralResourceWhitelistPattern(String generalResourceWhitelistPattern) {
-    this.generalResourceWhitelistPattern = generalResourceWhitelistPattern;
+    this.resourceWhitelistPatterns.put("general", generalResourceWhitelistPattern);
   }
 
-  public String getUserResourceWhitelistPattern() {
-    return getResourceWhitelistPattern("user");
+  public Map<String, String> getResourceWhitelistPatterns() {
+    return resourceWhitelistPatterns;
   }
 
-  public void setUserResourceWhitelistPattern(String userResourceWhitelistPattern) {
-    this.resourceWhitelistPatterns.put("user", userResourceWhitelistPattern);
-  }
-
-  public String getGroupResourceWhitelistPattern() {
-    return getResourceWhitelistPattern("group");
-  }
-
-  public void setGroupResourceWhitelistPattern(String groupResourceWhitelistPattern) {
-    this.resourceWhitelistPatterns.put("group", groupResourceWhitelistPattern);
-  }
-
-  public String getTenantResourceWhitelistPattern() {
-    return getResourceWhitelistPattern("tenant");
-  }
-
-  public void setTenantResourceWhitelistPattern(String tenantResourceWhitelistPattern) {
-    this.resourceWhitelistPatterns.put("tenant", tenantResourceWhitelistPattern);
+  public void setResourceWhitelistPatterns(Map<String, String> resourceWhitelistPatterns) {
+    this.resourceWhitelistPatterns = resourceWhitelistPatterns;
   }
 
   public String getResourceWhitelistPattern(String resourceType) {
@@ -798,6 +779,10 @@ public abstract class ProcessEngineConfiguration {
     } else {
       return getGeneralResourceWhitelistPattern();
     }
+  }
+
+  public void setResourceWhitelistPattern(String resourceType, String resourceWhitelistPattern) {
+    this.resourceWhitelistPatterns.put(resourceType, resourceWhitelistPattern);
   }
 
   public int getDefaultNumberOfRetries() {
