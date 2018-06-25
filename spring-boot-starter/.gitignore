@@ -8,6 +8,8 @@
 .factorypath
 .idea/
 *.iml
+*.ipr
+*.iws
 .DS_Store
 #
 # MAVEN

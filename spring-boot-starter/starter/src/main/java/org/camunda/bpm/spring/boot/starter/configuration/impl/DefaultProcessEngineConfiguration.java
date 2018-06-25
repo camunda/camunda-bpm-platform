@@ -18,6 +18,8 @@ public class DefaultProcessEngineConfiguration extends AbstractCamundaConfigurat
     setProcessEngineName(configuration);
     setDefaultSerializationFormat(configuration);
     setIdGenerator(configuration);
+    setJobExecutorAcquireByPriority(configuration);
+    setDefaultNumberOfRetries(configuration);
   }
 
   private void setIdGenerator(SpringProcessEngineConfiguration configuration) {
@@ -42,5 +44,13 @@ public class DefaultProcessEngineConfiguration extends AbstractCamundaConfigurat
     }
   }
 
+  private void setJobExecutorAcquireByPriority(SpringProcessEngineConfiguration configuration) {
+    Optional.ofNullable(camundaBpmProperties.getJobExecutorAcquireByPriority())
+      .ifPresent(configuration::setJobExecutorAcquireByPriority);
+  }
 
+  private void setDefaultNumberOfRetries(SpringProcessEngineConfiguration configuration) {
+    Optional.ofNullable(camundaBpmProperties.getDefaultNumberOfRetries())
+      .ifPresent(configuration::setDefaultNumberOfRetries);
+  }
 }

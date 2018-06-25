@@ -48,6 +48,10 @@ public class CamundaBpmProperties {
 
   private String idGenerator = IdGeneratorConfiguration.STRONG;
 
+  private Boolean jobExecutorAcquireByPriority = null;
+
+  private Integer defaultNumberOfRetries = null;
+
   /**
    * the history level to use
    */
@@ -272,6 +276,22 @@ public class CamundaBpmProperties {
     this.idGenerator = idGenerator;
   }
 
+  public Boolean getJobExecutorAcquireByPriority() {
+    return jobExecutorAcquireByPriority;
+  }
+
+  public void setJobExecutorAcquireByPriority(Boolean jobExecutorAcquireByPriority) {
+    this.jobExecutorAcquireByPriority = jobExecutorAcquireByPriority;
+  }
+
+  public Integer getDefaultNumberOfRetries() {
+    return defaultNumberOfRetries;
+  }
+
+  public void setDefaultNumberOfRetries(Integer defaultNumberOfRetries) {
+    this.defaultNumberOfRetries = defaultNumberOfRetries;
+  }
+
   public boolean isEnabled() {
     return enabled;
   }
@@ -302,6 +322,8 @@ public class CamundaBpmProperties {
       .add("adminUser=" + adminUser)
       .add("filter=" + filter)
       .add("idGenerator=" + idGenerator)
+      .add("jobExecutorAcquireByPriority=" + jobExecutorAcquireByPriority)
+      .add("defaultNumberOfRetries" + defaultNumberOfRetries)
       .toString();
   }
 

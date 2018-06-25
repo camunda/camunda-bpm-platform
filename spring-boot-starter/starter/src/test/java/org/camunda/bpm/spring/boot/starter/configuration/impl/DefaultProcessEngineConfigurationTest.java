@@ -73,6 +73,28 @@ public class DefaultProcessEngineConfigurationTest {
     assertThat(configuration.getDefaultSerializationFormat()).isEqualTo(defaultSerializationFormat);
   }
 
+  @Test
+  public void setJobExecutorAcquireByPriority() {
+    properties.setJobExecutorAcquireByPriority(null);
+    instance.preInit(configuration);
+    assertThat(configuration.isJobExecutorAcquireByPriority()).isEqualTo(false);
+
+    properties.setJobExecutorAcquireByPriority(true);
+    instance.preInit(configuration);
+    assertThat(configuration.isJobExecutorAcquireByPriority()).isEqualTo(true);
+  }
+
+  @Test
+  public void setDefaultNumberOfRetries() {
+    properties.setDefaultNumberOfRetries(null);
+    instance.preInit(configuration);
+    assertThat(configuration.getDefaultNumberOfRetries()).isEqualTo(3);
+
+    properties.setDefaultNumberOfRetries(1);
+    instance.preInit(configuration);
+    assertThat(configuration.getDefaultNumberOfRetries()).isEqualTo(1);
+  }
+
   private void initIdGenerator(IdGenerator idGenerator) {
     ReflectionTestUtils.setField(instance, "idGenerator", Optional.ofNullable(idGenerator));
   }

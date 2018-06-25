@@ -15,7 +15,16 @@ public class JobExecutionProperty {
   private boolean deploymentAware;
 
   private int corePoolSize = 3;
+  private Integer keepAliveSeconds;
   private int maxPoolSize = 10;
+  private Integer queueCapacity;
+
+  /*
+   * properties for job executor
+   */
+  private Integer lockTimeInMillis;
+  private Integer maxJobsPerAcquisition;
+  private Integer waitTimeInMillis;
 
   public boolean isEnabled() {
     return enabled;
@@ -49,6 +58,46 @@ public class JobExecutionProperty {
     this.maxPoolSize = maxPoolSize;
   }
 
+  public Integer getQueueCapacity() {
+    return queueCapacity;
+  }
+
+  public void setQueueCapacity(Integer queueCapacity) {
+    this.queueCapacity = queueCapacity;
+  }
+
+  public Integer getLockTimeInMillis() {
+    return lockTimeInMillis;
+  }
+
+  public void setLockTimeInMillis(Integer lockTimeInMillis) {
+    this.lockTimeInMillis = lockTimeInMillis;
+  }
+
+  public Integer getMaxJobsPerAcquisition() {
+    return maxJobsPerAcquisition;
+  }
+
+  public void setMaxJobsPerAcquisition(Integer maxJobsPerAcquisition) {
+    this.maxJobsPerAcquisition = maxJobsPerAcquisition;
+  }
+
+  public Integer getWaitTimeInMillis() {
+    return waitTimeInMillis;
+  }
+
+  public void setWaitTimeInMillis(Integer waitTimeInMillis) {
+    this.waitTimeInMillis = waitTimeInMillis;
+  }
+
+  public Integer getKeepAliveSeconds() {
+    return keepAliveSeconds;
+  }
+
+  public void setKeepAliveSeconds(Integer keepAliveSeconds) {
+    this.keepAliveSeconds = keepAliveSeconds;
+  }
+
   @Override
   public String toString() {
     return joinOn(this.getClass())
@@ -56,6 +105,11 @@ public class JobExecutionProperty {
       .add("deploymentAware=" + deploymentAware)
       .add("corePoolSize=" + corePoolSize)
       .add("maxPoolSize=" + maxPoolSize)
+      .add("queueCapacity=" + queueCapacity)
+      .add("lockTimeInMillis=" + lockTimeInMillis)
+      .add("maxJobsPerAcquisition=" + maxJobsPerAcquisition)
+      .add("waitTimeInMillis=" + waitTimeInMillis)
+      .add("keepAliveSeconds=" + keepAliveSeconds)
       .toString();
   }
 

@@ -3,6 +3,7 @@ package org.camunda.bpm.spring.boot.starter.configuration.impl;
 import static org.camunda.bpm.spring.boot.starter.util.CamundaSpringBootUtil.join;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -21,6 +22,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import javax.swing.text.html.Option;
 
 /**
  * Prepares JobExecutor and registers all known custom JobHandlers.
@@ -71,6 +74,10 @@ public class DefaultJobConfiguration extends AbstractCamundaConfiguration implem
       threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
       threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);
 
+      Optional.ofNullable(properties.getJobExecution().getKeepAliveSeconds())
+        .ifPresent(threadPoolTaskExecutor::setKeepAliveSeconds);
+      Optional.ofNullable(properties.getJobExecution().getQueueCapacity())
+        .ifPresent(threadPoolTaskExecutor::setQueueCapacity);
 
       LOG.configureJobExecutorPool(corePoolSize, maxPoolSize);
       return threadPoolTaskExecutor;
@@ -79,10 +86,17 @@ public class DefaultJobConfiguration extends AbstractCamundaConfiguration implem
     @Bean
     @ConditionalOnMissingBean(JobExecutor.class)
     @ConditionalOnProperty(prefix = "camunda.bpm.job-execution", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public static JobExecutor jobExecutor(@Qualifier(CAMUNDA_TASK_EXECUTOR_QUALIFIER) final TaskExecutor taskExecutor) {
+    public static JobExecutor jobExecutor(@Qualifier(CAMUNDA_TASK_EXECUTOR_QUALIFIER) final TaskExecutor taskExecutor, CamundaBpmProperties properties) {
       final SpringJobExecutor springJobExecutor = new SpringJobExecutor();
       springJobExecutor.setTaskExecutor(taskExecutor);
       springJobExecutor.setRejectedJobsHandler(new CallerRunsRejectedJobsHandler());
+
+      Optional.ofNullable(properties.getJobExecution().getLockTimeInMillis())
+        .ifPresent(springJobExecutor::setLockTimeInMillis);
+      Optional.ofNullable(properties.getJobExecution().getMaxJobsPerAcquisition())
+        .ifPresent(springJobExecutor::setMaxJobsPerAcquisition);
+      Optional.ofNullable(properties.getJobExecution().getWaitTimeInMillis())
+        .ifPresent(springJobExecutor::setWaitTimeInMillis);
 
       return springJobExecutor;
     }
