@@ -14,10 +14,10 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
@@ -854,6 +854,56 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
 
+  }
+
+  public void testStartableInTasklist() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ, CREATE_INSTANCE);
+    ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
+
+    // when
+    ProcessDefinition result = repositoryService.createProcessDefinitionQuery().startableInTasklist().singleResult();
+
+    // then
+    assertNotNull(result);
+    assertEquals(definition.getId(), result.getId());
+    assertTrue(result.isStartableInTasklist());
+  }
+
+  public void testStartableInTasklistWithReadOnly() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
+    selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
+
+    try {
+    // when
+    repositoryService.createProcessDefinitionQuery().startableInTasklist().singleResult();
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(CREATE_INSTANCE.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  public void testStartableInTasklistWithCreateInstancePermission() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, CREATE_INSTANCE);
+    selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
+
+    try {
+    // when
+    repositoryService.createProcessDefinitionQuery().startableInTasklist().singleResult();
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   // helper /////////////////////////////////////////////////////////////////////

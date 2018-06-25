@@ -431,6 +431,14 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return versionTag;
   }
 
+  public boolean isStartableInTasklist() {
+    return isStartableInTasklist;
+  }
+
+  public boolean isNotStartableInTasklist() {
+    return isNotStartableInTasklist;
+  }
+
   public ProcessDefinitionQueryImpl startableByUser(String userId) {
     ensureNotNull("userId", userId);
     this.authorizationUserId = userId;
