@@ -76,11 +76,11 @@ public class CustomHistoryLevelUserOperationLogTest {
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String ONE_TASK_CASE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
-  HistoryLevel customHistoryLevelFull = new CustomHistoryLevelUserOperationLog();
+  HistoryLevel customHistoryLevelUOL = new CustomHistoryLevelUserOperationLog();
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJdbcUrl("jdbc:h2:mem:CustomHistoryLevelUserOperationLogTest");
-      configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelFull));
+      configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelUOL));
       configuration.setHistory("aCustomHistoryLevelUOL");
       configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
       return configuration;
@@ -192,9 +192,10 @@ public class CustomHistoryLevelUserOperationLogTest {
     // when
     repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
     repositoryService.activateProcessDefinitionByKey("oneTaskProcess", true, null);
+    repositoryService.deleteProcessDefinitions().byKey("oneTaskProcess").cascade().delete();
 
     // then
-    assertEquals(2, query().entityType(PROCESS_DEFINITION).count());
+    assertEquals(3, query().entityType(PROCESS_DEFINITION).count());
 
     UserOperationLogEntry suspendDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
@@ -225,6 +226,21 @@ public class CustomHistoryLevelUserOperationLogTest {
     assertEquals("suspensionState", activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
+
+    UserOperationLogEntry deleteDefinitionEntry = query()
+      .entityType(PROCESS_DEFINITION)
+      .processDefinitionKey("oneTaskProcess")
+      .operationType(OPERATION_TYPE_DELETE)
+      .singleResult();
+
+    assertNotNull(deleteDefinitionEntry);
+    assertNotNull(deleteDefinitionEntry.getProcessDefinitionId());
+    assertEquals("oneTaskProcess", deleteDefinitionEntry.getProcessDefinitionKey());
+    assertNotNull(deleteDefinitionEntry.getDeploymentId());
+
+    assertEquals("cascade", deleteDefinitionEntry.getProperty());
+    assertEquals("true", deleteDefinitionEntry.getNewValue());
+    assertNotNull(deleteDefinitionEntry.getOrgValue());
   }
 
   @Test

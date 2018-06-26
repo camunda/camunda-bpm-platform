@@ -62,11 +62,11 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   private static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String ONE_TASK_CASE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
-  HistoryLevel customHistoryLevelFull = new CustomHistoryLevelFullWithoutUserOperationLog();
+  HistoryLevel customHistoryLevelFullWUOL = new CustomHistoryLevelFullWithoutUserOperationLog();
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJdbcUrl("jdbc:h2:mem:CustomHistoryLevelWithoutUserOperationLogTest");
-      configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelFull));
+      configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelFullWUOL));
       configuration.setHistory("aCustomHistoryLevelWUOL");
       configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
       return configuration;
