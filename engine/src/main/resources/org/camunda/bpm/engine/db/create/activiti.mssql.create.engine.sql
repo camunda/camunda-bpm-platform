@@ -122,7 +122,7 @@ create table ACT_RE_PROCDEF (
     TENANT_ID_ nvarchar(64),
     VERSION_TAG_ nvarchar(64),
     HISTORY_TTL_ int,
-    STARTABLE_ bit,
+    STARTABLE_ bit NOT NULL,
     primary key (ID_)
 );
 
