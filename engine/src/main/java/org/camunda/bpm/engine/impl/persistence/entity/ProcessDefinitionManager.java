@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -29,8 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,9 +101,6 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
   @SuppressWarnings({ "unchecked" })
   public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page) {
     configureProcessDefinitionQuery(processDefinitionQuery);
-    if (processDefinitionQuery.isStartableInTasklist()) {
-      getAuthorizationManager().configureQuery(processDefinitionQuery, PROCESS_DEFINITION, "RES.KEY_", Permissions.CREATE_INSTANCE);
-    }
     return getDbEntityManager().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery, page);
   }
 
