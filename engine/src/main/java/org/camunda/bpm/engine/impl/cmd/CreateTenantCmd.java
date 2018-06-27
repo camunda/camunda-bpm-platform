@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureValidResourceId;
 
 import java.io.Serializable;
 
@@ -35,8 +34,6 @@ public class CreateTenantCmd extends AbstractWritableIdentityServiceCmd<Tenant> 
 
   @Override
   protected Tenant executeCmd(CommandContext commandContext) {
-    ensureValidResourceId(commandContext, "Tenant", tenantId);
-
     return commandContext
       .getWritableIdentityProvider()
       .createNewTenant(tenantId);

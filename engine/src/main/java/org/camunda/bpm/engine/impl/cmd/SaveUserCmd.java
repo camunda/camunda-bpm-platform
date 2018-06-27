@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureValidResourceId;
+
 
 /**
  * @author Joram Barrez
@@ -35,7 +35,6 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
   
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("user", user);
-    ensureValidResourceId(commandContext, "User", user.getId());
 
     commandContext
       .getWritableIdentityProvider()

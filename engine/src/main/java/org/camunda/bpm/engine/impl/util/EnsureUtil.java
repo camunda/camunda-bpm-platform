@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.util;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -24,7 +23,6 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Sebastian Menski
@@ -371,12 +369,4 @@ public final class EnsureUtil {
     }
   }
 
-  public static void ensureValidResourceId(CommandContext commandContext, String resourceType, String resourceId) {
-    String resourcePattern = commandContext.getProcessEngineConfiguration().getResourceWhitelistPattern(resourceType.toLowerCase());
-    Pattern PATTERN = Pattern.compile(resourcePattern);
-
-    if (!PATTERN.matcher(resourceId).matches()) {
-      throw new ProcessEngineException(resourceType + " has an invalid id: id cannot be " + resourceId + ".");
-    }
-  }
 }
