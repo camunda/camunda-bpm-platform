@@ -65,20 +65,6 @@
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
-  <!-- CSRF Prevention filter -->
-  <filter>
-    <filter-name>CsrfPreventionFilter</filter-name>
-    <filter-class>org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter</filter-class>
-    <!--<init-param>-->
-      <!--<param-name>targetOrigin</param-name>-->
-      <!--<param-value>http://localhost:8080</param-value>-->
-    <!--</init-param>-->
-  </filter>
-  <filter-mapping>
-    <filter-name>CsrfPreventionFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
   <!-- engines filter -->
   <filter>
     <filter-name>Engines Filter</filter-name>
