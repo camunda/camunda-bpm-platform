@@ -59,6 +59,7 @@ public class IdentityServiceTenantTest {
   public ExpectedException thrown = ExpectedException.none();
 
   protected IdentityService identityService;
+  protected ProcessEngine processEngine;
 
   @Before
   public void initService() {
@@ -75,6 +76,11 @@ public class IdentityServiceTenantTest {
 
     identityService.deleteUser(USER_ONE);
     identityService.deleteUser(USER_TWO);
+
+    if (processEngine != null) {
+      processEngine.close();
+      ProcessEngines.unregister(processEngine);
+    }
   }
 
   @Test
@@ -168,7 +174,7 @@ public class IdentityServiceTenantTest {
 
   @Test
   public void createTenantWithGenericResourceId() {
-    ProcessEngine processEngine = ProcessEngineConfiguration
+    processEngine = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
       .buildProcessEngine();
 
@@ -185,9 +191,6 @@ public class IdentityServiceTenantTest {
     for (Authorization authorization : processEngine.getAuthorizationService().createAuthorizationQuery().list()) {
       processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
     }
-
-    processEngine.close();
-    ProcessEngines.unregister(processEngine);
   }
 
   @Test

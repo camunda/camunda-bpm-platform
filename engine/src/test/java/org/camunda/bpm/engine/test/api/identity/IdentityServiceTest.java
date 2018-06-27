@@ -71,6 +71,7 @@ public class IdentityServiceTest {
   public ExpectedException thrown = ExpectedException.none();
 
   protected IdentityService identityService;
+  protected ProcessEngine processEngine;
 
   @Before
   public void init() {
@@ -86,6 +87,11 @@ public class IdentityServiceTest {
       identityService.deleteGroup(group.getId());
     }
     ClockUtil.setCurrentTime(new Date());
+
+    if (processEngine != null) {
+      processEngine.close();
+      ProcessEngines.unregister(processEngine);
+    }
   }
 
   @Test
@@ -541,7 +547,7 @@ public class IdentityServiceTest {
 
   @Test
   public void testSaveUserWithGenericResourceId() {
-    ProcessEngine processEngine = ProcessEngineConfiguration
+    processEngine = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
       .buildProcessEngine();
 
@@ -559,13 +565,12 @@ public class IdentityServiceTest {
       processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
     }
 
-    processEngine.close();
-    ProcessEngines.unregister(processEngine);
+
   }
 
   @Test
   public void testSaveGroupWithGenericResourceId() {
-    ProcessEngine processEngine = ProcessEngineConfiguration
+    processEngine = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
       .buildProcessEngine();
 
@@ -582,9 +587,6 @@ public class IdentityServiceTest {
     for (Authorization authorization : processEngine.getAuthorizationService().createAuthorizationQuery().list()) {
       processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
     }
-
-    processEngine.close();
-    ProcessEngines.unregister(processEngine);
   }
 
   @Test
@@ -935,7 +937,7 @@ public class IdentityServiceTest {
 
   @Test
   public void testCustomResourceWhitelist() {
-    ProcessEngine processEngine = ProcessEngineConfiguration
+    processEngine = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/custom.whitelist.camunda.cfg.xml")
       .buildProcessEngine();
 
@@ -969,14 +971,11 @@ public class IdentityServiceTest {
     for (Authorization authorization : processEngine.getAuthorizationService().createAuthorizationQuery().list()) {
       processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
     }
-
-    processEngine.close();
-    ProcessEngines.unregister(processEngine);
   }
 
   @Test
   public void testSeparateResourceWhitelistPatterns() {
-    ProcessEngine processEngine = ProcessEngineConfiguration
+    processEngine = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/custom.resource.whitelist.camunda.cfg.xml")
       .buildProcessEngine();
 
@@ -1013,9 +1012,6 @@ public class IdentityServiceTest {
     for (Authorization authorization : processEngine.getAuthorizationService().createAuthorizationQuery().list()) {
       processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
     }
-
-    processEngine.close();
-    ProcessEngines.unregister(processEngine);
   }
 
   private Object createStringSet(String... strings) {
