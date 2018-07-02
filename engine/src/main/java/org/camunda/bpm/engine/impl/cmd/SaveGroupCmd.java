@@ -16,7 +16,6 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
@@ -35,6 +34,7 @@ public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> imple
   
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("group", group);
+    ensureWhitelistedResourceId(commandContext, "Group", group.getId());
 
     commandContext
       .getWritableIdentityProvider()

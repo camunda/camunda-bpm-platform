@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResourceId;
 
 import java.io.Serializable;
 
@@ -32,6 +33,7 @@ public class SaveTenantCmd extends AbstractWritableIdentityServiceCmd<Void> impl
   @Override
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("tenant", tenant);
+    ensureWhitelistedResourceId(commandContext, "Tenant", tenant.getId());
 
     commandContext
       .getWritableIdentityProvider()

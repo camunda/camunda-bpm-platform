@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -53,7 +55,7 @@ import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
  * userguide.
  * </p>
  *
- * <p>The second option is great for testing: {@link #createStandalonInMemeProcessEngineConfiguration()}
+ * <p>The second option is great for testing: {@link #createStandaloneInMemProcessEngineConfiguration()}
  * <pre>ProcessEngine processEngine = ProcessEngineConfiguration
  *   .createStandaloneInMemProcessEngineConfiguration()
  *   .buildProcessEngine();
@@ -271,6 +273,45 @@ public abstract class ProcessEngineConfiguration {
   protected ValueTypeResolver valueTypeResolver;
 
   protected String authorizationCheckRevokes = AUTHORIZATION_CHECK_REVOKE_AUTO;
+
+  /**
+   * A parameter used for defining acceptable values for the User, Group
+   * and Tenant IDs. The pattern can be defined by using the standard
+   * Java Regular Expression syntax should be used.
+   *
+   * <p>By default only alphanumeric values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String generalResourceWhitelistPattern =  "[a-zA-Z0-9]+|camunda-admin";
+
+  /**
+   * A parameter used for defining acceptable values for the User IDs.
+   * The pattern can be defined by using the standard Java Regular
+   * Expression syntax should be used.
+   *
+   * <p>If not defined, the general pattern is used. Only alphanumeric
+   * values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String userResourceWhitelistPattern;
+
+  /**
+   * A parameter used for defining acceptable values for the Group IDs.
+   * The pattern can be defined by using the standard Java Regular
+   * Expression syntax should be used.
+   *
+   * <p>If not defined, the general pattern is used. Only alphanumeric
+   * values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String groupResourceWhitelistPattern;
+
+  /**
+   * A parameter used for defining acceptable values for the Tenant IDs.
+   * The pattern can be defined by using the standard Java Regular
+   * Expression syntax should be used.
+   *
+   * <p>If not defined, the general pattern is used. Only alphanumeric
+   * values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String tenantResourceWhitelistPattern;
 
   /**
    * If the value of this flag is set <code>true</code> then the process engine
@@ -729,6 +770,38 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setTenantCheckEnabled(boolean isTenantCheckEnabled) {
     this.tenantCheckEnabled = isTenantCheckEnabled;
     return this;
+  }
+
+  public String getGeneralResourceWhitelistPattern() {
+    return generalResourceWhitelistPattern;
+  }
+
+  public void setGeneralResourceWhitelistPattern(String generalResourceWhitelistPattern) {
+    this.generalResourceWhitelistPattern = generalResourceWhitelistPattern;
+  }
+
+  public String getUserResourceWhitelistPattern() {
+    return userResourceWhitelistPattern;
+  }
+
+  public void setUserResourceWhitelistPattern(String userResourceWhitelistPattern) {
+    this.userResourceWhitelistPattern = userResourceWhitelistPattern;
+  }
+
+  public String getGroupResourceWhitelistPattern() {
+    return groupResourceWhitelistPattern;
+  }
+
+  public void setGroupResourceWhitelistPattern(String groupResourceWhitelistPattern) {
+    this.groupResourceWhitelistPattern = groupResourceWhitelistPattern;
+  }
+
+  public String getTenantResourceWhitelistPattern() {
+    return tenantResourceWhitelistPattern;
+  }
+
+  public void setTenantResourceWhitelistPattern(String tenantResourceWhitelistPattern) {
+    this.tenantResourceWhitelistPattern = tenantResourceWhitelistPattern;
   }
 
   public int getDefaultNumberOfRetries() {
