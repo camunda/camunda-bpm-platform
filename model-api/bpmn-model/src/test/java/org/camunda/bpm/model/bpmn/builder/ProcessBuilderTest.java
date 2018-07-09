@@ -426,6 +426,7 @@ public class ProcessBuilderTest {
       .camundaTaskPriority(TEST_PROCESS_TASK_PRIORITY)
       .camundaHistoryTimeToLive(TEST_HISTORY_TIME_TO_LIVE)
       .camundaStartableInTasklist(TEST_STARTABLE_IN_TASKLIST)
+      .camundaVersionTag(TEST_VERSION_TAG)
       .startEvent()
       .endEvent()
       .done();
@@ -435,6 +436,7 @@ public class ProcessBuilderTest {
     assertThat(process.getCamundaTaskPriority()).isEqualTo(TEST_PROCESS_TASK_PRIORITY);
     assertThat(process.getCamundaHistoryTimeToLive()).isEqualTo(TEST_HISTORY_TIME_TO_LIVE);
     assertThat(process.isCamundaStartableInTasklist()).isEqualTo(TEST_STARTABLE_IN_TASKLIST);
+    assertThat(process.getCamundaVersionTag()).isEqualTo(TEST_VERSION_TAG);
   }
 
   @Test

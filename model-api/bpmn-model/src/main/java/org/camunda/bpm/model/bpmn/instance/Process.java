@@ -104,4 +104,8 @@ public interface Process extends CallableElement {
   Boolean isCamundaStartableInTasklist();
 
   void setCamundaIsStartableInTasklist(Boolean isStartableInTasklist);
+
+  String getCamundaVersionTag();
+
+  void setCamundaVersionTag(String versionTag);
 }

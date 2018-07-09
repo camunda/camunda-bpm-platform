@@ -477,4 +477,5 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_VARIABLE_EVENTS = "variableEvents";
   public static final String CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE = "historyTimeToLive";
   public static final String CAMUNDA_ATTRIBUTE_IS_STARTABLE_IN_TASKLIST = "isStartableInTasklist";
+  public static final String CAMUNDA_ATTRIBUTE_VERSION_TAG = "versionTag";
 }

@@ -12,7 +12,8 @@
       camunda:jobPriority="15"
       camunda:taskPriority="13"
       camunda:historyTimeToLive="5"
-      camunda:isStartableInTasklist="false">
+      camunda:isStartableInTasklist="false"
+      camunda:versionTag="v1.0.0">
     <extensionElements>
       <camunda:executionListener event="start" class="org.camunda.test.Test"/>
     </extensionElements>

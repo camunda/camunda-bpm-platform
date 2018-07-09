@@ -60,7 +60,8 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "jobPriority"),
       new AttributeAssumption(CAMUNDA_NS, "taskPriority"),
       new AttributeAssumption(CAMUNDA_NS, "historyTimeToLive"),
-      new AttributeAssumption(CAMUNDA_NS, "isStartableInTasklist", false, false, true)
+      new AttributeAssumption(CAMUNDA_NS, "isStartableInTasklist", false, false, true),
+      new AttributeAssumption(CAMUNDA_NS, "versionTag")
     );
   }
 

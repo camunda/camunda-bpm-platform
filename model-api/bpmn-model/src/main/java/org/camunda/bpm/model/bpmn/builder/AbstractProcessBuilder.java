@@ -88,11 +88,23 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
 
   /**
    * Set whenever the process is startable in Tasklist
+   *
    * @param isStartableInTasklist default value is true
    * @return the builder object
    */
   public B camundaStartableInTasklist(Boolean isStartableInTasklist) {
     element.setCamundaIsStartableInTasklist(isStartableInTasklist);
+    return myself;
+  }
+
+  /**
+   * Set to specify a version tag for the process definition.
+   *
+   * @param versionTag the version of the process definition
+   * @return the builder object
+   */
+  public B camundaVersionTag(String versionTag) {
+    element.setCamundaVersionTag(versionTag);
     return myself;
   }
 }

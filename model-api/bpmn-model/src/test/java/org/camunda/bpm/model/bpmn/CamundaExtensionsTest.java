@@ -254,6 +254,11 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testVersionTag() {
+    assertThat(process.getCamundaVersionTag()).isEqualTo("v1.0.0");
+  }
+
+  @Test
   public void testServiceTaskPriority() {
     assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
