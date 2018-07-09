@@ -521,6 +521,21 @@ public interface RepositoryService {
   DiagramLayout getProcessDiagramLayout(String processDefinitionId);
 
   /**
+   * Returns list of 'startable' process definitions in Tasklist.
+   * The required Permissions are:
+   * <ul>
+   *    <li> {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE} </li>
+   *    <li> {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *    <li> {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   * </ul>
+   * @param maxResults Specifies the maximum number of results to return. Will return less results if there are no more results left.
+   * @param firstResult Specifies the index of the first result to return.
+   *
+   * @return list of process definitions
+   */
+  List<ProcessDefinition> getStartableProcessDefinitions(int firstResult, int maxResults);
+
+  /**
    * Returns the {@link BpmnModelInstance} for the given processDefinitionId.
    *
    * @param processDefinitionId the id of the Process Definition for which the {@link BpmnModelInstance}

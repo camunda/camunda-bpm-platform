@@ -100,6 +100,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/delete";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/delete";
 
+  protected static final String STARTABLE_PROCESS_DEFINITIONS = PROCESS_DEFINITION_URL + "/startableInTasklist";
+
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
   private FormService formServiceMock;
@@ -151,6 +153,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     DeleteProcessDefinitionsSelectBuilder deleteProcessDefinitionsSelectBuilder = mock(DeleteProcessDefinitionsSelectBuilder.class, RETURNS_DEEP_STUBS);
     when(repositoryServiceMock.deleteProcessDefinitions()).thenReturn(deleteProcessDefinitionsSelectBuilder);
 
+    List<ProcessDefinition> defs = MockProvider.createMockDefinitions();
+    when(repositoryServiceMock.getStartableProcessDefinitions(0, 1)).thenReturn(defs);
     setUpMockDefinitionQuery(mockDefinition);
 
     StartFormData formDataMock = MockProvider.createMockStartFormData(mockDefinition);
@@ -892,6 +896,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
+  @SuppressWarnings("unused")
   public void testSimpleProcessInstantiationWithVariables() {
     //mock process instance
     ProcessInstanceWithVariables mockInstance = MockProvider.createMockInstanceWithVariables();
@@ -3943,4 +3948,19 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .get(DEPLOYED_START_FORM_URL);
   }
 
+  @Test
+  public void testGetStartableProcessDefinition() {
+    int firstResult = 0;
+    int maxResults = 1;
+    given()
+      .queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
+      .contentType(ContentType.JSON)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(STARTABLE_PROCESS_DEFINITIONS);
+
+    verify(repositoryServiceMock).getStartableProcessDefinitions(0, 1);
+  }
 }

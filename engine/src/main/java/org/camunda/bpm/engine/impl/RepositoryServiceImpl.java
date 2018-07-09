@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmd.GetStartableProcessDefinitionsCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateDecisionDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateProcessDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
@@ -282,6 +283,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {
     return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
+  }
+
+  public List<ProcessDefinition> getStartableProcessDefinitions(int firstResult, int maxResults) {
+    return commandExecutor.execute(new GetStartableProcessDefinitionsCmd(firstResult, maxResults));
   }
 
   public BpmnModelInstance getBpmnModelInstance(String processDefinitionId) {

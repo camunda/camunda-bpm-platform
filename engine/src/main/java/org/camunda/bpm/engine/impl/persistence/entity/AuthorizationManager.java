@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
@@ -516,6 +517,16 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureProcessDefinitionQuery(ProcessDefinitionQueryImpl query) {
     configureQuery(query, PROCESS_DEFINITION, "RES.KEY_");
+  }
+
+  public void configureStartableProcessDefinitionQuery(ProcessDefinitionQueryImpl query) {
+    configureQuery(query);
+    CompositePermissionCheck compositePermissionCheck = new PermissionCheckBuilder()
+        .conjunctive()
+        .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", READ)
+        .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", CREATE_INSTANCE)
+        .build();
+    addPermissionCheck(query.getAuthCheck(), compositePermissionCheck);
   }
 
   // execution/process instance query ////////////////////////
