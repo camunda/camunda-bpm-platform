@@ -206,6 +206,7 @@ public class IdentityServiceTest {
 
     try {
       identityService.saveUser(secondUser);
+      fail("BadUserRequestException is expected");
     } catch (Exception ex) {
       if (!(ex instanceof BadUserRequestException)) {
         fail("BadUserRequestException is expected, but another exception was received:  " + ex);
@@ -271,6 +272,24 @@ public class IdentityServiceTest {
 
     // makes the picture go away
     identityService.deleteUser(user.getId());
+  }
+
+  @Test
+  public void testCreateExistingGroup() {
+    Group group = identityService.newGroup("greatGroup");
+    identityService.saveGroup(group);
+
+    Group secondGroup = identityService.newGroup("greatGroup");
+
+    try {
+      identityService.saveGroup(secondGroup);
+      fail("BadUserRequestException is expected");
+    } catch (Exception ex) {
+      if (!(ex instanceof BadUserRequestException)) {
+        fail("BadUserRequestException is expected, but another exception was received:  " + ex);
+      }
+      assertEquals("The group already exists", ex.getMessage());
+    }
   }
 
   @Test

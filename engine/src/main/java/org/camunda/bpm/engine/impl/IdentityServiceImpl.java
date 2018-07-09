@@ -89,7 +89,15 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public void saveGroup(Group group) {
-    commandExecutor.execute(new SaveGroupCmd((GroupEntity) group));
+
+    try {
+      commandExecutor.execute(new SaveGroupCmd((GroupEntity) group));
+  } catch (ProcessEngineException ex) {
+    if (ExceptionUtil.checkConstraintViolationException(ex)) {
+      throw new BadUserRequestException("The group already exists", ex);
+    }
+    throw ex;
+  }
   }
 
   public void saveUser(User user) {
@@ -105,7 +113,15 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public void saveTenant(Tenant tenant) {
-    commandExecutor.execute(new SaveTenantCmd(tenant));
+
+    try {
+      commandExecutor.execute(new SaveTenantCmd(tenant));
+    } catch (ProcessEngineException ex) {
+      if (ExceptionUtil.checkConstraintViolationException(ex)) {
+        throw new BadUserRequestException("The tenant already exists", ex);
+      }
+      throw ex;
+    }
   }
 
   public UserQuery createUserQuery() {
