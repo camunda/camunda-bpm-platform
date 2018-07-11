@@ -80,6 +80,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   protected boolean isStartableInTasklist = false;
   protected boolean isNotStartableInTasklist = false;
+  protected boolean permissionCheck = false;
 
   public ProcessDefinitionQueryImpl() {
   }
@@ -272,6 +273,11 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
+  public ProcessDefinitionQuery permissionCheck() {
+    this.permissionCheck = true;
+    return this;
+  }
+
   //sorting ////////////////////////////////////////////
 
   public ProcessDefinitionQuery orderByDeploymentId() {
@@ -437,6 +443,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   public boolean isNotStartableInTasklist() {
     return isNotStartableInTasklist;
+  }
+
+  public boolean isPermissionCheck() {
+    return permissionCheck;
   }
 
   public ProcessDefinitionQueryImpl startableByUser(String userId) {

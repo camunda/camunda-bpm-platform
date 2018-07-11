@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
@@ -83,6 +82,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private List<String> keys;
   private Boolean startableInTasklist;
   private Boolean notStartableInTasklist;
+  private Boolean permissionCheck;
 
   public ProcessDefinitionQueryDto() {
 
@@ -251,6 +251,11 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.notStartableInTasklist = notStartableInTasklist;
   }
 
+  @CamundaQueryParam(value = "permissionCheck", converter = BooleanConverter.class)
+  public void setPermissionCheck(Boolean permissionCheck) {
+    this.permissionCheck = permissionCheck;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -347,6 +352,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     }
     if (TRUE.equals(notStartableInTasklist)) {
       query.notStartableInTasklist();
+    }
+    if (TRUE.equals(permissionCheck)) {
+      query.permissionCheck();
     }
 
   }

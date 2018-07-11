@@ -467,6 +467,23 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   }
 
   @Test
+  public void testStartableInTasklistPermissionCheck() {
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+      MockProvider.mockDefinition().isStartableInTasklist(false).build());
+    mockedQuery = setUpMockDefinitionQuery(processDefinitions);
+
+    given()
+      .queryParam("permissionCheck", true)
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).permissionCheck();
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("category", "asc", Status.OK);
