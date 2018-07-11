@@ -67,13 +67,6 @@ public interface ProcessDefinitionRestService {
                                                    @QueryParam("maxResults") Integer maxResults);
 
   @GET
-  @Path("/startableInTasklist")
-  @Produces(MediaType.APPLICATION_JSON)
-  List<ProcessDefinitionDto> getStartableProcessDefinitions(
-                                                   @QueryParam("firstResult") Integer firstResult,
-                                                   @QueryParam("maxResults") Integer maxResults);
-
-  @GET
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getProcessDefinitionsCount(@Context UriInfo uriInfo);

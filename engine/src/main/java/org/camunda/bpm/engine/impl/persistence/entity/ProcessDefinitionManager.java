@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -29,8 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,19 +102,6 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
   public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery, Page page) {
     configureProcessDefinitionQuery(processDefinitionQuery);
     return getDbEntityManager().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery, page);
-  }
-
-  @SuppressWarnings({ "unchecked" })
-  public List<ProcessDefinition> findStartableInTasklistProcessDefinitions(int firstResult, int maxResults) {
-    if (!getAuthorizationManager().isAuthorized(Permissions.CREATE, PROCESS_INSTANCE, "*")) {
-      return new ArrayList<ProcessDefinition>();
-    }
-
-    ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl();
-    processDefinitionQuery = (ProcessDefinitionQueryImpl) processDefinitionQuery.startableInTasklist().latestVersion().active();
-
-    getAuthorizationManager().configureStartableProcessDefinitionQuery(processDefinitionQuery);
-    return getDbEntityManager().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery, new Page(firstResult, maxResults));
   }
 
   public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {

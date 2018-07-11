@@ -115,18 +115,6 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	  return definitions;
 	}
 
-  @Override
-  public List<ProcessDefinitionDto> getStartableProcessDefinitions(Integer firstResult, Integer maxResults) {
-
-    List<ProcessDefinition> processDefinitions = getProcessEngine().getRepositoryService().getStartableProcessDefinitions(firstResult, maxResults);
-    List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
-    for (ProcessDefinition definition : processDefinitions) {
-      ProcessDefinitionDto def = ProcessDefinitionDto.fromProcessDefinition(definition);
-      definitions.add(def);
-    }
-    return definitions;
-  }
-
 	private List<ProcessDefinition> executePaginatedQuery(ProcessDefinitionQuery query, Integer firstResult, Integer maxResults) {
 	  if (firstResult == null) {
 	    firstResult = 0;
