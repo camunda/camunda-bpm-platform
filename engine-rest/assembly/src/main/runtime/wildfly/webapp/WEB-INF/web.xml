@@ -35,6 +35,7 @@
     <filter-class>
       org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter
     </filter-class>
+	<async-supported>true</async-supported>
     <init-param>
       <param-name>authentication-provider</param-name>
       <param-value>org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider</param-value>
