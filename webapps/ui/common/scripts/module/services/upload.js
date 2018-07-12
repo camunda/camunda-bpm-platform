@@ -2,7 +2,7 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-module.exports = ['$window', '$q', '$rootScope', function($window, $q, $rootScope) {
+module.exports = ['$window', '$q', '$rootScope', '$browser', function($window, $q, $rootScope, $browser) {
   return function(url, files, fields) {
     var deferred = $q.defer();
 
@@ -54,6 +54,11 @@ module.exports = ['$window', '$q', '$rootScope', function($window, $q, $rootScop
 
     var sBoundary = '---------------------------' + Date.now().toString(16);
     req.setRequestHeader('Content-Type', 'multipart\/form-data; boundary=' + sBoundary);
+
+    var token = $browser.cookies()['XSRF-TOKEN'];
+    if (token) {
+      req.setRequestHeader('X-XSRF-TOKEN', token);
+    }
 
     var sData = '--' + sBoundary + '\r\n' + segments.join('--' + sBoundary + '\r\n') + '--' + sBoundary + '--\r\n';
 
