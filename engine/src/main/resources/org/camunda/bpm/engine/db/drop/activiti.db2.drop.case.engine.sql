@@ -40,6 +40,9 @@ drop index ACT_IDX_CASE_SENTRY_CASE_EXEC;
 drop index ACT_IDX_CASE_DEF_TENANT_ID;
 drop index ACT_IDX_CASE_EXEC_TENANT_ID;
 
+-- https://app.camunda.com/jira/browse/CAM-9165
+drop index ACT_IDX_CASE_EXE_CASE_INST;
+
 drop table ACT_RE_CASE_DEF;
 drop table ACT_RU_CASE_EXECUTION;
 drop table ACT_RU_CASE_SENTRY_PART;
