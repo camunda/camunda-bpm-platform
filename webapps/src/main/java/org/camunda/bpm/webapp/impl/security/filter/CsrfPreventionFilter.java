@@ -13,8 +13,12 @@
 
 package org.camunda.bpm.webapp.impl.security.filter;
 
-import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
-import org.jboss.com.sun.corba.se.spi.protocol.CorbaServerRequestDispatcher;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -25,16 +29,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
+
+import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
 
 /**
  * Provides basic CSRF protection implementing a Same Origin Standard Header verification (step 1)
@@ -119,9 +115,7 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
     HttpServletRequest request = (HttpServletRequest) servletRequest;
     HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-    boolean isNonModifyingRequest = isNonModifyingRequest(request);
-
-    if (!isNonModifyingRequest) {
+    if (!isNonModifyingRequest(request)) {
       // Not a fetch request -> validate token
       boolean isTokenValid = doSameOriginStandardHeadersVerification(request, response)
         && doTokenValidation(request, response);
@@ -130,8 +124,7 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
         return;
       }
     }
-
-    if (isNonModifyingRequest){
+    else {
       // Fetch request -> provide new token
       fetchToken(request, response);
     }
