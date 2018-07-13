@@ -28,6 +28,8 @@ var Controller = [
     var DEFAULT_PROCESS_DEFINITION_QUERY = {
       latest: true,
       active: true,
+      startableInTasklist: true,
+      permissionCheck: true,
       firstResult: 0,
       maxResults: 15
     };
