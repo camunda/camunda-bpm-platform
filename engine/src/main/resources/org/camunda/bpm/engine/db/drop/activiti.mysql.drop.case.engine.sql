@@ -29,6 +29,9 @@ alter table ACT_RU_CASE_SENTRY_PART
 alter table ACT_RU_CASE_SENTRY_PART
     drop foreign key ACT_FK_CASE_SENTRY_CASE_EXEC;
 
+-- https://app.camunda.com/jira/browse/CAM-9165
+drop index ACT_IDX_CASE_EXE_CASE_INST on ACT_RU_CASE_EXECUTION;
+
 drop table if exists ACT_RE_CASE_DEF;
 drop table if exists ACT_RU_CASE_EXECUTION;
 drop table if exists ACT_RU_CASE_SENTRY_PART;
