@@ -15,8 +15,8 @@ public class JobExecutionProperty {
   private boolean deploymentAware;
 
   private int corePoolSize = 3;
-  private Integer keepAliveSeconds;
   private int maxPoolSize = 10;
+  private Integer keepAliveSeconds;
   private Integer queueCapacity;
 
   /*
@@ -25,6 +25,11 @@ public class JobExecutionProperty {
   private Integer lockTimeInMillis;
   private Integer maxJobsPerAcquisition;
   private Integer waitTimeInMillis;
+  private Long maxWait;
+  private Integer backoffTimeInMillis;
+  private Long maxBackoff;
+  private Integer backoffDecreaseThreshold;
+  private Float waitIncreaseFactor;
 
   public boolean isEnabled() {
     return enabled;
@@ -56,6 +61,14 @@ public class JobExecutionProperty {
 
   public void setMaxPoolSize(int maxPoolSize) {
     this.maxPoolSize = maxPoolSize;
+  }
+
+  public Integer getKeepAliveSeconds() {
+    return keepAliveSeconds;
+  }
+
+  public void setKeepAliveSeconds(Integer keepAliveSeconds) {
+    this.keepAliveSeconds = keepAliveSeconds;
   }
 
   public Integer getQueueCapacity() {
@@ -90,12 +103,44 @@ public class JobExecutionProperty {
     this.waitTimeInMillis = waitTimeInMillis;
   }
 
-  public Integer getKeepAliveSeconds() {
-    return keepAliveSeconds;
+  public Long getMaxWait() {
+    return maxWait;
   }
 
-  public void setKeepAliveSeconds(Integer keepAliveSeconds) {
-    this.keepAliveSeconds = keepAliveSeconds;
+  public void setMaxWait(Long maxWait) {
+    this.maxWait = maxWait;
+  }
+
+  public Integer getBackoffTimeInMillis() {
+    return backoffTimeInMillis;
+  }
+
+  public void setBackoffTimeInMillis(Integer backoffTimeInMillis) {
+    this.backoffTimeInMillis = backoffTimeInMillis;
+  }
+
+  public Long getMaxBackoff() {
+    return maxBackoff;
+  }
+
+  public void setMaxBackoff(Long maxBackoff) {
+    this.maxBackoff = maxBackoff;
+  }
+
+  public Integer getBackoffDecreaseThreshold() {
+    return backoffDecreaseThreshold;
+  }
+
+  public void setBackoffDecreaseThreshold(Integer backoffDecreaseThreshold) {
+    this.backoffDecreaseThreshold = backoffDecreaseThreshold;
+  }
+
+  public Float getWaitIncreaseFactor() {
+    return waitIncreaseFactor;
+  }
+
+  public void setWaitIncreaseFactor(Float waitIncreaseFactor) {
+    this.waitIncreaseFactor = waitIncreaseFactor;
   }
 
   @Override
@@ -105,11 +150,16 @@ public class JobExecutionProperty {
       .add("deploymentAware=" + deploymentAware)
       .add("corePoolSize=" + corePoolSize)
       .add("maxPoolSize=" + maxPoolSize)
+      .add("keepAliveSeconds=" + keepAliveSeconds)
       .add("queueCapacity=" + queueCapacity)
       .add("lockTimeInMillis=" + lockTimeInMillis)
       .add("maxJobsPerAcquisition=" + maxJobsPerAcquisition)
       .add("waitTimeInMillis=" + waitTimeInMillis)
-      .add("keepAliveSeconds=" + keepAliveSeconds)
+      .add("maxWait=" + maxWait)
+      .add("backoffTimeInMillis=" + backoffTimeInMillis)
+      .add("maxBackoff=" + maxBackoff)
+      .add("backoffDecreaseThreshold=" + backoffDecreaseThreshold)
+      .add("waitIncreaseFactor=" + waitIncreaseFactor)
       .toString();
   }
 

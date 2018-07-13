@@ -13,17 +13,15 @@ import org.camunda.bpm.engine.spring.components.jobexecutor.SpringJobExecutor;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaJobConfiguration;
 import org.camunda.bpm.spring.boot.starter.event.JobExecutorStartingEventListener;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
+import org.camunda.bpm.spring.boot.starter.property.JobExecutionProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import javax.swing.text.html.Option;
 
 /**
  * Prepares JobExecutor and registers all known custom JobHandlers.
@@ -91,12 +89,15 @@ public class DefaultJobConfiguration extends AbstractCamundaConfiguration implem
       springJobExecutor.setTaskExecutor(taskExecutor);
       springJobExecutor.setRejectedJobsHandler(new CallerRunsRejectedJobsHandler());
 
-      Optional.ofNullable(properties.getJobExecution().getLockTimeInMillis())
-        .ifPresent(springJobExecutor::setLockTimeInMillis);
-      Optional.ofNullable(properties.getJobExecution().getMaxJobsPerAcquisition())
-        .ifPresent(springJobExecutor::setMaxJobsPerAcquisition);
-      Optional.ofNullable(properties.getJobExecution().getWaitTimeInMillis())
-        .ifPresent(springJobExecutor::setWaitTimeInMillis);
+      JobExecutionProperty jobExecution = properties.getJobExecution();
+      Optional.ofNullable(jobExecution.getLockTimeInMillis()).ifPresent(springJobExecutor::setLockTimeInMillis);
+      Optional.ofNullable(jobExecution.getMaxJobsPerAcquisition()).ifPresent(springJobExecutor::setMaxJobsPerAcquisition);
+      Optional.ofNullable(jobExecution.getWaitTimeInMillis()).ifPresent(springJobExecutor::setWaitTimeInMillis);
+      Optional.ofNullable(jobExecution.getMaxWait()).ifPresent(springJobExecutor::setMaxWait);
+      Optional.ofNullable(jobExecution.getBackoffTimeInMillis()).ifPresent(springJobExecutor::setBackoffTimeInMillis);
+      Optional.ofNullable(jobExecution.getMaxBackoff()).ifPresent(springJobExecutor::setMaxBackoff);
+      Optional.ofNullable(jobExecution.getBackoffDecreaseThreshold()).ifPresent(springJobExecutor::setBackoffDecreaseThreshold);
+      Optional.ofNullable(jobExecution.getWaitIncreaseFactor()).ifPresent(springJobExecutor::setWaitIncreaseFactor);
 
       return springJobExecutor;
     }
