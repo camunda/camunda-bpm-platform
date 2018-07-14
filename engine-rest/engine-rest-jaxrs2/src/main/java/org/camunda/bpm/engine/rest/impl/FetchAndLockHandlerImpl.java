@@ -17,9 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
+
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -28,14 +28,12 @@ import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.SingleConsumerCondition;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
-
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.Response.Status;
 
 
 /**
@@ -43,11 +41,10 @@ import javax.ws.rs.core.Response.Status;
  */
 public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
-  protected static final ReentrantLock LOCK_MONITOR = ProcessEngineImpl.LOCK_MONITOR;
-  protected static final Condition IS_EXTERNAL_TASK_AVAILABLE = ProcessEngineImpl.IS_EXTERNAL_TASK_AVAILABLE;
-
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
+
+  protected SingleConsumerCondition condition;
 
   protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
@@ -55,6 +52,10 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
 
   protected volatile boolean isRunning = false;
+
+  public FetchAndLockHandlerImpl() {
+    this.condition = new SingleConsumerCondition(handlerThread);
+  }
 
   @Override
   public void run() {
@@ -119,18 +120,18 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
     isRunning = true;
     handlerThread.start();
+
+    ProcessEngineImpl.EXT_TASK_CONDITIONS.addConsumer(condition);
   }
 
   @Override
   public void shutdown() {
-    LOCK_MONITOR.lock();
-
     try {
-      isRunning = false;
-      notifyAcquisition();
+      ProcessEngineImpl.EXT_TASK_CONDITIONS.removeConsumer(condition);
     }
     finally {
-      LOCK_MONITOR.unlock();
+      isRunning = false;
+      condition.signal();
     }
   }
 
@@ -144,16 +145,15 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   protected void suspendAcquisition(long millis) {
     if (queue.isEmpty() && isRunning) {
-      LOCK_MONITOR.lock();
       try {
         if (queue.isEmpty() && isRunning) {
-          IS_EXTERNAL_TASK_AVAILABLE.await(millis, TimeUnit.MILLISECONDS);
+          condition.await(millis);
         }
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
       }
       finally {
-        LOCK_MONITOR.unlock();
+        if (handlerThread.isInterrupted()) {
+          Thread.currentThread().interrupt();
+        }
       }
     }
   }
@@ -164,17 +164,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       errorTooManyRequests(asyncResponse);
     }
 
-    notifyAcquisition();
-  }
-
-  protected void notifyAcquisition() {
-    LOCK_MONITOR.lock();
-    try {
-      IS_EXTERNAL_TASK_AVAILABLE.signal();
-    }
-    finally {
-      LOCK_MONITOR.unlock();
-    }
+    condition.signal();
   }
 
   protected FetchAndLockResult tryFetchAndLock(FetchAndLockRequest request) {
@@ -278,5 +268,4 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   public List<FetchAndLockRequest> getPendingRequests() {
     return pendingRequests;
   }
-
 }
