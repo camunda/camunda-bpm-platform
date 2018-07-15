@@ -21,8 +21,11 @@ import java.util.Set;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -83,60 +86,72 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   protected String businessKey;
 
+  @Override
   public String getId() {
     return id;
   }
+  @Override
   public void setId(String id) {
     this.id = id;
   }
+  @Override
   public String getTopicName() {
     return topicName;
   }
   public void setTopicName(String topic) {
     this.topicName = topic;
   }
+  @Override
   public String getWorkerId() {
     return workerId;
   }
   public void setWorkerId(String workerId) {
     this.workerId = workerId;
   }
+  @Override
   public Date getLockExpirationTime() {
     return lockExpirationTime;
   }
   public void setLockExpirationTime(Date lockExpirationTime) {
     this.lockExpirationTime = lockExpirationTime;
   }
+  @Override
   public String getExecutionId() {
     return executionId;
   }
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
+  @Override
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
+  @Override
   public String getActivityId() {
     return activityId;
   }
   public void setActivityId(String activityId) {
     this.activityId = activityId;
   }
+  @Override
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
   public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
   }
+  @Override
   public int getRevision() {
     return revision;
   }
+  @Override
   public void setRevision(int revision) {
     this.revision = revision;
   }
+  @Override
   public int getRevisionNext() {
     return revision + 1;
   }
@@ -146,33 +161,39 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setSuspensionState(int suspensionState) {
     this.suspensionState = suspensionState;
   }
+  @Override
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
+  @Override
   public String getProcessInstanceId() {
     return processInstanceId;
   }
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
+  @Override
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
+  @Override
   public String getTenantId() {
     return tenantId;
   }
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
   }
+  @Override
   public Integer getRetries() {
     return retries;
   }
   public void setRetries(Integer retries) {
     this.retries = retries;
   }
+  @Override
   public String getErrorMessage() {
     return errorMessage;
   }
@@ -199,6 +220,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     this.businessKey = businessKey;
   }
 
+  @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new  HashMap<String, Object>();
     persistentState.put("topic", topicName);
@@ -444,6 +466,15 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void unlock() {
     workerId = null;
     lockExpirationTime = null;
+
+    Context.getCommandContext()
+      .getTransactionContext()
+      .addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
+        @Override
+        public void execute(CommandContext commandContext) {
+          ProcessEngineImpl.EXT_TASK_CONDITIONS.signalAll();
+        }
+      });
   }
 
   public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic, long priority) {
@@ -458,7 +489,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     externalTask.setTenantId(execution.getTenantId());
     externalTask.setPriority(priority);
 
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
     externalTask.setProcessDefinitionKey(processDefinition.getKey());
 
     externalTask.insert();

@@ -13,8 +13,10 @@
 package org.camunda.bpm.engine.test.api.externaltask;
 
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.util.SingleConsumerCondition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -93,6 +95,28 @@ public class ExternalTaskConditionsTest {
 
     // then
     verify(condition, times(2)).signal();
+  }
+
+  @Test
+  public void shouldSignalConditionOnUnlock() {
+
+    // given
+
+    rule.getRuntimeService()
+      .startProcessInstanceByKey("theProcess");
+
+    reset(condition); // clear signal for create
+
+    LockedExternalTask lockedTask = rule.getExternalTaskService().fetchAndLock(1, "theWorker")
+      .topic("theTopic", 10000)
+      .execute()
+      .get(0);
+
+    // when
+    rule.getExternalTaskService().unlock(lockedTask.getId());
+
+    // then
+    verify(condition, times(1)).signal();
   }
 
 }
