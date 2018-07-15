@@ -48,7 +48,7 @@ public class ExternalTaskManager extends AbstractManager {
 
   public void insert(ExternalTaskEntity externalTask) {
     getDbEntityManager().insert(externalTask);
-    fireExternalTaskCreatedEvent();
+    fireExternalTaskAvailableEvent();
   }
 
   public void delete(ExternalTaskEntity externalTask) {
@@ -147,8 +147,7 @@ public class ExternalTaskManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
-  public void fireExternalTaskCreatedEvent() {
-
+  public void fireExternalTaskAvailableEvent() {
     Context.getCommandContext()
       .getTransactionContext()
       .addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
