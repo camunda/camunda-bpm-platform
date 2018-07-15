@@ -154,13 +154,7 @@ public class ExternalTaskManager extends AbstractManager {
       .addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
         @Override
         public void execute(CommandContext commandContext) {
-          ProcessEngineImpl.LOCK_MONITOR.lock();
-          try {
-            ProcessEngineImpl.IS_EXTERNAL_TASK_AVAILABLE.signal();
-          }
-          finally {
-            ProcessEngineImpl.LOCK_MONITOR.unlock();
-          }
+          ProcessEngineImpl.EXT_TASK_CONDITIONS.signalAll();
         }
       });
   }
