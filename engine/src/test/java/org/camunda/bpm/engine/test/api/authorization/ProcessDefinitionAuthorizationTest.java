@@ -865,10 +865,26 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     final ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
 
     // when
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().permissionCheck().startableInTasklist().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().list();
     // then
     assertNotNull(processDefinitions);
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().permissionCheck().startableInTasklist().count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().count());
+    assertEquals(definition.getId(), processDefinitions.get(0).getId());
+    assertTrue(processDefinitions.get(0).isStartableInTasklist());
+  }
+
+  public void testStartableInTasklistReadAllProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, "*", userId, CREATE);
+    final ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
+
+    // when
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().list();
+    // then
+    assertNotNull(processDefinitions);
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().count());
     assertEquals(definition.getId(), processDefinitions.get(0).getId());
     assertTrue(processDefinitions.get(0).isStartableInTasklist());
   }
@@ -880,7 +896,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
 
     // when
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().permissionCheck().startableInTasklist().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().list();
     // then
     assertNotNull(processDefinitions);
     assertEquals(0, processDefinitions.size());
@@ -893,7 +909,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
 
     // when
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().permissionCheck().startableInTasklist().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().list();
     // then
     assertNotNull(processDefinitions);
     assertEquals(0, processDefinitions.size());
@@ -904,7 +920,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
 
     // when
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().permissionCheck().startableInTasklist().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().list();
     // then
     assertNotNull(processDefinitions);
     assertEquals(0, processDefinitions.size());

@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
@@ -516,22 +515,29 @@ public class AuthorizationManager extends AbstractManager {
   // process definition query ////////////////////////////////
 
   public void configureProcessDefinitionQuery(ProcessDefinitionQueryImpl query) {
-    if (query.isPermissionCheck()) {
-      configureStartableProcessDefinitionQuery(query);
-    }
-    else {
-      configureQuery(query, PROCESS_DEFINITION, "RES.KEY_");
-    }
-  }
+    configureQuery(query, PROCESS_DEFINITION, "RES.KEY_");
 
-  public void configureStartableProcessDefinitionQuery(ProcessDefinitionQueryImpl query) {
-    configureQuery(query);
-    CompositePermissionCheck compositePermissionCheck = new PermissionCheckBuilder()
-        .conjunctive()
-        .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", READ)
-        .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", CREATE_INSTANCE)
-        .build();
-    addPermissionCheck(query.getAuthCheck(), compositePermissionCheck);
+    if (query.isStartablePermissionCheck()) {
+      AuthorizationCheck authorizationCheck = query.getAuthCheck();
+
+      if (!authorizationCheck.isRevokeAuthorizationCheckEnabled()) {
+        PermissionCheck permCheck = newPermissionCheck();
+        permCheck.setResource(PROCESS_DEFINITION);
+        permCheck.setResourceIdQueryParam("RES.KEY_");
+        permCheck.setPermission(Permissions.CREATE_INSTANCE);
+        query.addProcessDefinitionCreatePermissionCheck(permCheck);
+
+      } else {
+        CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+            .conjunctive()
+            .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", READ)
+            .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", Permissions.CREATE_INSTANCE)
+            .build();
+        addPermissionCheck(authorizationCheck, permissionCheck);
+      }
+
+    }
+
   }
 
   // execution/process instance query ////////////////////////

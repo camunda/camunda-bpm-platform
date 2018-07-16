@@ -92,12 +92,12 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
     try {
       commandExecutor.execute(new SaveGroupCmd((GroupEntity) group));
-  } catch (ProcessEngineException ex) {
-    if (ExceptionUtil.checkConstraintViolationException(ex)) {
-      throw new BadUserRequestException("The group already exists", ex);
+    } catch (ProcessEngineException ex) {
+      if (ExceptionUtil.checkConstraintViolationException(ex)) {
+        throw new BadUserRequestException("The group already exists", ex);
+      }
+      throw ex;
     }
-    throw ex;
-  }
   }
 
   public void saveUser(User user) {

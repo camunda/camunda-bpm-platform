@@ -479,7 +479,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
       .when()
       .get(PROCESS_DEFINITION_QUERY_URL);
 
-    verify(mockedQuery).permissionCheck();
+    verify(mockedQuery).startablePermissionCheck();
     verify(mockedQuery).list();
   }
 

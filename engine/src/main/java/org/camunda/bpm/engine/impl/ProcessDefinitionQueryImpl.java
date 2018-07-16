@@ -21,6 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -80,7 +81,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   protected boolean isStartableInTasklist = false;
   protected boolean isNotStartableInTasklist = false;
-  protected boolean permissionCheck = false;
+  protected boolean startablePermissionCheck = false;
+  // for internal use
+  protected List<PermissionCheck> processDefinitionCreatePermissionChecks = new ArrayList<PermissionCheck>();
 
   public ProcessDefinitionQueryImpl() {
   }
@@ -273,8 +276,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
-  public ProcessDefinitionQuery permissionCheck() {
-    this.permissionCheck = true;
+  public ProcessDefinitionQuery startablePermissionCheck() {
+    this.startablePermissionCheck = true;
     return this;
   }
 
@@ -445,8 +448,20 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return isNotStartableInTasklist;
   }
 
-  public boolean isPermissionCheck() {
-    return permissionCheck;
+  public boolean isStartablePermissionCheck() {
+    return startablePermissionCheck;
+  }
+
+  public void setProcessDefinitionCreatePermissionChecks(List<PermissionCheck> processDefinitionCreatePermissionChecks) {
+    this.processDefinitionCreatePermissionChecks = processDefinitionCreatePermissionChecks;
+  }
+
+  public List<PermissionCheck> getProcessDefinitionCreatePermissionChecks() {
+    return processDefinitionCreatePermissionChecks;
+  }
+
+  public void addProcessDefinitionCreatePermissionCheck(PermissionCheck processDefinitionCreatePermissionCheck) {
+    processDefinitionCreatePermissionChecks.add(processDefinitionCreatePermissionCheck);
   }
 
   public ProcessDefinitionQueryImpl startableByUser(String userId) {

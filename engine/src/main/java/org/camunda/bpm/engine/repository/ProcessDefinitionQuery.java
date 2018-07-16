@@ -190,7 +190,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery notStartableInTasklist();
 
-  ProcessDefinitionQuery permissionCheck();
+  ProcessDefinitionQuery startablePermissionCheck();
 
   // ordering ////////////////////////////////////////////////////////////
 

@@ -354,7 +354,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
       query.notStartableInTasklist();
     }
     if (TRUE.equals(permissionCheck)) {
-      query.permissionCheck();
+      query.startablePermissionCheck();
     }
 
   }
