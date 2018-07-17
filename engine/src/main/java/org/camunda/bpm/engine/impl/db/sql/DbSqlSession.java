@@ -481,7 +481,9 @@ public class DbSqlSession extends AbstractPersistenceSession {
         tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, JDBC_METADATA_TABLE_TYPES);
         return tables.next();
       } finally {
-        tables.close();
+        if (tables != null) {
+          tables.close();
+        }
       }
 
     } catch (Exception e) {
