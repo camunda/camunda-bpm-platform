@@ -32,6 +32,9 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   /** the id of the super process instance */
   protected String superProcessInstanceId;
 
+  /** the id of the root process instance */
+  protected String rootProcessInstanceId;
+
   /** the id of the super case instance */
   protected String superCaseInstanceId;
 
@@ -91,6 +94,14 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
     this.superProcessInstanceId = superProcessInstanceId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public String getSuperCaseInstanceId() {
     return superCaseInstanceId;
   }
@@ -129,6 +140,7 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
            + "[businessKey=" + businessKey
            + ", startUserId=" + startUserId
            + ", superProcessInstanceId=" + superProcessInstanceId
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
            + ", superCaseInstanceId=" + superCaseInstanceId
            + ", deleteReason=" + deleteReason
            + ", durationInMillis=" + durationInMillis

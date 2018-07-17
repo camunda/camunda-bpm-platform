@@ -46,6 +46,7 @@
       START_ACT_ID_,
       END_ACT_ID_,
       SUPER_PROCESS_INSTANCE_ID_,
+      ROOT_PROCESS_INSTANCE_ID_,
       SUPER_CASE_INSTANCE_ID_,
       CASE_INST_ID_,
       DELETE_REASON_,
@@ -64,6 +65,7 @@
       #{startActivityId, jdbcType=VARCHAR},
       #{endActivityId, jdbcType=VARCHAR},
       #{superProcessInstanceId, jdbcType=VARCHAR},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
       #{superCaseInstanceId, jdbcType=VARCHAR},
       #{caseInstanceId, jdbcType=VARCHAR},
       #{deleteReason, jdbcType=VARCHAR},
@@ -133,6 +135,7 @@
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR"/>
     <result property="endActivityId" column="END_ACT_ID_" jdbcType="VARCHAR"/>
     <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="rootProcessInstanceId" column="ROOT_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR"/>
     <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR"/>
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR"/>

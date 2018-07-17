@@ -83,6 +83,11 @@ public interface HistoricProcessInstance {
   String getSuperProcessInstanceId();
 
   /**
+   * The process instance id of the top-level (root) process instance or null if no root process instance exists
+   */
+  String getRootProcessInstanceId();
+
+  /**
    * The case instance id of a potential super case instance or null if no super case instance exists
    */
   String getSuperCaseInstanceId();
