@@ -289,7 +289,7 @@ module.exports = [ function() {
           if (!$scope.task || !$scope.taskExists) return;
 
           taskResource.get($scope.task.id, function(err) {
-            if (err) {
+            if (err && err.status === 404) {
               $scope.taskExists = false;
               $scope.$broadcast('taskremoved');
             }
