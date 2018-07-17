@@ -29,7 +29,7 @@ var Controller = [
       latest: true,
       active: true,
       startableInTasklist: true,
-      permissionCheck: true,
+      startablePermissionCheck: true,
       firstResult: 0,
       maxResults: 15
     };
