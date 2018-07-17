@@ -473,7 +473,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     mockedQuery = setUpMockDefinitionQuery(processDefinitions);
 
     given()
-      .queryParam("permissionCheck", true)
+      .queryParam("startablePermissionCheck", true)
       .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .when()

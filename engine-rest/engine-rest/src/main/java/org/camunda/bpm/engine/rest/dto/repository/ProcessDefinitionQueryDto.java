@@ -82,7 +82,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private List<String> keys;
   private Boolean startableInTasklist;
   private Boolean notStartableInTasklist;
-  private Boolean permissionCheck;
+  private Boolean startablePermissionCheck;
 
   public ProcessDefinitionQueryDto() {
 
@@ -251,9 +251,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.notStartableInTasklist = notStartableInTasklist;
   }
 
-  @CamundaQueryParam(value = "permissionCheck", converter = BooleanConverter.class)
-  public void setPermissionCheck(Boolean permissionCheck) {
-    this.permissionCheck = permissionCheck;
+  @CamundaQueryParam(value = "startablePermissionCheck", converter = BooleanConverter.class)
+  public void setStartablePermissionCheck(Boolean startablePermissionCheck) {
+    this.startablePermissionCheck = startablePermissionCheck;
   }
 
   @Override
@@ -353,7 +353,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     if (TRUE.equals(notStartableInTasklist)) {
       query.notStartableInTasklist();
     }
-    if (TRUE.equals(permissionCheck)) {
+    if (TRUE.equals(startablePermissionCheck)) {
       query.startablePermissionCheck();
     }
 
