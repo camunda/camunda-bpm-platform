@@ -2,6 +2,8 @@
 var moment = require('camunda-commons-ui/vendor/moment'),
     angular = require('camunda-commons-ui/vendor/angular');
 
+var now = (new Date()).getTime();
+
 module.exports = function(ngModule, appRoot, appName) {
   ngModule.factory('localeLoader', ['$q', '$http', 'Notifications', 'configuration',
       function($q, $http, Notifications, configuration) {
@@ -30,7 +32,7 @@ module.exports = function(ngModule, appRoot, appName) {
               options.suffix
             ].join(''),
             method: 'GET',
-            params: ''
+            params: { '_' : now }
           }, options.$http))
             .success(function(data) {
               configuration.set(cacheKey, JSON.stringify(data));
