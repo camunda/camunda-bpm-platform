@@ -85,6 +85,7 @@ create table ACT_HI_VARINST (
     TASK_ID_ nvarchar(64),
     NAME_ nvarchar(255) not null,
     VAR_TYPE_ nvarchar(100),
+    CREATE_TIME_ datetime2,
     REV_ int,
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,

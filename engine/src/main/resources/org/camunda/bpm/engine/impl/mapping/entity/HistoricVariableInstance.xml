@@ -37,6 +37,7 @@
       NAME_,
       REV_,
       VAR_TYPE_,
+      CREATE_TIME_,
       BYTEARRAY_ID_,
       DOUBLE_,
       LONG_,
@@ -59,6 +60,7 @@
       #{variableName, jdbcType=VARCHAR},
       #{revision, jdbcType=VARCHAR},
       #{serializerName, jdbcType=VARCHAR},
+      #{createTime, jdbcType=TIMESTAMP},
       #{byteArrayId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -153,6 +155,7 @@
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
@@ -177,6 +180,7 @@
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
     <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />

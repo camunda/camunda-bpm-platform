@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -57,6 +58,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected String name;
   protected int revision;
+  protected Date createTime;
 
   protected Long longValue;
   protected Double doubleValue;
@@ -93,6 +95,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.doubleValue = historyEvent.getDoubleValue();
     this.textValue = historyEvent.getTextValue();
     this.textValue2 = historyEvent.getTextValue2();
+    this.createTime = historyEvent.getTimestamp();
 
     setSerializerName(historyEvent.getSerializerName());
 
@@ -361,6 +364,14 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.state = state;
   }
 
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -377,6 +388,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       + ", caseInstanceId=" + caseInstanceId
       + ", caseExecutionId=" + caseExecutionId
       + ", name=" + name
+      + ", createTime=" + createTime
       + ", revision=" + revision
       + ", serializerName=" + getSerializerName()
       + ", longValue=" + longValue

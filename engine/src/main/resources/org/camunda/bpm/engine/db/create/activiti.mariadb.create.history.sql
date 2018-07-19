@@ -85,6 +85,7 @@ create table ACT_HI_VARINST (
     TASK_ID_ varchar(64),
     NAME_ varchar(255) not null,
     VAR_TYPE_ varchar(100),
+    CREATE_TIME_ timestamp(3),
     REV_ integer,
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,

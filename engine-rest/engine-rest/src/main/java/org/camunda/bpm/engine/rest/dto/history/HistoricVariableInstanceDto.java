@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
@@ -32,6 +34,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
   private String errorMessage;
   private String tenantId;
   private String state;
+  private Date createDate;
 
   public String getId() {
     return id;
@@ -93,6 +96,10 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     return state;
   }
 
+  public Date getCreateDate() {
+    return createDate;
+  }
+
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
 
     HistoricVariableInstanceDto dto = new HistoricVariableInstanceDto();
@@ -111,6 +118,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     dto.taskId = historicVariableInstance.getTaskId();
     dto.tenantId = historicVariableInstance.getTenantId();
     dto.state = historicVariableInstance.getState();
+    dto.createDate = historicVariableInstance.getCreateTime();
 
     if(historicVariableInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());

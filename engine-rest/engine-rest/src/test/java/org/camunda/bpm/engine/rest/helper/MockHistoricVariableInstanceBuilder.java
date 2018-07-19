@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -44,6 +46,7 @@ public class MockHistoricVariableInstanceBuilder {
   protected String caseExecutionId;
   protected String taskId;
   protected String tenantId;
+  protected Date createTime;
 
   public MockHistoricVariableInstanceBuilder id(String id) {
     this.id = id;
@@ -120,6 +123,11 @@ public class MockHistoricVariableInstanceBuilder {
     return this;
   }
 
+  public MockHistoricVariableInstanceBuilder createTime(Date createTime) {
+    this.createTime = createTime;
+    return this;
+  }
+
   public String getId() {
     return id;
   }
@@ -184,6 +192,10 @@ public class MockHistoricVariableInstanceBuilder {
     return tenantId;
   }
 
+  public Date getCreateTime() {
+    return createTime;
+  }
+
   public HistoricVariableInstance build() {
     HistoricVariableInstance mockVariable = mock(HistoricVariableInstance.class);
     when(mockVariable.getId()).thenReturn(id);
@@ -217,6 +229,7 @@ public class MockHistoricVariableInstanceBuilder {
     when(mockVariable.getCaseExecutionId()).thenReturn(caseExecutionId);
     when(mockVariable.getTaskId()).thenReturn(taskId);
     when(mockVariable.getTenantId()).thenReturn(tenantId);
+    when(mockVariable.getCreateTime()).thenReturn(createTime);
 
     return mockVariable;
   }

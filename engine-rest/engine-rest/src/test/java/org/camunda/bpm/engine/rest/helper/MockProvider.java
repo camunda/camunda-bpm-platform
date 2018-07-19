@@ -229,6 +229,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_VARIABLE_INSTANCE_ERROR_MESSAGE = "aVariableInstanceErrorMessage";
   public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_KEY = "aVariableInstanceCaseDefKey";
   public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_ID = "aVariableInstanceCaseDefId";
+  public static final String EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME = withTimezone("2013-04-23T13:42:43");
 
   public static final String EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE = "aSerializedValue";
   public static final byte[] EXAMPLE_VARIABLE_INSTANCE_BYTE = "aSerializedValue".getBytes();
@@ -2083,7 +2084,8 @@ public abstract class MockProvider {
         .caseExecutionId(EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID)
         .taskId(EXAMPLE_VARIABLE_INSTANCE_TASK_ID)
         .tenantId(tenantId)
-        .errorMessage(null);
+        .errorMessage(null)
+        .createTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME));
   }
 
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
