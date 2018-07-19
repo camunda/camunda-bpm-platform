@@ -147,6 +147,8 @@
         <module>distro/wildfly</module>
         <module>distro/wildfly10</module>
         <module>distro/wildfly11</module>
+        <module>distro/wildfly12</module>
+        <module>distro/wildfly13</module>
       </modules>
     </profile>
 

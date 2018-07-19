@@ -118,6 +118,18 @@
         <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly11}/</wildfly.runtime.location>
       </properties>
     </profile>
+    <profile>
+      <id>wildfly12</id>
+      <properties>
+        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly12}/</wildfly.runtime.location>
+      </properties>
+    </profile>
+    <profile>
+      <id>wildfly13</id>
+      <properties>
+        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly13}/</wildfly.runtime.location>
+      </properties>
+    </profile>
 
     <profile>
       <id>tomcat</id>

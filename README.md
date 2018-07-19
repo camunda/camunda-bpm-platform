@@ -114,7 +114,7 @@ In order to configure the build, compose the profiles for runtime container, tes
 mvn clean install -Pengine-integration,jboss,h2
 ```
 
-For using wildfly as the runtime container you have to additionally specify the wildfly version: wildfly8, wildfly10 or wildfly11. Example:
+For using wildfly as the runtime container you have to additionally specify the wildfly version: wildfly8, wildfly10, wildfly11, wildfly12 or wildfly13. Example:
 
 ```
 mvn clean install -Pengine-integration,wildfly,wildfly10,h2

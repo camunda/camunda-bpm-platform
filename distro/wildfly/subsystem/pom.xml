@@ -157,6 +157,54 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>wildfly12</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-web-common</artifactId>
+          <version>${version.wildfly12}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-ejb3</artifactId>
+          <version>${version.wildfly12}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
+          <artifactId>wildfly-subsystem-test-framework</artifactId>
+          <version>${version.wildfly12.core}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>wildfly13</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-web-common</artifactId>
+          <version>${version.wildfly13}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-ejb3</artifactId>
+          <version>${version.wildfly13}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
+          <artifactId>wildfly-subsystem-test-framework</artifactId>
+          <version>${version.wildfly13.core}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 
 </project>

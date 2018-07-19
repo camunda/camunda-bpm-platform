@@ -320,6 +320,20 @@
     </profile>
 
     <profile>
+      <id>wildfly12</id>
+      <properties>
+        <container.id>wildfly12x</container.id>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>wildfly13</id>
+      <properties>
+        <container.id>wildfly13x</container.id>
+      </properties>
+    </profile>
+
+    <profile>
       <id>wildfly</id>
       <properties>
         <jboss.runtime>${basedir}/${wildfly.runtime.location}</jboss.runtime>
