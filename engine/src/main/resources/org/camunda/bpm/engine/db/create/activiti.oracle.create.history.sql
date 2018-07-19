@@ -169,6 +169,7 @@ create table ACT_HI_ATTACHMENT (
     URL_ NVARCHAR2(2000),
     CONTENT_ID_ NVARCHAR2(64),
     TENANT_ID_ NVARCHAR2(64),
+    CREATE_TIME_ TIMESTAMP(6),
     primary key (ID_)
 );
 

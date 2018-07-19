@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.task;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
 import org.camunda.bpm.engine.task.Attachment;
 
@@ -23,6 +25,7 @@ public class AttachmentDto extends LinkableDto {
   private String taskId;
   private String type;
   private String url;
+  private Date createTime;
 
   public AttachmentDto() {
   }
@@ -75,6 +78,14 @@ public class AttachmentDto extends LinkableDto {
     this.url = url;
   }
 
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
   public static AttachmentDto fromAttachment(Attachment attachment) {
     AttachmentDto dto = new AttachmentDto();
     dto.id = attachment.getId();
@@ -83,6 +94,7 @@ public class AttachmentDto extends LinkableDto {
     dto.description = attachment.getDescription();
     dto.taskId = attachment.getTaskId();
     dto.url = attachment.getUrl();
+    dto.createTime = attachment.getCreateTime();
     return dto;
   }
 }

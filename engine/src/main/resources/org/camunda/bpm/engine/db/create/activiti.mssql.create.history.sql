@@ -168,6 +168,7 @@ create table ACT_HI_ATTACHMENT (
     URL_ nvarchar(4000),
     CONTENT_ID_ nvarchar(64),
     TENANT_ID_ nvarchar(64),
+    CREATE_TIME_ datetime2,
     primary key (ID_)
 );
 

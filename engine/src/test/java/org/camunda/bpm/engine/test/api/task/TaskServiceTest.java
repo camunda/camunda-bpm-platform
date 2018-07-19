@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.task;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -108,6 +110,8 @@ public class TaskServiceTest {
   private CaseService caseService;
   private IdentityService identityService;
   private ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 
   @Before
   public void init() {
@@ -1615,7 +1619,10 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testTaskAttachmentByTaskIdAndAttachmentId() {
+  public void testTaskAttachmentByTaskIdAndAttachmentId() throws ParseException {
+    Date fixedDate = SDF.parse("01/01/2001 01:01:01.000");
+    ClockUtil.setCurrentTime(fixedDate);
+
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save task
@@ -1637,6 +1644,7 @@ public class TaskServiceTest {
       assertEquals("someprocessinstanceid", attachment.getProcessInstanceId());
       assertEquals("http://weather.com", attachment.getUrl());
       assertNull(taskService.getAttachmentContent(attachment.getId()));
+      assertThat(attachment.getCreateTime(), is(fixedDate));
 
       // delete attachment for taskId and attachmentId
       taskService.deleteTaskAttachment(taskId, attachmentId);
@@ -1704,14 +1712,20 @@ public class TaskServiceTest {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   @Test
-  public void testCreateTaskAttachmentWithNullTaskId() {
+  public void testCreateTaskAttachmentWithNullTaskId() throws ParseException {
+    Date fixedDate = SDF.parse("01/01/2001 01:01:01.000");
+    ClockUtil.setCurrentTime(fixedDate);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
     Attachment fetched = taskService.getAttachment(attachment.getId());
     assertThat(fetched,is(notNullValue()));
     assertThat(fetched.getTaskId(), is(nullValue()));
     assertThat(fetched.getProcessInstanceId(),is(notNullValue()));
+    assertThat(fetched.getCreateTime(), is(fixedDate));
     taskService.deleteAttachment(attachment.getId());
+
+    // clean up
+    ClockUtil.setCurrentTime(new Date());
   }
 
   @Test

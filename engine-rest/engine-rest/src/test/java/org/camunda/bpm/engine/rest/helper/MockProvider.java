@@ -177,6 +177,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_ATTACHMENT_DESCRIPTION = "aTaskAttachmentDescription";
   public static final String EXAMPLE_TASK_ATTACHMENT_TYPE = "aTaskAttachmentType";
   public static final String EXAMPLE_TASK_ATTACHMENT_URL = "aTaskAttachmentUrl";
+  public static final String EXAMPLE_TASK_ATTACHMENT_CREATE_DATE = withTimezone("2018-07-19T15:02:36");
 
   // task count by candidate group
 
@@ -974,6 +975,7 @@ public abstract class MockProvider {
     when(mockAttachment.getUrl()).thenReturn(EXAMPLE_TASK_ATTACHMENT_URL);
     when(mockAttachment.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(mockAttachment.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mockAttachment.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_ATTACHMENT_CREATE_DATE));
 
     return mockAttachment;
   }

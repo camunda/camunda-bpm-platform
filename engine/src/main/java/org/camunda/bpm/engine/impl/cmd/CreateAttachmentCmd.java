@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -26,10 +25,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Attachment;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -82,6 +79,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     attachment.setTaskId(taskId);
     attachment.setProcessInstanceId(processInstanceId);
     attachment.setUrl(url);
+    attachment.setCreateTime(ClockUtil.getCurrentTime());
 
     DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
     dbEntityManger.insert(attachment);

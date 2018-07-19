@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,26 +13,28 @@
 
 package org.camunda.bpm.engine.task;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.TaskService;
 
 
 
 /** Any type of content that is be associated with
  * a task or with a process instance.
- * 
+ *
  * @author Tom Baeyens
  */
 public interface Attachment {
 
   /** unique id for this attachment */
   String getId();
-  
+
   /** free user defined short (max 255 chars) name for this attachment */
   String getName();
 
   /** free user defined short (max 255 chars) name for this attachment */
   void setName(String name);
-  
+
   /** long (max 255 chars) explanation what this attachment is about in context of the task and/or process instance it's linked to. */
   String getDescription();
 
@@ -40,8 +42,8 @@ public interface Attachment {
   void setDescription(String description);
 
   /** indication of the type of content that this attachment refers to. Can be mime type or any other indication. */
-  String getType();  
-  
+  String getType();
+
   /** reference to the task to which this attachment is associated. */
   String getTaskId();
 
@@ -52,4 +54,7 @@ public interface Attachment {
    * {@link TaskService#createAttachment(String, String, String, String, String, java.io.InputStream) uploaded with an input stream}, 
    * then this method returns null and the content can be fetched with {@link TaskService#getAttachmentContent(String)}. */
   String getUrl();
+
+  /** The time when the attachment was created. */
+  Date getCreateTime();
 }
