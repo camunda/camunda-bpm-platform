@@ -6,6 +6,7 @@ create table ACT_HI_PROCINST (
     PROC_DEF_ID_ varchar(64) not null,
     START_TIME_ timestamp not null,
     END_TIME_ timestamp,
+    REMOVAL_TIME_ timestamp,
     DURATION_ bigint,
     START_USER_ID_ varchar(255),
     START_ACT_ID_ varchar(255),
@@ -284,6 +285,7 @@ create index ACT_IDX_HI_PRO_INST_PROC_DEF_KEY on ACT_HI_PROCINST(PROC_DEF_KEY_);
 create index ACT_IDX_HI_PRO_INST_PROC_TIME on ACT_HI_PROCINST(START_TIME_, END_TIME_);
 create index ACT_IDX_HI_PI_PDEFID_END_TIME on ACT_HI_PROCINST(PROC_DEF_ID_, END_TIME_);
 create index ACT_IDX_HI_PRO_INST_ROOT_PI on ACT_HI_PROCINST(ROOT_PROCESS_INSTANCE_ID_);
+create index ACT_IDX_HI_PRO_INST_RM_TIME on ACT_HI_PROCINST(REMOVAL_TIME_);
 
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);
 create index ACT_IDX_HI_ACT_INST_END on ACT_HI_ACTINST(END_TIME_);

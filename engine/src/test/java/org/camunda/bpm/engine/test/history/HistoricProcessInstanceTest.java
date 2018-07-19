@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionKey;
@@ -916,6 +917,31 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     assertNull(historicProcessInstance.getEndActivityId());
     assertNotNull(historicProcessInstance.getEndTime());
+  }
+
+  /**
+   * See: https://app.camunda.com/jira/browse/CAM-9200
+   * Test ignored until removalTime calculation logic is added
+   * */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"
+  })
+  public void ignoredTestRemovalTime() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    Task userTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+    taskService.complete(userTask.getId());
+
+    HistoricProcessInstance rootHistoricProcessInstance = historyService.createHistoricProcessInstanceQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult();
+
+    // then
+    assertNotNull(rootHistoricProcessInstance.getEndTime());
+    assertNotNull(rootHistoricProcessInstance.getRemovalTime());
+    assertTrue(rootHistoricProcessInstance.getRemovalTime().after(rootHistoricProcessInstance.getEndTime()));
   }
 
   @Deployment(resources = {

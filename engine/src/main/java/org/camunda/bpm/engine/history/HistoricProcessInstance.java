@@ -56,6 +56,9 @@ public interface HistoricProcessInstance {
   /** The time the process was ended. */
   Date getEndTime();
 
+  /** The time the process will be removed. */
+  Date getRemovalTime();
+
   /** The difference between {@link #getEndTime()} and {@link #getStartTime()} . */
   Long getDurationInMillis();
 

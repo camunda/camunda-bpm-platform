@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
+import java.util.Date;
+
 /**
  * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>
  *
@@ -52,7 +54,17 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
 
   protected String state;
 
+  protected Date removalTime;
+
   // getters / setters ////////////////////////////////////////
+
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
 
   public String getEndActivityId() {
     return endActivityId;
@@ -146,6 +158,7 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
            + ", durationInMillis=" + durationInMillis
            + ", startTime=" + startTime
            + ", endTime=" + endTime
+           + ", removalTime=" + removalTime
            + ", endActivityId=" + endActivityId
            + ", startActivityId=" + startActivityId
            + ", id=" + id

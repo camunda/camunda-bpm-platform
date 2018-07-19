@@ -546,6 +546,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setDurationInMillis(evt.getEndTime().getTime()-evt.getStartTime().getTime());
     }
 
+    // TODO: calculate & set removal time (CAM-9201)
+
     // set delete reason (if applicable).
     if (executionEntity.getDeleteReason() != null) {
       evt.setDeleteReason(executionEntity.getDeleteReason());

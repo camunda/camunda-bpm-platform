@@ -41,6 +41,7 @@
       PROC_DEF_ID_,
       START_TIME_,
       END_TIME_,
+      REMOVAL_TIME_,
       DURATION_,
       START_USER_ID_,
       START_ACT_ID_,
@@ -60,6 +61,7 @@
       #{processDefinitionId, jdbcType=VARCHAR},
       #{startTime, jdbcType=TIMESTAMP},
       #{endTime, jdbcType=TIMESTAMP},
+      #{removalTime, jdbcType=TIMESTAMP},
       #{durationInMillis ,jdbcType=BIGINT},
       #{startUserId, jdbcType=VARCHAR},
       #{startActivityId, jdbcType=VARCHAR},
@@ -89,6 +91,10 @@
     <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
+    </if>
+
+    <if test="removalTime!=null">
+      , REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
     </if>
 
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -130,6 +136,7 @@
     <result property="processDefinitionVersion" column="VERSION_" jdbcType="INTEGER"/>
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT"/>
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR"/>
     <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR"/>
