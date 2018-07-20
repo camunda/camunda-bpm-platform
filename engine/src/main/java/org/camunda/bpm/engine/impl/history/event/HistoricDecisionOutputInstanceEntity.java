@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.history.event;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
@@ -46,6 +48,8 @@ public class HistoricDecisionOutputInstanceEntity extends HistoryEvent implement
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
   protected TypedValueField typedValueField = new TypedValueField(this, false);
+
+  protected Date createTime;
 
   @Override
   public String getDecisionInstanceId() {
@@ -210,6 +214,14 @@ public class HistoricDecisionOutputInstanceEntity extends HistoryEvent implement
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
   }
 
   public void delete() {

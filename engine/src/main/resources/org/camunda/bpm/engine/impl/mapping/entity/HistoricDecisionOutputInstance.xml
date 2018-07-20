@@ -21,7 +21,8 @@
           LONG_,
           TEXT_,
           TEXT2_,
-          TENANT_ID_
+          TENANT_ID_,
+          CREATE_TIME_
      ) values (
           #{id, jdbcType=VARCHAR},
           #{decisionInstanceId, jdbcType=VARCHAR},
@@ -36,7 +37,8 @@
           #{longValue, jdbcType=BIGINT},
           #{textValue, jdbcType=VARCHAR},
           #{textValue2, jdbcType=VARCHAR},
-          #{tenantId, jdbcType=VARCHAR}
+          #{tenantId, jdbcType=VARCHAR},
+          #{createTime, jdbcType=TIMESTAMP}
      )
   </insert>
   
@@ -95,6 +97,7 @@
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
   
   <!-- select -->

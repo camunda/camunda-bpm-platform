@@ -55,6 +55,7 @@ create table ACT_HI_DEC_OUT (
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
     TENANT_ID_ varchar(64),
+    CREATE_TIME_ timestamp(3),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

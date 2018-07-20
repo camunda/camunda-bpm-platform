@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,6 +72,11 @@ public class HistoricDecisionInstanceInputOutputValueTest {
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
+  @After
+  public void tearDown() {
+    ClockUtil.setCurrentTime(new Date());
+  }
+
   @Test
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void decisionInputInstanceValue() throws ParseException {
@@ -88,13 +94,14 @@ public class HistoricDecisionInstanceInputOutputValueTest {
     assertThat(inputInstance.getTypeName(), is(valueType));
     assertThat(inputInstance.getValue(), is(inputValue));
     assertThat(inputInstance.getCreateTime(), is(fixedDate));
-
-    ClockUtil.setCurrentTime(new Date());
   }
 
   @Test
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
-  public void decisionOutputInstanceValue() {
+  public void decisionOutputInstanceValue() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+    Date fixedDate = sdf.parse("01/01/2001 01:01:01.000");
+    ClockUtil.setCurrentTime(fixedDate);
 
     startProcessInstanceAndEvaluateDecision(inputValue);
 
@@ -105,6 +112,7 @@ public class HistoricDecisionInstanceInputOutputValueTest {
     HistoricDecisionOutputInstance outputInstance = outputInstances.get(0);
     assertThat(outputInstance.getTypeName(), is(valueType));
     assertThat(outputInstance.getValue(), is(inputValue));
+    assertThat(outputInstance.getCreateTime(), is(fixedDate));
   }
 
   protected ProcessInstance startProcessInstanceAndEvaluateDecision(Object input) {

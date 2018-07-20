@@ -14,6 +14,10 @@ ALTER TABLE ACT_HI_ATTACHMENT
 ALTER TABLE ACT_HI_DEC_IN
   ADD CREATE_TIME_ timestamp(3);
 
+-- https://app.camunda.com/jira/browse/CAM-9217
+ALTER TABLE ACT_HI_DEC_OUT
+  ADD CREATE_TIME_ timestamp(3);
+
 -- https://app.camunda.com/jira/browse/CAM-9199
 ALTER TABLE ACT_HI_PROCINST
   ADD ROOT_PROCESS_INSTANCE_ID_ varchar(64);

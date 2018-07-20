@@ -266,6 +266,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
         HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity();
         outputInstance.setClauseId(outputClause.getId());
         outputInstance.setClauseName(outputClause.getName());
+        outputInstance.setCreateTime(ClockUtil.getCurrentTime());
 
         outputInstance.setRuleId(ruleId);
         outputInstance.setRuleOrder(ruleOrder);
