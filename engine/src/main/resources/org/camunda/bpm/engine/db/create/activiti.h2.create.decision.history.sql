@@ -35,6 +35,7 @@ create table ACT_HI_DEC_IN (
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
     TENANT_ID_ varchar(64),
+    CREATE_TIME_ timestamp,
     primary key (ID_)
 );
 

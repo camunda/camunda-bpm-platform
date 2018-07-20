@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
@@ -22,6 +24,7 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
   protected String clauseId;
   protected String clauseName;
   protected String errorMessage;
+  protected Date createDate;
 
   public String getId() {
     return id;
@@ -43,6 +46,10 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
     return errorMessage;
   }
 
+  public Date getCreateDate() {
+    return createDate;
+  }
+
   public static HistoricDecisionInputInstanceDto fromHistoricDecisionInputInstance(HistoricDecisionInputInstance historicDecisionInputInstance) {
 
     HistoricDecisionInputInstanceDto dto = new HistoricDecisionInputInstanceDto();
@@ -51,6 +58,7 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
     dto.decisionInstanceId = historicDecisionInputInstance.getDecisionInstanceId();
     dto.clauseId = historicDecisionInputInstance.getClauseId();
     dto.clauseName = historicDecisionInputInstance.getClauseName();
+    dto.createDate = historicDecisionInputInstance.getCreateTime();
 
     if(historicDecisionInputInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicDecisionInputInstance.getTypedValue());

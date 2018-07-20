@@ -585,6 +585,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
       assertThat(returnedInput, hasEntry("clauseId", (Object) MockProvider.EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_ID));
       assertThat(returnedInput, hasEntry("clauseName", (Object) MockProvider.EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_NAME));
       assertThat(returnedInput, hasEntry("errorMessage", null));
+      assertThat(returnedInput, hasEntry("createDate", (Object) MockProvider.EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CREATE_TIME));
     }
 
     verifyStringValue(returnedInputs.get(0));

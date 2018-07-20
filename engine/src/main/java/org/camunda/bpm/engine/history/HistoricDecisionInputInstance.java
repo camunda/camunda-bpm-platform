@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.history;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -58,4 +60,8 @@ public interface HistoricDecisionInputInstance {
    */
   String getErrorMessage();
 
+  /**
+   * Returns time when the variable was created.
+   */
+  Date getCreateTime();
 }

@@ -16,15 +16,19 @@ package org.camunda.bpm.engine.test.history.dmn;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -69,7 +73,10 @@ public class HistoricDecisionInstanceInputOutputValueTest {
 
   @Test
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
-  public void decisionInputInstanceValue() {
+  public void decisionInputInstanceValue() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+    Date fixedDate = sdf.parse("01/01/2001 01:01:01.000");
+    ClockUtil.setCurrentTime(fixedDate);
 
     startProcessInstanceAndEvaluateDecision(inputValue);
 
@@ -80,6 +87,9 @@ public class HistoricDecisionInstanceInputOutputValueTest {
     HistoricDecisionInputInstance inputInstance = inputInstances.get(0);
     assertThat(inputInstance.getTypeName(), is(valueType));
     assertThat(inputInstance.getValue(), is(inputValue));
+    assertThat(inputInstance.getCreateTime(), is(fixedDate));
+
+    ClockUtil.setCurrentTime(new Date());
   }
 
   @Test

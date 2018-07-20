@@ -797,6 +797,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_ID = "aDecisionInputInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_ID = "aDecisionInputClauseId";
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_NAME = "aDecisionInputClauseName";
+  public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CREATE_TIME = withTimezone("2015-09-06T11:00:00");
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_ID = "aDecisionInputInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_VARIABLE_NAME = "aDecisionInputInstanceName";
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CLAUSE_ID = "aDecisionInputClauseId";
@@ -2825,6 +2826,7 @@ public abstract class MockProvider {
     when(input.getClauseName()).thenReturn(EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_NAME);
     when(input.getTypedValue()).thenReturn(typedValue);
     when(input.getErrorMessage()).thenReturn(null);
+    when(input.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CREATE_TIME));
     return input;
   }
 

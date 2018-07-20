@@ -240,6 +240,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       HistoricDecisionInputInstanceEntity inputInstance = new HistoricDecisionInputInstanceEntity();
       inputInstance.setClauseId(inputClause.getId());
       inputInstance.setClauseName(inputClause.getName());
+      inputInstance.setCreateTime(ClockUtil.getCurrentTime());
 
       TypedValue typedValue = Variables.untypedValue(inputClause.getValue());
       inputInstance.setValue(typedValue);
