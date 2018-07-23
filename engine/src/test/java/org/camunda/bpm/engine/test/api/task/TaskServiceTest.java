@@ -64,6 +64,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -122,6 +123,11 @@ public class TaskServiceTest {
     caseService = engineRule.getCaseService();
     identityService = engineRule.getIdentityService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+  }
+
+  @After
+  public void tearDown() {
+    ClockUtil.setCurrentTime(new Date());
   }
 
   @Test
@@ -1723,9 +1729,6 @@ public class TaskServiceTest {
     assertThat(fetched.getProcessInstanceId(),is(notNullValue()));
     assertThat(fetched.getCreateTime(), is(fixedDate));
     taskService.deleteAttachment(attachment.getId());
-
-    // clean up
-    ClockUtil.setCurrentTime(new Date());
   }
 
   @Test
