@@ -162,6 +162,7 @@ public class RequestExecutor {
 
   protected void initHttpClient(RequestInterceptorHandler requestInterceptorHandler) {
     HttpClientBuilder httpClientBuilder = HttpClients.custom()
+      .useSystemProperties()
       .addInterceptorLast(requestInterceptorHandler);
 
     this.httpClient = httpClientBuilder.build();
