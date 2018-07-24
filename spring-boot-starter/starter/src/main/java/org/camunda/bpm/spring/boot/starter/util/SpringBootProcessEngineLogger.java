@@ -16,11 +16,11 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
   public static final SpringBootProcessEngineLogger LOG = createLogger(SpringBootProcessEngineLogger.class, PROJECT_CODE, PACKAGE, PROJECT_ID);
 
   public void creatingInitialAdminUser(User adminUser) {
-    logInfo("010", "creating initital Admin User: {}", adminUser);
+    logInfo("010", "creating initial Admin User: {}", adminUser);
   }
 
   public void skipAdminUserCreation(User existingUser) {
-    logInfo("011", "skip creating initital Admin User, user does exist: {}", existingUser);
+    logInfo("011", "skip creating initial Admin User, user does exist: {}", existingUser);
   }
 
   public void createInitialFilter(Filter filter) {
