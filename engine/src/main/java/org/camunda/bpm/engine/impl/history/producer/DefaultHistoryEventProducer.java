@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.history.producer;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionByteArray;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
@@ -539,14 +541,31 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     determineEndState(executionEntity, evt);
 
     // set end activity id
+    Date endTime = ClockUtil.getCurrentTime();
     evt.setEndActivityId(executionEntity.getActivityId());
-    evt.setEndTime(ClockUtil.getCurrentTime());
+    evt.setEndTime(endTime);
 
     if(evt.getStartTime() != null) {
       evt.setDurationInMillis(evt.getEndTime().getTime()-evt.getStartTime().getTime());
     }
 
-    // TODO: calculate & set removal time (CAM-9201)
+    if (executionEntity.getSuperExecution() == null) {
+
+      // determine root HPI time-to-live
+      Integer ttl = Context.getCommandContext()
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(executionEntity.getProcessDefinitionId())
+        .getHistoryTimeToLive();
+
+      if (ttl != null) {
+        // set hierarchical HPIs removal time
+        Date removalTime = determineRemovalTime(endTime, ttl);
+        Context.getCommandContext()
+          .getHistoricProcessInstanceManager()
+          .addRemovalTimeToProcessInstancesByRootId(executionEntity.getProcessInstanceId(), removalTime);
+      }
+    }
 
     // set delete reason (if applicable).
     if (executionEntity.getDeleteReason() != null) {
@@ -554,6 +573,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     return evt;
+  }
+
+  protected Date determineRemovalTime(Date endTime, int ttl) {
+    Calendar removeTime = Calendar.getInstance();
+    removeTime.setTime(endTime);
+    removeTime.add(Calendar.DATE, ttl);
+
+    return removeTime.getTime();
   }
 
   protected void determineEndState(ExecutionEntity executionEntity, HistoricProcessInstanceEventEntity evt) {

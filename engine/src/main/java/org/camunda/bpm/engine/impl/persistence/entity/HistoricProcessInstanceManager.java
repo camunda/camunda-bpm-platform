@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,4 +145,12 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectFinishedProcessInstancesReportEntitiesCount", query);
   }
 
+  public void addRemovalTimeToProcessInstancesByRootId(String rootId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("rootId", rootId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricProcessInstanceEventEntity.class, "updateHistoricProcessInstanceEventsByRootId", parameters);
+  }
 }
