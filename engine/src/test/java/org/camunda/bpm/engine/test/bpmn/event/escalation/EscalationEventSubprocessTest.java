@@ -13,12 +13,17 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.escalation;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
  * @author Philipp Ossler
@@ -35,6 +40,34 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+  }
+
+  /** CAM-9220 (https://app.camunda.com/jira/browse/CAM-9220) */
+  @Deployment
+  public void IGNORE_FAILING_testThrowEscalationEventFromEventSubprocess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embeddedEventSubprocess");
+
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.executeJob(job.getId());
+
+    assertEquals(0, taskService.createTaskQuery()
+      .processInstanceId(processInstance.getId())
+      .taskName("task in subprocess").count());
+    assertEquals(1, taskService.createTaskQuery()
+      .processInstanceId(processInstance.getId())
+      .taskName("task in process").count());
+
+    // second timer job shouldn't be available
+    job = managementService.createJobQuery().singleResult();
+    managementService.executeJob(job.getId());
+    assertNull(job);
+
+    // there should only be one completed Escalation Catch Boundary Event
+    assertEquals(1, historyService.createHistoricActivityInstanceQuery()
+      .processInstanceId(processInstance.getId())
+      .activityId("EscalationCatchBoundaryEvent")
+      .finished()
+      .count());
   }
 
   @Deployment
