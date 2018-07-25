@@ -29,5 +29,10 @@ window.camCockpitConf = {
   // skipCustomListeners: {
   //   default: true,
   //   hidden: false
+  // },
+  // 'batchOperation' : {
+  //   // select mode of query for process insatnces or decision instances
+  //   // possible values: filter, search
+  //   'mode': 'filter'
   // }
 };
