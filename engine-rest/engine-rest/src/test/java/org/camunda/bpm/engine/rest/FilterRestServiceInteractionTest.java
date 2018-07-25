@@ -1523,6 +1523,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(variableInstanceQueryMock, never()).variableScopeIdIn((String) anyVararg());
     verify(variableInstanceQueryMock, never()).variableNameIn((String) anyVararg());
     verify(variableInstanceQueryMock, never()).list();
+
   }
 
   @Test
@@ -1582,6 +1583,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(variableInstanceQueryMock, times(1)).variableNameIn((String) anyVararg());
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).list();
+    verify(identityServiceMock, times(1)).clearAuthentication();
   }
 
   @Test
@@ -1626,6 +1628,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(variableInstanceQueryMock, times(1)).list();
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
     verify(variableInstanceQueryMock, times(1)).disableCustomObjectDeserialization();
+    verify(identityServiceMock, times(1)).clearAuthentication();
 
     String content = response.asString();
     List<Map<String, Object>> variables = from(content).getJsonObject("_embedded.variable");
@@ -1694,6 +1697,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(variableInstanceQueryMock, times(1)).variableNameIn((String) anyVararg());
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).list();
+    verify(identityServiceMock, times(1)).clearAuthentication();
 
     String content = response.asString();
     List<Map<String, Object>> taskList = from(content).getList("_embedded.task");

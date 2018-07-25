@@ -16,10 +16,12 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.FilterRestService;
@@ -515,13 +517,23 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   }
 
   protected List<VariableInstance> queryVariablesInstancesByVariableScopeIds(Collection<String> variableNames, Collection<String> variableScopeIds) {
-    return getProcessEngine().getRuntimeService()
-      .createVariableInstanceQuery()
-      .disableBinaryFetching()
-      .disableCustomObjectDeserialization()
-      .variableNameIn(variableNames.toArray(new String[variableNames.size()]))
-      .variableScopeIdIn(variableScopeIds.toArray(new String[variableScopeIds.size()]))
-      .list();
+
+    IdentityService identityService = processEngine.getIdentityService();
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+
+    try {
+      identityService.clearAuthentication();
+      return getProcessEngine().getRuntimeService()
+          .createVariableInstanceQuery()
+          .disableBinaryFetching()
+          .disableCustomObjectDeserialization()
+          .variableNameIn(variableNames.toArray(new String[variableNames.size()]))
+          .variableScopeIdIn(variableScopeIds.toArray(new String[variableScopeIds.size()]))
+          .list();
+    } finally {
+      identityService.setAuthentication(currentAuthentication);
+    }
+
   }
 
   protected boolean isEntityOfClass(Object entity, Class<?> entityClass) {
