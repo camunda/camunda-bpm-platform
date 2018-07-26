@@ -39,6 +39,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
@@ -46,6 +47,9 @@ public class TransientVariableTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -416,7 +420,7 @@ public class TransientVariableTest {
         .scriptText("execution.setVariable('abc', blob);")
       .endEvent()
       .done();
- 
+
     testRule.deploy(instance);
     runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValueTyped("foo", Variables.stringValue("foo", false)));
@@ -484,6 +488,80 @@ public class TransientVariableTest {
     assertEquals("theTask1", task.getTaskDefinitionKey());
   }
 
+  @Test
+  public void testChangeTransientVariable() throws URISyntaxException {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask()
+        .camundaClass(ChangeVariableTransientDelegate.class.getName())
+      .userTask("user")
+      .endEvent()
+      .done();
+
+    testRule.deploy(instance);
+
+    // when
+    runtimeService.startProcessInstanceByKey("Process");
+
+    // then
+    List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, historicVariableInstances.size());
+    assertEquals(0, variableInstances.size());
+  }
+
+  @Test
+  public void testSwitchTransientToNonVariable() throws URISyntaxException {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask()
+        .camundaClass(SwitchTransientVariableDelegate.class.getName())
+      .userTask("user")
+      .endEvent()
+      .done();
+
+    testRule.deploy(instance);
+
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("transient1", true);
+    variables.put("transient2", false);
+
+    // expect
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot set transient variable with name variable to non-transient variable and vice versa.");
+
+    // when
+    runtimeService.startProcessInstanceByKey("Process", variables);
+  }
+
+  @Test
+  public void testSwitchNonToTransientVariable() throws URISyntaxException {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask()
+        .camundaClass(SwitchTransientVariableDelegate.class.getName())
+      .userTask("user")
+      .endEvent()
+      .done();
+
+    testRule.deploy(instance);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("transient1", false);
+    variables.put("transient2", true);
+
+    // expect
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot set transient variable with name variable to non-transient variable and vice versa.");
+
+    // when
+    runtimeService.startProcessInstanceByKey("Process", variables);
+  }
+
   public static class SetVariableTransientDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -511,6 +589,24 @@ public class TransientVariableTest {
     public void notify(DelegateExecution execution) throws Exception {
       Object variable = execution.getVariable(VARIABLE_NAME);
       assertNotNull(variable);
+    }
+  }
+
+  public static class ChangeVariableTransientDelegate implements JavaDelegate {
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, true));
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(2, true));
+    }
+  }
+
+  public static class SwitchTransientVariableDelegate implements JavaDelegate {
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      Boolean transient1 = (Boolean) execution.getVariable("transient1");
+      Boolean transient2 = (Boolean) execution.getVariable("transient2");
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, transient1));
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(2, transient2));
     }
   }
 

@@ -309,10 +309,14 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
     if (hasVariableLocal(variableName)) {
-      if (value.isTransient()) {
+      TypedValue previousTypeValue = getVariableInstanceLocal(variableName).getTypedValue(true);
+      if (value.isTransient() && previousTypeValue.isTransient()) {
+        setVariableLocalTransient(variableName, value);
+      } else if (!value.isTransient() && !previousTypeValue.isTransient()) {
+        setVariableLocal(variableName, value, sourceActivityVariableScope);
+      } else {
         throw ProcessEngineLogger.CORE_LOGGER.transientVariableException(variableName);
       }
-      setVariableLocal(variableName, value, sourceActivityVariableScope);
       return;
     }
     AbstractVariableScope parentVariableScope = getParentVariableScope();
@@ -449,9 +453,16 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   public void setVariableLocalTransient(String variableName, Object value, AbstractVariableScope sourceActivityVariableScope) {
+
     VariableStore<CoreVariableInstance> variableStore = getVariableStore();
-    setVariableLocalTransient(variableName, value);
-    invokeVariableLifecycleListenersCreate(variableStore.getVariable(variableName), sourceActivityVariableScope);
+    if (variableStore.containsKey(variableName)) {
+      CoreVariableInstance existingInstance = variableStore.getVariable(variableName);
+      existingInstance.setValue((TypedValue) value);
+      invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityVariableScope);
+    } else {
+      setVariableLocalTransient(variableName, value);
+      invokeVariableLifecycleListenersCreate(variableStore.getVariable(variableName), sourceActivityVariableScope);
+    }
   }
 
   public void removeVariable(String variableName) {

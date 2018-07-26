@@ -112,11 +112,6 @@ public class VariableStore<T extends CoreVariableInstance> {
   }
 
   public void addVariable(T value) {
-
-    if (containsKey(value.getName())) {
-      throw ProcessEngineLogger.CORE_LOGGER.duplicateVariableInstanceException(value);
-    }
-
     getVariablesMap().put(value.getName(), value);
 
     for (VariableStoreObserver<T> listener : observers) {

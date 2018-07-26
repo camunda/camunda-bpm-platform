@@ -64,7 +64,7 @@ public class CoreLogger extends ProcessEngineLogger {
   public ProcessEngineException transientVariableException(String variableName) {
     return new ProcessEngineException(exceptionMessage(
         "006",
-        "Cannot set transient variable with name {}. Persisted variable already exists",
+        "Cannot set transient variable with name {} to non-transient variable and vice versa.",
         variableName
       ));
   }

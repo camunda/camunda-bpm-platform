@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Thorben Lindhauer
@@ -750,6 +751,47 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
     LogVariableListener.reset();
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/VariableListenerTest.testUpdateEventListenerByClass.cmmn"
+      })
+  public void testUpdateEventListenerOfTransientVariable() {
+    caseService
+      .withCaseDefinitionByKey("case")
+      .create();
+
+    CaseExecution taskExecution =
+        caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    assertNotNull(taskExecution);
+
+    // when i create a variable on the human task
+    caseService.withCaseExecution(taskExecution.getId()).setVariableLocal("foo", Variables.stringValue("aTaskValue", true)).execute();
+
+    // then the listener is not invoked
+    assertTrue(LogVariableListener.getInvocations().isEmpty());
+
+    // when i update the variable on the human task
+    caseService.withCaseExecution(taskExecution.getId()).setVariableLocal("foo", Variables.stringValue("aNewTaskValue", true)).execute();
+
+    // then the listener is invoked
+    assertEquals(1, LogVariableListener.getInvocations().size());
+
+    DelegateVariableInstanceSpec
+      .fromCaseExecution(taskExecution)
+      .event(VariableListener.UPDATE)
+      .name("foo")
+      .value("aNewTaskValue")
+      .activityInstanceId(taskExecution.getId())
+      .matches(LogVariableListener.getInvocations().get(0));
+
+    LogVariableListener.reset();
+
+
+    // when i remove the variable from the human task
+    caseService.withCaseExecution(taskExecution.getId()).removeVariable("foo").execute();
+
+    // then the listener is not invoked
+    assertTrue(LogVariableListener.getInvocations().isEmpty());
+  }
 
   protected void tearDown() throws Exception {
     beans.clear();
