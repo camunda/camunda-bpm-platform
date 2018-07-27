@@ -309,7 +309,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
     if (hasVariableLocal(variableName)) {
-      TypedValue previousTypeValue = getVariableInstanceLocal(variableName).getTypedValue(true);
+      TypedValue previousTypeValue = getVariableInstanceLocal(variableName).getTypedValue(false);
       if (value.isTransient() && previousTypeValue.isTransient()) {
         setVariableLocalTransient(variableName, value);
       } else if (!value.isTransient() && !previousTypeValue.isTransient()) {
