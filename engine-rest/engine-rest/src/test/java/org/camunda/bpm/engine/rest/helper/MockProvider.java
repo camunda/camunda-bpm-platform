@@ -2940,6 +2940,7 @@ public abstract class MockProvider {
       .monitorJobDefinitionId(EXAMPLE_MONITOR_JOB_DEFINITION_ID)
       .batchJobDefinitionId(EXAMPLE_BATCH_JOB_DEFINITION_ID)
       .tenantId(EXAMPLE_TENANT_ID)
+      .createUserId(EXAMPLE_USER_ID)
       .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .endTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_END_TIME));
   }

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.api.authorization.batch;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
@@ -31,6 +32,7 @@ import java.util.List;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -142,6 +144,8 @@ public class DeleteProcessInstancesBatchAuthorizationTest extends AbstractBatchA
     if (authRule.assertScenario(getScenario())) {
       if (testHelper.isHistoryLevelFull()) {
         assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(BATCH_OPERATIONS));
+        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().list().get(0);
+        assertEquals("userId", historicBatch.getCreateUserId());
       }
 
       if (authRule.scenarioSucceeded()) {

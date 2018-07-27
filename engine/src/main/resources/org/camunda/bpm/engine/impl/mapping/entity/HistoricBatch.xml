@@ -18,6 +18,7 @@
       MONITOR_JOB_DEF_ID_,
       BATCH_JOB_DEF_ID_,
       TENANT_ID_,
+      CREATE_USER_ID_,
       START_TIME_,
       END_TIME_
     )
@@ -32,6 +33,7 @@
       #{monitorJobDefinitionId, jdbcType=VARCHAR},
       #{batchJobDefinitionId, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
+      #{createUserId, jdbcType=VARCHAR},
       #{startTime, jdbcType=TIMESTAMP},
       #{endTime, jdbcType=TIMESTAMP}
     )
@@ -49,6 +51,7 @@
     <result property="monitorJobDefinitionId" column="MONITOR_JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="batchJobDefinitionId" column="BATCH_JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>

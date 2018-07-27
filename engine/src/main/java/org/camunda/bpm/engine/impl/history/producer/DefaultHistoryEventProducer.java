@@ -921,6 +921,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     if (HistoryEventTypes.BATCH_START.equals(eventType)) {
       event.setStartTime(ClockUtil.getCurrentTime());
+      event.setCreateUserId(Context.getCommandContext().getAuthenticatedUserId());
     }
 
     if (HistoryEventTypes.BATCH_END.equals(eventType)) {

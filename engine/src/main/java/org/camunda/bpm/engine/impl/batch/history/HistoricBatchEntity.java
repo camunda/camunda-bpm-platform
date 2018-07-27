@@ -39,6 +39,7 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   protected String batchJobDefinitionId;
 
   protected String tenantId;
+  protected String createUserId;
 
   protected Date startTime;
   protected Date endTime;
@@ -105,6 +106,14 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getCreateUserId() {
+    return createUserId;
+  }
+
+  public void setCreateUserId(String createUserId) {
+    this.createUserId = createUserId;
   }
 
   public Date getStartTime() {

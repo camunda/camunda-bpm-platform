@@ -28,6 +28,7 @@ public class HistoricBatchDto {
   protected String monitorJobDefinitionId;
   protected String batchJobDefinitionId;
   protected String tenantId;
+  protected String createUserId;
   protected Date startTime;
   protected Date endTime;
 
@@ -67,6 +68,10 @@ public class HistoricBatchDto {
     return tenantId;
   }
 
+  public String getCreateUserId() {
+    return createUserId;
+  }
+
   public Date getStartTime() {
     return startTime;
   }
@@ -86,6 +91,7 @@ public class HistoricBatchDto {
     dto.monitorJobDefinitionId = historicBatch.getMonitorJobDefinitionId();
     dto.batchJobDefinitionId = historicBatch.getBatchJobDefinitionId();
     dto.tenantId = historicBatch.getTenantId();
+    dto.createUserId = historicBatch.getCreateUserId();
     dto.startTime = historicBatch.getStartTime();
     dto.endTime = historicBatch.getEndTime();
     return dto;

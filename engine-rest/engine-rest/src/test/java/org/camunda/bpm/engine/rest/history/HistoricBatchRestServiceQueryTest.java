@@ -310,6 +310,7 @@ public class HistoricBatchRestServiceQueryTest extends AbstractRestServiceTest {
     assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, historicBatch.getMonitorJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, historicBatch.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, historicBatch.getTenantId());
+    assertEquals(MockProvider.EXAMPLE_USER_ID, historicBatch.getCreateUserId());
     assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME), historicBatch.getStartTime());
     assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_END_TIME), historicBatch.getEndTime());
   }

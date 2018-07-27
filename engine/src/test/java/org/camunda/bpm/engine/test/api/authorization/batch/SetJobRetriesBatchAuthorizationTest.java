@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.api.authorization.batch;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -36,6 +37,7 @@ import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -240,6 +242,8 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
     if (authRule.assertScenario(getScenario())) {
       if (testHelper.isHistoryLevelFull()) {
         assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(BATCH_OPERATIONS));
+        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().list().get(0);
+        assertEquals("userId", historicBatch.getCreateUserId());
       }
       assertRetries(getAllJobIds(), 5);
     }

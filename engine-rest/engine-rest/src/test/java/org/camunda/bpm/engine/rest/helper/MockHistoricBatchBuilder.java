@@ -31,6 +31,7 @@ public class MockHistoricBatchBuilder {
   protected String monitorJobDefinitionId;
   protected String batchJobDefinitionId;
   protected String tenantId;
+  protected String createUserId;
   protected Date startTime;
   protected Date endTime;
 
@@ -79,6 +80,11 @@ public class MockHistoricBatchBuilder {
     return this;
   }
 
+  public MockHistoricBatchBuilder createUserId(String createUserId) {
+    this.createUserId = createUserId;
+    return this;
+  }
+
   public MockHistoricBatchBuilder startTime(Date startTime) {
     this.startTime = startTime;
     return this;
@@ -100,6 +106,7 @@ public class MockHistoricBatchBuilder {
     when(historicBatch.getMonitorJobDefinitionId()).thenReturn(monitorJobDefinitionId);
     when(historicBatch.getBatchJobDefinitionId()).thenReturn(batchJobDefinitionId);
     when(historicBatch.getTenantId()).thenReturn(tenantId);
+    when(historicBatch.getCreateUserId()).thenReturn(createUserId);
     when(historicBatch.getStartTime()).thenReturn(startTime);
     when(historicBatch.getEndTime()).thenReturn(endTime);
     return historicBatch;
