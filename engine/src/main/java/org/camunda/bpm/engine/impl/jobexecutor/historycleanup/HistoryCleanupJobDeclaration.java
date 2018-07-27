@@ -50,6 +50,7 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
     config.setImmediatelyDue(context.isImmediatelyDue());
     config.setMinuteFrom(context.getMinuteFrom());
     config.setMinuteTo(context.getMinuteTo());
+    config.setHierarchicalHistoryCleanup(context.isHierarchicalHistoryCleanup());
     return config;
   }
 

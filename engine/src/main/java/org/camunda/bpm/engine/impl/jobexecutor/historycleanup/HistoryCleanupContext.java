@@ -5,9 +5,17 @@ package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
  */
 public class HistoryCleanupContext {
 
+  private boolean hierarchicalHistoryCleanup;
   private boolean immediatelyDue;
   private int minuteFrom;
   private int minuteTo;
+
+  public HistoryCleanupContext(boolean immediatelyDue, int minuteFrom, int minuteTo, boolean hierarchicalHistoryCleanup) {
+    this.hierarchicalHistoryCleanup = hierarchicalHistoryCleanup;
+    this.immediatelyDue = immediatelyDue;
+    this.minuteFrom = minuteFrom;
+    this.minuteTo = minuteTo;
+  }
 
   public HistoryCleanupContext(boolean immediatelyDue, int minuteFrom, int minuteTo) {
     this.immediatelyDue = immediatelyDue;
@@ -18,6 +26,14 @@ public class HistoryCleanupContext {
   public HistoryCleanupContext(int minuteFrom, int minuteTo) {
     this.minuteFrom = minuteFrom;
     this.minuteTo = minuteTo;
+  }
+
+  public boolean isHierarchicalHistoryCleanup() {
+    return hierarchicalHistoryCleanup;
+  }
+
+  public void setHierarchicalHistoryCleanup(boolean hierarchicalHistoryCleanup) {
+    this.hierarchicalHistoryCleanup = hierarchicalHistoryCleanup;
   }
 
   public boolean isImmediatelyDue() {

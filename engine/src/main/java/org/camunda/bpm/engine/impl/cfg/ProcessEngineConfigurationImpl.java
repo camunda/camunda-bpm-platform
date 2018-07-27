@@ -732,6 +732,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
 
   protected int historyCleanupDegreeOfParallelism = 1;
+  protected boolean hierarchicalHistoryCleanup = true;
 
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
@@ -4060,6 +4061,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupDegreeOfParallelism(int historyCleanupDegreeOfParallelism) {
     this.historyCleanupDegreeOfParallelism = historyCleanupDegreeOfParallelism;
+  }
+
+  public boolean isHierarchicalHistoryCleanup() {
+    return hierarchicalHistoryCleanup;
+  }
+
+  public void setHierarchicalHistoryCleanup(boolean hierarchicalHistoryCleanup) {
+    this.hierarchicalHistoryCleanup = hierarchicalHistoryCleanup;
   }
 
   public void setBatchOperationHistoryTimeToLive(String batchOperationHistoryTimeToLive) {

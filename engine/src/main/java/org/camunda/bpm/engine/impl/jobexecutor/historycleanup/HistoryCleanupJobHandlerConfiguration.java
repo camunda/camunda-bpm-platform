@@ -29,11 +29,17 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   public static final String JOB_CONFIG_EXECUTE_AT_ONCE = "immediatelyDue";
   public static final String JOB_CONFIG_MINUTE_FROM = "minuteFrom";
   public static final String JOB_CONFIG_MINUTE_TO = "minuteTo";
+  public static final String JOB_CONFIG_CLEANUP_HIERARCHY = "hierarchicalHistoryCleanup";
 
   /**
    * Counts runs without data. Is used within batch window to calculate the delay between two job runs in case no data for cleanup was found.
    */
   private int countEmptyRuns = 0;
+
+  /**
+   * Indicates if the History Cleanup Job needs to be aware of the hierarchical structure of the historical entities.
+   */
+  private boolean hierarchicalHistoryCleanup;
 
   /**
    * Indicated that the job was triggered manually and must be executed at once without waiting for batch window start time.
@@ -57,6 +63,7 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
     json.put(JOB_CONFIG_EXECUTE_AT_ONCE, immediatelyDue);
     json.put(JOB_CONFIG_MINUTE_FROM, minuteFrom);
     json.put(JOB_CONFIG_MINUTE_TO, minuteTo);
+    json.put(JOB_CONFIG_CLEANUP_HIERARCHY, hierarchicalHistoryCleanup);
     return json.toString();
   }
 
@@ -67,6 +74,9 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
     }
     if (jsonObject.has(JOB_CONFIG_EXECUTE_AT_ONCE)) {
       config.setImmediatelyDue(jsonObject.getBoolean(JOB_CONFIG_EXECUTE_AT_ONCE));
+    }
+    if (jsonObject.has(JOB_CONFIG_CLEANUP_HIERARCHY)) {
+      config.setHierarchicalHistoryCleanup(jsonObject.getBoolean(JOB_CONFIG_CLEANUP_HIERARCHY));
     }
     config.setMinuteFrom(jsonObject.getInt(JOB_CONFIG_MINUTE_FROM));
     config.setMinuteTo(jsonObject.getInt(JOB_CONFIG_MINUTE_TO));
@@ -120,6 +130,14 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
 
   public void setMinuteTo(int minuteTo) {
     this.minuteTo = minuteTo;
+  }
+
+  public boolean isHierarchicalHistoryCleanup() {
+    return hierarchicalHistoryCleanup;
+  }
+
+  public void setHierarchicalHistoryCleanup(boolean hierarchicalHistoryCleanup) {
+    this.hierarchicalHistoryCleanup = hierarchicalHistoryCleanup;
   }
 }
 

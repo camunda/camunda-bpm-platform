@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.history;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -41,7 +42,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.BatchWindow;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
@@ -59,6 +59,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
@@ -67,12 +68,17 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -82,6 +88,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Svetlana Dorokhova
  */
+@RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoryCleanupTest {
 
@@ -101,6 +108,17 @@ public class HistoryCleanupTest {
   protected String defaultStartTime;
   protected String defaultEndTime;
   protected int defaultBatchSize;
+
+  protected boolean isHierarchicalCleanup;
+
+  @Parameterized.Parameters(name = "Hierachical History Cleanup: {0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{true}, {false}});
+  }
+
+  public HistoryCleanupTest(boolean isHierarchicalCleanup) {
+    this.isHierarchicalCleanup = isHierarchicalCleanup;
+  }
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -142,6 +160,7 @@ public class HistoryCleanupTest {
     defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
     defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
     defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
+    processEngineConfiguration.setHierarchicalHistoryCleanup(isHierarchicalCleanup);
   }
 
   @After
@@ -1207,6 +1226,84 @@ public class HistoryCleanupTest {
     thrown.expectMessage("historyCleanupBatchThreshold");
 
     processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testCleanupOrder() {
+    int expectedInstances = (isHierarchicalCleanup)? 1 : 0;
+    // given
+    BpmnModelInstance parentProcessInstance =
+      Bpmn.createExecutableProcess("nestedHierarchicalProcess")
+        .camundaHistoryTimeToLive(2)
+        .startEvent()
+        .callActivity("callActivity")
+          .calledElement("middleChildProcess")
+        .userTask("parentUserTask")
+        .endEvent()
+        .done();
+
+    BpmnModelInstance middleSubprocessInstance =
+      Bpmn.createExecutableProcess("middleChildProcess")
+        .camundaHistoryTimeToLive(1)
+        .startEvent()
+        .callActivity()
+          .calledElement("lastChildProcess")
+        .endEvent("subMiddleEnd")
+        .done();
+
+    BpmnModelInstance lastSubprocessInstance =
+      Bpmn.createExecutableProcess("lastChildProcess")
+        .camundaHistoryTimeToLive(1)
+        .startEvent()
+        .endEvent("subLastEnd")
+        .done();
+
+    testRule.deploy(parentProcessInstance, middleSubprocessInstance, lastSubprocessInstance);
+
+    //we're within batch window
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
+    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addMinutes(now, 30)));
+    processEngineConfiguration.initHistoryCleanup();
+
+    String parentProcessInstanceId = runtimeService.startProcessInstanceByKey("nestedHierarchicalProcess").getId();
+
+    HistoricProcessInstance middleChildInstance = historyService.createHistoricProcessInstanceQuery()
+      .superProcessInstanceId(parentProcessInstanceId)
+      .singleResult();
+
+    HistoricProcessInstance lastChildInstance = historyService.createHistoricProcessInstanceQuery()
+      .superProcessInstanceId(middleChildInstance.getId())
+      .singleResult();
+
+    // when
+    ClockUtil.setCurrentTime(DateUtils.addDays(now, 2));
+    runHistoryCleanup(true);
+
+    assertEquals(expectedInstances, historyService.createHistoricProcessInstanceQuery()
+      .processInstanceId(middleChildInstance.getId())
+      .count());
+    assertEquals(expectedInstances, historyService.createHistoricProcessInstanceQuery()
+      .processInstanceId(lastChildInstance.getId())
+      .count());
+
+    Task parentTask = processEngineConfiguration.getTaskService()
+      .createTaskQuery()
+      .processInstanceId(parentProcessInstanceId)
+      .singleResult();
+    processEngineConfiguration.getTaskService().complete(parentTask.getId());
+
+    // then
+    ClockUtil.setCurrentTime(DateUtils.addDays(now, 4));
+    runHistoryCleanup(true);
+
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(parentProcessInstanceId).count());
+
+    if (isHierarchicalCleanup) {
+      assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(middleChildInstance.getId()).count());
+      assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(lastChildInstance.getId()).count());
+    }
   }
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {

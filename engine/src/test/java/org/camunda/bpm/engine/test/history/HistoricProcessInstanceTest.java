@@ -941,8 +941,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(rootHistoricProcessInstance.getEndTime());
     assertNotNull(rootHistoricProcessInstance.getRemovalTime());
     assertTrue(rootHistoricProcessInstance.getRemovalTime().after(rootHistoricProcessInstance.getEndTime()));
-
-    repositoryService.updateProcessDefinitionHistoryTimeToLive(processInstance.getProcessDefinitionId(), null);
   }
 
   /**
@@ -997,8 +995,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     assertNotNull(lastChildHistoricProcessInstance.getRemovalTime());
     assertEquals(rootHistoricProcessInstance.getRemovalTime(), lastChildHistoricProcessInstance.getRemovalTime());
-
-    repositoryService.updateProcessDefinitionHistoryTimeToLive(processInstance.getProcessDefinitionId(), null);
   }
 
   /**

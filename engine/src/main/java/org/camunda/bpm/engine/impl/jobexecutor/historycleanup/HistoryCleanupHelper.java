@@ -67,7 +67,7 @@ public abstract class HistoryCleanupHelper {
 
     //add process instance ids
     final List<String> historicProcessInstanceIds = commandContext.getHistoricProcessInstanceManager()
-        .findHistoricProcessInstanceIdsForCleanup(batchSize, configuration.getMinuteFrom(), configuration.getMinuteTo());
+        .findHistoricProcessInstanceIdsForCleanup(batchSize, configuration.getMinuteFrom(), configuration.getMinuteTo(), configuration.isHierarchicalHistoryCleanup());
     if (historicProcessInstanceIds.size() > 0) {
       historyCleanupBatch.setHistoricProcessInstanceIds(historicProcessInstanceIds);
     }
