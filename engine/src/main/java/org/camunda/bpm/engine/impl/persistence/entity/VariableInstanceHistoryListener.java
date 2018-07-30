@@ -43,7 +43,7 @@ public class VariableInstanceHistoryListener implements VariableInstanceLifecycl
 
   @Override
   public void onDelete(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
-    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELETE, variableInstance)) {
+    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELETE, variableInstance) && !variableInstance.isTransient()) {
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
         public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {

@@ -45,6 +45,7 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class TransientVariableTest {
 
+  private static final int OUTPUT_VALUE = 2;
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -501,14 +502,20 @@ public class TransientVariableTest {
 
     testRule.deploy(instance);
 
+    String output = "transientVariableOutput";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(output, false);
+
     // when
-    runtimeService.startProcessInstanceByKey("Process");
+    runtimeService.startProcessInstanceByKey("Process", variables);
 
     // then
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
-    assertEquals(0, historicVariableInstances.size());
-    assertEquals(0, variableInstances.size());
+    assertEquals(1, historicVariableInstances.size());
+    assertEquals(1, variableInstances.size());
+    assertEquals(output, variableInstances.get(0).getName());
+    assertEquals(OUTPUT_VALUE, variableInstances.get(0).getValue());
   }
 
   @Test
@@ -596,7 +603,8 @@ public class TransientVariableTest {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
       execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, true));
-      execution.setVariable(VARIABLE_NAME, Variables.integerValue(2, true));
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(OUTPUT_VALUE, true));
+      execution.setVariable("transientVariableOutput", execution.getVariable(VARIABLE_NAME));
     }
   }
 
