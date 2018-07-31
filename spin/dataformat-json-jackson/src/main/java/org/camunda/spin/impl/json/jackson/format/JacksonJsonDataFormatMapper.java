@@ -60,7 +60,7 @@ public class JacksonJsonDataFormatMapper implements DataFormatMapper {
   public <T> T mapInternalToJava(Object parameter, String typeIdentifier) {
     try {
       //sometimes the class identifier is at once a fully qualified class name
-      final Class<?> aClass = Class.forName(typeIdentifier);
+      final Class<?> aClass = Class.forName(typeIdentifier, true, Thread.currentThread().getContextClassLoader());
       return (T) mapInternalToJava(parameter, aClass);
     } catch (ClassNotFoundException e) {
       JavaType javaType = format.constructJavaTypeFromCanonicalString(typeIdentifier);
