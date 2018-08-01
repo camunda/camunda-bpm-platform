@@ -845,6 +845,29 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
+  public void testHandleBpmnErrorWithVariables() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("errorCode", "anErrorCode");
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    parameters.put("variables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+
+    verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode", variables);
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
   public void testHandleBpmnErrorNonExistingTask() {
     doThrow(new NotFoundException())
       .when(externalTaskService)

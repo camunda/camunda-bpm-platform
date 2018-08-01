@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.hamcrest.Matchers.greaterThan;
@@ -1726,12 +1727,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(afterBpmnError.getTaskDefinitionKey(), "afterBpmnError");
   }
 
-
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testHandleBpmnErrorReclaimedLockExpiredTaskWithoutDefinedBoundary() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    handleBpmnErrorReclaimedLockExpiredTask();
+    handleBpmnErrorReclaimedLockExpiredTask(false);
     assertProcessEnded(processInstance.getId());
   }
 
@@ -1740,13 +1740,14 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     // given
     runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
     //then
-    handleBpmnErrorReclaimedLockExpiredTask();
+    handleBpmnErrorReclaimedLockExpiredTask(false);
   }
 
   /**
    * Helpher method which reclaims an external task after the lock is expired.
+   * @param includeVariables flag showing if pass or not variables
    */
-  public void handleBpmnErrorReclaimedLockExpiredTask() {
+  public void handleBpmnErrorReclaimedLockExpiredTask(boolean includeVariables) {
     // when
     List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
       .topic(TOPIC_NAME, LOCK_TIME)
@@ -1766,6 +1767,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ProcessEngineException e) {
       assertTextPresent("Bpmn error of External Task " + externalTasks.get(0).getId() + " cannot be reported by worker '" + WORKER_ID + "'. It is locked by worker 'anotherWorkerId'.", e.getMessage());
+      if (includeVariables) {
+        List<VariableInstance> list = runtimeService.createVariableInstanceQuery().list();
+        assertEquals(0, list.size());
+      }
     }
 
     // and the second worker can
@@ -1855,6 +1860,105 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("ExternalTask with id '" + task.getId() + "' is suspended", e.getMessage());
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
+  public void testHandleBpmnErrorPassVariablesBoundryEvent() {
+    //given
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // and the lock expires without the task being reclaimed
+    ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    variables.put("transientVar", Variables.integerValue(1, true));
+
+    // when
+    externalTaskService.handleBpmnError(externalTasks.get(0).getId(), WORKER_ID, "ERROR-OCCURED", variables);
+
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // then
+    assertEquals(0, externalTasks.size());
+    assertEquals(0, externalTaskService.createExternalTaskQuery().count());
+    Task afterBpmnError = taskService.createTaskQuery().singleResult();
+    assertNotNull(afterBpmnError);
+    assertEquals(afterBpmnError.getTaskDefinitionKey(), "afterBpmnError");
+    List<VariableInstance> list = runtimeService.createVariableInstanceQuery().processInstanceIdIn(pi.getId()).list();
+    assertEquals(1, list.size());
+    assertEquals("foo", list.get(0).getName());
+  }
+
+  public void testHandleBpmnErrorPassVariablesEventSubProcess() {
+    // when
+    BpmnModelInstance process =
+        Bpmn.createExecutableProcess("process")
+        .startEvent("startEvent")
+        .serviceTask("externalTask")
+          .camundaType("external")
+          .camundaTopic(TOPIC_NAME)
+        .endEvent("endEvent")
+        .done();
+
+    BpmnModelInstance subProcess = modify(process)
+        .addSubProcessTo("process")
+          .id("eventSubProcess")
+          .triggerByEvent()
+          .embeddedSubProcess()
+            .startEvent("eventSubProcessStart").error()
+            .userTask("afterBpmnError")
+            .endEvent()
+          .subProcessDone()
+          .done();
+
+    BpmnModelInstance targetProcess = modify(subProcess);
+
+    deploymentId = deployment(targetProcess);
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // and the lock expires without the task being reclaimed
+    ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(LOCK_TIME * 2).toDate());
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    variables.put("transientVar", Variables.integerValue(1, true));
+
+    // when
+    externalTaskService.handleBpmnError(externalTasks.get(0).getId(), WORKER_ID, "ERROR-OCCURED", variables);
+
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // then
+    assertEquals(0, externalTasks.size());
+    assertEquals(0, externalTaskService.createExternalTaskQuery().count());
+    Task afterBpmnError = taskService.createTaskQuery().singleResult();
+    assertNotNull(afterBpmnError);
+    assertEquals(afterBpmnError.getTaskDefinitionKey(), "afterBpmnError");
+    List<VariableInstance> list = runtimeService.createVariableInstanceQuery().processInstanceIdIn(pi.getId()).list();
+    assertEquals(1, list.size());
+    assertEquals("foo", list.get(0).getName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
+  public void testHandleBpmnErrorReclaimedLockExpiredTaskWithBoundaryAndPassVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    // then
+    handleBpmnErrorReclaimedLockExpiredTask(true);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")

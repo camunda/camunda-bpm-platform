@@ -15,12 +15,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * Command to handle an external task BPMN error.
- * 
+ *
  * @author Christopher Zell
  */
 public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
@@ -28,12 +30,19 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
    * The error code of the corresponding bpmn error.
    */
   protected String errorCode;
-  
+  protected Map<String, Object> variables;
+
   public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode) {
     super(externalTaskId, workerId);
     this.errorCode = errorCode;
   }
-  
+
+  public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode, Map<String, Object> variables) {
+    super(externalTaskId, workerId);
+    this.errorCode = errorCode;
+    this.variables = variables;
+  }
+
   @Override
   protected void validateInput() {
     super.validateInput();
@@ -47,6 +56,6 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
 
   @Override
   public void execute(ExternalTaskEntity externalTask) {
-    externalTask.bpmnError(errorCode);
+    externalTask.bpmnError(errorCode, variables);
   }
 }

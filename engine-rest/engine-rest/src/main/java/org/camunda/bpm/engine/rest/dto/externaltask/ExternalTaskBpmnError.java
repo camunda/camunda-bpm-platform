@@ -15,6 +15,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
+import java.util.Map;
+
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -23,6 +25,7 @@ public class ExternalTaskBpmnError {
 
   protected String workerId;
   protected String errorCode;
+  protected Map<String, Object> variables;
 
   public String getWorkerId() {
     return workerId;
@@ -38,5 +41,13 @@ public class ExternalTaskBpmnError {
 
   public void setErrorCode(String errorCode) {
     this.errorCode = errorCode;
+  }
+
+  public Map<String, Object> getVariables() {
+    return variables;
+  }
+
+  public void setVariables(Map<String, Object> variables) {
+    this.variables = variables;
   }
 }
