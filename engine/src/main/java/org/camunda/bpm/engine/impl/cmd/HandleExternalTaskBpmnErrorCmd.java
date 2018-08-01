@@ -30,6 +30,7 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
    * The error code of the corresponding bpmn error.
    */
   protected String errorCode;
+  protected String errorMessage;
   protected Map<String, Object> variables;
 
   public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode) {
@@ -37,9 +38,10 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
     this.errorCode = errorCode;
   }
 
-  public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode, Map<String, Object> variables) {
+  public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode, String errorMessage, Map<String, Object> variables) {
     super(externalTaskId, workerId);
     this.errorCode = errorCode;
+    this.errorMessage = errorMessage;
     this.variables = variables;
   }
 
@@ -56,6 +58,6 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
 
   @Override
   public void execute(ExternalTaskEntity externalTask) {
-    externalTask.bpmnError(errorCode, variables);
+    externalTask.bpmnError(errorCode, errorMessage, variables);
   }
 }

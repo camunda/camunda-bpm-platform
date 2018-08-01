@@ -62,12 +62,17 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   @Override
   public void handleBpmnError(String externalTaskId, String workerId, String errorCode) {
-    handleBpmnError(externalTaskId, workerId, errorCode, null);
+    handleBpmnError(externalTaskId, workerId, errorCode, null, null);
   }
 
   @Override
-  public void handleBpmnError(String externalTaskId, String workerId, String errorCode, Map<String, Object> variables) {
-    commandExecutor.execute(new HandleExternalTaskBpmnErrorCmd(externalTaskId, workerId, errorCode, variables));
+  public void handleBpmnError(String externalTaskId, String workerId, String errorCode, String errorMessage) {
+    handleBpmnError(externalTaskId, workerId, errorCode, errorMessage, null);
+  }
+
+  @Override
+  public void handleBpmnError(String externalTaskId, String workerId, String errorCode, String errorMessage, Map<String, Object> variables) {
+    commandExecutor.execute(new HandleExternalTaskBpmnErrorCmd(externalTaskId, workerId, errorCode, errorMessage, variables));
   }
 
   public void unlock(String externalTaskId) {

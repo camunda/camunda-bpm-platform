@@ -365,10 +365,15 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     produceHistoricExternalTaskFailedEvent();
   }
 
-  public void bpmnError(String errorCode, Map<String, Object> variables) {
+  public void bpmnError(String errorCode, String errorMessage, Map<String, Object> variables) {
     ensureActive();
     ActivityExecution activityExecution = getExecution();
-    BpmnError bpmnError = new BpmnError(errorCode);
+    BpmnError bpmnError = null;
+    if (errorMessage != null) {
+      bpmnError = new BpmnError(errorCode, errorMessage);
+    } else {
+      bpmnError = new BpmnError(errorCode);
+    }
     try {
       ExternalTaskActivityBehavior behavior = ((ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior());
       if (variables != null && !variables.isEmpty()) {

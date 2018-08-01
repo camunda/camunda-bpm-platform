@@ -849,6 +849,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
     parameters.put("errorCode", "anErrorCode");
+    parameters.put("errorMessage", "anErrorMessage");
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("foo", "bar");
     parameters.put("variables", variables);
@@ -863,7 +864,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
 
-    verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode", variables);
+    verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode", "anErrorMessage", variables);
     verifyNoMoreInteractions(externalTaskService);
   }
 
