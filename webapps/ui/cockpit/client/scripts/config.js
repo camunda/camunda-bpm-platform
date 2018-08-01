@@ -31,7 +31,7 @@ window.camCockpitConf = {
   //   hidden: false
   // },
   // 'batchOperation' : {
-  //   // select mode of query for process insatnces or decision instances
+  //   // select mode of query for process instances or decision instances
   //   // possible values: filter, search
   //   'mode': 'filter'
   // }
