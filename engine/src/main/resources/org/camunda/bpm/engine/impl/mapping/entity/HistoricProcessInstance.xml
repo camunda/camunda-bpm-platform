@@ -486,7 +486,7 @@
   </sql>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.REMOVAL_TIME_
+    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.END_TIME_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql"/>
     ${limitAfterWithoutOffset}

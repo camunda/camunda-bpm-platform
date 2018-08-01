@@ -1278,7 +1278,7 @@ public class HistoryCleanupTest {
       .singleResult();
 
     // when
-    ClockUtil.setCurrentTime(DateUtils.addDays(now, 2));
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(DateUtils.addDays(now, 1), 1));
     runHistoryCleanup(true);
 
     assertEquals(expectedInstances, historyService.createHistoricProcessInstanceQuery()
@@ -1295,7 +1295,7 @@ public class HistoryCleanupTest {
     processEngineConfiguration.getTaskService().complete(parentTask.getId());
 
     // then
-    ClockUtil.setCurrentTime(DateUtils.addDays(now, 4));
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(DateUtils.addDays(now, 3), 2));
     runHistoryCleanup(true);
 
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(parentProcessInstanceId).count());
