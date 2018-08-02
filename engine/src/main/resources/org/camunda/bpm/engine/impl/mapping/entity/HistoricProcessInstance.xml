@@ -486,28 +486,29 @@
   </sql>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.END_TIME_
+
+    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql"/>
     ${limitAfterWithoutOffset}
   </select>
 
   <select id="selectHierarchicalHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.END_TIME_
+    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_
     <include refid="selectHierarchicalHistoricProcessInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql"/>
     ${limitAfterWithoutOffset}
   </select>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_, pi.END_TIME_
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
     ${limitAfterWithoutOffset}
   </select>
 
   <select id="selectHierarchicalHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_, pi.END_TIME_
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_
     <include refid="selectHierarchicalHistoricProcessInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
     ${limitAfterWithoutOffset}
