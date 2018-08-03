@@ -137,7 +137,14 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
     ExternalTaskService externalTaskService = engine.getExternalTaskService();
 
     try {
-      externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode(), dto.getErrorMessage(), dto.getVariables());
+      if (dto.getVariables() != null) {
+        externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode(), dto.getErrorMessage(), dto.getVariables());
+      } else if (dto.getErrorMessage() != null) {
+        externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode(), dto.getErrorMessage());
+      } else {
+        externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode());
+      }
+
     } catch (NotFoundException e) {
       throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
     } catch (BadUserRequestException e) {
