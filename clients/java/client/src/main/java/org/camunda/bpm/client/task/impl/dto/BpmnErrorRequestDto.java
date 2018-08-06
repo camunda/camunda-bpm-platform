@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.client.task.impl.dto;
 
+import java.util.Map;
+
 import org.camunda.bpm.client.impl.RequestDto;
 
 /**
@@ -20,14 +22,24 @@ import org.camunda.bpm.client.impl.RequestDto;
 public class BpmnErrorRequestDto extends RequestDto {
 
   protected String errorCode;
+  protected Map<String, Object> variables;
 
   public BpmnErrorRequestDto(String workerId, String errorCode) {
     super(workerId);
     this.errorCode = errorCode;
   }
 
+  public BpmnErrorRequestDto(String workerId, String errorCode, Map<String, Object> variables) {
+    this(workerId, errorCode);
+    this.variables = variables;
+  }
+
   public String getErrorCode() {
     return errorCode;
+  }
+
+  public Map<String, Object> getVariables() {
+    return variables;
   }
 
 }

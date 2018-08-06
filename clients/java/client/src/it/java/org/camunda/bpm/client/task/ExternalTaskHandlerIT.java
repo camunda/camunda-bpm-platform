@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.IncidentDto;
@@ -317,6 +316,33 @@ public class ExternalTaskHandlerIT {
     assertThat(task).isNotNull();
     assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_AFTER_BPMN_ERROR);
+  }
+
+  @Test
+  public void shoulInvokeHandleBpmnErrorWithVariables() {
+    // given
+    String variableName = "foo";
+    String variableValue = "bar";
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+      client.handleBpmnError(task, "500", variables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    String processInstanceId = processInstance.getId();
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstanceId);
+    assertThat(task).isNotNull();
+    VariableInstanceDto processInstanceVariable = engineRule.getVariableByProcessInstanceId(processInstanceId);
+    assertThat(processInstanceVariable).isNotNull();
+    assertThat(processInstanceVariable.getValue()).isEqualTo(variableValue);
   }
 
   @Test

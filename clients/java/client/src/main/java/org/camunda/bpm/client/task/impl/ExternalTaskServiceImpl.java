@@ -72,8 +72,13 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   @Override
   public void handleBpmnError(ExternalTask externalTask, String errorCode) {
+    handleBpmnError(externalTask, errorCode, null);
+  }
+
+  @Override
+  public void handleBpmnError(ExternalTask externalTask, String errorCode, Map<String, Object> variables) {
     try {
-      engineClient.bpmnError(externalTask.getId(), errorCode);
+      engineClient.bpmnError(externalTask.getId(), errorCode, variables);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("notifying a BPMN error", e);
     }
