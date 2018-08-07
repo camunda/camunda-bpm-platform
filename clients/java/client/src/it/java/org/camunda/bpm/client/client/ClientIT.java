@@ -456,6 +456,47 @@ public class ClientIT {
   }
 
   @Test
+  public void shouldIgnoreBackoffStrategy() {
+    // given
+    AtomicBoolean isBackoffStrategyIgnored = new AtomicBoolean(true);
+    BackoffStrategy backoffStrategy = new BackOffStrategyBean() {
+      @Override
+      public void reconfigure(List<ExternalTask> externalTasks) {
+        isBackoffStrategyIgnored.set(false);
+      }
+    };
+
+    ClientRule clientRule = new ClientRule(() -> ExternalTaskClient.create()
+      .baseUrl(BASE_URL)
+      .disableBackoffStrategy()
+      .backoffStrategy(backoffStrategy));
+
+    try {
+      clientRule.before();
+
+      clientRule.client().subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(handler)
+        .open();
+
+      engineRule.startProcessInstance(processDefinition.getId());
+
+      // At this point TopicSubscriptionManager#acquire might not have been executed completely
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 1);
+
+      engineRule.startProcessInstance(processDefinition.getId());
+
+      // when
+      // At this point TopicSubscriptionManager#acquire have been executed completely at least once
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 2);
+    } finally {
+      clientRule.after();
+    }
+
+    // then
+    assertThat(isBackoffStrategyIgnored.get()).isTrue();
+  }
+
+  @Test
   public void shouldPerformAutoFetching() {
     ExternalTaskClient client = null;
 

@@ -60,6 +60,7 @@ public class TopicSubscriptionManager implements Runnable {
   protected Thread thread;
 
   protected BackoffStrategy backoffStrategy;
+  protected AtomicBoolean isBackoffStrategyDisabled;
 
   protected TypedValues typedValues;
 
@@ -72,7 +73,8 @@ public class TopicSubscriptionManager implements Runnable {
     this.externalTaskHandlers = new HashMap<>();
     this.clientLockDuration = clientLockDuration;
     this.typedValues = typedValues;
-    externalTaskService = new ExternalTaskServiceImpl(engineClient);
+    this.externalTaskService = new ExternalTaskServiceImpl(engineClient);
+    this.isBackoffStrategyDisabled = new AtomicBoolean(false);
   }
 
   public void run() {
@@ -106,7 +108,9 @@ public class TopicSubscriptionManager implements Runnable {
         }
       });
 
-      runBackoffStrategy(externalTasks);
+      if (!isBackoffStrategyDisabled.get()) {
+        runBackoffStrategy(externalTasks);
+      }
     }
   }
 
@@ -232,6 +236,10 @@ public class TopicSubscriptionManager implements Runnable {
     finally {
       ACQUISITION_MONITOR.unlock();
     }
+  }
+
+  public void disableBackoffStrategy() {
+    this.isBackoffStrategyDisabled.set(true);
   }
 
 }

@@ -80,6 +80,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
   protected BackoffStrategy backoffStrategy;
+  protected boolean isBackoffStrategyDisabled;
 
   public ExternalTaskClientBuilderImpl() {
     // default values
@@ -89,6 +90,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.interceptors = new ArrayList<>();
     this.isAutoFetchingEnabled = true;
     this.backoffStrategy = new ExponentialBackoffStrategy();
+    this.isBackoffStrategyDisabled = false;
   }
 
   public ExternalTaskClientBuilder baseUrl(String baseUrl) {
@@ -128,6 +130,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder backoffStrategy(BackoffStrategy backoffStrategy) {
     this.backoffStrategy = backoffStrategy;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder disableBackoffStrategy() {
+    this.isBackoffStrategyDisabled = true;
     return this;
   }
 
@@ -251,6 +258,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected void initTopicSubscriptionManager() {
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, typedValues, lockDuration);
     topicSubscriptionManager.setBackoffStrategy(getBackoffStrategy());
+
+    if (isBackoffStrategyDisabled) {
+      topicSubscriptionManager.disableBackoffStrategy();
+    }
 
     if (isAutoFetchingEnabled()) {
       topicSubscriptionManager.start();

@@ -34,9 +34,9 @@ public class ExponentialBackoffStrategy implements BackoffStrategy {
   }
 
   /**
-   * @param initTime for which the client is suspended after the first request
+   * @param initTime in milliseconds for which the client is suspended after the first request
    * @param factor is the base of the power by which the waiting time increases
-   * @param maxTime for which the client can be suspended
+   * @param maxTime in milliseconds for which the client can be suspended
    */
   public ExponentialBackoffStrategy(long initTime, float factor, long maxTime) {
     this.initTime = initTime;
