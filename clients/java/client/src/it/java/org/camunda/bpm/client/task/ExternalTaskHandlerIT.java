@@ -24,6 +24,7 @@ import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_AFTER_BPMN_ERR
 import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_ID;
 import static org.camunda.bpm.client.util.ProcessModels.createProcessWithExclusiveGateway;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ import org.camunda.bpm.client.util.ProcessModels;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,8 +66,20 @@ public class ExternalTaskHandlerIT {
   @Before
   public void setup() throws Exception {
     client = clientRule.client();
+
+    adjustProcessToAddErrorMessageVariable();
+
     processDefinition = engineRule.deploy(BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
     processInstance = engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY);
+  }
+
+  private void adjustProcessToAddErrorMessageVariable() {
+    BoundaryEvent boundaryError = BPMN_ERROR_EXTERNAL_TASK_PROCESS.getModelElementById("catchBPMNError");
+
+    Collection<ErrorEventDefinition> errorDefinitions = boundaryError.getChildElementsByType(ErrorEventDefinition.class);
+
+    ErrorEventDefinition errorDefinition = errorDefinitions.iterator().next();
+    errorDefinition.setCamundaErrorMessageVariable("errorMessage");
   }
 
   @Test
@@ -326,7 +341,31 @@ public class ExternalTaskHandlerIT {
     RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
       Map<String, Object> variables = new HashMap<>();
       variables.put(variableName, variableValue);
-      client.handleBpmnError(task, "500", variables);
+      client.handleBpmnError(task, "500", null, variables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    String processInstanceId = processInstance.getId();
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstanceId);
+    assertThat(task).isNotNull();
+    VariableInstanceDto processInstanceVariable = engineRule.getVariableByProcessInstanceId(processInstanceId, "foo");
+    assertThat(processInstanceVariable).isNotNull();
+    assertThat(processInstanceVariable.getValue()).isEqualTo(variableValue);
+  }
+
+  @Test
+  public void shoulInvokeHandleBpmnErrorWithErrorMessage() {
+    // given
+    String anErrorMessage = "meaningful error message";
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      client.handleBpmnError(task, "500", anErrorMessage);
     });
 
     // when
@@ -342,7 +381,8 @@ public class ExternalTaskHandlerIT {
     assertThat(task).isNotNull();
     VariableInstanceDto processInstanceVariable = engineRule.getVariableByProcessInstanceId(processInstanceId);
     assertThat(processInstanceVariable).isNotNull();
-    assertThat(processInstanceVariable.getValue()).isEqualTo(variableValue);
+    assertThat(processInstanceVariable.getName()).isEqualTo("errorMessage");
+    assertThat(processInstanceVariable.getValue()).isEqualTo(anErrorMessage);
   }
 
   @Test

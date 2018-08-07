@@ -22,6 +22,7 @@ import org.camunda.bpm.client.impl.RequestDto;
 public class BpmnErrorRequestDto extends RequestDto {
 
   protected String errorCode;
+  protected String errorMessage;
   protected Map<String, Object> variables;
 
   public BpmnErrorRequestDto(String workerId, String errorCode) {
@@ -29,13 +30,22 @@ public class BpmnErrorRequestDto extends RequestDto {
     this.errorCode = errorCode;
   }
 
-  public BpmnErrorRequestDto(String workerId, String errorCode, Map<String, Object> variables) {
+  public BpmnErrorRequestDto(String workerId, String errorCode, String errorMessage) {
     this(workerId, errorCode);
+    this.errorMessage = errorMessage;
+  }
+
+  public BpmnErrorRequestDto(String workerId, String errorCode, String errorMessage, Map<String, Object> variables) {
+    this(workerId, errorCode, errorMessage);
     this.variables = variables;
   }
 
   public String getErrorCode() {
     return errorCode;
+  }
+
+  public String getErrorMessage() {
+    return errorMessage;
   }
 
   public Map<String, Object> getVariables() {

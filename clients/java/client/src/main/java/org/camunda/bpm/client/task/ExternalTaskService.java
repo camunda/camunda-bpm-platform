@@ -144,14 +144,31 @@ public interface ExternalTaskService {
    * @param externalTask which is meant to notify a BPMN error for
    * @param errorCode    that indicates the predefined error. The error code
    *                     is used to identify the BPMN error handler.
-   * @param variables    which will be pass to the execution
+   * @param errorMessage which will be passed when the BPMN error is caught
    *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void handleBpmnError(ExternalTask externalTask, String errorCode, Map<String, Object> variables);
+  void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage);
+
+  /**
+   * Reports a business error in the context of a running task.
+   * The error code must be specified to identify the BPMN error handler.
+   *
+   * @param externalTask which is meant to notify a BPMN error for
+   * @param errorCode    that indicates the predefined error. The error code
+   *                     is used to identify the BPMN error handler.
+   * @param errorMessage which will be passed when the BPMN error is caught
+   * @param variables    which will be passed to the execution when the BPMN error is caught
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
+   */
+  void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage, Map<String, Object> variables);
 
   /**
    * Extends the timeout of the lock by a given amount of time.
