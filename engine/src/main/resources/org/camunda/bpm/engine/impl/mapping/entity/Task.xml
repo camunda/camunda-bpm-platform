@@ -593,7 +593,7 @@
               )
             </foreach>
             <if test="query.suspensionState != null">
-              <if test="suspensionState.stateCode == 1">
+              <if test="query.suspensionState.stateCode == 1">
                 ${queryType} RES.SUSPENSION_STATE_ = 1
               </if>
               <if test="query.suspensionState.stateCode == 2">
