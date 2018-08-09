@@ -108,7 +108,6 @@ public class CommandInvocationContext {
           isExecuting = true;
           while (! queuedInvocations.isEmpty()) {
             // assumption: all operations are executed within the same process application...
-            nextInvocation = queuedInvocations.get(0);
             invokeNext();
           }
         }
