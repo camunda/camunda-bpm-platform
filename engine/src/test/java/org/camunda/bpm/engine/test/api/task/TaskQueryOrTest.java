@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -1019,6 +1020,38 @@ public class TaskQueryOrTest {
         .followUpAfter(dates.get("oneHourLater"))
       .endOr()
       .count());
+  }
+
+  @Test
+  public void shouldReturnTasksByVariableAndActiveProcesses() throws Exception {
+    // given
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("oneTaskProcess")
+        .startEvent()
+          .userTask("testQuerySuspensionStateTask")
+        .endEvent()
+        .done();
+
+      repositoryService
+        .createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition)
+        .deploy();
+
+    // start two process instance and leave them active
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // start one process instance and suspend it
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", 0);
+    ProcessInstance suspendedProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    runtimeService.suspendProcessInstanceById(suspendedProcessInstance.getProcessInstanceId());
+
+    // assume
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask").active().count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask").suspended().count());
+
+    // then
+    assertEquals(3, taskService.createTaskQuery().or().active().processVariableValueEquals("foo", 0).endOr().list().size());
   }
 
   public HashMap<String, Date> createFollowUpAndDueDateTasks() throws ParseException {
