@@ -105,7 +105,7 @@ public class LegacyBehavior {
    * See: javadoc of this class for note about concurrent scopes.
    *
    * @param execution the concurrent scope execution to destroy
-   * @param cancellingActivity the activity that cancels the execution; it must hold that
+   * @param cancelledScopeActivity the activity that cancels the execution; it must hold that
    *   cancellingActivity's event scope is the scope the execution is responsible for
    */
   public static void cancelConcurrentScope(PvmExecutionImpl execution, PvmActivity cancelledScopeActivity) {
@@ -196,7 +196,6 @@ public class LegacyBehavior {
   /**
    * This method
    * @param scopeExecution
-   * @param isLegacyBehaviorTurnedOff
    * @return
    */
   protected static boolean isLegacyBehaviorRequired(ActivityExecution scopeExecution) {
@@ -221,7 +220,7 @@ public class LegacyBehavior {
    * - For an event subprocess this is the scope execution of the scope in which the event subprocess is embeded in
    * - For a multi instance sequential subprocess this is the multi instace scope body.
    *
-   * @param targetScope
+   * @param scope
    * @param activityExecutionMapping
    * @return
    */
