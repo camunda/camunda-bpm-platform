@@ -985,6 +985,21 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void testQueryBySuspensionState() throws Exception {
+
+    // Start 2 process-instance and leave them active
+    ProcessInstance activeProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance activeProcessInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // Start 1 process-instance and suspend it
+    ProcessInstance suspendedProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.suspendProcessInstanceById(suspendedProcessInstance.getProcessInstanceId());
+
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask").active().count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask").suspended().count());
+  }
+
+  @Deployment
   public void testProcessVariableValueEquals() throws Exception {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("longVar", 928374L);
