@@ -59,23 +59,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>jdk16</id>
-      <activation>
-        <jdk>1.6</jdk>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  
 </project>
