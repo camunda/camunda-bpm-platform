@@ -76,7 +76,7 @@ public class SingleConsumerConditionTest {
     }
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = 100000)
   public void conditionStressTest() throws InterruptedException {
 
     final SingleConsumerCondition condition = new SingleConsumerCondition(Thread.currentThread());
