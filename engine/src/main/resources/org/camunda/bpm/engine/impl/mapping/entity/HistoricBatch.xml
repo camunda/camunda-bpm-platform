@@ -174,7 +174,7 @@
     FROM ${prefix}ACT_HI_BATCH RES
     WHERE
     <foreach index="key" item="value" collection="parameter.map" open="(" separator="OR" close=")">
-      <bind name="days" value="'#{value}'"/>
+      <bind name="days" value="'#{value, jdbcType=INTEGER}'"/>
       RES.TYPE_ = #{key} and ${dayComparator}
     </foreach>
     AND RES.END_TIME_ is not null
