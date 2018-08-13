@@ -53,6 +53,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -1266,6 +1267,39 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
 
     verify(mockedQuery)
       .occurredAfter(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
+  }
+
+  @Test
+  public void testGetQueryWhereFileWasDeleted() {
+    doThrow(new IllegalArgumentException("Parameter 'filename' is null")).when(historicUpdateMock).getTypedValue();
+
+    // GET
+    expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testPostQueryWhereFileWasDeleted() {
+    doThrow(new IllegalArgumentException("Parameter 'filename' is null")).when(historicUpdateMock).getTypedValue();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(Collections.emptyMap())
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verifyNoMoreInteractions(mockedQuery);
   }
 
   private List<HistoricDetail> createMockHistoricDetailsTwoTenants() {
