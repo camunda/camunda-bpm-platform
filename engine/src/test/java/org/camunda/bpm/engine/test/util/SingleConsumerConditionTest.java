@@ -76,35 +76,4 @@ public class SingleConsumerConditionTest {
     }
   }
 
-  @Test(timeout = 100000)
-  public void conditionStressTest() throws InterruptedException {
-
-    final SingleConsumerCondition condition = new SingleConsumerCondition(Thread.currentThread());
-
-    final AtomicInteger signalCounter = new AtomicInteger();
-
-    Thread consumer = new Thread() {
-      @Override
-      public void run() {
-        for (int i = 0; i < 500000; i++) {
-
-          condition.signal();
-
-          while (signalCounter.get() == i) {
-            Thread.yield();
-          }
-        }
-      }
-    };
-
-    consumer.start();
-
-    for (int i = 0; i < 500000; i++) {
-      condition.await(100000);
-      signalCounter.set(i + 1);
-    }
-
-    consumer.join();
-  }
-
 }
