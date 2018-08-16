@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0iy4r9z" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.0-nightly">
+  <bpmn:process id="eventSubProcess" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0en8p17</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:subProcess id="SubProcess_1">
+      <bpmn:incoming>SequenceFlow_0en8p17</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1bi9p90</bpmn:outgoing>
+      <bpmn:startEvent id="StartEvent_sub">
+        <bpmn:outgoing>SequenceFlow_14avkdp</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_14avkdp" sourceRef="StartEvent_sub" targetRef="UserTask_inside" />
+      <bpmn:endEvent id="EndEvent_sub">
+        <bpmn:incoming>SequenceFlow_0wal55b</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_0wal55b" sourceRef="UserTask_inside" targetRef="EndEvent_sub" />
+      <bpmn:userTask id="UserTask_inside" name="inside subprocess">
+        <bpmn:incoming>SequenceFlow_14avkdp</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0wal55b</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:subProcess id="SubProcess_event" triggeredByEvent="true">
+        <bpmn:endEvent id="EndEvent_error">
+          <bpmn:incoming>SequenceFlow_0veu9z2</bpmn:incoming>
+          <bpmn:errorEventDefinition errorRef="Error_1exgexo" />
+        </bpmn:endEvent>
+        <bpmn:startEvent id="StartEvent_eventsub" isInterrupting="false">
+          <bpmn:outgoing>SequenceFlow_0veu9z2</bpmn:outgoing>
+          <bpmn:timerEventDefinition>
+            <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/PT10S</bpmn:timeCycle>
+          </bpmn:timerEventDefinition>
+        </bpmn:startEvent>
+        <bpmn:sequenceFlow id="SequenceFlow_0veu9z2" sourceRef="StartEvent_eventsub" targetRef="EndEvent_error" />
+      </bpmn:subProcess>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_0en8p17" sourceRef="StartEvent_1" targetRef="SubProcess_1" />
+    <bpmn:endEvent id="EndEvent_1">
+      <bpmn:incoming>SequenceFlow_1bi9p90</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1bi9p90" sourceRef="SubProcess_1" targetRef="EndEvent_1" />
+    <bpmn:sequenceFlow id="SequenceFlow_1b38ske" sourceRef="BoundaryEvent_error" targetRef="UserTask_afterCatch" />
+    <bpmn:endEvent id="EndEvent_afterCatch">
+      <bpmn:incoming>SequenceFlow_0d1okqt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0d1okqt" sourceRef="UserTask_afterCatch" targetRef="EndEvent_afterCatch" />
+    <bpmn:userTask id="UserTask_afterCatch" name="after catch">
+      <bpmn:incoming>SequenceFlow_1b38ske</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0d1okqt</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="BoundaryEvent_error" attachedToRef="SubProcess_1">
+      <bpmn:outgoing>SequenceFlow_1b38ske</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_1exgexo" />
+    </bpmn:boundaryEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_1exgexo" name="Error_throw" errorCode="err-21" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="eventSubProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="193" y="342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1jobcw8_di" bpmnElement="SubProcess_1" isExpanded="true">
+        <dc:Bounds x="358" y="182" width="373" height="384" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0en8p17_di" bpmnElement="SequenceFlow_0en8p17">
+        <di:waypoint x="229" y="360" />
+        <di:waypoint x="358" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1asho2q_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="816" y="342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1bi9p90_di" bpmnElement="SequenceFlow_1bi9p90">
+        <di:waypoint x="731" y="360" />
+        <di:waypoint x="816" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_09rt9y9_di" bpmnElement="StartEvent_sub">
+        <dc:Bounds x="396" y="244" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_14avkdp_di" bpmnElement="SequenceFlow_14avkdp">
+        <di:waypoint x="432" y="262" />
+        <di:waypoint x="482" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0wnia2u_di" bpmnElement="EndEvent_sub">
+        <dc:Bounds x="632" y="244" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0wal55b_di" bpmnElement="SequenceFlow_0wal55b">
+        <di:waypoint x="582" y="262" />
+        <di:waypoint x="632" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0zc8l0u_di" bpmnElement="UserTask_inside">
+        <dc:Bounds x="482" y="222" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1s15oh6_di" bpmnElement="SubProcess_event" isExpanded="true">
+        <dc:Bounds x="396" y="409" width="278" height="124" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1tql7nk_di" bpmnElement="EndEvent_error">
+        <dc:Bounds x="618" y="455" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1b38ske_di" bpmnElement="SequenceFlow_1b38ske">
+        <di:waypoint x="460" y="584" />
+        <di:waypoint x="460" y="647" />
+        <di:waypoint x="522" y="647" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0yw0xer_di" bpmnElement="EndEvent_afterCatch">
+        <dc:Bounds x="672" y="629" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0d1okqt_di" bpmnElement="SequenceFlow_0d1okqt">
+        <di:waypoint x="622" y="647" />
+        <di:waypoint x="672" y="647" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0un87la_di" bpmnElement="UserTask_afterCatch">
+        <dc:Bounds x="522" y="607" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_1lrdkyl_di" bpmnElement="BoundaryEvent_error">
+        <dc:Bounds x="442" y="548" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0lx0vqi_di" bpmnElement="StartEvent_eventsub">
+        <dc:Bounds x="423" y="455" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0veu9z2_di" bpmnElement="SequenceFlow_0veu9z2">
+        <di:waypoint x="459" y="473" />
+        <di:waypoint x="618" y="473" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

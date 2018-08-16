@@ -527,8 +527,7 @@ public class SignalEventTest {
    */
   @Deployment
   @Test
-  @Ignore
-  public void FAILING_testNoContinuationWhenSignalInterruptsThrowingActivity() {
+  public void testNoContinuationWhenSignalInterruptsThrowingActivity() {
 
     // given a process instance
     runtimeService.startProcessInstanceByKey("signalEventSubProcess");
@@ -611,6 +610,29 @@ public class SignalEventTest {
 
     // and a task
     assertEquals(1, taskService.createTaskQuery().count());
+  }
+
+  @Test
+  @Deployment
+  public void testThrownSignalInEventSubprocessInSubprocess() {
+    runtimeService.startProcessInstanceByKey("embeddedEventSubprocess");
+
+    Task taskBefore = taskService.createTaskQuery().singleResult();
+    assertNotNull(taskBefore);
+    assertEquals("task in subprocess", taskBefore.getName());
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    //when job is executed task is created
+    managementService.executeJob(job.getId());
+
+    Task taskAfter = taskService.createTaskQuery().singleResult();
+    assertNotNull(taskAfter);
+    assertEquals("after catch", taskAfter.getName());
+
+    Job jobAfter = managementService.createJobQuery().singleResult();
+    assertNull(jobAfter);
   }
 
 }

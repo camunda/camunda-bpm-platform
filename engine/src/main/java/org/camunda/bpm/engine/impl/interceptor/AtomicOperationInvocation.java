@@ -54,7 +54,8 @@ public class AtomicOperationInvocation {
 
     if(operation != PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE
        && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE
-       && operation != PvmAtomicOperation.ACTIVITY_START_CONCURRENT) {
+       && operation != PvmAtomicOperation.ACTIVITY_START_CONCURRENT
+       && operation != PvmAtomicOperation.DELETE_CASCADE) {
       // execution might be replaced in the meantime:
       ExecutionEntity replacedBy = execution.getReplacedBy();
       if(replacedBy != null) {

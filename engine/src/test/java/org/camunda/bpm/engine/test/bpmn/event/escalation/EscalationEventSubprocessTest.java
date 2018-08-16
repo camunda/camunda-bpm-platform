@@ -13,17 +13,14 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.escalation;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
  * @author Philipp Ossler
@@ -44,7 +41,7 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
   /** CAM-9220 (https://app.camunda.com/jira/browse/CAM-9220) */
   @Deployment
-  public void IGNORE_FAILING_testThrowEscalationEventFromEventSubprocess() {
+  public void testThrowEscalationEventFromEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embeddedEventSubprocess");
 
     Job job = managementService.createJobQuery().singleResult();
@@ -59,7 +56,6 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
     // second timer job shouldn't be available
     job = managementService.createJobQuery().singleResult();
-    managementService.executeJob(job.getId());
     assertNull(job);
 
     // there should only be one completed Escalation Catch Boundary Event

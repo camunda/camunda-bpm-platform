@@ -688,7 +688,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     // activity instance id handling
     this.activityInstanceId = execution.getActivityInstanceId();
     this.isActive = execution.isActive;
-    this.deleteRoot = execution.deleteRoot;
 
     this.replacedBy = null;
     execution.replacedBy = this;
@@ -1660,9 +1659,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void setDeleteRoot(boolean deleteRoot) {
-    if (getReplacedBy() != null) {
-      getReplacedBy().setDeleteRoot(deleteRoot);
-    }
     this.deleteRoot = deleteRoot;
   }
 

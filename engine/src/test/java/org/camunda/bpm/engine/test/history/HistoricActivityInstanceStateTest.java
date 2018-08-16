@@ -320,8 +320,8 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     assertNonCompletingActivityInstance(allInstances, "userTask");
 
     // fails due to CAM-4527: end execution listeners are executed twice for the signal end event
-//    assertIsCanceledActivityInstances(allInstances, "signalEnd", 1);
-//    assertNonCompletingActivityInstance(allInstances, "signalEnd");
+    assertIsCanceledActivityInstances(allInstances, "signalEnd", 1);
+    assertNonCompletingActivityInstance(allInstances, "signalEnd");
 
     assertNonCanceledActivityInstance(allInstances, "eventSubprocessStart");
     assertNonCompletingActivityInstance(allInstances, "eventSubprocessStart");
@@ -453,10 +453,6 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     assertIsCanceledActivityInstances(allInstances, "subprocess", 1);
     assertNonCompletingActivityInstance(allInstances, "subprocess");
 
-  }
-
-  private void assertIsCanceledActivityInstances(List<HistoricActivityInstance> allInstances, String activityId) {
-    assertIsCanceledActivityInstances(allInstances, activityId, -1);
   }
 
   private void assertIsCanceledActivityInstances(List<HistoricActivityInstance> allInstances, String activityId, int count) {
