@@ -13,8 +13,8 @@
 
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
+import static io.restassured.RestAssured.given;
+import static io.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -48,7 +48,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import com.jayway.restassured.response.Response;
+import io.restassured.response.Response;
 
 public class ConditionRestServiceTest extends AbstractRestServiceTest {
 

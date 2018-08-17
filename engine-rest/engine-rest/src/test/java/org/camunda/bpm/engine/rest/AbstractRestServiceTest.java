@@ -23,6 +23,7 @@ import java.util.ServiceLoader;
 
 import javax.ws.rs.core.MediaType;
 
+import io.restassured.http.Header;
 import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -39,8 +40,7 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.BeforeClass;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Header;
+import io.restassured.RestAssured;
 
 public abstract class AbstractRestServiceTest {
 

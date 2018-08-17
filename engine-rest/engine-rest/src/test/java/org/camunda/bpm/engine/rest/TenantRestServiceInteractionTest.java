@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
@@ -52,7 +52,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 
 public class TenantRestServiceInteractionTest extends AbstractRestServiceTest {
 

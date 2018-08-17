@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.rest;
 
 import static java.util.Collections.singletonMap;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.util.JsonPathUtil.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -44,8 +44,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 
 public class BatchRestServiceInteractionTest extends AbstractRestServiceTest {
 

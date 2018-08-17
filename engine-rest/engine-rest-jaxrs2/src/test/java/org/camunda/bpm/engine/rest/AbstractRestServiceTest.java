@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import com.jayway.restassured.RestAssured;
+import io.restassured.RestAssured;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;

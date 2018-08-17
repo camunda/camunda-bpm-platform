@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReport;
@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.query.PeriodUnit.MONTH;
 import static org.camunda.bpm.engine.query.PeriodUnit.QUARTER;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_END_TIME;

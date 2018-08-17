@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.expect;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -105,7 +105,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 
 public class ProcessEngineRestServiceTest extends

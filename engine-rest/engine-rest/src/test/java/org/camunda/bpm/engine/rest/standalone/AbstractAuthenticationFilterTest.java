@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.standalone;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -38,7 +38,7 @@ import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 
 public abstract class AbstractAuthenticationFilterTest extends AbstractRestServiceTest {
 

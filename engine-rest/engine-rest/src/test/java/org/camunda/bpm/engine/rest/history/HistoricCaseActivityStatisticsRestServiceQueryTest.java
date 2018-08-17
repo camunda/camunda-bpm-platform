@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
+import static io.restassured.RestAssured.given;
+import static io.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import javax.ws.rs.core.Response.Status;
 
-import com.jayway.restassured.response.Response;
+import io.restassured.response.Response;
 
 /**
  * @author Roman Smirnov

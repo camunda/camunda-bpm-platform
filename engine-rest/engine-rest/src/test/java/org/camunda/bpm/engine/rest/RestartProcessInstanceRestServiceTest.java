@@ -1,13 +1,13 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

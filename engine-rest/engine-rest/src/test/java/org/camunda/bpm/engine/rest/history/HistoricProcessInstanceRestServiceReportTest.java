@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
+import static io.restassured.RestAssured.given;
+import static io.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.query.PeriodUnit.MONTH;
 import static org.camunda.bpm.engine.query.PeriodUnit.QUARTER;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER;
@@ -55,8 +55,8 @@ import org.junit.Test;
 
 import javax.ws.rs.core.Response.Status;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 
 /**
  * @author Roman Smirnov

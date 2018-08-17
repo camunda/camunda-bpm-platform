@@ -16,8 +16,8 @@ package org.camunda.bpm.engine.rest.util;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.restassured.mapper.factory.DefaultJackson2ObjectMapperFactory;
-import com.jayway.restassured.path.json.JsonPath;
+import io.restassured.mapper.factory.DefaultJackson2ObjectMapperFactory;
+import io.restassured.path.json.JsonPath;
 
 public final class JsonPathUtil {
 

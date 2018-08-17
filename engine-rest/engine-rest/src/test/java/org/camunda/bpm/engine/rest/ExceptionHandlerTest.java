@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 
@@ -13,7 +13,7 @@ import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.jayway.restassured.http.ContentType;
+import io.restassured.http.ContentType;
 
 public class ExceptionHandlerTest extends AbstractRestServiceTest {
 
