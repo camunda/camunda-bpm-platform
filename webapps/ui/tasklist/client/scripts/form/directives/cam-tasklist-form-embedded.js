@@ -41,7 +41,7 @@ module.exports = [
             camForm.variableManager.destroyVariable(v);
           }
           // reset initial form variables
-          camForm.variableManager.variables = initialVariables;
+          camForm.variableManager.variables = angular.copy(initialVariables);
         }
 
         function handleAsynchronousFormKey(formInfo) {
