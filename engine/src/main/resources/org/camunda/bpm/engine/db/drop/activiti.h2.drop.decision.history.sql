@@ -9,6 +9,8 @@ drop index ACT_IDX_HI_DEC_INST_TENANT_ID;
 drop index ACT_IDX_HI_DEC_INST_ROOT_ID;
 drop index ACT_IDX_HI_DEC_INST_REQ_ID;
 drop index ACT_IDX_HI_DEC_INST_REQ_KEY;
+drop index ACT_IDX_HI_DEC_INST_ROOT_PI;
+drop index ACT_IDX_HI_DEC_INST_RM_TIME;
 
 drop index ACT_IDX_HI_DEC_IN_INST;
 drop index ACT_IDX_HI_DEC_IN_CLAUSE;

@@ -32,9 +32,11 @@
       ACT_INST_ID_,
       ACT_ID_,
       EVAL_TIME_,
+      REMOVAL_TIME_,
       COLLECT_VALUE_,
       USER_ID_,
       ROOT_DEC_INST_ID_,
+      ROOT_PROC_INST_ID_,
       DEC_REQ_ID_,
       DEC_REQ_KEY_,
       TENANT_ID_)
@@ -51,9 +53,11 @@
             #{activityInstanceId, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{evaluationTime, jdbcType=TIMESTAMP},
+            #{removalTime, jdbcType=TIMESTAMP},
             #{collectResultValue, jdbcType=DOUBLE},
             #{userId, jdbcType=VARCHAR},
             #{rootDecisionInstanceId, jdbcType=VARCHAR},
+            #{rootProcessInstanceId, jdbcType=VARCHAR},
             #{decisionRequirementsDefinitionId, jdbcType=VARCHAR},
             #{decisionRequirementsDefinitionKey, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
@@ -91,9 +95,11 @@
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR"/>
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR"/>
     <result property="evaluationTime" column="EVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
     <result property="collectResultValue" column="COLLECT_VALUE_" jdbcType="DOUBLE"/>
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR"/>
     <result property="rootDecisionInstanceId" column="ROOT_DEC_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR"/>
     <result property="decisionRequirementsDefinitionId" column="DEC_REQ_ID_" jdbcType="VARCHAR"/>
     <result property="decisionRequirementsDefinitionKey" column="DEC_REQ_KEY_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>

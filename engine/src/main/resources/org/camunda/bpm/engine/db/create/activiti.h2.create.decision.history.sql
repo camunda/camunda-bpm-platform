@@ -13,9 +13,11 @@ create table ACT_HI_DECINST (
     ACT_INST_ID_ varchar(64),
     ACT_ID_ varchar(255),
     EVAL_TIME_ timestamp not null,
+    REMOVAL_TIME_ timestamp,
     COLLECT_VALUE_ double,
     USER_ID_ varchar(255),
     ROOT_DEC_INST_ID_ varchar(64),
+    ROOT_PROC_INST_ID_ varchar(64),
     DEC_REQ_ID_ varchar(64),
     DEC_REQ_KEY_ varchar(255),
     TENANT_ID_ varchar(64),
@@ -71,6 +73,8 @@ create index ACT_IDX_HI_DEC_INST_TENANT_ID on ACT_HI_DECINST(TENANT_ID_);
 create index ACT_IDX_HI_DEC_INST_ROOT_ID on ACT_HI_DECINST(ROOT_DEC_INST_ID_);
 create index ACT_IDX_HI_DEC_INST_REQ_ID on ACT_HI_DECINST(DEC_REQ_ID_);
 create index ACT_IDX_HI_DEC_INST_REQ_KEY on ACT_HI_DECINST(DEC_REQ_KEY_);
+create index ACT_IDX_HI_DEC_INST_ROOT_PI on ACT_HI_DECINST(ROOT_PROC_INST_ID_);
+create index ACT_IDX_HI_DEC_INST_RM_TIME on ACT_HI_DECINST(REMOVAL_TIME_);
 
 create index ACT_IDX_HI_DEC_IN_INST on ACT_HI_DEC_IN(DEC_INST_ID_);
 create index ACT_IDX_HI_DEC_IN_CLAUSE on ACT_HI_DEC_IN(DEC_INST_ID_, CLAUSE_ID_);

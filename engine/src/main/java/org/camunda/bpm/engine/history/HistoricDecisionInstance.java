@@ -42,6 +42,9 @@ public interface HistoricDecisionInstance {
   /** Time when the decision was evaluated. */
   Date getEvaluationTime();
 
+  /** Time when the historic decision instance is to be removed. */
+  Date getRemovalTime();
+
   /** The corresponding key of the process definition in case the decision was evaluated inside a process. */
   String getProcessDefinitionKey();
 
@@ -98,6 +101,12 @@ public interface HistoricDecisionInstance {
    * Can be <code>null</code> if this instance is the root decision instance of the evaluation.
    */
   String getRootDecisionInstanceId();
+
+  /**
+   * The unique identifier of the root historic process instance of the evaluated root decision
+   * in case the decision was evaluated inside a process, otherwise <code>null</code>.
+   */
+  String getRootProcessInstanceId();
 
   /**
    * The id of the related decision requirements definition. Can be

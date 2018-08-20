@@ -45,10 +45,12 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
   protected String activityId;
 
   protected Date evaluationTime;
+  protected Date removalTime;
 
   protected Double collectResultValue;
 
   protected String rootDecisionInstanceId;
+  protected String rootProcessInstanceId;
   protected String decisionRequirementsDefinitionId;
   protected String decisionRequirementsDefinitionKey;
 
@@ -104,6 +106,14 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   public void setEvaluationTime(Date evaluationTime) {
     this.evaluationTime = evaluationTime;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
   }
 
   public String getUserId() {
@@ -183,6 +193,14 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   public void setRootDecisionInstanceId(String rootDecisionInstanceId) {
     this.rootDecisionInstanceId = rootDecisionInstanceId;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   public String getDecisionRequirementsDefinitionId() {
