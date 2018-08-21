@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="dish" name="Dish" namespace="test-drd-2">
+  <decision id="dish-decision" name="Dish Decision">
+    <extensionElements>
+      <biodi:bounds x="560" y="104" width="180" height="80" />
+      <biodi:edge source="season">
+        <biodi:waypoints x="656" y="272" />
+        <biodi:waypoints x="650" y="184" />
+      </biodi:edge>
+      <biodi:edge source="season">
+        <biodi:waypoints x="658" y="274" />
+        <biodi:waypoints x="662" y="184" />
+      </biodi:edge>
+      <biodi:edge source="feels">
+        <biodi:waypoints x="661" y="274" />
+        <biodi:waypoints x="672" y="184" />
+      </biodi:edge>
+    </extensionElements>
+    <informationRequirement>
+      <requiredDecision href="#feels" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#feels" />
+    </informationRequirement>
+    <decisionTable id="dishDecisionTable">
+      <input id="feelsInput" label="Feels Like">
+        <inputExpression id="feelsInputExpression" typeRef="string">
+          <text>feels</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Dish" name="desiredDish" typeRef="string" />
+      <rule id="row-495762709-1">
+        <inputEntry id="UnaryTests_1nxcsjr">
+          <text>"cold"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1mtwzqz">
+          <text>"Spareribs"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-495762709-3">
+        <inputEntry id="UnaryTests_0ifgmfm">
+          <text>"hot"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0wgaegy">
+          <text>"Light salad"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-445981423-4">
+        <inputEntry id="UnaryTests_06or48g">
+          <text>"meh"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_09ggol9">
+          <text>"Steak"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="feels" name="Feels decision">
+    <extensionElements>
+      <biodi:bounds x="566" y="274" width="180" height="80" />
+      <biodi:edge source="guestCount">
+        <biodi:waypoints x="652" y="454" />
+        <biodi:waypoints x="656" y="354" />
+      </biodi:edge>
+    </extensionElements>
+    <informationRequirement>
+      <requiredDecision href="#guestCount" />
+    </informationRequirement>
+    <decisionTable id="feelsDecisionTable">
+      <input id="temperatureInput" label="Weather in Celsius">
+        <inputExpression id="temperatureInputExpression" typeRef="integer">
+          <text>temperature</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0v6sv6v" label="Guest Count">
+        <inputExpression id="LiteralExpression_11mv677" typeRef="integer">
+          <text>guestCount</text>
+        </inputExpression>
+      </input>
+      <output id="feelsOutput" label="Feels Like" name="feels" typeRef="string" />
+      <rule id="row-495762709-5">
+        <inputEntry id="UnaryTests_1fd0eqo">
+          <text>&gt;30</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0svk9vs">
+          <text>4</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0l98klb">
+          <text>"meh"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-495762709-6">
+        <inputEntry id="UnaryTests_1nz6at2">
+          <text>&lt;10</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_11kbz95">
+          <text>4</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_08moy1k">
+          <text>"cold"</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-445981423-2">
+        <inputEntry id="UnaryTests_1a0imxy">
+          <text>[10..30]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_08xe8zm">
+          <text>4</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1poftw4">
+          <text>"meh"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="guestCount" name="Guest Count">
+    <extensionElements>
+      <biodi:bounds x="562" y="458" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="guestCountDecisionTable">
+      <input id="typeOfDayInput" label="Type of day">
+        <inputExpression id="typeOfDayInputExpression" typeRef="string">
+          <text>dayType</text>
+        </inputExpression>
+      </input>
+      <output id="guestCountOutput" label="Guest count" name="guestCount" typeRef="integer" />
+      <rule id="row-495762709-8">
+        <inputEntry id="UnaryTests_0l72u8n">
+          <text>"WeekDay"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0wuwqaz">
+          <text>4</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-495762709-9">
+        <inputEntry id="UnaryTests_03a73o9">
+          <text>"Holiday"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1whn119">
+          <text>10</text>
+        </outputEntry>
+      </rule>
+      <rule id="row-495762709-10">
+        <inputEntry id="UnaryTests_12tygwt">
+          <text>"Weekend"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1b5k9t8">
+          <text>15</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

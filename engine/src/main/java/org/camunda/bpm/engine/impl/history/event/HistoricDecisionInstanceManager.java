@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSeriali
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,6 +278,15 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(query, Resources.DECISION_DEFINITION);
     getTenantManager().configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectFinishedDecisionInstancesReportEntitiesCount", query);
+  }
+
+  public void addRemovalTimeToDecisionInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionInstanceEntity.class, "updateHistoricDecisionInstanceEventsByRootId", parameters);
   }
 
 }

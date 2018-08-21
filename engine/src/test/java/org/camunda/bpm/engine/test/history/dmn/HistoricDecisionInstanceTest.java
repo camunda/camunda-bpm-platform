@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -44,6 +45,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.BusinessRuleTaskBuilder;
 import org.joda.time.DateTime;
 
 /**
@@ -70,6 +72,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   public static final String DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/engine/test/api/dmn/DecisionWithLiteralExpression.dmn";
 
   public static final String DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+  public static final String MULTI_LEVEL_DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdMultiLevelDish.dmn11.xml";
+
 
   public static final String DECISION_DEFINITION_KEY = "testDecision";
 
@@ -328,8 +332,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     assertThat(historicDecisionInstance.getRootDecisionInstanceId(), is(nullValue()));
     assertThat(historicDecisionInstance.getRootProcessInstanceId(), is(nullValue()));
-    // TODO: test implementation of HDI removal time
-    //    assertThat(historicDecisionInstance.getRemovalTime(), is(notNullValue()));
+    assertThat(historicDecisionInstance.getRemovalTime(), is(notNullValue()));
 
     assertThat(historicDecisionInstance.getInputs().size(), is(0));
 
@@ -383,12 +386,12 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(requiredHistoricDecisionInstance1.getRootProcessInstanceId(), is(nullValue()));
     assertThat(requiredHistoricDecisionInstance2.getRootProcessInstanceId(), is(nullValue()));
 
-    // TODO: test implementation of HDI removal time
-//    assertThat(rootHistoricDecisionInstance.getRemovalTime(), is(notNullValue()));
-//    assertThat(requiredHistoricDecisionInstance1.getRemovalTime(), is(notNullValue()));
-//    assertThat(requiredHistoricDecisionInstance1.getRemovalTime(), is(rootHistoricDecisionInstance.getRemovalTime()));
-//    assertThat(requiredHistoricDecisionInstance2.getRemovalTime(), is(notNullValue()));
-//    assertThat(requiredHistoricDecisionInstance2.getRemovalTime(), is(rootHistoricDecisionInstance.getRemovalTime()));
+    // all HDIs in the hierarchy should have the root HDI removal time
+    assertThat(rootHistoricDecisionInstance.getRemovalTime(), is(notNullValue()));
+    assertThat(requiredHistoricDecisionInstance1.getRemovalTime(), is(notNullValue()));
+    assertThat(requiredHistoricDecisionInstance1.getRemovalTime(), is(rootHistoricDecisionInstance.getRemovalTime()));
+    assertThat(requiredHistoricDecisionInstance2.getRemovalTime(), is(notNullValue()));
+    assertThat(requiredHistoricDecisionInstance2.getRemovalTime(), is(rootHistoricDecisionInstance.getRemovalTime()));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -691,56 +694,45 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
       .singleResult();
 
     assertThat(historicDecisionInstance.getRootProcessInstanceId(), is(historicProcessInstance.getId()));
-    // TODO: test implementation of HDI removal time
-//    assertThat(historicDecisionInstance.getRemovalTime(), is(historicProcessInstance.getRemovalTime()));
+    // the HDI should have the containing HPI removal time
+    assertThat(historicDecisionInstance.getRemovalTime(), is(historicProcessInstance.getRemovalTime()));
   }
 
   public void testRootProcessInstanceAndRemovalTimePropertiesMultiLevelProcessInstance() {
-    BpmnModelInstance parentProcessInstance =
-      Bpmn.createExecutableProcess("nestedHierarchicalProcess")
-        .camundaHistoryTimeToLive(2)
-        .startEvent()
-        .callActivity("callActivity")
-          .calledElement("middleChildProcess")
-          .camundaIn("temperature", "temperature")
-          .camundaIn("dayType","dayType")
-        .endEvent()
-        .done();
-
-    BpmnModelInstance middleSubprocessInstance =
-      Bpmn.createExecutableProcess("middleChildProcess")
-        .camundaHistoryTimeToLive(1)
-        .startEvent()
-        .callActivity()
-        .calledElement("lastChildProcess")
-        .camundaIn("temperature", "temperature")
-        .camundaIn("dayType","dayType")
-        .endEvent("subMiddleEnd")
-        .done();
-
-    BpmnModelInstance lastSubprocessInstance =
-      Bpmn.createExecutableProcess("lastChildProcess")
-        .camundaHistoryTimeToLive(1)
-        .startEvent()
-        .businessRuleTask("dish-decision")
-          .camundaDecisionRef("dish-decision")
-          .camundaResultVariable("result")
-        .endEvent("subLastEnd")
-        .done();
-
-    deployment(DRG_DMN);
-    deployment(parentProcessInstance, middleSubprocessInstance, lastSubprocessInstance);
+    createAndDeployMultiLevelBpmnDmnModel(false);
 
     String rootProcessInstanceId = runtimeService.startProcessInstanceByKey("nestedHierarchicalProcess",
-        Variables.createVariables()
-          .putValue("temperature", 21)
-          .putValue("dayType", "Weekend"))
+      Variables.createVariables()
+        .putValue("temperature", 21)
+        .putValue("dayType", "WeekDay"))
       .getId();
 
+    validateRootProcessInstanceAndRemovalTimeProperties(rootProcessInstanceId);
+  }
+
+  public void testRootProcessInstanceAndRemovalTimePropertiesMultiLevelProcessInstanceAsync() {
+    createAndDeployMultiLevelBpmnDmnModel(true);
+
+    String rootProcessInstanceId = runtimeService.startProcessInstanceByKey("nestedHierarchicalProcess",
+      Variables.createVariables()
+        .putValue("temperature", 21)
+        .putValue("dayType", "WeekDay"))
+      .getId();
+
+    Job job = managementService.createJobQuery().processDefinitionKey("lastChildProcess").singleResult();
+    managementService.executeJob(job.getId());
+
+    validateRootProcessInstanceAndRemovalTimeProperties(rootProcessInstanceId);
+  }
+
+  protected void validateRootProcessInstanceAndRemovalTimeProperties(String rootProcessInstanceId) {
+
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
     HistoricDecisionInstance rootHistoricDecisionInstance = query.decisionDefinitionKey("dish-decision").singleResult();
-    HistoricDecisionInstance childHistoricDecisionInstance1 = query.decisionDefinitionKey("season").singleResult();
+    HistoricDecisionInstance childHistoricDecisionInstance1 = query.decisionDefinitionKey("feels").singleResult();
     HistoricDecisionInstance childHistoricDecisionInstance2 = query.decisionDefinitionKey("guestCount").singleResult();
+
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
       .processInstanceId(rootProcessInstanceId)
       .singleResult();
@@ -748,8 +740,11 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(rootHistoricDecisionInstance.getRootProcessInstanceId(), is(historicProcessInstance.getId()));
     assertThat(childHistoricDecisionInstance1.getRootProcessInstanceId(), is(historicProcessInstance.getId()));
     assertThat(childHistoricDecisionInstance2.getRootProcessInstanceId(), is(historicProcessInstance.getId()));
-    // TODO: test implementation of HDI removal time
-//    assertThat(rootHistoricDecisionInstance.getRemovalTime(), is(historicProcessInstance.getRemovalTime()));
+
+    // all HDIs in the hierarchy should have the root HPI removal time
+    assertThat(rootHistoricDecisionInstance.getRemovalTime(), is(historicProcessInstance.getRemovalTime()));
+    assertThat(childHistoricDecisionInstance1.getRemovalTime(), is(historicProcessInstance.getRemovalTime()));
+    assertThat(childHistoricDecisionInstance2.getRemovalTime(), is(historicProcessInstance.getRemovalTime()));
   }
 
   protected ProcessInstance startProcessInstanceAndEvaluateDecision() {
@@ -781,4 +776,39 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     ClockUtil.setCurrentTime(now.plusSeconds(10).toDate());
   }
 
+  protected void createAndDeployMultiLevelBpmnDmnModel(boolean async) {
+    BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("nestedHierarchicalProcess")
+      .camundaHistoryTimeToLive(2)
+      .startEvent()
+      .callActivity("callActivity")
+      .calledElement("middleChildProcess")
+      .camundaIn("temperature", "temperature")
+      .camundaIn("dayType","dayType")
+      .endEvent()
+      .done();
+
+    BpmnModelInstance middleSubprocessInstance = Bpmn.createExecutableProcess("middleChildProcess")
+      .camundaHistoryTimeToLive(1)
+      .startEvent()
+      .callActivity()
+      .calledElement("lastChildProcess")
+      .camundaIn("temperature", "temperature")
+      .camundaIn("dayType","dayType")
+      .endEvent("subMiddleEnd")
+      .done();
+
+    // Create last child instance
+    BusinessRuleTaskBuilder businessRuleTaskBuilder = Bpmn.createExecutableProcess("lastChildProcess")
+      .camundaHistoryTimeToLive(1)
+      .startEvent()
+      .businessRuleTask("dish-decision")
+      .camundaDecisionRef("dish-decision")
+      .camundaResultVariable("result");
+    businessRuleTaskBuilder = (async)? businessRuleTaskBuilder.camundaAsyncBefore() : businessRuleTaskBuilder;
+
+    BpmnModelInstance lastSubprocessInstance = businessRuleTaskBuilder.endEvent("subLastEnd").done();
+
+    deployment(MULTI_LEVEL_DRG_DMN);
+    deployment(parentProcessInstance, middleSubprocessInstance, lastSubprocessInstance);
+  }
 }

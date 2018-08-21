@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.*;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
@@ -561,9 +562,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       if (ttl != null) {
         // set hierarchical HPIs removal time
         Date removalTime = determineRemovalTime(endTime, ttl);
-        Context.getCommandContext()
-          .getHistoricProcessInstanceManager()
+        CommandContext commandContext = Context.getCommandContext();
+
+        commandContext.getHistoricProcessInstanceManager()
           .addRemovalTimeToProcessInstancesByRootId(executionEntity.getProcessInstanceId(), removalTime);
+        commandContext.getHistoricDecisionInstanceManager()
+          .addRemovalTimeToDecisionInstancesByRootProcessInstanceId(executionEntity.getProcessInstanceId(), removalTime);
       }
     }
 

@@ -14,7 +14,9 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
@@ -95,11 +97,18 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     HistoricDecisionEvaluationEvent event = newDecisionEvaluationEvent(evaluationEvent);
 
     HistoricDecisionInstanceEntity rootDecisionEvent = supplier.createHistoricDecisionInstance(evaluationEvent.getDecisionResult());
+    Date removalTime = null;
+    if (rootDecisionEvent.getRootProcessInstanceId() == null) {
+      removalTime = getRemovalTime(rootDecisionEvent.getEvaluationTime(), evaluationEvent.getDecisionResult());
+      rootDecisionEvent.setRemovalTime(removalTime);
+    }
+
     event.setRootHistoricDecisionInstance(rootDecisionEvent);
 
     List<HistoricDecisionInstanceEntity> requiredDecisionEvents = new ArrayList<HistoricDecisionInstanceEntity>();
     for (DmnDecisionLogicEvaluationEvent requiredDecisionResult : evaluationEvent.getRequiredDecisionResults()) {
       HistoricDecisionInstanceEntity requiredDecisionEvent = supplier.createHistoricDecisionInstance(requiredDecisionResult);
+      requiredDecisionEvent.setRemovalTime(removalTime);
       requiredDecisionEvents.add(requiredDecisionEvent);
     }
     event.setRequiredHistoricDecisionInstances(requiredDecisionEvents);
@@ -381,4 +390,18 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       return Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(event.getCaseExecutionId());
   }
 
+  protected Date getRemovalTime(Date evaluationTime, DmnDecisionLogicEvaluationEvent evaluationEvent) {
+    DecisionDefinition decision = (DecisionDefinition) evaluationEvent.getDecision();
+    Integer ttl = decision.getHistoryTimeToLive();
+
+    if (ttl == null) {
+      return null;
+    }
+
+    Calendar removeTime = Calendar.getInstance();
+    removeTime.setTime(evaluationTime);
+    removeTime.add(Calendar.DATE, ttl);
+
+    return removeTime.getTime();
+  }
 }

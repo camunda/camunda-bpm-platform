@@ -64,8 +64,18 @@
            )
   </insert>
   
+  <!-- update -->
+
+  <update id="updateHistoricDecisionInstanceEventsByRootId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_DECINST set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- delete -->
-  
+
   <delete id="deleteHistoricDecisionInstance" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity">
     delete from ${prefix}ACT_HI_DECINST where ID_ = #{id}
   </delete>
