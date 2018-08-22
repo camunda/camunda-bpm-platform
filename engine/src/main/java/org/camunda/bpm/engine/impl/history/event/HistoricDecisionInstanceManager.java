@@ -138,7 +138,11 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricDecisionInstanceIdsForCleanup(Integer batchSize, int minuteFrom, int minuteTo) {
+  public List<String> findHistoricDecisionInstanceIdsForCleanup(Integer batchSize, int minuteFrom, int minuteTo, boolean isHierarchical) {
+    String sqlStatement = (isHierarchical)?
+      "selectHierarchicalHistoricDecisionInstanceIdsForCleanup"
+      : "selectHistoricDecisionInstanceIdsForCleanup";
+
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("currentTimestamp", ClockUtil.getCurrentTime());
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -146,7 +150,12 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       parameters.put("minuteTo", minuteTo);
     }
     ListQueryParameterObject parameterObject = new ListQueryParameterObject(parameters, 0, batchSize);
-    return (List<String>) getDbEntityManager().selectList("selectHistoricDecisionInstanceIdsForCleanup", parameterObject);
+    return (List<String>) getDbEntityManager().selectList(sqlStatement, parameterObject);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> findHistoricDecisionInstanceIdsForCleanup(Integer batchSize, int minuteFrom, int minuteTo) {
+    return findHistoricDecisionInstanceIdsForCleanup(batchSize, minuteFrom, minuteTo, false);
   }
 
   protected void appendHistoricDecisionInputInstances(Map<String, HistoricDecisionInstanceEntity> decisionInstancesById, HistoricDecisionInstanceQueryImpl query) {

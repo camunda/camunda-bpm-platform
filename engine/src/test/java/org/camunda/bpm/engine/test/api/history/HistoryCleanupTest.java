@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
@@ -34,9 +35,11 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.BatchWindowConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
@@ -53,13 +56,13 @@ import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.management.MetricsQuery;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
@@ -289,6 +292,11 @@ public class HistoryCleanupTest {
           .fromJson(new JSONObject(((JobEntity) job).getJobHandlerConfigurationRaw()));
   }
 
+  private void setTimeAndRunHistoryCleanupManually(Date date) {
+    ClockUtil.setCurrentTime(date);
+    runHistoryCleanup(true);
+  }
+
   private void runHistoryCleanup() {
     runHistoryCleanup(false);
   }
@@ -374,13 +382,16 @@ public class HistoryCleanupTest {
     // given
     prepareInstances(null, HISTORY_TIME_TO_LIVE, null);
 
+    // Hierarchical Cleanup removes by model hierarchy, ignoring model types
+    int removedDecInst = isHierarchicalCleanup? DECISIONS_IN_PROCESS_INSTANCES : 0;
+
     ClockUtil.setCurrentTime(new Date());
     // when
     runHistoryCleanup(true);
 
     // then
     assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
-    assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(removedDecInst, historyService.createHistoricDecisionInstanceQuery().count());
     assertEquals(CASE_INSTANCES_COUNT, historyService.createHistoricCaseInstanceQuery().count());
   }
 
@@ -390,13 +401,16 @@ public class HistoryCleanupTest {
     // given
     prepareInstances(HISTORY_TIME_TO_LIVE, null, null);
 
+    // Hierarchical Cleanup removes by model hierarchy, ignoring model types
+    int removedDecInst = DECISION_INSTANCES_COUNT + (isHierarchicalCleanup? 0 : DECISIONS_IN_PROCESS_INSTANCES);
+
     ClockUtil.setCurrentTime(new Date());
     // when
     runHistoryCleanup(true);
 
     // then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
-    assertEquals(DECISION_INSTANCES_COUNT + DECISIONS_IN_PROCESS_INSTANCES, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(removedDecInst, historyService.createHistoricDecisionInstanceQuery().count());
     assertEquals(CASE_INSTANCES_COUNT, historyService.createHistoricCaseInstanceQuery().count());
   }
 
@@ -425,13 +439,16 @@ public class HistoryCleanupTest {
     // given
     prepareInstances(HISTORY_TIME_TO_LIVE, null, HISTORY_TIME_TO_LIVE);
 
+    // Hierarchical Cleanup removes by model hierarchy, ignoring model types
+    int removedDecInst = DECISION_INSTANCES_COUNT + (isHierarchicalCleanup? 0 : DECISIONS_IN_PROCESS_INSTANCES);
+
     ClockUtil.setCurrentTime(new Date());
     // when
     runHistoryCleanup(true);
 
     // then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
-    assertEquals(DECISION_INSTANCES_COUNT + DECISIONS_IN_PROCESS_INSTANCES, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(removedDecInst, historyService.createHistoricDecisionInstanceQuery().count());
     assertEquals(0, historyService.createHistoricCaseInstanceQuery().count());
   }
 
@@ -442,13 +459,16 @@ public class HistoryCleanupTest {
     // given
     prepareInstances(null, HISTORY_TIME_TO_LIVE, HISTORY_TIME_TO_LIVE);
 
+    // Hierarchical Cleanup removes by model hierarchy, ignoring model types
+    int removedDecInst = isHierarchicalCleanup? DECISIONS_IN_PROCESS_INSTANCES : 0;
+
     ClockUtil.setCurrentTime(new Date());
     // when
     runHistoryCleanup(true);
 
     // then
     assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
-    assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(removedDecInst, historyService.createHistoricDecisionInstanceQuery().count());
     assertEquals(0, historyService.createHistoricCaseInstanceQuery().count());
   }
 
@@ -1230,79 +1250,117 @@ public class HistoryCleanupTest {
 
   @Test
   public void testCleanupOrder() {
+    // setup test data
     int expectedInstances = (isHierarchicalCleanup)? 1 : 0;
-    // given
-    BpmnModelInstance parentProcessInstance =
-      Bpmn.createExecutableProcess("nestedHierarchicalProcess")
-        .camundaHistoryTimeToLive(2)
-        .startEvent()
-        .callActivity("callActivity")
-          .calledElement("middleChildProcess")
-        .userTask("parentUserTask")
-        .endEvent()
-        .done();
+    String multiLevelDrgDmn = "org/camunda/bpm/engine/test/dmn/deployment/drdMultiLevelDish.dmn11.xml";
 
-    BpmnModelInstance middleSubprocessInstance =
-      Bpmn.createExecutableProcess("middleChildProcess")
-        .camundaHistoryTimeToLive(1)
-        .startEvent()
-        .callActivity()
-          .calledElement("lastChildProcess")
-        .endEvent("subMiddleEnd")
-        .done();
+    int rootHpiTTL = 4;
+    int childHpiTTL = 3;
 
-    BpmnModelInstance lastSubprocessInstance =
-      Bpmn.createExecutableProcess("lastChildProcess")
-        .camundaHistoryTimeToLive(1)
-        .startEvent()
-        .endEvent("subLastEnd")
-        .done();
-
-    testRule.deploy(parentProcessInstance, middleSubprocessInstance, lastSubprocessInstance);
-
-    //we're within batch window
     Date now = ClockUtil.getCurrentTime();
+    Date childHdisRemovalTime = DateUtils.addSeconds(DateUtils.addDays(now, 1), 1);
+    Date rootHdiRemovalTime = DateUtils.addSeconds(DateUtils.addDays(childHdisRemovalTime, 1), 1);
+    Date childHpisRemovalTime = DateUtils.addSeconds(DateUtils.addDays(rootHdiRemovalTime, 1), 1);
+    Date rootHpiRemovalTime = DateUtils.addSeconds(DateUtils.addDays(childHpisRemovalTime, rootHpiTTL), 1);
+
+    // given
+    BpmnModelInstance parentProcessModelInstance = Bpmn.createExecutableProcess("nestedHierarchicalProcess")
+      .camundaHistoryTimeToLive(rootHpiTTL)
+      .startEvent()
+      .callActivity("callActivity")
+      .calledElement("middleChildProcess")
+        .camundaIn("temperature", "temperature")
+        .camundaIn("dayType","dayType")
+      .userTask("parentUserTask")
+      .endEvent()
+      .done();
+
+    BpmnModelInstance middleSubprocessModelInstance = Bpmn.createExecutableProcess("middleChildProcess")
+      .camundaHistoryTimeToLive(childHpiTTL)
+      .startEvent()
+      .callActivity()
+      .calledElement("lastChildProcess")
+        .camundaIn("temperature", "temperature")
+        .camundaIn("dayType","dayType")
+      .endEvent("subMiddleEnd")
+      .done();
+
+    // Create last child instance with a DRG DMN
+    BpmnModelInstance lastSubprocessModelInstance = Bpmn.createExecutableProcess("lastChildProcess")
+      .camundaHistoryTimeToLive(childHpiTTL)
+      .startEvent()
+      .businessRuleTask("dish-decision")
+        .camundaDecisionRef("dish-decision")
+        .camundaResultVariable("result")
+      .endEvent("subLastEnd")
+      .done();
+
+    testRule.deploy(multiLevelDrgDmn);
+    testRule.deploy(parentProcessModelInstance, middleSubprocessModelInstance, lastSubprocessModelInstance);
+
+    //we're within the batch window
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addMinutes(now, 30)));
     processEngineConfiguration.initHistoryCleanup();
 
-    String parentProcessInstanceId = runtimeService.startProcessInstanceByKey("nestedHierarchicalProcess").getId();
+    String parentProcessInstanceId = runtimeService.startProcessInstanceByKey("nestedHierarchicalProcess",
+      Variables.createVariables()
+        .putValue("temperature", 21)
+        .putValue("dayType", "WeekDay"))
+      .getId();
 
-    HistoricProcessInstance middleChildInstance = historyService.createHistoricProcessInstanceQuery()
-      .superProcessInstanceId(parentProcessInstanceId)
-      .singleResult();
+    // create Historic Process Instance queries
+    HistoricProcessInstanceQuery rootHpiQuery = historyService.createHistoricProcessInstanceQuery()
+      .processInstanceId(parentProcessInstanceId);
+    HistoricProcessInstanceQuery middleHpiQuery = historyService.createHistoricProcessInstanceQuery()
+      .superProcessInstanceId(parentProcessInstanceId);
+    HistoricProcessInstanceQuery lastHpiQuery = historyService.createHistoricProcessInstanceQuery()
+      .superProcessInstanceId(middleHpiQuery.singleResult().getId());
 
-    HistoricProcessInstance lastChildInstance = historyService.createHistoricProcessInstanceQuery()
-      .superProcessInstanceId(middleChildInstance.getId())
-      .singleResult();
+    // create Historic Decision Instance queries
+    HistoricDecisionInstanceQuery rootHdiQuery = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("dish-decision");
+    HistoricDecisionInstanceQuery middleHdiQuery = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("feels");
+    HistoricDecisionInstanceQuery lastHdiQuery = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("guestCount");
 
     // when
-    ClockUtil.setCurrentTime(DateUtils.addSeconds(DateUtils.addDays(now, 1), 1));
-    runHistoryCleanup(true);
 
-    assertEquals(expectedInstances, historyService.createHistoricProcessInstanceQuery()
-      .processInstanceId(middleChildInstance.getId())
-      .count());
-    assertEquals(expectedInstances, historyService.createHistoricProcessInstanceQuery()
-      .processInstanceId(lastChildInstance.getId())
-      .count());
+    // Set time to expired child Historic Decision Instances TTL
+    setTimeAndRunHistoryCleanupManually(childHdisRemovalTime);
+    validateRemainingHistoricInstances(expectedInstances, middleHdiQuery, lastHdiQuery);
+    validateRemainingHistoricInstances(1, middleHpiQuery, lastHpiQuery, rootHdiQuery, rootHpiQuery);
 
-    Task parentTask = processEngineConfiguration.getTaskService()
+    // Set time to expired root Historic Decision Instance TTL
+    setTimeAndRunHistoryCleanupManually(rootHdiRemovalTime);
+    validateRemainingHistoricInstances(expectedInstances, lastHdiQuery, middleHdiQuery, rootHdiQuery);
+    validateRemainingHistoricInstances(1, lastHpiQuery, middleHpiQuery, rootHpiQuery);
+
+    // Set time to expired Child Historic Process Instances TTL
+    setTimeAndRunHistoryCleanupManually(childHpisRemovalTime);
+    validateRemainingHistoricInstances(expectedInstances, lastHdiQuery, middleHdiQuery, rootHdiQuery, lastHpiQuery, middleHpiQuery);
+    validateRemainingHistoricInstances(1, rootHpiQuery);
+
+    String parentTaskId = processEngineConfiguration.getTaskService()
       .createTaskQuery()
       .processInstanceId(parentProcessInstanceId)
-      .singleResult();
-    processEngineConfiguration.getTaskService().complete(parentTask.getId());
+      .singleResult()
+      .getId();
+    processEngineConfiguration.getTaskService().complete(parentTaskId);
 
-    // then
-    ClockUtil.setCurrentTime(DateUtils.addSeconds(DateUtils.addDays(now, 3), 2));
-    runHistoryCleanup(true);
-
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(parentProcessInstanceId).count());
-
+    // then: Set time to expired root Historic Process Instance TTL
+    setTimeAndRunHistoryCleanupManually(rootHpiRemovalTime);
+    validateRemainingHistoricInstances(0, rootHpiQuery);
     if (isHierarchicalCleanup) {
-      assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(middleChildInstance.getId()).count());
-      assertEquals(0, historyService.createHistoricProcessInstanceQuery().processInstanceId(lastChildInstance.getId()).count());
+      validateRemainingHistoricInstances(0, lastHdiQuery, middleHdiQuery, rootHdiQuery, lastHpiQuery, middleHpiQuery);
+    }
+  }
+
+  private void validateRemainingHistoricInstances(int expectedCount, Query... queries) {
+    for (Query query : queries) {
+      assertEquals(expectedCount, query.count());
     }
   }
 

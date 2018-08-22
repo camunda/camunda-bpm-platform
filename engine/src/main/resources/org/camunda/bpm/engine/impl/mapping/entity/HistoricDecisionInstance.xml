@@ -311,16 +311,39 @@
         AND ${dayComparator}
   </sql>
 
+  <sql id="selectHierarchicalHistoricDecisionInstanceIdsForCleanupSql">
+    <bind name="date" value="'di.EVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    FROM ${prefix}ACT_HI_DECINST di
+    where
+      not di.REMOVAL_TIME_ is NULL
+      AND di.REMOVAL_TIME_ &lt;= #{parameter.currentTimestamp}
+  </sql>
+
   <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} di.ID_, di.EVAL_TIME_
+    SELECT ${limitBeforeWithoutOffset} di.ID_
     <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql"/>
     ${limitAfterWithoutOffset}
   </select>
 
+  <select id="selectHierarchicalHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT ${limitBeforeWithoutOffset} di.ID_
+    <include refid="selectHierarchicalHistoricDecisionInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </select>
+
   <select id="selectHistoricDecisionInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_, di.EVAL_TIME_
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_
     <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </select>
+
+  <select id="selectHierarchicalHistoricDecisionInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_
+    <include refid="selectHierarchicalHistoricDecisionInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
     ${limitAfterWithoutOffset}
   </select>

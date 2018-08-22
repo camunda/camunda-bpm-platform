@@ -67,7 +67,10 @@ public abstract class HistoryCleanupHelper {
 
     //add process instance ids
     final List<String> historicProcessInstanceIds = commandContext.getHistoricProcessInstanceManager()
-        .findHistoricProcessInstanceIdsForCleanup(batchSize, configuration.getMinuteFrom(), configuration.getMinuteTo(), configuration.isHierarchicalHistoryCleanup());
+        .findHistoricProcessInstanceIdsForCleanup(batchSize,
+          configuration.getMinuteFrom(),
+          configuration.getMinuteTo(),
+          configuration.isHierarchicalHistoryCleanup());
     if (historicProcessInstanceIds.size() > 0) {
       historyCleanupBatch.setHistoricProcessInstanceIds(historicProcessInstanceIds);
     }
@@ -75,7 +78,10 @@ public abstract class HistoryCleanupHelper {
     //if batch is not full, add decision instance ids
     if (historyCleanupBatch.size() < batchSize && processEngineConfiguration.isDmnEnabled()) {
       final List<String> historicDecisionInstanceIds = commandContext.getHistoricDecisionInstanceManager()
-          .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(), configuration.getMinuteFrom(), configuration.getMinuteTo());
+          .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(),
+            configuration.getMinuteFrom(),
+            configuration.getMinuteTo(),
+            configuration.isHierarchicalHistoryCleanup());
       if (historicDecisionInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricDecisionInstanceIds(historicDecisionInstanceIds);
       }
@@ -84,7 +90,9 @@ public abstract class HistoryCleanupHelper {
     //if batch is not full, add case instance ids
     if (historyCleanupBatch.size() < batchSize && processEngineConfiguration.isCmmnEnabled()) {
       final List<String> historicCaseInstanceIds = commandContext.getHistoricCaseInstanceManager()
-          .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(), configuration.getMinuteFrom(), configuration.getMinuteTo());
+          .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(),
+            configuration.getMinuteFrom(),
+            configuration.getMinuteTo());
       if (historicCaseInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricCaseInstanceIds(historicCaseInstanceIds);
       }
