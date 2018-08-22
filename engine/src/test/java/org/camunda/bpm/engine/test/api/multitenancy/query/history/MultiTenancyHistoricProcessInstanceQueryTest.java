@@ -14,9 +14,11 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -42,18 +44,20 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
       .endEvent()
     .done();
 
+    deployment(oneTaskProcess);
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
 
+    startProcessInstance();
     startProcessInstanceForTenant(TENANT_ONE);
     startProcessInstanceForTenant(TENANT_TWO);
   }
 
-  public void testQueryWithoutTenantId() {
+  public void testQueryNoTenantIdSet() {
     HistoricProcessInstanceQuery query = historyService.
         createHistoricProcessInstanceQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
@@ -86,6 +90,14 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
     assertThat(query.count(), is(0L));
   }
 
+  public void testQueryByWithoutTenantId() {
+    HistoricProcessInstanceQuery query = historyService
+      .createHistoricProcessInstanceQuery()
+      .withoutTenantId();
+
+    assertThat(query.count(), is(1L));
+  }
+
   public void testFailQueryByTenantIdNull() {
     try {
       historyService.createHistoricProcessInstanceQuery()
@@ -98,6 +110,7 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
 
   public void testQuerySortingAsc() {
     List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .asc()
         .list();
@@ -109,6 +122,7 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
 
   public void testQuerySortingDesc() {
     List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .desc()
         .list();
@@ -122,15 +136,15 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
     identityService.setAuthentication("user", null, null);
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count(), is(1L));
   }
 
   public void testQueryAuthenticatedTenant() {
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count(), is(2L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
     assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
@@ -141,9 +155,10 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count(), is(3L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.withoutTenantId().count(), is(1L));
   }
 
   public void testQueryDisabledTenantCheck() {
@@ -151,13 +166,19 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
     identityService.setAuthentication("user", null, null);
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
-    assertThat(query.count(), is(2L));
+    assertThat(query.count(), is(3L));
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
     return runtimeService.createProcessInstanceByKey("testProcess")
         .processDefinitionTenantId(tenant)
         .execute();
+  }
+
+  protected ProcessInstance startProcessInstance() {
+    return runtimeService.createProcessInstanceByKey("testProcess")
+      .processDefinitionWithoutTenantId()
+      .execute();
   }
 
 }

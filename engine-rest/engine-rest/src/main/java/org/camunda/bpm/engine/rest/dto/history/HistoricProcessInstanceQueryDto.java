@@ -32,6 +32,8 @@ import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
+import static java.lang.Boolean.TRUE;
+
 public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricProcessInstanceQuery> {
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
@@ -93,6 +95,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private String subCaseInstanceId;
   private String caseInstanceId;
   private List<String> tenantIds;
+  private Boolean withoutTenantId;
   private List<String> executedActivityIdIn;
   private List<String> activeActivityIdIn;
   private Boolean active;
@@ -262,6 +265,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @CamundaQueryParam(value = "executedActivityAfter", converter = DateConverter.class)
   public void setExecutedActivityAfter(Date executedActivityAfter) {
     this.executedActivityAfter = executedActivityAfter;
@@ -413,6 +421,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
 
     if (variables != null) {

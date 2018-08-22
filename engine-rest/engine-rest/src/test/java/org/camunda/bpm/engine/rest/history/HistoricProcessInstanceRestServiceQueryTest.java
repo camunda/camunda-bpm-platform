@@ -4,6 +4,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1307,6 +1308,54 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
 
     assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testWithoutTenantIdParameter() {
+    mockedQuery = setUpMockHistoricProcessInstanceQuery(Collections.singletonList(MockProvider.createMockHistoricProcessInstance(null)));
+
+    Response response = given()
+      .queryParam("withoutTenantId", true)
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
+  @Test
+  public void testWithoutTenantIdPostParameter() {
+    mockedQuery = setUpMockHistoricProcessInstanceQuery(Collections.singletonList(MockProvider.createMockHistoricProcessInstance(null)));
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("withoutTenantId", true);
+
+    Response response = given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(queryParameters)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
   }
 
   private List<HistoricProcessInstance> createMockHistoricProcessInstancesTwoTenants() {

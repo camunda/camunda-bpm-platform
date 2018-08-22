@@ -262,6 +262,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instances with one of the given tenant ids. */
   HistoricProcessInstanceQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic process instances which have no tenant id. */
+  HistoricProcessInstanceQuery withoutTenantId();
+
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of historic process instances without tenant id is database-specific.

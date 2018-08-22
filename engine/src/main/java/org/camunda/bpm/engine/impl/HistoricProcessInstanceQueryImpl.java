@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
+import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -69,6 +71,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
   protected String[] tenantIds;
+  protected boolean isTenantIdSet;
   protected String[] executedActivityIds;
   protected String[] activeActivityIds;
   protected String state;
@@ -232,6 +235,13 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery withoutTenantId() {
+    tenantIds = null;
+    isTenantIdSet = true;
     return this;
   }
 
