@@ -34,7 +34,7 @@ public class NullValueSerializer extends AbstractTypedValueSerializer<NullValueI
   }
 
   public NullValueImpl convertToTypedValue(UntypedValueImpl untypedValue) {
-    return NullValueImpl.INSTANCE;
+    return !untypedValue.isTransient() ? NullValueImpl.INSTANCE : NullValueImpl.INSTANCE_TRANSIENT;
   }
 
   public void writeValue(NullValueImpl value, ValueFields valueFields) {

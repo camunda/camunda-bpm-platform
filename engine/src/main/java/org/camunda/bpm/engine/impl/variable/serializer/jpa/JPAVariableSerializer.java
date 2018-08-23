@@ -60,7 +60,7 @@ public class JPAVariableSerializer extends AbstractTypedValueSerializer<ObjectVa
   }
 
   public ObjectValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.objectValue(untypedValue.getValue()).create();
+    return Variables.objectValue(untypedValue.getValue(), untypedValue.isTransient()).create();
   }
 
   public void writeValue(ObjectValue objectValue, ValueFields valueFields) {

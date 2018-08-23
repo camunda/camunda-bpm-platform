@@ -28,7 +28,7 @@ public class ShortValueSerializer extends PrimitiveValueSerializer<ShortValue> {
   }
 
   public ShortValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.shortValue((Short) untypedValue.getValue());
+    return Variables.shortValue((Short) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public ShortValue readValue(ValueFields valueFields) {

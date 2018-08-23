@@ -33,7 +33,7 @@ public class BooleanValueSerializer extends PrimitiveValueSerializer<BooleanValu
   }
 
   public BooleanValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.booleanValue((Boolean) untypedValue.getValue());
+    return Variables.booleanValue((Boolean) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public BooleanValue readValue(ValueFields valueFields) {

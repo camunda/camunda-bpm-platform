@@ -33,7 +33,7 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
 
   public ObjectValue convertToTypedValue(UntypedValueImpl untypedValue) {
     // untyped values are always deserialized
-    return Variables.objectValue(untypedValue.getValue()).create();
+    return Variables.objectValue(untypedValue.getValue(), untypedValue.isTransient()).create();
   }
 
   protected void writeToValueFields(ObjectValue value, ValueFields valueFields, byte[] serializedValue) {

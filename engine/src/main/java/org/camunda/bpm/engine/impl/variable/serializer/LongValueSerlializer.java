@@ -28,7 +28,7 @@ public class LongValueSerlializer extends PrimitiveValueSerializer<LongValue> {
   }
 
   public LongValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.longValue((Long) untypedValue.getValue());
+    return Variables.longValue((Long) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public LongValue readValue(ValueFields valueFields) {

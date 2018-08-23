@@ -28,7 +28,7 @@ public class IntegerValueSerializer extends PrimitiveValueSerializer<IntegerValu
   }
 
   public IntegerValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.integerValue((Integer) untypedValue.getValue());
+    return Variables.integerValue((Integer) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public void writeValue(IntegerValue variableValue, ValueFields valueFields) {

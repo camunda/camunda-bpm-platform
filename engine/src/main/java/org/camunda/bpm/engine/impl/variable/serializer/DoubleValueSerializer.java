@@ -28,7 +28,7 @@ public class DoubleValueSerializer extends PrimitiveValueSerializer<DoubleValue>
   }
 
   public DoubleValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.doubleValue((Double) untypedValue.getValue());
+    return Variables.doubleValue((Double) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public void writeValue(DoubleValue value, ValueFields valueFields) {

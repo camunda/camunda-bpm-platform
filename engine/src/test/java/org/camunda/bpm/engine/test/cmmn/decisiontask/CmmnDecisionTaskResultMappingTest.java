@@ -159,7 +159,7 @@ public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase
       fail("expect exception");
 
     } catch (ProcessEngineException e) {
-      assertTextPresent("variable with name 'decisionResult' can not be updated", e.getMessage());
+      assertTextPresent("transient variable with name decisionResult to non-transient", e.getMessage());
     }
   }
 

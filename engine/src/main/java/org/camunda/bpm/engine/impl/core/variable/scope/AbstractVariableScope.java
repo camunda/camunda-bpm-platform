@@ -448,7 +448,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
    * output mapping.
    */
   public void setVariableLocalTransient(String variableName, Object value) {
-    TypedValue typedValue = Variables.untypedValue(value);
+    TypedValue typedValue = Variables.untypedValue(value, true);
 
     checkJavaSerialization(variableName, typedValue);
 

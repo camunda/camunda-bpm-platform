@@ -29,7 +29,7 @@ public class StringValueSerializer extends PrimitiveValueSerializer<StringValue>
   }
 
   public StringValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.stringValue((String) untypedValue.getValue());
+    return Variables.stringValue((String) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public StringValue readValue(ValueFields valueFields) {

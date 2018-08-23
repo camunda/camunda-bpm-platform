@@ -33,7 +33,7 @@ public class DateValueSerializer extends PrimitiveValueSerializer<DateValue> {
   }
 
   public DateValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.dateValue((Date) untypedValue.getValue());
+    return Variables.dateValue((Date) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public DateValue readValue(ValueFields valueFields) {
