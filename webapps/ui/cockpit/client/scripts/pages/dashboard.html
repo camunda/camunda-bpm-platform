@@ -64,14 +64,7 @@
                    values="values.tasks"
                    placeholder="{{ 'DASHBOARD_OPEN_HUMAN_TASKS' | translate}}"></div>
               <a class="value"
-                 href="#/tasks"
-                 ng-if="hasTaskSearch">
-                {{ (!data.actual.tasks ? 0 : '') }}
-                {{ data.actual.tasks | abbreviateNumber }}
-              </a>
-              <a class="value"
-                 href="#/tasks"
-                 ng-if="!hasTaskSearch">
+                 href="#/tasks">
                 {{ (!data.actual.tasks ? 0 : '') }}
                 {{ data.actual.tasks | abbreviateNumber }}
               </a>
