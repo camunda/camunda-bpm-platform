@@ -265,10 +265,6 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void setValue(TypedValue value) {
-    if(isTransient()) {
-      throw LOG.updateTransientVariableException(getName());
-    }
-
     // clear value fields
     clearValueFields();
 
