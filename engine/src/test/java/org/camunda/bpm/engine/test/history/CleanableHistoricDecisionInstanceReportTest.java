@@ -27,13 +27,16 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.bpmn.servicetask.ServiceTaskVariablesTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
@@ -56,6 +59,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
   protected static final String SECOND_DECISION_DEFINITION_KEY = "two";
   protected static final String THIRD_DECISION_DEFINITION_KEY = "anotherDecision";
   protected static final String FOURTH_DECISION_DEFINITION_KEY = "decision";
+  protected static final String ROOT_DMN_DEFINITION_KEY = "dish-decision";
+  protected static final String DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdMultiLevelDish.dmn11.xml";
 
   @Before
   public void setUp() {
@@ -75,6 +80,10 @@ public class CleanableHistoricDecisionInstanceReportTest {
   }
 
   protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
+    prepareDecisionInstances(key, daysInThePast, historyTimeToLive, instanceCount, null);
+  }
+
+  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, VariableMap variables) {
     List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).list();
     assertEquals(1, decisionDefinitions.size());
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), historyTimeToLive);
@@ -82,7 +91,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysInThePast));
 
-    Map<String, Object> variables = Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
+    variables = (variables != null)? variables : Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
     for (int i = 0; i < instanceCount; i++) {
       engineRule.getDecisionService().evaluateDecisionByKey(key).variables(variables).evaluate();
     }
@@ -285,5 +294,38 @@ public class CleanableHistoricDecisionInstanceReportTest {
     assertEquals(THIRD_DECISION_DEFINITION_KEY, reportResult.get(0).getDecisionDefinitionKey());
     assertEquals(SECOND_DECISION_DEFINITION_KEY, reportResult.get(1).getDecisionDefinitionKey());
     assertEquals(DECISION_DEFINITION_KEY, reportResult.get(2).getDecisionDefinitionKey());
+  }
+
+  @Test
+  public void testReportOnHierarchicalData(){
+    engineRule.getProcessEngineConfiguration().setHierarchicalHistoryCleanup(true);
+    testRule.deploy(DRG_DMN);
+
+    updateDecisionDefinitionHistoryTTL("feels", 5);
+    updateDecisionDefinitionHistoryTTL("guestCount", 5);
+
+    prepareDecisionInstances(ROOT_DMN_DEFINITION_KEY, -3, 2, 1,
+      Variables.createVariables().putValue("temperature", 21).putValue("dayType", "WeekDay"));
+
+    List<CleanableHistoricDecisionInstanceReportResult> decisionReportResult = historyService
+      .createCleanableHistoricDecisionInstanceReport()
+      .decisionDefinitionKeyIn("guestCount", "feels", "dish-decision")
+      .orderByFinished()
+      .desc()
+      .list();
+
+    // then
+    assertEquals(3, decisionReportResult.size());
+    assertEquals(ROOT_DMN_DEFINITION_KEY, decisionReportResult.get(0).getDecisionDefinitionKey());
+    assertEquals("feels", decisionReportResult.get(1).getDecisionDefinitionKey());
+    assertEquals("guestCount", decisionReportResult.get(2).getDecisionDefinitionKey());
+  }
+
+  private void updateDecisionDefinitionHistoryTTL(String decisionDefinitionKey, int newHistoryTimeToLive) {
+    String definitionId = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey(decisionDefinitionKey)
+      .singleResult()
+      .getId();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(definitionId, newHistoryTimeToLive);
   }
 }

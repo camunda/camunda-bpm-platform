@@ -563,7 +563,13 @@
         RES.HISTORY_TTL_,
         RES.TENANT_ID_,
         F.FINISHED_,
-        SUM(CASE WHEN RES.HISTORY_TTL_ is not null and PI.END_TIME_ is not null and (RES.HISTORY_TTL_ = 0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
+        <!-- TODO: PASS isHierarchical parameter for checking. If true use PI.REMOVAL_TIME_ <= #{currentTimestamp} -->
+        <if test="isHierarchicalHistoryCleanup">
+          SUM(CASE WHEN RES.HISTORY_TTL_ is not null and PI.REMOVAL_TIME_ is not null and PI.REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_
+        </if>
+        <if test="!isHierarchicalHistoryCleanup">
+          SUM(CASE WHEN RES.HISTORY_TTL_ is not null and PI.END_TIME_ is not null and (RES.HISTORY_TTL_ = 0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
+        </if>
       FROM
         (
           SELECT DISTINCT RES.*

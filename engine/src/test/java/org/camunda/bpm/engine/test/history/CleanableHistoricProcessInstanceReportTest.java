@@ -27,8 +27,11 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -38,6 +41,8 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -63,6 +68,10 @@ public class CleanableHistoricProcessInstanceReportTest {
   protected static final String SECOND_PROCESS_DEFINITION_KEY = "SECOND_HISTORIC_INST";
   protected static final String THIRD_PROCESS_DEFINITION_KEY = "THIRD_HISTORIC_INST";
   protected static final String FOURTH_PROCESS_DEFINITION_KEY = "FOURTH_HISTORIC_INST";
+  protected static final String HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY = "ROOT_HIERARCHIC_INST";
+  protected static final String HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY = "CHILD_HIERARCHIC_INST";
+  protected static final String DMN_DEFINITION_KEY = "dish-decision";
+  protected static final String DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdMultiLevelDish.dmn11.xml";
 
   @Before
   public void setUp() {
@@ -90,6 +99,11 @@ public class CleanableHistoricProcessInstanceReportTest {
     for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
       historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
     }
+
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    for (HistoricDecisionInstance historicProcessInstance : historicDecisionInstances) {
+      historyService.deleteHistoricDecisionInstanceByInstanceId(historicProcessInstance.getId());
+    }
   }
 
   protected BpmnModelInstance createProcessWithUserTask(String key) {
@@ -101,7 +115,37 @@ public class CleanableHistoricProcessInstanceReportTest {
         .done();
   }
 
+  protected BpmnModelInstance[] createHierarchicalProcessWithDmn(String rootKey, String childKey) {
+    BpmnModelInstance[] modelInstances = new BpmnModelInstance[2];
+    modelInstances[0] = Bpmn.createExecutableProcess(rootKey)
+      .camundaHistoryTimeToLive(2)
+      .startEvent()
+      .callActivity("callActivity")
+      .calledElement(childKey)
+      .camundaIn("temperature", "temperature")
+      .camundaIn("dayType","dayType")
+      .userTask("parentUserTask")
+      .endEvent()
+      .done();
+
+    // Create child instance with a DRG DMN
+    modelInstances[1] = Bpmn.createExecutableProcess(childKey)
+      .camundaHistoryTimeToLive(1)
+      .startEvent()
+      .businessRuleTask(DMN_DEFINITION_KEY)
+      .camundaDecisionRef(DMN_DEFINITION_KEY)
+      .camundaResultVariable("result")
+      .endEvent("subLastEnd")
+      .done();
+
+    return modelInstances;
+  }
+
   protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
+    prepareProcessInstances(key, daysInThePast, historyTimeToLive, instanceCount, null);
+  }
+
+  protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, VariableMap variableMap) {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).list();
     assertEquals(1, processDefinitions.size());
     repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), historyTimeToLive);
@@ -111,7 +155,7 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     List<String> processInstanceIds = new ArrayList<String>();
     for (int i = 0; i < instanceCount; i++) {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key);
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key, variableMap);
       processInstanceIds.add(processInstance.getId());
     }
     runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
@@ -318,5 +362,39 @@ public class CleanableHistoricProcessInstanceReportTest {
     assertEquals(THIRD_PROCESS_DEFINITION_KEY, reportResult.get(0).getProcessDefinitionKey());
     assertEquals(SECOND_PROCESS_DEFINITION_KEY, reportResult.get(1).getProcessDefinitionKey());
     assertEquals(PROCESS_DEFINITION_KEY, reportResult.get(2).getProcessDefinitionKey());
+  }
+
+  @Test
+  public void testReportOnHierarchicalData(){
+    engineRule.getProcessEngineConfiguration().setHierarchicalHistoryCleanup(true);
+    testRule.deploy(DRG_DMN);
+    testRule.deploy(createHierarchicalProcessWithDmn(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY));
+
+    prepareProcessInstances(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, -3, 2, 1,
+      Variables.createVariables().putValue("temperature", 21).putValue("dayType", "WeekDay"));
+
+    List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
+      .createCleanableHistoricProcessInstanceReport()
+      .processDefinitionKeyIn(HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY, HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY)
+      .orderByFinished()
+      .desc()
+      .list();
+
+    List<CleanableHistoricDecisionInstanceReportResult> decisionReportResult = historyService
+      .createCleanableHistoricDecisionInstanceReport()
+      .decisionDefinitionKeyIn("guestCount", "feels", "dish-decision")
+      .orderByFinished()
+      .desc()
+      .list();
+
+    // then
+    assertEquals(2, reportResult.size());
+    assertEquals(HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY, reportResult.get(0).getProcessDefinitionKey());
+    assertEquals(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, reportResult.get(1).getProcessDefinitionKey());
+
+    assertEquals(3, decisionReportResult.size());
+    assertEquals("dish-decision", decisionReportResult.get(0).getDecisionDefinitionKey());
+    assertEquals("feels", decisionReportResult.get(1).getDecisionDefinitionKey());
+    assertEquals("guestCount", decisionReportResult.get(2).getDecisionDefinitionKey());
   }
 }

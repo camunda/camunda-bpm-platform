@@ -58,4 +58,9 @@ public interface CleanableHistoricProcessInstanceReport extends Query<CleanableH
    */
   CleanableHistoricProcessInstanceReport orderByFinished();
 
+  /**
+   * Selects historic process instances by using hierarchical attributes (removal time).
+   */
+  CleanableHistoricProcessInstanceReport usesHierarchicalHistoryCleanup();
+
 }

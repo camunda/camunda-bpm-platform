@@ -58,4 +58,9 @@ public interface CleanableHistoricDecisionInstanceReport extends Query<Cleanable
    */
   CleanableHistoricDecisionInstanceReport orderByFinished();
 
+  /**
+   * Selects historic decision instances by using hierarchical attributes (removal time).
+   */
+  CleanableHistoricDecisionInstanceReport usesHierarchicalHistoryCleanup();
+
 }
