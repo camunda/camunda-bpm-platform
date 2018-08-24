@@ -10,10 +10,12 @@ module.exports = [
   'CamForm',
   'camAPI',
   '$timeout',
+  'Uri',
   function(
     CamForm,
     camAPI,
-    $timeout
+    $timeout,
+    Uri
   ) {
 
     return {
@@ -79,7 +81,8 @@ module.exports = [
           angular.extend(params, {
             urlParams: {
               taskId: params.taskId || null,
-              userId: $scope.$root.authentication.name
+              userId: $scope.$root.authentication.name,
+              engineName: Uri.appUri(':engine')
             },
             containerElement: container,
             client: camAPI,
