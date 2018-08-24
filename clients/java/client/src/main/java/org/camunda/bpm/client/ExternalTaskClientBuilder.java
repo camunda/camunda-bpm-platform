@@ -85,7 +85,7 @@ public interface ExternalTaskClientBuilder {
    * The response is performed immediately, if external tasks are available in the moment of the request.
    * This information is optional. Unless a timeout is given, fetch and lock responses are synchronous.
    *
-   * @param asyncResponseTimeout of fetched and locked external tasks
+   * @param asyncResponseTimeout of fetched and locked external tasks in milliseconds
    * @return the builder
    */
   ExternalTaskClientBuilder asyncResponseTimeout(long asyncResponseTimeout);

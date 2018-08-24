@@ -17,6 +17,10 @@ The **Camunda External Task Client (Java)** allows to set up remote Service Task
 * Report BPMN errors as well as failures
 * Share primitive and object typed process variables with the Workflow Engine
 
+## Configuration options
+* The client can be configured with the fluent api of the [ExternalTaskClientBuilder](client/src/main/java/org/camunda/bpm/client/ExternalTaskClientBuilder.java). 
+* The topic subscription can be configured with the fluent api of the [TopicSubscriptionBuilder](client/src/main/java/org/camunda/bpm/client/topic/TopicSubscriptionBuilder.java).
+
 ## Prerequisites
 * Oracle Hotspot v1.8+ (JDK 8)
 * Camunda BPM Platform 7.9.0+
