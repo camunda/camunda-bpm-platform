@@ -445,7 +445,7 @@
       <dependency>
         <groupId>org.jruby</groupId>
         <artifactId>jruby-complete</artifactId>
-        <version>1.7.12</version>
+        <version>9.1.17.0</version>
       </dependency>
 
       <dependency>

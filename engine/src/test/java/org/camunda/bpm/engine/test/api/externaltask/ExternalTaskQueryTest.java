@@ -174,7 +174,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     // when
     List<ExternalTask> tasks = externalTaskService
         .createExternalTaskQuery()
-        .activityIdIn((String[])activityIds.toArray())
+        .activityIdIn(activityIds.toArray(new String[0]))
         .list();
 
     // then
