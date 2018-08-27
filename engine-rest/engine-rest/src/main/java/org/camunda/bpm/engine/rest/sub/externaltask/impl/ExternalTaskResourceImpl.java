@@ -138,7 +138,7 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
 
     try {
       if (dto.getVariables() != null) {
-        externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode(), dto.getErrorMessage(), dto.getVariables());
+        externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode(), dto.getErrorMessage(), VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
       } else if (dto.getErrorMessage() != null) {
         externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode(), dto.getErrorMessage());
       } else {

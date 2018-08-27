@@ -850,8 +850,12 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     parameters.put("workerId", "aWorkerId");
     parameters.put("errorCode", "anErrorCode");
     parameters.put("errorMessage", "anErrorMessage");
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("foo", "bar");
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+        .variable("var1", "val1")
+        .variable("var2", "val2", "String")
+        .variable("var3", ValueType.OBJECT.getName(), "val3", "aFormat", "aRootType")
+        .getVariables();
     parameters.put("variables", variables);
 
     given()
@@ -864,7 +868,20 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
 
-    verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode", "anErrorMessage", variables);
+    verify(externalTaskService).handleBpmnError(
+        eq("anExternalTaskId"),
+        eq("aWorkerId"),
+        eq("anErrorCode"),
+        eq("anErrorMessage"),
+        argThat(EqualsVariableMap.matches()
+          .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
+          .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
+          .matcher("var3",
+            EqualsObjectValue.objectValueMatcher()
+              .type(ValueType.OBJECT)
+              .serializedValue("val3")
+              .serializationFormat("aFormat")
+              .objectTypeName("aRootType"))));
     verifyNoMoreInteractions(externalTaskService);
   }
 
