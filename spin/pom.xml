@@ -23,7 +23,7 @@
 
   <properties>
     <jackson.version>2.9.5</jackson.version>
-    <spin.version.old>1.5.2</spin.version.old>
+    <spin.version.old>1.5.3</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
