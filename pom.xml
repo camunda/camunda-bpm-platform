@@ -242,4 +242,11 @@
     <system>Jira</system>
     <url>https://app.camunda.com/jira/browse/CAM/</url>
   </issueManagement>
+
+  <repositories>
+    <repository>
+      <id>fix-maven-snapshots-issue-with-nexus</id>
+      <url>allow-parent-pom-resolving-when-snapshot</url>
+    </repository>
+  </repositories>
 </project>
