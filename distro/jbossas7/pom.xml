@@ -15,6 +15,14 @@
   <name>camunda BPM - jBoss7</name>
 
   <profiles>
+    <!-- skip jboss as distro -->
+    <profile>
+      <id>jdk-9-and-onwards</id>
+      <activation>
+        <jdk>[9,</jdk>
+      </activation>
+    </profile>
+
     <profile>
       <id>distro</id>
       <activation>
