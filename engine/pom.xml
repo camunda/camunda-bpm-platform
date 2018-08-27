@@ -97,7 +97,7 @@
     </dependency>
     <dependency>
       <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
+      <artifactId>persistence-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -114,11 +114,6 @@
     <dependency>
       <groupId>org.apache.openjpa</groupId>
       <artifactId>openjpa</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
