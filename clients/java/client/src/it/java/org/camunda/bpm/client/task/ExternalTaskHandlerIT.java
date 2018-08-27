@@ -355,9 +355,13 @@ public class ExternalTaskHandlerIT {
     String processInstanceId = processInstance.getId();
     TaskDto task = engineRule.getTaskByProcessInstanceId(processInstanceId);
     assertThat(task).isNotNull();
-    VariableInstanceDto processInstanceVariable = engineRule.getVariableByProcessInstanceId(processInstanceId, "foo");
-    assertThat(processInstanceVariable).isNotNull();
-    assertThat(processInstanceVariable.getValue()).isEqualTo(variableValue);
+
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "foo");
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+
+    assertThat(variable.getName()).isEqualTo(variableName);
+    assertThat(variable.getValue()).isEqualTo(variableValue);
   }
 
   @Test

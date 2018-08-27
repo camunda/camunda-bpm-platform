@@ -93,7 +93,8 @@ public class EngineClient {
   }
 
   public void bpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables) throws EngineClientException {
-    BpmnErrorRequestDto payload = new BpmnErrorRequestDto(workerId, errorCode, errorMessage, variables);
+    Map<String, TypedValueField> typeValueDtoMap = typedValues.serializeVariables(variables);
+    BpmnErrorRequestDto payload = new BpmnErrorRequestDto(workerId, errorCode, errorMessage, typeValueDtoMap);
     String resourcePath = BPMN_ERROR_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
