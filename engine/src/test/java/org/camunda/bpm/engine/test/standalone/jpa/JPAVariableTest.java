@@ -190,7 +190,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     manager.persist(bigDecimalIdJPAEntity);
 
     bigIntegerIdJPAEntity = new BigIntegerIdJPAEntity();
-    bigIntegerIdJPAEntity.setBigIntegerId(new BigInteger("12345678912345678912345678900000"));
+    bigIntegerIdJPAEntity.setBigIntegerId(new BigInteger(Integer.toString((int) Math.pow(2, Integer.MAX_VALUE))));
     manager.persist(bigIntegerIdJPAEntity);
 
     manager.flush();
