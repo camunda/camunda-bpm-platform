@@ -143,9 +143,9 @@
       </dependencies>
     </profile>
     <profile>
-      <id>jdk-8-test-excludes</id>
+      <id>jdk-8-and-onwards-test-excludes</id>
       <activation>
-        <jdk>1.8</jdk>
+        <jdk>[1.8,</jdk>
       </activation>
       <build>
         <plugins>
@@ -159,6 +159,26 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>jdk9-and-onwards</id>
+      <activation>
+        <jdk>[9,</jdk>
+      </activation>
+
+      <dependencies>
+        <dependency>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 
