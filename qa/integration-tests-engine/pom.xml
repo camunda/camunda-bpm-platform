@@ -226,9 +226,6 @@
 
     <profile>
       <id>jboss</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
@@ -256,7 +253,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-enforcer-plugin</artifactId>
-            <version>1.3.1</version>
+            <version>3.0.0-M1</version>
             <executions>
               <execution>
                 <id>enforce-java</id>
@@ -465,6 +462,9 @@
 
     <profile>
       <id>wildfly11</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <container.adapter.groupId>org.wildfly.arquillian</container.adapter.groupId>
         <container.adapter.version>2.1.0.Final</container.adapter.version>

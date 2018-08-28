@@ -87,6 +87,12 @@
           <artifactId>wildfly-server</artifactId>
           <version>${version.wildfly}</version>
           <scope>provided</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>sun.jdk</groupId>
+              <artifactId>jconsole</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
         <dependency>
           <groupId>org.wildfly</groupId>
