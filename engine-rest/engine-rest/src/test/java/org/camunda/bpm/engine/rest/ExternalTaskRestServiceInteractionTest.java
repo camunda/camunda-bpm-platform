@@ -400,7 +400,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testLocalVariables() {
     // given
     when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
@@ -840,7 +839,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
 
-    verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode");
+    verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode", null, null);
     verifyNoMoreInteractions(externalTaskService);
   }
 
@@ -889,7 +888,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleBpmnErrorNonExistingTask() {
     doThrow(new NotFoundException())
       .when(externalTaskService)
-      .handleBpmnError(any(String.class), any(String.class), any(String.class));
+      .handleBpmnError(any(String.class), any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
@@ -912,7 +911,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleBpmnErrorThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
       .when(externalTaskService)
-      .handleBpmnError(any(String.class), any(String.class), any(String.class));
+      .handleBpmnError(any(String.class), any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
@@ -935,7 +934,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleBpmnErrorThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
       .when(externalTaskService)
-      .handleBpmnError(any(String.class), any(String.class), any(String.class));
+      .handleBpmnError(any(String.class), any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
