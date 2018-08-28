@@ -1543,13 +1543,14 @@ public class BpmnParse extends Parse {
       activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
     }
 
-    for (BpmnParseListener parseListener : parseListeners) {
-      parseListener.parseIntermediateThrowEvent(intermediateEventElement, scopeElement, nestedActivityImpl);
-    }
-
+    // CAM-9300 attach activity behaviour and execution listeners before executing parseListeners
     nestedActivityImpl.setActivityBehavior(activityBehavior);
 
     parseExecutionListenersOnScope(intermediateEventElement, nestedActivityImpl);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseIntermediateThrowEvent(intermediateEventElement, scopeElement, nestedActivityImpl);
+    }
 
     return nestedActivityImpl;
   }
