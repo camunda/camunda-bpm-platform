@@ -66,8 +66,7 @@
         <module>engine-plugins</module>
 
         <module>distro/license-book</module>
-        <module>distro/jbossas7/webapp</module>
-        <module>distro/jbossas7/webapp-standalone</module>
+        <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
 
@@ -85,8 +84,7 @@
       </activation>
       <modules>
         <module>distro/license-book</module>
-        <module>distro/jbossas7/webapp</module>
-        <module>distro/jbossas7/webapp-standalone</module>
+        <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
       </modules>
     </profile>
@@ -117,6 +115,9 @@
 
     <profile>
       <id>distro-jbossas7</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <modules>
         <module>javaee/ejb-client</module>
         <module>distro/license-book</module>
