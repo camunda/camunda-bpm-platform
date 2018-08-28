@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -27,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -143,6 +144,8 @@ public class BatchRestartAuthorizationTest {
       }
     }
     // then
-    authRule.assertScenario(scenario);
+    if (authRule.assertScenario(scenario)) {
+      assertEquals("userId", batch.getCreateUserId());
+    }
   }
 }

@@ -56,6 +56,7 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   protected ByteArrayField configuration = new ByteArrayField(this);
 
   protected String tenantId;
+  protected String createUserId;
 
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
@@ -150,6 +151,14 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getCreateUserId() {
+    return createUserId;
+  }
+
+  public void setCreateUserId(String createUserId) {
+    this.createUserId = createUserId;
   }
 
   public String getConfiguration() {

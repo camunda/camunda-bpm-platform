@@ -285,6 +285,7 @@ create table ACT_RU_BATCH (
   SUSPENSION_STATE_ tinyint,
   CONFIGURATION_ nvarchar(255),
   TENANT_ID_ nvarchar(64),
+  CREATE_USER_ID_ nvarchar(255),
   primary key (ID_)
 );
 

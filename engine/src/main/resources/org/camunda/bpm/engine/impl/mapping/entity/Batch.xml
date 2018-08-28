@@ -20,6 +20,7 @@
       BATCH_JOB_DEF_ID_,
       CONFIGURATION_,
       TENANT_ID_,
+      CREATE_USER_ID_,
       SUSPENSION_STATE_,
       REV_
     )
@@ -36,6 +37,7 @@
       #{batchJobDefinitionId, jdbcType=VARCHAR},
       #{configuration ,jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
+      #{createUserId, jdbcType=VARCHAR},
       #{suspensionState, jdbcType=INTEGER},
       1
     )
@@ -56,6 +58,7 @@
     <result property="batchJobDefinitionId" column="BATCH_JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
   </resultMap>
 

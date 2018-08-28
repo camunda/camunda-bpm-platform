@@ -31,6 +31,7 @@ public class MockBatchBuilder {
   protected String batchJobDefinitionId;
   protected boolean suspended;
   protected String tenantId;
+  protected String createUserId;
 
   public MockBatchBuilder id(String id) {
     this.id = id;
@@ -87,6 +88,11 @@ public class MockBatchBuilder {
     return this;
   }
 
+  public MockBatchBuilder createUserId(String createUserId) {
+    this.createUserId = createUserId;
+    return this;
+  }
+
   public Batch build() {
     Batch batch = mock(Batch.class);
     when(batch.getId()).thenReturn(id);
@@ -100,6 +106,7 @@ public class MockBatchBuilder {
     when(batch.getBatchJobDefinitionId()).thenReturn(batchJobDefinitionId);
     when(batch.isSuspended()).thenReturn(suspended);
     when(batch.getTenantId()).thenReturn(tenantId);
+    when(batch.getCreateUserId()).thenReturn(createUserId);
     return batch;
   }
 

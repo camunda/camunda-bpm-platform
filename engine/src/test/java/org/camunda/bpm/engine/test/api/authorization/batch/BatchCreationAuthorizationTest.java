@@ -50,6 +50,7 @@ import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Askar Akhmerov
@@ -140,7 +141,7 @@ public class BatchCreationAuthorizationTest {
     // then
     authRule.assertScenario(scenario);
   }
-  
+
   @Test
   public void createBatchModification() {
     //given
@@ -163,7 +164,10 @@ public class BatchCreationAuthorizationTest {
     engineRule.getRuntimeService().createModification(processDefinition.getId()).startAfterActivity("user1").processInstanceIds(instances).executeAsync();
 
     // then
-    authRule.assertScenario(scenario);
+    if (authRule.assertScenario(scenario)) {
+      Batch batch = engineRule.getManagementService().createBatchQuery().singleResult();
+      assertEquals("userId", batch.getCreateUserId());
+    }
   }
 
   @Test

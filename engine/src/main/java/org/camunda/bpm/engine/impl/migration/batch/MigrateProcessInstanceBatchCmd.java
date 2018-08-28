@@ -108,7 +108,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
     batch.setTenantId(sourceProcessDefinition.getTenantId());
-    commandContext.getBatchManager().insert(batch);
+    commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
   }

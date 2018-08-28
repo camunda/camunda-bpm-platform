@@ -31,6 +31,8 @@ create index ACT_IDX_HI_PRO_INST_RM_TIME on ACT_HI_PROCINST(REMOVAL_TIME_);
 -- https://app.camunda.com/jira/browse/CAM-9230
 ALTER TABLE ACT_HI_BATCH
   ADD CREATE_USER_ID_ varchar(255);
+ALTER TABLE ACT_RU_BATCH
+  ADD CREATE_USER_ID_ varchar(255);
 
 -- https://app.camunda.com/jira/browse/CAM-9270
 ALTER TABLE ACT_HI_DECINST

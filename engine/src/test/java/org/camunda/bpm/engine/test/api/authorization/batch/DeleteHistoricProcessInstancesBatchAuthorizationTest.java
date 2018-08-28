@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -145,6 +146,9 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
 
   protected void assertScenario() {
     if (authRule.assertScenario(getScenario())) {
+      Batch batch = engineRule.getManagementService().createBatchQuery().singleResult();
+      assertEquals("userId", batch.getCreateUserId());
+
       if (testHelper.isHistoryLevelFull()) {
         assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(BATCH_OPERATIONS));
         HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().list().get(0);

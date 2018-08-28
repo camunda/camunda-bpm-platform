@@ -83,7 +83,7 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
     batch.setTenantId(processDefinition.getTenantId());
-    commandContext.getBatchManager().insert(batch);
+    commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
   }

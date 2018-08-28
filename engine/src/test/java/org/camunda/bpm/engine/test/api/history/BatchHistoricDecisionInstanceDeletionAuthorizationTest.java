@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.api.history;
 
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -157,6 +158,8 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
       }
     }
     // then
-    authRule.assertScenario(scenario);
+    if (authRule.assertScenario(scenario)) {
+      assertEquals("userId", batch.getCreateUserId());
+    }
   }
 }

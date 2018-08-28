@@ -154,6 +154,8 @@ public class MigrateProcessInstanceAsyncTest {
 
     // then
     if (authRule.assertScenario(scenario)) {
+      Assert.assertEquals("userId", batch.getCreateUserId());
+
       Assert.assertEquals(1, engineRule.getManagementService().createBatchQuery().count());
     }
 

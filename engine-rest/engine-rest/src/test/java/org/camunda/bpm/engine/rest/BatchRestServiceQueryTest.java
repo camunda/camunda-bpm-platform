@@ -275,6 +275,7 @@ public class BatchRestServiceQueryTest extends AbstractRestServiceTest {
     assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
+    assertEquals(MockProvider.EXAMPLE_USER_ID, batch.getCreateUserId());
     assertTrue(batch.isSuspended());
   }
 

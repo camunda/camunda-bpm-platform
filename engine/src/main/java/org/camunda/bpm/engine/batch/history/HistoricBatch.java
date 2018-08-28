@@ -65,7 +65,7 @@ public interface HistoricBatch {
   String getTenantId();
 
   /**
-   * @return the batch's create user id
+   * @return the batch creator's user id
    */
   String getCreateUserId();
 

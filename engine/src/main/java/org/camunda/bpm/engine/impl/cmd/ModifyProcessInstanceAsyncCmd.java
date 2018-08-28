@@ -97,7 +97,7 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
     batch.setTenantId(tenantId);
-    commandContext.getBatchManager().insert(batch);
+    commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
   }

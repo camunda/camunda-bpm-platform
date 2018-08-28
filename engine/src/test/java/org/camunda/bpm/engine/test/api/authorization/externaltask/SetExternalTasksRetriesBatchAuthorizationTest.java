@@ -164,6 +164,8 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
 
     // then
     if (authRule.assertScenario(scenario)) {
+      Assert.assertEquals("userId", batch.getCreateUserId());
+
       externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
       for ( ExternalTask task : externalTasks) {
         Assert.assertEquals(5, (int) task.getRetries());

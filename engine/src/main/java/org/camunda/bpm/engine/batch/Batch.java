@@ -92,6 +92,11 @@ public interface Batch {
   String getTenantId();
 
   /**
+   * @return the batch creator's user id
+   */
+  String getCreateUserId();
+
+  /**
    * <p>
    * Indicates whether this batch is suspended. If a batch is suspended,
    * the batch jobs will not be acquired by the job executor.

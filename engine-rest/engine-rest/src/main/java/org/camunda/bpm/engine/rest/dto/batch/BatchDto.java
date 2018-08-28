@@ -28,6 +28,7 @@ public class BatchDto {
   protected String batchJobDefinitionId;
   protected boolean suspended;
   protected String tenantId;
+  protected String createUserId;
 
   public String getId() {
     return id;
@@ -73,6 +74,10 @@ public class BatchDto {
     return tenantId;
   }
 
+  public String getCreateUserId() {
+    return createUserId;
+  }
+
   public static BatchDto fromBatch(Batch batch) {
     BatchDto dto = new BatchDto();
     dto.id = batch.getId();
@@ -86,6 +91,7 @@ public class BatchDto {
     dto.batchJobDefinitionId = batch.getBatchJobDefinitionId();
     dto.suspended = batch.isSuspended();
     dto.tenantId = batch.getTenantId();
+    dto.createUserId = batch.getCreateUserId();
     return dto;
   }
 
