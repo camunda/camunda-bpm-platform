@@ -854,10 +854,12 @@ public class BpmnParse extends Parse {
 
       ensureNoIoMappingDefined(startEventElement);
 
+      parseExecutionListenersOnScope(startEventElement, startEventActivity);
+
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
       }
-      parseExecutionListenersOnScope(startEventElement, startEventActivity);
+
     }
 
     if (scope instanceof ProcessDefinitionEntity) {
@@ -1433,11 +1435,11 @@ public class BpmnParse extends Parse {
       addError("Unsupported intermediate catch event type", intermediateEventElement);
     }
 
+    parseExecutionListenersOnScope(intermediateEventElement, nestedActivity);
+
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseIntermediateCatchEvent(intermediateEventElement, scopeElement, nestedActivity);
     }
-
-    parseExecutionListenersOnScope(intermediateEventElement, nestedActivity);
 
     return nestedActivity;
   }
@@ -1543,13 +1545,13 @@ public class BpmnParse extends Parse {
       activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
     }
 
-    for (BpmnParseListener parseListener : parseListeners) {
-      parseListener.parseIntermediateThrowEvent(intermediateEventElement, scopeElement, nestedActivityImpl);
-    }
-
     nestedActivityImpl.setActivityBehavior(activityBehavior);
 
     parseExecutionListenersOnScope(intermediateEventElement, nestedActivityImpl);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseIntermediateThrowEvent(intermediateEventElement, scopeElement, nestedActivityImpl);
+    }
 
     return nestedActivityImpl;
   }
@@ -2933,11 +2935,12 @@ public class BpmnParse extends Parse {
 
       parseAsynchronousContinuationForActivity(endEventElement, activity);
 
+      parseExecutionListenersOnScope(endEventElement, activity);
+
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseEndEvent(endEventElement, scope, activity);
       }
 
-      parseExecutionListenersOnScope(endEventElement, activity);
     }
   }
 
@@ -3055,13 +3058,14 @@ public class BpmnParse extends Parse {
 
       ensureNoIoMappingDefined(boundaryEventElement);
 
+      boundaryEventActivity.setActivityBehavior(behavior);
+
+      parseExecutionListenersOnScope(boundaryEventElement, boundaryEventActivity);
+
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseBoundaryEvent(boundaryEventElement, flowScope, boundaryEventActivity);
       }
 
-      boundaryEventActivity.setActivityBehavior(behavior);
-
-      parseExecutionListenersOnScope(boundaryEventElement, boundaryEventActivity);
     }
 
   }

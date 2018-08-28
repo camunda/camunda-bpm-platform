@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.test.standalone.deploy;
 
-
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-
 
 /**
  * @author Frederik Heremans
@@ -32,5 +34,21 @@ public class BPMNParseListenerTest extends ResourceProcessEngineTestCase {
     // Check if process-definition has different key
     assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
     assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
+  }
+
+  @Deployment
+  public void testAlterActivityBehaviors() throws Exception {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithIntermediateThrowEvent-modified");
+    ProcessDefinitionImpl processDefinition = ((ProcessInstanceWithVariablesImpl) processInstance).getExecutionEntity().getProcessDefinition();
+
+    ActivityImpl cancelThrowEvent = processDefinition.findActivity("CancelthrowEvent");
+    assertTrue(cancelThrowEvent.getActivityBehavior() instanceof TestBPMNParseListener.TestCompensationEventActivityBehavior);
+
+    ActivityImpl startEvent = processDefinition.findActivity("theStart");
+    assertTrue(startEvent.getActivityBehavior() instanceof TestBPMNParseListener.TestNoneStartEventActivityBehavior);
+
+    ActivityImpl endEvent = processDefinition.findActivity("theEnd");
+    assertTrue(endEvent.getActivityBehavior() instanceof TestBPMNParseListener.TestNoneEndEventActivityBehavior);
   }
 }
