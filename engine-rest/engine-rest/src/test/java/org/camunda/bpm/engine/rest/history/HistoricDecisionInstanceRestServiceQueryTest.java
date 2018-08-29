@@ -235,6 +235,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     String returnedDecisionDefinitionKey = from(content).getString("[0].decisionDefinitionKey");
     String returnedDecisionDefinitionName = from(content).getString("[0].decisionDefinitionName");
     String returnedEvaluationTime = from(content).getString("[0].evaluationTime");
+    String returnedRemovalTime = from(content).getString("[0].removalTime");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
@@ -248,6 +249,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     Double returnedCollectResultValue = from(content).getDouble("[0].collectResultValue");
     String returnedTenantId = from(content).getString("[0].tenantId");
     String returnedRootDecisionInstanceId = from(content).getString("[0].rootDecisionInstanceId");
+    String returnedRootProcessInstanceId = from(content).getString("[0].rootProcessInstanceId");
     String returnedDecisionRequirementsDefinitionId = from(content).getString("[0].decisionRequirementsDefinitionId");
     String returnedDecisionRequirementsDefinitionKey = from(content).getString("[0].decisionRequirementsDefinitionKey");
 
@@ -256,6 +258,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     assertThat(returnedDecisionDefinitionKey, is(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY));
     assertThat(returnedDecisionDefinitionName, is(MockProvider.EXAMPLE_DECISION_DEFINITION_NAME));
     assertThat(returnedEvaluationTime, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));
+    assertThat(returnedRemovalTime, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_REMOVAL_TIME));
     assertThat(returnedProcessDefinitionId, is(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
     assertThat(returnedProcessDefinitionKey, is(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY));
     assertThat(returnedProcessInstanceId, is(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
@@ -269,6 +272,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     assertThat(returnedCollectResultValue, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE));
     assertThat(returnedTenantId, is(MockProvider.EXAMPLE_TENANT_ID));
     assertThat(returnedRootDecisionInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID));
+    assertThat(returnedRootProcessInstanceId, is(MockProvider.EXAMPLE_ROOT_HISTORIC_PROCESS_INSTANCE_ID));
     assertThat(returnedDecisionRequirementsDefinitionId, is(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID));
     assertThat(returnedDecisionRequirementsDefinitionKey, is(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY));
   }

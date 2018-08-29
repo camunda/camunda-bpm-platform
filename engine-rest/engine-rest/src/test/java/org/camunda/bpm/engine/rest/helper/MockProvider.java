@@ -201,6 +201,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY = "aKey";
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE = "aKeyLike";
   public static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcInstId";
+  public static final String EXAMPLE_ROOT_HISTORIC_PROCESS_INSTANCE_ID = "aRootProcInstId";
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
@@ -474,8 +475,10 @@ public abstract class MockProvider {
   public static final long EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS = 2000l;
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME = withTimezone("2013-04-23T13:42:43");
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_REMOVAL_TIME = withTimezone("2013-04-26T13:42:43");
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID = "aStartUserId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID = "aStartActivityId";
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_ROOT_PROCESS_INSTANCE_ID = "aRootProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID = "aSuperProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID = "aSuperCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_PROCESS_INSTANCE_ID = "aSubProcessInstanceId";
@@ -790,6 +793,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID = "aHistoricDecisionInstanceActivityInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID_IN = "aHistoricDecisionInstanceActivityInstanceId,anotherHistoricDecisionInstanceActivityInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME = withTimezone("2015-09-07T11:00:00");
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_REMOVAL_TIME = withTimezone("2015-09-10T11:00:00");
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE = withTimezone("2015-09-08T11:00:00");
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_AFTER = withTimezone("2015-09-06T11:00:00");
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID = "aUserId";
@@ -1954,11 +1958,13 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionVersion()).thenReturn(EXAMPLE_PROCESS_DEFINITION_VERSION);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
+    when(mock.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_REMOVAL_TIME));
     when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME));
     when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME));
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     when(mock.getStartUserId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID);
     when(mock.getStartActivityId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID);
+    when(mock.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_ROOT_PROCESS_INSTANCE_ID);
     when(mock.getSuperProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
     when(mock.getSuperCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID);
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
@@ -2766,9 +2772,11 @@ public abstract class MockProvider {
     when(mock.getActivityId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID);
     when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID);
     when(mock.getEvaluationTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));
+    when(mock.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INSTANCE_REMOVAL_TIME));
     when(mock.getUserId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID);
     when(mock.getCollectResultValue()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE);
     when(mock.getRootDecisionInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    when(mock.getRootProcessInstanceId()).thenReturn(EXAMPLE_ROOT_HISTORIC_PROCESS_INSTANCE_ID);
     when(mock.getDecisionRequirementsDefinitionId()).thenReturn(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
     when(mock.getDecisionRequirementsDefinitionKey()).thenReturn(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY);
     when(mock.getTenantId()).thenReturn(tenantId);

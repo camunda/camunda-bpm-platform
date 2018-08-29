@@ -399,10 +399,12 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     int returnedProcessDefinitionVersion= from(content).getInt("[0].processDefinitionVersion");
     String returnedStartTime = from(content).getString("[0].startTime");
     String returnedEndTime = from(content).getString("[0].endTime");
+    String returnedRemovalTime = from(content).getString("[0].removalTime");
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
     String returnedStartUserId = from(content).getString("[0].startUserId");
     String returnedStartActivityId = from(content).getString("[0].startActivityId");
     String returnedDeleteReason = from(content).getString("[0].deleteReason");
+    String returnedRootProcessInstanceId = from(content).getString("[0].rootProcessInstanceId");
     String returnedSuperProcessInstanceId = from(content).getString("[0].superProcessInstanceId");
     String returnedSuperCaseInstanceId = from(content).getString("[0].superCaseInstanceId");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
@@ -417,10 +419,12 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, returnedProcessDefinitionVersion);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME, returnedStartTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME, returnedEndTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_REMOVAL_TIME, returnedRemovalTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID, returnedStartUserId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID, returnedStartActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON, returnedDeleteReason);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_ROOT_PROCESS_INSTANCE_ID, returnedRootProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID, returnedCaseInstanceId);

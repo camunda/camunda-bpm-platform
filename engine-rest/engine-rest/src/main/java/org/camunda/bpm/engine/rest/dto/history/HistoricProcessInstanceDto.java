@@ -25,10 +25,12 @@ public class HistoricProcessInstanceDto {
   private Integer processDefinitionVersion;
   private Date startTime;
   private Date endTime;
+  private Date removalTime;
   private Long durationInMillis;
   private String startUserId;
   private String startActivityId;
   private String deleteReason;
+  private String rootProcessInstanceId;
   private String superProcessInstanceId;
   private String superCaseInstanceId;
   private String caseInstanceId;
@@ -107,6 +109,22 @@ public class HistoricProcessInstanceDto {
     this.state = state;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public static HistoricProcessInstanceDto fromHistoricProcessInstance(HistoricProcessInstance historicProcessInstance) {
 
     HistoricProcessInstanceDto dto = new HistoricProcessInstanceDto();
@@ -119,10 +137,12 @@ public class HistoricProcessInstanceDto {
     dto.processDefinitionVersion = historicProcessInstance.getProcessDefinitionVersion();
     dto.startTime = historicProcessInstance.getStartTime();
     dto.endTime = historicProcessInstance.getEndTime();
+    dto.removalTime = historicProcessInstance.getRemovalTime();
     dto.durationInMillis = historicProcessInstance.getDurationInMillis();
     dto.startUserId = historicProcessInstance.getStartUserId();
     dto.startActivityId = historicProcessInstance.getStartActivityId();
     dto.deleteReason = historicProcessInstance.getDeleteReason();
+    dto.rootProcessInstanceId = historicProcessInstance.getRootProcessInstanceId();
     dto.superProcessInstanceId = historicProcessInstance.getSuperProcessInstanceId();
     dto.superCaseInstanceId = historicProcessInstance.getSuperCaseInstanceId();
     dto.caseInstanceId = historicProcessInstance.getCaseInstanceId();
