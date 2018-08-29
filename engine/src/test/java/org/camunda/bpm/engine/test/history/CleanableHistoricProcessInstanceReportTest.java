@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
@@ -380,8 +379,6 @@ public class CleanableHistoricProcessInstanceReportTest {
     List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
       .createCleanableHistoricProcessInstanceReport()
       .processDefinitionKeyIn(HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY, HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY)
-      .orderByFinished()
-      .desc()
       .list();
 
     List<CleanableHistoricDecisionInstanceReportResult> decisionReportResult = historyService
@@ -391,8 +388,6 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     // then
     assertEquals(2, reportResult.size());
-    assertEquals(HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY, reportResult.get(0).getProcessDefinitionKey());
-    assertEquals(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, reportResult.get(1).getProcessDefinitionKey());
 
     assertEquals(3, decisionReportResult.size());
   }
