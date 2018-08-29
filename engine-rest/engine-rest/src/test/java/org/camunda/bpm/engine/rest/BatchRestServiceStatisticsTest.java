@@ -300,6 +300,7 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batchStatistics.getMonitorJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batchStatistics.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batchStatistics.getTenantId());
+    assertEquals(MockProvider.EXAMPLE_USER_ID, batchStatistics.getCreateUserId());
     assertEquals(MockProvider.EXAMPLE_BATCH_REMAINING_JOBS, batchStatistics.getRemainingJobs());
     assertEquals(MockProvider.EXAMPLE_BATCH_COMPLETED_JOBS, batchStatistics.getCompletedJobs());
     assertEquals(MockProvider.EXAMPLE_BATCH_FAILED_JOBS, batchStatistics.getFailedJobs());

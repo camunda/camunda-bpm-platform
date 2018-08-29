@@ -26,9 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class BatchManager extends AbstractManager {
 
   public void insertBatch(BatchEntity batch) {
-    if (getAuthorizationManager().isAuthorizationEnabled()) {
-      batch.setCreateUserId(getCommandContext().getAuthenticatedUserId());
-    }
+    batch.setCreateUserId(getCommandContext().getAuthenticatedUserId());
     getDbEntityManager().insert(batch);
   }
 

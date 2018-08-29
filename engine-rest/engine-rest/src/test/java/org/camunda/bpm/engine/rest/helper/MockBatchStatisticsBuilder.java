@@ -30,6 +30,7 @@ public class MockBatchStatisticsBuilder {
   protected String monitorJobDefinitionId;
   protected String batchJobDefinitionId;
   protected String tenantId;
+  protected String createUserId;
   protected int remainingJobs;
   protected int completedJobs;
   protected int failedJobs;
@@ -85,6 +86,11 @@ public class MockBatchStatisticsBuilder {
     return this;
   }
 
+  public MockBatchStatisticsBuilder createUserId(String createUserId) {
+    this.createUserId = createUserId;
+    return this;
+  }
+
   public MockBatchStatisticsBuilder remainingJobs(int remainingJobs) {
     this.remainingJobs = remainingJobs;
     return this;
@@ -117,6 +123,7 @@ public class MockBatchStatisticsBuilder {
     when(batchStatistics.getMonitorJobDefinitionId()).thenReturn(monitorJobDefinitionId);
     when(batchStatistics.getBatchJobDefinitionId()).thenReturn(batchJobDefinitionId);
     when(batchStatistics.getTenantId()).thenReturn(tenantId);
+    when(batchStatistics.getCreateUserId()).thenReturn(createUserId);
     when(batchStatistics.getRemainingJobs()).thenReturn(remainingJobs);
     when(batchStatistics.getCompletedJobs()).thenReturn(completedJobs);
     when(batchStatistics.getFailedJobs()).thenReturn(failedJobs);
