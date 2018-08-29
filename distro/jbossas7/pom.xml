@@ -18,7 +18,7 @@
     <profile>
       <id>distro</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <jdk>,1.8]</jdk>
       </activation>
       <modules>
         <module>assembly</module>
@@ -29,10 +29,20 @@
     <profile>
       <id>distro-ce</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <jdk>,1.8]</jdk>
       </activation>
       <modules>
         <module>distro</module>
+        <module>webapp</module>
+        <module>webapp-standalone</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>jdk-9-and-onwards</id>
+      <activation>
+        <jdk>[9,</jdk>
+      </activation>
+      <modules>
         <module>webapp</module>
         <module>webapp-standalone</module>
       </modules>
