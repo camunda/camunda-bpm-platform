@@ -370,6 +370,10 @@ public class CleanableHistoricProcessInstanceReportTest {
     testRule.deploy(DRG_DMN);
     testRule.deploy(createHierarchicalProcessWithDmn(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY));
 
+    updateDecisionDefinitionHistoryTTL("dish-decision", 5);
+    updateDecisionDefinitionHistoryTTL("feels", 5);
+    updateDecisionDefinitionHistoryTTL("guestCount", 5);
+
     prepareProcessInstances(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, -3, 2, 1,
       Variables.createVariables().putValue("temperature", 21).putValue("dayType", "WeekDay"));
 
@@ -383,8 +387,6 @@ public class CleanableHistoricProcessInstanceReportTest {
     List<CleanableHistoricDecisionInstanceReportResult> decisionReportResult = historyService
       .createCleanableHistoricDecisionInstanceReport()
       .decisionDefinitionKeyIn("guestCount", "feels", "dish-decision")
-      .orderByFinished()
-      .desc()
       .list();
 
     // then
@@ -393,8 +395,13 @@ public class CleanableHistoricProcessInstanceReportTest {
     assertEquals(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, reportResult.get(1).getProcessDefinitionKey());
 
     assertEquals(3, decisionReportResult.size());
-    assertEquals("dish-decision", decisionReportResult.get(0).getDecisionDefinitionKey());
-    assertEquals("feels", decisionReportResult.get(1).getDecisionDefinitionKey());
-    assertEquals("guestCount", decisionReportResult.get(2).getDecisionDefinitionKey());
+  }
+
+  private void updateDecisionDefinitionHistoryTTL(String decisionDefinitionKey, int newHistoryTimeToLive) {
+    String definitionId = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey(decisionDefinitionKey)
+      .singleResult()
+      .getId();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(definitionId, newHistoryTimeToLive);
   }
 }

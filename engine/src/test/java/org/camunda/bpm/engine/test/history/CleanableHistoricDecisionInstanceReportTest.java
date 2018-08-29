@@ -310,15 +310,10 @@ public class CleanableHistoricDecisionInstanceReportTest {
     List<CleanableHistoricDecisionInstanceReportResult> decisionReportResult = historyService
       .createCleanableHistoricDecisionInstanceReport()
       .decisionDefinitionKeyIn("guestCount", "feels", "dish-decision")
-      .orderByFinished()
-      .desc()
       .list();
 
     // then
     assertEquals(3, decisionReportResult.size());
-    assertEquals(ROOT_DMN_DEFINITION_KEY, decisionReportResult.get(0).getDecisionDefinitionKey());
-    assertEquals("feels", decisionReportResult.get(1).getDecisionDefinitionKey());
-    assertEquals("guestCount", decisionReportResult.get(2).getDecisionDefinitionKey());
   }
 
   private void updateDecisionDefinitionHistoryTTL(String decisionDefinitionKey, int newHistoryTimeToLive) {
