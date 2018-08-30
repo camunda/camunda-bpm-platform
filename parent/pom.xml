@@ -463,7 +463,7 @@
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-XX:MaxPermSize=160m -Xmx968m</argLine>
+            <argLine>-XX:MaxPermSize=384m -Xmx1536m -Duser.language=en -Duser.region=US</argLine>
           </configuration>
         </plugin>
         <plugin>
