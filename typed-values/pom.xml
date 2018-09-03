@@ -34,6 +34,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>javax.activation</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -71,6 +77,26 @@
               <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
               <failOnWarning>true</failOnWarning>
               <ignoredDifferencesFile>.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+              <artifactSet>
+                <includes>
+                  <include>com.sun.activation:javax.activation</include>
+                </includes>
+              </artifactSet>
             </configuration>
           </execution>
         </executions>
