@@ -145,7 +145,7 @@
     <profile>
       <id>jdk-8-and-onwards-test-excludes</id>
       <activation>
-        <jdk>[1.8,</jdk>
+        <jdk>[1.8,)</jdk>
       </activation>
       <build>
         <plugins>
@@ -163,7 +163,7 @@
     <profile>
       <id>jdk9-and-onwards</id>
       <activation>
-        <jdk>[9,</jdk>
+        <jdk>[9,)</jdk>
       </activation>
 
       <dependencies>
