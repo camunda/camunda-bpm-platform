@@ -4,15 +4,16 @@ import org.apache.commons.lang.StringUtils;
 import org.camunda.bpm.spring.boot.starter.annotation.EnableProcessApplication;
 import org.springframework.context.ApplicationContext;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
-
-import static org.apache.catalina.manager.StatusTransformer.filter;
 
 public class GetProcessApplicationNameFromAnnotation implements Supplier<Optional<String>>, UnaryOperator<Optional<String>> {
 
