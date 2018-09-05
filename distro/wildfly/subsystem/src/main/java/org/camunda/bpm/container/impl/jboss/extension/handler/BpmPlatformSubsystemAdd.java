@@ -24,7 +24,6 @@ import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
@@ -50,8 +49,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
   /** {@inheritDoc} */
   @Override
-  protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler,
-          List<ServiceController< ? >> newControllers) throws OperationFailedException {
+  protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
 
     // add deployment processors
     context.addStep(new AbstractDeploymentChainStep() {
@@ -69,11 +67,8 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     final ServiceController<MscRuntimeContainerDelegate> controller = context.getServiceTarget()
             .addService(ServiceNames.forMscRuntimeContainerDelegate(), processEngineService)
-            .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();
-
-    newControllers.add(controller);
 
     // discover and register bpm platform plugins
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
@@ -81,11 +76,8 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     ServiceController<BpmPlatformPlugins> serviceController = context.getServiceTarget()
       .addService(ServiceNames.forBpmPlatformPlugins(), managedPlugins)
-      .addListener(verificationHandler)
       .setInitialMode(Mode.ACTIVE)
       .install();
-
-    newControllers.add(serviceController);
   }
 
 }

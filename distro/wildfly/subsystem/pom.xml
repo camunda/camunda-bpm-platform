@@ -211,6 +211,33 @@
         </dependency>
       </dependencies>
     </profile>
-  </profiles>
+    <profile>
+      <id>wildfly14</id>
+      <properties>
+        <version.wildfly14>14.0.0.Final</version.wildfly14>
+        <version.wildfly14.core>5.0.0.Final</version.wildfly14.core>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-web-common</artifactId>
+          <version>${version.wildfly14}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-ejb3</artifactId>
+          <version>${version.wildfly14}</version>
+          <scope>provided</scope>
+        </dependency>
 
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
+          <artifactId>wildfly-subsystem-test-framework</artifactId>
+          <version>${version.wildfly14.core}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>
