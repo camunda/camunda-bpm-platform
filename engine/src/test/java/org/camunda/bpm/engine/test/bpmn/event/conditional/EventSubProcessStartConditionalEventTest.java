@@ -15,16 +15,17 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -1284,5 +1285,46 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/EventSubProcessStartConditionalEventTest.testVariableCondition.bpmn20.xml")
+  public void testVariableConditionWithHistory() {
+    // given process with event sub process conditional start event
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY,
+        Variables.createVariables()
+        .putValue(VARIABLE_NAME, 1)
+        .putValue("donotloseme", "here"));
+
+    // assume
+    tasksAfterVariableIsSet = taskService.createTaskQuery().processInstanceId(procInst.getId()).list();
+    assertEquals(1, tasksAfterVariableIsSet.size());
+
+    // then
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName(VARIABLE_NAME).count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("donotloseme").count());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment
+  public void testNonInterruptingVariableConditionWithHistory() {
+    // given process with event sub process conditional start event
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY,
+        Variables.createVariables()
+        .putValue(VARIABLE_NAME, 1)
+        .putValue("donotloseme", "here"));
+
+    // assume
+    tasksAfterVariableIsSet = taskService.createTaskQuery().processInstanceId(procInst.getId()).list();
+    assertEquals(2, tasksAfterVariableIsSet.size());
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+    // then
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName(VARIABLE_NAME).count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("donotloseme").count());
   }
 }

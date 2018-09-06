@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableInstance.Si
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
-import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -104,6 +103,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     // make created execution start in same activity instance
     createdExecution.activityInstanceId = activityInstanceId;
 
+    // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
     if (initializeExecutionStartContext) {
       createdExecution.setStartContext(new ExecutionStartContext());
     } else if (startContext != null) {

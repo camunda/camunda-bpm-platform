@@ -267,6 +267,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       createdExecution.setTenantId(tenantId);
     }
 
+    // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
     if (initializeExecutionStartContext) {
       createdExecution.setStartContext(new ExecutionStartContext());
     } else if (startContext != null) {
