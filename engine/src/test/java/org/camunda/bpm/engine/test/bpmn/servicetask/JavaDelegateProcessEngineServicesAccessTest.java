@@ -37,6 +37,10 @@ public class JavaDelegateProcessEngineServicesAccessTest extends AbstractProcess
     return StartProcessJavaDelegate.class;
   }
 
+  protected Class<?> getProcessEngineStartProcessClass() {
+    return ProcessEngineStartProcessJavaDelegate.class;
+  }
+
   protected Task createModelAccessTask(BpmnModelInstance modelInstance, Class<?> delegateClass) {
     ServiceTask serviceTask = modelInstance.newInstance(ServiceTask.class);
     serviceTask.setId("serviceTask");
@@ -62,4 +66,9 @@ public class JavaDelegateProcessEngineServicesAccessTest extends AbstractProcess
     }
   }
 
+  public static class ProcessEngineStartProcessJavaDelegate implements JavaDelegate {
+    public void execute(DelegateExecution execution) throws Exception {
+      assertCanStartProcessInstance(execution.getProcessEngine());
+    }
+  }
 }

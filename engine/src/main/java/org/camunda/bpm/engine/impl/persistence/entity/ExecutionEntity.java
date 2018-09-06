@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -1948,4 +1949,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 
+  @Override
+  public ProcessEngine getProcessEngine() {
+    return Context.getProcessEngineConfiguration().getProcessEngine();
+  }
 }

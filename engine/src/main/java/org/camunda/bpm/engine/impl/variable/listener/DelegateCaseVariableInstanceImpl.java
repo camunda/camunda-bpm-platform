@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.variable.listener;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
@@ -137,6 +138,10 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
   }
 
   public ProcessEngineServices getProcessEngineServices() {
+    return Context.getProcessEngineConfiguration().getProcessEngine();
+  }
+
+  public ProcessEngine getProcessEngine() {
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 

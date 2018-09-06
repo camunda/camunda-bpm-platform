@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -262,6 +263,11 @@ public class DelegateEvent implements DelegateExecution {
 
   @Override
   public ProcessEngineServices getProcessEngineServices() {
+    throw notYetImplemented();
+  }
+
+  @Override
+  public ProcessEngine getProcessEngine() {
     throw notYetImplemented();
   }
 

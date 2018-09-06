@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
@@ -304,6 +305,10 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   }
 
   public ProcessEngineServices getProcessEngineServices() {
+    throw LOG.unsupportedTransientOperationException(ProcessEngineServicesAware.class.getName());
+  }
+
+  public ProcessEngine getProcessEngine() {
     throw LOG.unsupportedTransientOperationException(ProcessEngineServicesAware.class.getName());
   }
 

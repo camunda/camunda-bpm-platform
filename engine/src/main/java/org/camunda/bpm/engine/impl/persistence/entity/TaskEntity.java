@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -31,7 +32,6 @@ import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -1427,6 +1427,11 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public ProcessEngineServices getProcessEngineServices() {
     return Context.getProcessEngineConfiguration()
           .getProcessEngine();
+  }
+
+  @Override
+  public ProcessEngine getProcessEngine() {
+    return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 
   @Override

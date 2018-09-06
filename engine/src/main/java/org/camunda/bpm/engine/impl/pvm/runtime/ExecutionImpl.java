@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
@@ -328,6 +329,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   public ProcessEngineServices getProcessEngineServices() {
+    throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient ExecutionImpl");
+  }
+
+  public ProcessEngine getProcessEngine() {
     throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient ExecutionImpl");
   }
 

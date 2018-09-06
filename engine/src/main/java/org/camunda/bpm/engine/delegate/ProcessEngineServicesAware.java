@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.delegate;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 
 /**
@@ -26,9 +27,17 @@ public interface ProcessEngineServicesAware {
   /**
    * Returns the {@link ProcessEngineServices} providing access to the
    * public API of the process engine.
-   * 
+   *
    * @return the {@link ProcessEngineServices}.
    */
   ProcessEngineServices getProcessEngineServices();
+
+  /**
+   * Returns the {@link ProcessEngine} providing access to the
+   * public API of the process engine.
+   *
+   * @return the {@link ProcessEngine}.
+   */
+  ProcessEngine getProcessEngine();
 
 }

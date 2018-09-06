@@ -38,6 +38,10 @@ public class TaskListenerProcessEngineServicesAccessTest extends AbstractProcess
     return StartProcessListener.class;
   }
 
+  protected Class<?> getProcessEngineStartProcessClass() {
+    return ProcessEngineStartProcessListener.class;
+  }
+
   protected Task createModelAccessTask(BpmnModelInstance modelInstance, Class<?> delegateClass) {
     UserTask task = modelInstance.newInstance(UserTask.class);
     task.setId("userTask");
@@ -63,6 +67,13 @@ public class TaskListenerProcessEngineServicesAccessTest extends AbstractProcess
   public static class StartProcessListener implements TaskListener {
     public void notify(DelegateTask execution) {
       assertCanStartProcessInstance(execution.getProcessEngineServices());
+    }
+  }
+
+  public static class ProcessEngineStartProcessListener implements TaskListener {
+    @Override
+    public void notify(DelegateTask execution) {
+      assertCanStartProcessInstance(execution.getProcessEngine());
     }
   }
 

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -876,6 +877,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     return Context
         .getProcessEngineConfiguration()
         .getProcessEngine();
+  }
+
+  public ProcessEngine getProcessEngine() {
+    return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 
   public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
