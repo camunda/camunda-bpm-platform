@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
@@ -138,18 +139,42 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       return true;
     }
 
+    if (visitedActivities.contains(srcActivity)) {
+      return false;
+    }
+
     // To avoid infinite looping, we must capture every node we visit and
     // check before going further in the graph if we have already visited the node.
     visitedActivities.add(srcActivity);
 
     List<PvmTransition> outgoingTransitions = srcActivity.getOutgoingTransitions();
+
     if (outgoingTransitions.isEmpty()) {
-      ScopeImpl flowScope = srcActivity.getFlowScope();
-      if (flowScope == null || !(flowScope instanceof PvmActivity)) {
-        return false;
+
+      if (srcActivity.getActivityBehavior() instanceof EventBasedGatewayActivityBehavior) {
+
+        ActivityImpl eventBasedGateway = (ActivityImpl) srcActivity;
+        Set<ActivityImpl> eventActivities = eventBasedGateway.getEventActivities();
+
+        for (ActivityImpl eventActivity : eventActivities) {
+          boolean isReachable = isReachable(eventActivity, targetActivity, visitedActivities);
+
+          if (isReachable) {
+            return true;
+          }
+        }
+
+      }
+      else {
+
+        ScopeImpl flowScope = srcActivity.getFlowScope();
+        if (flowScope != null && flowScope instanceof PvmActivity) {
+          return isReachable((PvmActivity) flowScope, targetActivity, visitedActivities);
+        }
+
       }
 
-      return isReachable((PvmActivity) flowScope, targetActivity, visitedActivities);
+      return false;
     }
     else {
       for (PvmTransition pvmTransition : outgoingTransitions) {

@@ -676,4 +676,67 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
   }
 
+  @Deployment
+  public void testJoinAfterEventBasedGateway() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskQuery.singleResult();
+    taskService.complete(task.getId());
+
+    // assume
+    assertNull(taskQuery.singleResult());
+
+    // when
+    runtimeService.correlateMessage("foo");
+
+    // then
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
+  }
+
+  @Deployment
+  public void testJoinAfterEventBasedGatewayInSubProcess() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskQuery.singleResult();
+    taskService.complete(task.getId());
+
+    // assume
+    assertNull(taskQuery.singleResult());
+
+    // when
+    runtimeService.correlateMessage("foo");
+
+    // then
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
+  }
+
+  @Deployment
+  public void testJoinAfterEventBasedGatewayContainedInSubProcess() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskQuery.singleResult();
+    taskService.complete(task.getId());
+
+    // assume
+    assertNull(taskQuery.singleResult());
+
+    // when
+    runtimeService.correlateMessage("foo");
+
+    // then
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
+  }
+
 }
