@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.repository.Resource;
@@ -32,6 +33,8 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
   protected String deploymentId;
   protected boolean generated = false;
   protected String tenantId;
+  protected String type;
+  protected Date createTime;
 
   public String getId() {
     return id;
@@ -89,6 +92,22 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
     this.tenantId = tenantId;
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -97,6 +116,8 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
            + ", deploymentId=" + deploymentId
            + ", generated=" + generated
            + ", tenantId=" + tenantId
+           + ", type=" + type
+           + ", createTime=" + createTime
            + "]";
   }
 }

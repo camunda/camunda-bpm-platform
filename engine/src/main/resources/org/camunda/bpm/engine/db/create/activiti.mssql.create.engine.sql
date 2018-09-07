@@ -31,6 +31,8 @@ create table ACT_GE_BYTEARRAY (
     BYTES_ image,
     GENERATED_ tinyint,
     TENANT_ID_ nvarchar(64),
+    TYPE_ nvarchar(64),
+    CREATE_TIME_ datetime2,
     primary key (ID_)
 );
 

@@ -31,6 +31,8 @@ create table ACT_GE_BYTEARRAY (
     BYTES_ BLOB,
     GENERATED_ NUMBER(1,0) CHECK (GENERATED_ IN (1,0)),
     TENANT_ID_ NVARCHAR2(64),
+    TYPE_ NVARCHAR2(64),
+    CREATE_TIME_ TIMESTAMP(6),
     primary key (ID_)
 );
 
