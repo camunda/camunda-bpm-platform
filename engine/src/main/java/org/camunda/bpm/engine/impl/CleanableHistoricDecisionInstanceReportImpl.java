@@ -83,16 +83,9 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   }
 
   @Override
-  public CleanableHistoricDecisionInstanceReport usesHierarchicalHistoryCleanup() {
-    isHierarchicalHistoryCleanup = true;
-    return this;
-  }
-
-  @Override
   public long executeCount(CommandContext commandContext) {
-    if (commandContext.getProcessEngineConfiguration().isHierarchicalHistoryCleanup()) {
-      this.usesHierarchicalHistoryCleanup();
-    }
+    this.isHierarchicalHistoryCleanup = commandContext.getProcessEngineConfiguration()
+      .isHierarchicalHistoryCleanup();
 
     checkQueryOk();
     return commandContext
@@ -102,9 +95,8 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   @Override
   public List<CleanableHistoricDecisionInstanceReportResult> executeList(CommandContext commandContext, Page page) {
-    if (commandContext.getProcessEngineConfiguration().isHierarchicalHistoryCleanup()) {
-      this.usesHierarchicalHistoryCleanup();
-    }
+    this.isHierarchicalHistoryCleanup = commandContext.getProcessEngineConfiguration()
+      .isHierarchicalHistoryCleanup();
 
     checkQueryOk();
     return commandContext

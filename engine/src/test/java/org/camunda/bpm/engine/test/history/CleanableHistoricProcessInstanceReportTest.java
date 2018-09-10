@@ -17,6 +17,8 @@ import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +51,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class CleanableHistoricProcessInstanceReportTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -63,6 +68,10 @@ public class CleanableHistoricProcessInstanceReportTest {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
 
+  @Parameterized.Parameter
+  public boolean isHierarchicalCleanup;
+  protected boolean isHierarchicalCleanupInitValue;
+
   protected static final String PROCESS_DEFINITION_KEY = "HISTORIC_INST";
   protected static final String SECOND_PROCESS_DEFINITION_KEY = "SECOND_HISTORIC_INST";
   protected static final String THIRD_PROCESS_DEFINITION_KEY = "THIRD_HISTORIC_INST";
@@ -72,6 +81,11 @@ public class CleanableHistoricProcessInstanceReportTest {
   protected static final String DMN_DEFINITION_KEY = "dish-decision";
   protected static final String DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdMultiLevelDish.dmn11.xml";
 
+  @Parameterized.Parameters(name = "Hierachical History Cleanup: {0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{true}, {false}});
+  }
+
   @Before
   public void setUp() {
     historyService = engineRule.getHistoryService();
@@ -80,6 +94,9 @@ public class CleanableHistoricProcessInstanceReportTest {
     runtimeService = engineRule.getRuntimeService();
 
     testRule.deploy(createProcessWithUserTask(PROCESS_DEFINITION_KEY));
+
+    isHierarchicalCleanupInitValue = engineRule.getProcessEngineConfiguration().isHierarchicalHistoryCleanup();
+    engineRule.getProcessEngineConfiguration().setHierarchicalHistoryCleanup(isHierarchicalCleanup);
   }
 
   @After
@@ -103,15 +120,17 @@ public class CleanableHistoricProcessInstanceReportTest {
     for (HistoricDecisionInstance historicProcessInstance : historicDecisionInstances) {
       historyService.deleteHistoricDecisionInstanceByInstanceId(historicProcessInstance.getId());
     }
+
+    engineRule.getProcessEngineConfiguration().setHierarchicalHistoryCleanup(isHierarchicalCleanupInitValue);
   }
 
   protected BpmnModelInstance createProcessWithUserTask(String key) {
     return Bpmn.createExecutableProcess(key)
-        .startEvent()
-        .userTask(key + "_task1")
-          .name(key + " Task 1")
-        .endEvent()
-        .done();
+      .startEvent()
+      .userTask(key + "_task1")
+      .name(key + " Task 1")
+      .endEvent()
+      .done();
   }
 
   protected BpmnModelInstance[] createHierarchicalProcessWithDmn(String rootKey, String childKey) {
@@ -175,7 +194,7 @@ public class CleanableHistoricProcessInstanceReportTest {
     prepareProcessInstances(FOURTH_PROCESS_DEFINITION_KEY, -6, 0, 10);
 
     repositoryService.deleteProcessDefinition(
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey(SECOND_PROCESS_DEFINITION_KEY).singleResult().getId(), false);
+      repositoryService.createProcessDefinitionQuery().processDefinitionKey(SECOND_PROCESS_DEFINITION_KEY).singleResult().getId(), false);
 
     // when
     List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
@@ -328,10 +347,10 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     // when
     List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
-        .createCleanableHistoricProcessInstanceReport()
-        .orderByFinished()
-        .asc()
-        .list();
+      .createCleanableHistoricProcessInstanceReport()
+      .orderByFinished()
+      .asc()
+      .list();
 
     // then
     assertEquals(3, reportResult.size());
@@ -351,10 +370,10 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     // when
     List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
-        .createCleanableHistoricProcessInstanceReport()
-        .orderByFinished()
-        .desc()
-        .list();
+      .createCleanableHistoricProcessInstanceReport()
+      .orderByFinished()
+      .desc()
+      .list();
 
     // then
     assertEquals(3, reportResult.size());
@@ -365,7 +384,6 @@ public class CleanableHistoricProcessInstanceReportTest {
 
   @Test
   public void testReportOnHierarchicalData(){
-    engineRule.getProcessEngineConfiguration().setHierarchicalHistoryCleanup(true);
     testRule.deploy(DRG_DMN);
     testRule.deploy(createHierarchicalProcessWithDmn(HIERARCHICAL_ROOT_PROCESS_DEFINITION_KEY, HIERARCHICAL_CHILD_PROCESS_DEFINITION_KEY));
 
@@ -388,7 +406,6 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     // then
     assertEquals(2, reportResult.size());
-
     assertEquals(3, decisionReportResult.size());
   }
 
@@ -400,3 +417,4 @@ public class CleanableHistoricProcessInstanceReportTest {
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(definitionId, newHistoryTimeToLive);
   }
 }
+
