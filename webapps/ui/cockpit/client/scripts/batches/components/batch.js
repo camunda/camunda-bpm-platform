@@ -276,6 +276,24 @@ Batch.prototype.loadDetails = function(id, type) {
   var self = this;
 
   var cb = (function(err, data) {
+
+    var loadingFailed = function(errMsg) {
+      events.emit('load:details:failed');
+
+      obj.data = errMsg;
+      obj.state = 'ERROR';
+    };
+
+    var loadingSuccessful = function() {
+      events.emit('load:details:completed');
+
+      obj.state = 'LOADED';
+
+      if(type === 'runtime') {
+        this._loadFailedJobs(obj.data);
+      }
+    };
+
     if(err || typeof data.length !== 'undefined' && data.length === 0) {
       // if the runtime version of the batch was requested,
       // try again with history (it may have finished in the meantime)
@@ -283,25 +301,46 @@ Batch.prototype.loadDetails = function(id, type) {
         events.emit('details:switchToHistory');
         self.loadDetails(id, 'history');
       } else {
-        events.emit('load:details:failed');
-        obj.data = err.message;
-        obj.state = 'ERROR';
+        loadingFailed(err.message);
       }
     } else {
       obj.data = data.length ? data[0] : data;
-      obj.state = 'LOADED';
-      events.emit('load:details:completed');
-      if(type === 'runtime') {
-        this._loadFailedJobs(obj.data);
+
+      var cb = function(err, data) {
+        if (err) {
+          if (err.status === 404) {
+            obj.data.createUser = userId;
+            loadingSuccessful();
+          } else {
+            loadingFailed(err.message);
+          }
+        } else {
+          if (data.firstName && data.lastName) {
+            obj.data.createUser = data.firstName + ' ' + data.lastName;
+          } else {
+            obj.data.createUser = userId;
+          }
+
+          loadingSuccessful();
+        }
+      };
+
+      var userId = obj.data.createUserId;
+      if (userId) {
+        this._sdk.resource('user').profile({id: userId}, cb);
+      } else {
+        loadingSuccessful();
       }
     }
   }).bind(this);
 
   switch(type) {
   case 'runtime':
-    return this._sdk.resource('batch').statistics({batchId: id}, cb);
+    this._sdk.resource('batch').statistics({batchId: id}, cb);
+    break;
   case 'history':
-    return this._sdk.resource('history').singleBatch(id, cb);
+    this._sdk.resource('history').singleBatch(id, cb);
+    break;
   }
 };
 
@@ -389,6 +428,7 @@ Batch.prototype.sortingKeys = [
   'startTime',
   'endTime',
   'type',
+  'createUser',
   'totalJobs',
   'completedJobs',
   'remainingJobs',
