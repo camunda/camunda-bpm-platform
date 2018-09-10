@@ -46,7 +46,7 @@ create index ACT_IDX_HI_DEC_INST_RM_TIME on ACT_HI_DECINST(REMOVAL_TIME_);
 
 -- https://app.camunda.com/jira/browse/CAM-9322
 ALTER TABLE ACT_GE_BYTEARRAY
-  ADD TYPE_ varchar(64);
+  ADD TYPE_ integer;
 
 ALTER TABLE ACT_GE_BYTEARRAY
   ADD CREATE_TIME_ timestamp;

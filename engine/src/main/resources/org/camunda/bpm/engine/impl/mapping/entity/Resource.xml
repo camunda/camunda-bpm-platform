@@ -24,7 +24,7 @@
         #{deploymentId, jdbcType=VARCHAR},
         #{generated, jdbcType=BOOLEAN},
         #{tenantId, jdbcType=VARCHAR},
-        #{type, jdbcType=VARCHAR},
+        #{type, jdbcType=INTEGER},
         #{createTime, jdbcType=TIMESTAMP},
         1)
   </insert>
@@ -46,7 +46,7 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
-    <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
+    <result property="type" column="TYPE_" jdbcType="INTEGER"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
   

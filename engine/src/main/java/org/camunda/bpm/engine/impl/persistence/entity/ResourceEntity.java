@@ -33,7 +33,7 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
   protected String deploymentId;
   protected boolean generated = false;
   protected String tenantId;
-  protected String type;
+  protected int type;
   protected Date createTime;
 
   public String getId() {
@@ -92,11 +92,11 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
     this.tenantId = tenantId;
   }
 
-  public String getType() {
+  public int getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(int type) {
     this.type = type;
   }
 
