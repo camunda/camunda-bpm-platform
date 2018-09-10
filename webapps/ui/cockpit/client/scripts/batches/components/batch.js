@@ -309,16 +309,16 @@ Batch.prototype.loadDetails = function(id, type) {
       var cb = function(err, data) {
         if (err) {
           if (err.status === 404) {
-            obj.data.createUser = userId;
+            obj.data.user = userId;
             loadingSuccessful();
           } else {
             loadingFailed(err.message);
           }
         } else {
           if (data.firstName && data.lastName) {
-            obj.data.createUser = data.firstName + ' ' + data.lastName;
+            obj.data.user = data.firstName + ' ' + data.lastName;
           } else {
-            obj.data.createUser = userId;
+            obj.data.user = userId;
           }
 
           loadingSuccessful();
@@ -428,7 +428,7 @@ Batch.prototype.sortingKeys = [
   'startTime',
   'endTime',
   'type',
-  'createUser',
+  'user',
   'totalJobs',
   'completedJobs',
   'remainingJobs',
