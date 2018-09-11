@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueUpdateListener;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -68,7 +69,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected String textValue;
   protected String textValue2;
 
-  protected ByteArrayField byteArrayField = new ByteArrayField(this);
+  protected ByteArrayField byteArrayField = new ByteArrayField(this, ResourceTypes.RUNTIME);
 
   protected TypedValueField typedValueField = new TypedValueField(this, true);
 

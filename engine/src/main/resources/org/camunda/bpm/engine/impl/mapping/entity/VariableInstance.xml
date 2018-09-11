@@ -434,13 +434,15 @@
   <!-- BYTE ARRAY INSERT -->
 
   <insert id="insertByteArray" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, TENANT_ID_, REV_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, TENANT_ID_, TYPE_, CREATE_TIME_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
       #{name, jdbcType=VARCHAR}, 
       #{bytes, jdbcType=BLOB}, 
       #{deploymentId, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
+      #{type, jdbcType=INTEGER},
+      #{createTime, jdbcType=TIMESTAMP},
       1 
     )  
   </insert>
@@ -482,6 +484,8 @@
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BLOB"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="type" column="TYPE_" jdbcType="INTEGER"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!-- BYTE ARRAY SELECT -->
@@ -497,6 +501,8 @@
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BINARY"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="type" column="TYPE_" jdbcType="INTEGER"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <select id="selectByteArray_postgres" parameterType="string" resultMap="byteArrayResultMap_postgres">
@@ -513,13 +519,15 @@
   </update>
 
     <insert id="insertByteArray_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, TENANT_ID_, REV_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, TENANT_ID_, TYPE_, CREATE_TIME_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
       #{name, jdbcType=VARCHAR},
       #{bytes, jdbcType=BINARY},
       #{deploymentId, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
+      #{type, jdbcType=INTEGER},
+      #{createTime, jdbcType=TIMESTAMP},
       1
     )
   </insert>

@@ -17,9 +17,6 @@ package org.camunda.bpm.engine.repository;
  */
 public interface Resource {
 
-  int TYPE_REPOSITORY = 1;
-  int TYPE_RUNTIME = 2;
-  int TYPE_HISTORY = 3;
 
   String getId();
 

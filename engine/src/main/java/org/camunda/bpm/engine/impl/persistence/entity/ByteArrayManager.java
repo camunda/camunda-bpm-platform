@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import java.util.List;
 
@@ -36,4 +37,8 @@ public class ByteArrayManager extends AbstractManager {
     getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArraysByIds", byteArrayEntityIds);
   }
 
+  public void insertByteArray(ByteArrayEntity arr) {
+    arr.setCreateTime(ClockUtil.getCurrentTime());
+    getDbEntityManager().insert(arr);
+  }
 }

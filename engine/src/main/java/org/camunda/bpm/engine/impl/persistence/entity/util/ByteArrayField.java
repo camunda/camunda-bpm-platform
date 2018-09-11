@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.repository.ResourceType;
 
 /**
  * A byte array value field what load and save {@link ByteArrayEntity}. It can
@@ -30,9 +31,15 @@ public class ByteArrayField {
   protected String byteArrayId;
 
   protected final Nameable nameProvider;
+  protected ResourceType type;
 
   public ByteArrayField(Nameable nameProvider) {
     this.nameProvider = nameProvider;
+  }
+
+  public ByteArrayField(Nameable nameProvider, ResourceType type) {
+    this.nameProvider = nameProvider;
+    this.type = type;
   }
 
   public String getByteArrayId() {
@@ -87,14 +94,18 @@ public class ByteArrayField {
       else {
         deleteByteArrayValue();
 
-        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes);
+        if (type != null) {
+          byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type);
+        } else {
+          byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes);
+        }
 
         // avoid insert of byte array value for a transient variable
         if (!isTransient) {
           Context.
           getCommandContext()
-          .getDbEntityManager()
-          .insert(byteArrayValue);
+          .getByteArrayManager()
+          .insertByteArray(byteArrayValue);
 
           byteArrayId = byteArrayValue.getId();
         }
