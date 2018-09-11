@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -66,7 +67,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String textValue2;
 
   protected String state = "CREATED";
-  protected ByteArrayField byteArrayField = new ByteArrayField(this);
+  protected ByteArrayField byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
 
   protected TypedValueField typedValueField = new TypedValueField(this, false);
 

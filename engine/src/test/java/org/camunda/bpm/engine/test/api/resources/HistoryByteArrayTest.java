@@ -13,21 +13,24 @@
 
 package org.camunda.bpm.engine.test.api.resources;
 
-import static org.camunda.bpm.engine.repository.ResourceTypes.RUNTIME;
+import static org.camunda.bpm.engine.repository.ResourceTypes.HISTORY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -40,7 +43,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class RuntimeByteArrayTest {
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+public class HistoryByteArrayTest {
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -51,6 +55,7 @@ public class RuntimeByteArrayTest {
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
   protected TaskService taskService;
+  protected HistoryService historyService;
 
   protected String id;
 
@@ -60,6 +65,7 @@ public class RuntimeByteArrayTest {
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
     taskService = engineRule.getTaskService();
+    historyService = engineRule.getHistoryService();
   }
 
   @After
@@ -80,7 +86,7 @@ public class RuntimeByteArrayTest {
 
     runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValueTyped("fileVar", fileValue));
 
-    String byteArrayValueId = ((VariableInstanceEntity)runtimeService.createVariableInstanceQuery().singleResult()).getByteArrayValueId();
+    String byteArrayValueId = ((HistoricVariableInstanceEntity)historyService.createHistoricVariableInstanceQuery().singleResult()).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
@@ -89,7 +95,7 @@ public class RuntimeByteArrayTest {
     // then
     assertNotNull(byteArrayEntity);
     assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
+    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
   }
 
   @Test
@@ -104,7 +110,7 @@ public class RuntimeByteArrayTest {
     id = task.getId();
     taskService.setVariablesLocal(id, variables);
 
-    String byteArrayValueId = ((VariableInstanceEntity)runtimeService.createVariableInstanceQuery().singleResult()).getByteArrayValueId();
+    String byteArrayValueId = ((HistoricVariableInstanceEntity)historyService.createHistoricVariableInstanceQuery().singleResult()).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
@@ -113,7 +119,7 @@ public class RuntimeByteArrayTest {
     // then
     assertNotNull(byteArrayEntity);
     assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
+    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
   }
 
   protected FileValue createFile() {
