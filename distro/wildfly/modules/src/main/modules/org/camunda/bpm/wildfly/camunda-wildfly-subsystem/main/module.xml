@@ -38,6 +38,8 @@
     <module name="org.camunda.bpm.camunda-engine-plugin-spin" services="import" />
     <module name="org.camunda.bpm.camunda-engine-plugin-connect" />
 
+    <module name="org.camunda.bpm.camunda-engine-plugins" optional="true" />
+
     <!-- for LDAP plugin only -->
     <module name="sun.jdk" />
 
