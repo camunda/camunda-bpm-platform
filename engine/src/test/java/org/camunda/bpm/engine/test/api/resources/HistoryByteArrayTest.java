@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -77,7 +78,7 @@ public class HistoryByteArrayTest {
   }
 
   @Test
-  public void testBinaryForFileValues() {
+  public void testHistoricVariableBinaryForFileValues() {
     // given
     BpmnModelInstance instance = createProcess();
 
@@ -99,7 +100,7 @@ public class HistoryByteArrayTest {
   }
 
   @Test
-  public void testDisableBinaryFetching() {
+  public void testHistoricVariableBinary() {
     byte[] binaryContent = "some binary content".getBytes();
 
     // given
@@ -121,6 +122,29 @@ public class HistoryByteArrayTest {
     assertNotNull(byteArrayEntity.getCreateTime());
     assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
   }
+
+  @Test
+  public void testHistoricDetailBinaryForFileValues() {
+    // given
+    BpmnModelInstance instance = createProcess();
+
+    testRule.deploy(instance);
+    FileValue fileValue = createFile();
+
+    runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValueTyped("fileVar", fileValue));
+
+    String byteArrayValueId = ((HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery().singleResult()).getByteArrayValueId();
+
+    // when
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(byteArrayValueId));
+
+    // then
+    assertNotNull(byteArrayEntity);
+    assertNotNull(byteArrayEntity.getCreateTime());
+    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+  }
+
 
   protected FileValue createFile() {
     String fileName = "text.txt";

@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 
 /**
  * <p>History event handler that writes history events to the process engine
@@ -89,11 +90,11 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
       // insert byte array entity (if applicable)
       byte[] byteValue = historyEvent.getByteValue();
       if(byteValue != null) {
-        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue);
+        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue, ResourceTypes.HISTORY);
         Context
         .getCommandContext()
-        .getDbEntityManager()
-        .insert(byteArrayEntity);
+        .getByteArrayManager()
+        .insertByteArray(byteArrayEntity);
         historyEvent.setByteArrayId(byteArrayEntity.getId());
 
       }
