@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 
 public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, HasDbRevision {
 
@@ -53,7 +54,7 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   protected String monitorJobDefinitionId;
   protected String batchJobDefinitionId;
 
-  protected ByteArrayField configuration = new ByteArrayField(this);
+  protected ByteArrayField configuration = new ByteArrayField(this, ResourceTypes.RUNTIME);
 
   protected String tenantId;
   protected String createUserId;

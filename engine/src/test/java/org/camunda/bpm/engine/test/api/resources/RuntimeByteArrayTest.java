@@ -21,13 +21,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -43,14 +47,18 @@ import org.junit.rules.RuleChain;
 public class RuntimeByteArrayTest {
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
+  protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
+
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule).around(testRule);
 
   protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
   protected TaskService taskService;
+  protected RepositoryService repositoryService;
 
   protected String id;
 
@@ -60,6 +68,12 @@ public class RuntimeByteArrayTest {
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
     taskService = engineRule.getTaskService();
+    repositoryService = engineRule.getRepositoryService();
+  }
+
+  @After
+  public void removeBatches() {
+    helper.removeAllRunningAndHistoricBatches();
   }
 
   @After
@@ -71,7 +85,7 @@ public class RuntimeByteArrayTest {
   }
 
   @Test
-  public void testBinaryForFileValues() {
+  public void testVariableBinaryForFileValues() {
     // given
     BpmnModelInstance instance = createProcess();
 
@@ -93,7 +107,7 @@ public class RuntimeByteArrayTest {
   }
 
   @Test
-  public void testDisableBinaryFetching() {
+  public void testVariableBinary() {
     byte[] binaryContent = "some binary content".getBytes();
 
     // given
@@ -115,6 +129,23 @@ public class RuntimeByteArrayTest {
     assertNotNull(byteArrayEntity.getCreateTime());
     assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
   }
+
+  @Test
+  public void testBatchCreation() {
+    // when
+    helper.migrateProcessInstancesAsync(15);
+
+    String byteArrayValueId = ((BatchEntity) managementService.createBatchQuery().singleResult()).getConfiguration();
+
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(byteArrayValueId));
+
+    // then
+    assertNotNull(byteArrayEntity);
+    assertNotNull(byteArrayEntity.getCreateTime());
+    assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
+  }
+
 
   protected FileValue createFile() {
     String fileName = "text.txt";
