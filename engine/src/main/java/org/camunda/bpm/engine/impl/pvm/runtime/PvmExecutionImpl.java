@@ -226,11 +226,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     startContext = new ProcessInstanceStartContext(getActivity());
 
     initialize();
-    initializeTimerDeclarations();
 
     if (variables != null) {
       setVariables(variables);
     }
+
+    initializeTimerDeclarations();
 
     fireHistoricProcessStartEvent();
 

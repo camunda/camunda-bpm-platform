@@ -33,6 +33,11 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 
 /**
  * @author Joram Barrez
@@ -1144,6 +1149,140 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     String anotherJobId = jobQuery.singleResult().getId();
     assertFalse(jobId.equals(anotherJobId));
+  }
+
+  public void testInterruptingWithDurationExpression() {
+    // given
+    Mocks.register("duration", "PT60S");
+
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent().timerWithDuration("${duration}")
+        .userTask("aTaskName")
+      .endEvent()
+      .done();
+
+    String deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+
+    // when
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(1, taskService.createTaskQuery().taskName("aTaskName").list().size());
+
+    // cleanup
+    Mocks.reset();
+    repositoryService.deleteDeployment(deploymentId, true);
+  }
+
+  public void testNonInterruptingWithDurationExpression() {
+    // given
+    Mocks.register("duration", "PT60S");
+
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent().interrupting(false).timerWithDuration("${duration}")
+        .userTask("aTaskName")
+      .endEvent().done();
+
+    String deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+
+    // when
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(1, taskService.createTaskQuery().taskName("aTaskName").list().size());
+
+    // cleanup
+    Mocks.reset();
+    repositoryService.deleteDeployment(deploymentId, true);
+  }
+
+  public void testInterruptingWithDurationExpressionInEventSubprocess() {
+    // given
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent()
+        .userTask()
+      .endEvent()
+      .done();
+
+    processBuilder.eventSubProcess()
+      .startEvent().timerWithDuration("${duration}")
+        .userTask("taskInSubprocess")
+      .endEvent();
+
+    String deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+
+    // when
+    runtimeService.startProcessInstanceByKey("process",
+      Variables.createVariables()
+        .putValue("duration", "PT60S"));
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
+
+    // cleanup
+    repositoryService.deleteDeployment(deploymentId, true);
+  }
+
+  public void testNonInterruptingWithDurationExpressionInEventSubprocess() {
+    // given
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent()
+        .userTask()
+      .endEvent().done();
+
+    processBuilder.eventSubProcess()
+      .startEvent().interrupting(false).timerWithDuration("${duration}")
+        .userTask("taskInSubprocess")
+      .endEvent();
+
+    String deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+
+    // when
+    runtimeService.startProcessInstanceByKey("process",
+      Variables.createVariables()
+        .putValue("duration", "PT60S"));
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
+
+    // cleanup
+    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Deployment
