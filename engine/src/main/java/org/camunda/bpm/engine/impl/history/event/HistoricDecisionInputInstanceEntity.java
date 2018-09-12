@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -41,7 +42,7 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
 
   protected String tenantId;
 
-  protected ByteArrayField byteArrayField = new ByteArrayField(this);
+  protected ByteArrayField byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
   protected TypedValueField typedValueField = new TypedValueField(this, false);
 
   protected Date createTime;
