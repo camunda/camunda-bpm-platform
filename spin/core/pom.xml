@@ -104,6 +104,7 @@
         </plugins>
       </build>
     </profile>
+    <!-- exclude the DataFormatProviderTest until PowerMock 2.0 is released: https://app.camunda.com/jira/browse/CAM-9309 -->
     <profile>
       <id>jdk-9-and-onwards</id>
       <activation>
