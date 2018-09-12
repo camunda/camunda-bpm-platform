@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.resources;
 import static org.camunda.bpm.engine.repository.ResourceTypes.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +28,11 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -146,6 +149,32 @@ public class RuntimeByteArrayTest {
     assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
   }
 
+  @Test
+  public void testExceptionStacktrace() {
+    // given
+    BpmnModelInstance instance = createFailingProcess();
+    testRule.deploy(instance);
+    runtimeService.startProcessInstanceByKey("Process");
+    String jobId = managementService.createJobQuery().singleResult().getId();
+
+    // when
+    try {
+      managementService.executeJob(jobId);
+      fail();
+    } catch (Exception e) {
+      // expected
+    }
+
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(job.getExceptionByteArrayId()));
+
+    // then
+    assertNotNull(byteArrayEntity);
+    assertNotNull(byteArrayEntity.getCreateTime());
+    assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
+  }
 
   protected FileValue createFile() {
     String fileName = "text.txt";
@@ -168,4 +197,16 @@ public class RuntimeByteArrayTest {
       .endEvent()
       .done();
   }
+
+  protected BpmnModelInstance createFailingProcess() {
+    return Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask("failing")
+      .camundaAsyncAfter()
+      .camundaAsyncBefore()
+      .camundaClass(FailingDelegate.class)
+      .endEvent()
+      .done();
+  }
+
 }

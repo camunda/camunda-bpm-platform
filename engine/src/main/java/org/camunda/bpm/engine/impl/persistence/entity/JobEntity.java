@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -454,7 +455,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     ByteArrayEntity byteArray = getExceptionByteArray();
 
     if(byteArray == null) {
-      byteArray = createJobExceptionByteArray(exceptionBytes);
+      byteArray = createJobExceptionByteArray(exceptionBytes, ResourceTypes.RUNTIME);
       exceptionByteArrayId = byteArray.getId();
       exceptionByteArray = byteArray;
     }

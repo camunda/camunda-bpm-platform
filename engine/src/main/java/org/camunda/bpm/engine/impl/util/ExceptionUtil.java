@@ -48,10 +48,6 @@ public class ExceptionUtil {
     return createExceptionByteArray("job.exceptionByteArray", byteArray, type);
   }
 
-  public static ByteArrayEntity createJobExceptionByteArray(byte[] byteArray) {
-    return createExceptionByteArray("job.exceptionByteArray", byteArray, null);
-  }
-
   /**
    * create ByteArrayEntity with specified name and payload and make sure it's
    * persisted
