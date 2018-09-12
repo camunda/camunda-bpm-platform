@@ -24,6 +24,22 @@ the https://github.com/camunda/camunda-bpm-examples/tree/master/spring-boot-star
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/master/.github/CONTRIBUTING.md[Contributing] - check this if you want to contribute
 * https://forum.camunda.org/c/spring-boot-starter[Discussion Forum] - this project has it's own sub-category at the camunda forum ... use it!
 
+### JDK 9 and onwards
+Beginning with version 3.1-alpha2, Camunda Spring Boot Starter can be used in conjunction with JDK 9 / 10.
+As Hibernate is part of Camunda Spring Boot Starter it requires JAXB. However, JAXB is deactivated by default 
+(and marked as deprecated) in JDK 9 / 10 and removed entirely in JDK 11. Therefore, it is sensible to 
+re-add JAXB to your Camunda Spring Boot Starter project.
+
+There exist various implementations of JAXB. The following Maven coordinates represent the implementation which is 
+included in the JDKs up to version 10:
+
+```xml
+<dependency>
+  <groupId>com.sun.xml.bind</groupId>
+  <artifactId>jaxb-impl</artifactId>
+</dependency>
+```
+
 ## Resources for versions older than 2.3.0
 
 Before version 2.2.0, the project existed as a community extension. Therefore the resources were located in different paths. You can find all the links below.
