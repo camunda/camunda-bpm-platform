@@ -46,7 +46,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testDurationStartTimerEvent() throws Exception {
-
     // Set the clock fixed
     Date startTime = new Date();
 
@@ -1163,7 +1162,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
       .endEvent()
       .done();
 
-    String deploymentId = repositoryService.createDeployment()
+    deploymentId = repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance).deploy()
       .getId();
 
@@ -1179,37 +1178,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // cleanup
     Mocks.reset();
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
-
-  public void testNonInterruptingWithDurationExpression() {
-    // given
-    Mocks.register("duration", "PT60S");
-
-    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
-
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent().interrupting(false).timerWithDuration("${duration}")
-        .userTask("aTaskName")
-      .endEvent().done();
-
-    String deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
-
-    // when
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
-
-    managementService.executeJob(jobId);
-
-    // then
-    assertEquals(1, taskService.createTaskQuery().taskName("aTaskName").list().size());
-
-    // cleanup
-    Mocks.reset();
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   public void testInterruptingWithDurationExpressionInEventSubprocess() {
@@ -1227,7 +1195,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
         .userTask("taskInSubprocess")
       .endEvent();
 
-    String deploymentId = repositoryService.createDeployment()
+    deploymentId = repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance).deploy()
       .getId();
 
@@ -1244,9 +1212,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
-
-    // cleanup
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   public void testNonInterruptingWithDurationExpressionInEventSubprocess() {
@@ -1263,7 +1228,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
         .userTask("taskInSubprocess")
       .endEvent();
 
-    String deploymentId = repositoryService.createDeployment()
+    deploymentId = repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance).deploy()
       .getId();
 
@@ -1280,9 +1245,6 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
-
-    // cleanup
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Deployment
