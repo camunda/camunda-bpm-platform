@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -70,7 +72,7 @@ public class HistoryByteArrayTest {
   protected TaskService taskService;
   protected HistoryService historyService;
 
-  protected String id;
+  protected String taskId;
 
   @Before
   public void initServices() {
@@ -83,9 +85,9 @@ public class HistoryByteArrayTest {
 
   @After
   public void tearDown() {
-    if (id != null) {
+    if (taskId != null) {
       // delete task
-      taskService.deleteTask(id, true);
+      taskService.deleteTask(taskId, true);
     }
   }
 
@@ -120,8 +122,8 @@ public class HistoryByteArrayTest {
     variables.put("binaryVariable", binaryContent);
     Task task = taskService.newTask();
     taskService.saveTask(task);
-    id = task.getId();
-    taskService.setVariablesLocal(id, variables);
+    taskId = task.getId();
+    taskService.setVariablesLocal(taskId, variables);
 
     String byteArrayValueId = ((HistoricVariableInstanceEntity)historyService.createHistoricVariableInstanceQuery().singleResult()).getByteArrayValueId();
 
@@ -199,6 +201,24 @@ public class HistoryByteArrayTest {
     assertNotNull(byteArrayEntity.getCreateTime());
     assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
   }
+
+  @Test
+  public void testAttachmentContentBinaries() {
+      // create and save task
+      Task task = taskService.newTask();
+      taskService.saveTask(task);
+      taskId = task.getId();
+
+      // when
+      AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment("web page", taskId, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+
+      ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(attachment.getContentId()));
+
+      // then
+      assertNotNull(byteArrayEntity);
+      assertNotNull(byteArrayEntity.getCreateTime());
+      assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+    }
 
   protected FileValue createFile() {
     String fileName = "text.txt";

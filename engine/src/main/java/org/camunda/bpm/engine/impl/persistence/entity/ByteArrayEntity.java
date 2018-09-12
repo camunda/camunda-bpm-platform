@@ -51,8 +51,9 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
     this.bytes = bytes;
   }
 
-  public ByteArrayEntity(byte[] bytes) {
+  public ByteArrayEntity(byte[] bytes, ResourceType type) {
     this.bytes = bytes;
+    this.type = type.getValue();
   }
 
   public byte[] getBytes() {

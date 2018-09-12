@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.task.Attachment;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -86,8 +87,8 @@ public class CreateAttachmentCmd implements Command<Attachment> {
 
     if (content != null) {
       byte[] bytes = IoUtil.readInputStream(content, attachmentName);
-      ByteArrayEntity byteArray = new ByteArrayEntity(bytes);
-      dbEntityManger.insert(byteArray);
+      ByteArrayEntity byteArray = new ByteArrayEntity(bytes, ResourceTypes.HISTORY);
+      commandContext.getByteArrayManager().insertByteArray(byteArray);
       attachment.setContentId(byteArray.getId());
     }
 
