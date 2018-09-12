@@ -82,6 +82,7 @@
   </dependencies>
 
   <profiles>
+    <!-- exclude tests until PowerMock 2.0 is released: https://app.camunda.com/jira/browse/CAM-9313 -->
     <profile>
       <id>jdk-9-and-onwards</id>
       <activation>
