@@ -167,6 +167,23 @@ public class GlobalRetryConfigurationTest {
     assertJobRetries(pi, 4);
   }
 
+  @Test
+  public void testRetryOnAsyncStartEvent() throws Exception {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("R5/PT5M")
+        .serviceTask()
+          .camundaClass("bar")
+        .endEvent()
+        .done();
+
+    testRule.deploy(bpmnModelInstance);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    assertJobRetries(processInstance, 4);
+  }
 
   private void assertJobRetries(ProcessInstance pi, int expectedJobRetries) {
     assertThat(pi, is(notNullValue()));

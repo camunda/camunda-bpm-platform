@@ -46,7 +46,7 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
     String type = startEventActivity.getProperties().get(BpmnProperties.TYPE);
-    if (type != null && type.equals(START_TIMER_EVENT)) {
+    if (type != null && type.equals(START_TIMER_EVENT) || isAsync(startEventActivity)) {
       this.setFailedJobRetryTimeCycleValue(startEventElement, startEventActivity);
     }
   }
