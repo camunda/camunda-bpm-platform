@@ -41,8 +41,9 @@ import org.camunda.bpm.engine.rest.util.EngineUtil;
  */
 public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
+  protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30 * 1000;
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
-  protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
+  protected static final long MAX_REQUEST_TIMEOUT = 1800000; // 30 minutes
 
   protected SingleConsumerCondition condition;
 
@@ -94,10 +95,8 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
           iterator.remove();
         }
         else {
-          long timeout = pendingRequest.getTimeoutTimestamp();
-          if (timeout < backoffTime) {
-            backoffTime = timeout;
-          }
+          final long msUntilTimeout = pendingRequest.getTimeoutTimestamp() - ClockUtil.getCurrentTime().getTime();
+          backoffTime = Math.min(backoffTime, msUntilTimeout);
         }
       }
       else {
@@ -109,7 +108,16 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       }
     }
 
-    suspend(Math.max(0, backoffTime - ClockUtil.getCurrentTime().getTime()));
+    final long waitTime = Math.max(0, backoffTime);
+
+    if (pendingRequests.isEmpty()) {
+      suspend(waitTime);
+    }
+    else {
+      // if there are pending requests, try fetch periodically to ensure tasks created on other
+      // cluster nodes and tasks with expired timeouts can be fetched in a timely manner
+      suspend(Math.min(PENDING_REQUEST_FETCH_INTERVAL, waitTime));
+    }
   }
 
   @Override
@@ -144,16 +152,14 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   }
 
   protected void suspendAcquisition(long millis) {
-    if (queue.isEmpty() && isRunning) {
-      try {
-        if (queue.isEmpty() && isRunning) {
-          condition.await(millis);
-        }
+    try {
+      if (queue.isEmpty() && isRunning) {
+        condition.await(millis);
       }
-      finally {
-        if (handlerThread.isInterrupted()) {
-          Thread.currentThread().interrupt();
-        }
+    }
+    finally {
+      if (handlerThread.isInterrupted()) {
+        Thread.currentThread().interrupt();
       }
     }
   }
@@ -233,9 +239,9 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   @Override
   public void addPendingRequest(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse, ProcessEngine processEngine) {
     Long asyncResponseTimeout = dto.getAsyncResponseTimeout();
-    if (asyncResponseTimeout != null && asyncResponseTimeout > MAX_TIMEOUT) {
+    if (asyncResponseTimeout != null && asyncResponseTimeout > MAX_REQUEST_TIMEOUT) {
       invalidRequest(asyncResponse, "The asynchronous response timeout cannot be set to a value greater than "
-        + MAX_TIMEOUT + " milliseconds");
+        + MAX_REQUEST_TIMEOUT + " milliseconds");
       return;
     }
 
