@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -1166,7 +1167,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
 
           byte[] aByteValue = StringUtil.toByteArray("abc");
-          ByteArrayEntity byteArray = ExceptionUtil.createJobExceptionByteArray(aByteValue);
+          ByteArrayEntity byteArray = ExceptionUtil.createJobExceptionByteArray(aByteValue, ResourceTypes.HISTORY);
           log.setExceptionByteArrayId(byteArray.getId());
 
           commandContext

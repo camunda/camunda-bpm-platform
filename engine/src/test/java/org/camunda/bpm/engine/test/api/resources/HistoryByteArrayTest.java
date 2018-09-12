@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -38,11 +39,13 @@ import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceE
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -218,7 +221,37 @@ public class HistoryByteArrayTest {
       assertNotNull(byteArrayEntity);
       assertNotNull(byteArrayEntity.getCreateTime());
       assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+  }
+
+  @Test
+  public void testExceptionStacktrace() {
+    // given
+    BpmnModelInstance instance = createFailingProcess();
+    testRule.deploy(instance);
+    runtimeService.startProcessInstanceByKey("Process");
+    String jobId = managementService.createJobQuery().singleResult().getId();
+
+    // when
+    try {
+      managementService.executeJob(jobId);
+      fail();
+    } catch (Exception e) {
+      // expected
     }
+
+    HistoricJobLogEventEntity entity = (HistoricJobLogEventEntity) historyService
+        .createHistoricJobLogQuery()
+        .failureLog()
+        .singleResult();
+    assertNotNull(entity);
+
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(entity.getExceptionByteArrayId()));
+
+    // then
+    assertNotNull(byteArrayEntity);
+    assertNotNull(byteArrayEntity.getCreateTime());
+    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+  }
 
   protected FileValue createFile() {
     String fileName = "text.txt";
@@ -238,6 +271,17 @@ public class HistoryByteArrayTest {
     return Bpmn.createExecutableProcess("Process")
       .startEvent()
       .userTask("user")
+      .endEvent()
+      .done();
+  }
+
+  protected BpmnModelInstance createFailingProcess() {
+    return Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask("failing")
+      .camundaAsyncAfter()
+      .camundaAsyncBefore()
+      .camundaClass(FailingDelegate.class)
       .endEvent()
       .done();
   }

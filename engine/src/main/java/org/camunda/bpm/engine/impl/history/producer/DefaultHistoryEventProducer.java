@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -951,7 +952,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       // stacktrace
       String exceptionStacktrace = getExceptionStacktrace(exception);
       byte[] exceptionBytes = toByteArray(exceptionStacktrace);
-      ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes);
+      ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes, ResourceTypes.HISTORY);
       event.setExceptionByteArrayId(byteArray.getId());
     }
 

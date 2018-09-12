@@ -22,6 +22,7 @@ import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.repository.ResourceType;
 
 /**
  * @author Roman Smirnov
@@ -43,8 +44,12 @@ public class ExceptionUtil {
     return result;
   }
 
+  public static ByteArrayEntity createJobExceptionByteArray(byte[] byteArray, ResourceType type) {
+    return createExceptionByteArray("job.exceptionByteArray", byteArray, type);
+  }
+
   public static ByteArrayEntity createJobExceptionByteArray(byte[] byteArray) {
-    return createExceptionByteArray("job.exceptionByteArray", byteArray);
+    return createExceptionByteArray("job.exceptionByteArray", byteArray, null);
   }
 
   /**
@@ -55,17 +60,26 @@ public class ExceptionUtil {
    *
    * @param name - type\source of the exception
    * @param byteArray - payload of the exception
+   * @param type - resource type of the exception
    * @return persisted entity
    */
-  public static ByteArrayEntity createExceptionByteArray(String name, byte[] byteArray) {
+  public static ByteArrayEntity createExceptionByteArray(String name, byte[] byteArray, ResourceType type) {
     ByteArrayEntity result = null;
 
     if (byteArray != null) {
-      result = new ByteArrayEntity(name, byteArray);
-      Context
+      if (type != null) {
+        result = new ByteArrayEntity(name, byteArray, type);
+        Context.getCommandContext()
+          .getByteArrayManager()
+          .insertByteArray(result);
+
+      } else {
+        result = new ByteArrayEntity(name, byteArray);
+        Context
           .getCommandContext()
           .getDbEntityManager()
           .insert(result);
+      }
     }
 
     return result;

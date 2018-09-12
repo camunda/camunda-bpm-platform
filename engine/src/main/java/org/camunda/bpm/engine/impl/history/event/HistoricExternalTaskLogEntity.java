@@ -122,7 +122,7 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
     EnsureUtil.ensureNotNull("exception", exception);
 
     byte[] exceptionBytes = toByteArray(exception);
-    ByteArrayEntity byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes);
+    ByteArrayEntity byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes, null);
     errorDetailsByteArrayId = byteArray.getId();
   }
 

@@ -277,7 +277,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     ByteArrayEntity byteArray = getErrorByteArray();
 
     if(byteArray == null) {
-      byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes);
+      byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes, null);
       errorDetailsByteArrayId = byteArray.getId();
       errorDetailsByteArray = byteArray;
     }
