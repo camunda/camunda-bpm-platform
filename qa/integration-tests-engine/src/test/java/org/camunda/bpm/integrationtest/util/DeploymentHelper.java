@@ -139,7 +139,7 @@ public class DeploymentHelper {
     } else if (server.equals("websphere")) {
       return Maven.configureResolver()
         .workOffline()
-        .loadPomFromFile("pom.xml", "was80")
+        .loadPomFromFile("pom.xml", "was85")
         .resolve("com.fasterxml.jackson.datatype:jackson-datatype-joda")
         .using(new RejectDependenciesStrategy(false,
           "joda-time:joda-time"))
@@ -176,7 +176,7 @@ public class DeploymentHelper {
     } else if (server.equals("websphere")) {
       return Maven.configureResolver()
         .workOffline()
-        .loadPomFromFile("pom.xml", "was80")
+        .loadPomFromFile("pom.xml", "was85")
         .resolve("org.camunda.spin:camunda-spin-dataformat-json-jackson")
         .using(new RejectDependenciesStrategy(false,
           "org.camunda.spin:camunda-spin-core",
