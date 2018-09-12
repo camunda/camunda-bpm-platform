@@ -213,7 +213,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void shouldThrowInvalidRequestExceptionOnMaxTimeoutExceeded() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandlerImpl.MAX_TIMEOUT + 1);
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT + 1);
 
     given()
       .contentType(ContentType.JSON)
