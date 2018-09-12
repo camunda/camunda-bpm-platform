@@ -14,8 +14,10 @@
 package org.camunda.bpm.engine.test.api.resources;
 
 import static org.camunda.bpm.engine.repository.ResourceTypes.HISTORY;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +30,10 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -164,6 +168,28 @@ public class HistoryByteArrayTest {
     assertEquals(1, inputInstances.size());
 
     String byteArrayValueId = ((HistoricDecisionInputInstanceEntity) inputInstances.get(0)).getByteArrayValueId();
+
+    // when
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(byteArrayValueId));
+
+    // then
+    assertNotNull(byteArrayEntity);
+    assertNotNull(byteArrayEntity.getCreateTime());
+    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+  }
+
+  @Test
+  public void testHistoricDecisionOutputInstanceBinary() {
+    testRule.deploy(DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN);
+
+    startProcessInstanceAndEvaluateDecision(new JavaSerializable("foo"));
+
+    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    List<HistoricDecisionOutputInstance> outputInstances = historicDecisionInstance.getOutputs();
+    assertThat(outputInstances.size(), is(1));
+
+
+    String byteArrayValueId = ((HistoricDecisionOutputInstanceEntity) outputInstances.get(0)).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(byteArrayValueId));

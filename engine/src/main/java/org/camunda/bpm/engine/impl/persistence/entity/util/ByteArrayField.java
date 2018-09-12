@@ -33,10 +33,6 @@ public class ByteArrayField {
   protected final Nameable nameProvider;
   protected ResourceType type;
 
-  public ByteArrayField(Nameable nameProvider) {
-    this.nameProvider = nameProvider;
-  }
-
   public ByteArrayField(Nameable nameProvider, ResourceType type) {
     this.nameProvider = nameProvider;
     this.type = type;
@@ -94,11 +90,7 @@ public class ByteArrayField {
       else {
         deleteByteArrayValue();
 
-        if (type != null) {
-          byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type);
-        } else {
-          byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes);
-        }
+        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type);
 
         // avoid insert of byte array value for a transient variable
         if (!isTransient) {
