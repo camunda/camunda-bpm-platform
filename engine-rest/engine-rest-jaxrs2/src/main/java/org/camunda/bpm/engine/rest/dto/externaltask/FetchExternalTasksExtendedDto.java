@@ -27,4 +27,10 @@ public class FetchExternalTasksExtendedDto extends FetchExternalTasksDto {
     return asyncResponseTimeout;
   }
 
+  @Override
+  public String toString() {
+    return "FetchExternalTasksExtendedDto [asyncResponseTimeout=" + asyncResponseTimeout + ", maxTasks=" + maxTasks + ", workerId=" + workerId
+        + ", usePriority=" + usePriority + ", topics=" + topics + "]";
+  }
+
 }
