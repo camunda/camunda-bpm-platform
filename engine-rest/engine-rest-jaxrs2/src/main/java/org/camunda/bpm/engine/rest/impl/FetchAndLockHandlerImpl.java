@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
@@ -40,6 +42,8 @@ import org.camunda.bpm.engine.rest.util.EngineUtil;
  * @author Tassilo Weidner
  */
 public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
+
+  private final static Logger LOG = Logger.getLogger(FetchAndLockHandlerImpl.class.getName());
 
   protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30 * 1000;
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
@@ -73,7 +77,11 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   }
 
   protected void acquire() {
+    LOG.log(Level.FINEST, "Acquire start");
+
     queue.drainTo(pendingRequests);
+
+    LOG.log(Level.FINEST, "Number of pending requests {0}", pendingRequests.size());
 
     long backoffTime = MAX_BACK_OFF_TIME; //timestamp
 
@@ -82,7 +90,11 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
       FetchAndLockRequest pendingRequest = iterator.next();
 
+      LOG.log(Level.FINEST, "Fetching tasks for request {0}", pendingRequest);
+
       FetchAndLockResult result = tryFetchAndLock(pendingRequest);
+
+      LOG.log(Level.FINEST, "Fetch and lock result: {0}", result);
 
       if (result.wasSuccessful()) {
 
@@ -91,6 +103,8 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
         if (!lockedTasks.isEmpty() || isExpired(pendingRequest)) {
           AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
           asyncResponse.resume(lockedTasks);
+
+          LOG.log(Level.FINEST, "resume and remove request with {0}", lockedTasks);
 
           iterator.remove();
         }
@@ -103,6 +117,8 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
         AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
         Throwable processEngineException = result.getThrowable();
         asyncResponse.resume(processEngineException);
+
+        LOG.log(Level.FINEST, "Resume and remove request with error {0}", processEngineException);
 
         iterator.remove();
       }
@@ -154,7 +170,9 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected void suspendAcquisition(long millis) {
     try {
       if (queue.isEmpty() && isRunning) {
+        LOG.log(Level.FINEST, "Suspend acquisition for {0}ms", millis);
         condition.await(millis);
+        LOG.log(Level.FINEST, "Acquisition woke up", millis);
       }
     }
     finally {
@@ -255,19 +273,29 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       .setAuthentication(authentication)
       .setDto(dto);
 
+    LOG.log(Level.FINEST, "New request: {0}", incomingRequest);
+
     FetchAndLockResult result = tryFetchAndLock(incomingRequest);
+
+    LOG.log(Level.FINEST, "Fetch and lock result: {0}", result);
 
     if (result.wasSuccessful()) {
       List<LockedExternalTaskDto> lockedTasks = result.getTasks();
       if (!lockedTasks.isEmpty() || dto.getAsyncResponseTimeout() == null) { // response immediately if tasks available
         asyncResponse.resume(lockedTasks);
+
+        LOG.log(Level.FINEST, "Resuming request with {0}", lockedTasks);
       } else {
         addRequest(incomingRequest);
+
+        LOG.log(Level.FINEST, "Deferred request");
       }
     }
     else {
       Throwable processEngineException = result.getThrowable();
       asyncResponse.resume(processEngineException);
+
+      LOG.log(Level.FINEST, "Resuming request with error {0}", processEngineException);
     }
   }
 

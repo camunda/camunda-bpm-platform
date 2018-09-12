@@ -135,5 +135,13 @@ public class LockedExternalTaskDto {
 
     return dtos;
   }
+  @Override
+  public String toString() {
+    return "LockedExternalTaskDto [activityId=" + activityId + ", activityInstanceId=" + activityInstanceId + ", errorMessage=" + errorMessage
+        + ", errorDetails=" + errorDetails + ", executionId=" + executionId + ", id=" + id + ", lockExpirationTime=" + lockExpirationTime
+        + ", processDefinitionId=" + processDefinitionId + ", processDefinitionKey=" + processDefinitionKey + ", processInstanceId=" + processInstanceId
+        + ", retries=" + retries + ", suspended=" + suspended + ", workerId=" + workerId + ", topicName=" + topicName + ", tenantId=" + tenantId
+        + ", variables=" + variables + ", priority=" + priority + ", businessKey=" + businessKey + "]";
+  }
 
 }

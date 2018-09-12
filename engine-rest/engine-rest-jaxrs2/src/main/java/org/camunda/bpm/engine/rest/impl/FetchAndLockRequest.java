@@ -83,4 +83,10 @@ public class FetchAndLockRequest {
     return requestTime + asyncResponseTimeout;
   }
 
+  @Override
+  public String toString() {
+    return "FetchAndLockRequest [requestTime=" + requestTime + ", dto=" + dto + ", asyncResponse=" + asyncResponse + ", processEngineName=" + processEngineName
+        + ", authentication=" + authentication + "]";
+  }
+
 }

@@ -53,4 +53,9 @@ public class FetchAndLockResult {
     return new FetchAndLockResult(throwable);
   }
 
+  @Override
+  public String toString() {
+    return "FetchAndLockResult [tasks=" + tasks + ", throwable=" + throwable + "]";
+  }
+
 }
