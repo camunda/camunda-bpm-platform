@@ -1,0 +1,5 @@
+<module xmlns="urn:jboss:module:1.0" name="net.minidev.accessors-smart">
+  <resources>
+    <resource-root path="accessors-smart-1.2.jar" />
+  </resources>
+</module>

@@ -28,7 +28,7 @@
         <extension module="org.wildfly.extension.batch"/>
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.undertow"/>
-        <extension module="org.camunda.bpm.wildfly.camunda-wildfly-subsystem"/>
+        <extension module="org.camunda.bpm.wildfly.camunda-wildfly8-subsystem"/>
     </extensions>
     <management>
         <security-realms>

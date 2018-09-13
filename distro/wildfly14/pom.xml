@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-database-settings</artifactId>
+    <relativePath>../../database</relativePath>
+    <version>7.10.0-SNAPSHOT</version>
+  </parent>
+  
+  <groupId>org.camunda.bpm.wildfly</groupId>
+  <artifactId>camunda-wildfly14</artifactId>
+  <packaging>pom</packaging>
+
+  <name>camunda BPM - Wildfly 14</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M1</version>
+        <executions>
+          <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[1.7,)</version>
+                  <message>
+                    *****************************************************************************************************
+                    *                                                                                                   *
+                    *            You must use at least use JDK 1.7 to compile Camunda Bpm Wildfly 14!!!                 *
+                    * Continue by excluding Wildfly from reactor by using '-P-distro-wildfly14' to disable the profile. *
+                    *                                                                                                   *
+                    *****************************************************************************************************
+                  </message>
+                </requireJavaVersion>
+              </rules>
+              <failFast>true</failFast>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${version.java.wildfly}</source>
+          <target>${version.java.wildfly}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>assembly</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro-ce</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro</module>
+      </modules>
+    </profile>
+  </profiles>
+
+</project>

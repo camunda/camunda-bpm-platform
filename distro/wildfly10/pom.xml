@@ -64,6 +64,8 @@
       </activation>
       <modules>
         <module>assembly</module>
+        <module>modules</module>
+        <module>subsystem</module>
       </modules>
     </profile>
     <profile>

@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.mybatis.mybatis">
+  <resources>
+    <resource-root path="mybatis-@version.mybatis@.jar" />
+  </resources>
+
+  <dependencies>    
+    <module name="javax.api" />
+    <module name="javax.transaction.api" />
+  </dependencies>
+</module>

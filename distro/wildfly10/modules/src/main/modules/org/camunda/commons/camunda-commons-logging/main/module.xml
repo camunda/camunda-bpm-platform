@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.commons.camunda-commons-logging">
+  <resources>
+    <resource-root path="camunda-commons-logging-@version.camunda.commons@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api"/>
+    <module name="org.slf4j" />
+  </dependencies>
+</module>

@@ -1,0 +1,39 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.camunda-engine">
+  <resources>
+    <resource-root path="camunda-engine-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+    <module name="javax.transaction.api"/>
+    <module name="javax.enterprise.api" />
+    <module name="javax.inject.api" />
+    <module name="javax.ejb.api" />
+    <module name="javax.xml.bind.api" />
+    <module name="javax.servlet.api" />
+
+    <module name="org.jboss.vfs" />
+
+    <module name="org.mybatis.mybatis" />
+    <module name="com.fasterxml.uuid.java-uuid-generator"/>
+    <module name="org.joda.time" slot="2.1" />
+    <module name="org.codehaus.groovy.groovy-all" services="import"/>
+
+    <module name="sun.jdk" services="import"/>
+
+    <module name="org.camunda.bpm.model.camunda-xml-model" />
+    <module name="org.camunda.bpm.model.camunda-bpmn-model" />
+    <module name="org.camunda.bpm.model.camunda-cmmn-model" />
+    <module name="org.camunda.bpm.model.camunda-dmn-model" />
+
+    <module name="org.camunda.commons.camunda-commons-logging" />
+    <module name="org.camunda.commons.camunda-commons-utils" />
+    <module name="org.camunda.commons.camunda-commons-typed-values" export="true" />
+    <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
+    <module name="org.camunda.spin.camunda-spin-core" services="import" />
+
+    <module name="org.camunda.bpm.dmn.camunda-engine-dmn" />
+
+  </dependencies>
+</module>

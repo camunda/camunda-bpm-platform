@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.codehaus.groovy.groovy-all">
+  <resources>
+    <resource-root path="groovy-all-2.4.13.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="org.camunda.spin.camunda-spin-core" />
+  </dependencies>
+</module>

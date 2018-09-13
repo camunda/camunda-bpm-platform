@@ -29,7 +29,7 @@
         <extension module="org.wildfly.extension.batch"/>
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.undertow"/>
-        <extension module="org.camunda.bpm.wildfly.camunda-wildfly-subsystem"/>
+        <extension module="org.camunda.bpm.wildfly.camunda-wildfly8-subsystem"/>
     </extensions>
     <system-properties>
         <!-- IPv4 is not required, but setting this helps avoid unintended use of IPv6 -->

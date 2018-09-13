@@ -1,0 +1,23 @@
+<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+    <job-executor>
+        <thread-pool-name>job-executor-tp</thread-pool-name>
+        <core-threads>5</core-threads>
+        <max-threads>15</max-threads>
+        <queue-length>15</queue-length>
+        <job-acquisitions>
+            <job-acquisition name="default">
+                
+                <!-- REMOVE deprecated  acquisition-strategy
+                <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+                -->
+                
+                <properties>
+                    <property name="lockTimeInMillis">300000</property>
+                    <property name="waitTimeInMillis">5000</property>
+                    <property name="maxJobsPerAcquisition">3</property>
+                </properties>
+            </job-acquisition>
+           
+        </job-acquisitions>
+    </job-executor>
+</subsystem>

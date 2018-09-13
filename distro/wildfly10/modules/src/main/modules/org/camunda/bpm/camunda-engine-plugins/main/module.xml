@@ -1,0 +1,7 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.camunda-engine-plugins">
+
+  <dependencies>
+    <!-- Add custom engine plugins here -->
+    <!-- <module name="org.camunda.bpm.camunda-custom-engine-plugin" export="true" /> -->
+  </dependencies>
+</module>
