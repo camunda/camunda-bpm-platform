@@ -14,33 +14,38 @@
 package org.camunda.bpm.engine.test.api.resources;
 
 import static org.camunda.bpm.engine.repository.ResourceTypes.HISTORY;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.ibatis.jdbc.RuntimeSqlException;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -63,6 +68,10 @@ import org.junit.rules.RuleChain;
 public class HistoryByteArrayTest {
   protected static final String DECISION_PROCESS = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml";
   protected static final String DECISION_SINGLE_OUTPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
+  protected static final String WORKER_ID = "aWorkerId";
+  protected static final long LOCK_TIME = 10000L;
+  protected static final String TOPIC_NAME = "externalTaskTopic";
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -74,6 +83,7 @@ public class HistoryByteArrayTest {
   protected ManagementService managementService;
   protected TaskService taskService;
   protected HistoryService historyService;
+  protected ExternalTaskService externalTaskService;
 
   protected String taskId;
 
@@ -84,6 +94,7 @@ public class HistoryByteArrayTest {
     managementService = engineRule.getManagementService();
     taskService = engineRule.getTaskService();
     historyService = engineRule.getHistoryService();
+    externalTaskService = engineRule.getExternalTaskService();
   }
 
   @After
@@ -110,10 +121,7 @@ public class HistoryByteArrayTest {
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
         .execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
@@ -134,10 +142,7 @@ public class HistoryByteArrayTest {
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
         .execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
@@ -156,10 +161,7 @@ public class HistoryByteArrayTest {
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
         .execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
@@ -177,10 +179,7 @@ public class HistoryByteArrayTest {
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
@@ -191,7 +190,7 @@ public class HistoryByteArrayTest {
 
     HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
     List<HistoricDecisionOutputInstance> outputInstances = historicDecisionInstance.getOutputs();
-    assertThat(outputInstances.size(), is(1));
+    assertEquals(1, outputInstances.size());
 
 
     String byteArrayValueId = ((HistoricDecisionOutputInstanceEntity) outputInstances.get(0)).getByteArrayValueId();
@@ -199,10 +198,7 @@ public class HistoryByteArrayTest {
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
@@ -217,14 +213,11 @@ public class HistoryByteArrayTest {
 
       ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(attachment.getContentId()));
 
-      // then
-      assertNotNull(byteArrayEntity);
-      assertNotNull(byteArrayEntity.getCreateTime());
-      assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
+      checkBinary(byteArrayEntity);
   }
 
   @Test
-  public void testExceptionStacktrace() {
+  public void testHistoricExceptionStacktraceBinary() {
     // given
     BpmnModelInstance instance = createFailingProcess();
     testRule.deploy(instance);
@@ -247,7 +240,46 @@ public class HistoryByteArrayTest {
 
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(entity.getExceptionByteArrayId()));
 
+    checkBinary(byteArrayEntity);
+  }
+
+  @Test
+  public void testHistoricExternalTaskJobLogStacktraceBinary() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = tasks.get(0);
+
+    // submitting a failure (after a simulated processing time of three seconds)
+    ClockUtil.setCurrentTime(nowPlus(3000L));
+
+    String errorMessage;
+    String exceptionStackTrace;
+    try {
+      throw new RuntimeSqlException("test cause");
+    } catch (RuntimeException e) {
+      exceptionStackTrace = ExceptionUtils.getStackTrace(e);
+      errorMessage = e.getMessage();
+    }
+    assertNotNull(exceptionStackTrace);
+
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, exceptionStackTrace, 5, 3000L);
+
+    HistoricExternalTaskLogEntity entity = (HistoricExternalTaskLogEntity) historyService.createHistoricExternalTaskLogQuery().errorMessage(errorMessage).singleResult();
+    assertNotNull(entity);
+
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(entity.getErrorDetailsByteArrayId()));
+
     // then
+    checkBinary(byteArrayEntity);
+  }
+
+  protected void checkBinary(ByteArrayEntity byteArrayEntity) {
     assertNotNull(byteArrayEntity);
     assertNotNull(byteArrayEntity.getCreateTime());
     assertEquals(HISTORY.getValue(), byteArrayEntity.getType());
@@ -291,4 +323,8 @@ public class HistoryByteArrayTest {
         Variables.createVariables().putValue("input1", input));
   }
 
+
+  protected Date nowPlus(long millis) {
+    return new Date(ClockUtil.getCurrentTime().getTime() + millis);
+  }
 }

@@ -63,19 +63,10 @@ public class ExceptionUtil {
     ByteArrayEntity result = null;
 
     if (byteArray != null) {
-      if (type != null) {
-        result = new ByteArrayEntity(name, byteArray, type);
-        Context.getCommandContext()
-          .getByteArrayManager()
-          .insertByteArray(result);
-
-      } else {
-        result = new ByteArrayEntity(name, byteArray);
-        Context
-          .getCommandContext()
-          .getDbEntityManager()
-          .insert(result);
-      }
+      result = new ByteArrayEntity(name, byteArray, type);
+      Context.getCommandContext()
+        .getByteArrayManager()
+        .insertByteArray(result);
     }
 
     return result;

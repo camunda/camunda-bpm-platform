@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 
 import java.util.Date;
 
@@ -122,7 +123,7 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
     EnsureUtil.ensureNotNull("exception", exception);
 
     byte[] exceptionBytes = toByteArray(exception);
-    ByteArrayEntity byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes, null);
+    ByteArrayEntity byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes, ResourceTypes.HISTORY);
     errorDetailsByteArrayId = byteArray.getId();
   }
 
