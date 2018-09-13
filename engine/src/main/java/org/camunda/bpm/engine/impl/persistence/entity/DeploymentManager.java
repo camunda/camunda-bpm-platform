@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 
 
 /**
@@ -49,6 +50,7 @@ public class DeploymentManager extends AbstractManager {
 
     for (ResourceEntity resource : deployment.getResources().values()) {
       resource.setDeploymentId(deployment.getId());
+      resource.setType(ResourceTypes.REPOSITORY.getValue());
       getResourceManager().insertResource(resource);
     }
 

@@ -17,6 +17,8 @@ import static org.camunda.bpm.engine.repository.ResourceTypes.REPOSITORY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -26,6 +28,8 @@ import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -67,6 +71,17 @@ public class RepositoryByteArrayTest {
   }
 
   @Test
+  public void testResourceBinary() {
+    String bpmnDeploymentId = testRule.deploy("org/camunda/bpm/engine/test/repository/one.bpmn20.xml").getId();
+    String dmnDeploymentId = testRule.deploy("org/camunda/bpm/engine/test/repository/one.dmn").getId();
+    String cmmnDeplymentId = testRule.deploy("org/camunda/bpm/engine/test/repository/one.cmmn").getId();
+
+    checkResource(bpmnDeploymentId);
+    checkResource(dmnDeploymentId);
+    checkResource(cmmnDeplymentId);
+  }
+
+  @Test
   public void testUserPictureBinary() {
     // when
     User user = identityService.newUser(USER_ID);
@@ -86,4 +101,12 @@ public class RepositoryByteArrayTest {
     assertEquals(REPOSITORY.getValue(), byteArrayEntity.getType());
   }
 
+
+  protected void checkResource(String deploymentId) {
+    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentId);
+    assertEquals(1, deploymentResources.size());
+    ResourceEntity resource = (ResourceEntity) deploymentResources.get(0);
+    assertNotNull(resource.getCreateTime());
+    assertEquals(REPOSITORY.getValue(), resource.getType());
+  }
 }

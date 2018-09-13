@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Set;
 public class ResourceManager extends AbstractManager {
 
   public void insertResource(ResourceEntity resource) {
+    resource.setCreateTime(ClockUtil.getCurrentTime());
     getDbEntityManager().insert(resource);
   }
 
