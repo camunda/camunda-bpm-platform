@@ -82,6 +82,22 @@ public class RepositoryByteArrayTest {
   }
 
   @Test
+  public void testFormsBinaries() {
+    String deploymentId = testRule.deploy("org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/api/form/start.form",
+        "org/camunda/bpm/engine/test/api/form/task.form",
+        "org/camunda/bpm/engine/test/api/authorization/renderedFormProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
+
+    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentId);
+    assertEquals(5, deploymentResources.size());
+    for (Resource resource : deploymentResources) {
+      ResourceEntity entity = (ResourceEntity) resource;
+      checkEntity(entity);
+    }
+  }
+
+  @Test
   public void testUserPictureBinary() {
     // when
     User user = identityService.newUser(USER_ID);
@@ -106,7 +122,12 @@ public class RepositoryByteArrayTest {
     List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentId);
     assertEquals(1, deploymentResources.size());
     ResourceEntity resource = (ResourceEntity) deploymentResources.get(0);
-    assertNotNull(resource.getCreateTime());
-    assertEquals(REPOSITORY.getValue(), resource.getType());
+    checkEntity(resource);
+  }
+
+  protected void checkEntity(ResourceEntity entity) {
+    assertNotNull(entity);
+    assertNotNull(entity.getCreateTime());
+    assertEquals(REPOSITORY.getValue(), entity.getType());
   }
 }
