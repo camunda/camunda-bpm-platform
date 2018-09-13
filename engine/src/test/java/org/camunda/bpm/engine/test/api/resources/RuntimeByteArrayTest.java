@@ -18,18 +18,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.ibatis.jdbc.RuntimeSqlException;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
@@ -48,6 +56,10 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 public class RuntimeByteArrayTest {
+  protected static final String WORKER_ID = "aWorkerId";
+  protected static final long LOCK_TIME = 10000L;
+  protected static final String TOPIC_NAME = "externalTaskTopic";
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
@@ -62,6 +74,7 @@ public class RuntimeByteArrayTest {
   protected ManagementService managementService;
   protected TaskService taskService;
   protected RepositoryService repositoryService;
+  protected ExternalTaskService externalTaskService;
 
   protected String id;
 
@@ -72,6 +85,7 @@ public class RuntimeByteArrayTest {
     managementService = engineRule.getManagementService();
     taskService = engineRule.getTaskService();
     repositoryService = engineRule.getRepositoryService();
+    externalTaskService = engineRule.getExternalTaskService();
   }
 
   @After
@@ -85,6 +99,7 @@ public class RuntimeByteArrayTest {
       // delete task
       taskService.deleteTask(id, true);
     }
+    ClockUtil.setCurrentTime(new Date());
   }
 
   @Test
@@ -103,10 +118,7 @@ public class RuntimeByteArrayTest {
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
         .execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
@@ -127,14 +139,11 @@ public class RuntimeByteArrayTest {
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
         .execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
-  public void testBatchCreation() {
+  public void testBatchBinary() {
     // when
     helper.migrateProcessInstancesAsync(15);
 
@@ -143,14 +152,11 @@ public class RuntimeByteArrayTest {
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
         .execute(new GetByteArrayCommand(byteArrayValueId));
 
-    // then
-    assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
-    assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
+    checkBinary(byteArrayEntity);
   }
 
   @Test
-  public void testExceptionStacktrace() {
+  public void testExceptionStacktraceBinary() {
     // given
     BpmnModelInstance instance = createFailingProcess();
     testRule.deploy(instance);
@@ -170,7 +176,45 @@ public class RuntimeByteArrayTest {
 
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(job.getExceptionByteArrayId()));
 
+    checkBinary(byteArrayEntity);
+  }
+
+  @Test
+  public void testExternalTaskStacktraceBinary() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = tasks.get(0);
+
+    // submitting a failure (after a simulated processing time of three seconds)
+    ClockUtil.setCurrentTime(nowPlus(3000L));
+
+    String errorMessage;
+    String exceptionStackTrace;
+    try {
+      throw new RuntimeSqlException("test cause");
+    } catch (RuntimeException e) {
+      exceptionStackTrace = ExceptionUtils.getStackTrace(e);
+      errorMessage = e.getMessage();
+    }
+    assertNotNull(exceptionStackTrace);
+
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, exceptionStackTrace, 5, 3000L);
+
+    ExternalTaskEntity externalTask = (ExternalTaskEntity) externalTaskService.createExternalTaskQuery().singleResult();
+
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(externalTask.getErrorDetailsByteArrayId()));
+
     // then
+    checkBinary(byteArrayEntity);
+  }
+
+  protected void checkBinary(ByteArrayEntity byteArrayEntity) {
     assertNotNull(byteArrayEntity);
     assertNotNull(byteArrayEntity.getCreateTime());
     assertEquals(RUNTIME.getValue(), byteArrayEntity.getType());
@@ -207,6 +251,10 @@ public class RuntimeByteArrayTest {
       .camundaClass(FailingDelegate.class)
       .endEvent()
       .done();
+  }
+
+  protected Date nowPlus(long millis) {
+    return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }
 
 }

@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
 
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createExceptionByteArray;
@@ -277,7 +278,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     ByteArrayEntity byteArray = getErrorByteArray();
 
     if(byteArray == null) {
-      byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes, null);
+      byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes, ResourceTypes.RUNTIME);
       errorDetailsByteArrayId = byteArray.getId();
       errorDetailsByteArray = byteArray;
     }
