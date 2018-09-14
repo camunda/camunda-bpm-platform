@@ -419,19 +419,6 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     addAuthorizationsFromIterator(processDefinition.getCandidateStarterGroupIdExpressions(), processDefinition, ExprType.GROUP);
   }
 
-  protected void createResource(String name, byte[] bytes, DeploymentEntity deploymentEntity) {
-    ResourceEntity resource = new ResourceEntity();
-    resource.setName(name);
-    resource.setBytes(bytes);
-    resource.setDeploymentId(deploymentEntity.getId());
-
-    // Mark the resource as 'generated'
-    resource.setGenerated(true);
-
-    getDbEntityManager()
-      .insert(resource);
-  }
-
   // context ///////////////////////////////////////////////////////////////////////////////////////////
 
   protected DbEntityManager getDbEntityManager() {
