@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.repository.ResourceTypes.REPOSITORY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.IdentityService;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -72,17 +74,23 @@ public class RepositoryByteArrayTest {
 
   @Test
   public void testResourceBinary() {
+    Date fixedDate = new Date();
+    ClockUtil.setCurrentTime(fixedDate);
+
     String bpmnDeploymentId = testRule.deploy("org/camunda/bpm/engine/test/repository/one.bpmn20.xml").getId();
     String dmnDeploymentId = testRule.deploy("org/camunda/bpm/engine/test/repository/one.dmn").getId();
     String cmmnDeplymentId = testRule.deploy("org/camunda/bpm/engine/test/repository/one.cmmn").getId();
 
-    checkResource(bpmnDeploymentId);
-    checkResource(dmnDeploymentId);
-    checkResource(cmmnDeplymentId);
+    checkResource(fixedDate, bpmnDeploymentId);
+    checkResource(fixedDate, dmnDeploymentId);
+    checkResource(fixedDate, cmmnDeplymentId);
   }
 
   @Test
   public void testFormsBinaries() {
+    Date fixedDate = new Date();
+    ClockUtil.setCurrentTime(fixedDate);
+
     String deploymentId = testRule.deploy("org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/form/start.form",
         "org/camunda/bpm/engine/test/api/form/task.form",
@@ -93,13 +101,15 @@ public class RepositoryByteArrayTest {
     assertEquals(5, deploymentResources.size());
     for (Resource resource : deploymentResources) {
       ResourceEntity entity = (ResourceEntity) resource;
-      checkEntity(entity);
+      checkEntity(fixedDate, entity);
     }
   }
 
   @Test
   public void testUserPictureBinary() {
     // when
+    Date fixedDate = new Date();
+    ClockUtil.setCurrentTime(fixedDate);
     User user = identityService.newUser(USER_ID);
     identityService.saveUser(user);
     String userId = user.getId();
@@ -113,21 +123,21 @@ public class RepositoryByteArrayTest {
 
     // then
     assertNotNull(byteArrayEntity);
-    assertNotNull(byteArrayEntity.getCreateTime());
+    assertEquals(fixedDate, byteArrayEntity.getCreateTime());
     assertEquals(REPOSITORY.getValue(), byteArrayEntity.getType());
   }
 
 
-  protected void checkResource(String deploymentId) {
+  protected void checkResource(Date expectedDate, String deploymentId) {
     List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentId);
     assertEquals(1, deploymentResources.size());
     ResourceEntity resource = (ResourceEntity) deploymentResources.get(0);
-    checkEntity(resource);
+    checkEntity(expectedDate, resource);
   }
 
-  protected void checkEntity(ResourceEntity entity) {
+  protected void checkEntity(Date expectedDate, ResourceEntity entity) {
     assertNotNull(entity);
-    assertNotNull(entity.getCreateTime());
+    assertEquals(expectedDate, entity.getCreateTime());
     assertEquals(REPOSITORY.getValue(), entity.getType());
   }
 }
