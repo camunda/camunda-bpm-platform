@@ -123,7 +123,7 @@ public class RepositoryByteArrayTest {
 
     // then
     assertNotNull(byteArrayEntity);
-    assertEquals(fixedDate, byteArrayEntity.getCreateTime());
+    assertEquals(fixedDate.toString(), byteArrayEntity.getCreateTime().toString());
     assertEquals(REPOSITORY.getValue(), byteArrayEntity.getType());
   }
 
@@ -137,7 +137,7 @@ public class RepositoryByteArrayTest {
 
   protected void checkEntity(Date expectedDate, ResourceEntity entity) {
     assertNotNull(entity);
-    assertEquals(expectedDate, entity.getCreateTime());
+    assertEquals(expectedDate.toString(), entity.getCreateTime().toString());
     assertEquals(REPOSITORY.getValue(), entity.getType());
   }
 }
