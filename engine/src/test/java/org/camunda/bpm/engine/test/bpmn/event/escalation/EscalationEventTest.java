@@ -343,4 +343,107 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
     // and set the escalationCode of the escalation event to the declared variable
     assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalation.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileThrowEscalation() {
+    // given
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", 42);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("EscalationParentProcess", variables).getId();
+
+    // when throw an escalation event on called process
+    String id = taskService.createTaskQuery().taskName("ut2").singleResult().getId();
+    taskService.complete(id);
+
+    // then
+    checkOutput(processInstanceId);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationTwoLevels.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileThrowEscalationTwoLevels() {
+    // given
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", 42);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("EscalationParentProcess", variables).getId();
+
+    // when throw an escalation event on called process
+    String id = taskService.createTaskQuery().taskName("ut2").singleResult().getId();
+    taskService.complete(id);
+
+    // then
+    checkOutput(processInstanceId);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationThreeLevels.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileThrowEscalationThreeLevels() {
+    // given
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", 42);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("EscalationParentProcess", variables).getId();
+
+    // when throw an escalation event on called process
+    String id = taskService.createTaskQuery().taskName("ut2").singleResult().getId();
+    taskService.complete(id);
+
+    // then
+    checkOutput(processInstanceId);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationInSubProcess.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileThrowEscalationInSubProcess() {
+    // given
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", 42);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("EscalationParentProcess", variables).getId();
+
+    // when throw an escalation event on called process
+    String id = taskService.createTaskQuery().taskName("ut2").singleResult().getId();
+    taskService.complete(id);
+
+    // then
+    checkOutput(processInstanceId);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationInSubProcessThreeLevels.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileThrowEscalationInSubProcessThreeLevels() {
+    // given
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", 42);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("EscalationParentProcess", variables).getId();
+
+    // when throw an escalation event on called process
+    String id = taskService.createTaskQuery().taskName("ut2").singleResult().getId();
+    taskService.complete(id);
+
+    // then
+    checkOutput(processInstanceId);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalation2.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileThrowEscalation2() {
+    // given
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", 42);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("EscalationParentProcess", variables).getId();
+
+    // when throw an escalation event on called process
+    String id = taskService.createTaskQuery().taskName("inside subprocess").singleResult().getId();
+    taskService.complete(id);
+
+    // then
+    checkOutput(processInstanceId);
+  }
+
+  protected void checkOutput(String processInstanceId) {
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // and set the output variable of the called process to the process
+    assertNotNull(runtimeService.getVariable(processInstanceId, "cancelReason"));
+    assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
+  }
 }

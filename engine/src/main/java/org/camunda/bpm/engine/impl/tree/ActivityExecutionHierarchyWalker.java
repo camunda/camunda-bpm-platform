@@ -39,17 +39,23 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
 
   @Override
   protected ActivityExecutionTuple nextElement() {
-    PvmScope currentScope = getCurrentElement().getScope();
+    ActivityExecutionTuple currentElement = getCurrentElement();
+
+    PvmScope currentScope = currentElement.getScope();
+    PvmExecutionImpl currentExecution = (PvmExecutionImpl) currentElement.getExecution();
+
     PvmScope flowScope = currentScope.getFlowScope();
 
-    if (flowScope != null) {
+    if (!currentExecution.isScope()) {
+      currentExecution = activityExecutionMapping.get(currentScope);
+      return new ActivityExecutionTuple(currentScope, currentExecution);
+    } else if (flowScope != null) {
       // walk to parent scope
       PvmExecutionImpl execution = activityExecutionMapping.get(flowScope);
       return new ActivityExecutionTuple(flowScope, execution);
-
     } else {
       // this is the process instance, look for parent
-      PvmExecutionImpl currentExecution = activityExecutionMapping.get(currentScope);
+      currentExecution = activityExecutionMapping.get(currentScope);
       PvmExecutionImpl superExecution = currentExecution.getSuperExecution();
 
       if (superExecution != null) {
