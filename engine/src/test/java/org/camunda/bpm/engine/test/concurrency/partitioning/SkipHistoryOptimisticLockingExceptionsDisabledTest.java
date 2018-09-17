@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -85,6 +86,12 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
       return null;
     }
 
+  }
+
+  protected void runTest() throws Throwable {
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      super.runTest();
+    }
   }
 
 }
