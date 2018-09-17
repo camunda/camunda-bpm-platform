@@ -20,13 +20,14 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.task.Attachment;
 
 
 /**
  * @author Tom Baeyens
  */
-public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Serializable {
+public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, HistoricEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 

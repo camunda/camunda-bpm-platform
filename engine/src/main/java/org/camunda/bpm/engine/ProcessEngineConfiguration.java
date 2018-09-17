@@ -14,8 +14,6 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -321,6 +319,14 @@ public abstract class ProcessEngineConfiguration {
    * <p>The default value is <code>false</code>.</p>
    */
   protected boolean enableExceptionsAfterUnhandledBpmnError = false;
+
+  /**
+   * If the value of this flag is set to <code>false</code>, {@link OptimisticLockingException}s
+   * are not skipped for UPDATE or DELETE operations applied to historic entities.
+   *
+   * <p>The default value is <code>true</code>.</p>
+   */
+  protected boolean skipHistoryOptimisticLockingExceptions = true;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -860,4 +866,13 @@ public abstract class ProcessEngineConfiguration {
   public void setEnableExceptionsAfterUnhandledBpmnError(boolean enableExceptionsAfterUnhandledBpmnError) {
     this.enableExceptionsAfterUnhandledBpmnError = enableExceptionsAfterUnhandledBpmnError;
   }
+
+  public boolean isSkipHistoryOptimisticLockingExceptions() {
+    return skipHistoryOptimisticLockingExceptions;
+  }
+
+  public void setSkipHistoryOptimisticLockingExceptions(boolean skipHistoryOptimisticLockingExceptions) {
+    this.skipHistoryOptimisticLockingExceptions = skipHistoryOptimisticLockingExceptions;
+  }
+
 }

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.history.event;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
@@ -39,7 +40,7 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
  * @author Daniel Meyer
  *
  */
-public class HistoryEvent implements Serializable, DbEntity {
+public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
 
   private static final long serialVersionUID = 1L;
 

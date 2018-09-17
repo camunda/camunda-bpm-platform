@@ -57,6 +57,7 @@ import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EntityLoadListener;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -72,9 +73,11 @@ import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 
 /**
  *
@@ -480,8 +483,24 @@ public class DbEntityManager implements Session, EntityLoadListener {
       }
     }
 
+    if (!isHandled && Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()) {
+      DbEntity dbEntity = ((DbEntityOperation) dbOperation).getEntity();
+      if (dbEntity instanceof HistoricEntity || isHistoricByteArray(dbEntity)) {
+        isHandled = true;
+      }
+    }
+
     if(!isHandled) {
       throw LOG.concurrentUpdateDbEntityException(dbOperation);
+    }
+  }
+
+  protected boolean isHistoricByteArray(DbEntity dbEntity) {
+    if (dbEntity instanceof ByteArrayEntity) {
+      ByteArrayEntity byteArrayEntity = (ByteArrayEntity) dbEntity;
+      return byteArrayEntity.getType().equals(ResourceTypes.HISTORY.getValue());
+    } else {
+      return false;
     }
   }
 

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
 
@@ -27,7 +28,7 @@ import org.camunda.bpm.engine.task.Event;
 /**
  * @author Tom Baeyens
  */
-public class CommentEntity implements Comment, Event, DbEntity, Serializable {
+public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, Serializable {
   
   private static final long serialVersionUID = 1L;
   
