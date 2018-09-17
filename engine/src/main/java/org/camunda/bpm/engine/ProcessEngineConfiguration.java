@@ -871,8 +871,9 @@ public abstract class ProcessEngineConfiguration {
     return skipHistoryOptimisticLockingExceptions;
   }
 
-  public void setSkipHistoryOptimisticLockingExceptions(boolean skipHistoryOptimisticLockingExceptions) {
+  public ProcessEngineConfiguration setSkipHistoryOptimisticLockingExceptions(boolean skipHistoryOptimisticLockingExceptions) {
     this.skipHistoryOptimisticLockingExceptions = skipHistoryOptimisticLockingExceptions;
+    return this;
   }
 
 }

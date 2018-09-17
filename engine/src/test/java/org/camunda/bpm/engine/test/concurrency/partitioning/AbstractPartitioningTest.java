@@ -31,6 +31,8 @@ public abstract class AbstractPartitioningTest extends ConcurrencyTestCase {
     super.setUp();
 
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+
+    processEngine.getProcessEngineConfiguration().setSkipHistoryOptimisticLockingExceptions(true);
   }
 
   final protected BpmnModelInstance PROCESS_WITH_USERTASK = Bpmn.createExecutableProcess("process")
