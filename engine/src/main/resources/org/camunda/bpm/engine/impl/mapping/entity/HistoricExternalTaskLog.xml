@@ -48,10 +48,6 @@
 
   <!-- DELETE -->
 
-  <delete id="deleteHistoricExternalTaskLogByProcessInstanceId">
-    delete from ${prefix}ACT_HI_EXT_TASK_LOG where PROC_INST_ID_ = #{processInstanceId}
-  </delete>
-
   <delete id="deleteHistoricExternalTaskLogByProcessInstanceIds">
     delete
     from ${prefix}ACT_HI_EXT_TASK_LOG

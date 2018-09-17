@@ -95,16 +95,6 @@
       </where>
   </delete>
 
-  <delete id="deleteByteArraysByIds">
-    delete
-    from
-    ${prefix}ACT_GE_BYTEARRAY
-    where
-      <bind name="listOfIds" value="list"/>
-      <bind name="fieldName" value="'ID_'"/>
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
-  </delete>
-
   <!-- ATTACHMENT RESULTMAP -->
 
   <resultMap id="attachmentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">

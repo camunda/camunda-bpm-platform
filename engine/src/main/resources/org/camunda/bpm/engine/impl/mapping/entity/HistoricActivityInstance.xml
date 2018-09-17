@@ -99,10 +99,6 @@
 
   <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
 
-  <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
-    delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
-  </delete>
-
   <delete id="deleteHistoricActivityInstancesByProcessInstanceIds">
     delete from ${prefix}ACT_HI_ACTINST
     where

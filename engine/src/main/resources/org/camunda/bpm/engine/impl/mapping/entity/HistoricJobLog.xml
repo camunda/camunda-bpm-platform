@@ -62,10 +62,6 @@
     delete from ${prefix}ACT_HI_JOB_LOG where JOB_ID_ = #{jobId}
   </delete>
 
-  <delete id="deleteHistoricJobLogByProcessInstanceId">
-    delete from ${prefix}ACT_HI_JOB_LOG where PROCESS_INSTANCE_ID_ = #{processInstanceId}
-  </delete>
-
   <delete id="deleteHistoricJobLogByProcessInstanceIds">
     delete
     from ${prefix}ACT_HI_JOB_LOG

@@ -121,10 +121,6 @@
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
 
-  <delete id="deleteHistoricFormProperty">
-    delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
-  </delete>
-
   <delete id="deleteHistoricDetailsByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_DETAIL
     <where>

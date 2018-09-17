@@ -70,10 +70,6 @@
     delete from ${prefix}ACT_HI_INCIDENT where ID_ = #{id}
   </delete>
 
-  <delete id="deleteHistoricIncidentsByProcessInstanceId">
-    delete from ${prefix}ACT_HI_INCIDENT where PROC_INST_ID_ = #{processInstanceId}
-  </delete>
-
   <delete id="deleteHistoricIncidentsByProcessInstanceIds">
     delete from ${prefix}ACT_HI_INCIDENT
     where

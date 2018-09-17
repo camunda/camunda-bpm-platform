@@ -94,10 +94,6 @@
     delete from ${prefix}ACT_HI_VARINST where ID_ = #{id} and REV_ = #{revision}
   </delete>
 
-  <delete id="deleteHistoricVariableInstanceById">
-    delete from ${prefix}ACT_HI_VARINST where ID_ = #{id}
-  </delete>
-
   <delete id="deleteHistoricVariableInstanceByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_VARINST
     <where>

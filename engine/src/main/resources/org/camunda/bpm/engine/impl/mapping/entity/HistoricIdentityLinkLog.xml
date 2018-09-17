@@ -35,10 +35,6 @@
   
   <!-- HISTORIC IDENTITY LINK DELETE -->
 
-  <delete id="deleteHistoricIdentityLink" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
-    delete from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id}
-  </delete>
-
   <delete id="deleteHistoricIdentityLinksByProcessDefinitionId">
     delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_DEF_ID_ = #{processDefinitionId}
   </delete>

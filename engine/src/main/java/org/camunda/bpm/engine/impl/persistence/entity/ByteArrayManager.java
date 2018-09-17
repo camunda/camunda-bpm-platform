@@ -33,10 +33,6 @@ public class ByteArrayManager extends AbstractManager {
     getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArrayNoRevisionCheck", byteArrayEntityId);
   }
 
-  public void deleteByteArrayByIds(List<String> byteArrayEntityIds) {
-    getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArraysByIds", byteArrayEntityIds);
-  }
-
   public void insertByteArray(ByteArrayEntity arr) {
     arr.setCreateTime(ClockUtil.getCurrentTime());
     getDbEntityManager().insert(arr);
