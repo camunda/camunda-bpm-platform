@@ -88,10 +88,4 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
 
   }
 
-  protected void runTest() throws Throwable {
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      super.runTest();
-    }
-  }
-
 }
