@@ -11,10 +11,13 @@ import static org.junit.Assert.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -25,6 +28,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -43,12 +47,58 @@ public class ProcessInstanceModificationSubProcessTest {
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
   private TaskService taskService;
+  private HistoryService historyService;
 
   @Before
   public void init() {
     repositoryService = rule.getRepositoryService();
     runtimeService = rule.getRuntimeService();
     taskService = rule.getTaskService();
+    historyService = rule.getHistoryService();
+  }
+
+  @Ignore("CAM-9354")
+  @Test
+  public void shouldHaveEqualParentActivityInstanceId() {
+    // given
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+        .subProcess("subprocess").embeddedSubProcess()
+          .startEvent()
+            .scriptTask("scriptTaskInSubprocess")
+              .scriptFormat("groovy")
+              .scriptText("throw new org.camunda.bpm.engine.delegate.BpmnError(\"anErrorCode\");")
+            .userTask()
+          .endEvent()
+        .subProcessDone()
+      .endEvent()
+      .moveToActivity("subprocess")
+        .boundaryEvent("boundary").error("anErrorCode")
+          .userTask("userTaskAfterBoundaryEvent")
+        .endEvent().done());
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    runtimeService.createModification(processInstance.getProcessDefinitionId())
+      .startAfterActivity("scriptTaskInSubprocess")
+      .processInstanceIds(processInstance.getId())
+      .execute();
+
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId())
+      .getActivityInstances("subprocess")[0];
+
+    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+      .activityId("subprocess")
+      .unfinished()
+      .singleResult();
+
+    // assume
+    assertNotNull(activityInstance);
+    assertNotNull(historicActivityInstance);
+
+    // then
+    assertEquals(historicActivityInstance.getParentActivityInstanceId(), activityInstance.getParentActivityInstanceId());
   }
 
   @Test
