@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -24,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author Tassilo Weidner
  */
+
 public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends AbstractPartitioningTest {
 
   final protected String VARIABLE_NAME = "aVariableName";

@@ -24,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author Tassilo Weidner
  */
+
 public class CompetingHistoricVariableInstancePartitioningTest extends AbstractPartitioningTest {
 
   final protected String VARIABLE_NAME = "aVariableName";

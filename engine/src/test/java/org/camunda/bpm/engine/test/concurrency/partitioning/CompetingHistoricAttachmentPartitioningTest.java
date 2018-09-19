@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.task.Attachment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -24,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * @author Tassilo Weidner
  */
+
 public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartitioningTest {
 
   public void testConcurrentFetchAndDelete() {

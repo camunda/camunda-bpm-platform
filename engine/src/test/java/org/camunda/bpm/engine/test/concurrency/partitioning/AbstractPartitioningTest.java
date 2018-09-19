@@ -12,9 +12,10 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -24,6 +25,8 @@ import java.util.Map;
 /**
  * @author Tassilo Weidner
  */
+
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public abstract class AbstractPartitioningTest extends ConcurrencyTestCase {
 
   protected CommandExecutor commandExecutor;
@@ -52,12 +55,6 @@ public abstract class AbstractPartitioningTest extends ConcurrencyTestCase {
 
     String processDefinitionKey = bpmnModelInstance.getDefinitions().getRootElements().iterator().next().getId();
     return runtimeService.startProcessInstanceByKey(processDefinitionKey, variablesMap);
-  }
-
-  protected void runTest() throws Throwable {
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      super.runTest();
-    }
   }
 
 }
