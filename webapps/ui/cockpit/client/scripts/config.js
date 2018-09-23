@@ -11,7 +11,8 @@ window.camCockpitConf = {
   //     // if you have a folder called `custom-ui` (in the `cockpit` folder)
   //     // with a file called `scripts.js` in it and defining the `custom-ui` AMD module
   //     'custom-ui': 'custom-ui/scripts'
-  //   },
+  //   }
+  // },
   // historicActivityInstanceMetrics: {
   //   adjustablePeriod: true,
   //   //select from the default time period: today, week, month, complete
@@ -34,5 +35,17 @@ window.camCockpitConf = {
   //   // select mode of query for process instances or decision instances
   //   // possible values: filter, search
   //   'mode': 'filter'
+  // },
+  // bpmnJs: {
+  //   moddleExtensions: {
+  //     // if you have a folder called 'my-custom-moddle' (in the 'cockpit' folder)
+  //     // with a file called 'camunda.json' in it defining the 'camunda' moddle extension
+  //     camunda: 'my-custom-moddle/camunda'
+  //   },
+  //   additionalModules: {
+  //     // if you have a folder called 'my-custom-module' (in the 'cockpit' folder)
+  //     // with a file called 'module.js' in it defining the 'my-custom-module' AMD module
+  //     myCustomModule: 'my-custom-module/module'
+  //   }
   // }
 };

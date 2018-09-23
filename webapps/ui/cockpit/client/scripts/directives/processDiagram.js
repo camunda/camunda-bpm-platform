@@ -7,8 +7,11 @@ var template = fs.readFileSync(__dirname + '/processDiagram.html', 'utf8');
 var angular = require('camunda-commons-ui/vendor/angular');
 
 var DirectiveController = [
-  '$scope', '$compile', '$injector', 'Views',
-  function( $scope,   $compile, $injector, Views) {
+  '$scope', '$compile', '$injector', 'Views', 'configuration',
+  function( $scope,   $compile, $injector, Views, configuration) {
+
+    $scope.bpmnJsConf = configuration.getBpmnJs();
+
     $scope.vars = { read: [ 'processData', 'bpmnElement', 'pageData', 'viewer' ] };
     var diagramPlugins = $scope.diagramProviderComponent ?  Views.getProviders({component: $scope.diagramProviderComponent}) : [];
 

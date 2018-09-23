@@ -46,7 +46,7 @@ window.__define('camunda-cockpit-bootstrap', [
       // before we start initializing the cockpit though (and leave the requirejs context),
       // lets see if we should load some custom scripts first
 
-      if (typeof window.camCockpitConf !== 'undefined' && window.camCockpitConf.customScripts) {
+      if (typeof window.camCockpitConf !== 'undefined' && (window.camCockpitConf.customScripts || window.camCockpitConf.bpmnJs)) {
         var custom = window.camCockpitConf.customScripts || {};
 
         // copy the relevant RequireJS configuration in a empty object
@@ -75,6 +75,19 @@ window.__define('camunda-cockpit-bootstrap', [
             conf[prop] = custom[prop];
           }
         });
+
+        var bpmnJsAdditionalModules = window.camCockpitConf.bpmnJs.additionalModules;
+        if (bpmnJsAdditionalModules) {
+          conf['paths'] = conf['paths'] || {};
+
+          custom['deps'] = custom['deps'] || [];
+          custom['ngDeps'] = custom['ngDeps'] || [];
+
+          angular.forEach(bpmnJsAdditionalModules, function(module, name) {
+            conf['paths'][name] = bpmnJsAdditionalModules[name];
+            custom['deps'].push(name);
+          });
+        }
 
         // configure RequireJS
         requirejs.config(conf);

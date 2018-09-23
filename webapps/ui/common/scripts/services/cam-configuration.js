@@ -107,6 +107,10 @@ module.exports = function(config, app) {
       return (config[param] && config[param].mode) || defaultConfig[param].mode;
     };
 
+    this.getBpmnJs = function() {
+      return config['bpmnJs'];
+    };
+
     this.$get = function() {
       return this;
     };
