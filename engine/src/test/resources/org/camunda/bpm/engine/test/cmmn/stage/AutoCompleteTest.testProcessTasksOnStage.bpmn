@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="oneTaskProcess" name="The One Task Process" isExecutable="true" camunda:historyTimeToLive="5">
+    <documentation>This is a process for testing purposes</documentation>
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+    <serviceTask id="theTask" name="my task" camunda:expression="${true}" />
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

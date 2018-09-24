@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                  targetNamespace="Examples">
+
+  <case id="case">
+    <casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+
+      <planItem id="PlanItem_0vefte2" definitionRef="Stage_0khjq8a" />
+
+      <stage id="Stage_0khjq8a" autoComplete="true">
+        <planItem id="PlanItem_12x2iyq" name="proc1" definitionRef="ProcessTask_0nfz8wx" />
+        <planItem id="PlanItem_1tm7frn" name="proc2" definitionRef="ProcessTask_1oky7kj" />
+
+        <processTask id="ProcessTask_0nfz8wx" processRef="oneTaskProcess" />
+        <processTask id="ProcessTask_1oky7kj" processRef="oneTaskProcess" />
+      </stage>
+
+    </casePlanModel>
+  </case>
+</definitions>

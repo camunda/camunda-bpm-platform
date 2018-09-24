@@ -139,7 +139,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
     // verify there are no STATE_ACTIVE children
     for (CmmnExecution child : children) {
-      if (child.isActive()) {
+      if (child.isNew() || child.isActive()) {
 
         if (throwException) {
           throw LOG.remainingChildException("complete", id, child.getId(), CaseExecutionState.ACTIVE);

@@ -12,12 +12,19 @@
  */
 package org.camunda.bpm.engine.test.cmmn.stage;
 
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Roman Smirnov
@@ -371,6 +378,25 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     CaseInstance caseInstance = instanceQuery.singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.cmmn",
+    "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.bpmn"
+  })
+  public void testProcessTasksOnStage() {
+    // given
+
+    // when
+    createCaseInstanceByKey(CASE_DEFINITION_KEY);
+
+    List<HistoricCaseActivityInstance> historicCaseActivityInstances =
+      historyService.createHistoricCaseActivityInstanceQuery()
+      .caseActivityType("processTask")
+      .list();
+
+    // then
+    assertThat(historicCaseActivityInstances.size(), is(2));
   }
 
 }
