@@ -81,6 +81,26 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
+  public void parseExclusiveGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+    parseActivity(exclusiveGwElement, activity);
+  }
+
+  @Override
+  public void parseInclusiveGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+    parseActivity(exclusiveGwElement, activity);
+  }
+
+  @Override
+  public void parseEventBasedGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+    parseActivity(exclusiveGwElement, activity);
+  }
+
+  @Override
+  public void parseParallelGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+    parseActivity(exclusiveGwElement, activity);
+  }
+
+  @Override
   public void parseScriptTask(Element scriptTaskElement, ScopeImpl scope, ActivityImpl activity) {
     parseActivity(scriptTaskElement, activity);
   }

@@ -539,6 +539,154 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
   }
 
+  public void testExclusiveGateway() throws Exception {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .exclusiveGateway()
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("R5/PT5M")
+          .camundaExecutionListenerClass("start", "foo")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
+    ClockUtil.setCurrentTime(startDate);
+
+    runtimeService.startProcessInstanceByKey("process");
+    Job job = managementService.createJobQuery().singleResult();
+
+    // assume
+    Assert.assertEquals(3, job.getRetries());
+
+    // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(4, job.getRetries());
+
+    Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
+    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+  }
+
+  public void testInclusiveGateway() throws Exception {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .exclusiveGateway()
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("R5/PT5M")
+          .camundaExecutionListenerClass("start", "foo")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
+    ClockUtil.setCurrentTime(startDate);
+
+    runtimeService.startProcessInstanceByKey("process");
+    Job job = managementService.createJobQuery().singleResult();
+
+    // assume
+    Assert.assertEquals(3, job.getRetries());
+
+    // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(4, job.getRetries());
+
+    Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
+    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+  }
+
+  public void testEventBasedGateway() throws Exception {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .exclusiveGateway()
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("R5/PT5M")
+          .camundaExecutionListenerClass("start", "foo")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
+    ClockUtil.setCurrentTime(startDate);
+
+    runtimeService.startProcessInstanceByKey("process");
+    Job job = managementService.createJobQuery().singleResult();
+
+    // assume
+    Assert.assertEquals(3, job.getRetries());
+
+    // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(4, job.getRetries());
+
+    Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
+    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+  }
+
+  public void testParallelGateway() throws Exception {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .exclusiveGateway()
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("R5/PT5M")
+          .camundaExecutionListenerClass("start", "foo")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Date startDate = simpleDateFormat.parse("2018-01-01T10:00:00");
+    ClockUtil.setCurrentTime(startDate);
+
+    runtimeService.startProcessInstanceByKey("process");
+    Job job = managementService.createJobQuery().singleResult();
+
+    // assume
+    Assert.assertEquals(3, job.getRetries());
+
+    // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(4, job.getRetries());
+
+    Date expectedDate = simpleDateFormat.parse("2018-01-01T10:05:00");
+    assertEquals(expectedDate, ((JobEntity) job).getLockExpirationTime());
+  }
+
   protected void assertJobRetriesForActivity(ProcessInstance pi, String activityId) {
     assertNotNull(pi);
 
