@@ -183,7 +183,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  // get properties ///////////////////////////
+  // get properties & set/delete property ///////////////////////////
 
   public void testGetPropertiesWithoutAuthorization() {
     // given
@@ -192,6 +192,34 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
       // when
       managementService.getProperties();
       fail("Exception expected: It should not be possible to get properties");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+    }
+  }
+
+  public void testSetPropertyWithoutAuthorization() {
+    // given
+
+    try {
+      // when
+      managementService.setProperty("aPropertyKey", "aPropertyValue");
+      fail("Exception expected: It should not be possible to set a property");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+    }
+  }
+
+  public void testDeletePropertyWithoutAuthorization() {
+    // given
+
+    try {
+      // when
+      managementService.deleteProperty("aPropertyName");
+      fail("Exception expected: It should not be possible to delete a property");
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();

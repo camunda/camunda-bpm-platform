@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 
@@ -33,6 +34,8 @@ public class DeletePropertyCmd implements Command<Object> {
   }
 
   public Object execute(CommandContext commandContext) {
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkCamundaAdmin();
 
     final PropertyManager propertyManager = commandContext.getPropertyManager();
 
