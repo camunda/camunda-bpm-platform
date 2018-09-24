@@ -72,4 +72,7 @@
     <tag>HEAD</tag>
   </scm>
 
+  <repositories>
+      <repository><id>fix</id><url>me</url></repository>
+  </repositories>
 </project>
