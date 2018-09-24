@@ -36,6 +36,21 @@
       </exclusions>
     </dependency>
 
+    <!-- overridden by respective wildfly profile (default manner) -->
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-web-common</artifactId>
+      <version>${version.wildfly10}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-ejb3</artifactId>
+      <version>${version.wildfly10}</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -70,6 +85,38 @@
   </build>
 
   <profiles>
+    <profile>
+      <id>jdk-7-skip-tests</id>
+      <activation>
+        <jdk>1.7</jdk>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-testCompile</id>
+                <phase>test-compile</phase>
+                <configuration>
+                  <testExcludes>
+                    <exclude>**/BpmPlatformSubsystemTest.java</exclude>
+                    <exclude>**/JBossSubsystemXMLTest.java</exclude>
+                    <exclude>**/ReflectionCompatibilityTest.java</exclude>
+                  </testExcludes>
+                </configuration>
+                <goals>
+                  <goal>testCompile</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <profile>
       <id>wildfly10</id>
       <activation>
