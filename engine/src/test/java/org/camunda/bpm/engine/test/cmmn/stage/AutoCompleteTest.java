@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.cmmn.stage;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -19,7 +20,7 @@ import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 import java.util.List;
 
@@ -384,6 +385,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.cmmn",
     "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.bpmn"
   })
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testProcessTasksOnStage() {
     // given
 
