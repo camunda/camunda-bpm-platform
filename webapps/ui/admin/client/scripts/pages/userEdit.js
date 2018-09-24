@@ -190,7 +190,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
 
                   engines.forEach(function(engine) {
                     AuthenticationService.logout(engine.name);
-                  })
+                  });
                 });
               }
             });
