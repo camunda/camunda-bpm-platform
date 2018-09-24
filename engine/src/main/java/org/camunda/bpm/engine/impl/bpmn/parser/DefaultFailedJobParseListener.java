@@ -76,6 +76,11 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
+  public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl activity) {
+    parseActivity(endEventElement, activity);
+  }
+
+  @Override
   public void parseScriptTask(Element scriptTaskElement, ScopeImpl scope, ActivityImpl activity) {
     parseActivity(scriptTaskElement, activity);
   }
