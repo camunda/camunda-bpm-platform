@@ -70,7 +70,7 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   @Override
   public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
     String type = activity.getProperties().get(BpmnProperties.TYPE);
-    if (type != null && type.equals(INTERMEDIATE_TIMER)) {
+    if (type != null && type.equals(INTERMEDIATE_TIMER) || isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(intermediateEventElement, activity);
     }
   }
