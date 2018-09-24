@@ -41,8 +41,8 @@
     <version.wildfly12.core>4.0.0.Final</version.wildfly12.core>
     <version.wildfly13>13.0.0.Final</version.wildfly13>
     <version.wildfly13.core>5.0.0.Final</version.wildfly13.core>
-    <version.wildfly14>14.0.0.Final</version.wildfly14>
-    <version.wildfly14.core>5.0.0.Final</version.wildfly14.core>
+    <version.wildfly14>14.0.1.Final</version.wildfly14>
+    <version.wildfly14.core>6.0.2.Final</version.wildfly14.core>
 
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>9.0.5</version.tomcat>
