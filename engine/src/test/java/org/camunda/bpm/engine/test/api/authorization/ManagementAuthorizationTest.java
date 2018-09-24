@@ -183,4 +183,20 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     }
   }
 
+  // get properties ///////////////////////////
+
+  public void testGetPropertiesWithoutAuthorization() {
+    // given
+
+    try {
+      // when
+      managementService.getProperties();
+      fail("Exception expected: It should not be possible to get properties");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+    }
+  }
+
 }
