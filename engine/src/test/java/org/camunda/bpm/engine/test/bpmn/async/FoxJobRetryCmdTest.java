@@ -579,7 +579,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   public void testInclusiveGateway() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
-        .exclusiveGateway()
+        .inclusiveGateway()
           .camundaAsyncBefore()
           .camundaFailedJobRetryTimeCycle("R5/PT5M")
           .camundaExecutionListenerClass("start", "foo")
@@ -616,7 +616,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   public void testEventBasedGateway() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
-        .exclusiveGateway()
+        .eventBasedGateway()
           .camundaAsyncBefore()
           .camundaFailedJobRetryTimeCycle("R5/PT5M")
           .camundaExecutionListenerClass("start", "foo")
@@ -653,7 +653,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   public void testParallelGateway() throws Exception {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
-        .exclusiveGateway()
+        .parallelGateway()
           .camundaAsyncBefore()
           .camundaFailedJobRetryTimeCycle("R5/PT5M")
           .camundaExecutionListenerClass("start", "foo")
