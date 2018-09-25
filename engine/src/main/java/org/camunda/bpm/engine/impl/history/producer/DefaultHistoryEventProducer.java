@@ -567,8 +567,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
         commandContext.getHistoricProcessInstanceManager()
           .addRemovalTimeToProcessInstancesByRootId(executionEntity.getProcessInstanceId(), removalTime);
-        commandContext.getHistoricDecisionInstanceManager()
-          .addRemovalTimeToDecisionInstancesByRootProcessInstanceId(executionEntity.getProcessInstanceId(), removalTime);
+        if (commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
+          commandContext.getHistoricDecisionInstanceManager()
+            .addRemovalTimeToDecisionInstancesByRootProcessInstanceId(executionEntity.getProcessInstanceId(), removalTime);
+        }
       }
     }
 

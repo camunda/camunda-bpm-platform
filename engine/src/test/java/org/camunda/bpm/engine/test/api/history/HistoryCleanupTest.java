@@ -106,13 +106,12 @@ public class HistoryCleanupTest {
   protected static final String ONE_TASK_CASE = "case";
   private static final int NUMBER_OF_THREADS = 3;
 
-  private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
   protected String defaultStartTime;
   protected String defaultEndTime;
   protected int defaultBatchSize;
 
   protected boolean isHierarchicalCleanup;
+  protected boolean isHierarchicalCleanupInitValue;
 
   @Parameterized.Parameters(name = "Hierachical History Cleanup: {0}")
   public static Collection<Object[]> data() {
@@ -163,6 +162,7 @@ public class HistoryCleanupTest {
     defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
     defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
     defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
+    isHierarchicalCleanupInitValue = processEngineConfiguration.isHierarchicalHistoryCleanup();
     processEngineConfiguration.setHierarchicalHistoryCleanup(isHierarchicalCleanup);
   }
 
@@ -172,6 +172,7 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
+    processEngineConfiguration.setHierarchicalHistoryCleanup(isHierarchicalCleanupInitValue);
 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
