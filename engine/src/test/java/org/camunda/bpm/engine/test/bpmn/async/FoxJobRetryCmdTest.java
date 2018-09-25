@@ -620,6 +620,8 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
           .camundaAsyncBefore()
           .camundaFailedJobRetryTimeCycle("R5/PT5M")
           .camundaExecutionListenerClass("start", "foo")
+        .intermediateCatchEvent()
+          .condition("${true}")
         .endEvent()
         .done();
 
