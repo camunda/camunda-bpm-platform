@@ -76,7 +76,7 @@ window.__define('camunda-cockpit-bootstrap', [
           }
         });
 
-        var bpmnJsAdditionalModules = window.camCockpitConf.bpmnJs.additionalModules;
+        var bpmnJsAdditionalModules = (window.camCockpitConf.bpmnJs || {}).additionalModules;
         if (bpmnJsAdditionalModules) {
           conf['paths'] = conf['paths'] || {};
 
