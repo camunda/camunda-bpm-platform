@@ -130,6 +130,12 @@
         <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly13}/</wildfly.runtime.location>
       </properties>
     </profile>
+    <profile>
+      <id>wildfly14</id>
+      <properties>
+        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly14}/</wildfly.runtime.location>
+      </properties>
+    </profile>
 
     <profile>
       <id>tomcat</id>
