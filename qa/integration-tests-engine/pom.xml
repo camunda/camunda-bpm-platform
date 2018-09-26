@@ -488,6 +488,14 @@
     </profile>
 
     <profile>
+      <id>wildfly14</id>
+      <properties>
+        <container.adapter.groupId>org.wildfly.arquillian</container.adapter.groupId>
+        <container.adapter.version>2.1.1.Final</container.adapter.version>
+      </properties>
+    </profile>
+
+    <profile>
       <id>wildfly</id>
       <dependencies>
         <dependency>
