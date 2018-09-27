@@ -12,6 +12,7 @@ var Controller = [
   'basePath',
   'variable',
   '$translate',
+  '$browser',
   function(
     $modalInstance,
     $scope,
@@ -19,7 +20,8 @@ var Controller = [
     Uri,
     basePath,
     variable,
-    $translate
+    $translate,
+    $browser
   ) {
 
     var BEFORE_UPLOAD = 'beforeUpload',
@@ -90,6 +92,7 @@ var Controller = [
       fd.append('valueType', variable.type);
 
       var xhr = new XMLHttpRequest();
+
       xhr.upload.addEventListener('progress', uploadProgress, false);
       xhr.addEventListener('load', function() {
         uploadComplete(xhr);
@@ -97,6 +100,12 @@ var Controller = [
       xhr.addEventListener('error', uploadFailed, false);
       xhr.addEventListener('abort', uploadFailed, false);
       xhr.open('POST', Uri.appUri(basePath + '/data'));
+
+      var token = $browser.cookies()['XSRF-TOKEN'];
+      if (token) {
+        xhr.setRequestHeader('X-XSRF-TOKEN', token);
+      }
+
       xhr.send(fd);
 
     };
