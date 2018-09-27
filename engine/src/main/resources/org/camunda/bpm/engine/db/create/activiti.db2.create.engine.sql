@@ -48,6 +48,7 @@ create table ACT_RE_DEPLOYMENT (
 create table ACT_RU_EXECUTION (
     ID_ varchar(64) not null,
     REV_ integer,
+    ROOT_PROC_INST_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     BUSINESS_KEY_ varchar(255),
     PARENT_ID_ varchar(64),
@@ -294,6 +295,7 @@ create table ACT_RU_BATCH (
   primary key (ID_)
 );
 
+create index ACT_IDX_EXECUTION_ROOT_PI on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);

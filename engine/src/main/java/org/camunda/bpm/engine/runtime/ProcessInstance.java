@@ -14,9 +14,8 @@ package org.camunda.bpm.engine.runtime;
 
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
-
-
-/** Represents one execution of a  {@link ProcessDefinition}.
+/**
+ * Represents one execution of a  {@link ProcessDefinition}.
  *
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -33,6 +32,11 @@ public interface ProcessInstance extends Execution {
    * The business key of this process instance.
    */
   String getBusinessKey();
+
+  /**
+   * The id of the root process instance associated with this process instance.
+   */
+  String getRootProcessInstanceId();
 
   /**
    * The id of the case instance associated with this process instance.

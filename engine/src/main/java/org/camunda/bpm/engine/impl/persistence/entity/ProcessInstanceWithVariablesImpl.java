@@ -67,6 +67,11 @@ public class ProcessInstanceWithVariablesImpl implements ProcessInstanceWithVari
   }
 
   @Override
+  public String getRootProcessInstanceId() {
+    return executionEntity.getRootProcessInstanceId();
+  }
+
+  @Override
   public boolean isEnded() {
     return executionEntity.isEnded();
   }

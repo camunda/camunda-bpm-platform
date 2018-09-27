@@ -215,6 +215,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected String superExecutionId;
 
   /**
+   * persisted reference to the root process instance.
+   *
+   * @see #getRootProcessInstanceId()
+   */
+  protected String rootProcessInstanceId;
+
+  /**
    * persisted reference to the super case execution of this execution
    *
    * @See {@link #getSuperCaseExecution()}
@@ -428,6 +435,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   public void start(Map<String, Object> variables) {
+    if (getSuperExecution() == null) {
+      setRootProcessInstanceId(processInstanceId);
+    } else {
+      ExecutionEntity superExecution = getSuperExecution();
+      setRootProcessInstanceId(superExecution.getRootProcessInstanceId());
+    }
+
     // determine tenant Id if null
     provideTenantId(variables);
     super.start(variables);
@@ -435,6 +449,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   public void startWithoutExecuting(Map<String, Object> variables) {
+    setRootProcessInstanceId(getProcessInstanceId());
     provideTenantId(variables);
     super.startWithoutExecuting(variables);
   }
@@ -462,6 +477,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   public void startWithFormProperties(VariableMap properties) {
+    setRootProcessInstanceId(getProcessInstanceId());
     provideTenantId(properties);
     if (isProcessInstanceExecution()) {
       ActivityImpl initial = processDefinition.getInitial();
@@ -1806,6 +1822,23 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public int getCachedEntityStateRaw() {
     return cachedEntityState;
+  }
+
+  public String getRootProcessInstanceId() {
+    if (isProcessInstanceExecution()) {
+      return rootProcessInstanceId;
+    } else {
+      ExecutionEntity processInstance = getProcessInstance();
+      return processInstance.rootProcessInstanceId;
+    }
+  }
+
+  public String getRootProcessInstanceIdRaw() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   public String getProcessInstanceId() {

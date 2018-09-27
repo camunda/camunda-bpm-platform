@@ -1,4 +1,5 @@
 drop index ACT_IDX_BYTEAR_DEPL ;
+drop index ACT_IDX_EXE_ROOT_PI;
 drop index ACT_IDX_EXE_PROCINST ;
 drop index ACT_IDX_EXE_PARENT ;
 drop index ACT_IDX_EXE_SUPER;

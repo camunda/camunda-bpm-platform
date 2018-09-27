@@ -10,6 +10,7 @@
     insert into ${prefix}ACT_RU_EXECUTION
     (
       ID_,
+      ROOT_PROC_INST_ID_,
       PROC_INST_ID_,
       BUSINESS_KEY_,
       PROC_DEF_ID_,
@@ -32,6 +33,7 @@
     values
     (
       #{id ,jdbcType=VARCHAR},
+      #{rootProcessInstanceIdRaw, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{businessKeyWithoutCascade, jdbcType=VARCHAR},
       #{processDefinitionId ,jdbcType=VARCHAR},
@@ -117,6 +119,7 @@
   <resultMap id="executionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
