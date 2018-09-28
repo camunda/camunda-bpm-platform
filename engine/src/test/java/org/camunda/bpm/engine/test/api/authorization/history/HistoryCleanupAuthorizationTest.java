@@ -92,7 +92,7 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 Required admin authenticated group.", message);
+      assertTextPresent("ENGINE-03029 Required admin authenticated group or user.", message);
     }
   }
 

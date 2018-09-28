@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.management.TablePage;
  */
 public class ManagementAuthorizationTest extends AuthorizationTest {
 
-  private static final String REQUIRED_ADMIN_AUTH_EXCEPTION = "ENGINE-03029 Required admin authenticated group.";
+  private static final String REQUIRED_ADMIN_AUTH_EXCEPTION = "ENGINE-03029 Required admin authenticated group or user.";
 
   // get table count //////////////////////////////////////////////
 

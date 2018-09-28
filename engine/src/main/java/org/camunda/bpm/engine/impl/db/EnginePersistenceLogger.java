@@ -311,7 +311,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public AuthorizationException requiredCamundaAdminException() {
     return new AuthorizationException(
-      exceptionMessage("029", "Required admin authenticated group."));
+      exceptionMessage("029", "Required admin authenticated group or user."));
   }
 
   public void createChildExecution(ExecutionEntity child, ExecutionEntity parent) {

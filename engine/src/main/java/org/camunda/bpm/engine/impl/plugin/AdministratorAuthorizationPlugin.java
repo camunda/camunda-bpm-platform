@@ -54,6 +54,9 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
     if (administratorGroupName != null && administratorGroupName.length() > 0) {
       processEngineConfiguration.getAdminGroups().add(administratorGroupName);
     }
+    if (administratorUserName != null && administratorUserName.length() > 0) {
+      processEngineConfiguration.getAdminUsers().add(administratorUserName);
+    }
   }
 
   public void postProcessEngineBuild(ProcessEngine processEngine) {

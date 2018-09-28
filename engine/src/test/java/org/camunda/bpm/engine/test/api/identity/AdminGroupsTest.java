@@ -99,7 +99,7 @@ public class AdminGroupsTest {
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     thrown.expect(AuthorizationException.class);
-    thrown.expectMessage("Required admin authenticated group.");
+    thrown.expectMessage("Required admin authenticated group or user.");
 
     // when
     identityService.unlockUser("jonny1");

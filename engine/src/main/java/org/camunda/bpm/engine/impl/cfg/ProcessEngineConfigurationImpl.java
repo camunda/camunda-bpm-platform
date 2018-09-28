@@ -683,6 +683,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<String> adminGroups;
 
+  protected List<String> adminUsers;
+
   // Migration
   protected MigrationActivityMatcher migrationActivityMatcher;
 
@@ -4154,4 +4156,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setAdminGroups(List<String> adminGroups) {
     this.adminGroups = adminGroups;
   }
+
+  public List<String> getAdminUsers() {
+    return adminUsers;
+  }
+
+  public void setAdminUsers(List<String> adminUsers) {
+    this.adminUsers = adminUsers;
+  }
+
 }

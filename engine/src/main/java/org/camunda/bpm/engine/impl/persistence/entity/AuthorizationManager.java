@@ -488,7 +488,7 @@ public class AuthorizationManager extends AbstractManager {
    * @param authentication
    *          authentication to check, cannot be <code>null</code>
    * @return <code>true</code> if the given authentication contains the group
-   *         {@link Groups#CAMUNDA_ADMIN}
+   *         {@link Groups#CAMUNDA_ADMIN} or the user
    */
   public boolean isCamundaAdmin(Authentication authentication) {
     List<String> groupIds = authentication.getGroupIds();
@@ -501,6 +501,14 @@ public class AuthorizationManager extends AbstractManager {
         }
       }
     }
+
+    String userId = authentication.getUserId();
+    if (userId != null) {
+      CommandContext commandContext = Context.getCommandContext();
+      List<String> adminUsers = commandContext.getProcessEngineConfiguration().getAdminUsers();
+      return adminUsers != null && adminUsers.contains(userId);
+    }
+
     return false;
   }
 
