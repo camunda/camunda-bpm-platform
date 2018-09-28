@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.engine.test.api.identity;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
@@ -28,10 +28,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
@@ -39,20 +37,17 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 public class AdminUsersTest {
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      List<String> adminUsers = new ArrayList<String>();
-      adminUsers.add("adminUser");
-      configuration.setAdminUsers(adminUsers);
-      return configuration;
-    }
-  };
+
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
+  @Rule
+  public final ExpectedException thrown = ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected IdentityService identityService;
@@ -86,7 +81,30 @@ public class AdminUsersTest {
   }
 
   @Test
+  public void testWithoutAdminUser() {
+    processEngineConfiguration.setAuthorizationEnabled(false);
+
+    identityService.setAuthentication("adminUser", null, null);
+    Authorization userAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    userAuth.setUserId("adminUser");
+    userAuth.setResource(USER);
+    userAuth.setResourceId(ANY);
+    userAuth.addPermission(READ);
+    authorizationService.saveAuthorization(userAuth);
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // then
+    thrown.expect(AuthorizationException.class);
+    thrown.expectMessage("Required admin authenticated group or user.");
+
+    // when
+    managementService.getProperties();
+  }
+
+  @Test
   public void testWithAdminUser() {
+    processEngineConfiguration.getAdminUsers().add("adminUser");
+
     processEngineConfiguration.setAuthorizationEnabled(false);
 
     identityService.setAuthentication("adminUser", null, null);

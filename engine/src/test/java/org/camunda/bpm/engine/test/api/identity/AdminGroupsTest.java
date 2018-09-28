@@ -18,14 +18,11 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
@@ -41,14 +38,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class AdminGroupsTest {
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      List<String> adminGroups = new ArrayList<String>();
-      adminGroups.add("adminGroup");
-      configuration.setAdminGroups(adminGroups);
-      return configuration;
-    }
-  };
+
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -107,6 +98,8 @@ public class AdminGroupsTest {
 
   @Test
   public void testWithAdminGroup() {
+    processEngineConfiguration.getAdminGroups().add("adminGroup");
+
     processEngineConfiguration.setAuthorizationEnabled(false);
 
     identityService.setAuthentication("admin", Collections.singletonList("adminGroup"), null);

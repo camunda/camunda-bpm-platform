@@ -825,6 +825,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initCommandCheckers();
     initDefaultUserPermissionForTask();
     initHistoryCleanup();
+    initAdminUser();
     initAdminGroups();
     invokePostInit();
   }
@@ -2285,6 +2286,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       } else {
         throw LOG.invalidConfigDefaultUserPermissionNameForTask(defaultUserPermissionNameForTask, new String[]{Permissions.UPDATE.getName(), Permissions.TASK_WORK.getName()});
       }
+    }
+  }
+
+  protected void initAdminUser() {
+    if (adminUsers == null) {
+      adminUsers = new ArrayList<>();
     }
   }
 
