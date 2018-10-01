@@ -48,4 +48,28 @@ public class DefaultDatasourceConfiguration extends AbstractCamundaConfiguration
     configuration.setJdbcBatchProcessing(database.isJdbcBatchProcessing());
   }
 
+  public PlatformTransactionManager getTransactionManager() {
+    return transactionManager;
+  }
+
+  public void setTransactionManager(PlatformTransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
+  }
+
+  public DataSource getDataSource() {
+    return dataSource;
+  }
+
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  public DataSource getCamundaDataSource() {
+    return camundaDataSource;
+  }
+
+  public void setCamundaDataSource(DataSource camundaDataSource) {
+    this.camundaDataSource = camundaDataSource;
+  }
+
 }
