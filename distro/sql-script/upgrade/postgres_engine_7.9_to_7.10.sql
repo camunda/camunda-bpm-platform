@@ -56,3 +56,27 @@ ALTER TABLE ACT_RU_EXECUTION
   ADD ROOT_PROC_INST_ID_ varchar(64);
 
 create index ACT_IDX_EXE_ROOT_PI on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
+
+-- https://app.camunda.com/jira/browse/CAM-9371
+ALTER TABLE ACT_HI_ACTINST
+  ADD ROOT_PROC_INST_ID_ varchar(64);
+
+create index ACT_IDX_HI_ACTINST_ROOT_PI on ACT_HI_ACTINST(ROOT_PROC_INST_ID_);
+
+-- https://app.camunda.com/jira/browse/CAM-9372
+ALTER TABLE ACT_HI_TASKINST
+  ADD ROOT_PROC_INST_ID_ varchar(64);
+
+create index ACT_IDX_HI_TASKINST_ROOT_PI on ACT_HI_TASKINST(ROOT_PROC_INST_ID_);
+
+-- https://app.camunda.com/jira/browse/CAM-9373
+ALTER TABLE ACT_HI_VARINST
+  ADD ROOT_PROC_INST_ID_ varchar(64);
+
+create index ACT_IDX_HI_VARINST_ROOT_PI on ACT_HI_VARINST(ROOT_PROC_INST_ID_);
+
+-- https://app.camunda.com/jira/browse/CAM-9374
+ALTER TABLE ACT_HI_DETAIL
+  ADD ROOT_PROC_INST_ID_ varchar(64);
+
+create index ACT_IDX_HI_DETAIL_ROOT_PI on ACT_HI_DETAIL(ROOT_PROC_INST_ID_);

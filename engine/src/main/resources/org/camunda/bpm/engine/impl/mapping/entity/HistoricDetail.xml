@@ -27,6 +27,7 @@
       TYPE_,
       PROC_DEF_KEY_,
       PROC_DEF_ID_,
+      ROOT_PROC_INST_ID_,
       PROC_INST_ID_,
       ACT_INST_ID_,
       EXECUTION_ID_,
@@ -43,6 +44,7 @@
       'FormProperty',
       #{processDefinitionKey, jdbcType=VARCHAR},
       #{processDefinitionId, jdbcType=VARCHAR},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
@@ -64,6 +66,7 @@
       TYPE_,
       PROC_DEF_KEY_,
       PROC_DEF_ID_,
+      ROOT_PROC_INST_ID_,
       PROC_INST_ID_,
       EXECUTION_ID_,
       ACT_INST_ID_,
@@ -91,6 +94,7 @@
       'VariableUpdate',
       #{processDefinitionKey, jdbcType=VARCHAR},
       #{processDefinitionId, jdbcType=VARCHAR},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
@@ -165,6 +169,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />

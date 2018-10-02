@@ -46,6 +46,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected String processDefinitionKey;
   protected String processDefinitionId;
+  protected String rootProcessInstanceId;
   protected String processInstanceId;
 
   protected String taskId;
@@ -98,6 +99,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.textValue = historyEvent.getTextValue();
     this.textValue2 = historyEvent.getTextValue2();
     this.createTime = historyEvent.getTimestamp();
+    this.rootProcessInstanceId = historyEvent.getRootProcessInstanceId();
 
     setSerializerName(historyEvent.getSerializerName());
 
@@ -374,12 +376,21 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.createTime = createTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
       + "[id=" + id
       + ", processDefinitionKey=" + processDefinitionKey
       + ", processDefinitionId=" + processDefinitionId
+      + ", rootProcessInstanceId=" + rootProcessInstanceId
       + ", processInstanceId=" + processInstanceId
       + ", taskId=" + taskId
       + ", executionId=" + executionId

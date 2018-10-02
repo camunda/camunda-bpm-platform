@@ -36,6 +36,9 @@ public interface HistoricTaskInstance {
   /** Process definition reference. */
   String getProcessDefinitionId();
 
+  /** Root process instance reference. */
+  String getRootProcessInstanceId();
+
   /** Process instance reference. */
   String getProcessInstanceId();
 

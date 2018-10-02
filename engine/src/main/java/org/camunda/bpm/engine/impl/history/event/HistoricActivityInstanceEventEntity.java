@@ -57,6 +57,9 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
   /** id of the tenant which belongs to the activity instance  */
   protected String tenantId;
 
+  /** the id of the root process instance */
+  protected String rootProcessInstanceId;
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getAssignee() {
@@ -159,6 +162,14 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
     this.tenantId = tenantId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -178,6 +189,7 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
            + ", eventType=" + eventType
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
            + ", processInstanceId=" + processInstanceId
            + ", tenantId=" + tenantId
            + "]";

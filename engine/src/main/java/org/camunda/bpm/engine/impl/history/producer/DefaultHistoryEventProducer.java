@@ -127,6 +127,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessInstanceId(execution.getProcessInstanceId());
     evt.setExecutionId(execution.getId());
     evt.setTenantId(execution.getTenantId());
+    evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
 
     ProcessDefinitionEntity definition = execution.getProcessDefinition();
     if (definition != null) {
@@ -235,6 +236,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     ExecutionEntity execution = taskEntity.getExecution();
     if (execution != null) {
       evt.setActivityInstanceId(execution.getActivityInstanceId());
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     }
 
   }
@@ -263,6 +265,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
         evt.setProcessDefinitionId(definition.getId());
         evt.setProcessDefinitionKey(definition.getKey());
       }
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     }
 
     CaseExecutionEntity caseExecution = variableInstance.getCaseExecution();
@@ -788,6 +791,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setTaskId(taskId);
     historicFormPropertyEntity.setTenantId(execution.getTenantId());
     historicFormPropertyEntity.setUserOperationId(Context.getCommandContext().getOperationId());
+    historicFormPropertyEntity.setRootProcessInstanceId(execution.getRootProcessInstanceId());
 
     ProcessDefinitionEntity definition = execution.getProcessDefinition();
     if (definition != null) {

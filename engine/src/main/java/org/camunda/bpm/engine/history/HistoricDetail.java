@@ -33,6 +33,9 @@ public interface HistoricDetail {
   /** The process definition reference. */
   String getProcessDefinitionId();
 
+  /** The root process instance reference */
+  String getRootProcessInstanceId();
+
   /** The process instance reference. */
   String getProcessInstanceId();
 
