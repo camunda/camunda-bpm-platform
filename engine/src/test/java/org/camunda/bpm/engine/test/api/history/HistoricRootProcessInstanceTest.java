@@ -12,20 +12,33 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
+import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.bpmn.async.FailingDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -36,6 +49,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +69,9 @@ public class HistoricRootProcessInstanceTest {
   protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
     .startEvent()
       .userTask("userTask").name("userTask")
+      .serviceTask()
+        .camundaAsyncBefore()
+        .camundaClass(FailingDelegate.class.getName())
     .endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
@@ -74,6 +91,10 @@ public class HistoricRootProcessInstanceTest {
   protected FormService formService;
   protected HistoryService historyService;
   protected TaskService taskService;
+  protected ManagementService managementService;
+  protected RepositoryService repositoryService;
+  protected IdentityService identityService;
+  protected ExternalTaskService externalTaskService;
 
   @Before
   public void init() {
@@ -81,6 +102,10 @@ public class HistoricRootProcessInstanceTest {
     formService = engineRule.getFormService();
     historyService = engineRule.getHistoryService();
     taskService = engineRule.getTaskService();
+    managementService = engineRule.getManagementService();
+    repositoryService = engineRule.getRepositoryService();
+    identityService = engineRule.getIdentityService();
+    externalTaskService = engineRule.getExternalTaskService();
   }
 
   @Test
@@ -214,6 +239,268 @@ public class HistoricRootProcessInstanceTest {
 
     // then
     assertThat(historicDetail.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveIncident() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.setJobRetries(jobId, 0);
+
+    try {
+      // when
+      managementService.executeJob(jobId);
+    } catch (Exception ignored) { }
+
+    List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
+
+    // assume
+    assertThat(historicIncidents.size(), is(2));
+
+    // then
+    assertThat(historicIncidents.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicIncidents.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldNotResolveStandaloneIncident() {
+    // given
+    testRule.deploy(CALLED_PROCESS);
+
+    repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date());
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.setJobRetries(jobId, 0);
+
+    try {
+      // when
+      managementService.executeJob(jobId);
+    } catch (Exception ignored) { }
+
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // assume
+    assertThat(historicIncident, notNullValue());
+
+    // then
+    assertThat(historicIncident.getRootProcessInstanceId(), nullValue());
+
+    // cleanup
+    clearJobLog(jobId);
+    clearHistoricIncident(historicIncident);
+  }
+
+  @Test
+  public void shouldResolveExternalTaskLog() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
+      .startEvent()
+        .serviceTask().camundaExternalTask("anExternalTaskTopic")
+      .endEvent().done());
+
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
+      .startEvent()
+        .callActivity()
+          .calledElement("calledProcess")
+      .endEvent().done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
+
+    HistoricExternalTaskLog ExternalTaskLog = historyService.createHistoricExternalTaskLogQuery().singleResult();
+
+    // assume
+    assertThat(ExternalTaskLog, notNullValue());
+
+    // then
+    assertThat(ExternalTaskLog.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveJobLog() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    try {
+      // when
+      managementService.executeJob(jobId);
+    } catch (Exception ignored) { }
+
+    List<HistoricJobLog> jobLog = historyService.createHistoricJobLogQuery().list();
+
+    // assume
+    assertThat(jobLog.size(), is(2));
+
+    // then
+    assertThat(jobLog.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(jobLog.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldNotResolveJobLog() {
+    // given
+    testRule.deploy(CALLED_PROCESS);
+
+    repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date());
+
+    // when
+    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
+
+    // assume
+    assertThat(jobLog, notNullValue());
+
+    // then
+    assertThat(jobLog.getRootProcessInstanceId(), nullValue());
+
+    // cleanup
+    managementService.deleteJob(jobLog.getJobId());
+    clearJobLog(jobLog.getJobId());
+  }
+
+  @Test
+  public void shouldResolveUserOperationLog_SetJobRetries() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    // when
+    identityService.setAuthenticatedUserId("aUserId");
+    managementService.setJobRetries(jobId, 65);
+    identityService.clearAuthentication();
+
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+
+    // assume
+    assertThat(userOperationLog, notNullValue());
+
+    // then
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveUserOperationLog_SetExternalTaskRetries() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
+      .startEvent()
+        .serviceTask().camundaExternalTask("anExternalTaskTopic")
+      .endEvent().done());
+
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
+      .startEvent()
+        .callActivity()
+          .calledElement("calledProcess")
+      .endEvent().done());
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
+
+    // when
+    identityService.setAuthenticatedUserId("aUserId");
+    externalTaskService.setRetries(externalTaskService.createExternalTaskQuery().singleResult().getId(), 65);
+    identityService.clearAuthentication();
+
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+
+    // assume
+    assertThat(userOperationLog, notNullValue());
+
+    // then
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveUserOperationLog_ClaimTask() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    // when
+    identityService.setAuthenticatedUserId("aUserId");
+    taskService.claim(taskService.createTaskQuery().singleResult().getId(), "aUserId");
+    identityService.clearAuthentication();
+
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+
+    // assume
+    assertThat(userOperationLog, notNullValue());
+
+    // then
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveUserOperationLog_CreateAttachment() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    // when
+    identityService.setAuthenticatedUserId("aUserId");
+    taskService.createAttachment(null, null, runtimeService.createProcessInstanceQuery().activityIdIn("userTask").singleResult().getId(), null, null, "http://camunda.com");
+    identityService.clearAuthentication();
+
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+
+    // assume
+    assertThat(userOperationLog, notNullValue());
+
+    // then
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  protected void clearJobLog(final String jobId) {
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+        return null;
+      }
+    });
+  }
+
+  protected void clearHistoricIncident(final HistoricIncident historicIncident) {
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricIncidentManager().delete((HistoricIncidentEntity) historicIncident);
+        return null;
+      }
+    });
   }
 
 }

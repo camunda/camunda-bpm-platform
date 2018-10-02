@@ -104,6 +104,12 @@ public interface HistoricJobLog {
   String getExecutionId();
 
   /**
+   * Returns the specific root process instance id of the process instance
+   * on which the associated job was created.
+   */
+  String getRootProcessInstanceId();
+
+  /**
    * Returns the specific process instance id on which the associated job was created.
    */
   String getProcessInstanceId();

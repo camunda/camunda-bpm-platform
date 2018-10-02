@@ -50,6 +50,8 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
 
   protected int state;
 
+  protected String rootProcessInstanceId;
+
   public Date getTimestamp() {
     return timestamp;
   }
@@ -195,6 +197,15 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
   @Override
   public boolean isDeletionLog() {
     return state == ExternalTaskState.DELETED.getStateCode();
+  }
+
+  @Override
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
 }

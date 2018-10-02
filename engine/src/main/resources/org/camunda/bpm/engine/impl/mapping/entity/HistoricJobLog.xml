@@ -22,6 +22,7 @@
             JOB_DEF_CONFIGURATION_,
             ACT_ID_,
             EXECUTION_ID_,
+            ROOT_PROC_INST_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
@@ -43,6 +44,7 @@
             #{jobDefinitionConfiguration, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
+            #{rootProcessInstanceId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{processDefinitionKey, jdbcType=VARCHAR},
@@ -134,6 +136,7 @@
     <result property="jobDefinitionConfiguration" column="JOB_DEF_CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />

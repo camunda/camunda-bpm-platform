@@ -55,6 +55,8 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String tenantId;
 
+  protected String rootProcessInstanceId;
+
   public Date getTimestamp() {
     return timestamp;
   }
@@ -207,4 +209,11 @@ public class HistoricJobLogEvent extends HistoryEvent {
     return state == JobState.DELETED.getStateCode();
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
 }

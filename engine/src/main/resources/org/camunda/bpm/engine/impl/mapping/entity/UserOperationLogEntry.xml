@@ -26,6 +26,7 @@
         DEPLOYMENT_ID_,
         PROC_DEF_ID_,
         PROC_DEF_KEY_,
+        ROOT_PROC_INST_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
         CASE_DEF_ID_,
@@ -49,6 +50,7 @@
         #{deploymentId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
+        #{rootProcessInstanceId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
         #{caseDefinitionId, jdbcType=VARCHAR},
@@ -83,6 +85,7 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />

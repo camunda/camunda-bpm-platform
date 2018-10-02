@@ -69,6 +69,12 @@ public interface HistoricIncident {
   public String getActivityId();
 
   /**
+   * Returns the specific root process instance id of the process instance
+   * on which this incident has happened.
+   */
+  String getRootProcessInstanceId();
+
+  /**
    * Returns the specific process instance on which this
    * incident has happened.
    */

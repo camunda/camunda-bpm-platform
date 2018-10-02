@@ -128,6 +128,9 @@ public interface UserOperationLogEntry {
    */
   String getProcessDefinitionKey();
 
+  /** Root process instance reference. */
+  String getRootProcessInstanceId();
+
   /** Process instance reference. */
   String getProcessInstanceId();
 

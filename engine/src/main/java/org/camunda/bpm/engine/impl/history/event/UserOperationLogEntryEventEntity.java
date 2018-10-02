@@ -37,6 +37,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   protected String deploymentId;
   protected String tenantId;
   protected String batchId;
+  protected String rootProcessInstanceId;
 
   public String getOperationId() {
     return operationId;
@@ -150,6 +151,14 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
     this.batchId = batchId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -170,6 +179,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
         + ", eventType=" + eventType
         + ", executionId=" + executionId
         + ", processDefinitionId=" + processDefinitionId
+        + ", rootProcessInstanceId=" + rootProcessInstanceId
         + ", processInstanceId=" + processInstanceId
         + ", tenantId=" + tenantId
         + ", entityType=" + entityType

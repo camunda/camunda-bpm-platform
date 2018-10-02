@@ -307,6 +307,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobDefinitionId(contextEntry.getJobDefinitionId());
     evt.setBatchId(contextEntry.getBatchId());
     evt.setTimestamp(ClockUtil.getCurrentTime());
+    evt.setRootProcessInstanceId(contextEntry.getRootProcessInstanceId());
 
     // init property value
     evt.setProperty(propertyChange.getPropertyName());
@@ -334,6 +335,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     ProcessDefinitionEntity definition = incidentEntity.getProcessDefinition();
     if (definition != null) {
       evt.setProcessDefinitionKey(definition.getKey());
+    }
+
+    ExecutionEntity execution = incidentEntity.getExecution();
+    if (execution != null) {
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     }
 
     // init event type
@@ -1008,6 +1014,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setDeploymentId(jobEntity.getDeploymentId());
     evt.setTenantId(jobEntity.getTenantId());
 
+    ExecutionEntity execution = jobEntity.getExecution();
+    if (execution != null) {
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+    }
+
     // initialize sequence counter
     initSequenceCounter(jobEntity, evt);
 
@@ -1072,6 +1083,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     event.setProcessDefinitionKey(entity.getProcessDefinitionKey());
     event.setTenantId(entity.getTenantId());
     event.setState(state.getStateCode());
+
+    ExecutionEntity execution = entity.getExecution();
+    if (execution != null) {
+      event.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+    }
 
     return event;
   }

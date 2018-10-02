@@ -35,6 +35,7 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
   protected int incidentState;
   protected String tenantId;
   protected String jobDefinitionId;
+  protected String rootProcessInstanceId;
 
   public Date getCreateTime() {
     return createTime;
@@ -130,6 +131,14 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
 
   public boolean isResolved() {
     return IncidentState.RESOLVED.getStateCode() == incidentState;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
 }

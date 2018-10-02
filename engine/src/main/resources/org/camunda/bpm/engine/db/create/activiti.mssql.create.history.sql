@@ -181,6 +181,7 @@ create table ACT_HI_OP_LOG (
     DEPLOYMENT_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
     PROC_DEF_KEY_ nvarchar(255),
+    ROOT_PROC_INST_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
     CASE_DEF_ID_ nvarchar(64),
@@ -206,6 +207,7 @@ create table ACT_HI_INCIDENT (
   ID_ nvarchar(64) not null,
   PROC_DEF_KEY_ nvarchar(255),
   PROC_DEF_ID_ nvarchar(64),
+  ROOT_PROC_INST_ID_ nvarchar(64),
   PROC_INST_ID_ nvarchar(64),
   EXECUTION_ID_ nvarchar(64),
   CREATE_TIME_ datetime2 not null,
@@ -237,6 +239,7 @@ create table ACT_HI_JOB_LOG (
     JOB_DEF_CONFIGURATION_ nvarchar(255),
     ACT_ID_ nvarchar(255),
     EXECUTION_ID_ nvarchar(64),
+    ROOT_PROC_INST_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROCESS_DEF_ID_ nvarchar(64),
     PROCESS_DEF_KEY_ nvarchar(255),
@@ -275,6 +278,7 @@ create table ACT_HI_EXT_TASK_LOG (
     ACT_ID_ nvarchar(255),
     ACT_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    ROOT_PROC_INST_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
     PROC_DEF_KEY_ nvarchar(255),
@@ -336,8 +340,10 @@ create index ACT_IDX_HI_VARINST_BYTEAR on ACT_HI_VARINST(BYTEARRAY_ID_);
 
 create index ACT_IDX_HI_INCIDENT_TENANT_ID on ACT_HI_INCIDENT(TENANT_ID_);
 create index ACT_IDX_HI_INCIDENT_PROC_DEF_KEY on ACT_HI_INCIDENT(PROC_DEF_KEY_);
+create index ACT_IDX_HI_INCIDENT_ROOT_PI on ACT_HI_INCIDENT(ROOT_PROC_INST_ID_);
 create index ACT_IDX_HI_INCIDENT_PROCINST on ACT_HI_INCIDENT(PROC_INST_ID_);
 
+create index ACT_IDX_HI_JOB_LOG_ROOT_PI on ACT_HI_JOB_LOG(ROOT_PROC_INST_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROCINST on ACT_HI_JOB_LOG(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROCDEF on ACT_HI_JOB_LOG(PROCESS_DEF_ID_);
 create index ACT_IDX_HI_JOB_LOG_TENANT_ID on ACT_HI_JOB_LOG(TENANT_ID_);
@@ -345,12 +351,14 @@ create index ACT_IDX_HI_JOB_LOG_JOB_DEF_ID on ACT_HI_JOB_LOG(JOB_DEF_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROC_DEF_KEY on ACT_HI_JOB_LOG(PROCESS_DEF_KEY_);
 create index ACT_IDX_HI_JOB_LOG_EX_STACK on ACT_HI_JOB_LOG(JOB_EXCEPTION_STACK_ID_);
 
+create index ACT_HI_EXT_TASK_LOG_ROOT_PI on ACT_HI_EXT_TASK_LOG(ROOT_PROC_INST_ID_);
 create index ACT_HI_EXT_TASK_LOG_PROCINST on ACT_HI_EXT_TASK_LOG(PROC_INST_ID_);
 create index ACT_HI_EXT_TASK_LOG_PROCDEF on ACT_HI_EXT_TASK_LOG(PROC_DEF_ID_);
 create index ACT_HI_EXT_TASK_LOG_PROC_DEF_KEY on ACT_HI_EXT_TASK_LOG(PROC_DEF_KEY_);
 create index ACT_HI_EXT_TASK_LOG_TENANT_ID on ACT_HI_EXT_TASK_LOG(TENANT_ID_);
 create index ACT_IDX_HI_EXTTASKLOG_ERRORDET on ACT_HI_EXT_TASK_LOG(ERROR_DETAILS_ID_);
 
+create index ACT_IDX_HI_OP_LOG_ROOT_PI on ACT_HI_OP_LOG(ROOT_PROC_INST_ID_);
 create index ACT_IDX_HI_OP_LOG_PROCINST on ACT_HI_OP_LOG(PROC_INST_ID_);
 create index ACT_IDX_HI_OP_LOG_PROCDEF on ACT_HI_OP_LOG(PROC_DEF_ID_);
 create index ACT_IDX_HI_OP_LOG_TASK on ACT_HI_OP_LOG(TASK_ID_);
