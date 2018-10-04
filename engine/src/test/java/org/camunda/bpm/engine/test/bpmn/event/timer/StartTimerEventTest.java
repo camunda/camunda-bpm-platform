@@ -150,6 +150,39 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
   }
 
+
+  // TODO: Consecutive jobs produced by a Timer Cycle don't have the defined JobPriority (https://app.camunda.com/jira/browse/SUPPORT-4899)
+  @Deployment
+  public void FAILING_testPriorityInTimerCycleEvent() throws Exception {
+    ClockUtil.setCurrentTime(new Date());
+
+    // After process start, there should be timer created
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    // ensure that the deployment Id is set on the new job
+    Job job = jobQuery.singleResult();
+    assertNotNull(job.getDeploymentId());
+    assertEquals(9999, job.getPriority());
+
+    final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery()
+      .processDefinitionKey("startTimerEventExampleCycle");
+
+    assertEquals(0, piq.count());
+
+    moveByMinutes(5);
+    executeAllJobs();
+    assertEquals(1, piq.count());
+    assertEquals(1, jobQuery.count());
+
+    // ensure that the deployment Id is set on the new job
+    job = jobQuery.singleResult();
+    assertNotNull(job.getDeploymentId());
+
+    // second job should have the same priority
+    assertEquals(9999, job.getPriority());
+  }
+
   @Deployment
   public void testExpressionStartTimerEvent() throws Exception {
     // ACT-1415: fixed start-date is an expression
