@@ -13,7 +13,8 @@
     		TYPE_,
     		USER_ID_, 
     		GROUP_ID_, 
-    		TASK_ID_, 
+    		TASK_ID_,
+    		ROOT_PROC_INST_ID_,
     		PROC_DEF_ID_, 
     		OPERATION_TYPE_,
             ASSIGNER_ID_,
@@ -25,6 +26,7 @@
             #{userId, jdbcType=VARCHAR},
             #{groupId, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
+            #{rootProcessInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{operationType, jdbcType=VARCHAR},
             #{assignerId, jdbcType=VARCHAR},
@@ -96,6 +98,7 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="operationType" column="OPERATION_TYPE_" jdbcType="VARCHAR"/>
     <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />

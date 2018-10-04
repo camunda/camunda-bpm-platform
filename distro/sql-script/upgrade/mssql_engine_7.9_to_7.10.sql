@@ -93,6 +93,12 @@ ALTER TABLE ACT_HI_EXT_TASK_LOG
 
 create index ACT_HI_EXT_TASK_LOG_ROOT_PI on ACT_HI_EXT_TASK_LOG(ROOT_PROC_INST_ID_);
 
+-- https://app.camunda.com/jira/browse/CAM-9391
+ALTER TABLE ACT_HI_IDENTITYLINK
+  ADD ROOT_PROC_INST_ID_ nvarchar(64);
+
+create index ACT_IDX_HI_IDENT_LNK_ROOT_PI on ACT_HI_IDENTITYLINK(ROOT_PROC_INST_ID_);
+
 -- https://app.camunda.com/jira/browse/CAM-9392
 ALTER TABLE ACT_HI_JOB_LOG
   ADD ROOT_PROC_INST_ID_ nvarchar(64);

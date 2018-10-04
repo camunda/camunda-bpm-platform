@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -481,6 +482,60 @@ public class HistoricRootProcessInstanceTest {
 
     // then
     assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveIdentityLink_AddCandidateUser() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    // when
+    taskService.addCandidateUser(taskService.createTaskQuery().singleResult().getId(), "aUserId");
+
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+
+    // assume
+    assertThat(historicIdentityLinkLog, notNullValue());
+
+    // then
+    assertThat(historicIdentityLinkLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldNotResolveIdentityLink_AddCandidateUser() {
+    // given
+    Task aTask = taskService.newTask();
+    taskService.saveTask(aTask);
+
+    // when
+    taskService.addCandidateUser(aTask.getId(), "aUserId");
+
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+
+    // assume
+    assertThat(historicIdentityLinkLog, notNullValue());
+
+    // then
+    assertThat(historicIdentityLinkLog.getRootProcessInstanceId(), nullValue());
+
+    // cleanup
+    taskService.complete(aTask.getId());
+    clearHistoricTaskInst(aTask.getId());
+  }
+
+  protected void clearHistoricTaskInst(final String taskId) {
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(taskId);
+        commandContext.getHistoricIdentityLinkManager().deleteHistoricIdentityLinksLogByTaskId(taskId);
+        return null;
+      }
+    });
   }
 
   protected void clearJobLog(final String jobId) {

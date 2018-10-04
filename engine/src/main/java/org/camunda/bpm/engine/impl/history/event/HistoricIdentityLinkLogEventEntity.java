@@ -26,6 +26,8 @@ public class HistoricIdentityLinkLogEventEntity extends HistoryEvent {
 
   protected String tenantId;
 
+  protected String rootProcessInstanceId;
+
   public Date getTime() {
     return time;
   }
@@ -89,4 +91,13 @@ public class HistoricIdentityLinkLogEventEntity extends HistoryEvent {
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
   }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
 }

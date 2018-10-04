@@ -90,4 +90,11 @@ public interface HistoricIdentityLinkLog {
    * Returns the id of the related tenant 
    */
   String getTenantId();
+
+  /**
+   * Returns the root process instance id of
+   * the related process instance
+   */
+  String getRootProcessInstanceId();
+
 }

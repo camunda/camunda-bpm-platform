@@ -877,6 +877,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       if (task.getProcessDefinition() != null) {
         evt.setProcessDefinitionKey(task.getProcessDefinition().getKey());
       }
+
+      ExecutionEntity execution = task.getExecution();
+      if (execution != null) {
+        evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+      }
     }
 
     if (identityLink.getProcessDefId() != null) {
