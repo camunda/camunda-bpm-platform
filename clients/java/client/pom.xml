@@ -21,15 +21,16 @@
     <version.jackson>2.9.5</version.jackson>
 
     <version.plugin.surefire>2.16</version.plugin.surefire>
-    <version.plugin.failsafe>2.20</version.plugin.failsafe>
+    <version.plugin.failsafe>2.22.0</version.plugin.failsafe>
     <version.plugin.helper>3.0.0</version.plugin.helper>
-    <version.plugin.cargo>1.6.2</version.plugin.cargo>
+    <version.plugin.cargo>1.6.10</version.plugin.cargo>
 
     <version.junit>4.10</version.junit>
     <version.slf4j>1.6.1</version.slf4j>
     <version.assertj>3.9.0</version.assertj>
     <version.jsonassert>1.5.0</version.jsonassert>
-    <version.tomcat>9.0.5</version.tomcat>
+    <version.tomcat>9.0.12</version.tomcat>
+    <version.jaxb>2.2.4</version.jaxb>
   </properties>
 
   <dependencies>
@@ -237,6 +238,12 @@
           <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+          <version>${version.jaxb}</version>
+          <scope>provided</scope>
+        </dependency>
       </dependencies>
 
       <build>
