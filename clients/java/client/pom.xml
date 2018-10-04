@@ -165,6 +165,22 @@
 
   <profiles>
     <profile>
+      <id>jdk-9-plus</id>
+      <activation>
+        <jdk>(1.8,)</jdk>
+      </activation>
+
+      <dependencies>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+          <version>${version.jaxb}</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
       <id>it</id>
 
       <!-- DO NOT REMOVE IF YOU DON'T KNOW WHAT YOU DO -->
@@ -238,12 +254,6 @@
           <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
-          <version>${version.jaxb}</version>
-          <scope>provided</scope>
-        </dependency>
       </dependencies>
 
       <build>
