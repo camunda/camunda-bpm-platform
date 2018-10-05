@@ -21,13 +21,14 @@
   <!-- ATTACHMENT INSERT -->
 
   <insert id="insertAttachment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">
-    insert into ${prefix}ACT_HI_ATTACHMENT (ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TENANT_ID_, CREATE_TIME_, REV_)
+    insert into ${prefix}ACT_HI_ATTACHMENT (ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TENANT_ID_, CREATE_TIME_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{name ,jdbcType=VARCHAR},
       #{description ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
       #{taskId ,jdbcType=VARCHAR},
+      #{rootProcessInstanceId ,jdbcType=VARCHAR},
       #{processInstanceId ,jdbcType=VARCHAR},
       #{url ,jdbcType=VARCHAR},
       #{contentId ,jdbcType=VARCHAR},
@@ -104,6 +105,7 @@
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
     <result property="type" column="TYPE_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="url" column="URL_" jdbcType="VARCHAR" />
     <result property="contentId" column="CONTENT_ID_" jdbcType="VARCHAR" />

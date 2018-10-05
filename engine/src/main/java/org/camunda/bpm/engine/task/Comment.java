@@ -37,6 +37,9 @@ public interface Comment {
   /** reference to the task on which this comment was made */
   String getTaskId();
 
+  /** reference to the root process instance id of the process instance on which this comment was made */
+  String getRootProcessInstanceId();
+
   /** reference to the process instance on which this comment was made */
   String getProcessInstanceId();
 

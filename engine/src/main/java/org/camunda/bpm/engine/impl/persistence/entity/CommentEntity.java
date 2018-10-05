@@ -48,6 +48,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   protected String message;
   protected String fullMessage;
   protected String tenantId;
+  protected String rootProcessInstanceId;
   
   public Object getPersistentState() {
     return CommentEntity.class;
@@ -179,6 +180,14 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.tenantId = tenantId;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -188,6 +197,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
            + ", time=" + time
            + ", taskId=" + taskId
            + ", processInstanceId=" + processInstanceId
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
            + ", action=" + action
            + ", message=" + message
            + ", fullMessage=" + fullMessage

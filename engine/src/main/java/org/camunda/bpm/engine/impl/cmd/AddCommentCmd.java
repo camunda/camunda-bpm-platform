@@ -18,6 +18,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
@@ -59,6 +61,11 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
     comment.setProcessInstanceId(processInstanceId);
     comment.setAction(Event.ACTION_ADD_COMMENT);
 
+    ExecutionEntity execution = getExecution(commandContext, taskId, processInstanceId);
+    if (execution != null) {
+      comment.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+    }
+
     String eventMessage = message.replaceAll("\\s+", " ");
     if (eventMessage.length() > 163) {
       eventMessage = eventMessage.substring(0, 160) + "...";
@@ -73,4 +80,22 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
 
     return comment;
   }
+
+  protected ExecutionEntity getExecution(CommandContext commandContext, String taskId, String processInstanceId) {
+    ExecutionEntity execution = null;
+    if (taskId != null) {
+      TaskEntity task = commandContext.getTaskManager()
+        .findTaskById(taskId);
+
+      if (task != null) {
+        execution = task.getExecution();
+      }
+    } else if (processInstanceId != null) {
+      execution = commandContext.getExecutionManager()
+        .findExecutionById(processInstanceId);
+    }
+
+    return execution;
+  }
+
 }

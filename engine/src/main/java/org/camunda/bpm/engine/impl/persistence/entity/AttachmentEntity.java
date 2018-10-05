@@ -43,6 +43,7 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
   protected ByteArrayEntity content;
   protected String tenantId;
   protected Date createTime;
+  protected String rootProcessInstanceId;
 
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
@@ -151,6 +152,14 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
     this.createTime = createTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -161,6 +170,7 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
            + ", type=" + type
            + ", taskId=" + taskId
            + ", processInstanceId=" + processInstanceId
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
            + ", url=" + url
            + ", contentId=" + contentId
            + ", content=" + content

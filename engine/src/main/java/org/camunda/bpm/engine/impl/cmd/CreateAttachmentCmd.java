@@ -82,6 +82,15 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     attachment.setUrl(url);
     attachment.setCreateTime(ClockUtil.getCurrentTime());
 
+    if (task != null) {
+      ExecutionEntity execution = task.getExecution();
+      if (execution != null) {
+        attachment.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+      }
+    } else if (processInstance != null) {
+      attachment.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
+    }
+
     DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
     dbEntityManger.insert(attachment);
 

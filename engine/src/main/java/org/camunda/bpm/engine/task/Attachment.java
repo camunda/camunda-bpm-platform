@@ -57,4 +57,8 @@ public interface Attachment {
 
   /** The time when the attachment was created. */
   Date getCreateTime();
+
+  /** reference to the root process instance id of the process instance on which this attachment was made */
+  String getRootProcessInstanceId();
+
 }

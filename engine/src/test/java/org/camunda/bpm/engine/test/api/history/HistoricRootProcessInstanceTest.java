@@ -33,9 +33,12 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Attachment;
+import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -50,6 +53,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -525,6 +529,291 @@ public class HistoricRootProcessInstanceTest {
     // cleanup
     taskService.complete(aTask.getId());
     clearHistoricTaskInst(aTask.getId());
+  }
+
+  @Test
+  public void shouldResolveCommentByProcessInstanceId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String processInstanceId = runtimeService.createProcessInstanceQuery()
+      .activityIdIn("userTask")
+      .singleResult()
+      .getId();
+
+    // when
+    taskService.createComment(null, processInstanceId, "aMessage");
+
+    Comment comment = taskService.getProcessInstanceComments(processInstanceId).get(0);
+
+    // assume
+    assertThat(comment, notNullValue());
+
+    // then
+    assertThat(comment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveCommentByTaskId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.createComment(taskId, null, "aMessage");
+
+    Comment comment = taskService.getTaskComments(taskId).get(0);
+
+    // assume
+    assertThat(comment, notNullValue());
+
+    // then
+    assertThat(comment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldNotResolveCommentByWrongTaskIdAndProcessInstanceId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String processInstanceId = runtimeService.createProcessInstanceQuery()
+      .activityIdIn("userTask")
+      .singleResult()
+      .getId();
+
+    // when
+    taskService.createComment("aNonExistentTaskId", processInstanceId, "aMessage");
+
+    Comment comment = taskService.getProcessInstanceComments(processInstanceId).get(0);
+
+    // assume
+    assertThat(comment, notNullValue());
+
+    // then
+    assertThat(comment.getRootProcessInstanceId(), nullValue());
+  }
+
+  @Test
+  public void shouldResolveCommentByTaskIdAndWrongProcessInstanceId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.createComment(taskId, "aNonExistentProcessInstanceId", "aMessage");
+
+    Comment comment = taskService.getTaskComments(taskId).get(0);
+
+    // assume
+    assertThat(comment, notNullValue());
+
+    // then
+    assertThat(comment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldNotResolveCommentByWrongProcessInstanceId() {
+    // given
+
+    // when
+    taskService.createComment(null, "aNonExistentProcessInstanceId", "aMessage");
+
+    Comment comment = taskService.getProcessInstanceComments("aNonExistentProcessInstanceId").get(0);
+
+    // assume
+    assertThat(comment, notNullValue());
+
+    // then
+    assertThat(comment.getRootProcessInstanceId(), nullValue());
+
+    // cleanup
+    clearCommentByProcessInstanceId("aNonExistentProcessInstanceId");
+  }
+
+  @Test
+  public void shouldNotResolveCommentByWrongTaskId() {
+    // given
+
+    // when
+    taskService.createComment("aNonExistentTaskId", null, "aMessage");
+
+    Comment comment = taskService.getTaskComments("aNonExistentTaskId").get(0);
+
+    // assume
+    assertThat(comment, notNullValue());
+
+    // then
+    assertThat(comment.getRootProcessInstanceId(), nullValue());
+
+    // cleanup
+    clearCommentByTaskId("aNonExistentTaskId");
+  }
+
+  @Test
+  public void shouldResolveAttachmentByProcessInstanceId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String processInstanceId = runtimeService.createProcessInstanceQuery()
+      .activityIdIn("userTask")
+      .singleResult()
+      .getId();
+
+    // when
+    String attachmentId = taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
+
+    Attachment attachment = taskService.getAttachment(attachmentId);
+
+    // assume
+    assertThat(attachment, notNullValue());
+
+    // then
+    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveAttachmentByTaskId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    String attachmentId = taskService.createAttachment(null, taskId, null, null, null, "http://camunda.com").getId();
+
+    Attachment attachment = taskService.getAttachment(attachmentId);
+
+    // assume
+    assertThat(attachment, notNullValue());
+
+    // then
+    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldNotResolveAttachmentByWrongTaskIdAndProcessInstanceId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String processInstanceId = runtimeService.createProcessInstanceQuery()
+      .activityIdIn("userTask")
+      .singleResult()
+      .getId();
+
+    // when
+    String attachmentId = taskService.createAttachment(null, "aWrongTaskId", processInstanceId, null, null, "http://camunda.com").getId();
+
+    Attachment attachment = taskService.getAttachment(attachmentId);
+
+    // assume
+    assertThat(attachment, notNullValue());
+
+    // then
+    assertThat(attachment.getRootProcessInstanceId(), nullValue());
+  }
+
+  @Test
+  public void shouldResolveAttachmentByTaskIdAndWrongProcessInstanceId() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery()
+      .singleResult()
+      .getId();
+
+    // when
+    String attachmentId = taskService.createAttachment(null, taskId, "aWrongProcessInstanceId", null, null, "http://camunda.com").getId();
+
+    Attachment attachment = taskService.getAttachment(attachmentId);
+
+    // assume
+    assertThat(attachment, notNullValue());
+
+    // then
+    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldNotResolveAttachmentByWrongTaskId() {
+    // given
+
+    // when
+    String attachmentId = taskService.createAttachment(null, "aWrongTaskId", null, null, null, "http://camunda.com").getId();
+
+    Attachment attachment = taskService.getAttachment(attachmentId);
+
+    // assume
+    assertThat(attachment, notNullValue());
+
+    // then
+    assertThat(attachment.getRootProcessInstanceId(), nullValue());
+
+    // cleanup
+    clearAttachment(attachment);
+  }
+
+  protected void clearAttachment(final Attachment attachment) {
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
+        return null;
+      }
+    });
+  }
+
+  protected void clearCommentByTaskId(final String taskId) {
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getCommentManager().deleteCommentsByTaskId(taskId);
+        return null;
+      }
+    });
+  }
+
+  protected void clearCommentByProcessInstanceId(final String processInstanceId) {
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getCommentManager().deleteCommentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
+        return null;
+      }
+    });
   }
 
   protected void clearHistoricTaskInst(final String taskId) {
