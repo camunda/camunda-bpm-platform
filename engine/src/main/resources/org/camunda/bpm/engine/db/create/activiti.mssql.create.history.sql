@@ -27,7 +27,7 @@ create table ACT_HI_ACTINST (
     PARENT_ACT_INST_ID_ nvarchar(64),
     PROC_DEF_KEY_ nvarchar(255),
     PROC_DEF_ID_ nvarchar(64) not null,
-    ROOT_PROC_INST_ID_ nvarchar(64) not null,
+    ROOT_PROC_INST_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64) not null,
     EXECUTION_ID_ nvarchar(64) not null,
     ACT_ID_ nvarchar(255) not null,
