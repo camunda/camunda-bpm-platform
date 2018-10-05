@@ -41,7 +41,6 @@ import org.camunda.bpm.engine.impl.history.event.HistoricDecisionEvaluationEvent
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -306,24 +305,17 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setProcessDefinitionKey(getProcessDefinitionKey(execution));
     event.setProcessDefinitionId(execution.getProcessDefinitionId());
 
-    String processInstanceId = execution.getProcessInstanceId();
-    event.setProcessInstanceId(processInstanceId);
+    setReferenceToRootProcessInstance(event, execution);
+
+    event.setProcessInstanceId(execution.getProcessInstanceId());
     event.setExecutionId(execution.getId());
-
-    HistoricProcessInstanceEventEntity historicProcessInstance = Context.getCommandContext()
-      .getDbEntityManager()
-      .getCachedEntity(HistoricProcessInstanceEventEntity.class, processInstanceId);
-
-    if (historicProcessInstance == null) {
-      historicProcessInstance = Context.getCommandContext()
-        .getHistoricProcessInstanceManager()
-        .findHistoricProcessInstance(processInstanceId);
-    }
-
-    event.setRootProcessInstanceId(historicProcessInstance.getRootProcessInstanceId());
 
     event.setActivityId(execution.getActivityId());
     event.setActivityInstanceId(execution.getActivityInstanceId());
+  }
+
+  protected void setReferenceToRootProcessInstance(HistoricDecisionInstanceEntity event, ExecutionEntity execution) {
+    event.setRootProcessInstanceId(execution.getRootProcessInstanceId());
   }
 
   protected String getProcessDefinitionKey(ExecutionEntity execution) {

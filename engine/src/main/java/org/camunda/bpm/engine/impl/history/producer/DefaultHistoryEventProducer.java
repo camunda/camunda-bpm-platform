@@ -176,6 +176,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setBusinessKey(execution.getProcessBusinessKey());
     evt.setCaseInstanceId(caseInstanceId);
     evt.setTenantId(tenantId);
+    evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
 
     if (execution.getSuperCaseExecution() != null) {
       evt.setSuperCaseInstanceId(execution.getSuperCaseExecution().getCaseInstanceId());
@@ -479,25 +480,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     ExecutionEntity superExecution = executionEntity.getSuperExecution();
     if (superExecution != null) {
       evt.setSuperProcessInstanceId(superExecution.getProcessInstanceId());
-
-      // get & set root process instance id
-      String superProcessInstanceId = superExecution.getProcessInstanceId();
-
-      HistoricProcessInstanceEventEntity root = Context.getCommandContext()
-        .getDbEntityManager()
-        .getCachedEntity(HistoricProcessInstanceEventEntity.class, superProcessInstanceId);
-
-      if (root == null) {
-        root = Context.getCommandContext()
-          .getHistoricProcessInstanceManager()
-          .findHistoricProcessInstance(superProcessInstanceId);
-      }
-
-      String rootProcessInstanceId = root.getRootProcessInstanceId();
-      evt.setRootProcessInstanceId(rootProcessInstanceId);
-    } else {
-      // set root process instance id
-      evt.setRootProcessInstanceId(execution.getProcessInstanceId());
     }
 
     //state
