@@ -118,9 +118,9 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
   protected HistoricDecisionInstanceEntity createDecisionEvaluatedEvt(DmnDecisionLogicEvaluationEvent evaluationEvent, ExecutionEntity execution) {
     // create event instance
     HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(execution, evaluationEvent);
+    setReferenceToProcessInstance(event, execution);
     // initialize event
     initDecisionInstanceEvent(event, evaluationEvent, HistoryEventTypes.DMN_DECISION_EVALUATE);
-    setReferenceToProcessInstance(event, execution);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
 
@@ -217,10 +217,11 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       event.setCollectResultValue(collectResultValue);
     }
 
-    List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(evaluationEvent);
+    String rootProcessInstanceId = event.getRootProcessInstanceId();
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(evaluationEvent, rootProcessInstanceId);
     event.setInputs(historicDecisionInputInstances);
 
-    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(evaluationEvent);
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(evaluationEvent, rootProcessInstanceId);
     event.setOutputs(historicDecisionOutputInstances);
   }
 
@@ -241,12 +242,12 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     }
   }
 
-  protected List<HistoricDecisionInputInstance> createHistoricDecisionInputInstances(DmnDecisionTableEvaluationEvent evaluationEvent) {
+  protected List<HistoricDecisionInputInstance> createHistoricDecisionInputInstances(DmnDecisionTableEvaluationEvent evaluationEvent, String rootProcessInstanceId) {
     List<HistoricDecisionInputInstance> inputInstances = new ArrayList<HistoricDecisionInputInstance>();
 
     for(DmnEvaluatedInput inputClause : evaluationEvent.getInputs()) {
 
-      HistoricDecisionInputInstanceEntity inputInstance = new HistoricDecisionInputInstanceEntity();
+      HistoricDecisionInputInstanceEntity inputInstance = new HistoricDecisionInputInstanceEntity(rootProcessInstanceId);
       inputInstance.setClauseId(inputClause.getId());
       inputInstance.setClauseName(inputClause.getName());
       inputInstance.setCreateTime(ClockUtil.getCurrentTime());
@@ -260,7 +261,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     return inputInstances;
   }
 
-  protected List<HistoricDecisionOutputInstance> createHistoricDecisionOutputInstances(DmnDecisionTableEvaluationEvent evaluationEvent) {
+  protected List<HistoricDecisionOutputInstance> createHistoricDecisionOutputInstances(DmnDecisionTableEvaluationEvent evaluationEvent, String rootProcessInstanceId) {
     List<HistoricDecisionOutputInstance> outputInstances = new ArrayList<HistoricDecisionOutputInstance>();
 
     List<DmnEvaluatedDecisionRule> matchingRules = evaluationEvent.getMatchingRules();
@@ -272,7 +273,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
 
       for(DmnEvaluatedOutput outputClause : rule.getOutputEntries().values()) {
 
-        HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity();
+        HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity(rootProcessInstanceId);
         outputInstance.setClauseId(outputClause.getId());
         outputInstance.setClauseName(outputClause.getName());
         outputInstance.setCreateTime(ClockUtil.getCurrentTime());
@@ -294,7 +295,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     // no inputs for expression
     event.setInputs(Collections.<HistoricDecisionInputInstance> emptyList());
 
-    HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity();
+    HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity(event.getRootProcessInstanceId());
     outputInstance.setVariableName(evaluationEvent.getOutputName());
     outputInstance.setValue(evaluationEvent.getOutputValue());
 
@@ -305,17 +306,12 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setProcessDefinitionKey(getProcessDefinitionKey(execution));
     event.setProcessDefinitionId(execution.getProcessDefinitionId());
 
-    setReferenceToRootProcessInstance(event, execution);
-
+    event.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     event.setProcessInstanceId(execution.getProcessInstanceId());
     event.setExecutionId(execution.getId());
 
     event.setActivityId(execution.getActivityId());
     event.setActivityInstanceId(execution.getActivityInstanceId());
-  }
-
-  protected void setReferenceToRootProcessInstance(HistoricDecisionInstanceEntity event, ExecutionEntity execution) {
-    event.setRootProcessInstanceId(execution.getRootProcessInstanceId());
   }
 
   protected String getProcessDefinitionKey(ExecutionEntity execution) {

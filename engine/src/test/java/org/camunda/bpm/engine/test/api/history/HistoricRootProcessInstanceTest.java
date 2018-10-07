@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -22,7 +23,9 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
@@ -32,11 +35,17 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -45,7 +54,9 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
 import org.camunda.bpm.engine.test.bpmn.async.FailingDelegate;
+import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -56,6 +67,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -103,6 +115,7 @@ public class HistoricRootProcessInstanceTest {
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
   protected ExternalTaskService externalTaskService;
+  protected DecisionService decisionService;
 
   @Before
   public void init() {
@@ -114,6 +127,8 @@ public class HistoricRootProcessInstanceTest {
     repositoryService = engineRule.getRepositoryService();
     identityService = engineRule.getIdentityService();
     externalTaskService = engineRule.getExternalTaskService();
+    decisionService = engineRule.getDecisionService();
+
   }
 
   @Test
@@ -143,6 +158,124 @@ public class HistoricRootProcessInstanceTest {
     assertThat(historicDecisionInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
     assertThat(historicDecisionInstances.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
     assertThat(historicDecisionInstances.get(2).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldResolveHistoricDecisionInputInstance() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+    .startEvent()
+      .businessRuleTask()
+        .camundaDecisionRef("dish-decision")
+    .endEvent().done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("temperature", 32)
+        .putValue("dayType", "Weekend"));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeInputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+
+    // then
+    assertThat(historicDecisionInputInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInputInstances.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldNotResolveHistoricDecisionInputInstance() {
+    // given
+
+    // when
+    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
+      .putValue("temperature", 32)
+      .putValue("dayType", "Weekend"));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeInputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+
+    // then
+    assertThat(historicDecisionInputInstances.get(0).getRootProcessInstanceId(), nullValue());
+    assertThat(historicDecisionInputInstances.get(1).getRootProcessInstanceId(), nullValue());
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldResolveHistoricDecisionOutputInstance() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+    .startEvent()
+      .businessRuleTask()
+        .camundaDecisionRef("dish-decision")
+    .endEvent().done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("temperature", 32)
+        .putValue("dayType", "Weekend"));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeOutputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+
+    // then
+    assertThat(historicDecisionOutputInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldNotResolveHistoricDecisionOutputInstance() {
+    // given
+
+    // when
+    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
+      .putValue("temperature", 32)
+      .putValue("dayType", "Weekend"));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeOutputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+
+    // then
+    assertThat(historicDecisionOutputInstances.get(0).getRootProcessInstanceId(), nullValue());
   }
 
   @Test
@@ -227,7 +360,6 @@ public class HistoricRootProcessInstanceTest {
     // cleanup
     taskService.deleteTask(task.getId(), true);
   }
-
 
   @Test
   public void shouldResolveHistoricVariableInstance() {

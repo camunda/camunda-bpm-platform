@@ -42,10 +42,21 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
 
   protected String tenantId;
 
-  protected ByteArrayField byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
+  protected ByteArrayField byteArrayField;
   protected TypedValueField typedValueField = new TypedValueField(this, false);
 
   protected Date createTime;
+
+  protected String rootProcessInstanceId;
+
+  public HistoricDecisionInputInstanceEntity() {
+    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
+  }
+
+  public HistoricDecisionInputInstanceEntity(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
+  }
 
   @Override
   public String getDecisionInstanceId() {
@@ -192,6 +203,14 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
 
   public void setCreateTime(Date createTime) {
     this.createTime = createTime;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   public void delete() {

@@ -64,4 +64,11 @@ public interface HistoricDecisionInputInstance {
    * Returns time when the variable was created.
    */
   Date getCreateTime();
+
+  /**
+   * Returns the root process instance id of the process instance
+   * on which the associated business rule task has been called.
+   */
+  String getRootProcessInstanceId();
+
 }
