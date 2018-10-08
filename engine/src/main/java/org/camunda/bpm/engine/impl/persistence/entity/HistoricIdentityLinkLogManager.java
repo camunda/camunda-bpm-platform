@@ -5,9 +5,6 @@ import java.util.List;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
 /**
@@ -28,13 +25,13 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricIdentityLinksLogByProcessDefinitionId(String processDefId) {
-    if (isHistoryEventProduced()) {
+    if (isHistoryLevelFullEnabled()) {
       getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByProcessDefinitionId", processDefId);
     }
   }
 
   public void deleteHistoricIdentityLinksLogByTaskId(String taskId) {
-    if (isHistoryEventProduced()) {
+    if (isHistoryLevelFullEnabled()) {
       getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskId", taskId);
     }
   }
@@ -50,12 +47,6 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
   protected void configureQuery(HistoricIdentityLinkLogQueryImpl query) {
     getAuthorizationManager().configureHistoricIdentityLinkQuery(query);
     getTenantManager().configureQuery(query);
-  }
-
-  protected boolean isHistoryEventProduced() {
-    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    return historyLevel.isHistoryEventProduced(HistoryEventTypes.IDENTITY_LINK_ADD, null) ||
-           historyLevel.isHistoryEventProduced(HistoryEventTypes.IDENTITY_LINK_DELETE, null);
   }
 
 }
