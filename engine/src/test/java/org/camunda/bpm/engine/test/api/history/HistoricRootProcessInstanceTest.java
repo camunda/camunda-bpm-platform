@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -969,6 +971,272 @@ public class HistoricRootProcessInstanceTest {
 
     // cleanup
     clearAttachment(attachment);
+  }
+
+  @Test
+  public void shouldResolveByteArray_CreateAttachmentByTask() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, taskId, null, null, null, new ByteArrayInputStream("hello world".getBytes()));
+
+    ByteArrayEntity byteArray = findByteArrayById(attachment.getContentId());
+
+    // assume
+    assertThat(byteArray, notNullValue());
+
+    // then
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveByteArray_CreateAttachmentByProcessInstance() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String calledProcessInstanceId = runtimeService.createProcessInstanceQuery()
+      .activityIdIn("userTask")
+      .singleResult()
+      .getId();
+
+    // when
+    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, null, calledProcessInstanceId, null, null, new ByteArrayInputStream("hello world".getBytes()));
+
+    ByteArrayEntity byteArray = findByteArrayById(attachment.getContentId());
+
+    // assume
+    assertThat(byteArray, notNullValue());
+
+    // then
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveByteArray_SetVariable() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    // when
+    runtimeService.setVariable(processInstance.getId(), "aVariableName", new ByteArrayInputStream("hello world".getBytes()));
+
+    HistoricVariableInstanceEntity historicVariableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
+
+    ByteArrayEntity byteArray = findByteArrayById(historicVariableInstance.getByteArrayId());
+
+    // assume
+    assertThat(byteArray, notNullValue());
+
+    // then
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveByteArray_UpdateVariable() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+
+    // when
+    runtimeService.setVariable(processInstance.getId(), "aVariableName", new ByteArrayInputStream("hello world".getBytes()));
+
+    HistoricDetailVariableInstanceUpdateEntity historicDetails = (HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery()
+      .variableUpdates()
+      .variableTypeIn("Bytes")
+      .singleResult();
+
+    // assume
+    ByteArrayEntity byteArray = findByteArrayById(historicDetails.getByteArrayValueId());
+
+    // then
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveByteArray_JobLog() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    try {
+      // when
+      managementService.executeJob(jobId);
+    } catch (Exception ignored) { }
+
+    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService.createHistoricJobLogQuery()
+      .jobExceptionMessage("I'm supposed to fail!")
+      .singleResult();
+
+    // assume
+    assertThat(jobLog, notNullValue());
+
+    ByteArrayEntity byteArray = findByteArrayById(jobLog.getExceptionByteArrayId());
+
+    // then
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  public void shouldResolveByteArray_ExternalTaskLog() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
+      .startEvent()
+        .serviceTask().camundaExternalTask("aTopicName")
+      .endEvent().done());
+
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
+      .startEvent()
+        .callActivity()
+          .calledElement("calledProcess")
+      .endEvent().done());
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, "aWorkerId")
+      .topic("aTopicName", Integer.MAX_VALUE)
+      .execute();
+
+    // when
+    externalTaskService.handleFailure(tasks.get(0).getId(), "aWorkerId", null, "errorDetails", 5, 3000L);
+
+    HistoricExternalTaskLogEntity externalTaskLog = (HistoricExternalTaskLogEntity) historyService.createHistoricExternalTaskLogQuery()
+      .failureLog()
+      .singleResult();
+
+    // assume
+    assertThat(externalTaskLog, notNullValue());
+
+    ByteArrayEntity byteArrayEntity = findByteArrayById(externalTaskLog.getErrorDetailsByteArrayId());
+
+    // then
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
+  })
+  public void shouldResolveByteArray_DecisionInput() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .startEvent()
+        .businessRuleTask().camundaDecisionRef("testDecision")
+      .endEvent().done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("pojo", new TestPojo("okay", 13.37)));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeInputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    HistoricDecisionInputInstanceEntity historicDecisionInputInstanceEntity = (HistoricDecisionInputInstanceEntity) historicDecisionInstance.getInputs().get(0);
+
+    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionInputInstanceEntity.getByteArrayValueId());
+
+    // then
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
+  })
+  public void shouldResolveByteArray_DecisionOutput() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .startEvent()
+        .businessRuleTask().camundaDecisionRef("testDecision")
+      .endEvent().done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("pojo", new TestPojo("okay", 13.37)));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeOutputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+
+    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+
+    // then
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  @Test
+  @Deployment
+  public void shouldResolveByteArray_DecisionOutputLiteralExpression() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .startEvent()
+        .businessRuleTask().camundaDecisionRef("testDecision")
+      .endEvent().done());
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("pojo", new TestPojo("okay", 13.37)));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeOutputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+
+    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+
+    // then
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+  }
+
+  protected ByteArrayEntity findByteArrayById(String byteArrayId) {
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    return commandExecutor.execute(new GetByteArrayCommand(byteArrayId));
   }
 
   protected void clearAttachment(final Attachment attachment) {

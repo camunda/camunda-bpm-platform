@@ -106,6 +106,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     byteArrayField.deleteByteArrayValue();
 
     if(historyEvent.getByteValue() != null) {
+      byteArrayField.setRootProcessInstanceId(rootProcessInstanceId);
       setByteArrayValue(historyEvent.getByteValue());
     }
 

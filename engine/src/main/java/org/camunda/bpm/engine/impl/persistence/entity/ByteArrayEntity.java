@@ -36,13 +36,18 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
   protected String tenantId;
   protected Integer type;
   protected Date createTime;
+  protected String rootProcessInstanceId;
 
   public ByteArrayEntity() {
   }
 
+  public ByteArrayEntity(String name, byte[] bytes, ResourceType type, String rootProcessInstanceId) {
+    this(name, bytes, type);
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public ByteArrayEntity(String name, byte[] bytes, ResourceType type) {
-    this.name = name;
-    this.bytes = bytes;
+    this(name, bytes);
     this.type = type.getValue();
   }
 
@@ -130,6 +135,14 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
     this.createTime = createTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -140,6 +153,7 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
            + ", tenantId=" + tenantId
            + ", type=" + type
            + ", createTime=" + createTime
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
            + "]";
   }
 

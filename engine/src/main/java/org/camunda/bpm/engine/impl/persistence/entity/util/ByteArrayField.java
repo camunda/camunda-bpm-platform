@@ -33,6 +33,13 @@ public class ByteArrayField {
   protected final Nameable nameProvider;
   protected ResourceType type;
 
+  protected String rootProcessInstanceId;
+
+  public ByteArrayField(Nameable nameProvider, ResourceType type, String rootProcessInstanceId) {
+    this(nameProvider, type);
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public ByteArrayField(Nameable nameProvider, ResourceType type) {
     this.nameProvider = nameProvider;
     this.type = type;
@@ -90,7 +97,7 @@ public class ByteArrayField {
       else {
         deleteByteArrayValue();
 
-        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type);
+        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type, rootProcessInstanceId);
 
         // avoid insert of byte array value for a transient variable
         if (!isTransient) {
@@ -127,6 +134,10 @@ public class ByteArrayField {
 
   public void setByteArrayValue(ByteArrayEntity byteArrayValue) {
     this.byteArrayValue = byteArrayValue;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
 }

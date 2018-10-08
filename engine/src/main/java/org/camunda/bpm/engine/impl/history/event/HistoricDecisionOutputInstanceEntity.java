@@ -60,7 +60,7 @@ public class HistoricDecisionOutputInstanceEntity extends HistoryEvent implement
 
   public HistoricDecisionOutputInstanceEntity(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
-    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
+    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY, getRootProcessInstanceId());
   }
 
   @Override

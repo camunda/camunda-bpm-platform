@@ -91,6 +91,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
       byte[] byteValue = historyEvent.getByteValue();
       if(byteValue != null) {
         ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue, ResourceTypes.HISTORY);
+        byteArrayEntity.setRootProcessInstanceId(historyEvent.getRootProcessInstanceId());
+
         Context
         .getCommandContext()
         .getByteArrayManager()

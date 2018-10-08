@@ -1,3 +1,4 @@
+drop index ACT_IDX_BYTEARRAY_ROOT_PI;
 drop index ACT_IDX_BYTEAR_DEPL;
 drop index ACT_IDX_EXE_ROOT_PROCINST;
 drop index ACT_IDX_EXE_PROCINST;

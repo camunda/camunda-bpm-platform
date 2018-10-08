@@ -97,6 +97,16 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     if (content != null) {
       byte[] bytes = IoUtil.readInputStream(content, attachmentName);
       ByteArrayEntity byteArray = new ByteArrayEntity(bytes, ResourceTypes.HISTORY);
+
+      if (task != null) {
+        ExecutionEntity execution = task.getExecution();
+        if (execution != null) {
+          byteArray.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+        }
+      } else if (processInstance != null) {
+        byteArray.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
+      }
+
       commandContext.getByteArrayManager().insertByteArray(byteArray);
       attachment.setContentId(byteArray.getId());
     }

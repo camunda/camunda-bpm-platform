@@ -951,7 +951,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       // stacktrace
       String exceptionStacktrace = getExceptionStacktrace(exception);
       byte[] exceptionBytes = toByteArray(exceptionStacktrace);
+
       ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes, ResourceTypes.HISTORY);
+      byteArray.setRootProcessInstanceId(event.getRootProcessInstanceId());
+
       event.setExceptionByteArrayId(byteArray.getId());
     }
 
