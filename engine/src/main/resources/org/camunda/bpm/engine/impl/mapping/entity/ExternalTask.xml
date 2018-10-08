@@ -183,7 +183,7 @@
         and
         <foreach collection="parameter.topics" open="(" close=")" separator="or" item="topicFilters">
           RES.TOPIC_NAME_ like #{topicFilters.topicName}
-          <if test="parameter.businessKeyFilter">
+          <if test="topicFilters.businessKey">
             and PI.BUSINESS_KEY_ = #{topicFilters.businessKey}
           </if>
           <if test="topicFilters.filterVariables.size() > 0">

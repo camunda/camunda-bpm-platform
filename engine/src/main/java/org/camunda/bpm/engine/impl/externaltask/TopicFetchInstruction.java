@@ -57,6 +57,10 @@ public class TopicFetchInstruction implements Serializable {
     this.businessKey = businessKey;
   }
 
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
   public List<QueryVariableValue> getFilterVariables() {
     return filterVariables;
   }

@@ -65,14 +65,13 @@ public class ExternalTaskManager extends AbstractManager {
     return getDbEntityManager().selectList("selectExternalTasksByProcessInstanceId", processInstanceId);
   }
 
-  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, boolean filterByBusinessKey, int maxResults, boolean usePriority) {
+  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, int maxResults, boolean usePriority) {
     if (queryFilters.isEmpty()) {
       return new ArrayList<ExternalTaskEntity>();
     }
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("topics", queryFilters);
-    parameters.put("businessKeyFilter", filterByBusinessKey);
     parameters.put("now", ClockUtil.getCurrentTime());
     parameters.put("applyOrdering", usePriority);
     List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();

@@ -2482,6 +2482,86 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  public void testQueryByBusinessKeyCombination1() {
+    // given
+    String topicName1 = "topic1";
+    String topicName2 = "topic2";
+
+    String businessKey1 = "testBusinessKey1";
+    String businessKey2 = "testBusinessKey2";
+
+    Long lockDuration = 60L * 1000L;
+
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey2);
+
+    //when
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .businessKey(businessKey1)
+        .topic(topicName2, lockDuration)
+        .execute();
+
+    //then
+    assertEquals(3, topicTasks.size());
+
+    for (LockedExternalTask externalTask : topicTasks) {
+      ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+          .processInstanceId(externalTask.getProcessInstanceId())
+          .singleResult();
+      if (externalTask.getTopicName().equals(topicName1)) {
+        assertEquals(businessKey1, pi.getBusinessKey());
+        assertEquals(businessKey1, externalTask.getBusinessKey());
+      } else if (externalTask.getTopicName().equals(topicName2)){
+        assertEquals(pi.getBusinessKey(), externalTask.getBusinessKey());
+      } else {
+        fail("No other topic name values should be available!");
+      }
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  public void testQueryByBusinessKeyCombination2() {
+    // given
+    String topicName1 = "topic1";
+    String topicName2 = "topic2";
+
+    String businessKey1 = "testBusinessKey1";
+    String businessKey2 = "testBusinessKey2";
+
+    Long lockDuration = 60L * 1000L;
+
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey2);
+
+    //when
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+        .topic(topicName2, lockDuration)
+          .businessKey(businessKey2)
+        .execute();
+
+    //then
+    assertEquals(3, topicTasks.size());
+
+    for (LockedExternalTask externalTask : topicTasks) {
+      ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+          .processInstanceId(externalTask.getProcessInstanceId())
+          .singleResult();
+      if (externalTask.getTopicName().equals(topicName1)) {
+        assertEquals(pi.getBusinessKey(), externalTask.getBusinessKey());
+      } else if (externalTask.getTopicName().equals(topicName2)){
+        assertEquals(businessKey2, pi.getBusinessKey());
+        assertEquals(businessKey2, externalTask.getBusinessKey());
+      } else {
+        fail("No other topic name values should be available!");
+      }
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
   public void testQueryByBusinessKeyLocking() {
     // given
     String topicName1 = "topic1";
