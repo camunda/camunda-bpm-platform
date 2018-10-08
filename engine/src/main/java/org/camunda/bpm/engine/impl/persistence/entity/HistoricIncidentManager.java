@@ -17,6 +17,9 @@ import java.util.List;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
 /**
@@ -41,19 +44,19 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricIncidentsByProcessDefinitionId(String processDefinitionId) {
-    if (isHistoryLevelFullEnabled()) {
+    if (isHistoryEventProduced()) {
       getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByProcessDefinitionId", processDefinitionId);
     }
   }
 
   public void deleteHistoricIncidentsByJobDefinitionId(String jobDefinitionId) {
-    if (isHistoryLevelFullEnabled()) {
+    if (isHistoryEventProduced()) {
       getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByJobDefinitionId", jobDefinitionId);
     }
   }
 
   public void deleteHistoricIncidentsByBatchId(List<String> historicBatchIds) {
-    if (isHistoryLevelFullEnabled()) {
+    if (isHistoryEventProduced()) {
       getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByBatchIds", historicBatchIds);
     }
   }
@@ -61,6 +64,14 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
   protected void configureQuery(HistoricIncidentQueryImpl query) {
     getAuthorizationManager().configureHistoricIncidentQuery(query);
     getTenantManager().configureQuery(query);
+  }
+
+  protected boolean isHistoryEventProduced() {
+    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    return historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_CREATE, null) ||
+           historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_DELETE, null) ||
+           historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_MIGRATE, null) ||
+           historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_RESOLVE, null);
   }
 
 }

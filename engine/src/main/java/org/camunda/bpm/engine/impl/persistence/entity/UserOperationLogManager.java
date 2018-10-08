@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -53,9 +54,14 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void deleteOperationLogEntryById(String entryId) {
-    if (isHistoryLevelFullEnabled()) {
+    if (isHistoryEventProduced()) {
       getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntryById", entryId);
     }
+  }
+
+  protected boolean isHistoryEventProduced() {
+    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    return historyLevel.isHistoryEventProduced(HistoryEventTypes.USER_OPERATION_LOG, null);
   }
 
   protected void fireUserOperationLog(final UserOperationLogContext context) {
@@ -299,7 +305,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public boolean isUserOperationLogEnabled() {
-    return Context.getProcessEngineConfiguration().getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.USER_OPERATION_LOG, null) &&
+    return isHistoryEventProduced() &&
         ((isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) ||
             !writeUserOperationLogOnlyWithLoggedInUser());
   }
