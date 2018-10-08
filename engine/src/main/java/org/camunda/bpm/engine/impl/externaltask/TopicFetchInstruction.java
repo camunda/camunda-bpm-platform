@@ -32,6 +32,10 @@ public class TopicFetchInstruction implements Serializable {
 
   protected String topicName;
   protected String businessKey;
+  protected String processDefinitionId;
+  protected String[] processDefinitionIds;
+  protected String processDefinitionKey;
+  protected String[] processDefinitionKeys;
   protected List<String> variablesToFetch;
 
   protected List<QueryVariableValue> filterVariables;
@@ -59,6 +63,38 @@ public class TopicFetchInstruction implements Serializable {
 
   public String getBusinessKey() {
     return businessKey;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionIds(String[] processDefinitionIds) {
+    this.processDefinitionIds = processDefinitionIds;
+  }
+
+  public String[] getProcessDefinitionIds() {
+    return processDefinitionIds;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKeys(String[] processDefinitionKeys) {
+    this.processDefinitionKeys = processDefinitionKeys;
+  }
+
+  public String[] getProcessDefinitionKeys() {
+    return processDefinitionKeys;
   }
 
   public List<QueryVariableValue> getFilterVariables() {
@@ -106,11 +142,11 @@ public class TopicFetchInstruction implements Serializable {
   }
 
   public boolean isLocalVariables() {
-	return localVariables;
+    return localVariables;
   }
 
   public void setLocalVariables(boolean localVariables) {
-	this.localVariables = localVariables;
+    this.localVariables = localVariables;
   }
 
 }

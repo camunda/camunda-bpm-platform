@@ -67,6 +67,38 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
   public ExternalTaskQueryTopicBuilder businessKey(String businessKey);
 
   /**
+   * Define process definition id to filter external tasks by.
+   *
+   * @param processDefinitionId the definition id to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder processDefinitionId(String processDefinitionId);
+
+  /**
+   * Define process definition ids to filter external tasksb by.
+   *
+   * @param processDefinitionIds the definition ids to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder processDefinitionIdIn(String... processDefinitionIds);
+
+  /**
+   * Define process definition key to filter external tasks by.
+   *
+   * @param processDefinitionKey the definition key to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder processDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Define process definition keys to filter external tasks by.
+   *
+   * @param processDefinitionKey the definition keys to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder processDefinitionKeyIn(String... processDefinitionKeys);
+
+  /**
    * Enable deserialization of variable values that are custom objects. By default, the query
    * will not attempt to deserialize the value of these variables.
    *

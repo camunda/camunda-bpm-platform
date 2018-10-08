@@ -186,6 +186,26 @@
           <if test="topicFilters.businessKey">
             and PI.BUSINESS_KEY_ = #{topicFilters.businessKey}
           </if>
+          <if test="topicFilters.processDefinitionId != null">
+            and RES.PROC_DEF_ID_ = #{topicFilters.processDefinitionId}
+          </if>
+          <if test="topicFilters.processDefinitionIds != null &amp;&amp; topicFilters.processDefinitionIds.length > 0">
+            and RES.PROC_DEF_ID_ in
+            <foreach item="item" index="index" collection="topicFilters.processDefinitionIds"
+                     open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </if>
+          <if test="topicFilters.processDefinitionKey != null">
+            and RES.PROC_DEF_KEY_ = #{topicFilters.processDefinitionKey}
+          </if>
+          <if test="topicFilters.processDefinitionKeys != null &amp;&amp; topicFilters.processDefinitionKeys.length > 0">
+            and RES.PROC_DEF_KEY_ in
+            <foreach item="item" index="index" collection="topicFilters.processDefinitionKeys"
+                     open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </if>
           <if test="topicFilters.filterVariables.size() > 0">
             and RES.PROC_INST_ID_ in (
               select VAR.EXECUTION_ID_

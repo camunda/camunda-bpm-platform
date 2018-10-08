@@ -91,6 +91,26 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     return this;
   }
 
+  public ExternalTaskQueryTopicBuilder processDefinitionId(String processDefinitionId) {
+    currentInstruction.setProcessDefinitionId(processDefinitionId);
+    return this;
+  }
+
+  public ExternalTaskQueryTopicBuilder processDefinitionIdIn(String... processDefinitionIds) {
+    currentInstruction.setProcessDefinitionIds(processDefinitionIds);
+    return this;
+  }
+
+  public ExternalTaskQueryTopicBuilder processDefinitionKey(String processDefinitionKey) {
+    currentInstruction.setProcessDefinitionKey(processDefinitionKey);
+    return this;
+  }
+
+  public ExternalTaskQueryTopicBuilder processDefinitionKeyIn(String... processDefinitionKeys) {
+    currentInstruction.setProcessDefinitionKeys(processDefinitionKeys);
+    return this;
+  }
+
   protected void submitCurrentInstruction() {
     if (currentInstruction != null) {
       this.instructions.put(currentInstruction.getTopicName(), currentInstruction);
