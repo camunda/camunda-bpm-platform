@@ -38,7 +38,7 @@ create table ACT_HI_DEC_IN (
     TEXT2_ nvarchar(4000),
     TENANT_ID_ nvarchar(64),
     CREATE_TIME_ datetime2,
-    ROOT_PROC_INST_ID_ varchar(64),
+    ROOT_PROC_INST_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -59,7 +59,7 @@ create table ACT_HI_DEC_OUT (
     TEXT2_ nvarchar(4000),
     TENANT_ID_ nvarchar(64),
     CREATE_TIME_ datetime2,
-    ROOT_PROC_INST_ID_ varchar(64),
+    ROOT_PROC_INST_ID_ nvarchar(64),
     primary key (ID_)
 );
 

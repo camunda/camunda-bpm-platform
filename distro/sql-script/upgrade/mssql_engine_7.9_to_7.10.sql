@@ -136,6 +136,6 @@ create index ACT_IDX_HI_DEC_OUT_ROOT_PI on ACT_HI_DEC_OUT(ROOT_PROC_INST_ID_);
 
 -- https://app.camunda.com/jira/browse/CAM-9388
 ALTER TABLE ACT_GE_BYTEARRAY
-  ADD ROOT_PROC_INST_ID_ varchar(64);
+  ADD ROOT_PROC_INST_ID_ nvarchar(64);
 
 create index ACT_IDX_BYTEARRAY_ROOT_PI on ACT_GE_BYTEARRAY(ROOT_PROC_INST_ID_);
