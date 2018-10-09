@@ -99,6 +99,29 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
   public ExternalTaskQueryTopicBuilder processDefinitionKeyIn(String... processDefinitionKeys);
 
   /**
+   * Filter external tasks only with null tenant id.
+   *
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder withoutTenantId();
+
+  /**
+   * Define tenant id to filter external tasks by.
+   *
+   * @param tenantId the tenant id to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder tenantId(String tenantId);
+
+  /**
+   * Define tenant ids to filter external tasks by.
+   *
+   * @param tenantIds the tenant ids to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder tenantIdIn(String... tenantIds);
+
+  /**
    * Enable deserialization of variable values that are custom objects. By default, the query
    * will not attempt to deserialize the value of these variables.
    *

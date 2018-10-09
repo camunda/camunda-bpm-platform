@@ -206,6 +206,18 @@
               #{item}
             </foreach>
           </if>
+          <if test="topicFilters.isTenantIdSet">
+            <if test="topicFilters.tenantIds == null" >
+              and RES.TENANT_ID_ is null
+            </if>
+            <if test="topicFilters.tenantIds != null &amp;&amp; topicFilters.tenantIds.length > 0">
+              and RES.TENANT_ID_ in
+              <foreach item="tenantId" index="index" collection="topicFilters.tenantIds"
+                       open="(" separator="," close=")">
+                #{tenantId}
+              </foreach>
+            </if>
+          </if>
           <if test="topicFilters.filterVariables.size() > 0">
             and RES.PROC_INST_ID_ in (
               select VAR.EXECUTION_ID_

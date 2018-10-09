@@ -997,6 +997,21 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml"})
+  public void testFetchWithoutTenant() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .withoutTenantId()
+      .execute();
+
+    // then
+    assertEquals(1, externalTasks.size());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
   public void testComplete() {
     // given

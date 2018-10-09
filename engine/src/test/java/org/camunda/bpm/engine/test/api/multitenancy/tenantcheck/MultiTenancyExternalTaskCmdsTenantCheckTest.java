@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,8 +25,10 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyExternalTaskCmdsTenantCheckTest {
   
   protected static final String TENANT_ONE = "tenant1";
-  
+  protected static final String TENANT_TWO = "tenant2";
+
   protected static final String PROCESS_DEFINITION_KEY = "twoExternalTaskProcess";
+  protected static final String PROCESS_DEFINITION_KEY_ONE = "oneExternalTaskProcess";
   private static final String ERROR_DETAILS = "anErrorDetail";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -121,6 +124,99 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
       .execute();
     assertEquals(1, externalTasks.size());
     
+  }
+
+  @Test
+  public void testFetchAndLockWithoutTenantId() {
+    // given
+    identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .withoutTenantId()
+      .execute();
+
+    // then
+    assertEquals(0, externalTasks.size());
+  }
+
+  @Test
+  public void testFetchAndLockWithTenantId() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY_ONE).getId();
+    identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .tenantId(TENANT_ONE)
+      .execute();
+
+    // then
+    assertEquals(1, externalTasks.size());
+  }
+
+  @Test
+  public void testFetchAndLockWithTenantIdIn() {
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .tenantIdIn(TENANT_ONE, TENANT_TWO)
+      .execute();
+
+    // then
+    assertEquals(1, externalTasks.size());
+  }
+
+  @Test
+  public void testFetchAndLockWithTenantIds() {
+    // given
+    testRule.deployForTenant(TENANT_TWO,
+        "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY_ONE).getId();
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .tenantId(TENANT_ONE)
+      .tenantIdIn(TENANT_ONE, TENANT_TWO)
+      .execute();
+
+    // then
+    assertEquals(1, externalTasks.size());
+    assertEquals(TENANT_ONE, externalTasks.get(0).getTenantId());
+  }
+
+  @Test
+  public void testFetchAndLockWithTenantIdInTwoTenants() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskWithPriorityProcess.bpmn20.xml");
+    engineRule.getRuntimeService().startProcessInstanceByKey("twoExternalTaskWithPriorityProcess").getId();
+    testRule.deployForTenant(TENANT_TWO,
+        "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
+    String instanceId = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY_ONE).getId();
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .tenantIdIn(TENANT_ONE, TENANT_TWO)
+      .execute();
+
+    // then
+    assertEquals(2, externalTasks.size());
+
+    for (LockedExternalTask externalTask : externalTasks) {
+      if (externalTask.getProcessInstanceId().equals(processInstanceId)) {
+        assertEquals(TENANT_ONE, externalTask.getTenantId());
+      } else if (externalTask.getProcessInstanceId().equals(instanceId)) {
+        assertEquals(TENANT_TWO, externalTask.getTenantId());
+      } else {
+        fail("No other external tasks should be available!");
+      }
+    }
   }
 
   // complete external task test cases

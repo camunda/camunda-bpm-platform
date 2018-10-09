@@ -16,6 +16,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -69,6 +71,10 @@ public class FetchExternalTasksDto {
     protected HashMap<String, Object> processVariables;
     protected boolean deserializeValues = false;
     protected boolean localVariables = false;
+
+    protected boolean withoutTenantId;
+    protected String tenantId;
+    protected String[] tenantIdIn;
 
     public String getTopicName() {
       return topicName;
@@ -136,6 +142,24 @@ public class FetchExternalTasksDto {
     public void setLocalVariables(boolean localVariables) {
       this.localVariables = localVariables;
     }
+    public boolean isWithoutTenantId() {
+      return withoutTenantId;
+    }
+    public void setWithoutTenantId(boolean withoutTenantId) {
+      this.withoutTenantId = withoutTenantId;
+    }
+    public String getTenantId() {
+      return tenantId;
+    }
+    public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+    }
+    public String[] getTenantIdIn() {
+      return tenantIdIn;
+    }
+    public void setTenantIdIn(String[] tenantIdIn) {
+      this.tenantIdIn = tenantIdIn;
+    }
   }
 
   public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
@@ -182,6 +206,18 @@ public class FetchExternalTasksDto {
 
         if (topicDto.isLocalVariables()) {
           topicFetchBuilder = topicFetchBuilder.localVariables();
+        }
+
+        if (TRUE.equals(topicDto.isWithoutTenantId())) {
+          topicFetchBuilder = topicFetchBuilder.withoutTenantId();
+        }
+
+        if (topicDto.getTenantId() != null) {
+          topicFetchBuilder = topicFetchBuilder.tenantId(topicDto.getTenantId());
+        }
+
+        if (topicDto.getTenantIdIn() != null) {
+          topicFetchBuilder = topicFetchBuilder.tenantIdIn(topicDto.getTenantIdIn());
         }
 
         fetchBuilder = topicFetchBuilder;

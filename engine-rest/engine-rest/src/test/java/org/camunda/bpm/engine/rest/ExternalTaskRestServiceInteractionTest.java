@@ -144,6 +144,9 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.processDefinitionKey(any(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.processDefinitionKeyIn(any(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.processInstanceVariableEquals(anyMapOf(String.class, Object.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.withoutTenantId()).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.tenantId(any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.tenantIdIn(any(String.class))).thenReturn(fetchTopicBuilder);
 
     Batch batch = createMockBatch();
     updateRetriesBuilder = mock(UpdateExternalTaskRetriesBuilder.class);
@@ -318,6 +321,37 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).execute();
+    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+  }
+
+  @Test
+  public void testFetchAndLockWithTenant() {
+    // given
+    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+
+    // when
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("usePriority", true);
+
+    Map<String, Object> topicParameter = new HashMap<String, Object>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("withoutTenantId", true);
+    topicParameter.put("tenantId", "tenant1");
+    topicParameter.put("tenantIdIn", Arrays.asList("tenant2"));
+    topicParameter.put("lockDuration", 12354L);
+    parameters.put("topics", Arrays.asList(topicParameter));
+
+    executePost(parameters);
+
+    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).withoutTenantId();
+    inOrder.verify(fetchTopicBuilder).tenantId("tenant1");
+    inOrder.verify(fetchTopicBuilder).tenantIdIn("tenant2");
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
