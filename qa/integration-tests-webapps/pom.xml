@@ -334,6 +334,13 @@
     </profile>
 
     <profile>
+      <id>wildfly14</id>
+      <properties>
+        <container.id>wildfly14x</container.id>
+      </properties>
+    </profile>
+
+    <profile>
       <id>wildfly</id>
       <properties>
         <jboss.runtime>${basedir}/${wildfly.runtime.location}</jboss.runtime>
