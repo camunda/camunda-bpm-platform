@@ -82,6 +82,7 @@ public abstract class AbstractRestServiceTest {
   protected static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";
   protected static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcessInstanceId";
   protected static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcessDefinitionId";
+  protected static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
   protected static final String EXAMPLE_BUSINESS_KEY = "aBusinessKey";
   protected static final String EXAMPLE_EXECUTION_ID = "anExecutionId";
 

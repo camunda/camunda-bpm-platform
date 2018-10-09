@@ -139,6 +139,10 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.localVariables()).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.businessKey(any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionId(any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionIdIn(any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionKey(any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionKeyIn(any(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.processInstanceVariableEquals(anyMapOf(String.class, Object.class))).thenReturn(fetchTopicBuilder);
 
     Batch batch = createMockBatch();
@@ -178,33 +182,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     parameters.put("topics", Arrays.asList(topicParameter));
 
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(parameters)
-      .header("accept", MediaType.APPLICATION_JSON)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .body("[0].id", equalTo(MockProvider.EXTERNAL_TASK_ID))
-      .body("[0].topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
-      .body("[0].workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
-      .body("[0].lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
-      .body("[0].processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .body("[0].executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
-      .body("[0].activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
-      .body("[0].activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
-      .body("[0].processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-      .body("[0].processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
-      .body("[0].tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
-      .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
-      .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
-      .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
-      .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
-      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
-          notNullValue())
-      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-          equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
-      .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-          equalTo("String"))
-      .when().post(FETCH_EXTERNAL_TASK_URL);
+    executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
@@ -232,39 +210,46 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     parameters.put("topics", Arrays.asList(topicParameter));
 
-    given()
-        .contentType(POST_JSON_CONTENT_TYPE)
-        .body(parameters)
-        .header("accept", MediaType.APPLICATION_JSON)
-        .then().expect().statusCode(Status.OK.getStatusCode())
-        .body("[0].id", equalTo(MockProvider.EXTERNAL_TASK_ID))
-        .body("[0].topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
-        .body("[0].workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
-        .body("[0].lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
-        .body("[0].processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-        .body("[0].executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
-        .body("[0].activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
-        .body("[0].activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
-        .body("[0].processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-        .body("[0].processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
-        .body("[0].tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
-        .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
-        .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
-        .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
-        .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
-            notNullValue())
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-            equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-            equalTo("String"))
-        .when().post(FETCH_EXTERNAL_TASK_URL);
+    executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).businessKey(EXAMPLE_BUSINESS_KEY);
     inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).execute();
+    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+  }
+
+  @Test
+  public void testFetchAndLockWithProcessDefinition() {
+    // given
+    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+
+    // when
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("usePriority", true);
+
+    Map<String, Object> topicParameter = new HashMap<String, Object>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("processDefinitionId", EXAMPLE_PROCESS_DEFINITION_ID);
+    topicParameter.put("processDefinitionIdIn", Arrays.asList(EXAMPLE_PROCESS_DEFINITION_ID));
+    topicParameter.put("processDefinitionKey", EXAMPLE_PROCESS_DEFINITION_KEY);
+    topicParameter.put("processDefinitionKeyIn", Arrays.asList(EXAMPLE_PROCESS_DEFINITION_KEY));
+    topicParameter.put("lockDuration", 12354L);
+    parameters.put("topics", Arrays.asList(topicParameter));
+
+    executePost(parameters);
+
+    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+    inOrder.verify(fetchTopicBuilder).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID);
+    inOrder.verify(fetchTopicBuilder).processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
+    inOrder.verify(fetchTopicBuilder).processDefinitionKeyIn(EXAMPLE_PROCESS_DEFINITION_KEY);
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
@@ -292,33 +277,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     parameters.put("topics", Arrays.asList(topicParameter));
 
-    given()
-        .contentType(POST_JSON_CONTENT_TYPE)
-        .body(parameters)
-        .header("accept", MediaType.APPLICATION_JSON)
-        .then().expect().statusCode(Status.OK.getStatusCode())
-        .body("[0].id", equalTo(MockProvider.EXTERNAL_TASK_ID))
-        .body("[0].topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
-        .body("[0].workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
-        .body("[0].lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
-        .body("[0].processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-        .body("[0].executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
-        .body("[0].activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
-        .body("[0].activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
-        .body("[0].processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-        .body("[0].processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
-        .body("[0].tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
-        .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
-        .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
-        .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
-        .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
-            notNullValue())
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-            equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
-        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-            equalTo("String"))
-        .when().post(FETCH_EXTERNAL_TASK_URL);
+    executePost(parameters);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
@@ -1578,6 +1537,36 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .statusCode(Status.NOT_FOUND.getStatusCode())
     .when()
       .post(EXTEND_LOCK_ON_EXTERNAL_TASK);
+  }
+
+  protected void executePost(Map<String, Object> parameters) {
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .body("[0].id", equalTo(MockProvider.EXTERNAL_TASK_ID))
+        .body("[0].topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
+        .body("[0].workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
+        .body("[0].lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
+        .body("[0].processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("[0].executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
+        .body("[0].activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
+        .body("[0].activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("[0].processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("[0].processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+        .body("[0].tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+        .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
+        .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
+        .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
+        .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
+        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
+            notNullValue())
+        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
+            equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+        .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
+            equalTo("String"))
+        .when().post(FETCH_EXTERNAL_TASK_URL);
   }
 
 }

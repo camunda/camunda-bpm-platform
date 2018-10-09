@@ -60,6 +60,10 @@ public class FetchExternalTasksDto {
   public static class FetchExternalTaskTopicDto {
     protected String topicName;
     protected String businessKey;
+    protected String processDefinitionId;
+    protected String[] processDefinitionIdIn;
+    protected String processDefinitionKey;
+    protected String[] processDefinitionKeyIn;
     protected long lockDuration;
     protected List<String> variables;
     protected HashMap<String, Object> processVariables;
@@ -77,6 +81,30 @@ public class FetchExternalTasksDto {
     }
     public void setBusinessKey(String businessKey) {
       this.businessKey = businessKey;
+    }
+    public String getProcessDefinitionId() {
+      return processDefinitionId;
+    }
+    public void setProcessDefinitionId(String processDefinitionId) {
+      this.processDefinitionId = processDefinitionId;
+    }
+    public String[] getProcessDefinitionIdIn() {
+      return processDefinitionIdIn;
+    }
+    public void setProcessDefinitionIdIn(String[] processDefinitionIds) {
+      this.processDefinitionIdIn = processDefinitionIds;
+    }
+    public String getProcessDefinitionKey() {
+      return processDefinitionKey;
+    }
+    public void setProcessDefinitionKey(String processDefinitionKey) {
+      this.processDefinitionKey = processDefinitionKey;
+    }
+    public String[] getProcessDefinitionKeyIn() {
+      return processDefinitionKeyIn;
+    }
+    public void setProcessDefinitionKeyIn(String[] processDefinitionKeys) {
+      this.processDefinitionKeyIn = processDefinitionKeys;
     }
     public long getLockDuration() {
       return lockDuration;
@@ -103,7 +131,7 @@ public class FetchExternalTasksDto {
       this.deserializeValues = deserializeValues;
     }
     public boolean isLocalVariables() {
-	  return localVariables;
+      return localVariables;
     }
     public void setLocalVariables(boolean localVariables) {
       this.localVariables = localVariables;
@@ -122,6 +150,22 @@ public class FetchExternalTasksDto {
 
         if (topicDto.getBusinessKey() != null) {
           topicFetchBuilder = topicFetchBuilder.businessKey(topicDto.getBusinessKey());
+        }
+
+        if (topicDto.getProcessDefinitionId() != null) {
+          topicFetchBuilder.processDefinitionId(topicDto.getProcessDefinitionId());
+        }
+
+        if (topicDto.getProcessDefinitionIdIn() != null) {
+          topicFetchBuilder.processDefinitionIdIn(topicDto.getProcessDefinitionIdIn());
+        }
+
+        if (topicDto.getProcessDefinitionKey() != null) {
+          topicFetchBuilder.processDefinitionKey(topicDto.getProcessDefinitionKey());
+        }
+
+        if (topicDto.getProcessDefinitionKeyIn() != null) {
+          topicFetchBuilder.processDefinitionKeyIn(topicDto.getProcessDefinitionKeyIn());
         }
 
         if (topicDto.getVariables() != null) {
