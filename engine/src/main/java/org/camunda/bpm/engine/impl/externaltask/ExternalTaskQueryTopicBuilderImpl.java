@@ -116,10 +116,6 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     return this;
   }
 
-  public ExternalTaskQueryTopicBuilder tenantId(String tenantId) {
-    return tenantIdIn(tenantId);
-  }
-
   public ExternalTaskQueryTopicBuilder tenantIdIn(String... tenantIds) {
     currentInstruction.setTenantIds(tenantIds);
     return this;

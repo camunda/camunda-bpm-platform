@@ -73,7 +73,6 @@ public class FetchExternalTasksDto {
     protected boolean localVariables = false;
 
     protected boolean withoutTenantId;
-    protected String tenantId;
     protected String[] tenantIdIn;
 
     public String getTopicName() {
@@ -148,12 +147,6 @@ public class FetchExternalTasksDto {
     public void setWithoutTenantId(boolean withoutTenantId) {
       this.withoutTenantId = withoutTenantId;
     }
-    public String getTenantId() {
-      return tenantId;
-    }
-    public void setTenantId(String tenantId) {
-      this.tenantId = tenantId;
-    }
     public String[] getTenantIdIn() {
       return tenantIdIn;
     }
@@ -210,10 +203,6 @@ public class FetchExternalTasksDto {
 
         if (TRUE.equals(topicDto.isWithoutTenantId())) {
           topicFetchBuilder = topicFetchBuilder.withoutTenantId();
-        }
-
-        if (topicDto.getTenantId() != null) {
-          topicFetchBuilder = topicFetchBuilder.tenantId(topicDto.getTenantId());
         }
 
         if (topicDto.getTenantIdIn() != null) {

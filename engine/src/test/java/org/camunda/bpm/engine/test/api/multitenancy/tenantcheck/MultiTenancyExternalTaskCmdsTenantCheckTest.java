@@ -151,7 +151,7 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
     // when
     List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
       .topic(TOPIC_NAME, LOCK_TIME)
-      .tenantId(TENANT_ONE)
+      .tenantIdIn(TENANT_ONE)
       .execute();
 
     // then
@@ -169,25 +169,6 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
 
     // then
     assertEquals(1, externalTasks.size());
-  }
-
-  @Test
-  public void testFetchAndLockWithTenantIds() {
-    // given
-    testRule.deployForTenant(TENANT_TWO,
-        "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
-    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY_ONE).getId();
-
-    // when
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
-      .topic(TOPIC_NAME, LOCK_TIME)
-      .tenantId(TENANT_ONE)
-      .tenantIdIn(TENANT_ONE, TENANT_TWO)
-      .execute();
-
-    // then
-    assertEquals(1, externalTasks.size());
-    assertEquals(TENANT_ONE, externalTasks.get(0).getTenantId());
   }
 
   @Test

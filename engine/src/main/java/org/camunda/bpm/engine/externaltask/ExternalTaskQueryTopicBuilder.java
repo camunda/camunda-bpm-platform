@@ -106,14 +106,6 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
   public ExternalTaskQueryTopicBuilder withoutTenantId();
 
   /**
-   * Define tenant id to filter external tasks by.
-   *
-   * @param tenantId the tenant id to filter by
-   * @return this builder
-   */
-  public ExternalTaskQueryTopicBuilder tenantId(String tenantId);
-
-  /**
    * Define tenant ids to filter external tasks by.
    *
    * @param tenantIds the tenant ids to filter by

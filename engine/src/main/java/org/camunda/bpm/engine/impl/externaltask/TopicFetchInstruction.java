@@ -37,7 +37,6 @@ public class TopicFetchInstruction implements Serializable {
   protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
   protected boolean isTenantIdSet = false;
-  protected String tenantId;
   protected String[] tenantIds;
   protected List<String> variablesToFetch;
 
@@ -106,15 +105,6 @@ public class TopicFetchInstruction implements Serializable {
 
   public void setTenantIdSet(boolean isTenantIdSet) {
     this.isTenantIdSet = isTenantIdSet;
-  }
-
-  public void setTenantId(String tenantId) {
-    isTenantIdSet = true;
-    this.tenantId = tenantId;
-  }
-
-  public String getTenantId() {
-    return tenantId;
   }
 
   public String[] getTenantIds() {
