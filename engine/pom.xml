@@ -701,6 +701,8 @@
                 <exclude>**/DeploymentTest.java</exclude>
                 <exclude>**/CustomHistoryLevelUserOperationLogTest.java</exclude>
                 <exclude>**/CustomHistoryLevelWithoutUserOperationLogTest.java</exclude>
+                <exclude>**/CustomHistoryLevelIncidentTest.java</exclude>
+                <exclude>**/CustomHistoryLevelIdentityLinkTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
