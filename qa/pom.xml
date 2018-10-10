@@ -24,6 +24,9 @@
     <!-- jboss -->
     <jboss.runtime.location>../jboss7-runtime/target/server/jboss-as-${version.jboss.as}/</jboss.runtime.location>
 
+    <!-- wildfly -->
+    <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly}/</wildfly.runtime.location>
+
     <jboss.http.port>38080</jboss.http.port>
     <jboss.ajp.port>38009</jboss.ajp.port>
     <jboss.https.port>38443</jboss.https.port>
@@ -99,42 +102,6 @@
       <modules>
         <module>wildfly-runtime</module>
       </modules>
-    </profile>
-    <profile>
-      <id>wildfly8</id>
-      <properties>
-        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly}/</wildfly.runtime.location>
-      </properties>
-    </profile>
-    <profile>
-      <id>wildfly10</id>
-      <properties>
-        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly10}/</wildfly.runtime.location>
-      </properties>
-    </profile>
-    <profile>
-      <id>wildfly11</id>
-      <properties>
-        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly11}/</wildfly.runtime.location>
-      </properties>
-    </profile>
-    <profile>
-      <id>wildfly12</id>
-      <properties>
-        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly12}/</wildfly.runtime.location>
-      </properties>
-    </profile>
-    <profile>
-      <id>wildfly13</id>
-      <properties>
-        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly13}/</wildfly.runtime.location>
-      </properties>
-    </profile>
-    <profile>
-      <id>wildfly14</id>
-      <properties>
-        <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly14}/</wildfly.runtime.location>
-      </properties>
     </profile>
 
     <profile>

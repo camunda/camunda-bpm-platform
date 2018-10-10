@@ -51,16 +51,20 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
   }
 
   @Override
-  protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
+  protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
+          ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
+          throws OperationFailedException {
 
     String engineName = PathAddress.pathAddress(operation.get(ADDRESS)).getLastElement().getValue();
 
     ManagedProcessEngineMetadata processEngineConfiguration = transformConfiguration(context, engineName, model);
 
-    ServiceController<ProcessEngine> controller = installService(context, processEngineConfiguration);
+    ServiceController<ProcessEngine> controller = installService(context, verificationHandler, processEngineConfiguration);
+
+    newControllers.add(controller);
   }
 
-  protected ServiceController<ProcessEngine> installService(OperationContext context, 
+  protected ServiceController<ProcessEngine> installService(OperationContext context, ServiceVerificationHandler verificationHandler,
       ManagedProcessEngineMetadata processEngineConfiguration) {
 
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);
@@ -70,6 +74,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
     MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder, processEngineConfiguration.getJobExecutorAcquisitionName());
 
+    serviceBuilder.addListener(verificationHandler);
     return serviceBuilder.install();
   }
 

@@ -15,6 +15,9 @@
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
     <version.chromedriver>2.27</version.chromedriver>
 
+    <!-- Needs to be updated after a new WildFly release (check support on Codehaus Cargo first) -->
+    <cargo.wildfly.container.id>wildfly14x</cargo.wildfly.container.id>
+
     <redirect.test.output>true</redirect.test.output>
   </properties>
 
@@ -299,48 +302,6 @@
     </profile>
 
     <profile>
-      <id>wildfly8</id>
-      <properties>
-        <container.id>wildfly8x</container.id>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>wildfly10</id>
-      <properties>
-        <container.id>wildfly10x</container.id>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>wildfly11</id>
-      <properties>
-        <container.id>wildfly11x</container.id>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>wildfly12</id>
-      <properties>
-        <container.id>wildfly12x</container.id>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>wildfly13</id>
-      <properties>
-        <container.id>wildfly13x</container.id>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>wildfly14</id>
-      <properties>
-        <container.id>wildfly14x</container.id>
-      </properties>
-    </profile>
-
-    <profile>
       <id>wildfly</id>
       <properties>
         <jboss.runtime>${basedir}/${wildfly.runtime.location}</jboss.runtime>
@@ -395,7 +356,7 @@
               <!-- Container configuration -->
               <container>
                 <type>installed</type>
-                <containerId>${container.id}</containerId>
+                <containerId>${cargo.wildfly.container.id}</containerId>
                 <append>false</append>
                 <home>${jboss.runtime}</home>
                 <timeout>${cargo.timeout}</timeout>

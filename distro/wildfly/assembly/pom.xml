@@ -57,7 +57,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- license book -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>license-book</artifactId>
@@ -79,7 +78,7 @@
       <!-- this dependency is to make sure that we are executed after camunda-modules 
         in the reactor -->
       <groupId>org.camunda.bpm.wildfly</groupId>
-      <artifactId>camunda-wildfly8-modules</artifactId>
+      <artifactId>camunda-wildfly-modules</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

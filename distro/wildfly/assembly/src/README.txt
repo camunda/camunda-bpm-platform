@@ -27,7 +27,7 @@ Contents:
   lib/
         This directory contains the java libraries for application 
         development.
-  
+
   modules/
         This directory contains additional modules for Wildfly Application
         Server. You can use these modules to patch a vanilla distribution
@@ -36,7 +36,7 @@ Contents:
   server/
         This directory contains a preconfigured distribution 
         of Wildfly Application Server with Camunda BPM platform readily
-        installed. 
+        installed.
 
         run the
           server/wildfly-${version.wildfly}/bin/standalone.{bat/sh}

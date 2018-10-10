@@ -9,10 +9,10 @@
   </parent>
   
   <groupId>org.camunda.bpm.wildfly</groupId>
-  <artifactId>camunda-wildfly</artifactId>
+  <artifactId>camunda-wildfly8</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - Wildfly</name>
+  <name>camunda BPM - Wildfly 8</name>
 
   <build>
     <plugins>
@@ -31,12 +31,12 @@
                 <requireJavaVersion>
                   <version>[1.7,)</version>
                   <message>
-                    *****************************************************************************************************
-                    *                                                                                                   *
-                    *            You must use at least use JDK 1.7 to compile Camunda Bpm Wildfly!!!                *
-                    *  Continue by excluding Wildfly from reactor by using '-P-distro-wildfly' to disable the profile.  *
-                    *                                                                                                   *
-                    *****************************************************************************************************
+                    ***************************************************************************************************
+                    *                                                                                                 *
+                    *            You must use at least JDK 1.7 to compile Camunda Bpm Wildfly 8!!!                      *
+                    * Continue by excluding Wildfly from reactor by using '-P-distro-wildfly8' to disable the profile. *
+                    *                                                                                                 *
+                    ***************************************************************************************************
                   </message>
                 </requireJavaVersion>
               </rules>
@@ -63,18 +63,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>assembly</module>
         <module>modules</module>
         <module>subsystem</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>distro-ce</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>distro</module>
       </modules>
     </profile>
   </profiles>

@@ -54,14 +54,14 @@
       </resource>
       <!-- server specific -->
       <resource>
-        <directory>src/main/${server}/standalone</directory>
+        <directory>src/main/wildfly/standalone</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/*.xml</include>
         </includes>
       </resource>
       <resource>
-        <directory>src/main/${server}/domain</directory>
+        <directory>src/main/wildfly/domain</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/*.xml</include>
@@ -126,212 +126,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>wildfly8</id>
-      <properties>
-        <server>wildfly</server>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>wildfly10</id>
-      <properties>
-        <server>wildfly10</server>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M1</version>
-            <executions>
-              <execution>
-                <id>enforce-java</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireJavaVersion>
-                      <version>[1.8,)</version>
-                      <message>
-                        *****************************************************************************************************
-                        *                                                                                                   *
-                        *            You must use at least JDK 1.8 to start Camunda Bpm Wildfly 10!!!                       *
-                        *                                                                                                   *
-                        *****************************************************************************************************
-                      </message>
-                    </requireJavaVersion>
-                  </rules>
-                  <failFast>true</failFast>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>wildfly11</id>
-      <properties>
-        <server>wildfly11</server>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M1</version>
-            <executions>
-              <execution>
-                <id>enforce-java</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireJavaVersion>
-                      <version>[1.8,)</version>
-                      <message>
-                        *****************************************************************************************************
-                        *                                                                                                   *
-                        *            You must use at least JDK 1.8 to start Camunda Bpm Wildfly 11!!!                       *
-                        *                                                                                                   *
-                        *****************************************************************************************************
-                      </message>
-                    </requireJavaVersion>
-                  </rules>
-                  <failFast>true</failFast>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>wildfly12</id>
-      <properties>
-        <server>wildfly12</server>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M1</version>
-            <executions>
-              <execution>
-                <id>enforce-java</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireJavaVersion>
-                      <version>[1.8,)</version>
-                      <message>
-                        *****************************************************************************************************
-                        *                                                                                                   *
-                        *            You must use at least JDK 1.8 to start Camunda Bpm Wildfly 12!!!                       *
-                        *                                                                                                   *
-                        *****************************************************************************************************
-                      </message>
-                    </requireJavaVersion>
-                  </rules>
-                  <failFast>true</failFast>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>wildfly13</id>
-      <properties>
-        <server>wildfly13</server>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M1</version>
-            <executions>
-              <execution>
-                <id>enforce-java</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireJavaVersion>
-                      <version>[1.8,)</version>
-                      <message>
-                        *****************************************************************************************************
-                        *                                                                                                   *
-                        *            You must use at least JDK 1.8 to start Camunda Bpm Wildfly 13!!!                       *
-                        *                                                                                                   *
-                        *****************************************************************************************************
-                      </message>
-                    </requireJavaVersion>
-                  </rules>
-                  <failFast>true</failFast>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>wildfly14</id>
-      <properties>
-        <server>wildfly14</server>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M1</version>
-            <executions>
-              <execution>
-                <id>enforce-java</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireJavaVersion>
-                      <version>[1.8,)</version>
-                      <message>
-                        *****************************************************************************************************
-                        *                                                                                                   *
-                        *            You must use at least JDK 1.8 to start Camunda Bpm Wildfly 14!!!                       *
-                        *                                                                                                   *
-                        *****************************************************************************************************
-                      </message>
-                    </requireJavaVersion>
-                  </rules>
-                  <failFast>true</failFast>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
 
     <profile>
       <id>wildfly</id>
@@ -339,7 +133,7 @@
         <dependency>
           <!-- make sure it comes after assembly in the build -->
           <groupId>org.camunda.bpm.wildfly</groupId>
-          <artifactId>camunda-${server}-assembly</artifactId>
+          <artifactId>camunda-wildfly-assembly</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
           <scope>test</scope>
@@ -348,6 +142,36 @@
 
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.0.0-M1</version>
+            <executions>
+              <execution>
+                <id>enforce-java</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireJavaVersion>
+                      <version>[1.8,)</version>
+                      <message>
+                        *****************************************************************************************************
+                        *                                                                                                   *
+                        *               You must use at least JDK 1.8 to start Camunda Bpm Wildfly!!!                       *
+                        *                                                                                                   *
+                        *****************************************************************************************************
+                      </message>
+                    </requireJavaVersion>
+                  </rules>
+                  <failFast>true</failFast>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
@@ -363,7 +187,7 @@
                   <artifactItems>
                     <artifactItem>
                       <groupId>org.camunda.bpm.wildfly</groupId>
-                      <artifactId>camunda-${server}-assembly</artifactId>
+                      <artifactId>camunda-wildfly-assembly</artifactId>
                       <version>${project.version}</version>
                       <type>tar.gz</type>
                       <overWrite>true</overWrite>
@@ -468,7 +292,7 @@
         <dependency>
           <!-- make sure it comes after assembly in the build -->
           <groupId>org.camunda.bpm.wildfly</groupId>
-          <artifactId>camunda-${server}-assembly</artifactId>
+          <artifactId>camunda-wildfly-assembly</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
           <scope>test</scope>
@@ -492,7 +316,7 @@
                   <artifactItems>
                     <artifactItem>
                       <groupId>org.camunda.bpm.wildfly</groupId>
-                      <artifactId>camunda-${server}-assembly</artifactId>
+                      <artifactId>camunda-wildfly-assembly</artifactId>
                       <version>${project.version}</version>
                       <type>tar.gz</type>
                       <overWrite>true</overWrite>

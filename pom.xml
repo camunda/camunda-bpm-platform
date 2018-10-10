@@ -144,12 +144,8 @@
       <modules>
         <module>javaee/ejb-client</module>
         <module>distro/license-book</module>
+        <module>distro/wildfly8</module>
         <module>distro/wildfly</module>
-        <module>distro/wildfly10</module>
-        <module>distro/wildfly11</module>
-        <module>distro/wildfly12</module>
-        <module>distro/wildfly13</module>
-        <module>distro/wildfly14</module>
       </modules>
     </profile>
 

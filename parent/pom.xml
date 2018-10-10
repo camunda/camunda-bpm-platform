@@ -33,17 +33,9 @@
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.wildfly>8.2.1.Final</version.wildfly>
-    <version.wildfly10>10.1.0.Final</version.wildfly10>
-    <version.wildfly10.core>2.2.0.Final</version.wildfly10.core>
-    <version.wildfly11>11.0.0.Final</version.wildfly11>
-    <version.wildfly11.core>3.0.8.Final</version.wildfly11.core>
-    <version.wildfly12>12.0.0.Final</version.wildfly12>
-    <version.wildfly12.core>4.0.0.Final</version.wildfly12.core>
-    <version.wildfly13>13.0.0.Final</version.wildfly13>
-    <version.wildfly13.core>5.0.0.Final</version.wildfly13.core>
-    <version.wildfly14>14.0.1.Final</version.wildfly14>
-    <version.wildfly14.core>6.0.2.Final</version.wildfly14.core>
+    <version.wildfly8>8.2.1.Final</version.wildfly8>
+    <version.wildfly>14.0.1.Final</version.wildfly>
+    <version.wildfly.core>6.0.2.Final</version.wildfly.core>
 
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>9.0.12</version.tomcat>

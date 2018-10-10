@@ -44,7 +44,9 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
   }
 
   @Override
-  protected void performRuntime(final OperationContext context, final ModelNode operation, final ModelNode model) throws OperationFailedException {
+  protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
+          ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
+          throws OperationFailedException {
 
     String acquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
@@ -61,8 +63,12 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
     ServiceController<RuntimeContainerJobExecutor> serviceController = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
       .addDependency(ServiceNames.forMscRuntimeContainerDelegate())
       .addDependency(ServiceNames.forMscExecutorService())
+      .addListener(verificationHandler)
       .setInitialMode(Mode.ACTIVE)
       .install();
+
+    newControllers.add(serviceController);
+
   }
 
 }
