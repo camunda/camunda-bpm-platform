@@ -28,7 +28,8 @@
             PROCESS_DEF_KEY_,
             DEPLOYMENT_ID_,
             TENANT_ID_,
-            SEQUENCE_COUNTER_
+            SEQUENCE_COUNTER_,
+            REMOVAL_TIME_
           )
     values (#{id, jdbcType=VARCHAR},
             #{timestamp, jdbcType=TIMESTAMP},
@@ -50,7 +51,8 @@
             #{processDefinitionKey, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
-            #{sequenceCounter, jdbcType=BIGINT}
+            #{sequenceCounter, jdbcType=BIGINT},
+            #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
 
@@ -144,6 +146,7 @@
     <result property="state" column="JOB_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <sql id="selectExceptionByteArrayIds">

@@ -34,7 +34,6 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
   protected String taskDefinitionKey;
   protected String activityInstanceId;
   protected String tenantId;
-  protected String rootProcessInstanceId;
 
   // getters and setters //////////////////////////////////////////////////////
 

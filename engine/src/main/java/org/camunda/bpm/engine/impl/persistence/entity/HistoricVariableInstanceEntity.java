@@ -69,6 +69,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String textValue2;
 
   protected String state = "CREATED";
+
+  protected Date removalTime;
+
   protected ByteArrayField byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
 
   protected TypedValueField typedValueField = new TypedValueField(this, false);
@@ -100,6 +103,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.textValue2 = historyEvent.getTextValue2();
     this.createTime = historyEvent.getTimestamp();
     this.rootProcessInstanceId = historyEvent.getRootProcessInstanceId();
+    this.removalTime = historyEvent.getRemovalTime();
 
     setSerializerName(historyEvent.getSerializerName());
 
@@ -107,6 +111,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
     if(historyEvent.getByteValue() != null) {
       byteArrayField.setRootProcessInstanceId(rootProcessInstanceId);
+      byteArrayField.setRemovalTime(removalTime);
       setByteArrayValue(historyEvent.getByteValue());
     }
 
@@ -385,6 +390,14 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -392,6 +405,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       + ", processDefinitionKey=" + processDefinitionKey
       + ", processDefinitionId=" + processDefinitionId
       + ", rootProcessInstanceId=" + rootProcessInstanceId
+      + ", removalTime=" + removalTime
       + ", processInstanceId=" + processInstanceId
       + ", taskId=" + taskId
       + ", executionId=" + executionId

@@ -61,4 +61,7 @@ public interface Attachment {
   /** reference to the root process instance id of the process instance on which this attachment was made */
   String getRootProcessInstanceId();
 
+  /** The time the historic attachment will be removed. */
+  Date getRemovalTime();
+
 }

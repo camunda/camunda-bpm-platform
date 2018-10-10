@@ -139,4 +139,7 @@ public interface HistoricIncident {
    */
   String getJobDefinitionId();
 
+  /** The time the historic incident will be removed. */
+  Date getRemovalTime();
+
 }

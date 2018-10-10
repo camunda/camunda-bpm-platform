@@ -171,7 +171,9 @@ import org.camunda.bpm.engine.impl.form.validator.MinLengthValidator;
 import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
+import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.HistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -742,6 +744,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected BatchWindowManager batchWindowManager = new DefaultBatchWindowManager();
 
+  protected HistoryRemovalTimeProvider historyRemovalTimeProvider;
+
+  protected String historyRemovalTimeStrategy;
+
   /**
    * Size of batch in which history cleanup data will be deleted. {@link HistoryCleanupBatch#MAX_BATCH_SIZE} must be respected.
    */
@@ -824,10 +830,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMigration();
     initCommandCheckers();
     initDefaultUserPermissionForTask();
+    initHistoryRemovalTime();
     initHistoryCleanup();
     initAdminUser();
     initAdminGroups();
     invokePostInit();
+  }
+
+  public void initHistoryRemovalTime() {
+    initHistoryRemovalTimeProvider();
+    initHistoryRemovalTimeStrategy();
+  }
+
+  public void initHistoryRemovalTimeStrategy() {
+    if (historyRemovalTimeStrategy == null) {
+      historyRemovalTimeStrategy = HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END;
+    }
+
+    if (!HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START.equals(historyRemovalTimeStrategy) &&
+      !HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END.equals(historyRemovalTimeStrategy)) {
+      throw LOG.invalidPropertyValue("historyRemovalTimeStrategy", String.valueOf(historyRemovalTimeStrategy),
+        String.format("history removal time strategy must be either '%s' or '%s'", HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START, HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END));
+    }
+  }
+
+  public void initHistoryRemovalTimeProvider() {
+    if (historyRemovalTimeProvider == null) {
+      historyRemovalTimeProvider = new DefaultHistoryRemovalTimeProvider();
+    }
   }
 
   public void initHistoryCleanup() {
@@ -4106,6 +4136,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchWindowManager(BatchWindowManager batchWindowManager) {
     this.batchWindowManager = batchWindowManager;
+  }
+
+  public HistoryRemovalTimeProvider getHistoryRemovalTimeProvider() {
+    return historyRemovalTimeProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryRemovalTimeProvider(HistoryRemovalTimeProvider removalTimeProvider) {
+    historyRemovalTimeProvider = removalTimeProvider;
+    return this;
+  }
+
+  public String getHistoryRemovalTimeStrategy() {
+    return historyRemovalTimeStrategy;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryRemovalTimeStrategy(String removalTimeStrategy) {
+    historyRemovalTimeStrategy = removalTimeStrategy;
+    return this;
   }
 
   public int getFailedJobListenerMaxRetries() {

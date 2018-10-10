@@ -71,4 +71,7 @@ public interface HistoricDecisionInputInstance {
    */
   String getRootProcessInstanceId();
 
+  /** The time the historic decision instance will be removed. */
+  Date getRemovalTime();
+
 }

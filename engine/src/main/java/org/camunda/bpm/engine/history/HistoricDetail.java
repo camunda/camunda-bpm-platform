@@ -74,4 +74,8 @@ public interface HistoricDetail {
    * References operationId of user operation log entry.
    */
   String getUserOperationId();
+
+  /** The time the historic detail will be removed. */
+  Date getRemovalTime();
+
 }

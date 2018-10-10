@@ -46,6 +46,8 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionKey;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionName;
@@ -60,6 +62,10 @@ import static org.hamcrest.CoreMatchers.containsString;
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase {
+
+  public void setUp() {
+    processEngineConfiguration.initHistoryRemovalTime();
+  }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testHistoricDataCreatedForProcessExecution() {
@@ -925,6 +931,10 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"
   })
   public void testRootRemovalTime() {
+    processEngineConfiguration
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END)
+      .initHistoryRemovalTime();
+
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     repositoryService.updateProcessDefinitionHistoryTimeToLive(processInstance.getProcessDefinitionId(), 3);
@@ -952,6 +962,10 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
   })
   public void testRootRemovalTimeWithMultilevelHierarchicalHPIAsync() {
+    processEngineConfiguration
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END)
+      .initHistoryRemovalTime();
+
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedHierarchicalProcess");
     repositoryService.updateProcessDefinitionHistoryTimeToLive(processInstance.getProcessDefinitionId(), 3);

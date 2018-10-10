@@ -104,4 +104,8 @@ public interface HistoricTaskInstance {
    * if the historic task instance belongs to no single tenant.
    */
   String getTenantId();
+
+  /** The time the historic task instance will be removed. */
+  Date getRemovalTime();
+
 }

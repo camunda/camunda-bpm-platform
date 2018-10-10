@@ -30,7 +30,6 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
   protected Date timestamp;
   protected String tenantId;
   protected String userOperationId;
-  protected String rootProcessInstanceId;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -82,6 +81,14 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   public void delete() {
     Context
       .getCommandContext()
@@ -99,6 +106,7 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", rootProcessInstanceId=" + rootProcessInstanceId
+           + ", removalTime=" + removalTime
            + ", processInstanceId=" + processInstanceId
            + ", id=" + id
            + ", tenantId=" + tenantId

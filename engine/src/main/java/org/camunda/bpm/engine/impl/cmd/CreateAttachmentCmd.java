@@ -14,10 +14,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.task.Attachment;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
 
@@ -91,6 +95,10 @@ public class CreateAttachmentCmd implements Command<Attachment> {
       attachment.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
     }
 
+    if (isHistoryRemovalTimeStrategyProcessStart()) {
+      provideRemovalTime(attachment);
+    }
+
     DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
     dbEntityManger.insert(attachment);
 
@@ -98,14 +106,8 @@ public class CreateAttachmentCmd implements Command<Attachment> {
       byte[] bytes = IoUtil.readInputStream(content, attachmentName);
       ByteArrayEntity byteArray = new ByteArrayEntity(bytes, ResourceTypes.HISTORY);
 
-      if (task != null) {
-        ExecutionEntity execution = task.getExecution();
-        if (execution != null) {
-          byteArray.setRootProcessInstanceId(execution.getRootProcessInstanceId());
-        }
-      } else if (processInstance != null) {
-        byteArray.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
-      }
+      byteArray.setRootProcessInstanceId(attachment.getRootProcessInstanceId());
+      byteArray.setRemovalTime(attachment.getRemovalTime());
 
       commandContext.getByteArrayManager().insertByteArray(byteArray);
       attachment.setContentId(byteArray.getId());
@@ -122,6 +124,33 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     }
 
     return attachment;
+  }
+
+  protected boolean isHistoryRemovalTimeStrategyProcessStart() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START.equals(getHistoryRemovalTimeStrategy());
+  }
+
+  protected String getHistoryRemovalTimeStrategy() {
+    return Context.getProcessEngineConfiguration()
+      .getHistoryRemovalTimeStrategy();
+  }
+
+  protected HistoricProcessInstanceEventEntity getHistoricRootProcessInstance(String rootProcessInstanceId) {
+    return Context.getCommandContext().getDbEntityManager()
+      .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
+  }
+
+  protected void provideRemovalTime(AttachmentEntity attachment) {
+    String rootProcessInstanceId = attachment.getRootProcessInstanceId();
+    if (rootProcessInstanceId != null) {
+      HistoricProcessInstanceEventEntity historicRootProcessInstance =
+        getHistoricRootProcessInstance(rootProcessInstanceId);
+
+      if (historicRootProcessInstance != null) {
+        Date removalTime = historicRootProcessInstance.getRemovalTime();
+        attachment.setRemovalTime(removalTime);
+      }
+    }
   }
 
 }

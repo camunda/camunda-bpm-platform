@@ -34,9 +34,6 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   /** the id of the super process instance */
   protected String superProcessInstanceId;
 
-  /** the id of the root process instance */
-  protected String rootProcessInstanceId;
-
   /** the id of the super case instance */
   protected String superCaseInstanceId;
 
@@ -53,8 +50,6 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   protected String tenantId;
 
   protected String state;
-
-  protected Date removalTime;
 
   // getters / setters ////////////////////////////////////////
 

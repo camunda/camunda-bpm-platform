@@ -138,4 +138,8 @@ public interface HistoricExternalTaskLog {
    * the deletion of the associated external task.
    */
   boolean isDeletionLog();
+
+  /** The time the historic external task log will be removed. */
+  Date getRemovalTime();
+
 }

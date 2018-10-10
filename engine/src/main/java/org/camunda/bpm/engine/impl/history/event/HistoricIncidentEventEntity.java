@@ -35,7 +35,6 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
   protected int incidentState;
   protected String tenantId;
   protected String jobDefinitionId;
-  protected String rootProcessInstanceId;
 
   public Date getCreateTime() {
     return createTime;

@@ -45,12 +45,10 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
   protected String activityId;
 
   protected Date evaluationTime;
-  protected Date removalTime;
 
   protected Double collectResultValue;
 
   protected String rootDecisionInstanceId;
-  protected String rootProcessInstanceId;
   protected String decisionRequirementsDefinitionId;
   protected String decisionRequirementsDefinitionKey;
 

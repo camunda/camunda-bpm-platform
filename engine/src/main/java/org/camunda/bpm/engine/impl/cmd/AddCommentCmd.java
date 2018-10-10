@@ -14,7 +14,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
@@ -24,6 +28,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
@@ -66,6 +71,10 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
       comment.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     }
 
+    if (isHistoryRemovalTimeStrategyProcessStart()) {
+      provideRemovalTime(comment);
+    }
+
     String eventMessage = message.replaceAll("\\s+", " ");
     if (eventMessage.length() > 163) {
       eventMessage = eventMessage.substring(0, 160) + "...";
@@ -96,6 +105,33 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
     }
 
     return execution;
+  }
+
+  protected boolean isHistoryRemovalTimeStrategyProcessStart() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START.equals(getHistoryRemovalTimeStrategy());
+  }
+
+  protected String getHistoryRemovalTimeStrategy() {
+    return Context.getProcessEngineConfiguration()
+      .getHistoryRemovalTimeStrategy();
+  }
+
+  protected HistoricProcessInstanceEventEntity getHistoricRootProcessInstance(String rootProcessInstanceId) {
+    return Context.getCommandContext()
+      .getDbEntityManager()
+      .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
+  }
+
+  protected void provideRemovalTime(CommentEntity comment) {
+    String rootProcessInstanceId = comment.getRootProcessInstanceId();
+    if (rootProcessInstanceId != null) {
+      HistoricProcessInstanceEventEntity historicRootProcessInstance = getHistoricRootProcessInstance(rootProcessInstanceId);
+
+      if (historicRootProcessInstance != null) {
+        Date removalTime = historicRootProcessInstance.getRemovalTime();
+        comment.setRemovalTime(removalTime);
+      }
+    }
   }
 
 }

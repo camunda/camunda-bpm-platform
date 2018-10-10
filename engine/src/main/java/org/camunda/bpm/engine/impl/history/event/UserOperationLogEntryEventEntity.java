@@ -37,7 +37,6 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   protected String deploymentId;
   protected String tenantId;
   protected String batchId;
-  protected String rootProcessInstanceId;
 
   public String getOperationId() {
     return operationId;

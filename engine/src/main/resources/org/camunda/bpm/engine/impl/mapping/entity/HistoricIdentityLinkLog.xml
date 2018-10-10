@@ -19,7 +19,8 @@
     		OPERATION_TYPE_,
             ASSIGNER_ID_,
             PROC_DEF_KEY_,
-            TENANT_ID_)
+            TENANT_ID_,
+            REMOVAL_TIME_)
     values (#{id, jdbcType=VARCHAR},
             #{time, jdbcType=TIMESTAMP},  
             #{type, jdbcType=VARCHAR},
@@ -31,7 +32,8 @@
             #{operationType, jdbcType=VARCHAR},
             #{assignerId, jdbcType=VARCHAR},
             #{processDefinitionKey, jdbcType=VARCHAR},
-            #{tenantId, jdbcType=VARCHAR}
+            #{tenantId, jdbcType=VARCHAR},
+            #{removalTime, jdbcType=TIMESTAMP}
            )
   </insert>
   
@@ -104,6 +106,7 @@
     <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
   
   <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultMap="historicIdentityLinkResultMap">

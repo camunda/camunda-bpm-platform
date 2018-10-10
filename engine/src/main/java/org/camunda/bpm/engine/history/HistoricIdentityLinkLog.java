@@ -97,4 +97,7 @@ public interface HistoricIdentityLinkLog {
    */
   String getRootProcessInstanceId();
 
+  /** The time the historic identity link log will be removed. */
+  Date getRemovalTime();
+
 }

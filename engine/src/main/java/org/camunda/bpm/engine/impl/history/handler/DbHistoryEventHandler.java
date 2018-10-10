@@ -92,6 +92,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
       if(byteValue != null) {
         ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue, ResourceTypes.HISTORY);
         byteArrayEntity.setRootProcessInstanceId(historyEvent.getRootProcessInstanceId());
+        byteArrayEntity.setRemovalTime(historyEvent.getRemovalTime());
 
         Context
         .getCommandContext()

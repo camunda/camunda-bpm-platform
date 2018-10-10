@@ -55,8 +55,6 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String tenantId;
 
-  protected String rootProcessInstanceId;
-
   public Date getTimestamp() {
     return timestamp;
   }

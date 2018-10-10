@@ -57,9 +57,6 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
   /** id of the tenant which belongs to the activity instance  */
   protected String tenantId;
 
-  /** the id of the root process instance */
-  protected String rootProcessInstanceId;
-
   // getters and setters //////////////////////////////////////////////////////
 
   public String getAssignee() {

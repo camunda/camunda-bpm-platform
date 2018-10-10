@@ -52,15 +52,14 @@ public class HistoricDecisionOutputInstanceEntity extends HistoryEvent implement
 
   protected Date createTime;
 
-  protected String rootProcessInstanceId;
-
   public HistoricDecisionOutputInstanceEntity() {
     byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY);
   }
 
-  public HistoricDecisionOutputInstanceEntity(String rootProcessInstanceId) {
+  public HistoricDecisionOutputInstanceEntity(String rootProcessInstanceId, Date removalTime) {
     this.rootProcessInstanceId = rootProcessInstanceId;
-    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY, getRootProcessInstanceId());
+    this.removalTime = removalTime;
+    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY, getRootProcessInstanceId(), getRemovalTime());
   }
 
   @Override

@@ -93,4 +93,7 @@ public interface HistoricActivityInstance {
    */
   String getTenantId();
 
+  /** The time the historic activity instance will be removed. */
+  Date getRemovalTime();
+
 }

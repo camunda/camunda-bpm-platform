@@ -41,7 +41,8 @@
         DURATION_,
         ACT_INST_STATE_,
         SEQUENCE_COUNTER_,
-        TENANT_ID_
+        TENANT_ID_,
+        REMOVAL_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{parentActivityInstanceId ,jdbcType=VARCHAR},
@@ -62,7 +63,8 @@
         #{durationInMillis ,jdbcType=BIGINT},
         #{activityInstanceState,jdbcType=INTEGER},
         #{sequenceCounter,jdbcType=BIGINT},
-        #{tenantId, jdbcType=VARCHAR}
+        #{tenantId, jdbcType=VARCHAR},
+        #{removalTime, jdbcType=TIMESTAMP}
       )
   </insert>
 
@@ -132,6 +134,7 @@
     <result property="activityInstanceState" column="ACT_INST_STATE_" jdbcType="INTEGER" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->

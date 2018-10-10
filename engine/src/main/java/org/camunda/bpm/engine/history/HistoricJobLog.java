@@ -159,4 +159,7 @@ public interface HistoricJobLog {
    */
   boolean isDeletionLog();
 
+  /** The time the historic job log will be removed. */
+  Date getRemovalTime();
+
 }

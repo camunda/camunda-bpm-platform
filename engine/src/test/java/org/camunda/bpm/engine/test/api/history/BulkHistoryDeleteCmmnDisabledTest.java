@@ -122,7 +122,7 @@ public class BulkHistoryDeleteCmmnDisabledTest {
   private void prepareHistoricProcesses(int instanceCount) {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     List<String> processInstanceIds = new ArrayList<String>();
-
+    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
     for (int i = 0; i < instanceCount; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
       processInstanceIds.add(processInstance.getId());
@@ -130,7 +130,7 @@ public class BulkHistoryDeleteCmmnDisabledTest {
     List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().list();
     assertEquals(1, processDefinitions.size());
     engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), 5);
-    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
+
     runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
     ClockUtil.setCurrentTime(oldCurrentTime);
   }

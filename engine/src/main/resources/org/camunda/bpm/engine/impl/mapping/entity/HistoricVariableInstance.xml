@@ -39,6 +39,7 @@
       REV_,
       VAR_TYPE_,
       CREATE_TIME_,
+      REMOVAL_TIME_,
       BYTEARRAY_ID_,
       DOUBLE_,
       LONG_,
@@ -63,6 +64,7 @@
       #{revision, jdbcType=VARCHAR},
       #{serializerName, jdbcType=VARCHAR},
       #{createTime, jdbcType=TIMESTAMP},
+      #{removalTime, jdbcType=TIMESTAMP},
       #{byteArrayId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -161,6 +163,7 @@
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <resultMap id="historicVariableInstanceResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
@@ -187,6 +190,7 @@
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!-- HISTORIC VARIABLE SELECT -->

@@ -44,6 +44,7 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
   protected String tenantId;
   protected Date createTime;
   protected String rootProcessInstanceId;
+  protected Date removalTime;
 
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
@@ -156,6 +157,14 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
     return rootProcessInstanceId;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
@@ -171,6 +180,7 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
            + ", taskId=" + taskId
            + ", processInstanceId=" + processInstanceId
            + ", rootProcessInstanceId=" + rootProcessInstanceId
+           + ", removalTime=" + removalTime
            + ", url=" + url
            + ", contentId=" + contentId
            + ", content=" + content

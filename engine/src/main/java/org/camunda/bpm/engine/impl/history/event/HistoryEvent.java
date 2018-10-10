@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HistoricEntity;
@@ -86,6 +87,9 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
 
+  /** the root process instance in which the event has happened */
+  protected String rootProcessInstanceId;
+
   /** the process instance in which the event has happened */
   protected String processInstanceId;
 
@@ -127,6 +131,9 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
 
   protected long sequenceCounter;
 
+  /* the time when the history event will be deleted */
+  protected Date removalTime;
+
   // getters / setters ///////////////////////////////////
 
   public String getProcessInstanceId() {
@@ -135,6 +142,14 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   public String getExecutionId() {
@@ -241,6 +256,14 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
     this.sequenceCounter = sequenceCounter;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   // persistent object implementation ///////////////
 
   public Object getPersistentState() {
@@ -262,6 +285,8 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
+           + ", removalTime=" + removalTime
            + "]";
   }
 

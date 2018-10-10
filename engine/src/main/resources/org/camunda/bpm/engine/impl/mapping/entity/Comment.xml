@@ -21,7 +21,7 @@
   <!-- COMMENT INSERT -->
   
   <insert id="insertComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
@@ -33,12 +33,13 @@
       #{action ,jdbcType=VARCHAR},
       #{message ,jdbcType=VARCHAR},
       #{fullMessageBytes ,jdbcType=BLOB},
-      #{tenantId ,jdbcType=VARCHAR}
+      #{tenantId ,jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
 
   <insert id="insertComment_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
@@ -50,7 +51,8 @@
       #{action ,jdbcType=VARCHAR},
       #{message ,jdbcType=VARCHAR},
       #{fullMessageBytes ,jdbcType=BINARY},
-      #{tenantId ,jdbcType=VARCHAR}
+      #{tenantId ,jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
 
@@ -128,6 +130,7 @@
     <result property="message" column="MESSAGE_" jdbcType="VARCHAR" />
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BLOB" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <resultMap id="commentResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
@@ -142,6 +145,7 @@
     <result property="message" column="MESSAGE_" jdbcType="VARCHAR" />
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BINARY" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
   
   <!-- COMMENT SELECT -->

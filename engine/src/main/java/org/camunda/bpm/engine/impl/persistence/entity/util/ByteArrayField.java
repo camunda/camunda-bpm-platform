@@ -19,6 +19,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.repository.ResourceType;
 
+import java.util.Date;
+
 /**
  * A byte array value field what load and save {@link ByteArrayEntity}. It can
  * be used in an entity which implements {@link ValueFields}.
@@ -34,9 +36,11 @@ public class ByteArrayField {
   protected ResourceType type;
 
   protected String rootProcessInstanceId;
+  protected Date removalTime;
 
-  public ByteArrayField(Nameable nameProvider, ResourceType type, String rootProcessInstanceId) {
+  public ByteArrayField(Nameable nameProvider, ResourceType type, String rootProcessInstanceId, Date removalTime) {
     this(nameProvider, type);
+    this.removalTime = removalTime;
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
@@ -97,7 +101,7 @@ public class ByteArrayField {
       else {
         deleteByteArrayValue();
 
-        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type, rootProcessInstanceId);
+        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type, rootProcessInstanceId, removalTime);
 
         // avoid insert of byte array value for a transient variable
         if (!isTransient) {
@@ -138,6 +142,10 @@ public class ByteArrayField {
 
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
   }
 
 }

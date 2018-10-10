@@ -46,4 +46,8 @@ public interface Comment {
   /** the full comment message the user had related to the task and/or process instance
    * @see TaskService#getTaskComments(String) */
   String getFullMessage();
+
+  /** The time the historic comment will be removed. */
+  Date getRemovalTime();
+
 }

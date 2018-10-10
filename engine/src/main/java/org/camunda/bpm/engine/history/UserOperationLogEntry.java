@@ -194,4 +194,8 @@ public interface UserOperationLogEntry {
 
   /** The new value of the property. */
   String getNewValue();
+
+  /** The time the historic user operation log will be removed. */
+  Date getRemovalTime();
+
 }

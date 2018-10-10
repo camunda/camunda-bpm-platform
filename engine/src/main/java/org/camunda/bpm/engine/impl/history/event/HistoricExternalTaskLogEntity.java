@@ -50,8 +50,6 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
 
   protected int state;
 
-  protected String rootProcessInstanceId;
-
   public Date getTimestamp() {
     return timestamp;
   }
@@ -127,6 +125,7 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
     byte[] exceptionBytes = toByteArray(exception);
     ByteArrayEntity byteArray = createExceptionByteArray(EXCEPTION_NAME, exceptionBytes, ResourceTypes.HISTORY);
     byteArray.setRootProcessInstanceId(rootProcessInstanceId);
+    byteArray.setRemovalTime(removalTime);
 
     errorDetailsByteArrayId = byteArray.getId();
   }

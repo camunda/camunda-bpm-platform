@@ -26,8 +26,6 @@ public class HistoricIdentityLinkLogEventEntity extends HistoryEvent {
 
   protected String tenantId;
 
-  protected String rootProcessInstanceId;
-
   public Date getTime() {
     return time;
   }

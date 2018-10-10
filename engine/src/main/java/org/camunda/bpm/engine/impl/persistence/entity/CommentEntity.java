@@ -49,7 +49,8 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   protected String fullMessage;
   protected String tenantId;
   protected String rootProcessInstanceId;
-  
+  protected Date removalTime;
+
   public Object getPersistentState() {
     return CommentEntity.class;
   }
@@ -188,6 +189,14 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -198,6 +207,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
            + ", taskId=" + taskId
            + ", processInstanceId=" + processInstanceId
            + ", rootProcessInstanceId=" + rootProcessInstanceId
+           + ", removalTime=" + removalTime
            + ", action=" + action
            + ", message=" + message
            + ", fullMessage=" + fullMessage

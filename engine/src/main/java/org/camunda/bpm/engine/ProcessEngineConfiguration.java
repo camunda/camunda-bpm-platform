@@ -142,6 +142,16 @@ public abstract class ProcessEngineConfiguration {
   public static final String HISTORY_DEFAULT = HISTORY_AUDIT;
 
   /**
+   * Removal time for historic entities is set during execution.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START = "process-start";
+
+  /**
+   * Removal time for historic entities is set if process instance has been ended.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END = "process-end";
+
+  /**
    * Always enables check for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations.
    * This mode is equal to the &lt; 7.5 behavior.
    *<p />

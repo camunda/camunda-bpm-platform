@@ -37,7 +37,8 @@
       TEXT_,
       SEQUENCE_COUNTER_,
       TENANT_ID_,
-      OPERATION_ID_
+      OPERATION_ID_,
+      REMOVAL_TIME_
     )
     values (
       #{id, jdbcType=VARCHAR},
@@ -54,7 +55,8 @@
       #{propertyValue, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
       #{tenantId, jdbcType=VARCHAR},
-      #{userOperationId, jdbcType=VARCHAR}
+      #{userOperationId, jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
 
@@ -87,7 +89,8 @@
       TEXT2_,
       SEQUENCE_COUNTER_,
       TENANT_ID_,
-      OPERATION_ID_
+      OPERATION_ID_,
+      REMOVAL_TIME_
     )
     values (
       #{id, jdbcType=VARCHAR},
@@ -115,7 +118,8 @@
       #{textValue2, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
       #{tenantId, jdbcType=VARCHAR},
-      #{userOperationId, jdbcType=VARCHAR}
+      #{userOperationId, jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
 
@@ -182,6 +186,7 @@
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="userOperationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
     <discriminator javaType="string" column="TYPE_">
       <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap"/>
       <case value="FormProperty" resultMap="historicFormPropertyResultMap"/>
@@ -198,6 +203,7 @@
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <resultMap id="historicFormPropertyResultMap" extends="historicDetailResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity">

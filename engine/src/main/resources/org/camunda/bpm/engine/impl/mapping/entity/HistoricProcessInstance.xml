@@ -112,7 +112,7 @@
 
   <select id="selectHistoricProcessInstanceEvent" parameterType="java.lang.String"
           resultMap="historicProcessInstanceResultMap">
-    select HPI.START_TIME_ from ${prefix}ACT_HI_PROCINST HPI
+    select HPI.START_TIME_, HPI.REMOVAL_TIME_ from ${prefix}ACT_HI_PROCINST HPI
     where HPI.ID_ = #{id, jdbcType=VARCHAR}
   </select>
 

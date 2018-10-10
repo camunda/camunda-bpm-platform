@@ -20,7 +20,8 @@
           TEXT2_,
           TENANT_ID_,
           CREATE_TIME_,
-          ROOT_PROC_INST_ID_
+          ROOT_PROC_INST_ID_,
+          REMOVAL_TIME_
       ) values ( 
           #{id, jdbcType=VARCHAR},
           #{decisionInstanceId, jdbcType=VARCHAR},
@@ -34,7 +35,8 @@
           #{textValue2, jdbcType=VARCHAR},
           #{tenantId, jdbcType=VARCHAR},
           #{createTime, jdbcType=TIMESTAMP},
-          #{rootProcessInstanceId, jdbcType=VARCHAR}
+          #{rootProcessInstanceId, jdbcType=VARCHAR},
+          #{removalTime, jdbcType=TIMESTAMP}
       )
   </insert>
   
@@ -91,6 +93,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
     <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
   
   <!-- select -->
