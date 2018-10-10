@@ -123,7 +123,10 @@ public class CustomHistoryLevelUserOperationLogTest {
   @After
   public void tearDown() throws Exception {
     identityService.clearAuthentication();
-    managementService.purge();
+    List<UserOperationLogEntry> logs = query().list();
+    for (UserOperationLogEntry log : logs) {
+      historyService.deleteUserOperationLogEntry(log.getId());
+    }
   }
 
   @Test
@@ -546,6 +549,26 @@ public class CustomHistoryLevelUserOperationLogTest {
     verifyQueryResults(query, 1);
 
     repositoryService.deleteDeployment(deploymentId, true);
+  }
+
+  @Test
+  @Deployment(resources = { ONE_TASK_PROCESS })
+  public void testUserOperationLogDeletion() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.setVariable(process.getId(), "testVariable1", "THIS IS TESTVARIABLE!!!");
+
+    // assume
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
+
+    // when
+    UserOperationLogEntry log = query().entityType(EntityTypes.VARIABLE).operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).singleResult();
+    assertNotNull(log);
+    historyService.deleteUserOperationLogEntry(log.getId());
+
+    // then
+    List<UserOperationLogEntry> list = query().entityType(EntityTypes.VARIABLE).operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).list();
+    assertEquals(0, list.size());
   }
 
   protected void verifyQueryResults(UserOperationLogQuery query, int countExpected) {

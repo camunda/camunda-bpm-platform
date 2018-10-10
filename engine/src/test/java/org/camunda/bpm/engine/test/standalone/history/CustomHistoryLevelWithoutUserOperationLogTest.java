@@ -109,7 +109,6 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   @After
   public void tearDown() throws Exception {
     identityService.clearAuthentication();
-    managementService.purge();
   }
 
   @Test
