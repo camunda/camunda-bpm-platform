@@ -53,6 +53,7 @@ public class TopicSubscriptionIT {
   protected ExternalTaskClient client;
 
   protected ProcessDefinitionDto processDefinition;
+  protected ProcessDefinitionDto processDefinition2;
   protected RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
 
   @Before
@@ -60,6 +61,7 @@ public class TopicSubscriptionIT {
     client = clientRule.client();
     handler.clear();
     processDefinition = engineRule.deploy(BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
+    processDefinition2 = engineRule.deploy(ONE_EXTERNAL_TASK_WITH_OUTPUT_PARAM_PROCESS).get(0);
   }
 
   @Test
@@ -107,6 +109,130 @@ public class TopicSubscriptionIT {
     ExternalTask task = handler.getHandledTasks().get(0);
     assertThat(task.getBusinessKey()).isEqualTo(BUSINESS_KEY);
     assertThat(topicSubscription.getBusinessKey()).isEqualTo(BUSINESS_KEY);
+  }
+
+  @Test
+  public void shouldFilterByProcessDefinitionId() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+    String processDefinitionId2 = processDefinition2.getId();
+    engineRule.startProcessInstance(processDefinition2.getId());
+
+    // when
+    TopicSubscription topicSubscription = client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .processDefinitionId(processDefinitionId2)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+    ExternalTask task = handler.getHandledTasks().get(0);
+    assertThat(task.getProcessDefinitionId()).isEqualTo(processDefinitionId2);
+    assertThat(topicSubscription.getProcessDefinitionId()).isEqualTo(processDefinitionId2);
+  }
+
+  @Test
+  public void shouldFilterBySingleProcessDefinitionIdIn() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+    String processDefinitionId2 = processDefinition2.getId();
+    engineRule.startProcessInstance(processDefinitionId2);
+
+    // when
+    TopicSubscription topicSubscription = client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .processDefinitionIdIn(processDefinitionId2)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    assertThat(task.getProcessDefinitionId()).isEqualTo(processDefinitionId2);
+    assertThat(topicSubscription.getProcessDefinitionIdIn().get(0)).isEqualTo(processDefinitionId2);
+  }
+
+  @Test
+  public void shouldFilterByProcessDefinitionIdIn() {
+    // given
+    String processDefinitionId1 = processDefinition.getId();
+    engineRule.startProcessInstance(processDefinitionId1);
+    String processDefinitionId2 = processDefinition2.getId();
+    engineRule.startProcessInstance(processDefinitionId2);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .processDefinitionIdIn(processDefinitionId1, processDefinitionId2)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    List<ExternalTask> handledTasks = handler.getHandledTasks();
+    assertThat(handledTasks.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldFilterByProcessDefinitionKey() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+    engineRule.startProcessInstance(processDefinition2.getId());
+
+    // when
+    TopicSubscription topicSubscription = client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .processDefinitionKey(PROCESS_KEY_2)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+    ExternalTask task = handler.getHandledTasks().get(0);
+    assertThat(task.getProcessDefinitionKey()).isEqualTo(PROCESS_KEY_2);
+    assertThat(topicSubscription.getProcessDefinitionKey()).isEqualTo(PROCESS_KEY_2);
+  }
+
+  @Test
+  public void shouldFilterBySingleProcessDefinitionKeyIn() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+    engineRule.startProcessInstance(processDefinition2.getId());
+
+    // when
+    TopicSubscription topicSubscription = client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .processDefinitionKeyIn(PROCESS_KEY_2)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    assertThat(task.getProcessDefinitionKey()).isEqualTo(PROCESS_KEY_2);
+    assertThat(topicSubscription.getProcessDefinitionKeyIn().get(0)).isEqualTo(PROCESS_KEY_2);
+  }
+
+  @Test
+  public void shouldFilterByProcessDefinitionKeyIn() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+    engineRule.startProcessInstance(processDefinition2.getId());
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .processDefinitionKeyIn(PROCESS_KEY, PROCESS_KEY_2)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    List<ExternalTask> handledTasks = handler.getHandledTasks();
+    assertThat(handledTasks.size()).isEqualTo(2);
   }
 
   @Test

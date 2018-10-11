@@ -28,6 +28,10 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected TopicSubscriptionManager topicSubscriptionManager;
   protected List<String> variableNames;
   protected String businessKey;
+  protected String processDefinitionId;
+  protected List<String> processDefinitionIdIn;
+  protected String processDefinitionKey;
+  protected List<String> processDefinitionKeyIn;
 
   public TopicSubscriptionImpl(String topicName, Long lockDuration, ExternalTaskHandler externalTaskHandler,
                                TopicSubscriptionManager topicSubscriptionManager, List<String> variableNames,
@@ -63,6 +67,42 @@ public class TopicSubscriptionImpl implements TopicSubscription {
 
   public String getBusinessKey() {
     return businessKey;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public TopicSubscription setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public List<String> getProcessDefinitionIdIn() {
+    return processDefinitionIdIn;
+  }
+
+  public TopicSubscription setProcessDefinitionIdIn(List<String> processDefinitionIds) {
+    this.processDefinitionIdIn = processDefinitionIds;
+    return this;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public TopicSubscription setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public List<String> getProcessDefinitionKeyIn() {
+    return processDefinitionKeyIn;
+  }
+
+  public TopicSubscription setProcessDefinitionKeyIn(List<String> processDefinitionKeys) {
+    this.processDefinitionKeyIn = processDefinitionKeys;
+    return this;
   }
 
   public int hashCode() {

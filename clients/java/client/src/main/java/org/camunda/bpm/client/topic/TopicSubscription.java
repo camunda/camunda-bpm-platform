@@ -58,4 +58,24 @@ public interface TopicSubscription {
    */
   String getBusinessKey();
 
+  /**
+   * @return the process definition id associated with the external tasks which are supposed to be fetched and locked
+   */
+  String getProcessDefinitionId();
+
+
+  /**
+   * @return the process definition ids associated with the external tasks which are supposed to be fetched and locked
+   */
+  List<String> getProcessDefinitionIdIn();
+
+  /**
+   * @return the process definition key associated with the external tasks which are supposed to be fetched and locked
+   */
+  String getProcessDefinitionKey();
+
+  /**
+   * @return the process definition keys associated with the external tasks which are supposed to be fetched and locked
+   */
+  List<String> getProcessDefinitionKeyIn();
 }

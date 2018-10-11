@@ -31,6 +31,10 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected Long lockDuration;
   protected List<String> variableNames;
   protected String businessKey;
+  protected String processDefinitionId;
+  protected List<String> processDefinitionIds;
+  protected String processDefinitionKey;
+  protected List<String> processDefinitionKeys;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
 
@@ -61,6 +65,26 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     return this;
   }
 
+  public TopicSubscriptionBuilder processDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public TopicSubscriptionBuilder processDefinitionIdIn(String... processDefinitionIds) {
+    this.processDefinitionIds = Arrays.asList(processDefinitionIds);
+    return this;
+  }
+
+  public TopicSubscriptionBuilder processDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public TopicSubscriptionBuilder processDefinitionKeyIn(String... processDefinitionKeys) {
+    this.processDefinitionKeys = Arrays.asList(processDefinitionKeys);
+    return this;
+  }
+
   public TopicSubscription open() {
     if (topicName == null) {
       throw LOG.topicNameNullException();
@@ -75,6 +99,18 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     }
 
     TopicSubscriptionImpl subscription = new TopicSubscriptionImpl(topicName, lockDuration, externalTaskHandler, topicSubscriptionManager, variableNames, businessKey);
+    if (processDefinitionId != null) {
+      subscription.setProcessDefinitionId(processDefinitionId);
+    }
+    if (processDefinitionIds != null) {
+      subscription.setProcessDefinitionIdIn(processDefinitionIds);
+    }
+    if (processDefinitionKey != null) {
+      subscription.setProcessDefinitionKey(processDefinitionKey);
+    }
+    if (processDefinitionKeys != null) {
+      subscription.setProcessDefinitionKeyIn(processDefinitionKeys);
+    }
     topicSubscriptionManager.subscribe(subscription);
 
     return subscription;

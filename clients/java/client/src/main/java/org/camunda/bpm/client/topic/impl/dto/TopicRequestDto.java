@@ -25,6 +25,10 @@ public class TopicRequestDto {
   protected long lockDuration;
   protected List<String> variables;
   protected String businessKey;
+  protected String processDefinitionId;
+  protected List<String> processDefinitionIdIn;
+  protected String processDefinitionKey;
+  protected List<String> processDefinitionKeyIn;
 
   public TopicRequestDto(String topicName, long lockDuration, List<String> variables, String businessKey) {
     this.topicName = topicName;
@@ -49,6 +53,38 @@ public class TopicRequestDto {
     return businessKey;
   }
 
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+
+  public List<String> getProcessDefinitionIdIn() {
+    return processDefinitionIdIn;
+  }
+
+  public void setProcessDefinitionIdIn(List<String> processDefinitionIds) {
+    this.processDefinitionIdIn = processDefinitionIds;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public List<String> getProcessDefinitionKeyIn() {
+    return processDefinitionKeyIn;
+  }
+
+  public void setProcessDefinitionKeyIn(List<String> processDefinitionKeys) {
+    this.processDefinitionKeyIn = processDefinitionKeys;
+  }
+
   public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription, long clientLockDuration) {
     Long lockDuration = topicSubscription.getLockDuration();
 
@@ -60,7 +96,20 @@ public class TopicRequestDto {
     List<String> variables = topicSubscription.getVariableNames();
     String businessKey = topicSubscription.getBusinessKey();
 
-    return new TopicRequestDto(topicName, lockDuration, variables, businessKey);
+    TopicRequestDto topicRequestDto = new TopicRequestDto(topicName, lockDuration, variables, businessKey);
+    if (topicSubscription.getProcessDefinitionId() != null) {
+      topicRequestDto.setProcessDefinitionId(topicSubscription.getProcessDefinitionId());
+    }
+    if (topicSubscription.getProcessDefinitionIdIn() != null) {
+      topicRequestDto.setProcessDefinitionIdIn(topicSubscription.getProcessDefinitionIdIn());
+    }
+    if (topicSubscription.getProcessDefinitionKey() != null) {
+      topicRequestDto.setProcessDefinitionKey(topicSubscription.getProcessDefinitionKey());
+    }
+    if (topicSubscription.getProcessDefinitionKeyIn() != null) {
+      topicRequestDto.setProcessDefinitionKeyIn(topicSubscription.getProcessDefinitionKeyIn());
+    }
+    return topicRequestDto;
   }
 
 }
