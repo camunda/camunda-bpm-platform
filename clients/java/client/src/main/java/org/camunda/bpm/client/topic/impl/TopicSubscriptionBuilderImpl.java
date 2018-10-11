@@ -58,6 +58,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   }
 
   public TopicSubscriptionBuilder variables(String... variableNames) {
+    ensureNotNull(variableNames, "variableNames");
     this.variableNames = Arrays.asList(variableNames);
     return this;
   }
