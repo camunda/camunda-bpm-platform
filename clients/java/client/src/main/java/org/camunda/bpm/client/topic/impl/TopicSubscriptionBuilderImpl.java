@@ -73,6 +73,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   }
 
   public TopicSubscriptionBuilder processDefinitionIdIn(String... processDefinitionIds) {
+    ensureNotNull(processDefinitionIds, "processDefinitionIds");
     this.processDefinitionIds = Arrays.asList(processDefinitionIds);
     return this;
   }
@@ -83,6 +84,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   }
 
   public TopicSubscriptionBuilder processDefinitionKeyIn(String... processDefinitionKeys) {
+    ensureNotNull(processDefinitionKeys, "processDefinitionKeys");
     this.processDefinitionKeys = Arrays.asList(processDefinitionKeys);
     return this;
   }
