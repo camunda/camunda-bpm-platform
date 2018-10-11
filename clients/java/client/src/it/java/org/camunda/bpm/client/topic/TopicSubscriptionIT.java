@@ -286,7 +286,7 @@ public class TopicSubscriptionIT {
     ExternalTask taskOne = handler.getHandledTasks().get(0);
     assertThat(taskOne.getAllVariables().size()).isEqualTo(0);
 
-    ExternalTask taskTwo = handler.getHandledTasks().get(0);
+    ExternalTask taskTwo = handler.getHandledTasks().get(1);
     assertThat(taskTwo.getAllVariables().size()).isEqualTo(0);
   }
 
