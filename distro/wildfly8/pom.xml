@@ -31,12 +31,12 @@
                 <requireJavaVersion>
                   <version>[1.7,)</version>
                   <message>
-                    ***************************************************************************************************
-                    *                                                                                                 *
-                    *            You must use at least JDK 1.7 to compile Camunda Bpm Wildfly 8!!!                      *
+                    ****************************************************************************************************
+                    *                                                                                                  *
+                    *               You must use at least JDK 1.7 to compile Camunda Bpm Wildfly 8!!!                  *
                     * Continue by excluding Wildfly from reactor by using '-P-distro-wildfly8' to disable the profile. *
-                    *                                                                                                 *
-                    ***************************************************************************************************
+                    *                                                                                                  *
+                    ****************************************************************************************************
                   </message>
                 </requireJavaVersion>
               </rules>

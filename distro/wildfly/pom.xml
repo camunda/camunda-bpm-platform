@@ -33,7 +33,7 @@
                   <message>
                     *****************************************************************************************************
                     *                                                                                                   *
-                    *            You must use at least use JDK 1.7 to compile Camunda Bpm Wildfly!!!                *
+                    *                    You must use at least JDK 1.7 to compile Camunda Bpm Wildfly!!!                *
                     *  Continue by excluding Wildfly from reactor by using '-P-distro-wildfly' to disable the profile.  *
                     *                                                                                                   *
                     *****************************************************************************************************
