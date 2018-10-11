@@ -29,6 +29,8 @@ public class TopicRequestDto {
   protected List<String> processDefinitionIdIn;
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeyIn;
+  protected boolean withoutTenantId;
+  protected List<String> tenantIdIn;
 
   public TopicRequestDto(String topicName, long lockDuration, List<String> variables, String businessKey) {
     this.topicName = topicName;
@@ -85,6 +87,22 @@ public class TopicRequestDto {
     this.processDefinitionKeyIn = processDefinitionKeys;
   }
 
+  public boolean isWithoutTenantId() {
+    return withoutTenantId;
+  }
+
+  public void setWithoutTenantId(boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  public List<String> getTenantIdIn() {
+    return tenantIdIn;
+  }
+
+  public void setTenantIdIn(List<String> tenantIdIn) {
+    this.tenantIdIn = tenantIdIn;
+  }
+
   public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription, long clientLockDuration) {
     Long lockDuration = topicSubscription.getLockDuration();
 
@@ -108,6 +126,12 @@ public class TopicRequestDto {
     }
     if (topicSubscription.getProcessDefinitionKeyIn() != null) {
       topicRequestDto.setProcessDefinitionKeyIn(topicSubscription.getProcessDefinitionKeyIn());
+    }
+    if (topicSubscription.isWithoutTenantId()) {
+      topicRequestDto.setWithoutTenantId(topicSubscription.isWithoutTenantId());
+    }
+    if (topicSubscription.getTenantIdIn() != null) {
+      topicRequestDto.setTenantIdIn(topicSubscription.getTenantIdIn());
     }
     return topicRequestDto;
   }

@@ -32,6 +32,8 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected List<String> processDefinitionIdIn;
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeyIn;
+  protected boolean withoutTenantId;
+  protected List<String> tenantIdIn;
 
   public TopicSubscriptionImpl(String topicName, Long lockDuration, ExternalTaskHandler externalTaskHandler,
                                TopicSubscriptionManager topicSubscriptionManager, List<String> variableNames,
@@ -102,6 +104,24 @@ public class TopicSubscriptionImpl implements TopicSubscription {
 
   public TopicSubscription setProcessDefinitionKeyIn(List<String> processDefinitionKeys) {
     this.processDefinitionKeyIn = processDefinitionKeys;
+    return this;
+  }
+
+  public boolean isWithoutTenantId() {
+    withoutTenantId = true;
+    return withoutTenantId;
+  }
+
+  public void setWithoutTenantId(boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  public List<String> getTenantIdIn() {
+    return tenantIdIn;
+  }
+
+  public TopicSubscription setTenantIdIn(List<String> tenantIds) {
+    this.tenantIdIn = tenantIds;
     return this;
   }
 

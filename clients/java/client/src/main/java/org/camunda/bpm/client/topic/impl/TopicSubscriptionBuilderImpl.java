@@ -35,6 +35,8 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected List<String> processDefinitionIds;
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeys;
+  protected boolean withoutTenantId;
+  protected List<String> tenantIds;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
 
@@ -85,6 +87,17 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     return this;
   }
 
+  public TopicSubscriptionBuilder withoutTenantId() {
+    withoutTenantId = true;
+    return this;
+  }
+
+  public TopicSubscriptionBuilder tenantIdIn(String... tenantIds) {
+    ensureNotNull(tenantIds, "tenantIds");
+    this.tenantIds = Arrays.asList(tenantIds);
+    return this;
+  }
+
   public TopicSubscription open() {
     if (topicName == null) {
       throw LOG.topicNameNullException();
@@ -111,9 +124,21 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     if (processDefinitionKeys != null) {
       subscription.setProcessDefinitionKeyIn(processDefinitionKeys);
     }
+    if (withoutTenantId) {
+      subscription.setWithoutTenantId(withoutTenantId);
+    }
+    if (tenantIds != null) {
+      subscription.setTenantIdIn(tenantIds);
+    }
     topicSubscriptionManager.subscribe(subscription);
 
     return subscription;
+  }
+
+  protected void ensureNotNull(Object tenantIds, String parameterName) {
+    if (tenantIds == null) {
+      throw LOG.passNullValueParameter(parameterName);
+    }
   }
 
 }

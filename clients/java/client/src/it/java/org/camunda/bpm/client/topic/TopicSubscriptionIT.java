@@ -14,6 +14,7 @@ package org.camunda.bpm.client.topic;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
+import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
@@ -233,6 +234,71 @@ public class TopicSubscriptionIT {
 
     List<ExternalTask> handledTasks = handler.getHandledTasks();
     assertThat(handledTasks.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldFilterByNoTenantId() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .withoutTenantId()
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldFilterWithoutTenantId() {
+    // given
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(processDefinition.getId());
+    String tenantId = "aTenantId";
+    processDefinition = engineRule.deploy(tenantId, BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
+    engineRule.startProcessInstanceByKey(processDefinition.getKey(), tenantId);
+
+    // when
+    TopicSubscription topicSubscription = client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .withoutTenantId()
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+    ExternalTask task = handler.getHandledTasks().get(0);
+    assertThat(task.getTenantId()).isNull();;
+    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(topicSubscription.isWithoutTenantId()).isTrue();
+  }
+
+  @Test
+  public void shouldFilterByTenantId() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+    String tenantId = "aTenantId";
+    processDefinition = engineRule.deploy(tenantId, BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstanceByKey(processDefinition.getKey(), tenantId);
+
+    // when
+    TopicSubscription topicSubscription = client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .tenantIdIn(tenantId)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+    ExternalTask task = handler.getHandledTasks().get(0);
+    assertThat(task.getTenantId()).isEqualTo(tenantId);
+    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(topicSubscription.getTenantIdIn().get(0)).isEqualTo(tenantId);
   }
 
   @Test

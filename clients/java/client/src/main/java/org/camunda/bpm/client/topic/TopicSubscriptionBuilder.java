@@ -59,7 +59,7 @@ public interface TopicSubscriptionBuilder {
 
   /**
    * @param processDefinitionIds to filter for external tasks that are supposed to be fetched and locked
-   * @return
+   * @return the builder
    */
   TopicSubscriptionBuilder processDefinitionIdIn(String... processDefinitionIds);
 
@@ -71,9 +71,21 @@ public interface TopicSubscriptionBuilder {
 
   /**
    * @param processDefinitionKeys to filter for external tasks that are supposed to be fetched and locked
-   * @return
+   * @return the builder
    */
   TopicSubscriptionBuilder processDefinitionKeyIn(String... processDefinitionKeys);
+
+  /**
+   * Filter for external tasks without tenant
+   * @return the builder
+   */
+  TopicSubscriptionBuilder withoutTenantId();
+
+  /**
+   * @param tenantIds to filter for external tasks that are supposed to be fetched and locked
+   * @return the builder
+   */
+  TopicSubscriptionBuilder tenantIdIn(String... tenantIds);
 
   /**
    * Release the topic subscription for being executed asynchronously
