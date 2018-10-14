@@ -1132,7 +1132,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected boolean isRootProcessInstance(HistoricProcessInstanceEventEntity evt) {
-    return evt.getRootProcessInstanceId().equals(evt.getProcessInstanceId());
+    return evt.getProcessInstanceId().equals(evt.getRootProcessInstanceId());
   }
 
   protected boolean isHistoryRemovalTimeStrategyProcessStart() {

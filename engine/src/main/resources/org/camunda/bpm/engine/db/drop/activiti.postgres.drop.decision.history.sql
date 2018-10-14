@@ -15,10 +15,12 @@ drop index ACT_IDX_HI_DEC_INST_RM_TIME;
 drop index ACT_IDX_HI_DEC_IN_INST;
 drop index ACT_IDX_HI_DEC_IN_CLAUSE;
 drop index ACT_IDX_HI_DEC_IN_ROOT_PI;
+drop index ACT_IDX_HI_DEC_IN_RM_TIME;
 
 drop index ACT_IDX_HI_DEC_OUT_INST;
 drop index ACT_IDX_HI_DEC_OUT_RULE;
 drop index ACT_IDX_HI_DEC_OUT_ROOT_PI;
+drop index ACT_IDX_HI_DEC_OUT_RM_TIME;
 
 drop table ACT_HI_DECINST;
 

@@ -1,4 +1,5 @@
 drop index ACT_IDX_BYTEARRAY_ROOT_PI;
+drop index ACT_IDX_BYTEARRAY_RM_TIME;
 drop index ACT_IDX_EXECUTION_ROOT_PI;
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
