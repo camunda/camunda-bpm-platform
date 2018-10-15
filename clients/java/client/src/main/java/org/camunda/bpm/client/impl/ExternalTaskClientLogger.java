@@ -22,7 +22,6 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
-import org.camunda.bpm.client.exception.NotValidException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.bpm.client.spi.DataFormatConfigurator;
@@ -224,8 +223,8 @@ public class ExternalTaskClientLogger extends BaseLogger {
     return new ExternalTaskClientException(exceptionMessage("029", "Variable '{}' of type file could not be retrieved", variableName), e);
   }
 
-  public <T> NotValidException passNullValueParameter(String parameterName) {
-    return new NotValidException(exceptionMessage(
+  public ExternalTaskClientException passNullValueParameter(String parameterName) {
+    return new ExternalTaskClientException(exceptionMessage(
         "030", "Null value is not allowed as '{}'", parameterName));
   }
 
