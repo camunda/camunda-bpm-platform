@@ -106,14 +106,6 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
     this.evaluationTime = evaluationTime;
   }
 
-  public Date getRemovalTime() {
-    return removalTime;
-  }
-
-  public void setRemovalTime(Date removalTime) {
-    this.removalTime = removalTime;
-  }
-
   public String getUserId() {
     return userId;
   }

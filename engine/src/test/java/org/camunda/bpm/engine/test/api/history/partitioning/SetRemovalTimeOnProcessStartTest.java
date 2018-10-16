@@ -114,7 +114,7 @@ public class SetRemovalTimeOnProcessStartTest {
     .endEvent().done();
 
   protected final Date START_DATE = new Date(1363608000000L);
-  
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -420,8 +420,6 @@ public class SetRemovalTimeOnProcessStartTest {
 
     // then
     assertThat(historicProcessInstance.getRemovalTime(), is(removalTime));
-
-    assertThat(historicProcessInstance.getRemovalTime(), is(removalTime));
   }
 
   @Test
@@ -610,8 +608,6 @@ public class SetRemovalTimeOnProcessStartTest {
 
     // assume
     assertThat(historicIncident, notNullValue());
-
-    Date removalTime = addDays(START_DATE, 5);
 
     // then
     assertThat(historicIncident.getRemovalTime(), nullValue());
@@ -958,7 +954,7 @@ public class SetRemovalTimeOnProcessStartTest {
 
     // assume
     assertThat(comment, notNullValue());
-    
+
     // then
     assertThat(comment.getRemovalTime(), nullValue());
   }

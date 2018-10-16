@@ -81,14 +81,6 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
-  public Date getRemovalTime() {
-    return removalTime;
-  }
-
-  public void setRemovalTime(Date removalTime) {
-    this.removalTime = removalTime;
-  }
-
   public void delete() {
     Context
       .getCommandContext()
