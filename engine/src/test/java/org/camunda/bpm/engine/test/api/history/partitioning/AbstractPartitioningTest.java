@@ -91,10 +91,12 @@ public abstract class AbstractPartitioningTest {
 
   @AfterClass
   public static void tearDown() {
-    processEngineConfiguration
-      .setHistoryRemovalTimeProvider(null)
-      .setHistoryRemovalTimeStrategy(null)
-      .initHistoryRemovalTime();
+    if (processEngineConfiguration != null) {
+      processEngineConfiguration
+        .setHistoryRemovalTimeProvider(null)
+        .setHistoryRemovalTimeStrategy(null)
+        .initHistoryRemovalTime();
+    }
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId) {
