@@ -41,6 +41,9 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
 
   @Override
   public TypedValue createValue(Object value, Map<String, Object> valueInfo) {
+    if (valueInfo == null) {
+      throw new IllegalArgumentException("Cannot create file without valueInfo.");
+    }
     Object filename = valueInfo.get(VALUE_INFO_FILE_NAME);
     if (filename == null) {
       throw new IllegalArgumentException("Cannot create file without filename! Please set a name into ValueInfo with key " + VALUE_INFO_FILE_NAME);
