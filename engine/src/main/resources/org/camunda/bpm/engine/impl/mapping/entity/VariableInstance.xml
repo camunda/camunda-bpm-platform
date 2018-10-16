@@ -460,6 +460,14 @@
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
+  <update id="updateByteArraysByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_GE_BYTEARRAY set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- BYTE ARRAY DELETE -->
 
   <select id="selectBytesOfByteArray" parameterType="string" resultType="hashmap">

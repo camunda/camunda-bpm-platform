@@ -51,6 +51,14 @@
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
+  <update id="updateAttachmentsByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_ATTACHMENT set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- ATTACHMENT DELETE -->
 
   <delete id="deleteAttachment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">

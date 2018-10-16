@@ -289,13 +289,19 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectFinishedDecisionInstancesReportEntitiesCount", query);
   }
 
-  public void addRemovalTimeToDecisionInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+  public void addRemovalTimeToDecisionsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
     getDbEntityManager()
-      .updatePreserveOrder(HistoricDecisionInstanceEntity.class, "updateHistoricDecisionInstanceEventsByRootId", parameters);
+      .updatePreserveOrder(HistoricDecisionInstanceEntity.class, "updateHistoricDecisionInstancesByRootProcessInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionInputInstanceEntity.class, "updateHistoricDecisionInputInstancesByRootProcessInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "updateHistoricDecisionOutputInstancesByRootProcessInstanceId", parameters);
   }
 
 }

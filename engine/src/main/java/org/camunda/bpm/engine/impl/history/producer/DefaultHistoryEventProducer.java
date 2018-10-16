@@ -579,7 +579,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
         addRemovalTimeToHistoricProcessInstances(evt.getRootProcessInstanceId(), removalTime);
 
         if (isDmnEnabled()) {
-          addRemovalTimeToHistoricDecisionInstances(evt.getRootProcessInstanceId(), removalTime);
+          addRemovalTimeToHistoricDecisions(evt.getRootProcessInstanceId(), removalTime);
         }
       }
     }
@@ -592,16 +592,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
-  protected void addRemovalTimeToHistoricDecisionInstances(String rootProcessInstanceId, Date removalTime) {
+  protected void addRemovalTimeToHistoricDecisions(String rootProcessInstanceId, Date removalTime) {
     Context.getCommandContext()
       .getHistoricDecisionInstanceManager()
-      .addRemovalTimeToDecisionInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+      .addRemovalTimeToDecisionsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
   }
 
   protected void addRemovalTimeToHistoricProcessInstances(String rootProcessInstanceId, Date removalTime) {
     Context.getCommandContext()
       .getHistoricProcessInstanceManager()
-      .addRemovalTimeToProcessInstancesByRootId(rootProcessInstanceId, removalTime);
+      .addRemovalTimeToProcessInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
   }
 
   protected boolean isDmnEnabled() {

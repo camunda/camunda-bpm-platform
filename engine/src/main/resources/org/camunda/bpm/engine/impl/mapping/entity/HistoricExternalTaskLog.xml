@@ -50,6 +50,16 @@
     )
   </insert>
 
+  <!-- UPDATE -->
+
+  <update id="updateExternalTaskLogByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_EXT_TASK_LOG set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- DELETE -->
 
   <delete id="deleteHistoricExternalTaskLogByProcessInstanceIds">

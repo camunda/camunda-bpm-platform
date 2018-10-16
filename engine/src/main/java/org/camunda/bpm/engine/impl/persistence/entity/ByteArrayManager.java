@@ -16,7 +16,9 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
-import java.util.List;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -37,4 +39,14 @@ public class ByteArrayManager extends AbstractManager {
     arr.setCreateTime(ClockUtil.getCurrentTime());
     getDbEntityManager().insert(arr);
   }
+
+  public void addRemovalTimeToByteArraysByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByRootProcessInstanceId", parameters);
+  }
+
 }

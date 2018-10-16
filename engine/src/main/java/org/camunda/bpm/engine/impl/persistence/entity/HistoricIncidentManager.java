@@ -12,13 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
@@ -37,6 +41,15 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
   public List<HistoricIncident> findHistoricIncidentByQueryCriteria(HistoricIncidentQueryImpl query, Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectHistoricIncidentByQueryCriteria", query, page);
+  }
+
+  public void addRemovalTimeToIncidentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricIncidentEventEntity.class, "updateHistoricIncidentsByRootProcessInstanceId", parameters);
   }
 
   public void deleteHistoricIncidentsByProcessInstanceIds(List<String> processInstanceIds) {

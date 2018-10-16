@@ -66,7 +66,7 @@
   
   <!-- update -->
 
-  <update id="updateHistoricDecisionInstanceEventsByRootId"
+  <update id="updateHistoricDecisionInstancesByRootProcessInstanceId"
           parameterType="java.util.Map">
       update ${prefix}ACT_HI_DECINST set
       REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}

@@ -154,12 +154,48 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectFinishedProcessInstancesReportEntitiesCount", query);
   }
 
-  public void addRemovalTimeToProcessInstancesByRootId(String rootId, Date removalTime) {
+  public void addRemovalTimeToProcessInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    commandContext.getHistoricActivityInstanceManager()
+      .addRemovalTimeToActivityInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getHistoricTaskInstanceManager()
+      .addRemovalTimeToTaskInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getHistoricDetailManager()
+      .addRemovalTimeToDetailsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getHistoricIncidentManager()
+      .addRemovalTimeToIncidentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getHistoricExternalTaskLogManager()
+      .addRemovalTimeToExternalTaskLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getHistoricJobLogManager()
+      .addRemovalTimeToJobLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getOperationLogManager()
+      .addRemovalTimeToUserOperationLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getHistoricIdentityLinkManager()
+      .addRemovalTimeToIdentityLinkLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getCommentManager()
+      .addRemovalTimeToCommentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getAttachmentManager()
+      .addRemovalTimeToAttachmentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    commandContext.getByteArrayManager()
+      .addRemovalTimeToByteArraysByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
     Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("rootId", rootId);
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
     getDbEntityManager()
       .updatePreserveOrder(HistoricProcessInstanceEventEntity.class, "updateHistoricProcessInstanceEventsByRootId", parameters);
   }
+
 }

@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -47,7 +46,6 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START;
 
 /**
  * @author Tassilo Weidner
@@ -89,16 +87,14 @@ public abstract class AbstractPartitioningTest {
     decisionService = engineRule.getDecisionService();
 
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-
-    processEngineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START)
-      .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
-      .initHistoryRemovalTime();
   }
 
   @AfterClass
   public static void tearDown() {
-    processEngineConfiguration.initHistoryRemovalTime();
+    processEngineConfiguration
+      .setHistoryRemovalTimeProvider(null)
+      .setHistoryRemovalTimeStrategy(null)
+      .initHistoryRemovalTime();
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId) {

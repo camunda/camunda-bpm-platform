@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,17 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
   public long findHistoricJobLogsCountByQueryCriteria(HistoricJobLogQueryImpl query) {
     configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectHistoricJobLogCountByQueryCriteria", query);
+  }
+
+  // update ///////////////////////////////////////////////////////////////////
+
+  public void addRemovalTimeToJobLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricJobLogEventEntity.class, "updateJobLogByRootProcessInstanceId", parameters);
   }
 
   // delete ///////////////////////////////////////////////////////////////////

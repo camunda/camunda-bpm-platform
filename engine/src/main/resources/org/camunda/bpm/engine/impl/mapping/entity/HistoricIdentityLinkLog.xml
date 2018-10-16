@@ -36,6 +36,16 @@
             #{removalTime, jdbcType=TIMESTAMP}
            )
   </insert>
+
+  <!-- HISTORIC IDENTITY LINK UPDATE -->
+
+  <update id="updateIdentityLinkLogByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_IDENTITYLINK set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
   
   <!-- HISTORIC IDENTITY LINK DELETE -->
 

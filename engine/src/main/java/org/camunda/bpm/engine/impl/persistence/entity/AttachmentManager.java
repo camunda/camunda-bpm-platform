@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,15 @@ public class AttachmentManager extends AbstractHistoricManager {
   public List<Attachment> findAttachmentsByTaskId(String taskId) {
     checkHistoryEnabled();
     return getDbEntityManager().selectList("selectAttachmentsByTaskId", taskId);
+  }
+
+  public void addRemovalTimeToAttachmentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(AttachmentEntity.class, "updateAttachmentsByRootProcessInstanceId", parameters);
   }
 
   @SuppressWarnings("unchecked")
