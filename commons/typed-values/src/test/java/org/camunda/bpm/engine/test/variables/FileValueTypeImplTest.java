@@ -175,6 +175,12 @@ public class FileValueTypeImplTest {
     type.createValue(file, Collections.<String, Object> emptyMap());
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void cannotCreateFileWithoutValueInfo() {
+    InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    type.createValue(file, null);
+  }
+
   @Test
   public void cannotCreateFileWithInvalidTransientFlag() {
     InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
