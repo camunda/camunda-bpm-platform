@@ -12,16 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.history.partitioning;
 
-import org.camunda.bpm.engine.DecisionService;
-import org.camunda.bpm.engine.ExternalTaskService;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
@@ -39,13 +29,9 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
@@ -54,23 +40,14 @@ import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
 import org.camunda.bpm.engine.test.bpmn.async.FailingDelegate;
 import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
-import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -84,8 +61,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 /**
  * @author Tassilo Weidner
  */
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class HistoricRootProcessInstanceTest {
+public class HistoricRootProcessInstanceTest extends AbstractPartitioningTest {
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
   protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
@@ -102,36 +78,6 @@ public class HistoricRootProcessInstanceTest {
       .callActivity()
         .calledElement(CALLED_PROCESS_KEY)
     .endEvent().done();
-
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  protected RuntimeService runtimeService;
-  protected FormService formService;
-  protected HistoryService historyService;
-  protected TaskService taskService;
-  protected ManagementService managementService;
-  protected RepositoryService repositoryService;
-  protected IdentityService identityService;
-  protected ExternalTaskService externalTaskService;
-  protected DecisionService decisionService;
-
-  @Before
-  public void init() {
-    runtimeService = engineRule.getRuntimeService();
-    formService = engineRule.getFormService();
-    historyService = engineRule.getHistoryService();
-    taskService = engineRule.getTaskService();
-    managementService = engineRule.getManagementService();
-    repositoryService = engineRule.getRepositoryService();
-    identityService = engineRule.getIdentityService();
-    externalTaskService = engineRule.getExternalTaskService();
-    decisionService = engineRule.getDecisionService();
-
-  }
 
   @Test
   @Deployment(resources = {
@@ -1232,72 +1178,6 @@ public class HistoricRootProcessInstanceTest {
 
     // then
     assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
-  }
-
-  protected ByteArrayEntity findByteArrayById(String byteArrayId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    return commandExecutor.execute(new GetByteArrayCommand(byteArrayId));
-  }
-
-  protected void clearAttachment(final Attachment attachment) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
-        return null;
-      }
-    });
-  }
-
-  protected void clearCommentByTaskId(final String taskId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getCommentManager().deleteCommentsByTaskId(taskId);
-        return null;
-      }
-    });
-  }
-
-  protected void clearCommentByProcessInstanceId(final String processInstanceId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getCommentManager().deleteCommentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
-        return null;
-      }
-    });
-  }
-
-  protected void clearHistoricTaskInst(final String taskId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(taskId);
-        commandContext.getHistoricIdentityLinkManager().deleteHistoricIdentityLinksLogByTaskId(taskId);
-        return null;
-      }
-    });
-  }
-
-  protected void clearJobLog(final String jobId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        return null;
-      }
-    });
-  }
-
-  protected void clearHistoricIncident(final HistoricIncident historicIncident) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricIncidentManager().delete((HistoricIncidentEntity) historicIncident);
-        return null;
-      }
-    });
   }
 
 }
