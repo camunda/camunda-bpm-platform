@@ -135,21 +135,23 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
   // Validate request token value with session token values
   protected boolean doTokenValidation(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+    HttpSession session = request.getSession();
     String tokenHeader = getCSRFTokenHeader(request);
+    String tokenSession = (String) session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME);
+    boolean isValid = true;
+
     if (isBlank(tokenHeader)) {
+      session.invalidate();
       response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, CsrfConstants.CSRF_TOKEN_HEADER_REQUIRED);
       response.sendError(getDenyStatus(), "CSRFPreventionFilter: Token provided via HTTP Header is absent/empty.");
-      return false;
-    }
-
-    HttpSession session = request.getSession();
-    String tokenSession = (String) session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME);
-    if (isBlank(tokenSession) || !tokenSession.equals(tokenHeader)) {
+      isValid = false;
+    } else if (isBlank(tokenSession) || !tokenSession.equals(tokenHeader)) {
+      session.invalidate();
       response.sendError(getDenyStatus(), "CSRFPreventionFilter: Invalid HTTP Header Token.");
-      return false;
+      isValid = false;
     }
 
-    return true;
+    return isValid;
   }
 
   protected boolean doSameOriginStandardHeadersVerification(HttpServletRequest request, HttpServletResponse response) throws IOException {
