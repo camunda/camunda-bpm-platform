@@ -59,6 +59,7 @@ public class TimerEntity extends JobEntity {
     processDefinitionId = te.processDefinitionId;
     processDefinitionKey = te.processDefinitionKey;
     tenantId = te.tenantId;
+    priority = te.priority;
   }
 
   @Override

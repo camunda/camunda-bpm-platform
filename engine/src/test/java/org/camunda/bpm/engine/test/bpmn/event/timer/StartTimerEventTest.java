@@ -150,10 +150,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
   }
 
-
-  // TODO: Consecutive jobs produced by a Timer Cycle don't have the defined JobPriority (https://app.camunda.com/jira/browse/SUPPORT-4899)
   @Deployment
-  public void FAILING_testPriorityInTimerCycleEvent() throws Exception {
+  public void testPriorityInTimerCycleEvent() throws Exception {
     ClockUtil.setCurrentTime(new Date());
 
     // After process start, there should be timer created
