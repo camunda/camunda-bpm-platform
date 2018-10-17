@@ -14,12 +14,15 @@
 package org.camunda.bpm.webapp.impl.security.filter;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -82,28 +85,55 @@ import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
  *
  * @author Nikola Koevski
  */
-public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
+public class CsrfPreventionFilter implements Filter {
 
-  protected static final Pattern NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
+  private static String randomClass = SecureRandom.class.getName();
 
-  protected static final Pattern DEFAULT_ENTRY_URL_PATTERN = Pattern.compile("^/api/admin/auth/user/.+/login/(cockpit|tasklist|admin|welcome)$");
-
-  private final Set<String> entryPoints = new HashSet<String>();
+  private static Random randomSource;
 
   private URL targetOrigin;
 
-  @Override public void init(FilterConfig filterConfig) throws ServletException {
-    super.init(filterConfig);
+  private int denyStatus = HttpServletResponse.SC_FORBIDDEN;
+
+  private final Set<String> entryPoints = new HashSet<String>();
+
+
+  @Override
+  public void init(FilterConfig filterConfig) throws ServletException {
     try {
+
+      String newRandomClass = filterConfig.getInitParameter("randomClass");
+      if (!isBlank(newRandomClass)) {
+        setRandomClass(newRandomClass);
+      }
+
+      Class<?> clazz = Class.forName(randomClass);
+      randomSource = (Random) clazz.getConstructor().newInstance();
+
       String targetOrigin = filterConfig.getInitParameter("targetOrigin");
       if (!isBlank(targetOrigin)) {
         setTargetOrigin(targetOrigin);
+      }
+
+      String customDenyStatus = filterConfig.getInitParameter("denyStatus");
+      if (!isBlank(customDenyStatus)) {
+        setDenyStatus(Integer.valueOf(customDenyStatus));
       }
 
       String customEntryPoints = filterConfig.getInitParameter("entryPoints");
       if (!isBlank(customEntryPoints)) {
         setEntryPoints(customEntryPoints);
       }
+    } catch (ClassNotFoundException e) {
+      throw new ServletException("Cannot instantiate CSRF Prevention filter: Random class not found.", e);
+    } catch (InstantiationException e) {
+      throw new ServletException("Cannot instantiate CSRF Prevention filter: cannot instantiate provided Random class", e);
+    } catch (InvocationTargetException e) {
+      throw new ServletException("Cannot instantiate CSRF Prevention filter: cannot instantiate provided Random class", e);
+    } catch (NoSuchMethodException e) {
+      throw new ServletException("Cannot instantiate CSRF Prevention filter: cannot instantiate provided Random class", e);
+    } catch (IllegalAccessException e) {
+      throw new ServletException("Cannot instantiate CSRF Prevention filter: Random class constructor not accessible", e);
     } catch (MalformedURLException e) {
       throw new ServletException("CSRFPreventionFilter: Could not read target origin URL: " + e.getMessage());
     }
@@ -116,7 +146,6 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
     HttpServletResponse response = (HttpServletResponse) servletResponse;
 
     if (!isNonModifyingRequest(request)) {
-      // Not a fetch request -> validate token
       boolean isTokenValid = doSameOriginStandardHeadersVerification(request, response)
         && doTokenValidation(request, response);
 
@@ -124,20 +153,24 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
         return;
       }
     }
-    else {
-      // Fetch request -> provide new token
-      fetchToken(request, response);
-    }
 
     filterChain.doFilter(request, response);
   }
 
-  // Validate request token value with session token values
+  /**
+   * Validates the provided CSRF token value from
+   * the request with the session CSRF token value.
+   *
+   * @param request
+   * @param response
+   * @return true if the token is valid
+   * @throws IOException
+   */
   protected boolean doTokenValidation(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     HttpSession session = request.getSession();
     String tokenHeader = getCSRFTokenHeader(request);
-    String tokenSession = (String) session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME);
+    String tokenSession = (String) getCSRFTokenSession(session);
     boolean isValid = true;
 
     if (isBlank(tokenHeader)) {
@@ -154,9 +187,17 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
     return isValid;
   }
 
+  /**
+   * Validates if the Origin/Referer header matches the provided target origin.
+   *
+   * @param request
+   * @param response
+   * @return true if the values match
+   * @throws IOException
+   */
   protected boolean doSameOriginStandardHeadersVerification(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // if target origin is not set, skip Same Origin with Standard Headers Verification
-    if (targetOrigin == null) {
+    if (getTargetOrigin() == null) {
       return true;
     }
 
@@ -173,67 +214,39 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
 
     //Compare the source against the expected target origin
     URL sourceURL = new URL(source);
-    if (!this.targetOrigin.getProtocol().equals(sourceURL.getProtocol())
-      || !this.targetOrigin.getHost().equals(sourceURL.getHost())
-      || this.targetOrigin.getPort() != sourceURL.getPort()) {
+    if (!getTargetOrigin().getProtocol().equals(sourceURL.getProtocol())
+      || !getTargetOrigin().getHost().equals(sourceURL.getHost())
+      || getTargetOrigin().getPort() != sourceURL.getPort()) {
+
       //If any part of the URL doesn't match, an error is reported
-      response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format("CSRFPreventionFilter: Protocol/Host/Port does not fully match: (%s != %s) ", this.targetOrigin, sourceURL));
+      response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format("CSRFPreventionFilter: Protocol/Host/Port does not fully match: (%s != %s) ", getTargetOrigin(), sourceURL));
       return false;
     }
 
     return true;
   }
 
-  protected Cookie getCSRFCookie(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(CsrfConstants.CSRF_TOKEN_COOKIE_NAME)) {
-          return cookie;
-        }
-      }
-    }
+  /**
+   * Generates a new CSRF Token which is persisted in the session.
+   * How the token is forwarded to the client and how it will be
+   * persisted there is not covered by this method.
+   *
+   * @param request
+   * @return the token string for client side handling
+   */
+  public static String setCSRFToken(HttpServletRequest request, HttpServletResponse response) {
 
-    return new Cookie(CsrfConstants.CSRF_TOKEN_COOKIE_NAME, null);
-  }
+    String token = generateCSRFToken();
 
-  protected String getCSRFTokenHeader(HttpServletRequest request) {
-    return request.getHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME);
-  }
 
-  // If the Request is a Fetch request, a new Token needs to be provided with the response.
-  protected void fetchToken(HttpServletRequest request, HttpServletResponse response) {
-    HttpSession session = request.getSession();
+    Cookie csrfCookie = new Cookie(CsrfConstants.CSRF_TOKEN_COOKIE_NAME, token);
+    csrfCookie.setPath(request.getContextPath());
 
-    if (session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME) == null) {
-      String token = generateToken();
+    request.getSession().setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
+    response.addCookie(csrfCookie);
+    response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
 
-      Cookie csrfCookie = getCSRFCookie(request);
-      csrfCookie.setValue(token);
-      csrfCookie.setPath(request.getContextPath());
-
-      session.setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
-      response.addCookie(csrfCookie);
-      response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
-    }
-  }
-
-  // A non-modifying request is one that is either a 'HTTP GET' request,
-  // or is allowed explicitly through the 'entryPoints' parameter in the web.xml
-  protected boolean isNonModifyingRequest(HttpServletRequest request) {
-    return NON_MODIFYING_METHODS_PATTERN.matcher(request.getMethod()).matches()
-        || DEFAULT_ENTRY_URL_PATTERN.matcher(getRequestedPath(request)).matches()
-        || entryPoints.contains(getRequestedPath(request));
-  }
-
-  private String getRequestedPath(HttpServletRequest request) {
-    String path = request.getServletPath();
-
-    if (request.getPathInfo() != null) {
-      path = path + request.getPathInfo();
-    }
-
-    return path;
+    return token;
   }
 
   public URL getTargetOrigin() {
@@ -260,11 +273,117 @@ public class CsrfPreventionFilter extends BaseCsrfPreventionFilter {
    * to HTTP GET requests and should not trigger any security sensitive
    * actions.
    *
-   * @param entryPoints   Comma separated list of URLs to be configured as
-   *                      entry points.
+   * @param entryPoints
+   *            Comma separated list of URLs to be configured as
+   *            entry points.
    */
   public void setEntryPoints(String entryPoints) {
     this.entryPoints.addAll(parseURLs(entryPoints));
+  }
+
+  /**
+   * @return the response status code that is used to reject a denied request.
+   */
+  public int getDenyStatus() {
+    return denyStatus;
+  }
+
+  /**
+   * Sets the response status code that is used to reject denied request.
+   * If none is set, the default value of 403 will be used.
+   *
+   * @param denyStatus
+   *            HTTP status code
+   */
+  public void setDenyStatus(int denyStatus) {
+    this.denyStatus = denyStatus;
+  }
+
+  public String getRandomClass() {
+    return randomClass;
+  }
+
+  /**
+   * Sets the name of the class to use to generate tokens. The class must
+   * be an instance of `java.util.Random`. If not set, the default value
+   * of `java.security.SecureRandom` will be used.
+   *
+   * @param randomClass
+   *            The name of the class
+   */
+  public void setRandomClass(String randomClass) {
+    this.randomClass = randomClass;
+  }
+
+  @Override
+  public void destroy() {
+  }
+
+  /**
+   * Generate a one-time token for authenticating subsequent
+   * requests.
+   *
+   * @return the generated token
+   */
+  protected static String generateCSRFToken() {
+    byte random[] = new byte[16];
+
+    // Render the result as a String of hexadecimal digits
+    StringBuilder buffer = new StringBuilder();
+
+    randomSource.nextBytes(random);
+
+    for (int j = 0; j < random.length; j++) {
+      byte b1 = (byte) ((random[j] & 0xf0) >> 4);
+      byte b2 = (byte) (random[j] & 0x0f);
+      if (b1 < 10) {
+        buffer.append((char) ('0' + b1));
+      } else {
+        buffer.append((char) ('A' + (b1 - 10)));
+      }
+      if (b2 < 10) {
+        buffer.append((char) ('0' + b2));
+      } else {
+        buffer.append((char) ('A' + (b2 - 10)));
+      }
+    }
+
+    return buffer.toString();
+  }
+
+  /**
+   * Determine if the request a non-modifying request. A non-modifying
+   * request is one that is either a 'HTTP GET/OPTIONS/HEAD' request, or
+   * is allowed explicitly through the 'entryPoints' parameter in the web.xml
+   *
+   * @return true if the request is a non-modifying request
+   * */
+  protected boolean isNonModifyingRequest(HttpServletRequest request) {
+    return CsrfConstants.CSRF_NON_MODIFYING_METHODS_PATTERN.matcher(request.getMethod()).matches()
+      || CsrfConstants.CSRF_DEFAULT_ENTRY_URL_PATTERN.matcher(getRequestedPath(request)).matches()
+      || entryPoints.contains(getRequestedPath(request));
+  }
+
+  private Object getCSRFTokenSession(HttpSession session) {
+    return session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME);
+  }
+
+  private String getCSRFTokenHeader(HttpServletRequest request) {
+    return request.getHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME);
+  }
+
+  private boolean isBlank(String s) {
+    return s == null || s.trim().isEmpty();
+  }
+
+  private String getRequestedPath(HttpServletRequest request) {
+    String path = request.getServletPath();
+
+    if (request.getPathInfo() != null) {
+      path = path + request.getPathInfo();
+    }
+
+    return path;
   }
 
   private Set<String> parseURLs(String urlString) {
