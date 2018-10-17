@@ -164,6 +164,7 @@ public class CsrfPreventionFilterTest {
       Assert.assertEquals(CSRF_HEADER_REQUIRED, response2.getHeader(CSRF_HEADER_NAME));
       Assert.assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response2.getStatus());
       Assert.assertEquals("CSRFPreventionFilter: Token provided via HTTP Header is absent/empty.", response2.getErrorMessage());
+      Assert.assertNotEquals(modifyingRequest.getSession().getId(), session.getId());
     }
   }
 
