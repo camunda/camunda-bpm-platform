@@ -129,7 +129,9 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
 
     for (Execution matchingExecution : matchingExecutions) {
       CorrelationHandlerResult correlationResult = CorrelationHandlerResult.matchedExecution((ExecutionEntity) matchingExecution);
-      result.add(correlationResult);
+      if (!commandContext.getDbEntityManager().isDeleted(correlationResult.getExecutionEntity())) {
+        result.add(correlationResult);
+      }
     }
 
     return result;

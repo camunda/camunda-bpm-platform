@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="_ersGAHYXEeSiaf32_fRHjA" targetNamespace="http://camunda.org/examples" exporter="Camunda Modeler" exporterVersion="1.11.2" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="waitForMessageProcess" isExecutable="true">
+    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="ReceiveTask_1" />
+    <bpmn2:endEvent id="EndEvent_1">
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="ReceiveTask_1" targetRef="EndEvent_1" />
+    <bpmn2:startEvent id="StartEvent_1" camunda:modelerTemplate="at.sozvers.zepta.process.modeler.extension.startnode">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property name="prozessEingangsDTO" value="" />
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:receiveTask id="ReceiveTask_1" name="Wait for Message" messageRef="Message_1932rjt">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+    </bpmn2:receiveTask>
+  </bpmn2:process>
+  <bpmn2:message id="Message_1932rjt" name="waitForCorrelationKeyMessage" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Wait_For_Message_Process">
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="StartEvent_1z0s33z_di" targetElement="ReceiveTask_0k9scmg_di">
+        <di:waypoint xsi:type="dc:Point" x="236" y="196" />
+        <di:waypoint xsi:type="dc:Point" x="286" y="196" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="216" y="171" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_50" bpmnElement="EndEvent_1">
+        <dc:Bounds x="436" y="178" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="ReceiveTask_0k9scmg_di" targetElement="_BPMNShape_EndEvent_50">
+        <di:waypoint xsi:type="dc:Point" x="386" y="196" />
+        <di:waypoint xsi:type="dc:Point" x="436" y="196" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="366" y="171" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1z0s33z_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="200" y="178" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="173" y="214" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveTask_0k9scmg_di" bpmnElement="ReceiveTask_1">
+        <dc:Bounds x="286" y="156" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
