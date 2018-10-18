@@ -963,6 +963,7 @@ public abstract class MockProvider {
     when(mockComment.getUserId()).thenReturn(EXAMPLE_USER_ID);
     when(mockComment.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_COMMENT_TIME));
     when(mockComment.getFullMessage()).thenReturn(EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+    when(mockComment.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_COMMENT_TIME));
     return mockComment;
   }
 

@@ -1955,6 +1955,7 @@ public class TaskRestServiceInteractionTest extends
       .body("userId", equalTo(EXAMPLE_USER_ID))
       .body("time", equalTo(EXAMPLE_TASK_COMMENT_TIME))
       .body("message", equalTo(EXAMPLE_TASK_COMMENT_FULL_MESSAGE))
+      .body("removalTime", equalTo(EXAMPLE_TASK_COMMENT_TIME))
     .when()
       .get(SINGLE_TASK_SINGLE_COMMENT_URL);
   }

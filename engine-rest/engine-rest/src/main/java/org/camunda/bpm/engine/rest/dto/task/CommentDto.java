@@ -24,6 +24,7 @@ public class CommentDto extends LinkableDto {
   private Date time;
   private String taskId;
   private String message;
+  private Date removalTime;
 
   public CommentDto() {
   }
@@ -64,6 +65,14 @@ public class CommentDto extends LinkableDto {
     this.message = message;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalDate) {
+    this.removalTime = removalDate;
+  }
+
   public static CommentDto fromComment(Comment comment) {
     CommentDto dto = new CommentDto();
     dto.id = comment.getId();
@@ -71,6 +80,7 @@ public class CommentDto extends LinkableDto {
     dto.time = comment.getTime();
     dto.taskId = comment.getTaskId();
     dto.message = comment.getFullMessage();
+    dto.removalTime = comment.getRemovalTime();
     return dto;
   }
 }
