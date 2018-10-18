@@ -27,7 +27,8 @@ public class HistoricDecisionOutputInstanceDto extends VariableValueDto {
   protected Integer ruleOrder;
   protected String variableName;
   protected String errorMessage;
-  protected Date createDate;
+  protected Date createTime;
+  protected Date removalTime;
 
   public String getId() {
     return id;
@@ -61,8 +62,12 @@ public class HistoricDecisionOutputInstanceDto extends VariableValueDto {
     return errorMessage;
   }
 
-  public Date getCreateDate() {
-    return createDate;
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
   }
 
   public static HistoricDecisionOutputInstanceDto fromHistoricDecisionOutputInstance(HistoricDecisionOutputInstance historicDecisionOutputInstance) {
@@ -76,7 +81,8 @@ public class HistoricDecisionOutputInstanceDto extends VariableValueDto {
     dto.ruleId = historicDecisionOutputInstance.getRuleId();
     dto.ruleOrder = historicDecisionOutputInstance.getRuleOrder();
     dto.variableName = historicDecisionOutputInstance.getVariableName();
-    dto.createDate = historicDecisionOutputInstance.getCreateTime();
+    dto.createTime = historicDecisionOutputInstance.getCreateTime();
+    dto.removalTime = historicDecisionOutputInstance.getRemovalTime();
 
     if(historicDecisionOutputInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicDecisionOutputInstance.getTypedValue());

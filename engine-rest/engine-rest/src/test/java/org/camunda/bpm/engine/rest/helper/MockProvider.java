@@ -812,6 +812,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_RULE_ID = "aDecisionInputRuleId";
   public static final Integer EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_RULE_ORDER = 12;
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CREATE_TIME = withTimezone("2015-09-06T11:00:00");
+  public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_REMOVAL_TIME = withTimezone("2015-10-18T11:00:00");
   public static final ObjectValue EXAMPLE_HISTORIC_DECISION_SERIALIZED_VALUE = MockObjectValue.fromObjectValue(Variables.objectValue("test").serializationDataFormat("aDataFormat").create()).objectTypeName("aTypeName");
   public static final BytesValue EXAMPLE_HISTORIC_DECISION_BYTE_ARRAY_VALUE = Variables.byteArrayValue("test".getBytes());
   public static final StringValue EXAMPLE_HISTORIC_DECISION_STRING_VALUE = Variables.stringValue("test");
@@ -2866,6 +2867,7 @@ public abstract class MockProvider {
     when(output.getTypedValue()).thenReturn(typedValue);
     when(output.getErrorMessage()).thenReturn(null);
     when(output.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CREATE_TIME));
+    when(output.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_REMOVAL_TIME));
     return output;
   }
 
