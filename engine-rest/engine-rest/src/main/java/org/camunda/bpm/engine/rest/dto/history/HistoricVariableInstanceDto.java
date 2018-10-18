@@ -34,7 +34,8 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
   private String errorMessage;
   private String tenantId;
   private String state;
-  private Date createDate;
+  private Date createTime;
+  private Date removalTime;
 
   public String getId() {
     return id;
@@ -96,8 +97,12 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     return state;
   }
 
-  public Date getCreateDate() {
-    return createDate;
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
   }
 
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
@@ -118,7 +123,8 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     dto.taskId = historicVariableInstance.getTaskId();
     dto.tenantId = historicVariableInstance.getTenantId();
     dto.state = historicVariableInstance.getState();
-    dto.createDate = historicVariableInstance.getCreateTime();
+    dto.createTime = historicVariableInstance.getCreateTime();
+    dto.removalTime = historicVariableInstance.getRemovalTime();
 
     if(historicVariableInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());

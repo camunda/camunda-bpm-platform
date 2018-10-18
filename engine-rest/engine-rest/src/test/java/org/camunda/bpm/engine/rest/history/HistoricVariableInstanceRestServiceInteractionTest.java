@@ -106,7 +106,8 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("tenantId", equalTo(builder.getTenantId()))
-      .body("createDate", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
+      .body("createTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
+      .body("removalTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_REMOVAL_TIME))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -148,7 +149,8 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("tenantId", equalTo(builder.getTenantId()))
-      .body("createDate", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
+      .body("createTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
+      .body("removalTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_REMOVAL_TIME))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -191,7 +193,8 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("tenantId", equalTo(builder.getTenantId()))
-      .body("createDate", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
+      .body("createTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
+      .body("removalTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_REMOVAL_TIME))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();

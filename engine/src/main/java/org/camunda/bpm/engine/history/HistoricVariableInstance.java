@@ -155,4 +155,7 @@ public interface HistoricVariableInstance {
    * The time when the variable was created.
    */
   Date getCreateTime();
+
+  /** The time when the historic variable instance will be removed. */
+  Date getRemovalTime();
 }
