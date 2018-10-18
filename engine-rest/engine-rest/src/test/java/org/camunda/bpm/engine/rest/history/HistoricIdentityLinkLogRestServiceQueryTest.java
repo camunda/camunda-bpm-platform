@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -227,6 +226,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedOperationType = from(content).getString("[0].operationType");
     Date loggedDate = DateTimeUtil.parseDate(from(content).getString("[0].time"));
+    Date returnedRemovalTime = DateTimeUtil.parseDate(from(content).getString("[0].removalTime"));
 
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TIME), loggedDate);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID, returnedAssignerId);
@@ -238,6 +238,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE, returnedType);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE, returnedOperationType);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_REMOVAL_TIME), returnedRemovalTime);
   }
 
   @Test

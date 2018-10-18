@@ -678,6 +678,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_IDENTITY_LINK_TYPE = "assignee";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE = "add";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_TIME = withTimezone("2014-01-05T00:00:00");
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_REMOVAL_TIME = withTimezone("2018-01-05T00:00:00");
   public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_BEFORE = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_AFTER = withTimezone("2014-01-06T00:00:00");
   public static final String EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID = "aAssignerId";
@@ -2185,6 +2186,7 @@ public abstract class MockProvider {
     when(identityLink.getProcessDefinitionId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID);
     when(identityLink.getProcessDefinitionKey()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY);
     when(identityLink.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_IDENTITY_LINK_TIME));
+    when(identityLink.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_IDENTITY_LINK_REMOVAL_TIME));
     return identityLink;
   }
 
