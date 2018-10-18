@@ -92,6 +92,14 @@
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
+  <update id="updateHistoricVariableInstancesByRootProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_VARINST set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- HISTORIC PROCESS VARIABLE DELETE -->
 
   <delete id="deleteHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">

@@ -163,6 +163,9 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     commandContext.getHistoricTaskInstanceManager()
       .addRemovalTimeToTaskInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
+    commandContext.getHistoricVariableInstanceManager()
+      .addRemovalTimeToVariableInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
     commandContext.getHistoricDetailManager()
       .addRemovalTimeToDetailsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 

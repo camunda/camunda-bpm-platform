@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
@@ -338,6 +339,41 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
 
     // then
     assertThat(historicTaskInstance.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  public void shouldResolveVariableInstance() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+
+    runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+
+    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+
+    // assume
+    assertThat(historicVariableInstance.getRemovalTime(), nullValue());
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    // when
+    taskService.complete(taskId);
+
+    historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+
+    Date removalTime = addDays(END_DATE, 5);
+
+    // then
+    assertThat(historicVariableInstance.getRemovalTime(), is(removalTime));
   }
 
   @Test
