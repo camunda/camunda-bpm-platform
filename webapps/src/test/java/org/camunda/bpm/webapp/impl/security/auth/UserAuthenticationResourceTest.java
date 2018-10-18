@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
+import javax.servlet.Filter;
+import javax.servlet.ServletException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -24,12 +26,16 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter;
+import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.mock.web.MockFilterConfig;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Thorben Lindhauer
@@ -44,13 +50,18 @@ public class UserAuthenticationResourceTest {
   protected ProcessEngineConfiguration processEngineConfiguration;
   protected IdentityService identityService;
   protected AuthorizationService authorizationService;
+  protected Filter csrfPreventionFilter;
 
   @Before
-  public void setUp() {
+  public void setUp() throws ServletException {
     this.processEngine = processEngineRule.getProcessEngine();
     this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
     this.identityService = processEngine.getIdentityService();
     this.authorizationService = processEngine.getAuthorizationService();
+
+    MockFilterConfig config = new MockFilterConfig();
+    csrfPreventionFilter = new CsrfPreventionFilter();
+    csrfPreventionFilter.init(config);
   }
 
   @After
@@ -111,7 +122,9 @@ public class UserAuthenticationResourceTest {
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
+    MockHttpServletResponse servletResponse = new MockHttpServletResponse();
     authResource.request = new MockHttpServletRequest();
+    authResource.response = servletResponse;
     String oldSessionId = authResource.request.getSession().getId();
 
     // first login session
@@ -128,6 +141,7 @@ public class UserAuthenticationResourceTest {
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     Assert.assertNotEquals(oldSessionId, newSessionId);
     Assert.assertNotEquals(newSessionId, newestSessionId);
+    Assert.assertNotNull(servletResponse.getHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME));
   }
 
   @Test
