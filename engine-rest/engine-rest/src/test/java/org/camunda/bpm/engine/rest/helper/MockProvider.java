@@ -626,6 +626,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_ASSIGNEE = "anAssignee";
   public static final String EXAMPLE_HISTORIC_TASK_INST_START_TIME = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HISTORIC_TASK_INST_END_TIME = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HISTORIC_TASK_INST_REMOVAL_TIME = withTimezone("2018-01-01T00:00:00");
   public static final Long EXAMPLE_HISTORIC_TASK_INST_DURATION = 5000L;
   public static final String EXAMPLE_HISTORIC_TASK_INST_DEF_KEY = "aTaskDefinitionKey";
   public static final int EXAMPLE_HISTORIC_TASK_INST_PRIORITY = 60;
@@ -2361,6 +2362,7 @@ public abstract class MockProvider {
     when(taskInstance.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID);
     when(taskInstance.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID);
     when(taskInstance.getTenantId()).thenReturn(tenantId);
+    when(taskInstance.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_REMOVAL_TIME));
     return taskInstance;
   }
 

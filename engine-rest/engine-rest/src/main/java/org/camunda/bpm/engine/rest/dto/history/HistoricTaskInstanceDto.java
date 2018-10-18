@@ -46,6 +46,7 @@ public class HistoricTaskInstanceDto {
   protected String parentTaskId;
   protected Date followUp;
   private String tenantId;
+  protected Date removalTime;
 
   public String getId() {
     return id;
@@ -143,6 +144,10 @@ public class HistoricTaskInstanceDto {
     return tenantId;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
   public static HistoricTaskInstanceDto fromHistoricTaskInstance(HistoricTaskInstance taskInstance) {
 
     HistoricTaskInstanceDto dto = new HistoricTaskInstanceDto();
@@ -171,6 +176,7 @@ public class HistoricTaskInstanceDto {
     dto.parentTaskId = taskInstance.getParentTaskId();
     dto.followUp = taskInstance.getFollowUpDate();
     dto.tenantId = taskInstance.getTenantId();
+    dto.removalTime = taskInstance.getRemovalTime();
 
     return dto;
   }
