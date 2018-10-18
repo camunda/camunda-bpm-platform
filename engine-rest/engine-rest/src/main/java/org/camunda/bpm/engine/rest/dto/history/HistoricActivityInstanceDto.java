@@ -37,6 +37,7 @@ public class HistoricActivityInstanceDto {
   private Boolean canceled;
   private Boolean completeScope;
   private String tenantId;
+  private Date removalTime;
 
   public String getId() {
     return id;
@@ -114,6 +115,10 @@ public class HistoricActivityInstanceDto {
     return tenantId;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
   public static HistoricActivityInstanceDto fromHistoricActivityInstance(HistoricActivityInstance historicActivityInstance) {
 
     HistoricActivityInstanceDto dto = new HistoricActivityInstanceDto();
@@ -137,6 +142,7 @@ public class HistoricActivityInstanceDto {
     dto.canceled = historicActivityInstance.isCanceled();
     dto.completeScope = historicActivityInstance.isCompleteScope();
     dto.tenantId = historicActivityInstance.getTenantId();
+    dto.removalTime = historicActivityInstance.getRemovalTime();
 
     return dto;
   }
