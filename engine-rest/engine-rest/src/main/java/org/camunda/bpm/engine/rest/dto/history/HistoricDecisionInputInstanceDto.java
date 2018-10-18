@@ -24,7 +24,8 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
   protected String clauseId;
   protected String clauseName;
   protected String errorMessage;
-  protected Date createDate;
+  protected Date createTime;
+  protected Date removalTime;
 
   public String getId() {
     return id;
@@ -46,8 +47,12 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
     return errorMessage;
   }
 
-  public Date getCreateDate() {
-    return createDate;
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
   }
 
   public static HistoricDecisionInputInstanceDto fromHistoricDecisionInputInstance(HistoricDecisionInputInstance historicDecisionInputInstance) {
@@ -58,7 +63,8 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
     dto.decisionInstanceId = historicDecisionInputInstance.getDecisionInstanceId();
     dto.clauseId = historicDecisionInputInstance.getClauseId();
     dto.clauseName = historicDecisionInputInstance.getClauseName();
-    dto.createDate = historicDecisionInputInstance.getCreateTime();
+    dto.createTime = historicDecisionInputInstance.getCreateTime();
+    dto.removalTime = historicDecisionInputInstance.getRemovalTime();
 
     if(historicDecisionInputInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicDecisionInputInstance.getTypedValue());
