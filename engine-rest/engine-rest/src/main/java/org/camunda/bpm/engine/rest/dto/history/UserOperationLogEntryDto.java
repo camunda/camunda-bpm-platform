@@ -44,6 +44,7 @@ public class UserOperationLogEntryDto {
   protected String property;
   protected String orgValue;
   protected String newValue;
+  protected Date removalTime;
 
   public static UserOperationLogEntryDto map(UserOperationLogEntry entry) {
     UserOperationLogEntryDto dto = new UserOperationLogEntryDto();
@@ -69,6 +70,7 @@ public class UserOperationLogEntryDto {
     dto.property = entry.getProperty();
     dto.orgValue = entry.getOrgValue();
     dto.newValue = entry.getNewValue();
+    dto.removalTime = entry.getRemovalTime();
 
     return dto;
   }
@@ -163,5 +165,9 @@ public class UserOperationLogEntryDto {
 
   public String getNewValue() {
     return newValue;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
   }
 }
