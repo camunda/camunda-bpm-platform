@@ -20,6 +20,7 @@ public class HistoricExternalTaskLogDto {
 
   protected String id;
   protected Date timestamp;
+  protected Date removalTime;
 
   protected String externalTaskId;
   protected String topicName;
@@ -118,11 +119,16 @@ public class HistoricExternalTaskLogDto {
     return deletionLog;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
   public static HistoricExternalTaskLogDto fromHistoricExternalTaskLog(HistoricExternalTaskLog historicExternalTaskLog) {
     HistoricExternalTaskLogDto result = new HistoricExternalTaskLogDto();
 
     result.id = historicExternalTaskLog.getId();
     result.timestamp = historicExternalTaskLog.getTimestamp();
+    result.removalTime = historicExternalTaskLog.getRemovalTime();
 
     result.externalTaskId = historicExternalTaskLog.getExternalTaskId();
     result.topicName = historicExternalTaskLog.getTopicName();

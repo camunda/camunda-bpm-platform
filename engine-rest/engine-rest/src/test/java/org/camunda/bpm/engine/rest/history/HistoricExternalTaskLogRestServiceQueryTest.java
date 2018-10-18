@@ -471,6 +471,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
 
     String returnedId = from(content).getString("[0].id");
     String returnedTimestamp = from(content).getString("[0].timestamp");
+    String returnedRemovalTime = from(content).getString("[0].removalTime");
     String returnedExternalTaskId = from(content).getString("[0].externalTaskId");
     String returnedExternalTaskTopicName = from(content).getString("[0].topicName");
     String returnedExternalTaskWorkerId = from(content).getString("[0].workerId");
@@ -490,6 +491,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
 
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ID, returnedId);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TIMESTAMP, returnedTimestamp);
+    assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_REMOVAL_TIME, returnedRemovalTime);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID, returnedExternalTaskId);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TOPIC_NAME, returnedExternalTaskTopicName);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_WORKER_ID, returnedExternalTaskWorkerId);
@@ -789,5 +791,5 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
       MockProvider.createMockHistoricExternalTaskLog(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
   }
 
-  
+
 }

@@ -73,6 +73,7 @@ public class HistoricExternalTaskLogRestServiceInteractionTest extends AbstractR
         .statusCode(Status.OK.getStatusCode())
         .body("id", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ID))
         .body("timestamp", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TIMESTAMP))
+        .body("removalTime", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_REMOVAL_TIME))
         .body("externalTaskId", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID))
         .body("topicName", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TOPIC_NAME))
         .body("workerId", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_WORKER_ID))

@@ -868,6 +868,7 @@ public abstract class MockProvider {
   // historic external task log
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ID = "aHistoricExternalTaskLogId";
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TIMESTAMP = withTimezone("2015-01-01T00:00:00");
+  public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_REMOVAL_TIME = withTimezone("2018-01-01T00:00:00");
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID = "anExternalTaskId";
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TOPIC_NAME = "aTopicName";
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_WORKER_ID = "aWorkerId";
@@ -3060,6 +3061,7 @@ public abstract class MockProvider {
 
     when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ID);
     when(mock.getTimestamp()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TIMESTAMP));
+    when(mock.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_REMOVAL_TIME));
 
     when(mock.getExternalTaskId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID);
     when(mock.getTopicName()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TOPIC_NAME);
