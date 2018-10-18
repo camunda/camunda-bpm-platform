@@ -26,6 +26,7 @@ public class AttachmentDto extends LinkableDto {
   private String type;
   private String url;
   private Date createTime;
+  private Date removalTime;
 
   public AttachmentDto() {
   }
@@ -86,6 +87,14 @@ public class AttachmentDto extends LinkableDto {
     this.createTime = createTime;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   public static AttachmentDto fromAttachment(Attachment attachment) {
     AttachmentDto dto = new AttachmentDto();
     dto.id = attachment.getId();
@@ -95,6 +104,7 @@ public class AttachmentDto extends LinkableDto {
     dto.taskId = attachment.getTaskId();
     dto.url = attachment.getUrl();
     dto.createTime = attachment.getCreateTime();
+    dto.removalTime = attachment.getRemovalTime();
     return dto;
   }
 }

@@ -2242,6 +2242,7 @@ public class TaskRestServiceInteractionTest extends
       .body("name", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_NAME))
       .body("url", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_URL))
       .body("createTime", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_CREATE_DATE))
+      .body("removalTime", equalTo(MockProvider.EXAMPLE_TASK_ATTACHMENT_REMOVAL_DATE))
     .when().get(SINGLE_TASK_SINGLE_ATTACHMENT_URL);
   }
 
