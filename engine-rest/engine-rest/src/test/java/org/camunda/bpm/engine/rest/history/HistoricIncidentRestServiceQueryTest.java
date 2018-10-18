@@ -3,7 +3,6 @@ package org.camunda.bpm.engine.rest.history;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_JOB_ACTIVITY_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_JOB_DEFINITION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_JOB_DEFINITION_ID;
 import static org.fest.assertions.Assertions.assertThat;
@@ -350,6 +349,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Boolean returnedIncidentResolved = from(content).getBoolean("[0].resolved");
     String returnedTenantId = from(content).getString("[0].tenantId");
     String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
+    Date returnedRemovalTime = DateTimeUtil.parseDate(from(content).getString("[0].removalTime"));
 
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
@@ -369,6 +369,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_STATE_RESOLVED, returnedIncidentResolved);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(EXAMPLE_JOB_DEFINITION_ID, returnedJobDefinitionId);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_INCIDENT_REMOVAL_TIME), returnedRemovalTime);
   }
 
   @Test

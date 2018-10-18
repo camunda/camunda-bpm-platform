@@ -29,6 +29,7 @@ public class HistoricIncidentDto {
   protected String executionId;
   protected Date createTime;
   protected Date endTime;
+  protected Date removalTime;
   protected String incidentType;
   protected String activityId;
   protected String causeIncidentId;
@@ -67,6 +68,10 @@ public class HistoricIncidentDto {
 
   public Date getEndTime() {
     return endTime;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
   }
 
   public String getIncidentType() {
@@ -134,6 +139,7 @@ public class HistoricIncidentDto {
     dto.resolved = historicIncident.isResolved();
     dto.tenantId = historicIncident.getTenantId();
     dto.jobDefinitionId = historicIncident.getJobDefinitionId();
+    dto.removalTime = historicIncident.getRemovalTime();
 
     return dto;
   }

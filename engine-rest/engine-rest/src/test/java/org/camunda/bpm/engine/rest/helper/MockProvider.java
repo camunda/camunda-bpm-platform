@@ -660,6 +660,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_INCIDENT_ID = "anIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HIST_INCIDENT_END_TIME = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_REMOVAL_TIME = withTimezone("2018-01-01T00:00:00");
   public static final String EXAMPLE_HIST_INCIDENT_TYPE = "anIncidentType";
   public static final String EXAMPLE_HIST_INCIDENT_EXECUTION_ID = "anExecutionId";
   public static final String EXAMPLE_HIST_INCIDENT_ACTIVITY_ID = "anActivityId";
@@ -2426,6 +2427,7 @@ public abstract class MockProvider {
     when(incident.isResolved()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_RESOLVED);
     when(incident.getTenantId()).thenReturn(tenantId);
     when(incident.getJobDefinitionId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
+    when(incident.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_INCIDENT_REMOVAL_TIME));
 
     return incident;
   }
