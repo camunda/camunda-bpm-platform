@@ -49,6 +49,7 @@ public abstract class HistoricDetailDto {
   protected String tenantId;
   protected String userOperationId;
   protected Date time;
+  protected Date removalTime;
 
   public String getId() {
     return id;
@@ -106,6 +107,10 @@ public abstract class HistoricDetailDto {
     return time;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
   public static HistoricDetailDto fromHistoricDetail(HistoricDetail historicDetail) {
 
     HistoricDetailDto dto = null;
@@ -138,6 +143,7 @@ public abstract class HistoricDetailDto {
     dto.tenantId = historicDetail.getTenantId();
     dto.userOperationId = historicDetail.getUserOperationId();
     dto.time = historicDetail.getTime();
+    dto.removalTime = historicDetail.getRemovalTime();
   }
 
 

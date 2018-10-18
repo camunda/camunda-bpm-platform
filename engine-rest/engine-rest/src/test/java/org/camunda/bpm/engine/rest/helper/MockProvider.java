@@ -2295,6 +2295,7 @@ public abstract class MockProvider {
     when(historicFromField.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID);
     when(historicFromField.getTaskId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_TASK_ID);
     when(historicFromField.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_FORM_FIELD_TIME));
+    when(historicFromField.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_FORM_FIELD_TIME));
     when(historicFromField.getFieldId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID);
     when(historicFromField.getFieldValue()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_VALUE);
     when(historicFromField.getCaseDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_KEY);
