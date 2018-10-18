@@ -48,7 +48,7 @@ public class HistoricJobLogRestServiceInteractionTest extends AbstractRestServic
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String HISTORIC_JOB_LOG_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/job-log";
   protected static final String SINGLE_HISTORIC_JOB_LOG_RESOURCE_URL = HISTORIC_JOB_LOG_RESOURCE_URL + "/{id}";
   protected static final String HISTORIC_JOB_LOG_RESOURCE_GET_STACKTRACE_URL = SINGLE_HISTORIC_JOB_LOG_RESOURCE_URL + "/stacktrace";
@@ -83,6 +83,7 @@ public class HistoricJobLogRestServiceInteractionTest extends AbstractRestServic
         .statusCode(Status.OK.getStatusCode())
         .body("id", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ID))
         .body("timestamp", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP))
+        .body("removalTime", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_REMOVAL_TIME))
         .body("jobId", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_ID))
         .body("jobDueDate", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE))
         .body("jobRetries", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES))

@@ -24,6 +24,7 @@ public class HistoricJobLogDto {
 
   protected String id;
   protected Date timestamp;
+  protected Date removalTime;
 
   protected String jobId;
   protected Date jobDueDate;
@@ -54,6 +55,10 @@ public class HistoricJobLogDto {
 
   public Date getTimestamp() {
     return timestamp;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
   }
 
   public String getJobId() {
@@ -137,6 +142,7 @@ public class HistoricJobLogDto {
 
     result.id = historicJobLog.getId();
     result.timestamp = historicJobLog.getTimestamp();
+    result.removalTime = historicJobLog.getRemovalTime();
 
     result.jobId = historicJobLog.getJobId();
     result.jobDueDate = historicJobLog.getJobDueDate();

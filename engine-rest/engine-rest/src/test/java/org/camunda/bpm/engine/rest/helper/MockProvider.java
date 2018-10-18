@@ -769,6 +769,7 @@ public abstract class MockProvider {
 
   public static final String EXAMPLE_HISTORIC_JOB_LOG_ID = "aHistoricJobLogId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP = withTimezone(withTimezone("2015-01-01T00:00:00"));
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_REMOVAL_TIME = withTimezone(withTimezone("2018-01-01T00:00:00"));
 
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_ID = "aJobId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE = withTimezone("2015-10-01T00:00:00");
@@ -2731,6 +2732,7 @@ public abstract class MockProvider {
 
     when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ID);
     when(mock.getTimestamp()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP));
+    when(mock.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_JOB_LOG_REMOVAL_TIME));
 
     when(mock.getJobId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_ID);
     when(mock.getJobDueDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE));
