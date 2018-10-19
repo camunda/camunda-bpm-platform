@@ -45,6 +45,7 @@ public class UserOperationLogEntryDto {
   protected String orgValue;
   protected String newValue;
   protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   public static UserOperationLogEntryDto map(UserOperationLogEntry entry) {
     UserOperationLogEntryDto dto = new UserOperationLogEntryDto();
@@ -71,6 +72,7 @@ public class UserOperationLogEntryDto {
     dto.orgValue = entry.getOrgValue();
     dto.newValue = entry.getNewValue();
     dto.removalTime = entry.getRemovalTime();
+    dto.rootProcessInstanceId = entry.getRootProcessInstanceId();
 
     return dto;
   }
@@ -170,4 +172,9 @@ public class UserOperationLogEntryDto {
   public Date getRemovalTime() {
     return removalTime;
   }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
 }
