@@ -170,6 +170,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";
   public static final String EXAMPLE_TASK_COMMENT_FULL_MESSAGE = "aTaskCommentFullMessage";
   public static final String EXAMPLE_TASK_COMMENT_TIME = withTimezone("2014-04-24T14:10:44");
+  public static final String EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
 
   // task attachment
   public static final String EXAMPLE_TASK_ATTACHMENT_ID = "aTaskAttachmentId";
@@ -974,6 +975,7 @@ public abstract class MockProvider {
     when(mockComment.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_COMMENT_TIME));
     when(mockComment.getFullMessage()).thenReturn(EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
     when(mockComment.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_COMMENT_TIME));
+    when(mockComment.getRootProcessInstanceId()).thenReturn(EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID);
     return mockComment;
   }
 

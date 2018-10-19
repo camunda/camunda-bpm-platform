@@ -25,6 +25,7 @@ public class CommentDto extends LinkableDto {
   private String taskId;
   private String message;
   private Date removalTime;
+  private String rootProcessInstanceId;
 
   public CommentDto() {
   }
@@ -73,6 +74,14 @@ public class CommentDto extends LinkableDto {
     this.removalTime = removalDate;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public static CommentDto fromComment(Comment comment) {
     CommentDto dto = new CommentDto();
     dto.id = comment.getId();
@@ -81,6 +90,8 @@ public class CommentDto extends LinkableDto {
     dto.taskId = comment.getTaskId();
     dto.message = comment.getFullMessage();
     dto.removalTime = comment.getRemovalTime();
+    dto.rootProcessInstanceId = comment.getRootProcessInstanceId();
+
     return dto;
   }
 }

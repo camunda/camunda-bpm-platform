@@ -15,6 +15,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTAC
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ATTACHMENT_URL;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_FULL_MESSAGE;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_COMMENT_TIME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_EXECUTION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
@@ -1956,6 +1957,7 @@ public class TaskRestServiceInteractionTest extends
       .body("time", equalTo(EXAMPLE_TASK_COMMENT_TIME))
       .body("message", equalTo(EXAMPLE_TASK_COMMENT_FULL_MESSAGE))
       .body("removalTime", equalTo(EXAMPLE_TASK_COMMENT_TIME))
+      .body("rootProcessInstanceId", equalTo(EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID))
     .when()
       .get(SINGLE_TASK_SINGLE_COMMENT_URL);
   }
