@@ -646,6 +646,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_INVOLVED_GROUP = "aGroupId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_HAD_CANDIDATE_USER = "cUserId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_HAD_CANDIDATE_GROUP = "cGroupId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_ROOT_PROC_INST_ID = "aRootProcInstId";
+
   // Incident
   public static final String EXAMPLE_INCIDENT_ID = "anIncidentId";
   public static final String EXAMPLE_INCIDENT_TIMESTAMP = withTimezone("2014-01-01T00:00:00");
@@ -2381,6 +2383,8 @@ public abstract class MockProvider {
     when(taskInstance.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID);
     when(taskInstance.getTenantId()).thenReturn(tenantId);
     when(taskInstance.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_REMOVAL_TIME));
+    when(taskInstance.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ROOT_PROC_INST_ID);
+
     return taskInstance;
   }
 

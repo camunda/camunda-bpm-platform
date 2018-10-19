@@ -47,6 +47,7 @@ public class HistoricTaskInstanceDto {
   protected Date followUp;
   private String tenantId;
   protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   public String getId() {
     return id;
@@ -148,6 +149,10 @@ public class HistoricTaskInstanceDto {
     return removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public static HistoricTaskInstanceDto fromHistoricTaskInstance(HistoricTaskInstance taskInstance) {
 
     HistoricTaskInstanceDto dto = new HistoricTaskInstanceDto();
@@ -177,6 +182,7 @@ public class HistoricTaskInstanceDto {
     dto.followUp = taskInstance.getFollowUpDate();
     dto.tenantId = taskInstance.getTenantId();
     dto.removalTime = taskInstance.getRemovalTime();
+    dto.rootProcessInstanceId = taskInstance.getRootProcessInstanceId();
 
     return dto;
   }
