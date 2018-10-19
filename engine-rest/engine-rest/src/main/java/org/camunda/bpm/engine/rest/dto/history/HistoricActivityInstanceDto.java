@@ -38,6 +38,7 @@ public class HistoricActivityInstanceDto {
   private Boolean completeScope;
   private String tenantId;
   private Date removalTime;
+  private String rootProcessInstanceId;
 
   public String getId() {
     return id;
@@ -119,6 +120,10 @@ public class HistoricActivityInstanceDto {
     return removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public static HistoricActivityInstanceDto fromHistoricActivityInstance(HistoricActivityInstance historicActivityInstance) {
 
     HistoricActivityInstanceDto dto = new HistoricActivityInstanceDto();
@@ -143,6 +148,7 @@ public class HistoricActivityInstanceDto {
     dto.completeScope = historicActivityInstance.isCompleteScope();
     dto.tenantId = historicActivityInstance.getTenantId();
     dto.removalTime = historicActivityInstance.getRemovalTime();
+    dto.rootProcessInstanceId = historicActivityInstance.getRootProcessInstanceId();
 
     return dto;
   }

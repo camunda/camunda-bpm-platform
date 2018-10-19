@@ -94,6 +94,7 @@ public class HistoricActivityInstanceRestServiceInteractionTest extends Abstract
     boolean completeScope = from(content).getBoolean("completeScope");
     String returnedTenantId = from(content).getString("tenantId");
     String returnedRemovalTime = from(content).getString("removalTime");
+    String returnedRootProcessInstanceId= from(content).getString("rootProcessInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_PARENT_ACTIVITY_INSTANCE_ID, returnedParentActivityInstanceId);
@@ -115,6 +116,7 @@ public class HistoricActivityInstanceRestServiceInteractionTest extends Abstract
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE, completeScope);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME, returnedRemovalTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_ROOT_PROCESS_INSTANCE_ID, returnedRootProcessInstanceId);
   }
 
   @Test
