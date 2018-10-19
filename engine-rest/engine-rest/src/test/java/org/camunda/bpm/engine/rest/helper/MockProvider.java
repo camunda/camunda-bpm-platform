@@ -673,6 +673,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_INCIDENT_PROC_INST_ID = "aProcInstId";
   public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_ID = "aProcDefId";
   public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY = "aProcDefKey";
+  public static final String EXAMPLE_HIST_INCIDENT_ROOT_PROC_INST_ID = "aRootProcInstId";
   public static final String EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID = "aCauseIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID = "aRootCauseIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_CONFIGURATION = "aConfiguration";
@@ -2447,6 +2448,7 @@ public abstract class MockProvider {
     when(incident.getTenantId()).thenReturn(tenantId);
     when(incident.getJobDefinitionId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
     when(incident.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_INCIDENT_REMOVAL_TIME));
+    when(incident.getRootProcessInstanceId()).thenReturn(EXAMPLE_HIST_INCIDENT_ROOT_PROC_INST_ID);
 
     return incident;
   }

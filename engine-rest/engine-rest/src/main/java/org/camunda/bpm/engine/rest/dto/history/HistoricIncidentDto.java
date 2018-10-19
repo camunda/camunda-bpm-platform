@@ -27,6 +27,7 @@ public class HistoricIncidentDto {
   protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
+  protected String rootProcessInstanceId;
   protected Date createTime;
   protected Date endTime;
   protected Date removalTime;
@@ -60,6 +61,10 @@ public class HistoricIncidentDto {
 
   public String getExecutionId() {
     return executionId;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
   }
 
   public Date getCreateTime() {
@@ -140,6 +145,7 @@ public class HistoricIncidentDto {
     dto.tenantId = historicIncident.getTenantId();
     dto.jobDefinitionId = historicIncident.getJobDefinitionId();
     dto.removalTime = historicIncident.getRemovalTime();
+    dto.rootProcessInstanceId = historicIncident.getRootProcessInstanceId();
 
     return dto;
   }
