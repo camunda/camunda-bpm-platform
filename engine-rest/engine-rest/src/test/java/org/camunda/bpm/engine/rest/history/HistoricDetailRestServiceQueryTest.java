@@ -582,6 +582,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     String returnedCaseExecutionId2 = from(content).getString("[1].caseExecutionId");
     String returnedTenantId2 = from(content).getString("[1].tenantId");
     String returnedOperationId2 = from(content).getString("[1].userOperationId");
+    String returnedRootProcessInstanceId = from(content).getString("[1].rootProcessInstanceId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ID, returnedId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY, returnedProcessDefinitionKey2);
@@ -602,6 +603,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID, returnedExecutionId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_OPERATION_ID, returnedOperationId2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_ROOT_PROCESS_INSTANCE_ID, returnedRootProcessInstanceId);
   }
 
   @Test

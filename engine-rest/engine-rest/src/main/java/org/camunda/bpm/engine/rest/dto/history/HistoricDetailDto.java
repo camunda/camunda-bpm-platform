@@ -50,6 +50,7 @@ public abstract class HistoricDetailDto {
   protected String userOperationId;
   protected Date time;
   protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   public String getId() {
     return id;
@@ -111,6 +112,10 @@ public abstract class HistoricDetailDto {
     return removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public static HistoricDetailDto fromHistoricDetail(HistoricDetail historicDetail) {
 
     HistoricDetailDto dto = null;
@@ -144,6 +149,7 @@ public abstract class HistoricDetailDto {
     dto.userOperationId = historicDetail.getUserOperationId();
     dto.time = historicDetail.getTime();
     dto.removalTime = historicDetail.getRemovalTime();
+    dto.rootProcessInstanceId = historicDetail.getRootProcessInstanceId();
   }
 
 

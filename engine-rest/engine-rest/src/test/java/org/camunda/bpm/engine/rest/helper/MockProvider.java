@@ -614,6 +614,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_ID = "aCaseDefId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_CASE_INST_ID = "aCaseInstId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID = "aCaseExecId";
+  public static final String EXAMPLE_HISTORIC_FORM_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
 
   // historic task instance
   public static final String EXAMPLE_HISTORIC_TASK_INST_ID = "aHistoricTaskInstanceId";
@@ -2320,6 +2321,7 @@ public abstract class MockProvider {
     when(historicFromField.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID);
     when(historicFromField.getTenantId()).thenReturn(tenantId);
     when(historicFromField.getUserOperationId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_OPERATION_ID);
+    when(historicFromField.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_ROOT_PROCESS_INSTANCE_ID);
 
     return historicFromField;
   }
