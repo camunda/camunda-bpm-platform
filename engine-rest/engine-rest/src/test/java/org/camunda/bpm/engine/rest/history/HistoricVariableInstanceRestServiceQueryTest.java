@@ -390,6 +390,7 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
           .body("[0].tenantId", equalTo(mockInstanceBuilder.getTenantId()))
           .body("[0].createTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
           .body("[0].removalTime", equalTo(MockProvider.EXAMPLE_HISTORIC_VARIABLE_INSTANCE_REMOVAL_TIME))
+          .body("[0].rootProcessInstanceId", equalTo(mockInstanceBuilder.getRootProcessInstanceId()))
       .when()
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 

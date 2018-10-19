@@ -48,6 +48,7 @@ public class MockHistoricVariableInstanceBuilder {
   protected String tenantId;
   protected Date createTime;
   protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   public MockHistoricVariableInstanceBuilder id(String id) {
     this.id = id;
@@ -134,6 +135,11 @@ public class MockHistoricVariableInstanceBuilder {
     return this;
   }
 
+  public MockHistoricVariableInstanceBuilder rootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+    return this;
+  }
+
   public String getId() {
     return id;
   }
@@ -206,6 +212,10 @@ public class MockHistoricVariableInstanceBuilder {
     return removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public HistoricVariableInstance build() {
     HistoricVariableInstance mockVariable = mock(HistoricVariableInstance.class);
     when(mockVariable.getId()).thenReturn(id);
@@ -241,6 +251,7 @@ public class MockHistoricVariableInstanceBuilder {
     when(mockVariable.getTenantId()).thenReturn(tenantId);
     when(mockVariable.getCreateTime()).thenReturn(createTime);
     when(mockVariable.getRemovalTime()).thenReturn(removalTime);
+    when(mockVariable.getRootProcessInstanceId()).thenReturn(rootProcessInstanceId);
 
     return mockVariable;
   }

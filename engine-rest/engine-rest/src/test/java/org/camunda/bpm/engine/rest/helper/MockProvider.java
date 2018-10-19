@@ -236,6 +236,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_ID = "aVariableInstanceCaseDefId";
   public static final String EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME = withTimezone("2013-04-23T13:42:43");
   public static final String EXAMPLE_HISTORIC_VARIABLE_INSTANCE_REMOVAL_TIME = withTimezone("2018-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_VARIABLE_INSTANCE_ROOT_PROC_INST_ID = "aRootProcInstId";
 
   public static final String EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE = "aSerializedValue";
   public static final byte[] EXAMPLE_VARIABLE_INSTANCE_BYTE = "aSerializedValue".getBytes();
@@ -2124,7 +2125,8 @@ public abstract class MockProvider {
         .tenantId(tenantId)
         .errorMessage(null)
         .createTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_VARIABLE_INSTANCE_CREATE_TIME))
-        .removalTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_VARIABLE_INSTANCE_REMOVAL_TIME));
+        .removalTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_VARIABLE_INSTANCE_REMOVAL_TIME))
+        .rootProcessInstanceId(EXAMPLE_HISTORIC_VARIABLE_INSTANCE_ROOT_PROC_INST_ID);
   }
 
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
