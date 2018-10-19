@@ -198,7 +198,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     parameters.put("removalTime", removalTime);
 
     getDbEntityManager()
-      .updatePreserveOrder(HistoricProcessInstanceEventEntity.class, "updateHistoricProcessInstanceEventsByRootId", parameters);
+      .updatePreserveOrder(HistoricProcessInstanceEventEntity.class, "updateHistoricProcessInstanceEventsByRootProcessInstanceId", parameters);
   }
 
 }

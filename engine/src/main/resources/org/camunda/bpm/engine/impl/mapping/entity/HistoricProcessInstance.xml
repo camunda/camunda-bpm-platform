@@ -100,7 +100,7 @@
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
 
-  <update id="updateHistoricProcessInstanceEventsByRootId"
+  <update id="updateHistoricProcessInstanceEventsByRootProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_PROCINST set
     REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
