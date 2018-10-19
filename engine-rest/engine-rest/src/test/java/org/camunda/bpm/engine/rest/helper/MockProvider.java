@@ -892,6 +892,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_INST_ID = "aProcInstId";
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_ID = "aProcDefId";
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_KEY = "aProcDefKey";
+  public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ROOT_PROC_INST_ID = "aRootProcInstId";
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_CREATION_LOG= true;
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_FAILURE_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_SUCCESS_LOG = true;
@@ -3100,6 +3101,8 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_ID);
     when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_KEY);
     when(mock.getTenantId()).thenReturn(tenantId);
+    when(mock.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ROOT_PROC_INST_ID);
+
     when(mock.isCreationLog()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_CREATION_LOG);
     when(mock.isFailureLog()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_FAILURE_LOG);
     when(mock.isSuccessLog()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_SUCCESS_LOG);

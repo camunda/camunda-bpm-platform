@@ -87,6 +87,7 @@ public class HistoricExternalTaskLogRestServiceInteractionTest extends AbstractR
         .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_ID))
         .body("processDefinitionKey", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_KEY))
         .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+        .body("rootProcessInstanceId", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ROOT_PROC_INST_ID))
         .body("creationLog", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_CREATION_LOG))
         .body("failureLog", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_FAILURE_LOG))
         .body("successLog", equalTo(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_SUCCESS_LOG))

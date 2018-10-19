@@ -484,6 +484,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
+    String returnedRootProcessInstanceId = from(content).getString("[0].rootProcessInstanceId");
     boolean returnedCreationLog = from(content).getBoolean("[0].creationLog");
     boolean returnedFailureLog = from(content).getBoolean("[0].failureLog");
     boolean returnedSuccessLog = from(content).getBoolean("[0].successLog");
@@ -504,6 +505,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_INST_ID, returnedProcessInstanceId);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_ID, returnedProcessDefinitionId);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_PROC_DEF_KEY, returnedProcessDefinitionKey);
+    assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ROOT_PROC_INST_ID, returnedRootProcessInstanceId);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_CREATION_LOG, returnedCreationLog);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_FAILURE_LOG, returnedFailureLog);
     assertEquals(MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_SUCCESS_LOG, returnedSuccessLog);

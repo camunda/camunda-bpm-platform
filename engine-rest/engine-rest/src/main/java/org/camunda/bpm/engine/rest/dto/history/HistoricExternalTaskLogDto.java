@@ -37,6 +37,7 @@ public class HistoricExternalTaskLogDto {
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String tenantId;
+  protected String rootProcessInstanceId;
 
   protected boolean creationLog;
   protected boolean failureLog;
@@ -123,6 +124,10 @@ public class HistoricExternalTaskLogDto {
     return removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public static HistoricExternalTaskLogDto fromHistoricExternalTaskLog(HistoricExternalTaskLog historicExternalTaskLog) {
     HistoricExternalTaskLogDto result = new HistoricExternalTaskLogDto();
 
@@ -145,6 +150,7 @@ public class HistoricExternalTaskLogDto {
     result.processDefinitionId = historicExternalTaskLog.getProcessDefinitionId();
     result.processDefinitionKey = historicExternalTaskLog.getProcessDefinitionKey();
     result.tenantId = historicExternalTaskLog.getTenantId();
+    result.rootProcessInstanceId = historicExternalTaskLog.getRootProcessInstanceId();
 
     result.creationLog = historicExternalTaskLog.isCreationLog();
     result.failureLog = historicExternalTaskLog.isFailureLog();
