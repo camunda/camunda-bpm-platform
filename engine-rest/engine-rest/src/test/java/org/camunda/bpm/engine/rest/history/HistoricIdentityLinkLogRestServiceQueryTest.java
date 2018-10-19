@@ -227,6 +227,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     String returnedOperationType = from(content).getString("[0].operationType");
     Date loggedDate = DateTimeUtil.parseDate(from(content).getString("[0].time"));
     Date returnedRemovalTime = DateTimeUtil.parseDate(from(content).getString("[0].removalTime"));
+    String returnedRootProcessInstanceId = from(content).getString("[0].rootProcessInstanceId");
 
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TIME), loggedDate);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID, returnedAssignerId);
@@ -239,6 +240,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE, returnedOperationType);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_REMOVAL_TIME), returnedRemovalTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_ROOT_PROC_INST_ID, returnedRootProcessInstanceId);
   }
 
   @Test
@@ -357,7 +359,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
 
     verify(mockedQuery).processDefinitionKey(processDefinitionKey);
   }
-  
+
   @Test
   public void testQueryByType() {
     String type = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE;

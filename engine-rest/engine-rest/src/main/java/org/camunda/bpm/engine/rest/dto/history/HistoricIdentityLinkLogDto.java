@@ -17,6 +17,7 @@ public class HistoricIdentityLinkLogDto {
   protected String assignerId;
   protected String tenantId;
   protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   public String getId() {
     return id;
@@ -66,6 +67,10 @@ public class HistoricIdentityLinkLogDto {
     return removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public static HistoricIdentityLinkLogDto fromHistoricIdentityLink(HistoricIdentityLinkLog historicIdentityLink) {
     HistoricIdentityLinkLogDto dto = new HistoricIdentityLinkLogDto();
     dto.id = historicIdentityLink.getId();
@@ -80,6 +85,8 @@ public class HistoricIdentityLinkLogDto {
     dto.userId = historicIdentityLink.getUserId();
     dto.tenantId = historicIdentityLink.getTenantId();
     dto.removalTime = historicIdentityLink.getRemovalTime();
+    dto.rootProcessInstanceId = historicIdentityLink.getRootProcessInstanceId();
+
     return dto;
   }
 }
