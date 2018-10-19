@@ -16,8 +16,11 @@ package org.camunda.bpm.model.bpmn.instance.camunda;
 import java.util.Arrays;
 import java.util.Collection;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstanceTest;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import static org.junit.Assert.fail;
 
 /**
  * @author Sebastian Menski
@@ -38,4 +41,50 @@ public class CamundaInputParameterTest extends BpmnModelElementInstanceTest {
     );
   }
 
+  @Ignore("Test ignored. CAM-9441: Bug fix needed")
+  @Test
+  public void testIntputParameterScriptChildAssignment() {
+    try {
+      CamundaInputParameter inputParamElement = modelInstance.newInstance(CamundaInputParameter.class);
+      inputParamElement.setCamundaName("aVariable");
+
+      CamundaScript scriptElement = modelInstance.newInstance(CamundaScript.class);
+      scriptElement.setCamundaScriptFormat("juel");
+      scriptElement.setTextContent("${'a script'}");
+
+      inputParamElement.addChildElement(scriptElement);
+    } catch (Exception e) {
+      fail("CamundaScript should be accepted as a child element of CamundaInputParameter. Error: " + e.getMessage());
+    }
+  }
+
+  @Ignore("Test ignored. CAM-9441: Bug fix needed")
+  @Test
+  public void testInputParameterListChildAssignment() {
+    try {
+      CamundaInputParameter inputParamElement = modelInstance.newInstance(CamundaInputParameter.class);
+      inputParamElement.setCamundaName("aVariable");
+
+      CamundaList listElement = modelInstance.newInstance(CamundaList.class);
+
+      inputParamElement.addChildElement(listElement);
+    } catch (Exception e) {
+      fail("CamundaList should be accepted as a child element of CamundaInputParameter. Error: " + e.getMessage());
+    }
+  }
+
+  @Ignore("Test ignored. CAM-9441: Bug fix needed")
+  @Test
+  public void testInputParameterMapChildAssignment() {
+    try {
+      CamundaInputParameter inputParamElement = modelInstance.newInstance(CamundaInputParameter.class);
+      inputParamElement.setCamundaName("aVariable");
+
+      CamundaMap listElement = modelInstance.newInstance(CamundaMap.class);
+
+      inputParamElement.addChildElement(listElement);
+    } catch (Exception e) {
+      fail("CamundaMap should be accepted as a child element of CamundaInputParameter. Error: " + e.getMessage());
+    }
+  }
 }
