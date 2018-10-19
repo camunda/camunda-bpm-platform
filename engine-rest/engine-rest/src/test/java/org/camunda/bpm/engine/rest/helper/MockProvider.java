@@ -179,6 +179,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_ATTACHMENT_URL = "aTaskAttachmentUrl";
   public static final String EXAMPLE_TASK_ATTACHMENT_CREATE_DATE = withTimezone("2018-07-19T15:02:36");
   public static final String EXAMPLE_TASK_ATTACHMENT_REMOVAL_DATE = withTimezone("2018-10-17T13:35:07");
+  public static final String EXAMPLE_TASK_ATTACHMENT_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
 
   // task count by candidate group
 
@@ -994,6 +995,7 @@ public abstract class MockProvider {
     when(mockAttachment.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mockAttachment.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_ATTACHMENT_CREATE_DATE));
     when(mockAttachment.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_TASK_ATTACHMENT_REMOVAL_DATE));
+    when(mockAttachment.getRootProcessInstanceId()).thenReturn(EXAMPLE_TASK_ATTACHMENT_ROOT_PROCESS_INSTANCE_ID);
 
     return mockAttachment;
   }

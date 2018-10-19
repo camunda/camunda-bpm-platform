@@ -27,6 +27,7 @@ public class AttachmentDto extends LinkableDto {
   private String url;
   private Date createTime;
   private Date removalTime;
+  private String rootProcessInstanceId;
 
   public AttachmentDto() {
   }
@@ -95,6 +96,14 @@ public class AttachmentDto extends LinkableDto {
     this.removalTime = removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
   public static AttachmentDto fromAttachment(Attachment attachment) {
     AttachmentDto dto = new AttachmentDto();
     dto.id = attachment.getId();
@@ -105,6 +114,7 @@ public class AttachmentDto extends LinkableDto {
     dto.url = attachment.getUrl();
     dto.createTime = attachment.getCreateTime();
     dto.removalTime = attachment.getRemovalTime();
+    dto.rootProcessInstanceId = attachment.getRootProcessInstanceId();
     return dto;
   }
 }
