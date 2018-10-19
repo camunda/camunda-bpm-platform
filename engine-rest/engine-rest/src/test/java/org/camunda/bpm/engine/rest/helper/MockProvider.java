@@ -813,6 +813,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_NAME = "aDecisionInputClauseName";
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CREATE_TIME = withTimezone("2015-09-06T11:00:00");
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_REMOVAL_TIME = withTimezone("2015-10-18T11:00:00");
+  public static final String EXAMPLE_HISTORIC_DECISION_INPUT_ROOT_PROCESS_INSTANCE_ID = "aRootProcInstId";
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_ID = "aDecisionInputInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_VARIABLE_NAME = "aDecisionInputInstanceName";
   public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CLAUSE_ID = "aDecisionInputClauseId";
@@ -2862,6 +2863,8 @@ public abstract class MockProvider {
     when(input.getErrorMessage()).thenReturn(null);
     when(input.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CREATE_TIME));
     when(input.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_REMOVAL_TIME));
+    when(input.getRootProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INPUT_ROOT_PROCESS_INSTANCE_ID);
+
     return input;
   }
 

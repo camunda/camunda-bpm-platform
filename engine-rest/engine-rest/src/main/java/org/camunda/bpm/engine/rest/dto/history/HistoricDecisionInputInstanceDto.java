@@ -26,6 +26,7 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
   protected String errorMessage;
   protected Date createTime;
   protected Date removalTime;
+  protected String rootProcessInstanceId;
 
   public String getId() {
     return id;
@@ -55,6 +56,10 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
     return removalTime;
   }
 
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
   public static HistoricDecisionInputInstanceDto fromHistoricDecisionInputInstance(HistoricDecisionInputInstance historicDecisionInputInstance) {
 
     HistoricDecisionInputInstanceDto dto = new HistoricDecisionInputInstanceDto();
@@ -65,6 +70,7 @@ public class HistoricDecisionInputInstanceDto extends VariableValueDto {
     dto.clauseName = historicDecisionInputInstance.getClauseName();
     dto.createTime = historicDecisionInputInstance.getCreateTime();
     dto.removalTime = historicDecisionInputInstance.getRemovalTime();
+    dto.rootProcessInstanceId = historicDecisionInputInstance.getRootProcessInstanceId();
 
     if(historicDecisionInputInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicDecisionInputInstance.getTypedValue());
