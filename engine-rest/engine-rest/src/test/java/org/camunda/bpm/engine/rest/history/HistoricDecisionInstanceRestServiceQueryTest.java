@@ -615,6 +615,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
       assertThat(returnedOutput, hasEntry("errorMessage", null));
       assertThat(returnedOutput, hasEntry("createTime", (Object) MockProvider.EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CREATE_TIME));
       assertThat(returnedOutput, hasEntry("removalTime", (Object) MockProvider.EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_REMOVAL_TIME));
+      assertThat(returnedOutput, hasEntry("rootProcessInstanceId", (Object) MockProvider.EXAMPLE_HISTORIC_DECISION_OUTPUT_ROOT_PROCESS_INSTANCE_ID));
     }
 
     verifyStringValue(returnedOutputs.get(0));
