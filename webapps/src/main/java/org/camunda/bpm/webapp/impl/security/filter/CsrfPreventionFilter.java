@@ -32,7 +32,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.Response;
 
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
 
 /**
@@ -87,9 +89,9 @@ import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
  */
 public class CsrfPreventionFilter implements Filter {
 
-  private static String randomClass = SecureRandom.class.getName();
+  private String randomClass = SecureRandom.class.getName();
 
-  private static Random randomSource;
+  private Random randomSource;
 
   private URL targetOrigin;
 
@@ -152,6 +154,9 @@ public class CsrfPreventionFilter implements Filter {
       if (!isTokenValid) {
         return;
       }
+    } else {
+      // Fetch request -> provide new token
+      setCSRFToken(request, response);
     }
 
     filterChain.doFilter(request, response);
@@ -234,19 +239,27 @@ public class CsrfPreventionFilter implements Filter {
    * @param request
    * @return the token string for client side handling
    */
-  public static String setCSRFToken(HttpServletRequest request, HttpServletResponse response) {
+  protected void setCSRFToken(HttpServletRequest request, HttpServletResponse response) {
+    HttpSession session = request.getSession();
+    Object sessionMutex = getSessionMutex(session);
 
-    String token = generateCSRFToken();
+    if (session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME) == null) {
 
+      synchronized (sessionMutex) {
 
-    Cookie csrfCookie = new Cookie(CsrfConstants.CSRF_TOKEN_COOKIE_NAME, token);
-    csrfCookie.setPath(request.getContextPath());
+        if (session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME) == null) {
+          String token = generateCSRFToken();
 
-    request.getSession().setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
-    response.addCookie(csrfCookie);
-    response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
+          Cookie csrfCookie = getCSRFCookie(request);
+          csrfCookie.setValue(token);
+          csrfCookie.setPath(request.getContextPath());
 
-    return token;
+          session.setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
+          response.addCookie(csrfCookie);
+          response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
+        }
+      }
+    }
   }
 
   public URL getTargetOrigin() {
@@ -320,12 +333,25 @@ public class CsrfPreventionFilter implements Filter {
   }
 
   /**
+   * Determine if the request a non-modifying request. A non-modifying
+   * request is one that is either a 'HTTP GET/OPTIONS/HEAD' request, or
+   * is allowed explicitly through the 'entryPoints' parameter in the web.xml
+   *
+   * @return true if the request is a non-modifying request
+   * */
+  protected boolean isNonModifyingRequest(HttpServletRequest request) {
+    return CsrfConstants.CSRF_NON_MODIFYING_METHODS_PATTERN.matcher(request.getMethod()).matches()
+      || CsrfConstants.CSRF_DEFAULT_ENTRY_URL_PATTERN.matcher(getRequestedPath(request)).matches()
+      || entryPoints.contains(getRequestedPath(request));
+  }
+
+  /**
    * Generate a one-time token for authenticating subsequent
    * requests.
    *
    * @return the generated token
    */
-  protected static String generateCSRFToken() {
+  protected String generateCSRFToken() {
     byte random[] = new byte[16];
 
     // Render the result as a String of hexadecimal digits
@@ -351,25 +377,38 @@ public class CsrfPreventionFilter implements Filter {
     return buffer.toString();
   }
 
-  /**
-   * Determine if the request a non-modifying request. A non-modifying
-   * request is one that is either a 'HTTP GET/OPTIONS/HEAD' request, or
-   * is allowed explicitly through the 'entryPoints' parameter in the web.xml
-   *
-   * @return true if the request is a non-modifying request
-   * */
-  protected boolean isNonModifyingRequest(HttpServletRequest request) {
-    return CsrfConstants.CSRF_NON_MODIFYING_METHODS_PATTERN.matcher(request.getMethod()).matches()
-      || CsrfConstants.CSRF_DEFAULT_ENTRY_URL_PATTERN.matcher(getRequestedPath(request)).matches()
-      || entryPoints.contains(getRequestedPath(request));
-  }
-
   private Object getCSRFTokenSession(HttpSession session) {
     return session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME);
   }
 
   private String getCSRFTokenHeader(HttpServletRequest request) {
     return request.getHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME);
+  }
+
+  private Cookie getCSRFCookie(HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals(CsrfConstants.CSRF_TOKEN_COOKIE_NAME)) {
+          return cookie;
+        }
+      }
+    }
+
+    return new Cookie(CsrfConstants.CSRF_TOKEN_COOKIE_NAME, null);
+  }
+
+  private Object getSessionMutex(HttpSession session) {
+    if (session == null) {
+      throw new InvalidRequestException(Response.Status.BAD_REQUEST, "HttpSession is missing");
+    }
+
+    Object mutex =  session.getAttribute(CsrfConstants.CSRF_SESSION_MUTEX);
+    if (mutex == null) {
+      mutex = session;
+    }
+
+    return mutex;
   }
 
   private boolean isBlank(String s) {
