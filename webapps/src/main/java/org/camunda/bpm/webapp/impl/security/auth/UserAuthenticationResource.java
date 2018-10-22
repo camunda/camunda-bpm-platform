@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -32,7 +31,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 
 /**
@@ -48,9 +46,6 @@ public class UserAuthenticationResource {
 
   @Context
   protected HttpServletRequest request;
-
-  @Context
-  protected HttpServletResponse response;
 
   @GET
   @Path("/{processEngineName}")
@@ -105,10 +100,6 @@ public class UserAuthenticationResource {
 
     if (request != null) {
       Authentications.revalidateSession(request, authentication);
-
-      // Using the HttpServletResponse object, since the JAX-RS Response appears to be
-      // incompatible with some lower level APIs and the Response-added token gets lost
-      CsrfPreventionFilter.setCSRFToken(request, response);
     }
 
     return Response.ok(AuthenticationDto.fromAuthentication(authentication)).build();
