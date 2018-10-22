@@ -22,6 +22,11 @@
     <listener-class>org.camunda.bpm.welcome.impl.web.bootstrap.WelcomeContainerBootstrap</listener-class>
   </listener>
 
+  <!-- http session mutex listener -->
+  <listener>
+    <listener-class>org.camunda.bpm.webapp.impl.security.filter.util.HttpSessionMutexListener</listener-class>
+  </listener>
+
   <!-- Container Based Authentication filter -->
   <!-- <filter>
     <filter-name>Container Based Authentication Filter</filter-name>
