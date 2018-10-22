@@ -46,7 +46,7 @@
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
-    <version.java.wildfly>1.7</version.java.wildfly>
+    <version.java.wildfly>1.8</version.java.wildfly>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />

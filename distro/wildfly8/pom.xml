@@ -14,48 +14,6 @@
 
   <name>camunda BPM - Wildfly 8</name>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M1</version>
-        <executions>
-          <execution>
-            <id>enforce-java</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireJavaVersion>
-                  <version>[1.7,)</version>
-                  <message>
-                    ****************************************************************************************************
-                    *                                                                                                  *
-                    *               You must use at least JDK 1.7 to compile Camunda Bpm Wildfly 8!!!                  *
-                    * Continue by excluding Wildfly from reactor by using '-P-distro-wildfly8' to disable the profile. *
-                    *                                                                                                  *
-                    ****************************************************************************************************
-                  </message>
-                </requireJavaVersion>
-              </rules>
-              <failFast>true</failFast>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>${version.java.wildfly}</source>
-          <target>${version.java.wildfly}</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
   <profiles>
     <profile>
       <id>distro</id>

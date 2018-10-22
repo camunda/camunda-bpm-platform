@@ -36,7 +36,6 @@
       </exclusions>
     </dependency>
 
-    <!-- overridden by respective wildfly profile (default manner) -->
     <dependency>
       <groupId>org.wildfly</groupId>
       <artifactId>wildfly-web-common</artifactId>
@@ -49,6 +48,13 @@
       <artifactId>wildfly-ejb3</artifactId>
       <version>${version.wildfly}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly.core</groupId>
+      <artifactId>wildfly-subsystem-test-framework</artifactId>
+      <version>${version.wildfly.core}</version>
+      <scope>test</scope>
     </dependency>
 
     <!-- test dependencies -->
@@ -84,66 +90,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>jdk-7-skip-tests</id>
-      <activation>
-        <jdk>1.7</jdk>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>default-testCompile</id>
-                <phase>test-compile</phase>
-                <configuration>
-                  <testExcludes>
-                    <exclude>**/BpmPlatformSubsystemTest.java</exclude>
-                    <exclude>**/JBossSubsystemXMLTest.java</exclude>
-                    <exclude>**/ReflectionCompatibilityTest.java</exclude>
-                  </testExcludes>
-                </configuration>
-                <goals>
-                  <goal>testCompile</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>wildfly</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-web-common</artifactId>
-          <version>${version.wildfly}</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-ejb3</artifactId>
-          <version>${version.wildfly}</version>
-          <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-          <groupId>org.wildfly.core</groupId>
-          <artifactId>wildfly-subsystem-test-framework</artifactId>
-          <version>${version.wildfly.core}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>

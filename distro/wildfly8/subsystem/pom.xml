@@ -36,6 +36,47 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-controller</artifactId>
+      <version>${version.wildfly8}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-server</artifactId>
+      <version>${version.wildfly8}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>sun.jdk</groupId>
+          <artifactId>jconsole</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-web-common</artifactId>
+      <version>${version.wildfly8}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-ejb3</artifactId>
+      <version>${version.wildfly8}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-subsystem-test-framework</artifactId>
+      <version>${version.wildfly8}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -69,52 +110,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>wildfly8</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-
-      <dependencies>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-controller</artifactId>
-          <version>${version.wildfly8}</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-server</artifactId>
-          <version>${version.wildfly8}</version>
-          <scope>provided</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>sun.jdk</groupId>
-              <artifactId>jconsole</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-web-common</artifactId>
-          <version>${version.wildfly8}</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-ejb3</artifactId>
-          <version>${version.wildfly8}</version>
-          <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-          <groupId>org.wildfly</groupId>
-          <artifactId>wildfly-subsystem-test-framework</artifactId>
-          <version>${version.wildfly8}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>
