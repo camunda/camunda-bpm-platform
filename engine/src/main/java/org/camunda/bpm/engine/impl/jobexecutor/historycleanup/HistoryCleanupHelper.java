@@ -57,12 +57,11 @@ public abstract class HistoryCleanupHelper {
    * instances and historic batches - and adds them to the batch.
    *
    * @param commandContext
-   * @param configuration
    * @return
    */
-  public static HistoryCleanupBatch getNextBatch(CommandContext commandContext, HistoryCleanupJobHandlerConfiguration configuration) {
+  public static void prepareNextBatch(HistoryCleanupBatch historyCleanupBatch, CommandContext commandContext) {
+    final HistoryCleanupJobHandlerConfiguration configuration = historyCleanupBatch.getConfiguration();
     final Integer batchSize = getHistoryCleanupBatchSize(commandContext);
-    HistoryCleanupBatch historyCleanupBatch = new HistoryCleanupBatch();
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
 
     //add process instance ids
@@ -108,8 +107,6 @@ public abstract class HistoryCleanupHelper {
         historyCleanupBatch.setHistoricBatchIds(historicBatchIds);
       }
     }
-
-    return historyCleanupBatch;
   }
 
   public static int[][] listMinuteChunks(int numberOfChunks) {

@@ -438,6 +438,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
         for (int statementResult : batchResult.getUpdateCounts()) {
           flushResultSize++;
           DbOperation thisOperation = operationIt.next();
+          thisOperation.setRowsAffected(statementResult);
           if (thisOperation instanceof DbEntityOperation && ((DbEntityOperation) thisOperation).getEntity() instanceof HasDbRevision
             && !thisOperation.getOperationType().equals(DbOperationType.INSERT)) {
             final DbEntity dbEntity = ((DbEntityOperation) thisOperation).getEntity();
@@ -627,9 +628,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
    * @param entityType
    * @param statement
    * @param parameter
+   * @return delete operation
    */
-  public void deletePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
-    performBulkOperationPreserveOrder(entityType, statement, parameter, DELETE_BULK);
+  public DbBulkOperation deletePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+    return performBulkOperationPreserveOrder(entityType, statement, parameter, DELETE_BULK);
   }
 
   protected DbBulkOperation performBulkOperation(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {

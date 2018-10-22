@@ -218,6 +218,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHand
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.BatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.DefaultBatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupBatch;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
@@ -737,6 +738,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected int historyCleanupDegreeOfParallelism = 1;
   protected boolean hierarchicalHistoryCleanup = true;
+  protected boolean historyCleanupByRemovalTime = false;
 
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
@@ -877,9 +879,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     initHistoryCleanupBatchWindowsMap();
 
-    if (historyCleanupBatchSize > HistoryCleanupBatch.MAX_BATCH_SIZE || historyCleanupBatchSize <= 0) {
+    if (historyCleanupBatchSize > HistoryCleanupHandler.MAX_BATCH_SIZE || historyCleanupBatchSize <= 0) {
       throw LOG.invalidPropertyValue("historyCleanupBatchSize", String.valueOf(historyCleanupBatchSize),
-          String.format("value for batch size should be between 1 and %s", HistoryCleanupBatch.MAX_BATCH_SIZE));
+          String.format("value for batch size should be between 1 and %s", HistoryCleanupHandler.MAX_BATCH_SIZE));
     }
 
     if (historyCleanupBatchThreshold < 0) {
@@ -4100,6 +4102,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupDegreeOfParallelism(int historyCleanupDegreeOfParallelism) {
     this.historyCleanupDegreeOfParallelism = historyCleanupDegreeOfParallelism;
+  }
+
+  public boolean isHistoryCleanupByRemovalTime() {
+    return historyCleanupByRemovalTime;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupByRemovalTime(boolean historyCleanupByRemovalTime) {
+    this.historyCleanupByRemovalTime = historyCleanupByRemovalTime;
+    return this;
   }
 
   public boolean isHierarchicalHistoryCleanup() {

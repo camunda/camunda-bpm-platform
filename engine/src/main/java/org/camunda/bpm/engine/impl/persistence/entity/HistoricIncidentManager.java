@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -85,6 +87,20 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
            historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_DELETE, null) ||
            historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_MIGRATE, null) ||
            historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_RESOLVE, null);
+  }
+
+  public DbOperation deleteHistoricIncidentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("removalTime", removalTime);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    parameters.put("batchSize", batchSize);
+
+    return getDbEntityManager()
+      .deletePreserveOrder(HistoricIncidentEntity.class, "deleteHistoricIncidentsByRemovalTime",
+        new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }

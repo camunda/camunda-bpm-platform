@@ -182,6 +182,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
     // execute the delete
     int nrOfRowsDeleted = executeDelete(deleteStatement, dbEntity);
+    operation.setRowsAffected(nrOfRowsDeleted);
 
     // It only makes sense to check for optimistic locking exceptions for objects that actually have a revision
     if (dbEntity instanceof HasDbRevision && nrOfRowsDeleted == 0) {
@@ -210,7 +211,8 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
     LOG.executeDatabaseBulkOperation("DELETE", statement, parameter);
 
-    executeDelete(statement, parameter);
+    int rowsAffected = executeDelete(statement, parameter);
+    operation.setRowsAffected(rowsAffected);
   }
 
   // update ////////////////////////////////////////

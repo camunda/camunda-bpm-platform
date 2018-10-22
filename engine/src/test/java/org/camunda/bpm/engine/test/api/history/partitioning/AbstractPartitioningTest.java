@@ -90,7 +90,7 @@ public abstract class AbstractPartitioningTest {
   }
 
   @AfterClass
-  public static void tearDown() {
+  public static void tearDownAfterAll() {
     if (processEngineConfiguration != null) {
       processEngineConfiguration
         .setHistoryRemovalTimeProvider(null)

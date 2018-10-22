@@ -28,6 +28,8 @@ public abstract class DbOperation implements Recyclable {
    */
   protected DbOperationType operationType;
 
+  protected int rowsAffected;
+
   /**
    * The type of the DbEntity this operation is executed on.
    */
@@ -57,6 +59,14 @@ public abstract class DbOperation implements Recyclable {
 
   public void setOperationType(DbOperationType operationType) {
     this.operationType = operationType;
+  }
+
+  public int getRowsAffected() {
+    return rowsAffected;
+  }
+
+  public void setRowsAffected(int rowsAffected) {
+    this.rowsAffected = rowsAffected;
   }
 
 }

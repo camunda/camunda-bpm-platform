@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.CleanableHistoricDecisionInstanceReportImpl;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -302,6 +304,38 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
     getDbEntityManager()
       .updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "updateHistoricDecisionOutputInstancesByRootProcessInstanceId", parameters);
+  }
+
+  public Set<DbOperation> deleteHistoricDecisionsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("removalTime", removalTime);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    parameters.put("batchSize", batchSize);
+
+    Set<DbOperation> deleteOperations = new HashSet<>();
+
+    DbOperation deleteDecisionInputInstances = getDbEntityManager()
+      .deletePreserveOrder(HistoricDecisionInputInstanceEntity.class, "deleteHistoricDecisionInputInstancesByRemovalTime",
+        new ListQueryParameterObject(parameters, 0, batchSize));
+
+    deleteOperations.add(deleteDecisionInputInstances);
+
+    DbOperation deleteDecisionOutputInstances = getDbEntityManager()
+      .deletePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "deleteHistoricDecisionOutputInstancesByRemovalTime",
+        new ListQueryParameterObject(parameters, 0, batchSize));
+
+    deleteOperations.add(deleteDecisionOutputInstances);
+
+    DbOperation deleteDecisionInstances = getDbEntityManager()
+      .deletePreserveOrder(HistoricDecisionInstanceEntity.class, "deleteHistoricDecisionInstancesByRemovalTime",
+        new ListQueryParameterObject(parameters, 0, batchSize));
+
+    deleteOperations.add(deleteDecisionInstances);
+
+    return deleteOperations;
   }
 
 }
