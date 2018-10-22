@@ -82,7 +82,7 @@ public class CustomHistoryLevelIncidentTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
-      processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:" + getClass().getSimpleName());
+      processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:" + CustomHistoryLevelIncident.class.getSimpleName());
       List<HistoryLevel> levels = new ArrayList<>();
       levels.add(customHistoryLevelIncident);
       processEngineConfiguration.setCustomHistoryLevels(levels);
