@@ -61,6 +61,7 @@
     update ${prefix}ACT_RU_EXECUTION set
       REV_ = #{revisionNext, jdbcType=INTEGER},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      BUSINESS_KEY_ = #{businessKeyWithoutCascade, jdbcType=VARCHAR},
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       ACT_INST_ID_ = #{activityInstanceId, jdbcType=VARCHAR},
       IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN},

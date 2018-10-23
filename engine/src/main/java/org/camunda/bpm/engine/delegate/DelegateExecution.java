@@ -33,6 +33,14 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
   String getProcessBusinessKey();
 
   /**
+   * Configure a business key on the process instance this execution is associated
+   * with.
+   *
+   * @param businessKey the new business key
+   */
+  void setProcessBusinessKey(String businessKey);
+
+  /**
    * The process definition key for the process instance this execution is
    * associated with.
    */

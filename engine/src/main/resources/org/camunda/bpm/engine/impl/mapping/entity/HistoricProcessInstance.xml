@@ -83,6 +83,7 @@
     update ${prefix}ACT_HI_PROCINST set
     PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
     PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+    BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
     END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
     DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
     SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId, jdbcType=VARCHAR},

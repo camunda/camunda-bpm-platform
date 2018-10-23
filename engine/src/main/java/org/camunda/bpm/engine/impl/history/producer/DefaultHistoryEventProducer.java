@@ -525,7 +525,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
     // create event instance
-    HistoricProcessInstanceEventEntity evt = newProcessInstanceEventEntity(executionEntity);
+    HistoricProcessInstanceEventEntity evt = loadProcessInstanceEventEntity(executionEntity);
 
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_UPDATE);

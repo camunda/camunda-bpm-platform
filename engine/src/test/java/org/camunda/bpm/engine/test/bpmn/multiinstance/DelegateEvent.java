@@ -346,4 +346,9 @@ public class DelegateEvent implements DelegateExecution {
   public Incident createIncident(String incidentType, String configuration, String message) {
     throw notYetImplemented();
   }
+
+  @Override
+  public void setProcessBusinessKey(String businessKey) {
+    throw notYetImplemented();
+  }
 }
