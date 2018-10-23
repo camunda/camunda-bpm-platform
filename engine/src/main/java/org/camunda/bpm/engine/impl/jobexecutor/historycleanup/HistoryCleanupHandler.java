@@ -12,11 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Tassilo Weidner
@@ -33,23 +34,22 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
   protected CommandExecutor commandExecutor;
 
   protected boolean isRescheduleNow;
+  protected Map<String, Long> report;
 
   public HistoryCleanupHandler() {
     isRescheduleNow = false;
+    report = new HashMap<>();
   }
 
   public void execute(CommandContext commandContext) {
     // passed commandContext may be in an inconsistent state
-    commandExecutor.execute(new HistoryCleanupSchedulerCmd(isRescheduleNow, configuration, jobId));
+    commandExecutor.execute(new HistoryCleanupSchedulerCmd(isRescheduleNow, report, configuration, jobId));
   }
 
   abstract void performCleanup();
 
-  protected void recordValue(String name, long value) {
-    ProcessEngineConfigurationImpl engineConfiguration = Context.getCommandContext().getProcessEngineConfiguration();
-    if (engineConfiguration.isHistoryCleanupMetricsEnabled()) {
-      engineConfiguration.getDbMetricsReporter().reportValueAtOnce(name, value);
-    }
+  protected void reportValue(String name, long value) {
+    report.put(name, value);
   }
 
   public HistoryCleanupJobHandlerConfiguration getConfiguration() {

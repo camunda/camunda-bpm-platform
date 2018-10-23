@@ -13,45 +13,51 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.Metrics;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Tassilo Weidner
  */
 public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
 
-  protected Set<DbOperation> deleteOperations;
+  protected Map<Class<? extends DbEntity>, DbOperation> deleteOperations;
 
   public HistoryCleanupRemovalTime() {
-    deleteOperations = new HashSet<>();
+    deleteOperations = new HashMap<>();
   }
 
   public void performCleanup() {
-    deleteOperations.addAll(performProcessCleanup());
+    deleteOperations.putAll(performProcessCleanup());
 
     if (isDmnEnabled()) {
-      deleteOperations.addAll(performDmnCleanup());
+      deleteOperations.putAll(performDmnCleanup());
     }
   }
 
   public void execute(CommandContext commandContext) {
+    reportMetrics();
+
     setRescheduleNow(isMaxBatchExceeded());
 
     super.execute(commandContext);
   }
 
-  protected Set<DbOperation> performDmnCleanup() {
+  protected Map<Class<? extends DbEntity>, DbOperation> performDmnCleanup() {
     return Context.getCommandContext().getHistoricDecisionInstanceManager()
       .deleteHistoricDecisionsByRemovalTime(ClockUtil.getCurrentTime(),
         configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSizePerDeleteOperation());
   }
 
-  protected Set<DbOperation> performProcessCleanup() {
+  protected Map<Class<? extends DbEntity>, DbOperation> performProcessCleanup() {
     return Context.getCommandContext().getHistoricProcessInstanceManager()
       .deleteHistoricProcessInstancesByRemovalTime(ClockUtil.getCurrentTime(),
         configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSizePerDeleteOperation());
@@ -62,8 +68,22 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
       .isDmnEnabled();
   }
 
+  protected void reportMetrics() {
+    DbOperation deleteOperationProcessInstance = deleteOperations.get(HistoricProcessInstanceEntity.class);
+    if (deleteOperationProcessInstance != null) {
+      reportValue(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, deleteOperationProcessInstance.getRowsAffected());
+    }
+
+    if (isDmnEnabled()) {
+      DbOperation deleteOperationDecisionInstance = deleteOperations.get(HistoricDecisionInstanceEntity.class);
+      if (deleteOperationDecisionInstance != null) {
+        reportValue(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, deleteOperationDecisionInstance.getRowsAffected());
+      }
+    }
+  }
+
   protected boolean isMaxBatchExceeded() {
-    for (DbOperation deleteOperation : deleteOperations) {
+    for (DbOperation deleteOperation : deleteOperations.values()) {
       if (deleteOperation.getRowsAffected() == getBatchSizePerDeleteOperation()) {
         return true;
       }

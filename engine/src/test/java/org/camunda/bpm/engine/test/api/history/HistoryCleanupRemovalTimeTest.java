@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -236,6 +237,38 @@ public class HistoryCleanupRemovalTimeTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  public void shouldReportMetricsForDecisionInstanceCleanup() {
+    // given
+    testRule.deploy(CALLING_PROCESS_CALLS_DMN);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
+      Variables.createVariables()
+        .putValue("temperature", 32)
+        .putValue("dayType", "Weekend"));
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+
+    managementService.executeJob(jobId);
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    runHistoryCleanup();
+
+    long removedDecisionInstancesSum = managementService.createMetricsQuery()
+      .name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES)
+      .sum();
+
+    // then
+    assertThat(removedDecisionInstancesSum, is(3L));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
   public void shouldCleanupDecisionInputInstance() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
@@ -345,6 +378,34 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(historicProcessInstances.size(), is(0));
+  }
+
+  @Test
+  public void shouldReportMetricsForProcessInstanceCleanup() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.complete(taskId);
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    runHistoryCleanup();
+
+    long removedProcessInstancesSum = managementService.createMetricsQuery()
+      .name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES)
+      .sum();
+
+    // then
+    assertThat(removedProcessInstancesSum, is(2L));
   }
 
   @Test

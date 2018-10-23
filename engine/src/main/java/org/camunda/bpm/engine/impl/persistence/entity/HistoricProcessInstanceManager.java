@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -204,70 +205,70 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
       .updatePreserveOrder(HistoricProcessInstanceEventEntity.class, "updateHistoricProcessInstanceEventsByRootProcessInstanceId", parameters);
   }
 
-  public Set<DbOperation> deleteHistoricProcessInstancesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public Map<Class<? extends DbEntity>, DbOperation> deleteHistoricProcessInstancesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
     CommandContext commandContext = Context.getCommandContext();
 
-    Set<DbOperation> deleteOperations = new HashSet<>();
+    Map<Class<? extends DbEntity>, DbOperation> deleteOperations = new HashMap<>();
 
     DbOperation deleteActivityInstances = commandContext.getHistoricActivityInstanceManager()
       .deleteHistoricActivityInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteActivityInstances);
+    deleteOperations.put(deleteActivityInstances.getEntityType(), deleteActivityInstances);
 
     DbOperation deleteTaskInstances = commandContext.getHistoricTaskInstanceManager()
       .deleteHistoricTaskInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteTaskInstances);
+    deleteOperations.put(deleteTaskInstances.getEntityType(), deleteTaskInstances);
 
     DbOperation deleteVariableInstances = commandContext.getHistoricVariableInstanceManager()
       .deleteHistoricVariableInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteVariableInstances);
+    deleteOperations.put(deleteVariableInstances.getEntityType(), deleteVariableInstances);
 
     DbOperation deleteDetails = commandContext.getHistoricDetailManager()
       .deleteHistoricDetailsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteDetails);
+    deleteOperations.put(deleteDetails.getEntityType(), deleteDetails);
 
     DbOperation deleteIncidents = commandContext.getHistoricIncidentManager()
       .deleteHistoricIncidentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteIncidents);
+    deleteOperations.put(deleteIncidents.getEntityType(), deleteIncidents);
 
     DbOperation deleteTaskLog = commandContext.getHistoricExternalTaskLogManager()
       .deleteExternalTaskLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteTaskLog);
+    deleteOperations.put(deleteTaskLog.getEntityType(), deleteTaskLog);
 
     DbOperation deleteJobLog = commandContext.getHistoricJobLogManager()
       .deleteJobLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteJobLog);
+    deleteOperations.put(deleteJobLog.getEntityType(), deleteJobLog);
 
     DbOperation deleteOperationLog = commandContext.getOperationLogManager()
       .deleteOperationLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteOperationLog);
+    deleteOperations.put(deleteOperationLog.getEntityType(), deleteOperationLog);
 
     DbOperation deleteIdentityLinkLog = commandContext.getHistoricIdentityLinkManager()
       .deleteHistoricIdentityLinkLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteIdentityLinkLog);
+    deleteOperations.put(deleteIdentityLinkLog.getEntityType(), deleteIdentityLinkLog);
 
     DbOperation deleteComments = commandContext.getCommentManager()
       .deleteCommentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteComments);
+    deleteOperations.put(deleteComments.getEntityType(), deleteComments);
 
     DbOperation deleteAttachments = commandContext.getAttachmentManager()
       .deleteAttachmentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteAttachments);
+    deleteOperations.put(deleteVariableInstances.getEntityType(), deleteAttachments);
 
     DbOperation deleteByteArrays = commandContext.getByteArrayManager()
       .deleteByteArraysByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.add(deleteByteArrays);
+    deleteOperations.put(deleteAttachments.getEntityType(), deleteByteArrays);
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
@@ -281,7 +282,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
       .deletePreserveOrder(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstancesByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
 
-    deleteOperations.add(deleteProcessInstances);
+    deleteOperations.put(deleteProcessInstances.getEntityType(), deleteProcessInstances);
 
     return deleteOperations;
   }
