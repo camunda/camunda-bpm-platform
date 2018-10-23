@@ -127,10 +127,9 @@ public class HistoryCleanupRemovalTimeTest {
 
     engineConfiguration
       .setHistoryCleanupByRemovalTime(true)
-      .setHistoryCleanupBatchSize(500);
+      .setHistoryCleanupBatchSize(HistoryCleanupHandler.MAX_BATCH_SIZE);
 
     engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
-    engineConfiguration.setHistoryCleanupBatchSize(HistoryCleanupHandler.MAX_BATCH_SIZE);
 
     engineConfiguration.initHistoryCleanup();
 
@@ -153,8 +152,12 @@ public class HistoryCleanupRemovalTimeTest {
       engineConfiguration
         .setHistoryRemovalTimeProvider(null)
         .setHistoryRemovalTimeStrategy(null)
-        .setHistoryCleanupByRemovalTime(false)
-        .initHistoryRemovalTime();
+        .setHistoryCleanupByRemovalTime(false);
+
+      engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
+
+      engineConfiguration.initHistoryRemovalTime();
+      engineConfiguration.initHistoryCleanup();
     }
   }
 
