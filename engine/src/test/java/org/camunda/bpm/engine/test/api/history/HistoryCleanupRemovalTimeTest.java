@@ -75,6 +75,7 @@ import static org.apache.commons.lang.time.DateUtils.addMinutes;
 import static org.apache.commons.lang.time.DateUtils.addSeconds;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END;
+import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler.MAX_BATCH_SIZE;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -126,11 +127,11 @@ public class HistoryCleanupRemovalTimeTest {
       .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
       .initHistoryRemovalTime();
 
-    engineConfiguration
-      .setHistoryCleanupByRemovalTime(true)
-      .setHistoryCleanupBatchSize(HistoryCleanupHandler.MAX_BATCH_SIZE);
+    engineConfiguration.setHistoryCleanupByRemovalTime(true);
 
+    engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
     engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
 
     engineConfiguration.initHistoryCleanup();
 
@@ -153,11 +154,14 @@ public class HistoryCleanupRemovalTimeTest {
       engineConfiguration
         .setHistoryRemovalTimeProvider(null)
         .setHistoryRemovalTimeStrategy(null)
-        .setHistoryCleanupByRemovalTime(false);
+        .initHistoryRemovalTime();
 
+      engineConfiguration.setHistoryCleanupByRemovalTime(false);
+
+      engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
       engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
+      engineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
 
-      engineConfiguration.initHistoryRemovalTime();
       engineConfiguration.initHistoryCleanup();
     }
   }
