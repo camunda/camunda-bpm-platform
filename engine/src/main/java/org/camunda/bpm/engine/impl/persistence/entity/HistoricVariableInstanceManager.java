@@ -159,7 +159,7 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
     parameters.put("batchSize", batchSize);
 
     return getDbEntityManager()
-      .deletePreserveOrder(HistoricProcessInstanceEntity.class, "deleteHistoricVariableInstancesByRemovalTime",
+      .deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstancesByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 }

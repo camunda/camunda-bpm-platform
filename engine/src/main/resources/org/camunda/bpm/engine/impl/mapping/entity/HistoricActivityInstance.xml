@@ -153,14 +153,14 @@
     ${limitAfterWithoutOffset}
   </delete>
 
-  <delete id="deleteHistoricActivityInstancesByRemovalTime_postgres"
+  <delete id="deleteHistoricActivityInstancesByRemovalTime_postgres_or_db2"
           parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     <bind name="date" value="'REMOVAL_TIME_'"/>
     <bind name="reportPeriodUnitName" value="'MINUTE'"/>
     delete from ${prefix}ACT_HI_ACTINST
     where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
     <include refid="andWhereMinuteInDateBetweenSql"/>
-    AND ID_ IN (SELECT ID_ FROM ${prefix}ACT_HI_ACTINST LIMIT #{parameter.maxResults})
+    AND ID_ IN (SELECT ID_ FROM ${prefix}ACT_HI_ACTINST ${limitAfterWithoutOffset})
   </delete>
 
   <!-- HISTORIC ACTIVITY INSTANCE RESULT MAP -->

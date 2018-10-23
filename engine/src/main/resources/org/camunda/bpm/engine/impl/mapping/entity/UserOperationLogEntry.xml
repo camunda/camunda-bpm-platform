@@ -125,14 +125,14 @@
     ${limitAfterWithoutOffset}
   </delete>
 
-  <delete id="deleteUserOperationLogByRemovalTime_postgres"
+  <delete id="deleteUserOperationLogByRemovalTime_postgres_or_db2"
           parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     <bind name="date" value="'REMOVAL_TIME_'"/>
     <bind name="reportPeriodUnitName" value="'MINUTE'"/>
     delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_OP_LOG
     where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
     <include refid="andWhereMinuteInDateBetweenSql"/>
-    AND ID_ IN (SELECT ID_ FROM ${prefix}ACT_HI_OP_LOG LIMIT #{parameter.maxResults})
+    AND ID_ IN (SELECT ID_ FROM ${prefix}ACT_HI_OP_LOG ${limitAfterWithoutOffset})
   </delete>
 
   <!--OPERATION LOG ENTRY RESULT MAP -->

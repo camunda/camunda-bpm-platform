@@ -263,12 +263,12 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     DbOperation deleteAttachments = commandContext.getAttachmentManager()
       .deleteAttachmentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.put(deleteVariableInstances.getEntityType(), deleteAttachments);
+    deleteOperations.put(deleteAttachments.getEntityType(), deleteAttachments);
 
     DbOperation deleteByteArrays = commandContext.getByteArrayManager()
       .deleteByteArraysByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
-    deleteOperations.put(deleteAttachments.getEntityType(), deleteByteArrays);
+    deleteOperations.put(deleteByteArrays.getEntityType(), deleteByteArrays);
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
