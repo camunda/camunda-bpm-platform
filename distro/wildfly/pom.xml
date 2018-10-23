@@ -35,6 +35,7 @@
                     *                                                                                                   *
                     *                    You must use at least JDK 1.8 to compile Camunda Bpm Wildfly!!!                *
                     *  Continue by excluding Wildfly from reactor by using '-P-distro-wildfly' to disable the profile.  *
+                    *                       (this will still compile the Camunda Wildfly 8 Subsystem)                   *
                     *                                                                                                   *
                     *****************************************************************************************************
                   </message>
