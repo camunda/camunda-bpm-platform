@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 
@@ -50,15 +51,17 @@ public class AuthenticationService {
 
   public Authentication createAuthenticate(ProcessEngine processEngine, String username, List<String> groupIds, List<String> tenantIds) {
 
+    User user = processEngine.getIdentityService().createUserQuery().userId(username).singleResult();
+    String userId = user.getId();
     // make sure authentication is executed without authentication :)
     processEngine.getIdentityService().clearAuthentication();
 
     if (groupIds == null) {
-      groupIds = getGroupsOfUser(processEngine, username);
+      groupIds = getGroupsOfUser(processEngine, userId);
     }
 
     if (tenantIds == null) {
-      tenantIds = getTenantsOfUser(processEngine, username);
+      tenantIds = getTenantsOfUser(processEngine, userId);
     }
 
     // check user's app authorizations
@@ -69,7 +72,7 @@ public class AuthenticationService {
 
     if (processEngine.getProcessEngineConfiguration().isAuthorizationEnabled()) {
       for (String application: APPS) {
-        if (isAuthorizedForApp(authorizationService, username, groupIds, application)) {
+        if (isAuthorizedForApp(authorizationService, userId, groupIds, application)) {
           authorizedApps.add(application);
         }
       }
@@ -79,7 +82,7 @@ public class AuthenticationService {
     }
 
     // create new authentication
-    UserAuthentication newAuthentication = new UserAuthentication(username, processEngine.getName());
+    UserAuthentication newAuthentication = new UserAuthentication(userId, processEngine.getName());
     newAuthentication.setGroupIds(groupIds);
     newAuthentication.setTenantIds(tenantIds);
     newAuthentication.setAuthorizedApps(authorizedApps);
