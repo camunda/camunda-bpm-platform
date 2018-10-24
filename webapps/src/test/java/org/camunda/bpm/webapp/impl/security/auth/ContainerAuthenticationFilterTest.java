@@ -44,12 +44,12 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
 import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider;
-import org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
@@ -183,6 +183,14 @@ public class ContainerAuthenticationFilterTest {
 
     when(currentEngine.getAuthorizationService()).thenReturn(authorizationService);
     when(currentEngine.getIdentityService()).thenReturn(identityService);
+
+    User mockedUser = mock(User.class);
+    when(mockedUser.getId()).thenReturn(MockProvider.EXAMPLE_USER_ID);
+
+    UserQuery mockUserQuery = mock(UserQuery.class);
+    when(identityService.createUserQuery()).thenReturn(mockUserQuery);
+    when(mockUserQuery.userId(anyString())).thenReturn(mockUserQuery);
+    when(mockUserQuery.singleResult()).thenReturn(mockedUser);
 
     GroupQuery mockGroupQuery = mock(GroupQuery.class);
     when(identityService.createGroupQuery()).thenReturn(mockGroupQuery);

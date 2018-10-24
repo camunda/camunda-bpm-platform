@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
-import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 
@@ -89,8 +88,7 @@ public class UserAuthenticationResource {
     }
 
     AuthenticationService authenticationService = new AuthenticationService();
-    User user = processEngine.getIdentityService().createUserQuery().userId(username).singleResult();
-    UserAuthentication authentication = (UserAuthentication) authenticationService.createAuthenticate(processEngine, user.getId(), null, null);
+    UserAuthentication authentication = (UserAuthentication) authenticationService.createAuthenticate(processEngine, username, null, null);
 
     Set<String> authorizedApps = authentication.getAuthorizedApps();
 
