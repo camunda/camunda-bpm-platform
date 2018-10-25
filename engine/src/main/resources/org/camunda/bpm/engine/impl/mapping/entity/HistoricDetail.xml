@@ -152,6 +152,11 @@
     <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
     <where>
       <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
+      <!-- https://app.camunda.com/jira/browse/CAM-9436 -->
+      <!-- null filter to speed up the history cleanup -->
+      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+        and D.TASK_ID_ is not null
+      </if>
     </where>
   </delete>
 
