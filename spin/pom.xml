@@ -107,17 +107,6 @@
 
     </dependencies>
   </dependencyManagement>
-  <profiles>
-    <profile>
-      <id>jackson-26</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <properties>
-        <jackson.version>2.6.3</jackson.version>
-      </properties>
-    </profile>
-  </profiles>
 
   <build>
     <pluginManagement>
