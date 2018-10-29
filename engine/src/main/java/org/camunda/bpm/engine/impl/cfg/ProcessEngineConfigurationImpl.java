@@ -668,6 +668,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableExpressionsInStoredQueries = true;
 
   /**
+   * If true, enables protection against XML eXternal Entity (XXE) Processing attacks.
+   */
+  protected boolean enableXXEProcessingProtection = true;
+
+  /**
    * If true, user operation log entries are only written if there is an
    * authenticated user present in the context. If false, user operation log
    * entries are written regardless of authentication state.
@@ -3718,6 +3723,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setEnableExpressionsInStoredQueries(boolean enableExpressionsInStoredQueries) {
     this.enableExpressionsInStoredQueries = enableExpressionsInStoredQueries;
+  }
+
+  public boolean isEnableXXEProcessingProtection() {
+    return enableXXEProcessingProtection;
+  }
+
+  public void setEnableXXEProcessingProtection(boolean enableXXEProcessingProtection) {
+    this.enableXXEProcessingProtection = enableXXEProcessingProtection;
   }
 
   public ProcessEngineConfigurationImpl setBpmnStacktraceVerbose(boolean isBpmnStacktraceVerbose) {

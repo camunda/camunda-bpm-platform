@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -48,6 +49,7 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class BpmnParseTest extends PluggableProcessEngineTestCase {
+
   public void testInvalidSubProcessWithTimerStartEvent() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithTimerStartEvent");
@@ -868,5 +870,15 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(1, processDefinitions.size());
 
     assertFalse(processDefinitions.get(0).isStartableInTasklist());
+  }
+
+  public void testXXEProcessing() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionXXE");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+    } catch (ProcessEngineException e) {
+      assertTextPresent("cvc-datatype-valid.1.2.1: ''", e.getMessage());
+      assertTextPresent("cvc-type.3.1.3: The value ''", e.getMessage());
+    }
   }
 }

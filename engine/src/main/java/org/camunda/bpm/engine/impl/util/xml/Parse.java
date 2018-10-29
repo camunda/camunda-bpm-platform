@@ -17,17 +17,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.io.InputStreamSource;
 import org.camunda.bpm.engine.impl.util.io.ResourceStreamSource;
 import org.camunda.bpm.engine.impl.util.io.StreamSource;
 import org.camunda.bpm.engine.impl.util.io.StringStreamSource;
 import org.camunda.bpm.engine.impl.util.io.UrlStreamSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -42,6 +46,7 @@ public class Parse extends DefaultHandler {
   private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
   private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
   private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+  private static final String XXA_PROCESSING = "http://xml.org/sax/features/external-general-entities";
 
   private static final String NEW_LINE = System.getProperty("line.separator");
 
@@ -116,6 +121,8 @@ public class Parse extends DefaultHandler {
   public Parse execute() {
     try {
       InputStream inputStream = streamSource.getInputStream();
+
+      setXXEProtection();
 
       if (schemaResource == null) { // must be done before parser is created
         parser.getSaxParserFactory().setNamespaceAware(false);
@@ -202,6 +209,17 @@ public class Parse extends DefaultHandler {
       LOG.unableToSetSchemaResource(e);
     }
     this.schemaResource = schemaResource;
+  }
+
+  protected void setXXEProtection() throws SAXNotSupportedException, SAXNotRecognizedException, ParserConfigurationException {
+    boolean isXXEProtectionEnabled = Context.getCommandContext()
+      .getProcessEngineConfiguration()
+      .isEnableXXEProcessingProtection();
+
+    // if XXE Protection is enabled, disable feature
+    boolean isXXEProtected = isXXEProtectionEnabled? false : true;
+
+    parser.getSaxParserFactory().setFeature(XXA_PROCESSING, isXXEProtected);
   }
 
 }
