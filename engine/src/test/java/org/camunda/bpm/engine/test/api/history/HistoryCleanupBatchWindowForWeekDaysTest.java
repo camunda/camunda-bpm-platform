@@ -3,7 +3,6 @@ package org.camunda.bpm.engine.test.api.history;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -11,16 +10,9 @@ import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.history.HistoricCaseInstance;
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.cfg.BatchWindowConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
@@ -58,11 +50,16 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
       configuration.setHistoryCleanupBatchThreshold(10);
       configuration.setDefaultNumberOfRetries(5);
 
-      configuration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("22:00", "01:00"));
-      configuration.getHistoryCleanupBatchWindows().put(Calendar.TUESDAY, new BatchWindowConfiguration("22:00", "23:00"));
-      configuration.getHistoryCleanupBatchWindows().put(Calendar.WEDNESDAY, new BatchWindowConfiguration("15:00", "20:00"));
-      configuration.getHistoryCleanupBatchWindows().put(Calendar.FRIDAY, new BatchWindowConfiguration("22:00", "01:00"));
-      configuration.getHistoryCleanupBatchWindows().put(Calendar.SUNDAY, new BatchWindowConfiguration("10:00", "20:00"));
+      configuration.setMondayHistoryCleanupBatchWindowStartTime("22:00");
+      configuration.setMondayHistoryCleanupBatchWindowEndTime("01:00");
+      configuration.setTuesdayHistoryCleanupBatchWindowStartTime("22:00");
+      configuration.setTuesdayHistoryCleanupBatchWindowEndTime("23:00");
+      configuration.setWednesdayHistoryCleanupBatchWindowStartTime("15:00");
+      configuration.setWednesdayHistoryCleanupBatchWindowEndTime("20:00");
+      configuration.setFridayHistoryCleanupBatchWindowStartTime("22:00");
+      configuration.setFridayHistoryCleanupBatchWindowEndTime("01:00");
+      configuration.setSundayHistoryCleanupBatchWindowStartTime("10:00");
+      configuration.setSundayHistoryCleanupBatchWindowEndTime("20:00");
 
       return configuration;
     }
@@ -145,8 +142,9 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
 
   @Test
   public void testScheduleJobForBatchWindow() throws ParseException {
-    ClockUtil.setCurrentTime(currentDate);
 
+    ClockUtil.setCurrentTime(currentDate);
+    processEngineConfiguration.initHistoryCleanup();
     Job job = historyService.cleanUpHistoryAsync();
 
     assertFalse(startDateForCheck.after(job.getDuedate())); // job due date is not before start date
@@ -168,11 +166,11 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
 
   @Test
   public void testScheduleJobForBatchWindowWithDefaultWindowConfigured() throws ParseException {
+    ClockUtil.setCurrentTime(currentDate);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("00:00");
     processEngineConfiguration.initHistoryCleanup();
 
-    ClockUtil.setCurrentTime(currentDate);
 
     Job job = historyService.cleanUpHistoryAsync();
 
@@ -202,13 +200,13 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
 
   @Test
   public void testScheduleJobForBatchWindowWithShortcutConfiguration() throws ParseException {
+    ClockUtil.setCurrentTime(currentDate);
     processEngineConfiguration.setThursdayHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setThursdayHistoryCleanupBatchWindowEndTime("00:00");
     processEngineConfiguration.setSaturdayHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setSaturdayHistoryCleanupBatchWindowEndTime("00:00");
     processEngineConfiguration.initHistoryCleanup();
 
-    ClockUtil.setCurrentTime(currentDate);
 
     Job job = historyService.cleanUpHistoryAsync();
 

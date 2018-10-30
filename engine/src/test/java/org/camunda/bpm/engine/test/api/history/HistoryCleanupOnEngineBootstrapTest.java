@@ -248,6 +248,7 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
   @Test
   public void testBatchWindowOneDayOfWeek() throws ParseException {
+    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T22:00:00"));       //monday
     //given
     final ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl)ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
     //we have batch window only once per week - Monday afternoon
@@ -256,7 +257,6 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
     //when
     //we're on Monday evening
-    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T22:00:00"));       //monday
     //and we bootstrap the engine
     ProcessEngine engine = configuration.buildProcessEngine();
 
