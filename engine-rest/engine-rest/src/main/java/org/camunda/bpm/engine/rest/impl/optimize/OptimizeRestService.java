@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,15 +14,15 @@ package org.camunda.bpm.engine.rest.impl.optimize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricOptimizeVariableUpdateDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricVariableUpdateDto;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 
 import javax.ws.rs.GET;
@@ -136,6 +136,30 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
       result.add(dto);
     }
     return result;
+  }
+
+  @GET
+  @Path("/decision-instance")
+  public List<HistoricDecisionInstanceDto> getHistoricDecisionInstances(@QueryParam("evaluatedAfter") String evaluatedAfterAsString,
+                                                                        @QueryParam("evaluatedAt") String evaluatedAtAsString,
+                                                                        @QueryParam("maxResults") int maxResults) {
+    Date evaluatedAfter = dateConverter.convertQueryParameterToType(evaluatedAfterAsString);
+    Date evaluatedAt = dateConverter.convertQueryParameterToType(evaluatedAtAsString);
+    maxResults = ensureValidMaxResults(maxResults);
+
+    ProcessEngineConfigurationImpl config =
+      (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+    List<HistoricDecisionInstance> historicDecisionInstances =
+      config.getOptimizeService().getHistoricDecisionInstances(evaluatedAfter, evaluatedAt, maxResults);
+
+    List<HistoricDecisionInstanceDto> resultList = new ArrayList<HistoricDecisionInstanceDto>();
+    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
+      HistoricDecisionInstanceDto dto =
+        HistoricDecisionInstanceDto.fromHistoricDecisionInstance(historicDecisionInstance);
+      resultList.add(dto);
+    }
+
+    return resultList;
   }
 
   protected int ensureValidMaxResults(int givenMaxResults) {

@@ -496,4 +496,25 @@
 
   </sql>
 
+  <select id="selectHistoricDecisionInstancePage" resultMap="historicDecisionInstanceResultMap"
+          parameterType="java.util.Map">
+    <bind name="maxResults" value="parameter.maxResults"/>
+
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_DECINST RES
+
+    <where>
+      <if test="parameter.evaluatedAfter != null">
+        and RES.EVAL_TIME_ &gt; #{parameter.evaluatedAfter}
+      </if>
+      <if test="test=parameter.evaluatedAt != null">
+        and RES.EVAL_TIME_ = #{parameter.evaluatedAt}
+      </if>
+    </where>
+
+    ORDER BY RES.EVAL_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+
+  </select>
+
 </mapper>

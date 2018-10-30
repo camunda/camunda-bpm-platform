@@ -13,10 +13,12 @@
 package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricActivityInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricProcessInstanceQueryCmd;
+import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricDecisionInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricVariableUpdateQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricProcessInstanceQueryCmd;
 
@@ -54,6 +56,14 @@ public class OptimizeService extends ServiceImpl {
                                                                  int maxResults) {
     return commandExecutor.execute(
       new OptimizeHistoricVariableUpdateQueryCmd(occurredAfter, occurredAt,maxResults)
+    );
+  }
+
+  public List<HistoricDecisionInstance> getHistoricDecisionInstances(Date evaluatedAfter,
+                                                                     Date evaluatedAt,
+                                                                     int maxResults) {
+    return commandExecutor.execute(
+      new OptimizeHistoricDecisionInstanceQueryCmd(evaluatedAfter, evaluatedAt, maxResults)
     );
   }
 

@@ -37,7 +37,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class OptimizeServiceAuthorizationTest extends AuthorizationTest {
+public class OptimizeProcessDefinitionServiceAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
   private OptimizeService optimizeService;

@@ -120,22 +120,27 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       @SuppressWarnings("unchecked")
       List<HistoricDecisionInstance> decisionInstances = getDbEntityManager().selectList("selectHistoricDecisionInstancesByQueryCriteria", query, page);
 
-      Map<String, HistoricDecisionInstanceEntity> decisionInstancesById = new HashMap<String, HistoricDecisionInstanceEntity>();
-      for(HistoricDecisionInstance decisionInstance : decisionInstances) {
-        decisionInstancesById.put(decisionInstance.getId(), (HistoricDecisionInstanceEntity) decisionInstance);
-      }
-
-      if (!decisionInstances.isEmpty() && query.isIncludeInput()) {
-        appendHistoricDecisionInputInstances(decisionInstancesById, query);
-      }
-
-      if(!decisionInstances.isEmpty() && query.isIncludeOutputs()) {
-        appendHistoricDecisionOutputInstances(decisionInstancesById, query);
-      }
+      enrichHistoricDecisionsWithInputsAndOutputs(query, decisionInstances);
 
       return decisionInstances;
     } else {
       return Collections.emptyList();
+    }
+  }
+
+  public void enrichHistoricDecisionsWithInputsAndOutputs(HistoricDecisionInstanceQueryImpl query, List<HistoricDecisionInstance> decisionInstances) {
+    Map<String, HistoricDecisionInstanceEntity> decisionInstancesById =
+      new HashMap<String, HistoricDecisionInstanceEntity>();
+    for(HistoricDecisionInstance decisionInstance : decisionInstances) {
+      decisionInstancesById.put(decisionInstance.getId(), (HistoricDecisionInstanceEntity) decisionInstance);
+    }
+
+    if (!decisionInstances.isEmpty() && query.isIncludeInput()) {
+      appendHistoricDecisionInputInstances(decisionInstancesById, query);
+    }
+
+    if(!decisionInstances.isEmpty() && query.isIncludeOutputs()) {
+      appendHistoricDecisionOutputInstances(decisionInstancesById, query);
     }
   }
 
