@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -39,7 +38,6 @@ import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -65,6 +63,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -72,11 +71,9 @@ import java.util.Set;
 
 import static org.apache.commons.lang.time.DateUtils.addDays;
 import static org.apache.commons.lang.time.DateUtils.addMinutes;
-import static org.apache.commons.lang.time.DateUtils.addSeconds;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler.MAX_BATCH_SIZE;
-import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -164,6 +161,8 @@ public class HistoryCleanupRemovalTimeTest {
 
       engineConfiguration.initHistoryCleanup();
     }
+
+    ClockUtil.reset();
   }
 
   protected final String PROCESS_KEY = "process";
@@ -870,79 +869,31 @@ public class HistoryCleanupRemovalTimeTest {
     assertThat(byteArray, nullValue());
   }
 
-  @Test
-  public void shouldRescheduleCleanupToNow() {
-    // given
-    testRule.deploy(CALLING_PROCESS);
-
-    testRule.deploy(PROCESS);
-
-    ClockUtil.setCurrentTime(END_DATE);
-
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
-
-    String taskId = taskService.createTaskQuery().singleResult().getId();
-    taskService.complete(taskId);
-
-    engineConfiguration.setHistoryCleanupBatchSize(6);
-    engineConfiguration.setHistoryCleanupBatchWindowStartTime("13:00");
-    engineConfiguration.initHistoryCleanup();
-
-    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
-
-    // when
-    runHistoryCleanup();
-
-    Job job = historyService.findHistoryCleanupJobs().get(0);
-
-    // then
-    assertThat(job.getDuedate(), is(ClockUtil.getCurrentTime()));
-  }
+  // parallelism test cases ////////////////////////////////////////////////////////////////////////////////////////////
 
   @Test
-  public void shouldRescheduleCleanupToLater() {
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldDistributeWorkForDecisions() {
     // given
-    testRule.deploy(CALLING_PROCESS);
-
-    testRule.deploy(PROCESS);
-
-    ClockUtil.setCurrentTime(END_DATE);
-
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
-
-    String taskId = taskService.createTaskQuery().singleResult().getId();
-    taskService.complete(taskId);
-
-    engineConfiguration.setHistoryCleanupBatchSize(7);
-    engineConfiguration.setHistoryCleanupBatchWindowStartTime("13:00");
-    engineConfiguration.initHistoryCleanup();
-
-    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
-
-    // when
-    runHistoryCleanup();
-
-    Job job = historyService.findHistoryCleanupJobs().get(0);
-
-    // then
-    assertThat(job.getDuedate(), is(addSeconds(ClockUtil.getCurrentTime(), START_DELAY)));
-  }
-
-  @Test
-  public void shouldDistributeWork() {
-    // given
-    testRule.deploy(PROCESS);
+    testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
     for (int i = 0; i < 60; i++) {
-      runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
+          Variables.createVariables()
+            .putValue("temperature", 32)
+            .putValue("dayType", "Weekend"));
 
-      ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
-      String taskId = taskService.createTaskQuery().singleResult().getId();
-      taskService.complete(taskId);
+        String jobId = managementService.createJobQuery().singleResult().getId();
+        managementService.executeJob(jobId);
+      }
     }
 
-    ClockUtil.setCurrentTime(addDays(END_DATE, 7));
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
 
     engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
     engineConfiguration.initHistoryCleanup();
@@ -951,11 +902,13 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    CleanableHistoricProcessInstanceReportResult reportResults = historyService.createCleanableHistoricProcessInstanceReport().list().get(0);
+    List<HistoricDecisionInstance> decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
 
     // assume
     assertThat(jobs.size(), is(3));
-    assertThat(reportResults.getCleanableProcessInstanceCount(), is(60L));
+    assertThat(decisionInstances.size(), is(45));
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
 
     Job jobOne = jobs.get(0);
     jobIds.add(jobOne.getId());
@@ -963,10 +916,10 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     managementService.executeJob(jobOne.getId());
 
-    reportResults = historyService.createCleanableHistoricProcessInstanceReport().list().get(0);
+    decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
 
     // then
-    assertThat(reportResults.getCleanableProcessInstanceCount(), is(40L));
+    assertThat(decisionInstances.size(), is(30));
 
     Job jobTwo = jobs.get(1);
     jobIds.add(jobTwo.getId());
@@ -974,10 +927,10 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     managementService.executeJob(jobTwo.getId());
 
-    reportResults = historyService.createCleanableHistoricProcessInstanceReport().list().get(0);
+    decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
 
     // then
-    assertThat(reportResults.getCleanableProcessInstanceCount(), is(20L));
+    assertThat(decisionInstances.size(), is(15));
 
     Job jobThree = jobs.get(2);
     jobIds.add(jobThree.getId());
@@ -985,10 +938,968 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     managementService.executeJob(jobThree.getId());
 
-    reportResults = historyService.createCleanableHistoricProcessInstanceReport().list().get(0);
+    decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
 
     // then
-    assertThat(reportResults.getCleanableProcessInstanceCount(), is(0L));
+    assertThat(decisionInstances.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForProcessInstances() {
+    // given
+    testRule.deploy(PROCESS);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(processInstances.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    processInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(processInstances.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    processInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(processInstances.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    processInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(processInstances.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForActivityInstances() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricActivityInstance> activityInstances = historyService.createHistoricActivityInstanceQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(activityInstances.size(), is(90));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    activityInstances = historyService.createHistoricActivityInstanceQuery().list();
+
+    // then
+    assertThat(activityInstances.size(), is(60));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    activityInstances = historyService.createHistoricActivityInstanceQuery().list();
+
+    // then
+    assertThat(activityInstances.size(), is(30));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    activityInstances = historyService.createHistoricActivityInstanceQuery().list();
+
+    // then
+    assertThat(activityInstances.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForTaskInstances() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(taskInstances.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertThat(taskInstances.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertThat(taskInstances.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+
+    // then
+    assertThat(taskInstances.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForVariableInstances() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricVariableInstance> variableInstances = historyService.createHistoricVariableInstanceQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(variableInstances.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    variableInstances = historyService.createHistoricVariableInstanceQuery().list();
+
+    // then
+    assertThat(variableInstances.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    variableInstances = historyService.createHistoricVariableInstanceQuery().list();
+
+    // then
+    assertThat(variableInstances.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    variableInstances = historyService.createHistoricVariableInstanceQuery().list();
+
+    // then
+    assertThat(variableInstances.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForDetails() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(historicDetails.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    historicDetails = historyService.createHistoricDetailQuery().list();
+
+    // then
+    assertThat(historicDetails.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    historicDetails = historyService.createHistoricDetailQuery().list();
+
+    // then
+    assertThat(historicDetails.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    historicDetails = historyService.createHistoricDetailQuery().list();
+
+    // then
+    assertThat(historicDetails.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForIncidents() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS_INCIDENT);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        String jobId = managementService.createJobQuery().singleResult().getId();
+
+        managementService.setJobRetries(jobId, 0);
+
+        try {
+          managementService.executeJob(jobId);
+        } catch (Exception ignored) { }
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(historicIncidents.size(), is(30));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    historicIncidents = historyService.createHistoricIncidentQuery().list();
+
+    // then
+    assertThat(historicIncidents.size(), is(20));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    historicIncidents = historyService.createHistoricIncidentQuery().list();
+
+    // then
+    assertThat(historicIncidents.size(), is(10));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    historicIncidents = historyService.createHistoricIncidentQuery().list();
+
+    // then
+    assertThat(historicIncidents.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForExternalTaskLogs() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
+      .startEvent()
+        .serviceTask().camundaExternalTask("anExternalTaskTopic")
+      .endEvent().done());
+
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
+      .camundaHistoryTimeToLive(5)
+      .startEvent()
+        .callActivity()
+          .calledElement("calledProcess")
+      .endEvent().done());
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey("callingProcess");
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
+          .topic("anExternalTaskTopic", 3000)
+          .execute()
+          .get(0);
+
+        externalTaskService.complete(externalTask.getId(), "aWorkerId");
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricExternalTaskLog> externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(externalTaskLogs.size(), is(30));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+
+    // then
+    assertThat(externalTaskLogs.size(), is(20));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+
+    // then
+    assertThat(externalTaskLogs.size(), is(10));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+
+    // then
+    assertThat(externalTaskLogs.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForJobLogs() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
+      .startEvent().camundaAsyncBefore()
+        .userTask("userTask").name("userTask")
+      .endEvent().done());
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        String jobId = managementService.createJobQuery()
+          .singleResult()
+          .getId();
+
+        managementService.executeJob(jobId);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(jobLogs.size(), is(30));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    jobLogs = historyService.createHistoricJobLogQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // then
+    assertThat(jobLogs.size(), is(20));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    jobLogs = historyService.createHistoricJobLogQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // then
+    assertThat(jobLogs.size(), is(10));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    jobLogs = historyService.createHistoricJobLogQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // then
+    assertThat(jobLogs.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForUserOperationLogs() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
+      .startEvent().camundaAsyncBefore()
+        .userTask("userTask").name("userTask")
+      .endEvent().done());
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        String jobId = managementService.createJobQuery()
+          .singleResult()
+          .getId();
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        identityService.setAuthenticatedUserId("aUserId");
+        managementService.setJobRetries(jobId, 65);
+        identityService.clearAuthentication();
+
+        managementService.executeJob(jobId);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<UserOperationLogEntry> userOperationLogs = historyService.createUserOperationLogQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(userOperationLogs.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    userOperationLogs = historyService.createUserOperationLogQuery().list();
+
+    // then
+    assertThat(userOperationLogs.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    userOperationLogs = historyService.createUserOperationLogQuery().list();
+
+    // then
+    assertThat(userOperationLogs.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    userOperationLogs = historyService.createUserOperationLogQuery().list();
+
+    // then
+    assertThat(userOperationLogs.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForIdentityLinkLogs() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+
+        taskService.addCandidateUser(taskId, "aUserId");
+
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<HistoricIdentityLinkLog> historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(historicIdentityLinkLogs.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+
+    // then
+    assertThat(historicIdentityLinkLogs.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+
+    // then
+    assertThat(historicIdentityLinkLogs.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+
+    // then
+    assertThat(historicIdentityLinkLogs.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForComment() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    List<String> processInstanceIds = new ArrayList<>();
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        String processInstanceId = runtimeService.createProcessInstanceQuery()
+          .activityIdIn("userTask")
+          .singleResult()
+          .getId();
+
+        processInstanceIds.add(processInstanceId);
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        taskService.createComment(null, processInstanceId, "aMessage");
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<Comment> comments = getCommentsBy(processInstanceIds);
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(comments.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    comments = getCommentsBy(processInstanceIds);
+
+    // then
+    assertThat(comments.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    comments = getCommentsBy(processInstanceIds);
+
+    // then
+    assertThat(comments.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    comments = getCommentsBy(processInstanceIds);
+
+    // then
+    assertThat(comments.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForAttachment() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    List<String> processInstanceIds = new ArrayList<>();
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        String processInstanceId = runtimeService.createProcessInstanceQuery()
+          .activityIdIn("userTask")
+          .singleResult()
+          .getId();
+
+        processInstanceIds.add(processInstanceId);
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    List<Attachment> attachments = getAttachmentsBy(processInstanceIds);
+
+    // assume
+    assertThat(jobs.size(), is(3));
+    assertThat(attachments.size(), is(15));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    attachments = getAttachmentsBy(processInstanceIds);
+
+    // then
+    assertThat(attachments.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    attachments = getAttachmentsBy(processInstanceIds);
+
+    // then
+    assertThat(attachments.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    attachments = getAttachmentsBy(processInstanceIds);
+
+    // then
+    assertThat(attachments.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForByteArray() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS_INCIDENT);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+        String jobId = managementService.createJobQuery()
+          .singleResult()
+          .getId();
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        try {
+          managementService.executeJob(jobId);
+        } catch (Exception ignored) { }
+
+        managementService.setJobRetries(jobId, 0);
+
+        managementService.executeJob(jobId);
+
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        taskService.complete(taskId);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    List<ByteArrayEntity> byteArrays = findByteArrays();
+
+    // then
+    assertThat(byteArrays.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    byteArrays = findByteArrays();
+
+    // then
+    assertThat(byteArrays.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    byteArrays = findByteArrays();
+
+    // then
+    assertThat(byteArrays.size(), is(0));
   }
 
   // helper /////////////////////////////////////////////////////////////////
@@ -1005,11 +1916,40 @@ public class HistoryCleanupRemovalTimeTest {
     return jobs;
   }
 
+  protected List<Attachment> getAttachmentsBy(List<String> processInstanceIds) {
+    List<Attachment> attachments = new ArrayList<>();
+    for (String processInstanceId : processInstanceIds) {
+      attachments.addAll(taskService.getProcessInstanceAttachments(processInstanceId));
+    }
 
+    return attachments;
+  }
+
+  protected List<Comment> getCommentsBy(List<String> processInstanceIds) {
+    List<Comment> comments = new ArrayList<>();
+    for (String processInstanceId : processInstanceIds) {
+      comments.addAll(taskService.getProcessInstanceComments(processInstanceId));
+    }
+
+    return comments;
+  }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId) {
     return engineConfiguration.getCommandExecutorTxRequired()
       .execute(new GetByteArrayCommand(byteArrayId));
+  }
+
+  protected List<ByteArrayEntity> findByteArrays() {
+    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
+      .failureLog()
+      .list();
+
+    List<ByteArrayEntity> byteArrays = new ArrayList<>();
+    for (HistoricJobLog jobLog: jobLogs) {
+      byteArrays.add(findByteArrayById(((HistoricJobLogEventEntity) jobLog).getExceptionByteArrayId()));
+    }
+
+    return byteArrays;
   }
 
   protected void clearJobLog(final String jobId) {

@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -97,6 +98,8 @@ public abstract class AbstractPartitioningTest {
         .setHistoryRemovalTimeStrategy(null)
         .initHistoryRemovalTime();
     }
+
+    ClockUtil.reset();
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId) {
