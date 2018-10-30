@@ -703,6 +703,7 @@
                 <exclude>**/CustomHistoryLevelWithoutUserOperationLogTest.java</exclude>
                 <exclude>**/CustomHistoryLevelIncidentTest.java</exclude>
                 <exclude>**/CustomHistoryLevelIdentityLinkTest.java</exclude>
+                <exclude>**/removaltime/cleanup/HistoryCleanupScheduler*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>
