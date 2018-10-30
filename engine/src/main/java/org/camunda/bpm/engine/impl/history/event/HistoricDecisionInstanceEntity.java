@@ -185,14 +185,6 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
     this.rootDecisionInstanceId = rootDecisionInstanceId;
   }
 
-  public String getRootProcessInstanceId() {
-    return rootProcessInstanceId;
-  }
-
-  public void setRootProcessInstanceId(String rootProcessInstanceId) {
-    this.rootProcessInstanceId = rootProcessInstanceId;
-  }
-
   public String getDecisionRequirementsDefinitionId() {
     return decisionRequirementsDefinitionId;
   }

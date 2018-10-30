@@ -33,7 +33,6 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
   protected String[] tenantIdIn;
   protected boolean isTenantIdSet = false;
   protected boolean isCompact = false;
-  protected boolean isHierarchicalHistoryCleanup = true;
 
   protected Date currentTimestamp;
 
@@ -82,9 +81,6 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    this.isHierarchicalHistoryCleanup = commandContext.getProcessEngineConfiguration()
-      .isHierarchicalHistoryCleanup();
-
     checkQueryOk();
     return commandContext
         .getHistoricProcessInstanceManager()
@@ -93,9 +89,6 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
 
   @Override
   public List<CleanableHistoricProcessInstanceReportResult> executeList(CommandContext commandContext, final Page page) {
-    this.isHierarchicalHistoryCleanup = commandContext.getProcessEngineConfiguration()
-      .isHierarchicalHistoryCleanup();
-
     checkQueryOk();
     return commandContext
         .getHistoricProcessInstanceManager()
@@ -132,9 +125,5 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
 
   public boolean isCompact() {
     return isCompact;
-  }
-
-  public boolean isHierarchicalHistoryCleanup() {
-    return isHierarchicalHistoryCleanup;
   }
 }

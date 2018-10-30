@@ -66,16 +66,15 @@ public class HistoryCleanupCmd implements Command<Job> {
     //find job instance
     List<Job> historyCleanupJobs = getHistoryCleanupJobs();
 
-    boolean isHierarchicalHistoryCleanup = processEngineConfiguration.isHierarchicalHistoryCleanup();
     int degreeOfParallelism = processEngineConfiguration.getHistoryCleanupDegreeOfParallelism();
     int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(degreeOfParallelism);
 
     if (shouldCreateJobs(historyCleanupJobs)) {
-      historyCleanupJobs = createJobs(degreeOfParallelism, minuteChunks, isHierarchicalHistoryCleanup);
+      historyCleanupJobs = createJobs(degreeOfParallelism, minuteChunks);
 
     }
     else if (shouldReconfigureJobs(historyCleanupJobs)) {
-      historyCleanupJobs = reconfigureJobs(historyCleanupJobs, degreeOfParallelism, minuteChunks, isHierarchicalHistoryCleanup);
+      historyCleanupJobs = reconfigureJobs(historyCleanupJobs, degreeOfParallelism, minuteChunks);
 
     }
     else if (shouldSuspendJobs(historyCleanupJobs)) {
@@ -108,7 +107,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     return immediatelyDue || HistoryCleanupHelper.isBatchWindowConfigured(commandContext);
   }
 
-  protected List<Job> createJobs(int degreeOfParallelism, int[][] minuteChunks, boolean isHierachicalHistoryCleanup) {
+  protected List<Job> createJobs(int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
 
     PropertyManager propertyManager = commandContext.getPropertyManager();
@@ -122,7 +121,7 @@ public class HistoryCleanupCmd implements Command<Job> {
 
     if (historyCleanupJobs.isEmpty()) {
       for (int[] minuteChunk : minuteChunks) {
-        JobEntity job = createJob(minuteChunk, isHierachicalHistoryCleanup);
+        JobEntity job = createJob(minuteChunk);
         jobManager.insertAndHintJobExecutor(job);
         historyCleanupJobs.add(job);
       }
@@ -132,7 +131,7 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   @SuppressWarnings("unchecked")
-  protected List<Job> reconfigureJobs(List<Job> historyCleanupJobs, int degreeOfParallelism, int[][] minuteChunks, boolean isHierarchicalHistoryCleanup) {
+  protected List<Job> reconfigureJobs(List<Job> historyCleanupJobs, int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
     JobManager jobManager = commandContext.getJobManager();
 
@@ -142,7 +141,7 @@ public class HistoryCleanupCmd implements Command<Job> {
       JobEntity historyCleanupJob = (JobEntity) historyCleanupJobs.get(i);
 
       //apply new configuration
-      HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunks[i], isHierarchicalHistoryCleanup);
+      HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunks[i]);
 
       HISTORY_CLEANUP_JOB_DECLARATION.reconfigure(historyCleanupContext, historyCleanupJob);
 
@@ -156,7 +155,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     if (delta > 0) {
       //create new job, as there are not enough of them
       for (int i = size; i < degreeOfParallelism; i++) {
-        JobEntity job = createJob(minuteChunks[i], isHierarchicalHistoryCleanup);
+        JobEntity job = createJob(minuteChunks[i]);
         jobManager.insertAndHintJobExecutor(job);
         historyCleanupJobs.add(job);
       }
@@ -183,14 +182,14 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   @SuppressWarnings("unchecked")
-  protected JobEntity createJob(int[] minuteChunk, boolean isHierarchicalHistoryCleanup) {
-    HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunk, isHierarchicalHistoryCleanup);
+  protected JobEntity createJob(int[] minuteChunk) {
+    HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunk);
     return HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(historyCleanupContext);
   }
 
-  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk, boolean isHierarchicalHistoryCleanup) {
+  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk) {
     int minuteFrom = minuteChunk[0];
     int minuteTo = minuteChunk[1];
-    return new HistoryCleanupContext(immediatelyDue, minuteFrom, minuteTo, isHierarchicalHistoryCleanup);
+    return new HistoryCleanupContext(immediatelyDue, minuteFrom, minuteTo);
   }
 }

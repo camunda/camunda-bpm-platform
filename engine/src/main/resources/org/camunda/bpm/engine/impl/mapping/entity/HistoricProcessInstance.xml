@@ -497,16 +497,6 @@
         AND ${dayComparator}
   </sql>
 
-  <sql id="selectHierarchicalHistoricProcessInstanceIdsForCleanupSql">
-    <!-- END_TIME_ is still used, so that we can still take advantage of the parallel cleanup jobs -->
-    <bind name="date" value="'pi.END_TIME_'"/>
-    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
-    FROM ${prefix}ACT_HI_PROCINST pi
-    where
-      not pi.REMOVAL_TIME_ is NULL
-      AND pi.REMOVAL_TIME_ &lt;= #{parameter.currentTimestamp}
-  </sql>
-
   <sql id="andWhereMinuteInDateBetweenSql">
     <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
       AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
@@ -522,29 +512,15 @@
   </sql>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_
+    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.END_TIME_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-    <include refid="andWhereMinuteInDateBetweenSql"/>
-    ${limitAfterWithoutOffset}
-  </select>
-
-  <select id="selectHierarchicalHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_
-    <include refid="selectHierarchicalHistoricProcessInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql"/>
     ${limitAfterWithoutOffset}
   </select>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_, pi.END_TIME_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
-    ${limitAfterWithoutOffset}
-  </select>
-
-  <select id="selectHierarchicalHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_
-    <include refid="selectHierarchicalHistoricProcessInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
     ${limitAfterWithoutOffset}
   </select>
@@ -594,13 +570,7 @@
         RES.HISTORY_TTL_,
         RES.TENANT_ID_,
         F.FINISHED_,
-        <!-- TODO: PASS isHierarchical parameter for checking. If true use PI.REMOVAL_TIME_ <= #{currentTimestamp} -->
-        <if test="isHierarchicalHistoryCleanup">
-          SUM(CASE WHEN RES.HISTORY_TTL_ is not null and PI.REMOVAL_TIME_ is not null and PI.REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_
-        </if>
-        <if test="!isHierarchicalHistoryCleanup">
-          SUM(CASE WHEN RES.HISTORY_TTL_ is not null and PI.END_TIME_ is not null and (RES.HISTORY_TTL_ = 0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
-        </if>
+        SUM(CASE WHEN RES.HISTORY_TTL_ is not null and PI.END_TIME_ is not null and (RES.HISTORY_TTL_ = 0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
       FROM
         (
           SELECT DISTINCT RES.*

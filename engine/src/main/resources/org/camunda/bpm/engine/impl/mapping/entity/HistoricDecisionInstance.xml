@@ -143,7 +143,6 @@
     <result property="decisionRequirementsDefinitionId" column="DEC_REQ_ID_" jdbcType="VARCHAR"/>
     <result property="decisionRequirementsDefinitionKey" column="DEC_REQ_KEY_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
-    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!-- select -->
@@ -342,39 +341,16 @@
         AND ${dayComparator}
   </sql>
 
-  <sql id="selectHierarchicalHistoricDecisionInstanceIdsForCleanupSql">
-    <bind name="date" value="'di.EVAL_TIME_'"/>
-    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
-    FROM ${prefix}ACT_HI_DECINST di
-    where
-      not di.REMOVAL_TIME_ is NULL
-      AND di.REMOVAL_TIME_ &lt;= #{parameter.currentTimestamp}
-  </sql>
-
   <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} di.ID_
+    SELECT ${limitBeforeWithoutOffset} di.ID_, di.EVAL_TIME_
     <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
-    <include refid="andWhereMinuteInDateBetweenSql"/>
-    ${limitAfterWithoutOffset}
-  </select>
-
-  <select id="selectHierarchicalHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ${limitBeforeWithoutOffset} di.ID_
-    <include refid="selectHierarchicalHistoricDecisionInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql"/>
     ${limitAfterWithoutOffset}
   </select>
 
   <select id="selectHistoricDecisionInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_, di.EVAL_TIME_
     <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
-    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
-    ${limitAfterWithoutOffset}
-  </select>
-
-  <select id="selectHierarchicalHistoricDecisionInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_
-    <include refid="selectHierarchicalHistoricDecisionInstanceIdsForCleanupSql"/>
     <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
     ${limitAfterWithoutOffset}
   </select>
@@ -421,13 +397,7 @@
         RES.HISTORY_TTL_,
         RES.TENANT_ID_,
         F.FINISHED_,
-        <!-- TODO: PASS isHierarchical parameter for checking. If true use DI.REMOVAL_TIME_ <= #{currentTimestamp} -->
-        <if test="isHierarchicalHistoryCleanup">
-            SUM(CASE WHEN RES.HISTORY_TTL_ is not null and DI.REMOVAL_TIME_ is not null and DI.REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_
-        </if>
-        <if test="!isHierarchicalHistoryCleanup">
-          SUM(CASE WHEN RES.HISTORY_TTL_ is not null and DI.EVAL_TIME_ is not null and (RES.HISTORY_TTL_=0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
-        </if>
+        SUM(CASE WHEN RES.HISTORY_TTL_ is not null and DI.EVAL_TIME_ is not null and (RES.HISTORY_TTL_=0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
       FROM
         (
           SELECT DISTINCT RES.*

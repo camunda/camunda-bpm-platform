@@ -92,14 +92,6 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
     this.superProcessInstanceId = superProcessInstanceId;
   }
 
-  public String getRootProcessInstanceId() {
-    return rootProcessInstanceId;
-  }
-
-  public void setRootProcessInstanceId(String rootProcessInstanceId) {
-    this.rootProcessInstanceId = rootProcessInstanceId;
-  }
-
   public String getSuperCaseInstanceId() {
     return superCaseInstanceId;
   }

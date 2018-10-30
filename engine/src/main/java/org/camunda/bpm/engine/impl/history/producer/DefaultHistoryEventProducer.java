@@ -564,9 +564,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     determineEndState(executionEntity, evt);
 
     // set end activity id
-    Date endTime = ClockUtil.getCurrentTime();
     evt.setEndActivityId(executionEntity.getActivityId());
-    evt.setEndTime(endTime);
+    evt.setEndTime(ClockUtil.getCurrentTime());
 
     if(evt.getStartTime() != null) {
       evt.setDurationInMillis(evt.getEndTime().getTime()-evt.getStartTime().getTime());

@@ -16,10 +16,9 @@ package org.camunda.bpm.engine.test.history;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
@@ -35,17 +34,13 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class CleanableHistoricDecisionInstanceReportTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -57,21 +52,10 @@ public class CleanableHistoricDecisionInstanceReportTest {
   protected HistoryService historyService;
   protected RepositoryService repositoryService;
 
-  @Parameterized.Parameter
-  public boolean isHierarchicalCleanup;
-  protected boolean isHierarchicalCleanupInitValue;
-
   protected static final String DECISION_DEFINITION_KEY = "one";
   protected static final String SECOND_DECISION_DEFINITION_KEY = "two";
   protected static final String THIRD_DECISION_DEFINITION_KEY = "anotherDecision";
   protected static final String FOURTH_DECISION_DEFINITION_KEY = "decision";
-  protected static final String ROOT_DMN_DEFINITION_KEY = "dish-decision";
-  protected static final String DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdMultiLevelDish.dmn11.xml";
-
-  @Parameterized.Parameters(name = "Hierachical History Cleanup: {0}")
-  public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {{true}, {false}});
-  }
 
   @Before
   public void setUp() {
@@ -79,9 +63,6 @@ public class CleanableHistoricDecisionInstanceReportTest {
     repositoryService = engineRule.getRepositoryService();
 
     testRule.deploy("org/camunda/bpm/engine/test/repository/one.dmn");
-
-    isHierarchicalCleanupInitValue = engineRule.getProcessEngineConfiguration().isHierarchicalHistoryCleanup();
-    engineRule.getProcessEngineConfiguration().setHierarchicalHistoryCleanup(isHierarchicalCleanup);
   }
 
   @After
@@ -91,15 +72,9 @@ public class CleanableHistoricDecisionInstanceReportTest {
     for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
       historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
     }
-
-    engineRule.getProcessEngineConfiguration().setHierarchicalHistoryCleanup(isHierarchicalCleanupInitValue);
   }
 
   protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
-    prepareDecisionInstances(key, daysInThePast, historyTimeToLive, instanceCount, null);
-  }
-
-  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, VariableMap variables) {
     List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).list();
     assertEquals(1, decisionDefinitions.size());
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), historyTimeToLive);
@@ -107,7 +82,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysInThePast));
 
-    variables = (variables != null)? variables : Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
+    Map<String, Object> variables = Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
     for (int i = 0; i < instanceCount; i++) {
       engineRule.getDecisionService().evaluateDecisionByKey(key).variables(variables).evaluate();
     }
@@ -310,32 +285,5 @@ public class CleanableHistoricDecisionInstanceReportTest {
     assertEquals(THIRD_DECISION_DEFINITION_KEY, reportResult.get(0).getDecisionDefinitionKey());
     assertEquals(SECOND_DECISION_DEFINITION_KEY, reportResult.get(1).getDecisionDefinitionKey());
     assertEquals(DECISION_DEFINITION_KEY, reportResult.get(2).getDecisionDefinitionKey());
-  }
-
-  @Test
-  public void testReportOnHierarchicalData(){
-    testRule.deploy(DRG_DMN);
-
-    updateDecisionDefinitionHistoryTTL("feels", 5);
-    updateDecisionDefinitionHistoryTTL("guestCount", 5);
-
-    prepareDecisionInstances(ROOT_DMN_DEFINITION_KEY, -3, 2, 1,
-      Variables.createVariables().putValue("temperature", 21).putValue("dayType", "WeekDay"));
-
-    List<CleanableHistoricDecisionInstanceReportResult> decisionReportResult = historyService
-      .createCleanableHistoricDecisionInstanceReport()
-      .decisionDefinitionKeyIn("guestCount", "feels", "dish-decision")
-      .list();
-
-    // then
-    assertEquals(3, decisionReportResult.size());
-  }
-
-  private void updateDecisionDefinitionHistoryTTL(String decisionDefinitionKey, int newHistoryTimeToLive) {
-    String definitionId = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionKey(decisionDefinitionKey)
-      .singleResult()
-      .getId();
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(definitionId, newHistoryTimeToLive);
   }
 }
