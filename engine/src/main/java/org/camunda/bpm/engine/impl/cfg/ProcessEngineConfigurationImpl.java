@@ -670,7 +670,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /**
    * If true, enables protection against XML eXternal Entity (XXE) Processing attacks.
    */
-  protected boolean enableXXEProcessingProtection = true;
+  protected boolean enableXxeProcessing = false;
 
   /**
    * If true, user operation log entries are only written if there is an
@@ -3725,12 +3725,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.enableExpressionsInStoredQueries = enableExpressionsInStoredQueries;
   }
 
-  public boolean isEnableXXEProcessingProtection() {
-    return enableXXEProcessingProtection;
+  public boolean isEnableXxeProcessing() {
+    return enableXxeProcessing;
   }
 
-  public void setEnableXXEProcessingProtection(boolean enableXXEProcessingProtection) {
-    this.enableXXEProcessingProtection = enableXXEProcessingProtection;
+  public void setEnableXxeProcessing(boolean enableXxeProcessing) {
+    this.enableXxeProcessing = enableXxeProcessing;
   }
 
   public ProcessEngineConfigurationImpl setBpmnStacktraceVerbose(boolean isBpmnStacktraceVerbose) {
