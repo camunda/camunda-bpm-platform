@@ -75,7 +75,7 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
   }
 
   protected boolean isDmnEnabled() {
-    return Context.getCommandContext().getProcessEngineConfiguration()
+    return Context.getProcessEngineConfiguration()
       .isDmnEnabled();
   }
 
@@ -109,7 +109,7 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
   }
 
   public int getBatchSizePerDeleteOperation() {
-    return Context.getCommandContext().getProcessEngineConfiguration()
+    return Context.getProcessEngineConfiguration()
       .getHistoryCleanupBatchSize();
   }
 
