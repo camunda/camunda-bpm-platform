@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.history;
 
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
@@ -26,7 +27,7 @@ import java.util.Date;
 public interface HistoryRemovalTimeProvider {
 
   /**
-   * Calculates the removal time of historic entities.
+   * Calculates the removal time of historic entities related to processes.
    *
    * START: the removal time is set for each historic entity separately on occurrence (creation).
    *        {@link HistoricProcessInstanceEventEntity#getEndTime()} is {@code null}
@@ -40,5 +41,19 @@ public interface HistoryRemovalTimeProvider {
    * @return the removal time of historic entities
    */
   Date calculateRemovalTime(HistoricProcessInstanceEventEntity historicRootProcessInstance, ProcessDefinition processDefinition);
+
+  /**
+   * Calculates the removal time of historic batches.
+   *
+   * START: the removal time is set for the historic batch entity on start.
+   *        {@link HistoricBatchEntity#getEndTime()} is {@code null}
+   *
+   * END:   the removal time is set for the historic batch entity on end.
+   *        {@link HistoricBatchEntity#getEndTime()} is not {@code null}
+   *
+   * @param historicBatch which is either in state running or ended
+   * @return the removal time of historic entities
+   */
+  Date calculateRemovalTime(HistoricBatchEntity historicBatch);
 
 }

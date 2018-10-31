@@ -97,6 +97,9 @@ public abstract class AbstractPartitioningTest {
         .setHistoryRemovalTimeProvider(null)
         .setHistoryRemovalTimeStrategy(null)
         .initHistoryRemovalTime();
+
+      processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
+      processEngineConfiguration.initHistoryCleanup();
     }
 
     ClockUtil.reset();

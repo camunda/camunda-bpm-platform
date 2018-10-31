@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.history.partitioning;
 
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
@@ -51,6 +53,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1341,6 +1344,32 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     // then
     assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  public void shouldResolveBatch() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+
+    // then
+    assertThat(historicBatch.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
   }
 
 }

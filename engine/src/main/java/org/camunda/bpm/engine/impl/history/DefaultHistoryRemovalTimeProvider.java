@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.history;
 
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
@@ -40,6 +42,41 @@ public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProv
     }
 
     return null;
+  }
+
+  public Date calculateRemovalTime(HistoricBatchEntity historicBatch) {
+    String batchOperation = historicBatch.getType();
+    if (batchOperation != null) {
+      Integer historyTimeToLive = getTTLByBatchOperation(batchOperation);
+      if (historyTimeToLive != null) {
+        if (isBatchRunning(historicBatch)) {
+          Date startTime = historicBatch.getStartTime();
+          return determineRemovalTime(startTime, historyTimeToLive);
+
+        } else if (isBatchEnded(historicBatch)) {
+          Date endTime = historicBatch.getEndTime();
+          return determineRemovalTime(endTime, historyTimeToLive);
+
+        }
+      }
+    }
+
+    return null;
+  }
+
+  protected boolean isBatchRunning(HistoricBatchEntity historicBatch) {
+    return historicBatch.getEndTime() == null;
+  }
+
+  protected boolean isBatchEnded(HistoricBatchEntity historicBatch) {
+    return historicBatch.getEndTime() != null;
+  }
+
+  protected Integer getTTLByBatchOperation(String batchOperation) {
+    return Context.getCommandContext()
+      .getProcessEngineConfiguration()
+      .getParsedBatchOperationsForHistoryCleanup()
+      .get(batchOperation);
   }
 
   protected boolean isProcessInstanceRunning(HistoricProcessInstanceEventEntity historicProcessInstance) {

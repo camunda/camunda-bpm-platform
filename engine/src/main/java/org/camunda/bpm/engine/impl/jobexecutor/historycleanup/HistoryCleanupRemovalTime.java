@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
@@ -21,6 +22,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEnt
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +43,9 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
     if (isDmnEnabled()) {
       deleteOperations.putAll(performDmnCleanup());
     }
+
+    DbOperation batchCleanup = performBatchCleanup();
+    deleteOperations.put(batchCleanup.getEntityType(), batchCleanup);
   }
 
   public void execute(CommandContext commandContext) {
@@ -63,6 +68,12 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
         configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSizePerDeleteOperation());
   }
 
+  protected DbOperation performBatchCleanup() {
+    return Context.getCommandContext().getHistoricBatchManager()
+      .deleteHistoricBatchesByRemovalTime(ClockUtil.getCurrentTime(),
+        configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSizePerDeleteOperation());
+  }
+
   protected boolean isDmnEnabled() {
     return Context.getCommandContext().getProcessEngineConfiguration()
       .isDmnEnabled();
@@ -79,6 +90,11 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
       if (deleteOperationDecisionInstance != null) {
         reportValue(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, deleteOperationDecisionInstance.getRowsAffected());
       }
+    }
+
+    DbOperation deleteOperationBatch = deleteOperations.get(HistoricBatchEntity.class);
+    if (deleteOperationBatch != null) {
+      reportValue(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, deleteOperationBatch.getRowsAffected());
     }
   }
 

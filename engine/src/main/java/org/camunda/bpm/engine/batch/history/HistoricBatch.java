@@ -79,4 +79,7 @@ public interface HistoricBatch {
    */
   Date getEndTime();
 
+  /** The time the historic batch will be removed. */
+  Date getRemovalTime();
+
 }

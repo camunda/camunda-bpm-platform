@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.history.partitioning;
 
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
@@ -37,6 +39,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
@@ -50,6 +53,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1493,6 +1497,39 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
 
     // then
     assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  public void shouldResolveBatch() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      managementService.executeJob(job.getId());
+    }
+
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+
+    // then
+    assertThat(historicBatch.getRemovalTime(), is(addDays(END_DATE, 5)));
+
+    // cleanup
+    historyService.deleteHistoricBatch(batch.getId());
   }
 
 }

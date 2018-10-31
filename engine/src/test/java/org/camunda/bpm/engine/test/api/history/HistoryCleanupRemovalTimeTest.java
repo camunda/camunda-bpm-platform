@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
@@ -66,6 +67,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -132,6 +134,8 @@ public class HistoryCleanupRemovalTimeTest {
     engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
     engineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
 
+    engineConfiguration.setBatchOperationHistoryTimeToLive(null);
+
     engineConfiguration.initHistoryCleanup();
 
     jobIds = new HashSet<>();
@@ -160,6 +164,8 @@ public class HistoryCleanupRemovalTimeTest {
       engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
       engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
       engineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
+
+      engineConfiguration.setBatchOperationHistoryTimeToLive(null);
 
       engineConfiguration.initHistoryCleanup();
     }
@@ -869,6 +875,92 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(byteArray, nullValue());
+  }
+
+  @Test
+  public void shouldCleanupBatch() {
+    // given
+    engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+    jobIds.add(jobId);
+
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      managementService.executeJob(job.getId());
+      jobIds.add(job.getId());
+    }
+
+    // assume
+    List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery().list();
+
+    assertThat(historicBatches.size(), is(1));
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    runHistoryCleanup();
+
+    historicBatches = historyService.createHistoricBatchQuery().list();
+
+    // then
+    assertThat(historicBatches.size(), is(0));
+  }
+
+  @Test
+  public void shouldReportMetricsForBatchCleanup() {
+    // given
+    engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+    jobIds.add(jobId);
+
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      managementService.executeJob(job.getId());
+      jobIds.add(job.getId());
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery().list();
+
+    // assume
+    assertThat(historicBatches.size(), is(1));
+
+    // when
+    runHistoryCleanup();
+
+    long removedBatchesSum = managementService.createMetricsQuery()
+      .name(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS)
+      .sum();
+
+    // then
+    assertThat(removedBatchesSum, is(1L));
   }
 
   // parallelism test cases ////////////////////////////////////////////////////////////////////////////////////////////
@@ -1902,6 +1994,87 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(byteArrays.size(), is(0));
+  }
+
+  @Test
+  public void shouldDistributeWorkForBatches() {
+    // given
+    engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+
+        runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+        String jobId = managementService.createJobQuery().singleResult().getId();
+        managementService.executeJob(jobId);
+        jobIds.add(jobId);
+
+        List<Job> jobs = managementService.createJobQuery().list();
+        for (Job job : jobs) {
+          managementService.executeJob(job.getId());
+          jobIds.add(job.getId());
+        }
+      }
+    }
+
+    // assume
+    List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery().list();
+
+    assertThat(historicBatches.size(), is(15));
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    // assume
+    assertThat(jobs.size(), is(3));
+
+    Job jobOne = jobs.get(0);
+    jobIds.add(jobOne.getId());
+
+    // when
+    managementService.executeJob(jobOne.getId());
+
+    historicBatches = historyService.createHistoricBatchQuery().list();
+
+    // then
+    assertThat(historicBatches.size(), is(10));
+
+    Job jobTwo = jobs.get(1);
+    jobIds.add(jobTwo.getId());
+
+    // when
+    managementService.executeJob(jobTwo.getId());
+
+    historicBatches = historyService.createHistoricBatchQuery().list();
+
+    // then
+    assertThat(historicBatches.size(), is(5));
+
+    Job jobThree = jobs.get(2);
+    jobIds.add(jobThree.getId());
+
+    // when
+    managementService.executeJob(jobThree.getId());
+
+    historicBatches = historyService.createHistoricBatchQuery().list();
+
+    // then
+    assertThat(historicBatches.size(), is(0));
   }
 
   // report tests //////////////////////////////////////////////////////////////////////////////////////////////////////

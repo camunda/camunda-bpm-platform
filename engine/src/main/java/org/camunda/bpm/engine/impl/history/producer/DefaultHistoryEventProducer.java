@@ -937,12 +937,24 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   @Override
   public HistoryEvent createBatchStartEvent(Batch batch) {
-    return createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_START);
+    HistoryEvent historicBatch = createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_START);
+
+    if (isHistoryRemovalTimeStrategyProcessStart()) {
+      provideRemovalTime((HistoricBatchEntity) historicBatch);
+    }
+
+    return historicBatch;
   }
 
   @Override
   public HistoryEvent createBatchEndEvent(Batch batch) {
-    return createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_END);
+    HistoryEvent historicBatch = createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_END);
+
+    if (isHistoryRemovalTimeStrategyProcessEnd()) {
+      provideRemovalTime((HistoricBatchEntity) historicBatch);
+    }
+
+    return historicBatch;
   }
 
   protected HistoryEvent createBatchEvent(BatchEntity batch, HistoryEventTypes eventType) {
@@ -1154,6 +1166,19 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return Context.getProcessEngineConfiguration()
       .getHistoryRemovalTimeProvider()
       .calculateRemovalTime((HistoricProcessInstanceEventEntity) historyEvent, processDefinition);
+  }
+
+  protected Date calculateRemovalTime(HistoricBatchEntity historicBatch) {
+    return Context.getProcessEngineConfiguration()
+      .getHistoryRemovalTimeProvider()
+      .calculateRemovalTime(historicBatch);
+  }
+
+  protected void provideRemovalTime(HistoricBatchEntity historicBatch) {
+    Date removalTime = calculateRemovalTime(historicBatch);
+    if (removalTime != null) {
+      historicBatch.setRemovalTime(removalTime);
+    }
   }
 
   protected void provideRemovalTime(HistoryEvent historyEvent) {
