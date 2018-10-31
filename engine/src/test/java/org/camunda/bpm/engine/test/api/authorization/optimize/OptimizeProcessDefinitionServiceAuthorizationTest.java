@@ -96,6 +96,37 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     assertThat(completedHistoricActivityInstances.size(), is(2));
   }
 
+  public void testGetRunningActivitiesWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+
+    try {
+      // when
+      optimizeService.getRunningHistoricActivityInstances(new Date(0L), null, 10);
+      fail("Exception expected: It should not be possible to retrieve the activities");
+    } catch (AuthorizationException e) {
+      // then
+      String exceptionMessage = e.getMessage();
+      assertTextPresent(userId, exceptionMessage);
+      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
+    }
+
+  }
+
+  public void testGetRunningActivitiesWithAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
+
+    // when
+    List<HistoricActivityInstance> runningHistoricActivityInstances =
+      optimizeService.getRunningHistoricActivityInstances(new Date(0L), null, 10);
+
+    // then
+    assertThat(runningHistoricActivityInstances.size(), is(0));
+  }
+
   public void testGetCompletedProcessInstancesWithoutAuthorization() {
     // given
     startProcessInstanceByKey("process");

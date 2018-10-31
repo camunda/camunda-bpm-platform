@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricActivit
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricProcessInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricDecisionInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricVariableUpdateQueryCmd;
+import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricActivityInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricProcessInstanceQueryCmd;
 
 import java.util.Date;
@@ -31,7 +32,15 @@ public class OptimizeService extends ServiceImpl {
                                                                               Date finishedAt,
                                                                               int maxResults) {
     return commandExecutor.execute(
-      new OptimizeCompletedHistoricActivityInstanceQueryCmd(finishedAfter, finishedAt,maxResults)
+      new OptimizeCompletedHistoricActivityInstanceQueryCmd(finishedAfter, finishedAt, maxResults)
+    );
+  }
+
+  public List<HistoricActivityInstance> getRunningHistoricActivityInstances(Date startedAfter,
+                                                                            Date startedAt,
+                                                                            int maxResults) {
+    return commandExecutor.execute(
+      new OptimizeRunningHistoricActivityInstanceQueryCmd(startedAfter, startedAt, maxResults)
     );
   }
 
@@ -55,7 +64,7 @@ public class OptimizeService extends ServiceImpl {
                                                                  Date occurredAt,
                                                                  int maxResults) {
     return commandExecutor.execute(
-      new OptimizeHistoricVariableUpdateQueryCmd(occurredAfter, occurredAt,maxResults)
+      new OptimizeHistoricVariableUpdateQueryCmd(occurredAfter, occurredAt, maxResults)
     );
   }
 
@@ -66,7 +75,6 @@ public class OptimizeService extends ServiceImpl {
       new OptimizeHistoricDecisionInstanceQueryCmd(evaluatedAfter, evaluatedAt, maxResults)
     );
   }
-
 
 
 }

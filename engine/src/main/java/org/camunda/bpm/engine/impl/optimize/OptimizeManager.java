@@ -14,12 +14,9 @@ package org.camunda.bpm.engine.impl.optimize;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 import java.util.Date;
@@ -45,6 +42,20 @@ public class OptimizeManager extends AbstractManager {
     params.put("maxResults", maxResults);
 
     return getDbEntityManager().selectList("selectCompletedHistoricActivityPage", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricActivityInstance> getRunningHistoricActivityInstances(Date startedAfter,
+                                                                            Date startedAt,
+                                                                            int maxResults) {
+    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("startedAfter", startedAfter);
+    params.put("startedAt", startedAt);
+    params.put("maxResults", maxResults);
+
+    return getDbEntityManager().selectList("selectRunningHistoricActivityPage", params);
   }
 
   private void checkIsAuthorizedToReadHistoryOfProcessDefinitions() {
@@ -109,10 +120,10 @@ public class OptimizeManager extends AbstractManager {
 
     HistoricDecisionInstanceQueryImpl query =
       (HistoricDecisionInstanceQueryImpl) new HistoricDecisionInstanceQueryImpl()
-      .disableBinaryFetching()
-      .disableCustomObjectDeserialization()
-      .includeInputs()
-      .includeOutputs();
+        .disableBinaryFetching()
+        .disableCustomObjectDeserialization()
+        .includeInputs()
+        .includeOutputs();
 
     getHistoricDecisionInstanceManager()
       .enrichHistoricDecisionsWithInputsAndOutputs(query, decisionInstances);

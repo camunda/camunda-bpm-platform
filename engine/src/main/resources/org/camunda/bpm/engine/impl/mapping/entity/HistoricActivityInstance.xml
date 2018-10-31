@@ -332,4 +332,24 @@
     ${optimizeLimitAfterWithoutOffset}
   </select>
 
+  <select id="selectRunningHistoricActivityPage" resultMap="historicActivityInstanceResultMap"
+          parameterType="java.util.Map">
+    <bind name="maxResults" value="parameter.maxResults"/>
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_ACTINST RES
+
+    <where>
+      <if test="parameter.startedAfter != null">
+        and RES.START_TIME_ &gt; #{parameter.startedAfter}
+      </if>
+      <if test="parameter.startedAt != null">
+        and RES.START_TIME_ = #{parameter.startedAt}
+      </if>
+      and RES.END_TIME_ is null
+    </where>
+
+    ORDER BY RES.START_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
 </mapper>
