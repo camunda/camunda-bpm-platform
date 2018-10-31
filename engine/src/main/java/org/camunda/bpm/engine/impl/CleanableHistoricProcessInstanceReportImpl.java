@@ -21,6 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -35,6 +36,8 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
   protected boolean isCompact = false;
 
   protected Date currentTimestamp;
+
+  protected boolean isHistoryCleanupByRemovalTime;
 
   public CleanableHistoricProcessInstanceReportImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -81,6 +84,9 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
 
   @Override
   public long executeCount(CommandContext commandContext) {
+    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
+      .isHistoryCleanupByRemovalTime();
+
     checkQueryOk();
     return commandContext
         .getHistoricProcessInstanceManager()
@@ -89,6 +95,9 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
 
   @Override
   public List<CleanableHistoricProcessInstanceReportResult> executeList(CommandContext commandContext, final Page page) {
+    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
+      .isHistoryCleanupByRemovalTime();
+
     checkQueryOk();
     return commandContext
         .getHistoricProcessInstanceManager()
@@ -126,4 +135,9 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
   public boolean isCompact() {
     return isCompact;
   }
+
+  public boolean isHistoryCleanupByRemovalTime() {
+    return isHistoryCleanupByRemovalTime;
+  }
+
 }

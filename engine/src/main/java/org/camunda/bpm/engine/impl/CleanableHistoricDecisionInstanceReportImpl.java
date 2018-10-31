@@ -21,6 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -35,6 +36,8 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   protected boolean isCompact = false;
 
   protected Date currentTimestamp;
+
+  protected boolean isHistoryCleanupByRemovalTime;
 
   public CleanableHistoricDecisionInstanceReportImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -83,6 +86,9 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   @Override
   public long executeCount(CommandContext commandContext) {
+    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
+      .isHistoryCleanupByRemovalTime();
+
     checkQueryOk();
     return commandContext
         .getHistoricDecisionInstanceManager()
@@ -91,6 +97,9 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   @Override
   public List<CleanableHistoricDecisionInstanceReportResult> executeList(CommandContext commandContext, Page page) {
+    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
+      .isHistoryCleanupByRemovalTime();
+
     checkQueryOk();
     return commandContext
         .getHistoricDecisionInstanceManager()
@@ -135,6 +144,10 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   public boolean isCompact() {
     return isCompact;
+  }
+
+  public boolean isHistoryCleanupByRemovalTime() {
+    return isHistoryCleanupByRemovalTime;
   }
 
 }

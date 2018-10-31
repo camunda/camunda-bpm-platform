@@ -397,7 +397,14 @@
         RES.HISTORY_TTL_,
         RES.TENANT_ID_,
         F.FINISHED_,
-        SUM(CASE WHEN RES.HISTORY_TTL_ is not null and DI.EVAL_TIME_ is not null and (RES.HISTORY_TTL_=0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
+        <choose>
+          <when test="isHistoryCleanupByRemovalTime">
+            SUM(CASE WHEN DI.REMOVAL_TIME_ is not null and DI.REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_
+          </when>
+          <otherwise>
+            SUM(CASE WHEN RES.HISTORY_TTL_ is not null and DI.EVAL_TIME_ is not null and (RES.HISTORY_TTL_=0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
+          </otherwise>
+        </choose>
       FROM
         (
           SELECT DISTINCT RES.*

@@ -22,6 +22,8 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -1900,6 +1902,120 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(byteArrays.size(), is(0));
+  }
+
+  // report tests //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  @Test
+  public void shouldSeeCleanableProcessInstances() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy("process-start")
+      .initHistoryRemovalTime();
+
+    testRule.deploy(PROCESS);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
+
+    // then
+    assertThat(report.getCleanableProcessInstanceCount(), is(5L));
+  }
+
+  @Test
+  public void shouldNotSeeCleanableProcessInstances() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy("process-end")
+      .initHistoryRemovalTime();
+
+    testRule.deploy(PROCESS);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
+
+    // then
+    assertThat(report.getCleanableProcessInstanceCount(), is(0L));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSeeCleanableDecisionInstances() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy("process-start")
+      .initHistoryRemovalTime();
+
+    testRule.deploy(CALLING_PROCESS_CALLS_DMN);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend"));
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    CleanableHistoricDecisionInstanceReportResult report = historyService.createCleanableHistoricDecisionInstanceReport()
+      .decisionDefinitionKeyIn("dish-decision")
+      .singleResult();
+
+    // then
+    assertThat(report.getCleanableDecisionInstanceCount(), is(5L));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldNotSeeCleanableDecisionInstances() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy("process-end")
+      .initHistoryRemovalTime();
+
+    testRule.deploy(CALLING_PROCESS_CALLS_DMN);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend"));
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    CleanableHistoricDecisionInstanceReportResult report = historyService.createCleanableHistoricDecisionInstanceReport()
+      .decisionDefinitionKeyIn("dish-decision")
+      .singleResult();
+
+    // then
+    assertThat(report.getCleanableDecisionInstanceCount(), is(0L));
   }
 
   // helper /////////////////////////////////////////////////////////////////
