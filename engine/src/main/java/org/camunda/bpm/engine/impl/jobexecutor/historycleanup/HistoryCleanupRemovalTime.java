@@ -49,7 +49,9 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
   }
 
   public void execute(CommandContext commandContext) {
-    reportMetrics();
+    if (isMetricsEnabled()) {
+      reportMetrics();
+    }
 
     setRescheduleNow(isMaxBatchExceeded());
 
@@ -77,6 +79,11 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
   protected boolean isDmnEnabled() {
     return Context.getProcessEngineConfiguration()
       .isDmnEnabled();
+  }
+
+  protected boolean isMetricsEnabled() {
+    return Context.getProcessEngineConfiguration()
+      .isHistoryCleanupMetricsEnabled();
   }
 
   protected void reportMetrics() {
