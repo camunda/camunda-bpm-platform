@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.migration.instance.EmergingJobInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
@@ -38,7 +38,8 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
   @Override
   public void handle(MigratingInstanceParseContext parseContext, MigratingActivityInstance activityInstance, List<JobEntity> elements) {
 
-    Map<String, TimerDeclarationImpl> timerDeclarationsInEventScope = getTimerDeclarationsByTriggeringActivity(activityInstance.getTargetScope());
+    Map<String, TimerDeclarationImpl> sourceTimerDeclarationsInEventScope = getTimerDeclarationsByTriggeringActivity(activityInstance.getSourceScope());
+    Map<String, TimerDeclarationImpl> targetTimerDeclarationsInEventScope = getTimerDeclarationsByTriggeringActivity(activityInstance.getTargetScope());
 
     for (JobEntity job : elements) {
       if (!isTimerJob(job)) {
@@ -53,7 +54,7 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
         // the timer job is migrated
         JobDefinitionEntity targetJobDefinitionEntity = parseContext.getTargetJobDefinition(targetActivity.getActivityId(), job.getJobHandlerType());
 
-        TimerDeclarationImpl targetTimerDeclaration = timerDeclarationsInEventScope.remove(targetActivity.getId());
+        TimerDeclarationImpl targetTimerDeclaration = targetTimerDeclarationsInEventScope.remove(targetActivity.getId());
 
         MigratingJobInstance migratingTimerJobInstance =
             new MigratingTimerJobInstance(
@@ -78,7 +79,7 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
     }
 
     if (activityInstance.migrates()) {
-      addEmergingTimerJobs(activityInstance, timerDeclarationsInEventScope.values());
+      addEmergingTimerJobs(parseContext, activityInstance, sourceTimerDeclarationsInEventScope, targetTimerDeclarationsInEventScope);
     }
   }
 
@@ -86,10 +87,33 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
     return job != null && job.getType().equals(TimerEntity.TYPE);
   }
 
-  protected void addEmergingTimerJobs(MigratingActivityInstance owningInstance, Collection<TimerDeclarationImpl> emergingDeclarations) {
-    for (TimerDeclarationImpl timerDeclaration : emergingDeclarations) {
-      owningInstance.addEmergingDependentInstance(new EmergingJobInstance(timerDeclaration));
+  protected void addEmergingTimerJobs(MigratingInstanceParseContext parseContext, MigratingActivityInstance activityInstance,
+      Map<String, TimerDeclarationImpl> sourceTimerDeclarationsInEventScope, Map<String, TimerDeclarationImpl> targetTimerDeclarationsInEventScope) {
+    for (TimerDeclarationImpl targetTimerDeclaration : targetTimerDeclarationsInEventScope.values()) {
+      if(!isNonInterruptingTimerTriggeredAlready(parseContext, sourceTimerDeclarationsInEventScope, targetTimerDeclaration)) {
+        activityInstance.addEmergingDependentInstance(new EmergingJobInstance(targetTimerDeclaration));
+      }
     }
+  }
+
+  protected boolean isNonInterruptingTimerTriggeredAlready(MigratingInstanceParseContext parseContext,
+      Map<String, TimerDeclarationImpl> sourceTimerDeclarationsInEventScope, TimerDeclarationImpl targetTimerDeclaration) {
+    if ((!targetTimerDeclaration.isInterruptingTimer()) && targetTimerDeclaration.getJobHandlerType() == TimerExecuteNestedActivityJobHandler.TYPE && sourceTimerDeclarationsInEventScope.values().size() != 0) {
+      return true;
+    }
+    for (TimerDeclarationImpl sourceTimerDeclaration : sourceTimerDeclarationsInEventScope.values()) {
+      MigrationInstruction migrationInstruction1 = parseContext.findSingleMigrationInstruction(sourceTimerDeclaration.getActivityId());
+      MigrationInstruction migrationInstruction2 = parseContext.findSingleMigrationInstruction(targetTimerDeclaration.getActivityId());
+
+      if (migrationInstruction1 == null || migrationInstruction2 == null) {
+        return false;
+      }
+
+      if (migrationInstruction1.equals(migrationInstruction2)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected Map<String, TimerDeclarationImpl> getTimerDeclarationsByTriggeringActivity(ScopeImpl scope) {
