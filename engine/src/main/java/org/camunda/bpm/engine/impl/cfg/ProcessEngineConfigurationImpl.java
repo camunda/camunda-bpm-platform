@@ -668,7 +668,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableExpressionsInStoredQueries = true;
 
   /**
-   * If true, enables protection against XML eXternal Entity (XXE) Processing attacks.
+   * If false, disables XML eXternal Entity (XXE) Processing. This provides protection against XXE Processing attacks.
    */
   protected boolean enableXxeProcessing = false;
 
