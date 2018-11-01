@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInst
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -135,6 +136,36 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  public void shouldResolveStandaloneHistoricDecisionInstance() {
+    // given
+    ClockUtil.setCurrentTime(START_DATE);
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey("dish-decision")
+      .singleResult();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
+
+    // when
+    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
+      .putValue("temperature", 32)
+      .putValue("dayType", "Weekend"));
+
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+
+    // assume
+    assertThat(historicDecisionInstances.size(), is(3));
+
+    Date removalTime = addDays(START_DATE, 5);
+
+    // then
+    assertThat(historicDecisionInstances.get(0).getRemovalTime(), is(removalTime));
+    assertThat(historicDecisionInstances.get(1).getRemovalTime(), is(removalTime));
+    assertThat(historicDecisionInstances.get(2).getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
   public void shouldResolveHistoricDecisionInputInstance() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -151,6 +182,40 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
       Variables.createVariables()
         .putValue("temperature", 32)
         .putValue("dayType", "Weekend"));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeInputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+
+    Date removalTime = addDays(START_DATE, 5);
+
+    // then
+    assertThat(historicDecisionInputInstances.get(0).getRemovalTime(), is(removalTime));
+    assertThat(historicDecisionInputInstances.get(1).getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldResolveStandaloneHistoricDecisionInputInstance() {
+    // given
+    ClockUtil.setCurrentTime(START_DATE);
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey("dish-decision")
+      .singleResult();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
+
+    // when
+    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
+      .putValue("temperature", 32)
+      .putValue("dayType", "Weekend"));
 
     HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
       .rootDecisionInstancesOnly()
@@ -209,6 +274,43 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
       .startEvent()
         .businessRuleTask()
           .camundaDecisionRef("dish-decision")
+      .endEvent().done());
+
+    // when
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+      Variables.createVariables()
+        .putValue("temperature", 32)
+        .putValue("dayType", "Weekend"));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeOutputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+
+    Date removalTime = addDays(START_DATE, 5);
+
+    // then
+    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldResolveStandaloneHistoricDecisionOutputInstance() {
+    // given
+    ClockUtil.setCurrentTime(START_DATE);
+
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .camundaHistoryTimeToLive(5)
+      .startEvent()
+      .businessRuleTask()
+      .camundaDecisionRef("dish-decision")
       .endEvent().done());
 
     // when

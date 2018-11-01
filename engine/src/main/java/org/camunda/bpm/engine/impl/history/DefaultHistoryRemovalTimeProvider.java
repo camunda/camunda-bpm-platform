@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.impl.history;
 
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 import java.util.Calendar;
@@ -39,6 +41,18 @@ public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProv
         return determineRemovalTime(endTime, historyTimeToLive);
 
       }
+    }
+
+    return null;
+  }
+
+  public Date calculateRemovalTime(HistoricDecisionInstanceEntity historicRootDecisionInstance, DecisionDefinition decisionDefinition) {
+
+    Integer historyTimeToLive = decisionDefinition.getHistoryTimeToLive();
+
+    if (historyTimeToLive != null) {
+      Date evaluationTime = historicRootDecisionInstance.getEvaluationTime();
+      return determineRemovalTime(evaluationTime, historyTimeToLive);
     }
 
     return null;

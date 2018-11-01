@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -239,6 +240,47 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+
+    // then
+    assertThat(historicDecisionInstances.size(), is(0));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldCleanupStandaloneDecisionInstance() {
+    // given
+    ClockUtil.setCurrentTime(END_DATE);
+
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey("dish-decision")
+      .singleResult();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
+
+
+    // when
+    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
+      .putValue("temperature", 32)
+      .putValue("dayType", "Weekend"));
+
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .includeOutputs()
+      .list();
+
+    // assume
+    assertThat(historicDecisionInstances.size(), is(3));
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    // when
+    runHistoryCleanup();
+
+    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .includeOutputs()
+      .list();
 
     // then
     assertThat(historicDecisionInstances.size(), is(0));

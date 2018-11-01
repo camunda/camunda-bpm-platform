@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +28,7 @@ import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedOutput;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
@@ -101,8 +101,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     HistoricDecisionInstanceEntity rootDecisionEvent = supplier.createHistoricDecisionInstance(evaluationEvent.getDecisionResult());
     Date removalTime = null;
     if (rootDecisionEvent.getRootProcessInstanceId() == null) {
-      removalTime = getRemovalTime(rootDecisionEvent.getEvaluationTime(), evaluationEvent.getDecisionResult());
-      rootDecisionEvent.setRemovalTime(removalTime);
+      removalTime = calculateRemovalTime(rootDecisionEvent, evaluationEvent.getDecisionResult());
+      provideStandaloneRemovalTime(rootDecisionEvent, removalTime);
     }
 
     event.setRootHistoricDecisionInstance(rootDecisionEvent);
@@ -112,7 +112,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       HistoricDecisionInstanceEntity requiredDecisionEvent = supplier.createHistoricDecisionInstance(requiredDecisionResult);
 
       if (requiredDecisionEvent.getRemovalTime() == null) {
-        requiredDecisionEvent.setRemovalTime(removalTime);
+        provideStandaloneRemovalTime(requiredDecisionEvent, removalTime);
       }
 
       requiredDecisionEvents.add(requiredDecisionEvent);
@@ -389,19 +389,12 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       return Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(event.getCaseExecutionId());
   }
 
-  protected Date getRemovalTime(Date evaluationTime, DmnDecisionLogicEvaluationEvent evaluationEvent) {
-    DecisionDefinition decision = (DecisionDefinition) evaluationEvent.getDecision();
-    Integer ttl = decision.getHistoryTimeToLive();
+  protected Date calculateRemovalTime(HistoricDecisionInstanceEntity historicDecisionInstance, DmnDecisionLogicEvaluationEvent evaluationEvent) {
+    DecisionDefinition decisionDefinition = (DecisionDefinition) evaluationEvent.getDecision();
 
-    if (ttl == null) {
-      return null;
-    }
-
-    Calendar removeTime = Calendar.getInstance();
-    removeTime.setTime(evaluationTime);
-    removeTime.add(Calendar.DATE, ttl);
-
-    return removeTime.getTime();
+    return Context.getProcessEngineConfiguration()
+      .getHistoryRemovalTimeProvider()
+      .calculateRemovalTime(historicDecisionInstance, decisionDefinition);
   }
 
   protected void provideRemovalTime(HistoryEvent historyEvent) {
@@ -414,6 +407,19 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
         Date removalTime = historicRootProcessInstance.getRemovalTime();
         historyEvent.setRemovalTime(removalTime);
       }
+    }
+  }
+
+  protected void provideStandaloneRemovalTime(HistoricDecisionInstanceEntity historyEvent, Date removalTime) {
+
+    historyEvent.setRemovalTime(removalTime);
+
+    for (HistoricDecisionInputInstance inputInstance : historyEvent.getInputs()) {
+      ((HistoricDecisionInputInstanceEntity) inputInstance).setRemovalTime(removalTime);
+    }
+
+    for (HistoricDecisionOutputInstance outputInstance : historyEvent.getOutputs()) {
+      ((HistoricDecisionOutputInstanceEntity) outputInstance).setRemovalTime(removalTime);
     }
   }
 

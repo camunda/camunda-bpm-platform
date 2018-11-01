@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.impl.history;
 
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 import java.util.Date;
@@ -38,9 +40,18 @@ public interface HistoryRemovalTimeProvider {
    *
    * @param historicRootProcessInstance which is either in state running or ended
    * @param processDefinition of the historic root process instance
-   * @return the removal time of historic entities
+   * @return the removal time for historic process instances
    */
   Date calculateRemovalTime(HistoricProcessInstanceEventEntity historicRootProcessInstance, ProcessDefinition processDefinition);
+
+  /**
+   * Calculates the removal time of historic entities related to decisions.
+   *
+   * @param historicRootDecisionInstance
+   * @param decisionDefinition of the historic root decision instance
+   * @return the removal time for historic decision instances
+   */
+  Date calculateRemovalTime(HistoricDecisionInstanceEntity historicRootDecisionInstance, DecisionDefinition decisionDefinition);
 
   /**
    * Calculates the removal time of historic batches.
