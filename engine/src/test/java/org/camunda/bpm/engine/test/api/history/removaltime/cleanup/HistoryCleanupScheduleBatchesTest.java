@@ -34,6 +34,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.apache.commons.lang.time.DateUtils.addDays;
+import static org.apache.commons.lang.time.DateUtils.addSeconds;
+import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration.START_DELAY;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -169,7 +171,7 @@ public class HistoryCleanupScheduleBatchesTest extends AbstractHistoryCleanupSch
     Job job = historyService.findHistoryCleanupJobs().get(0);
 
     // then
-    assertThat(job.getDuedate(), is(removalTime));
+    assertThat(job.getDuedate(), is(addSeconds(removalTime, START_DELAY)));
   }
 
 }
