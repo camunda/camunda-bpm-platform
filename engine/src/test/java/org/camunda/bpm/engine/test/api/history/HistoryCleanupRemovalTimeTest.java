@@ -21,8 +21,10 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -931,7 +933,7 @@ public class HistoryCleanupRemovalTimeTest {
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
 
-    runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    String batchId = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason").getId();
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -950,15 +952,26 @@ public class HistoryCleanupRemovalTimeTest {
 
     assertThat(historicBatches.size(), is(1));
 
+    // assume
+    List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery()
+      .jobDefinitionConfiguration(batchId)
+      .list();
+
+    assertThat(historicJobLogs.size(), is(6));
+
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
     runHistoryCleanup();
 
     historicBatches = historyService.createHistoricBatchQuery().list();
+    historicJobLogs = historyService.createHistoricJobLogQuery()
+      .jobDefinitionConfiguration(batchId)
+      .list();
 
     // then
     assertThat(historicBatches.size(), is(0));
+    assertThat(historicJobLogs.size(), is(0));
   }
 
   @Test
@@ -2231,6 +2244,66 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableDecisionInstanceCount(), is(0L));
+  }
+
+  @Test
+  public void shouldSeeCleanableBatches() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy("process-start")
+      .initHistoryRemovalTime();
+
+    engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport().singleResult();
+
+    // then
+    assertThat(report.getCleanableBatchesCount(), is(1L));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldNotSeeCleanableBatches() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy("process-end")
+      .initHistoryRemovalTime();
+
+    engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // when
+    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport().singleResult();
+
+    // then
+    assertThat(report.getCleanableBatchesCount(), is(0L));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
   }
 
   // helper /////////////////////////////////////////////////////////////////

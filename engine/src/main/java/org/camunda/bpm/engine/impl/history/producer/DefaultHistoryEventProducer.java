@@ -952,6 +952,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     if (isHistoryRemovalTimeStrategyProcessEnd()) {
       provideRemovalTime((HistoricBatchEntity) historicBatch);
+
+      addRemovalTimeToHistoricJobLog((HistoricBatchEntity) historicBatch);
     }
 
     return historicBatch;
@@ -1041,6 +1043,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setJobDefinitionId(jobDefinition.getId());
       evt.setJobDefinitionType(jobDefinition.getJobType());
       evt.setJobDefinitionConfiguration(jobDefinition.getJobConfiguration());
+
+      String historicBatchId = jobDefinition.getJobConfiguration();
+      if (historicBatchId != null) {
+        HistoricBatchEntity historicBatch = getHistoricBatchById(historicBatchId);
+        if (historicBatch != null && isHistoryRemovalTimeStrategyProcessStart()) {
+          evt.setRemovalTime(historicBatch.getRemovalTime());
+        }
+      }
+
     }
     else {
       // in case of async signal there does not exist a job definition
@@ -1205,6 +1216,21 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       .getProcessEngineConfiguration()
       .getDeploymentCache()
       .findDeployedProcessDefinitionById(processDefinitionId);
+  }
+
+  protected HistoricBatchEntity getHistoricBatchById(String batchId) {
+    return Context.getCommandContext()
+      .getHistoricBatchManager()
+      .findHistoricBatchById(batchId);
+  }
+
+  protected void addRemovalTimeToHistoricJobLog(HistoricBatchEntity historicBatch) {
+    Date removalTime = historicBatch.getRemovalTime();
+    if (removalTime != null) {
+      Context.getCommandContext()
+        .getHistoricJobLogManager()
+        .addRemovalTimeToJobLogByBatchId(historicBatch.getId(), removalTime);
+    }
   }
 
   // sequence counter //////////////////////////////////////////////////////

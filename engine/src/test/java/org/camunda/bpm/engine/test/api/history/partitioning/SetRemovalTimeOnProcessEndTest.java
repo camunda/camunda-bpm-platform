@@ -1532,4 +1532,39 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
     historyService.deleteHistoricBatch(batch.getId());
   }
 
+  @Test
+  public void shouldResolveBatchJobLog() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      managementService.executeJob(job.getId());
+    }
+
+    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery().list();
+
+    // then
+    assertThat(jobLogs.get(0).getRemovalTime(), is(addDays(END_DATE, 5)));
+    assertThat(jobLogs.get(1).getRemovalTime(), is(addDays(END_DATE, 5)));
+    assertThat(jobLogs.get(2).getRemovalTime(), is(addDays(END_DATE, 5)));
+
+    // cleanup
+    historyService.deleteHistoricBatch(batch.getId());
+  }
+
 }

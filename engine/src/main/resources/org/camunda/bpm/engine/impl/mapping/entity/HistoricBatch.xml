@@ -250,7 +250,14 @@
     FROM (
       SELECT RES.TYPE_,
              C.HISTORY_TTL_,
-             SUM(CASE WHEN HISTORY_TTL_ is not null and (HISTORY_TTL_ = 0 OR ${dayComparator}) and END_TIME_ is not null THEN 1 ELSE 0 END) AS CLEANABLE_,
+             <choose>
+               <when test="isHistoryCleanupByRemovalTime">
+                 SUM(CASE WHEN REMOVAL_TIME_ is not null and REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_,
+               </when>
+               <otherwise>
+                 SUM(CASE WHEN HISTORY_TTL_ is not null and (HISTORY_TTL_ = 0 OR ${dayComparator}) and END_TIME_ is not null THEN 1 ELSE 0 END) AS CLEANABLE_,
+               </otherwise>
+             </choose>
              F.FINISHED_
         FROM ${prefix}ACT_HI_BATCH RES
         LEFT JOIN (

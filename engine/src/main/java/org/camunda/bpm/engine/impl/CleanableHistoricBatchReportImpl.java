@@ -29,6 +29,8 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
 
   protected Date currentTimestamp;
 
+  protected boolean isHistoryCleanupByRemovalTime;
+
   public CleanableHistoricBatchReportImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
@@ -41,6 +43,9 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
 
   @Override
   public long executeCount(CommandContext commandContext) {
+    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
+      .isHistoryCleanupByRemovalTime();
+
     checkQueryOk();
     checkPermissions(commandContext);
 
@@ -50,6 +55,9 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
 
   @Override
   public List<CleanableHistoricBatchReportResult> executeList(CommandContext commandContext, Page page) {
+    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
+      .isHistoryCleanupByRemovalTime();
+
     checkQueryOk();
     checkPermissions(commandContext);
 
@@ -69,6 +77,10 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadHistoricBatch();
     }
+  }
+
+  public boolean isHistoryCleanupByRemovalTime() {
+    return isHistoryCleanupByRemovalTime;
   }
 
 }
