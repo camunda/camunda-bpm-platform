@@ -33,14 +33,23 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
 
   protected Map<Class<? extends DbEntity>, DbOperation> deleteOperations;
 
+  protected boolean isDmnEnabled;
+  protected boolean isMetricsEnabled;
+  protected int batchSizePerDeleteOperation;
+
   public HistoryCleanupRemovalTime() {
     deleteOperations = new HashMap<>();
+
+    // store information before command context has been closed
+    isDmnEnabled = isDmnEnabled();
+    isMetricsEnabled = isMetricsEnabled();
+    batchSizePerDeleteOperation = getBatchSizePerDeleteOperation();
   }
 
   public void performCleanup() {
     deleteOperations.putAll(performProcessCleanup());
 
-    if (isDmnEnabled()) {
+    if (isDmnEnabled) {
       deleteOperations.putAll(performDmnCleanup());
     }
 
@@ -49,7 +58,7 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
   }
 
   public void execute(CommandContext commandContext) {
-    if (isMetricsEnabled()) {
+    if (isMetricsEnabled) {
       reportMetrics();
     }
 
@@ -92,7 +101,7 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
       reportValue(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, deleteOperationProcessInstance.getRowsAffected());
     }
 
-    if (isDmnEnabled()) {
+    if (isDmnEnabled) {
       DbOperation deleteOperationDecisionInstance = deleteOperations.get(HistoricDecisionInstanceEntity.class);
       if (deleteOperationDecisionInstance != null) {
         reportValue(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, deleteOperationDecisionInstance.getRowsAffected());
@@ -107,7 +116,7 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
 
   protected boolean isMaxBatchExceeded() {
     for (DbOperation deleteOperation : deleteOperations.values()) {
-      if (deleteOperation.getRowsAffected() == getBatchSizePerDeleteOperation()) {
+      if (deleteOperation.getRowsAffected() == batchSizePerDeleteOperation) {
         return true;
       }
     }
