@@ -467,6 +467,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return new HistoricJobLogEventEntity();
   }
 
+  protected HistoricBatchEntity newBatchEventEntity(BatchEntity batch) {
+    return new HistoricBatchEntity();
+  }
+
   protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
     return newProcessInstanceEventEntity(execution);
   }
@@ -481,6 +485,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected HistoricIncidentEventEntity loadIncidentEvent(Incident incident) {
     return newIncidentEventEntity(incident);
+  }
+
+  protected HistoricBatchEntity loadBatchEntity(BatchEntity batch) {
+    return newBatchEventEntity(batch);
   }
 
   // Implementation ////////////////////////////////
@@ -960,7 +968,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected HistoryEvent createBatchEvent(BatchEntity batch, HistoryEventTypes eventType) {
-    HistoricBatchEntity event = new HistoricBatchEntity();
+    HistoricBatchEntity event = loadBatchEntity(batch);
 
     event.setId(batch.getId());
     event.setType(batch.getType());
@@ -1045,9 +1053,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setJobDefinitionConfiguration(jobDefinition.getJobConfiguration());
 
       String historicBatchId = jobDefinition.getJobConfiguration();
-      if (historicBatchId != null) {
+      if (historicBatchId != null && isHistoryRemovalTimeStrategyProcessStart()) {
         HistoricBatchEntity historicBatch = getHistoricBatchById(historicBatchId);
-        if (historicBatch != null && isHistoryRemovalTimeStrategyProcessStart()) {
+        if (historicBatch != null) {
           evt.setRemovalTime(historicBatch.getRemovalTime());
         }
       }

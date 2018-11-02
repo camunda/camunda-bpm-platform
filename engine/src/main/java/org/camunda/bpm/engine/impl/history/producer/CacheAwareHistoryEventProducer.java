@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.*;
@@ -83,6 +85,20 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
 
     } else {
       return newIncidentEventEntity(incident);
+
+    }
+  }
+
+  protected HistoricBatchEntity loadBatchEntity(BatchEntity batch) {
+    String batchId = batch.getId();
+
+    HistoricBatchEntity cachedEntity = findInCache(HistoricBatchEntity.class, batchId);
+
+    if(cachedEntity != null) {
+      return cachedEntity;
+
+    } else {
+      return newBatchEventEntity(batch);
 
     }
   }
