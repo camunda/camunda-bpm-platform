@@ -34,6 +34,7 @@ public class MockHistoricBatchBuilder {
   protected String createUserId;
   protected Date startTime;
   protected Date endTime;
+  protected Date removalTime;
 
   public MockHistoricBatchBuilder id(String id) {
     this.id = id;
@@ -95,6 +96,11 @@ public class MockHistoricBatchBuilder {
     return this;
   }
 
+  public MockHistoricBatchBuilder removalTime(Date removalTime) {
+    this.removalTime = removalTime;
+    return this;
+  }
+
   public HistoricBatch build() {
     HistoricBatch historicBatch = mock(HistoricBatch.class);
     when(historicBatch.getId()).thenReturn(id);
@@ -109,6 +115,7 @@ public class MockHistoricBatchBuilder {
     when(historicBatch.getCreateUserId()).thenReturn(createUserId);
     when(historicBatch.getStartTime()).thenReturn(startTime);
     when(historicBatch.getEndTime()).thenReturn(endTime);
+    when(historicBatch.getRemovalTime()).thenReturn(removalTime);
     return historicBatch;
   }
 

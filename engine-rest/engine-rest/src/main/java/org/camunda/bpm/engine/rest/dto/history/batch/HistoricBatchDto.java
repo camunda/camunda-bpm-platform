@@ -31,6 +31,7 @@ public class HistoricBatchDto {
   protected String createUserId;
   protected Date startTime;
   protected Date endTime;
+  protected Date removalTime;
 
   public String getId() {
     return id;
@@ -80,6 +81,10 @@ public class HistoricBatchDto {
     return endTime;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
   public static HistoricBatchDto fromBatch(HistoricBatch historicBatch) {
     HistoricBatchDto dto = new HistoricBatchDto();
     dto.id = historicBatch.getId();
@@ -94,6 +99,7 @@ public class HistoricBatchDto {
     dto.createUserId = historicBatch.getCreateUserId();
     dto.startTime = historicBatch.getStartTime();
     dto.endTime = historicBatch.getEndTime();
+    dto.removalTime = historicBatch.getRemovalTime();
     return dto;
   }
 

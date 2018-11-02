@@ -862,6 +862,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_BATCH_JOB_DEFINITION_ID = "aBatchJobDefinitionId";
   public static final String EXAMPLE_HISTORIC_BATCH_START_TIME = withTimezone("2016-04-12T15:29:33");
   public static final String EXAMPLE_HISTORIC_BATCH_END_TIME = withTimezone("2016-04-12T16:23:34");
+  public static final String EXAMPLE_HISTORIC_BATCH_REMOVAL_TIME = withTimezone("2016-04-12T16:23:34");
   public static final int EXAMPLE_BATCH_REMAINING_JOBS = 21;
   public static final int EXAMPLE_BATCH_COMPLETED_JOBS = 22;
   public static final int EXAMPLE_BATCH_FAILED_JOBS = 23;
@@ -3000,7 +3001,8 @@ public abstract class MockProvider {
       .tenantId(EXAMPLE_TENANT_ID)
       .createUserId(EXAMPLE_USER_ID)
       .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
-      .endTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_END_TIME));
+      .endTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_END_TIME))
+      .removalTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_REMOVAL_TIME));
   }
 
   public static HistoricBatch createMockHistoricBatch() {
