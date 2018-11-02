@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="engineOne">
+    <job-acquisition>default</job-acquisition>
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
+
+    <properties>
+      <property name="history">full</property>
+      <property name="databaseSchemaUpdate">create-drop</property>
+      <property name="databaseType">h2</property>
+      <property name="jdbcUrl">jdbc:h2:mem:engineOne</property>
+
+      <property name="historyRemovalTimeStrategy">process-start</property>
+      <property name="historyCleanupByRemovalTime">true</property>
+    </properties>
+  </process-engine>
+
+  <process-archive name="archiveOne">
+    <process-engine>engineOne</process-engine>
+    <resource>org/camunda/bpm/integrationtest/cleanup/CleanupProcess.bpmn20.xml</resource>
+
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isScanForProcessDefinitions">false</property>
+    </properties>
+  </process-archive>
+
+</process-application>
