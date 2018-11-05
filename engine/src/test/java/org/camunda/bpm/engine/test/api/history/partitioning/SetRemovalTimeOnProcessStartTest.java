@@ -1378,6 +1378,40 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
   })
+  public void shouldResolveByteArray_StandaloneDecisionInput() {
+    // given
+    ClockUtil.setCurrentTime(START_DATE);
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey("testDecision")
+      .singleResult();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
+
+    // when
+    decisionService.evaluateDecisionTableByKey("testDecision", Variables.createVariables()
+      .putValue("pojo", new TestPojo("okay", 13.37)));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeInputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    HistoricDecisionInputInstanceEntity historicDecisionInputInstanceEntity = (HistoricDecisionInputInstanceEntity) historicDecisionInstance.getInputs().get(0);
+
+    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionInputInstanceEntity.getByteArrayValueId());
+
+    Date removalTime = addDays(START_DATE, 5);
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
+  })
   public void shouldResolveByteArray_DecisionOutput() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1392,6 +1426,39 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
       Variables.createVariables()
         .putValue("pojo", new TestPojo("okay", 13.37)));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeOutputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+
+    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+
+    Date removalTime = addDays(START_DATE, 5);
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+  }
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
+  })
+  public void shouldResolveByteArray_StandaloneDecisionOutput() {
+    // given
+    ClockUtil.setCurrentTime(START_DATE);
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey("testDecision")
+      .singleResult();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
+
+    // when
+    decisionService.evaluateDecisionTableByKey("testDecision", Variables.createVariables()
+      .putValue("pojo", new TestPojo("okay", 13.37)));
 
     HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
       .rootDecisionInstancesOnly()
@@ -1429,6 +1496,40 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
       Variables.createVariables()
         .putValue("pojo", new TestPojo("okay", 13.37)));
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .rootDecisionInstancesOnly()
+      .includeOutputs()
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance, notNullValue());
+
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+
+    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+
+    Date removalTime = addDays(START_DATE, 5);
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+  }
+
+  @Test
+  @Deployment( resources = {
+    "org/camunda/bpm/engine/test/api/history/partitioning/HistoricRootProcessInstanceTest.shouldResolveByteArray_DecisionOutputLiteralExpression.dmn"
+  })
+  public void shouldResolveByteArray_StandaloneDecisionOutputLiteralExpression() {
+    // given
+    ClockUtil.setCurrentTime(START_DATE);
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionKey("testDecision")
+      .singleResult();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
+
+    // when
+    decisionService.evaluateDecisionTableByKey("testDecision", Variables.createVariables()
+      .putValue("pojo", new TestPojo("okay", 13.37)));
 
     HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
       .rootDecisionInstancesOnly()
