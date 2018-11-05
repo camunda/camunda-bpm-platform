@@ -16,8 +16,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +41,8 @@ import org.junit.rules.RuleChain;
 
 public class MigrationTimerBoundryEventTest {
 
+  private static final String DUE_DATE_IN_THE_PAST = "2018-02-11T12:13:14Z";
+  protected static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
@@ -53,10 +59,20 @@ public class MigrationTimerBoundryEventTest {
     taskService = rule.getTaskService();
   }
 
+  @After
+  public void cleanUpJobs() {
+    List<Job> jobs = managementService.createJobQuery().list();
+    if (!jobs.isEmpty()) {
+      for (Job job : jobs) {
+        managementService.deleteJob(job.getId());
+      }
+    }
+  }
+
   @Test
   public void testMigrationNonInterruptingTimerEvent() {
     // given
-    BpmnModelInstance model = createModel(false, "2018-02-11T12:13:14Z");
+    BpmnModelInstance model = createModel(false, DUE_DATE_IN_THE_PAST);
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
@@ -82,7 +98,7 @@ public class MigrationTimerBoundryEventTest {
   @Test
   public void testMigrationInterruptingTimerEvent() {
     // given
-    BpmnModelInstance model = createModel(true, "2018-02-11T12:13:14Z");
+    BpmnModelInstance model = createModel(true, DUE_DATE_IN_THE_PAST);
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
@@ -108,7 +124,8 @@ public class MigrationTimerBoundryEventTest {
   @Test
   public void testMigrationNonTriggeredInterruptingTimerEvent() {
     // given
-    BpmnModelInstance model = createModel(true, "2999-02-11T12:13:14Z");
+    Date futureDueDate = DateUtils.addYears(ClockUtil.getCurrentTime(), 1);
+    BpmnModelInstance model = createModel(true, sdf.format(futureDueDate));
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
@@ -134,9 +151,22 @@ public class MigrationTimerBoundryEventTest {
   @Test
   public void testMigrationTwoInterruptingTimerEvents() {
     // given
-    String resource = "org/camunda/bpm/engine/test/api/runtime/migration/MigrationTimerBoundryEventTest.twoNonInterruptingTimers.bpmn20.xml";
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(resource).getDeployedProcessDefinitions().get(0);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(resource).getDeployedProcessDefinitions().get(0);
+    Date futureDueDate = DateUtils.addYears(ClockUtil.getCurrentTime(), 1);
+    BpmnModelInstance model = Bpmn.createExecutableProcess()
+        .startEvent("startEvent")
+        .userTask("userTask").name("User Task")
+        .boundaryEvent("timerPast")
+          .cancelActivity(false)
+          .timerWithDate(DUE_DATE_IN_THE_PAST)
+        .userTask("past")
+        .moveToActivity("userTask")
+          .boundaryEvent("timerFuture")
+          .cancelActivity(false)
+          .timerWithDate(sdf.format(futureDueDate))
+        .userTask("future")
+        .done();
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
 
@@ -167,7 +197,7 @@ public class MigrationTimerBoundryEventTest {
         .userTask("afterTimer")
         .endEvent("endEvent")
         .done();
-    BpmnModelInstance targetModel = createModel(false, "2018-02-11T12:13:14Z");
+    BpmnModelInstance targetModel = createModel(false, DUE_DATE_IN_THE_PAST);
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
 
@@ -188,7 +218,7 @@ public class MigrationTimerBoundryEventTest {
   @Test
   public void testMigrationWithSourceNonInterruptingTimerEvent() {
     // given
-    BpmnModelInstance sourceModel = createModel(false, "2018-02-11T12:13:14Z");
+    BpmnModelInstance sourceModel = createModel(false, DUE_DATE_IN_THE_PAST);
     BpmnModelInstance targetModel = Bpmn.createExecutableProcess()
         .startEvent("startEvent")
         .userTask("userTask").name("User Task")
@@ -217,21 +247,21 @@ public class MigrationTimerBoundryEventTest {
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
   }
-
   @Test
   public void testMigrationTwoToOneNonInterruptingTimerEvents() {
     // given
+    Date futureDueDate = DateUtils.addYears(ClockUtil.getCurrentTime(), 1);
     BpmnModelInstance sourceModel = Bpmn.createExecutableProcess()
         .startEvent("startEvent")
         .userTask("userTask").name("User Task")
         .boundaryEvent("timerPast")
           .cancelActivity(false)
-          .timerWithDate("2018-02-11T12:13:14Z")
+          .timerWithDate(DUE_DATE_IN_THE_PAST)
         .userTask("past")
         .moveToActivity("userTask")
           .boundaryEvent("timerFuture")
           .cancelActivity(false)
-          .timerWithDate("2999-02-11T12:13:14Z")
+          .timerWithDate(sdf.format(futureDueDate))
         .userTask("future")
         .done();
     BpmnModelInstance targetModel = Bpmn.createExecutableProcess()
@@ -239,7 +269,7 @@ public class MigrationTimerBoundryEventTest {
         .userTask("userTask").name("User Task")
           .boundaryEvent("timerFuture")
           .cancelActivity(false)
-          .timerWithDate("2999-02-11T12:13:14Z")
+          .timerWithDate(sdf.format(futureDueDate))
         .userTask("future")
         .done();
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
