@@ -69,7 +69,8 @@
   <update id="updateJobLogByBatchId"
           parameterType="java.util.Map">
       update ${prefix}ACT_HI_JOB_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      TIMESTAMP_ = TIMESTAMP_
 
       where JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
   </update>
