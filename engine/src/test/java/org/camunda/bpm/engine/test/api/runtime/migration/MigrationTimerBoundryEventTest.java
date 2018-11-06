@@ -93,6 +93,7 @@ public class MigrationTimerBoundryEventTest {
     List<Job> list = managementService.createJobQuery().list();
     assertTrue(list.isEmpty());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
   }
 
   @Test
@@ -119,6 +120,7 @@ public class MigrationTimerBoundryEventTest {
     List<Job> list = managementService.createJobQuery().list();
     assertTrue(list.isEmpty());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
+    assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
   }
 
   @Test
@@ -131,10 +133,6 @@ public class MigrationTimerBoundryEventTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
 
-    Job job = managementService.createJobQuery().singleResult();
-    assertNotNull(job);
-    managementService.executeJob(job.getId());
-
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -144,12 +142,13 @@ public class MigrationTimerBoundryEventTest {
 
     // then
     List<Job> list = managementService.createJobQuery().list();
-    assertTrue(list.isEmpty());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
+    assertEquals(1, list.size());
+    assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
   }
 
   @Test
-  public void testMigrationTwoInterruptingTimerEvents() {
+  public void testMigrationTwoNonInterruptingTimerEvents() {
     // given
     Date futureDueDate = DateUtils.addYears(ClockUtil.getCurrentTime(), 1);
     BpmnModelInstance model = Bpmn.createExecutableProcess()
@@ -185,7 +184,9 @@ public class MigrationTimerBoundryEventTest {
     List<Job> list = managementService.createJobQuery().list();
     assertEquals(1, list.size());
     assertEquals(1, managementService.createJobQuery().duedateHigherThan(ClockUtil.getCurrentTime()).count());
-    assertEquals(1, taskService.createTaskQuery().taskName("past").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("past").count());
+    assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("future").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
   }
 
   @Test
@@ -212,6 +213,7 @@ public class MigrationTimerBoundryEventTest {
 
     // then
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
+    assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
     assertEquals(1, managementService.createJobQuery().count());
   }
 
@@ -247,6 +249,7 @@ public class MigrationTimerBoundryEventTest {
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
   }
+
   @Test
   public void testMigrationTwoToOneNonInterruptingTimerEvents() {
     // given
@@ -291,7 +294,7 @@ public class MigrationTimerBoundryEventTest {
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    List<Job> list = managementService.createJobQuery().list();
+    List<Job> list = managementService.createJobQuery().duedateHigherThan(ClockUtil.getCurrentTime()).list();
     assertEquals(1, list.size());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("future").count());

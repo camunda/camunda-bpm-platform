@@ -98,8 +98,8 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
 
   protected boolean isNonInterruptingTimerTriggeredAlready(MigratingInstanceParseContext parseContext,
       Map<String, TimerDeclarationImpl> sourceTimerDeclarationsInEventScope, TimerDeclarationImpl targetTimerDeclaration) {
-    if ((!targetTimerDeclaration.isInterruptingTimer()) && targetTimerDeclaration.getJobHandlerType() == TimerExecuteNestedActivityJobHandler.TYPE && sourceTimerDeclarationsInEventScope.values().size() != 0) {
-      return true;
+    if (targetTimerDeclaration.isInterruptingTimer() || targetTimerDeclaration.getJobHandlerType() != TimerExecuteNestedActivityJobHandler.TYPE || sourceTimerDeclarationsInEventScope.values().size() == 0) {
+      return false;
     }
     for (TimerDeclarationImpl sourceTimerDeclaration : sourceTimerDeclarationsInEventScope.values()) {
       MigrationInstruction migrationInstruction1 = parseContext.findSingleMigrationInstruction(sourceTimerDeclaration.getActivityId());
