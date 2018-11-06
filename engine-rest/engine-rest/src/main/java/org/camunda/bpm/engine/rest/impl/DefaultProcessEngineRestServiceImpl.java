@@ -203,6 +203,11 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
     return super.getOptimizeRestService(null);
   }
 
+  @Path(VersionRestService.PATH)
+  public VersionRestService getVersionRestService() {
+    return super.getVersionRestService(null);
+  }
+
   @Override
   protected URI getRelativeEngineUri(String engineName) {
     // the default engine

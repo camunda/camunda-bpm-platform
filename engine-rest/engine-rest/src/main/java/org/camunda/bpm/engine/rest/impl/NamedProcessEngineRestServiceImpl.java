@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.BatchRestService;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
@@ -244,6 +243,11 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + OptimizeRestService.PATH)
   public OptimizeRestService getOptimizeRestService(@PathParam("name") String engineName) {
     return super.getOptimizeRestService(engineName);
+  }
+
+  @Path("/{name}" + VersionRestService.PATH)
+  public VersionRestService getVersionRestService(@PathParam("name") String engineName) {
+    return super.getVersionRestService(engineName);
   }
 
   @GET
