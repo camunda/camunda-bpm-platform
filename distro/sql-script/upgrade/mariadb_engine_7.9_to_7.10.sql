@@ -4,19 +4,19 @@ ALTER TABLE ACT_RE_PROCDEF
 
 -- https://app.camunda.com/jira/browse/CAM-9153
 ALTER TABLE ACT_HI_VARINST
-  ADD CREATE_TIME_ timestamp(3);
+  ADD CREATE_TIME_ datetime(3);
 
 -- https://app.camunda.com/jira/browse/CAM-9215
 ALTER TABLE ACT_HI_ATTACHMENT
-  ADD CREATE_TIME_ timestamp(3);
+  ADD CREATE_TIME_ datetime(3);
 
 -- https://app.camunda.com/jira/browse/CAM-9216
 ALTER TABLE ACT_HI_DEC_IN
-  ADD CREATE_TIME_ timestamp(3);
+  ADD CREATE_TIME_ datetime(3);
 
 -- https://app.camunda.com/jira/browse/CAM-9217
 ALTER TABLE ACT_HI_DEC_OUT
-  ADD CREATE_TIME_ timestamp(3);
+  ADD CREATE_TIME_ datetime(3);
 
 -- https://app.camunda.com/jira/browse/CAM-9199
 ALTER TABLE ACT_HI_PROCINST
@@ -49,7 +49,7 @@ ALTER TABLE ACT_GE_BYTEARRAY
   ADD TYPE_ integer;
 
 ALTER TABLE ACT_GE_BYTEARRAY
-  ADD CREATE_TIME_ timestamp(3);
+  ADD CREATE_TIME_ datetime(3);
 
 -- https://app.camunda.com/jira/browse/CAM-9370
 ALTER TABLE ACT_RU_EXECUTION

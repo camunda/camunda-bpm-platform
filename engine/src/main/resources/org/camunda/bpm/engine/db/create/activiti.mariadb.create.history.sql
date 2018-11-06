@@ -92,7 +92,7 @@ create table ACT_HI_VARINST (
     TASK_ID_ varchar(64),
     NAME_ varchar(255) not null,
     VAR_TYPE_ varchar(100),
-    CREATE_TIME_ timestamp(3),
+    CREATE_TIME_ datetime(3),
     REV_ integer,
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,
@@ -182,7 +182,7 @@ create table ACT_HI_ATTACHMENT (
     URL_ varchar(4000),
     CONTENT_ID_ varchar(64),
     TENANT_ID_ varchar(64),
-    CREATE_TIME_ timestamp(3),
+    CREATE_TIME_ datetime(3),
     REMOVAL_TIME_ datetime(3),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

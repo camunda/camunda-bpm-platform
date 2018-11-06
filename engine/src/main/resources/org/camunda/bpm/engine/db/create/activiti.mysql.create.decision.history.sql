@@ -37,7 +37,7 @@ create table ACT_HI_DEC_IN (
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
     TENANT_ID_ varchar(64),
-    CREATE_TIME_ timestamp,
+    CREATE_TIME_ datetime,
     ROOT_PROC_INST_ID_ varchar(64),
     REMOVAL_TIME_ datetime,
     primary key (ID_)
@@ -59,7 +59,7 @@ create table ACT_HI_DEC_OUT (
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
     TENANT_ID_ varchar(64),
-    CREATE_TIME_ timestamp,
+    CREATE_TIME_ datetime,
     ROOT_PROC_INST_ID_ varchar(64),
     REMOVAL_TIME_ datetime,
     primary key (ID_)

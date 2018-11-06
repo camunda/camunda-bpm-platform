@@ -32,7 +32,7 @@ create table ACT_GE_BYTEARRAY (
     GENERATED_ TINYINT,
     TENANT_ID_ varchar(64),
     TYPE_ integer,
-    CREATE_TIME_ timestamp(3),
+    CREATE_TIME_ datetime(3),
     ROOT_PROC_INST_ID_ varchar(64),
     REMOVAL_TIME_ datetime(3),
     primary key (ID_)
