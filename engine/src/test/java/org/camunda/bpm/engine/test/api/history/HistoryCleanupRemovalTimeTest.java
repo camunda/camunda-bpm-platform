@@ -138,6 +138,7 @@ public class HistoryCleanupRemovalTimeTest {
     engineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
 
     engineConfiguration.setBatchOperationHistoryTimeToLive(null);
+    engineConfiguration.setBatchOperationsForHistoryCleanup(null);
 
     engineConfiguration.initHistoryCleanup();
 
@@ -169,6 +170,7 @@ public class HistoryCleanupRemovalTimeTest {
       engineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
 
       engineConfiguration.setBatchOperationHistoryTimeToLive(null);
+      engineConfiguration.setBatchOperationsForHistoryCleanup(null);
 
       engineConfiguration.initHistoryCleanup();
     }
