@@ -10,10 +10,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.history.partitioning;
+package org.camunda.bpm.engine.test.api.history.removaltime;
 
-import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
@@ -28,7 +26,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
@@ -37,8 +34,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -50,17 +45,14 @@ import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -69,15 +61,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
-
-  @Before
-  public void setUp() {
-    processEngineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START)
-      .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
-      .initHistoryRemovalTime();
-  }
+public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
   protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
@@ -90,13 +74,10 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
   protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
     .startEvent()
       .callActivity()
         .calledElement(CALLED_PROCESS_KEY)
     .endEvent().done();
-
-  protected final Date START_DATE = new Date(1363608000000L);
 
   @Test
   @Deployment(resources = {
@@ -104,17 +85,14 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   })
   public void shouldResolveHistoricDecisionInstance() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask()
-          .camundaDecisionRef("dish-decision")
-      .endEvent().done());
+    .startEvent()
+      .businessRuleTask()
+        .camundaDecisionRef("dish-decision")
+    .endEvent().done());
 
     // when
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
       Variables.createVariables()
         .putValue("temperature", 32)
         .putValue("dayType", "Weekend"));
@@ -124,42 +102,10 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicDecisionInstances.size(), is(3));
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicDecisionInstances.get(0).getRemovalTime(), is(removalTime));
-    assertThat(historicDecisionInstances.get(1).getRemovalTime(), is(removalTime));
-    assertThat(historicDecisionInstances.get(2).getRemovalTime(), is(removalTime));
-  }
-
-  @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
-  public void shouldResolveStandaloneHistoricDecisionInstance() {
-    // given
-    ClockUtil.setCurrentTime(START_DATE);
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionKey("dish-decision")
-      .singleResult();
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
-
-    // when
-    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
-      .putValue("temperature", 32)
-      .putValue("dayType", "Weekend"));
-
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-
-    // assume
-    assertThat(historicDecisionInstances.size(), is(3));
-
-    Date removalTime = addDays(START_DATE, 5);
-
-    // then
-    assertThat(historicDecisionInstances.get(0).getRemovalTime(), is(removalTime));
-    assertThat(historicDecisionInstances.get(1).getRemovalTime(), is(removalTime));
-    assertThat(historicDecisionInstances.get(2).getRemovalTime(), is(removalTime));
+    assertThat(historicDecisionInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInstances.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInstances.get(2).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -168,17 +114,14 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   })
   public void shouldResolveHistoricDecisionInputInstance() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask()
-          .camundaDecisionRef("dish-decision")
-      .endEvent().done());
+    .startEvent()
+      .businessRuleTask()
+        .camundaDecisionRef("dish-decision")
+    .endEvent().done());
 
     // when
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
       Variables.createVariables()
         .putValue("temperature", 32)
         .putValue("dayType", "Weekend"));
@@ -193,45 +136,9 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicDecisionInputInstances.get(0).getRemovalTime(), is(removalTime));
-    assertThat(historicDecisionInputInstances.get(1).getRemovalTime(), is(removalTime));
-  }
-
-  @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
-  public void shouldResolveStandaloneHistoricDecisionInputInstance() {
-    // given
-    ClockUtil.setCurrentTime(START_DATE);
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionKey("dish-decision")
-      .singleResult();
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
-
-    // when
-    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
-      .putValue("temperature", 32)
-      .putValue("dayType", "Weekend"));
-
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
-
-    // assume
-    assertThat(historicDecisionInstance, notNullValue());
-
-    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
-
-    Date removalTime = addDays(START_DATE, 5);
-
-    // then
-    assertThat(historicDecisionInputInstances.get(0).getRemovalTime(), is(removalTime));
-    assertThat(historicDecisionInputInstances.get(1).getRemovalTime(), is(removalTime));
+    assertThat(historicDecisionInputInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInputInstances.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -257,8 +164,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
 
     // then
-    assertThat(historicDecisionInputInstances.get(0).getRemovalTime(), nullValue());
-    assertThat(historicDecisionInputInstances.get(1).getRemovalTime(), nullValue());
+    assertThat(historicDecisionInputInstances.get(0).getRootProcessInstanceId(), nullValue());
+    assertThat(historicDecisionInputInstances.get(1).getRootProcessInstanceId(), nullValue());
   }
 
   @Test
@@ -267,54 +174,14 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   })
   public void shouldResolveHistoricDecisionOutputInstance() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask()
-          .camundaDecisionRef("dish-decision")
-      .endEvent().done());
-
-    // when
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
-
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
-
-    // assume
-    assertThat(historicDecisionInstance, notNullValue());
-
-    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
-
-    Date removalTime = addDays(START_DATE, 5);
-
-    // then
-    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime(), is(removalTime));
-  }
-
-  @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
-  public void shouldResolveStandaloneHistoricDecisionOutputInstance() {
-    // given
-    ClockUtil.setCurrentTime(START_DATE);
-
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
+    .startEvent()
       .businessRuleTask()
-      .camundaDecisionRef("dish-decision")
-      .endEvent().done());
+        .camundaDecisionRef("dish-decision")
+    .endEvent().done());
 
     // when
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
       Variables.createVariables()
         .putValue("temperature", 32)
         .putValue("dayType", "Weekend"));
@@ -329,10 +196,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime(), is(removalTime));
+    assertThat(historicDecisionOutputInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -358,14 +223,12 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
 
     // then
-    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime(), nullValue());
+    assertThat(historicDecisionOutputInstances.get(0).getRootProcessInstanceId(), nullValue());
   }
 
   @Test
   public void shouldResolveHistoricProcessInstance() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -380,17 +243,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicProcessInstance, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicProcessInstance.getRemovalTime(), is(removalTime));
+    assertThat(historicProcessInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveHistoricActivityInstance() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -405,17 +264,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicActivityInstance, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicActivityInstance.getRemovalTime(), is(removalTime));
+    assertThat(historicActivityInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveHistoricTaskInstance() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -430,10 +285,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicTaskInstance, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicTaskInstance.getRemovalTime(), is(removalTime));
+    assertThat(historicTaskInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -450,41 +303,36 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     assertThat(historicTaskInstance, notNullValue());
 
     // then
-    assertThat(historicTaskInstance.getRemovalTime(), nullValue());
+    assertThat(historicTaskInstance.getRootProcessInstanceId(), nullValue());
 
     // cleanup
     taskService.deleteTask(task.getId(), true);
   }
 
   @Test
-  public void shouldResolveVariableInstance() {
+  public void shouldResolveHistoricVariableInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
 
-    ClockUtil.setCurrentTime(START_DATE);
-
+    // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
       Variables.createVariables()
         .putValue("aVariableName", Variables.stringValue("aVariableValue")));
 
-    // when
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
-
     HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
 
-    Date removalTime = addDays(START_DATE, 5);
+    // assume
+    assertThat(historicVariableInstance, notNullValue());
 
     // then
-    assertThat(historicVariableInstance.getRemovalTime(), is(removalTime));
+    assertThat(historicVariableInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveHistoricDetailByVariableInstanceUpdate() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -503,45 +351,37 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicDetails.size(), is(2));
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicDetails.get(0).getRemovalTime(), is(removalTime));
-    assertThat(historicDetails.get(1).getRemovalTime(), is(removalTime));
+    assertThat(historicDetails.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDetails.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveHistoricDetailByFormProperty() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
+    testRule.deploy(CALLING_PROCESS);
 
-    DeploymentWithDefinitions deployment = testRule.deploy(CALLING_PROCESS);
-
-    testRule.deploy(CALLED_PROCESS);
+    DeploymentWithDefinitions deployment = testRule.deploy(CALLED_PROCESS);
 
     String processDefinitionId = deployment.getDeployedProcessDefinitions().get(0).getId();
     Map<String, Object> properties = new HashMap<>();
     properties.put("aFormProperty", "aFormPropertyValue");
 
     // when
-    formService.submitStartForm(processDefinitionId, properties);
+    ProcessInstance processInstance = formService.submitStartForm(processDefinitionId, properties);
 
     HistoricDetail historicDetail = historyService.createHistoricDetailQuery().formFields().singleResult();
 
     // assume
     assertThat(historicDetail, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicDetail.getRemovalTime(), is(removalTime));
+    assertThat(historicDetail.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveIncident() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -565,21 +405,17 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicIncidents.size(), is(2));
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicIncidents.get(0).getRemovalTime(), is(removalTime));
-    assertThat(historicIncidents.get(1).getRemovalTime(), is(removalTime));
+    assertThat(historicIncidents.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicIncidents.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldNotResolveStandaloneIncident() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLED_PROCESS);
 
-    repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date(1363608000000L));
+    repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date());
 
     String jobId = managementService.createJobQuery()
       .singleResult()
@@ -597,10 +433,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicIncident, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicIncident.getRemovalTime(), nullValue());
+    assertThat(historicIncident.getRootProcessInstanceId(), nullValue());
 
     // cleanup
     clearJobLog(jobId);
@@ -610,39 +444,32 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   @Test
   public void shouldResolveExternalTaskLog() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
       .startEvent()
         .serviceTask().camundaExternalTask("anExternalTaskTopic")
       .endEvent().done());
 
     testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
       .startEvent()
         .callActivity()
           .calledElement("calledProcess")
       .endEvent().done());
 
     // when
-    runtimeService.startProcessInstanceByKey("callingProcess");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
 
-    HistoricExternalTaskLog externalTaskLog = historyService.createHistoricExternalTaskLogQuery().singleResult();
+    HistoricExternalTaskLog ExternalTaskLog = historyService.createHistoricExternalTaskLogQuery().singleResult();
 
     // assume
-    assertThat(externalTaskLog, notNullValue());
-
-    Date removalTime = addDays(START_DATE, 5);
+    assertThat(ExternalTaskLog, notNullValue());
 
     // then
-    assertThat(externalTaskLog.getRemovalTime(), is(removalTime));
+    assertThat(ExternalTaskLog.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveJobLog() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -664,21 +491,17 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(jobLog.size(), is(2));
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(jobLog.get(0).getRemovalTime(), is(removalTime));
-    assertThat(jobLog.get(1).getRemovalTime(), is(removalTime));
+    assertThat(jobLog.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(jobLog.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldNotResolveJobLog() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLED_PROCESS);
 
-    repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date(1363608000000L));
+    repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date());
 
     // when
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
@@ -687,7 +510,7 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     assertThat(jobLog, notNullValue());
 
     // then
-    assertThat(jobLog.getRemovalTime(), nullValue());
+    assertThat(jobLog.getRootProcessInstanceId(), nullValue());
 
     // cleanup
     managementService.deleteJob(jobLog.getJobId());
@@ -697,13 +520,11 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   @Test
   public void shouldResolveUserOperationLog_SetJobRetries() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
 
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
     String jobId = managementService.createJobQuery()
@@ -720,30 +541,25 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(userOperationLog, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(userOperationLog.getRemovalTime(), is(removalTime));
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveUserOperationLog_SetExternalTaskRetries() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
       .startEvent()
         .serviceTask().camundaExternalTask("anExternalTaskTopic")
       .endEvent().done());
 
     testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
       .startEvent()
         .callActivity()
           .calledElement("calledProcess")
       .endEvent().done());
 
-    runtimeService.startProcessInstanceByKey("callingProcess");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
 
     // when
     identityService.setAuthenticatedUserId("aUserId");
@@ -755,17 +571,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(userOperationLog, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(userOperationLog.getRemovalTime(), is(removalTime));
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveUserOperationLog_ClaimTask() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -782,17 +594,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(userOperationLog, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(userOperationLog.getRemovalTime(), is(removalTime));
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveUserOperationLog_CreateAttachment() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -809,17 +617,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(userOperationLog, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(userOperationLog.getRemovalTime(), is(removalTime));
+    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveIdentityLink_AddCandidateUser() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -834,17 +638,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(historicIdentityLinkLog, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(historicIdentityLinkLog.getRemovalTime(), is(removalTime));
+    assertThat(historicIdentityLinkLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldNotResolveIdentityLink_AddCandidateUser() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     Task aTask = taskService.newTask();
     taskService.saveTask(aTask);
 
@@ -857,7 +657,7 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     assertThat(historicIdentityLinkLog, notNullValue());
 
     // then
-    assertThat(historicIdentityLinkLog.getRemovalTime(), nullValue());
+    assertThat(historicIdentityLinkLog.getRootProcessInstanceId(), nullValue());
 
     // cleanup
     taskService.complete(aTask.getId());
@@ -867,8 +667,6 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   @Test
   public void shouldResolveCommentByProcessInstanceId() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -888,17 +686,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(comment, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(comment.getRemovalTime(), is(removalTime));
+    assertThat(comment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveCommentByTaskId() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -915,17 +709,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(comment, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(comment.getRemovalTime(), is(removalTime));
+    assertThat(comment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
   public void shouldNotResolveCommentByWrongTaskIdAndProcessInstanceId() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -944,21 +734,19 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     // assume
     assertThat(comment, notNullValue());
-    
+
     // then
-    assertThat(comment.getRemovalTime(), nullValue());
+    assertThat(comment.getRootProcessInstanceId(), nullValue());
   }
 
   @Test
   public void shouldResolveCommentByTaskIdAndWrongProcessInstanceId() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
 
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -970,10 +758,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(comment, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(comment.getRemovalTime(), is(removalTime));
+    assertThat(comment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
@@ -989,7 +775,7 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     assertThat(comment, notNullValue());
 
     // then
-    assertThat(comment.getRemovalTime(), nullValue());
+    assertThat(comment.getRootProcessInstanceId(), nullValue());
 
     // cleanup
     clearCommentByProcessInstanceId("aNonExistentProcessInstanceId");
@@ -1008,7 +794,7 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     assertThat(comment, notNullValue());
 
     // then
-    assertThat(comment.getRemovalTime(), nullValue());
+    assertThat(comment.getRootProcessInstanceId(), nullValue());
 
     // cleanup
     clearCommentByTaskId("aNonExistentTaskId");
@@ -1017,13 +803,11 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   @Test
   public void shouldResolveAttachmentByProcessInstanceId() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
 
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     String processInstanceId = runtimeService.createProcessInstanceQuery()
       .activityIdIn("userTask")
@@ -1038,22 +822,18 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(attachment, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(attachment.getRemovalTime(), is(removalTime));
+    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveAttachmentByTaskId() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
 
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -1065,10 +845,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(attachment, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(attachment.getRemovalTime(), is(removalTime));
+    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
@@ -1094,19 +872,17 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     assertThat(attachment, notNullValue());
 
     // then
-    assertThat(attachment.getRemovalTime(), nullValue());
+    assertThat(attachment.getRootProcessInstanceId(), nullValue());
   }
 
   @Test
   public void shouldResolveAttachmentByTaskIdAndWrongProcessInstanceId() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
 
-    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     String taskId = taskService.createTaskQuery()
       .singleResult()
@@ -1120,10 +896,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(attachment, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(attachment.getRemovalTime(), is(removalTime));
+    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
@@ -1139,7 +913,7 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     assertThat(attachment, notNullValue());
 
     // then
-    assertThat(attachment.getRemovalTime(), nullValue());
+    assertThat(attachment.getRootProcessInstanceId(), nullValue());
 
     // cleanup
     clearAttachment(attachment);
@@ -1148,8 +922,6 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   @Test
   public void shouldResolveByteArray_CreateAttachmentByTask() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -1166,17 +938,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(byteArray, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArray.getRemovalTime(), is(removalTime));
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveByteArray_CreateAttachmentByProcessInstance() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -1196,17 +964,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(byteArray, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArray.getRemovalTime(), is(removalTime));
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveByteArray_SetVariable() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -1223,17 +987,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     assertThat(byteArray, notNullValue());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArray.getRemovalTime(), is(removalTime));
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveByteArray_UpdateVariable() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -1253,17 +1013,13 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
     // assume
     ByteArrayEntity byteArray = findByteArrayById(historicDetails.getByteArrayValueId());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArray.getRemovalTime(), is(removalTime));
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveByteArray_JobLog() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(CALLING_PROCESS);
 
     testRule.deploy(CALLED_PROCESS);
@@ -1290,24 +1046,19 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     ByteArrayEntity byteArray = findByteArrayById(jobLog.getExceptionByteArrayId());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArray.getRemovalTime(), is(removalTime));
+    assertThat(byteArray.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveByteArray_ExternalTaskLog() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
       .startEvent()
         .serviceTask().camundaExternalTask("aTopicName")
       .endEvent().done());
 
     testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
       .startEvent()
         .callActivity()
           .calledElement("calledProcess")
@@ -1331,10 +1082,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     ByteArrayEntity byteArrayEntity = findByteArrayById(externalTaskLog.getErrorDetailsByteArrayId());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -1343,10 +1092,7 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   })
   public void shouldResolveByteArray_DecisionInput() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
       .startEvent()
         .businessRuleTask().camundaDecisionRef("testDecision")
       .endEvent().done());
@@ -1368,44 +1114,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionInputInstanceEntity.getByteArrayValueId());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
-  }
-
-  @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
-  })
-  public void shouldResolveByteArray_StandaloneDecisionInput() {
-    // given
-    ClockUtil.setCurrentTime(START_DATE);
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionKey("testDecision")
-      .singleResult();
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
-
-    // when
-    decisionService.evaluateDecisionTableByKey("testDecision", Variables.createVariables()
-      .putValue("pojo", new TestPojo("okay", 13.37)));
-
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
-
-    // assume
-    assertThat(historicDecisionInstance, notNullValue());
-
-    HistoricDecisionInputInstanceEntity historicDecisionInputInstanceEntity = (HistoricDecisionInputInstanceEntity) historicDecisionInstance.getInputs().get(0);
-
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionInputInstanceEntity.getByteArrayValueId());
-
-    Date removalTime = addDays(START_DATE, 5);
-
-    // then
-    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -1414,10 +1124,7 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
   })
   public void shouldResolveByteArray_DecisionOutput() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
       .startEvent()
         .businessRuleTask().camundaDecisionRef("testDecision")
       .endEvent().done());
@@ -1439,55 +1146,15 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
-  }
-  @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
-  })
-  public void shouldResolveByteArray_StandaloneDecisionOutput() {
-    // given
-    ClockUtil.setCurrentTime(START_DATE);
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionKey("testDecision")
-      .singleResult();
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
-
-    // when
-    decisionService.evaluateDecisionTableByKey("testDecision", Variables.createVariables()
-      .putValue("pojo", new TestPojo("okay", 13.37)));
-
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
-
-    // assume
-    assertThat(historicDecisionInstance, notNullValue());
-
-    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
-
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
-
-    Date removalTime = addDays(START_DATE, 5);
-
-    // then
-    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
   @Test
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/api/history/partitioning/HistoricRootProcessInstanceTest.shouldResolveByteArray_DecisionOutputLiteralExpression.dmn"
-  })
+  @Deployment
   public void shouldResolveByteArray_DecisionOutputLiteralExpression() {
     // given
-    ClockUtil.setCurrentTime(START_DATE);
-
     testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
       .startEvent()
         .businessRuleTask().camundaDecisionRef("testDecision")
       .endEvent().done());
@@ -1509,104 +1176,8 @@ public class SetRemovalTimeOnProcessStartTest extends AbstractPartitioningTest {
 
     ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
 
-    Date removalTime = addDays(START_DATE, 5);
-
     // then
-    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
-  }
-
-  @Test
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/api/history/partitioning/HistoricRootProcessInstanceTest.shouldResolveByteArray_DecisionOutputLiteralExpression.dmn"
-  })
-  public void shouldResolveByteArray_StandaloneDecisionOutputLiteralExpression() {
-    // given
-    ClockUtil.setCurrentTime(START_DATE);
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionKey("testDecision")
-      .singleResult();
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
-
-    // when
-    decisionService.evaluateDecisionTableByKey("testDecision", Variables.createVariables()
-      .putValue("pojo", new TestPojo("okay", 13.37)));
-
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
-
-    // assume
-    assertThat(historicDecisionInstance, notNullValue());
-
-    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
-
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
-
-    Date removalTime = addDays(START_DATE, 5);
-
-    // then
-    assertThat(byteArrayEntity.getRemovalTime(), is(removalTime));
-  }
-
-  @Test
-  public void shouldResolveBatch() {
-    // given
-    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
-    processEngineConfiguration.initHistoryCleanup();
-
-    testRule.deploy(CALLED_PROCESS);
-
-    testRule.deploy(CALLING_PROCESS);
-
-    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
-
-    ClockUtil.setCurrentTime(START_DATE);
-
-    // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
-
-    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
-
-    // then
-    assertThat(historicBatch.getRemovalTime(), is(addDays(START_DATE, 5)));
-
-    // cleanup
-    managementService.deleteBatch(batch.getId(), true);
-  }
-
-  @Test
-  public void shouldResolveBatchJobLog() {
-    // given
-    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
-    processEngineConfiguration.initHistoryCleanup();
-
-    testRule.deploy(CALLED_PROCESS);
-
-    testRule.deploy(CALLING_PROCESS);
-
-    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
-
-    ClockUtil.setCurrentTime(START_DATE);
-
-    // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
-
-    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
-
-    // then
-    assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
-
-    // when
-    managementService.executeJob(jobLog.getJobId());
-
-    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery().list();
-
-    assertThat(jobLogs.get(0).getRemovalTime(), is(addDays(START_DATE, 5)));
-    assertThat(jobLogs.get(1).getRemovalTime(), is(addDays(START_DATE, 5)));
-
-    // cleanup
-    managementService.deleteBatch(batch.getId(), true);
+    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
 }

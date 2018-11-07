@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.history.partitioning;
+package org.camunda.bpm.engine.test.api.history.removaltime;
 
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
@@ -52,7 +52,7 @@ import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
  * @author Tassilo Weidner
  */
 @RequiredHistoryLevel(HISTORY_FULL)
-public abstract class AbstractPartitioningTest {
+public abstract class AbstractRemovalTimeTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);

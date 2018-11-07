@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.history.partitioning;
+package org.camunda.bpm.engine.test.api.history.removaltime;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -68,7 +68,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
+public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
   @Before
   public void setUp() {

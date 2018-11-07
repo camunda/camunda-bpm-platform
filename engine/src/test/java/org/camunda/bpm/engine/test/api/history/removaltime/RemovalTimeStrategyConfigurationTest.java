@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.history.partitioning;
+package org.camunda.bpm.engine.test.api.history.removaltime;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Tassilo Weidner
  */
-public class PartitioningProcessEngineConfigurationTest {
+public class RemovalTimeStrategyConfigurationTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
