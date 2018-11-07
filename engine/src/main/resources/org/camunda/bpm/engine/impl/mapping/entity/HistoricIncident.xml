@@ -76,6 +76,15 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricIncidentsByRootProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_INCIDENT set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+    CREATE_TIME_ = CREATE_TIME_
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- HISTORIC INCIDENT DELETE -->
 
   <delete id="deleteHistoricIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">

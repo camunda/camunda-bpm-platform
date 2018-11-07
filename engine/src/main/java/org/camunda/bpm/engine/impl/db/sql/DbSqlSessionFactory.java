@@ -183,6 +183,16 @@ public class DbSqlSessionFactory implements SessionFactory {
 
       addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIncidentsByBatchIds", "deleteHistoricIncidentsByBatchIds_mysql");
 
+      // related to CAM-9505
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIncident", "updateIncident_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateTaskSuspensionStateByParameters", "updateTaskSuspensionStateByParameters_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateJobLogByBatchId", "updateJobLogByBatchId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateJobLogByRootProcessInstanceId", "updateJobLogByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_mysql");
+
       constants = new HashMap<String, String>();
       constants.put("constant.event", "'event'");
       constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");

@@ -88,34 +88,48 @@
       REV_ = REV_ + 1,
       SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
-      <if test="parameter.processInstanceId != null">
-        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.processDefinitionId != null">
-        PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.processDefinitionKey != null">
-        PROC_DEF_ID_ IN (
-          SELECT ID_ 
-          FROM ${prefix}ACT_RE_PROCDEF PD
-          WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
-          <if test="parameter.isProcessDefinitionTenantIdSet">
-            <if test="parameter.processDefinitionTenantId != null">
-              and PD.TENANT_ID_ = #{parameter.processDefinitionTenantId, jdbcType=VARCHAR}
-            </if>
-            <if test="parameter.processDefinitionTenantId == null">
-              and PD.TENANT_ID_ is null
-            </if>
-          </if>
-        )
-        <bind name="columnPrefix" value="''"/>
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
-      </if>
-      <if test="parameter.caseExecutionId != null">
-        CASE_EXECUTION_ID_ = #{parameter.caseExecutionId, jdbcType=VARCHAR}
-      </if>
+      <include refid="updateTaskSuspensionStateByParametersSql" />
     </where>
   </update>
+
+  <update id="updateTaskSuspensionStateByParameters_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    update ${prefix}ACT_RU_TASK set
+      REV_ = REV_ + 1,
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER},
+      CREATE_TIME_ = CREATE_TIME_
+    <where>
+      <include refid="updateTaskSuspensionStateByParametersSql" />
+    </where>
+  </update>
+
+  <sql id="updateTaskSuspensionStateByParametersSql">
+    <if test="parameter.processInstanceId != null">
+      PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
+    </if>
+    <if test="parameter.processDefinitionId != null">
+      PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
+    </if>
+    <if test="parameter.processDefinitionKey != null">
+      PROC_DEF_ID_ IN (
+      SELECT ID_
+      FROM ${prefix}ACT_RE_PROCDEF PD
+      WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+      <if test="parameter.isProcessDefinitionTenantIdSet">
+        <if test="parameter.processDefinitionTenantId != null">
+          and PD.TENANT_ID_ = #{parameter.processDefinitionTenantId, jdbcType=VARCHAR}
+        </if>
+        <if test="parameter.processDefinitionTenantId == null">
+          and PD.TENANT_ID_ is null
+        </if>
+      </if>
+      )
+      <bind name="columnPrefix" value="''"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </if>
+    <if test="parameter.caseExecutionId != null">
+      CASE_EXECUTION_ID_ = #{parameter.caseExecutionId, jdbcType=VARCHAR}
+    </if>
+  </sql>
 
   <!-- TASK DELETE -->
   <delete id="deleteTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TaskEntity">

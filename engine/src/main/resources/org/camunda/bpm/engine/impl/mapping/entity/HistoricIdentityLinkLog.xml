@@ -46,6 +46,15 @@
 
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
+
+  <update id="updateIdentityLinkLogByRootProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_IDENTITYLINK set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      TIMESTAMP_ = TIMESTAMP_
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
   
   <!-- HISTORIC IDENTITY LINK DELETE -->
 

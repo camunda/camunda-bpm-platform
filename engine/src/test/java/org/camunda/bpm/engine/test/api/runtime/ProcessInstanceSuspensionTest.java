@@ -282,6 +282,31 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-9505
+   */
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testPreserveCreateTimeOnUpdatedTask() {
+    // given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    runtimeService.startProcessInstanceByKey(processDefinition.getKey());
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+
+    Task taskBeforeSuspension = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Date createTime = taskBeforeSuspension.getCreateTime();
+
+    // when
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // assume
+    assertTrue(task.isSuspended());
+
+    // then
+    assertEquals(createTime, task.getCreateTime());
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testTaskSuspendedAfterProcessInstanceSuspensionByProcessDefinitionId() {
 

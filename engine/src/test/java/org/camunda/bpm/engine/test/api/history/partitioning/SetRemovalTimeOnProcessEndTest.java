@@ -504,6 +504,47 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
     assertThat(historicIncidents.get(1).getRemovalTime(), is(removalTime));
   }
 
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-9505
+   */
+  @Test
+  public void shouldResolveIncidentWithPreservedCreateTime() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
+    .startEvent()
+      .scriptTask()
+        .camundaAsyncBefore()
+        .scriptFormat("groovy")
+        .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException()")
+      .userTask()
+    .endEvent().done());
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+
+    managementService.setJobRetries(jobId, 0);
+
+    try {
+      managementService.executeJob(jobId);
+    } catch (Exception ignored) { }
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    // when
+    taskService.complete(taskId);
+
+    List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
+
+    // then
+    assertThat(historicIncidents.get(0).getCreateTime(), is(START_DATE));
+    assertThat(historicIncidents.get(1).getCreateTime(), is(START_DATE));
+  }
+
   @Test
   public void shouldNotResolveStandaloneIncident() {
     // given
@@ -578,6 +619,43 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
     assertThat(externalTaskLogs.get(1).getRemovalTime(), is(removalTime));
   }
 
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-9505
+   */
+  @Test
+  public void shouldResolveExternalTaskLogWithTimestampPreserved() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
+      .startEvent()
+        .serviceTask().camundaExternalTask("anExternalTaskTopic")
+      .endEvent().done());
+
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
+      .camundaHistoryTimeToLive(5)
+      .startEvent()
+        .callActivity()
+          .calledElement("calledProcess")
+      .endEvent().done());
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    runtimeService.startProcessInstanceByKey("callingProcess");
+
+    LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
+      .topic("anExternalTaskTopic", 3000)
+      .execute()
+      .get(0);
+
+    // when
+    externalTaskService.complete(externalTask.getId(), "aWorkerId");
+
+    List<HistoricExternalTaskLog> externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+
+    // then
+    assertThat(externalTaskLogs.get(0).getTimestamp(), is(START_DATE));
+    assertThat(externalTaskLogs.get(1).getTimestamp(), is(START_DATE));
+  }
+
   @Test
   public void shouldResolveJobLog() {
     // given
@@ -620,6 +698,43 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
     // then
     assertThat(jobLog.get(0).getRemovalTime(), is(removalTime));
     assertThat(jobLog.get(1).getRemovalTime(), is(removalTime));
+  }
+
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-9505
+   */
+  @Test
+  public void shouldResolveJobLogWithTimestampPreserved() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
+      .startEvent().camundaAsyncBefore()
+        .userTask("userTask").name("userTask")
+      .endEvent().done());
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    try {
+      managementService.executeJob(jobId);
+    } catch (Exception ignored) { }
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.complete(taskId);
+
+    List<HistoricJobLog> jobLog = historyService.createHistoricJobLogQuery().list();
+
+    // then
+    assertThat(jobLog.get(0).getTimestamp(), is(START_DATE));
+    assertThat(jobLog.get(1).getTimestamp(), is(START_DATE));
   }
 
   @Test
@@ -786,6 +901,37 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
     assertThat(userOperationLog.getRemovalTime(), is(removalTime));
   }
 
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-9505
+   */
+  @Test
+  public void shouldResolveUserOperationLogWithTimestampPreserved() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask").singleResult().getId();
+
+    identityService.setAuthenticatedUserId("aUserId");
+    taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com");
+    identityService.clearAuthentication();
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.complete(taskId);
+
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+
+    // then
+    assertThat(userOperationLog.getTimestamp(), is(START_DATE));
+  }
+
   @Test
   public void shouldResolveIdentityLink_AddCandidateUser() {
     // given
@@ -817,6 +963,33 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
 
     // then
     assertThat(historicIdentityLinkLog.getRemovalTime(), is(removalTime));
+  }
+
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-9505
+   */
+  @Test
+  public void shouldResolveIdentityLinkWithTimePreserved() {
+    // given
+    testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(CALLED_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.addCandidateUser(taskId, "aUserId");
+
+    // when
+    taskService.complete(taskId);
+
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+
+    // then
+    assertThat(historicIdentityLinkLog.getTime(), is(START_DATE));
   }
 
   @Test
@@ -1562,6 +1735,46 @@ public class SetRemovalTimeOnProcessEndTest extends AbstractPartitioningTest {
     assertThat(jobLogs.get(0).getRemovalTime(), is(addDays(END_DATE, 5)));
     assertThat(jobLogs.get(1).getRemovalTime(), is(addDays(END_DATE, 5)));
     assertThat(jobLogs.get(2).getRemovalTime(), is(addDays(END_DATE, 5)));
+
+    // cleanup
+    historyService.deleteHistoricBatch(batch.getId());
+  }
+
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-9505
+   */
+  @Test
+  public void shouldResolveBatchJobLogWithTimestampPreserved() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+
+    testRule.deploy(CALLING_PROCESS);
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+
+    List<Job> jobs = managementService.createJobQuery().list();
+
+    managementService.executeJob(jobs.get(0).getId());
+
+    // when
+    managementService.executeJob(jobs.get(1).getId());
+
+    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery().list();
+
+    // then
+    assertThat(jobLogs.get(0).getTimestamp(), is(START_DATE));
+    assertThat(jobLogs.get(1).getTimestamp(), is(START_DATE));
+    assertThat(jobLogs.get(2).getTimestamp(), is(START_DATE));
 
     // cleanup
     historyService.deleteHistoricBatch(batch.getId());
