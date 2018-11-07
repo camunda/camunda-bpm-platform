@@ -1628,7 +1628,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
   @Test
   @Deployment( resources = {
-    "org/camunda/bpm/engine/test/api/history/partitioning/HistoricRootProcessInstanceTest.shouldResolveByteArray_DecisionOutputLiteralExpression.dmn"
+    "org/camunda/bpm/engine/test/api/history/removaltime/HistoricRootProcessInstanceTest.shouldResolveByteArray_DecisionOutputLiteralExpression.dmn"
   })
   public void shouldResolveByteArray_DecisionOutputLiteralExpression() {
     // given
