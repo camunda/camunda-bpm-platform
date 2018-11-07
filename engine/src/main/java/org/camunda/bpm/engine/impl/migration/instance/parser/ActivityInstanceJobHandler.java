@@ -102,14 +102,10 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
       return false;
     }
     for (TimerDeclarationImpl sourceTimerDeclaration : sourceTimerDeclarationsInEventScope.values()) {
-      MigrationInstruction migrationInstruction1 = parseContext.findSingleMigrationInstruction(sourceTimerDeclaration.getActivityId());
-      MigrationInstruction migrationInstruction2 = parseContext.findSingleMigrationInstruction(targetTimerDeclaration.getActivityId());
+      MigrationInstruction migrationInstruction = parseContext.findSingleMigrationInstruction(sourceTimerDeclaration.getActivityId());
+      ActivityImpl targetActivity = parseContext.getTargetActivity(migrationInstruction);
 
-      if (migrationInstruction1 == null || migrationInstruction2 == null) {
-        return false;
-      }
-
-      if (migrationInstruction1.equals(migrationInstruction2)) {
+      if(targetActivity != null && targetTimerDeclaration.getActivityId().equals(targetActivity.getActivityId())) {
         return true;
       }
     }

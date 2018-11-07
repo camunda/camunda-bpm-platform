@@ -300,6 +300,43 @@ public class MigrationTimerBoundryEventTest {
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("future").count());
   }
 
+  @Test
+  public void testMigrationNonInterruptingTimerEventDifferentActivityId() {
+    // given
+    BpmnModelInstance sourceModel = createModel(false, DUE_DATE_IN_THE_PAST);
+    BpmnModelInstance targetModel = Bpmn.createExecutableProcess()
+        .startEvent("startEvent")
+        .userTask("userTask").name("User Task")
+        .boundaryEvent("timer2")
+          .cancelActivity(false)
+          .timerWithDate(DUE_DATE_IN_THE_PAST)
+        .userTask("afterTimer")
+        .endEvent("endEvent")
+        .done();
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    managementService.executeJob(job.getId());
+
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .mapActivities("timer", "timer2")
+      .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    List<Job> list = managementService.createJobQuery().list();
+    assertTrue(list.isEmpty());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("afterTimer").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
+  }
+
   protected BpmnModelInstance createModel(boolean isCancelActivity, String date) {
     BpmnModelInstance model = Bpmn.createExecutableProcess()
         .startEvent("startEvent")
