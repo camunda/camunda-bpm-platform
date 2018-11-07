@@ -8,17 +8,19 @@ import java.time.ZoneId
 import java.time.OffsetTime
 
 class FeelLocalTimeTypeTransformer extends DmnDataTypeTransformer {
-  
+
   def transform(value: Any): TypedValue = {
-    
+
     val localTime: LocalTime = value match {
-      case x: LocalTime => x
-      case x: Time      => x.toLocalTime
+      case x: LocalTime  => x
+      case x: Time       => x.toLocalTime
       case x: OffsetTime => x.toLocalTime
-      case other => throw new IllegalArgumentException(s"Cannot transform '$other' to FEEL local-time.")
+      case other =>
+        throw new IllegalArgumentException(
+          s"Cannot transform '$other' to FEEL local-time.")
     }
-    
-    Variables.untypedValue(localTime);    
+
+    Variables.untypedValue(localTime);
   }
-  
+
 }

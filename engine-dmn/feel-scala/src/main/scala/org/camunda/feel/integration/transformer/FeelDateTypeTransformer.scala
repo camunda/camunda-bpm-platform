@@ -8,15 +8,17 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 
 class FeelDateTypeTransformer extends DmnDataTypeTransformer {
-  
+
   def transform(value: Any): TypedValue = {
-    
+
     val date: Date = value match {
       case x: Date => x
-      case other => throw new IllegalArgumentException(s"Cannot transform '$other' to FEEL date.")
+      case other =>
+        throw new IllegalArgumentException(
+          s"Cannot transform '$other' to FEEL date.")
     }
-    
-    Variables.untypedValue(date);    
+
+    Variables.untypedValue(date);
   }
-  
+
 }
