@@ -251,7 +251,7 @@
       SELECT RES.TYPE_,
              C.HISTORY_TTL_,
              <choose>
-               <when test="isHistoryCleanupByRemovalTime">
+               <when test="isHistoryCleanupStrategyRemovalTimeBased">
                  SUM(CASE WHEN REMOVAL_TIME_ is not null and REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_,
                </when>
                <otherwise>

@@ -742,7 +742,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
 
   protected int historyCleanupDegreeOfParallelism = 1;
-  protected boolean historyCleanupByRemovalTime = false;
 
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
@@ -753,6 +752,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected HistoryRemovalTimeProvider historyRemovalTimeProvider;
 
   protected String historyRemovalTimeStrategy;
+
+  protected String historyCleanupStrategy;
 
   /**
    * Size of batch in which history cleanup data will be deleted. {@link HistoryCleanupBatch#MAX_BATCH_SIZE} must be respected.
@@ -850,13 +851,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void initHistoryRemovalTimeStrategy() {
     if (historyRemovalTimeStrategy == null) {
-      historyRemovalTimeStrategy = HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END;
+      historyRemovalTimeStrategy = HISTORY_REMOVAL_TIME_STRATEGY_END;
     }
 
-    if (!HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START.equals(historyRemovalTimeStrategy) &&
-      !HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END.equals(historyRemovalTimeStrategy)) {
+    if (!HISTORY_REMOVAL_TIME_STRATEGY_START.equals(historyRemovalTimeStrategy) &&
+      !HISTORY_REMOVAL_TIME_STRATEGY_END.equals(historyRemovalTimeStrategy) &&
+      !HISTORY_REMOVAL_TIME_STRATEGY_NONE.equals(historyRemovalTimeStrategy)) {
       throw LOG.invalidPropertyValue("historyRemovalTimeStrategy", String.valueOf(historyRemovalTimeStrategy),
-        String.format("history removal time strategy must be either '%s' or '%s'", HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START, HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END));
+        String.format("history removal time strategy must be set to '%s', '%s' or '%s'", HISTORY_REMOVAL_TIME_STRATEGY_START, HISTORY_REMOVAL_TIME_STRATEGY_END, HISTORY_REMOVAL_TIME_STRATEGY_NONE));
     }
   }
 
@@ -867,6 +869,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void initHistoryCleanup() {
+    initHistoryCleanupStrategy();
+
     //validate number of threads
     if (historyCleanupDegreeOfParallelism < 1 || historyCleanupDegreeOfParallelism > MAX_THREADS_NUMBER) {
       throw LOG.invalidPropertyValue("historyCleanupDegreeOfParallelism", String.valueOf(historyCleanupDegreeOfParallelism),
@@ -894,6 +898,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     initBatchOperationsHistoryTimeToLive();
+  }
+
+  protected void initHistoryCleanupStrategy() {
+    if (historyCleanupStrategy == null) {
+      historyCleanupStrategy = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
+    }
+
+    if (!HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy) &&
+      !HISTORY_CLEANUP_STRATEGY_END_TIME_BASED.equals(historyCleanupStrategy)) {
+      throw LOG.invalidPropertyValue("historyCleanupStrategy", String.valueOf(historyCleanupStrategy),
+        String.format("history cleanup strategy must be either set to '%s' or '%s'", HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED, HISTORY_CLEANUP_STRATEGY_END_TIME_BASED));
+    }
+
+    if (HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy) &&
+      HISTORY_REMOVAL_TIME_STRATEGY_NONE.equals(historyRemovalTimeStrategy)) {
+      throw LOG.invalidPropertyValue("historyRemovalTimeStrategy", String.valueOf(historyRemovalTimeStrategy),
+        String.format("history removal time strategy cannot be set to '%s'", HISTORY_REMOVAL_TIME_STRATEGY_NONE));
+    }
   }
 
   private void initHistoryCleanupBatchWindowsMap() {
@@ -4116,15 +4138,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.historyCleanupDegreeOfParallelism = historyCleanupDegreeOfParallelism;
   }
 
-  public boolean isHistoryCleanupByRemovalTime() {
-    return historyCleanupByRemovalTime;
-  }
-
-  public ProcessEngineConfigurationImpl setHistoryCleanupByRemovalTime(boolean historyCleanupByRemovalTime) {
-    this.historyCleanupByRemovalTime = historyCleanupByRemovalTime;
-    return this;
-  }
-
   public void setBatchOperationHistoryTimeToLive(String batchOperationHistoryTimeToLive) {
     this.batchOperationHistoryTimeToLive = batchOperationHistoryTimeToLive;
   }
@@ -4168,6 +4181,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setHistoryRemovalTimeStrategy(String removalTimeStrategy) {
     historyRemovalTimeStrategy = removalTimeStrategy;
+    return this;
+  }
+
+  public String getHistoryCleanupStrategy() {
+    return historyCleanupStrategy;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupStrategy(String historyCleanupStrategy) {
+    this.historyCleanupStrategy = historyCleanupStrategy;
     return this;
   }
 

@@ -35,7 +35,9 @@ import java.util.List;
 import java.util.Set;
 
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP;
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler.MAX_BATCH_SIZE;
 
 /**
@@ -58,11 +60,11 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
 
   public void initEngineConfiguration(ProcessEngineConfigurationImpl engineConfiguration) {
     engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END)
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
       .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
       .initHistoryRemovalTime();
 
-    engineConfiguration.setHistoryCleanupByRemovalTime(true);
+    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
     engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
     engineConfiguration.setHistoryCleanupBatchWindowStartTime("13:00");
@@ -89,7 +91,7 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
         .setHistoryRemovalTimeStrategy(null)
         .initHistoryRemovalTime();
 
-      engineConfiguration.setHistoryCleanupByRemovalTime(false);
+      engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
 
       engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
       engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);

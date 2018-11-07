@@ -142,14 +142,29 @@ public abstract class ProcessEngineConfiguration {
   public static final String HISTORY_DEFAULT = HISTORY_AUDIT;
 
   /**
-   * Removal time for historic entities is set during execution.
+   * History cleanup is performed based on end time.
    */
-  public static final String HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START = "process-start";
+  public static final String HISTORY_CLEANUP_STRATEGY_END_TIME_BASED = "endTimeBased";
 
   /**
-   * Removal time for historic entities is set if process instance has been ended.
+   * History cleanup is performed based on removal time.
    */
-  public static final String HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END = "process-end";
+  public static final String HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED = "removalTimeBased";
+
+  /**
+   * Removal time for historic entities is set on execution start.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_START = "start";
+
+  /**
+   * Removal time for historic entities is set if execution has been ended.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_END = "end";
+
+  /**
+   * Removal time for historic entities is not set.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_NONE = "none";
 
   /**
    * Always enables check for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations.

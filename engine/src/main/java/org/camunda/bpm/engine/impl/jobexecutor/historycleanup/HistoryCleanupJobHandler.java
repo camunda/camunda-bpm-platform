@@ -9,6 +9,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
+
 /**
  * Job handler for history cleanup job.
  * @author Svetlana Dorokhova
@@ -33,7 +35,7 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
   protected HistoryCleanupHandler initCleanupHandler(HistoryCleanupJobHandlerConfiguration configuration, CommandContext commandContext) {
     HistoryCleanupHandler cleanupHandler = null;
 
-    if (isHistoryCleanupByRemovalTimeEnabled(commandContext)) {
+    if (isHistoryCleanupStrategyRemovalTimeBased(commandContext)) {
       cleanupHandler = new HistoryCleanupRemovalTime();
     } else {
       cleanupHandler = new HistoryCleanupBatch();
@@ -50,9 +52,11 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
       .setJobId(jobId);
   }
 
-  protected boolean isHistoryCleanupByRemovalTimeEnabled(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration()
-      .isHistoryCleanupByRemovalTime();
+  protected boolean isHistoryCleanupStrategyRemovalTimeBased(CommandContext commandContext) {
+    String historyRemovalTimeStrategy = commandContext.getProcessEngineConfiguration()
+      .getHistoryCleanupStrategy();
+
+    return HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyRemovalTimeStrategy);
   }
 
   protected boolean isWithinBatchWindow(CommandContext commandContext) {

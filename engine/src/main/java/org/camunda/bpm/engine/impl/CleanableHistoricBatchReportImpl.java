@@ -23,13 +23,15 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
+
 public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult> implements CleanableHistoricBatchReport {
 
   private static final long serialVersionUID = 1L;
 
   protected Date currentTimestamp;
 
-  protected boolean isHistoryCleanupByRemovalTime;
+  protected boolean isHistoryCleanupStrategyRemovalTimeBased;
 
   public CleanableHistoricBatchReportImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -43,8 +45,7 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
-      .isHistoryCleanupByRemovalTime();
+    provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
     checkPermissions(commandContext);
@@ -55,8 +56,7 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
 
   @Override
   public List<CleanableHistoricBatchReportResult> executeList(CommandContext commandContext, Page page) {
-    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
-      .isHistoryCleanupByRemovalTime();
+    provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
     checkPermissions(commandContext);
@@ -79,8 +79,15 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
     }
   }
 
-  public boolean isHistoryCleanupByRemovalTime() {
-    return isHistoryCleanupByRemovalTime;
+  protected void provideHistoryCleanupStrategy(CommandContext commandContext) {
+    String historyCleanupStrategy = commandContext.getProcessEngineConfiguration()
+      .getHistoryCleanupStrategy();
+
+    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy);
+  }
+
+  public boolean isHistoryCleanupStrategyRemovalTimeBased() {
+    return isHistoryCleanupStrategyRemovalTimeBased;
   }
 
 }

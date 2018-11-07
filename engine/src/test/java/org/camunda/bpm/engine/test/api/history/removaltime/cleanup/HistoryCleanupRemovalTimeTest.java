@@ -78,8 +78,10 @@ import java.util.Set;
 
 import static org.apache.commons.lang.time.DateUtils.addDays;
 import static org.apache.commons.lang.time.DateUtils.addMinutes;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler.MAX_BATCH_SIZE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -127,11 +129,11 @@ public class HistoryCleanupRemovalTimeTest {
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
     engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_END)
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
       .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
       .initHistoryRemovalTime();
 
-    engineConfiguration.setHistoryCleanupByRemovalTime(true);
+    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
     engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
     engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
@@ -163,7 +165,7 @@ public class HistoryCleanupRemovalTimeTest {
         .setHistoryRemovalTimeStrategy(null)
         .initHistoryRemovalTime();
 
-      engineConfiguration.setHistoryCleanupByRemovalTime(false);
+      engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
       engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
       engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
@@ -2140,7 +2142,7 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldSeeCleanableProcessInstances() {
     // given
     engineConfiguration
-      .setHistoryRemovalTimeStrategy("process-start")
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
       .initHistoryRemovalTime();
 
     testRule.deploy(PROCESS);
@@ -2164,7 +2166,7 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldNotSeeCleanableProcessInstances() {
     // given
     engineConfiguration
-      .setHistoryRemovalTimeStrategy("process-end")
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
       .initHistoryRemovalTime();
 
     testRule.deploy(PROCESS);
@@ -2191,7 +2193,7 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldSeeCleanableDecisionInstances() {
     // given
     engineConfiguration
-      .setHistoryRemovalTimeStrategy("process-start")
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
       .initHistoryRemovalTime();
 
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
@@ -2223,7 +2225,7 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldNotSeeCleanableDecisionInstances() {
     // given
     engineConfiguration
-      .setHistoryRemovalTimeStrategy("process-end")
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
       .initHistoryRemovalTime();
 
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
@@ -2252,7 +2254,7 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldSeeCleanableBatches() {
     // given
     engineConfiguration
-      .setHistoryRemovalTimeStrategy("process-start")
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
       .initHistoryRemovalTime();
 
     engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
@@ -2282,7 +2284,7 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldNotSeeCleanableBatches() {
     // given
     engineConfiguration
-      .setHistoryRemovalTimeStrategy("process-end")
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
       .initHistoryRemovalTime();
 
     engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");

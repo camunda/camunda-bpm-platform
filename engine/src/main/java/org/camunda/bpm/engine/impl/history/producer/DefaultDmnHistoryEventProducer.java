@@ -53,7 +53,7 @@ import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 
 /**
  * @author Philipp Ossler
@@ -115,7 +115,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(execution, evaluationEvent);
     setReferenceToProcessInstance(event, execution);
 
-    if (isHistoryRemovalTimeStrategyProcessStart()) {
+    if (isHistoryRemovalTimeStrategyStart()) {
       provideRemovalTime(event);
     }
 
@@ -407,8 +407,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     }
   }
 
-  protected boolean isHistoryRemovalTimeStrategyProcessStart() {
-    return HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START.equals(getHistoryRemovalTimeStrategy());
+  protected boolean isHistoryRemovalTimeStrategyStart() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_START.equals(getHistoryRemovalTimeStrategy());
   }
 
   protected String getHistoryRemovalTimeStrategy() {

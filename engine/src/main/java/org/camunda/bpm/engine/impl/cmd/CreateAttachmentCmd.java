@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.task.Attachment;
 
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
 
@@ -95,7 +95,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
       attachment.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
     }
 
-    if (isHistoryRemovalTimeStrategyProcessStart()) {
+    if (isHistoryRemovalTimeStrategyStart()) {
       provideRemovalTime(attachment);
     }
 
@@ -126,8 +126,8 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     return attachment;
   }
 
-  protected boolean isHistoryRemovalTimeStrategyProcessStart() {
-    return HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START.equals(getHistoryRemovalTimeStrategy());
+  protected boolean isHistoryRemovalTimeStrategyStart() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_START.equals(getHistoryRemovalTimeStrategy());
   }
 
   protected String getHistoryRemovalTimeStrategy() {

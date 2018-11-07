@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
 
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
@@ -71,7 +71,7 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
       comment.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     }
 
-    if (isHistoryRemovalTimeStrategyProcessStart()) {
+    if (isHistoryRemovalTimeStrategyStart()) {
       provideRemovalTime(comment);
     }
 
@@ -107,8 +107,8 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
     return execution;
   }
 
-  protected boolean isHistoryRemovalTimeStrategyProcessStart() {
-    return HISTORY_REMOVAL_TIME_STRATEGY_PROCESS_START.equals(getHistoryRemovalTimeStrategy());
+  protected boolean isHistoryRemovalTimeStrategyStart() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_START.equals(getHistoryRemovalTimeStrategy());
   }
 
   protected String getHistoryRemovalTimeStrategy() {

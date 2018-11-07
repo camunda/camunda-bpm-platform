@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Date;
@@ -21,7 +22,6 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -37,7 +37,7 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   protected Date currentTimestamp;
 
-  protected boolean isHistoryCleanupByRemovalTime;
+  protected boolean isHistoryCleanupStrategyRemovalTimeBased;
 
   public CleanableHistoricDecisionInstanceReportImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -86,8 +86,7 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
-      .isHistoryCleanupByRemovalTime();
+    provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
     return commandContext
@@ -97,8 +96,7 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   @Override
   public List<CleanableHistoricDecisionInstanceReportResult> executeList(CommandContext commandContext, Page page) {
-    isHistoryCleanupByRemovalTime = commandContext.getProcessEngineConfiguration()
-      .isHistoryCleanupByRemovalTime();
+    provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
     return commandContext
@@ -146,8 +144,15 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
     return isCompact;
   }
 
-  public boolean isHistoryCleanupByRemovalTime() {
-    return isHistoryCleanupByRemovalTime;
+  protected void provideHistoryCleanupStrategy(CommandContext commandContext) {
+    String historyCleanupStrategy = commandContext.getProcessEngineConfiguration()
+      .getHistoryCleanupStrategy();
+
+    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy);
+  }
+
+  public boolean isHistoryCleanupStrategyRemovalTimeBased() {
+    return isHistoryCleanupStrategyRemovalTimeBased;
   }
 
 }
