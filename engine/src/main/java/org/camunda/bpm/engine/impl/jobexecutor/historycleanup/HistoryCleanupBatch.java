@@ -1,7 +1,9 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -64,32 +66,48 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
     if (size() > 0) {
       if (historicProcessInstanceIds.size() > 0) {
         commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(historicProcessInstanceIds);
-        reportValue(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, historicProcessInstanceIds.size());
       }
       if (historicDecisionInstanceIds.size() > 0) {
         commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByIds(historicDecisionInstanceIds);
-        reportValue(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, historicDecisionInstanceIds.size());
       }
       if (historicCaseInstanceIds.size() > 0) {
         commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
-        reportValue(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES, historicCaseInstanceIds.size());
       }
       if (historicBatchIds.size() > 0) {
         commandContext.getHistoricBatchManager().deleteHistoricBatchesByIds(historicBatchIds);
-        reportValue(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, historicBatchIds.size());
       }
     }
-
-    setRescheduleNow(isBatchThresholdReached());
   }
 
-  protected boolean isBatchThresholdReached() {
+  @Override
+  protected Map<String, Long> reportMetrics() {
+    Map<String, Long> reports = new HashMap<>();
+
+    if (historicProcessInstanceIds.size() > 0) {
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, (long) historicProcessInstanceIds.size());
+    }
+    if (historicDecisionInstanceIds.size() > 0) {
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, (long) historicDecisionInstanceIds.size());
+    }
+    if (historicCaseInstanceIds.size() > 0) {
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES, (long) historicCaseInstanceIds.size());
+    }
+    if (historicBatchIds.size() > 0) {
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, (long) historicBatchIds.size());
+    }
+
+    return reports;
+  }
+
+  @Override
+  boolean shouldRescheduleNow() {
     return size() >= getBatchSizeThreshold();
   }
 
   public Integer getBatchSizeThreshold() {
-    return Context.getCommandContext().getProcessEngineConfiguration()
-      .getHistoryCleanupBatchThreshold();
+    return Context
+        .getProcessEngineConfiguration()
+        .getHistoryCleanupBatchThreshold();
   }
 
 }

@@ -139,9 +139,11 @@
     <bind name="date" value="'REMOVAL_TIME_'"/>
     <bind name="reportPeriodUnitName" value="'MINUTE'"/>
     delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_OP_LOG
-    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
-    <include refid="andWhereMinuteInDateBetweenSql"/>
-    AND ID_ IN (SELECT ID_ FROM ${prefix}ACT_HI_OP_LOG ${limitAfterWithoutOffset})
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_OP_LOG
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
   </delete>
 
   <!--OPERATION LOG ENTRY RESULT MAP -->

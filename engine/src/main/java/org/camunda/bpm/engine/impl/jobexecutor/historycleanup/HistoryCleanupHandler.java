@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Tassilo Weidner
@@ -33,24 +33,27 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
   protected String jobId;
   protected CommandExecutor commandExecutor;
 
-  protected boolean isRescheduleNow;
-  protected Map<String, Long> report;
-
-  public HistoryCleanupHandler() {
-    isRescheduleNow = false;
-    report = new HashMap<>();
-  }
-
   public void execute(CommandContext commandContext) {
     // passed commandContext may be in an inconsistent state
-    commandExecutor.execute(new HistoryCleanupSchedulerCmd(isRescheduleNow, report, configuration, jobId));
+    commandExecutor.execute(new Command<Void>() {
+      @Override
+      public Void execute(CommandContext commandContext) {
+
+        Map<String, Long> report = reportMetrics();
+        boolean isRescheduleNow = shouldRescheduleNow();
+
+        new HistoryCleanupSchedulerCmd(isRescheduleNow, report, configuration, jobId).execute(commandContext);
+
+        return null;
+      }
+    });
   }
 
   abstract void performCleanup();
 
-  protected void reportValue(String name, long value) {
-    report.put(name, value);
-  }
+  abstract Map<String, Long> reportMetrics();
+
+  abstract boolean shouldRescheduleNow();
 
   public HistoryCleanupJobHandlerConfiguration getConfiguration() {
     return configuration;
@@ -69,10 +72,6 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
   public HistoryCleanupHandler setCommandExecutor(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
     return this;
-  }
-
-  public void setRescheduleNow(boolean rescheduleNow) {
-    isRescheduleNow = rescheduleNow;
   }
 
 }

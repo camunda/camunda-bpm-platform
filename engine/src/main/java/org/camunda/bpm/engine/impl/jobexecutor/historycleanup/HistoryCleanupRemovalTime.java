@@ -12,111 +12,93 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Tassilo Weidner
  */
 public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
 
-  protected Map<Class<? extends DbEntity>, DbOperation> deleteOperations;
-
-  protected boolean isDmnEnabled;
-  protected boolean isMetricsEnabled;
-  protected int batchSizePerDeleteOperation;
-
-  public HistoryCleanupRemovalTime() {
-    deleteOperations = new HashMap<>();
-
-    // store information before command context has been closed
-    isDmnEnabled = isDmnEnabled();
-    isMetricsEnabled = isMetricsEnabled();
-    batchSizePerDeleteOperation = getBatchSizePerDeleteOperation();
-  }
+  protected Map<Class<? extends DbEntity>, DbOperation> deleteOperations = new HashMap<>();
 
   public void performCleanup() {
     deleteOperations.putAll(performProcessCleanup());
 
-    if (isDmnEnabled) {
+    if (isDmnEnabled()) {
       deleteOperations.putAll(performDmnCleanup());
     }
 
     DbOperation batchCleanup = performBatchCleanup();
+
     deleteOperations.put(batchCleanup.getEntityType(), batchCleanup);
   }
 
-  public void execute(CommandContext commandContext) {
-    if (isMetricsEnabled) {
-      reportMetrics();
-    }
-
-    setRescheduleNow(isMaxBatchExceeded());
-
-    super.execute(commandContext);
-  }
-
   protected Map<Class<? extends DbEntity>, DbOperation> performDmnCleanup() {
-    return Context.getCommandContext().getHistoricDecisionInstanceManager()
-      .deleteHistoricDecisionsByRemovalTime(ClockUtil.getCurrentTime(),
-        configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSizePerDeleteOperation());
+    return Context
+        .getCommandContext()
+        .getHistoricDecisionInstanceManager()
+        .deleteHistoricDecisionsByRemovalTime(ClockUtil.getCurrentTime(),
+            configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSize());
   }
 
   protected Map<Class<? extends DbEntity>, DbOperation> performProcessCleanup() {
-    return Context.getCommandContext().getHistoricProcessInstanceManager()
-      .deleteHistoricProcessInstancesByRemovalTime(ClockUtil.getCurrentTime(),
-        configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSizePerDeleteOperation());
+    return Context
+        .getCommandContext()
+        .getHistoricProcessInstanceManager()
+        .deleteHistoricProcessInstancesByRemovalTime(ClockUtil.getCurrentTime(),
+            configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSize());
   }
 
   protected DbOperation performBatchCleanup() {
-    return Context.getCommandContext().getHistoricBatchManager()
-      .deleteHistoricBatchesByRemovalTime(ClockUtil.getCurrentTime(),
-        configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSizePerDeleteOperation());
+    return Context
+        .getCommandContext()
+        .getHistoricBatchManager()
+        .deleteHistoricBatchesByRemovalTime(ClockUtil.getCurrentTime(),
+            configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSize());
   }
 
-  protected boolean isDmnEnabled() {
-    return Context.getProcessEngineConfiguration()
-      .isDmnEnabled();
-  }
+  protected Map<String, Long> reportMetrics() {
+    Map<String, Long> reports = new HashMap<>();
 
-  protected boolean isMetricsEnabled() {
-    return Context.getProcessEngineConfiguration()
-      .isHistoryCleanupMetricsEnabled();
-  }
-
-  protected void reportMetrics() {
     DbOperation deleteOperationProcessInstance = deleteOperations.get(HistoricProcessInstanceEntity.class);
     if (deleteOperationProcessInstance != null) {
-      reportValue(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, deleteOperationProcessInstance.getRowsAffected());
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, (long) deleteOperationProcessInstance.getRowsAffected());
     }
 
-    if (isDmnEnabled) {
-      DbOperation deleteOperationDecisionInstance = deleteOperations.get(HistoricDecisionInstanceEntity.class);
-      if (deleteOperationDecisionInstance != null) {
-        reportValue(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, deleteOperationDecisionInstance.getRowsAffected());
-      }
+    DbOperation deleteOperationDecisionInstance = deleteOperations.get(HistoricDecisionInstanceEntity.class);
+    if (deleteOperationDecisionInstance != null) {
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, (long) deleteOperationDecisionInstance.getRowsAffected());
     }
 
     DbOperation deleteOperationBatch = deleteOperations.get(HistoricBatchEntity.class);
     if (deleteOperationBatch != null) {
-      reportValue(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, deleteOperationBatch.getRowsAffected());
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, (long) deleteOperationBatch.getRowsAffected());
     }
+
+    return reports;
   }
 
-  protected boolean isMaxBatchExceeded() {
+  protected boolean isDmnEnabled() {
+    return Context
+        .getProcessEngineConfiguration()
+        .isDmnEnabled();
+  }
+
+  protected boolean shouldRescheduleNow() {
+    int batchSize = getBatchSize();
+
     for (DbOperation deleteOperation : deleteOperations.values()) {
-      if (deleteOperation.getRowsAffected() == batchSizePerDeleteOperation) {
+      if (deleteOperation.getRowsAffected() == batchSize) {
         return true;
       }
     }
@@ -124,9 +106,10 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
     return false;
   }
 
-  public int getBatchSizePerDeleteOperation() {
-    return Context.getProcessEngineConfiguration()
-      .getHistoryCleanupBatchSize();
+  public int getBatchSize() {
+    return Context
+        .getProcessEngineConfiguration()
+        .getHistoryCleanupBatchSize();
   }
 
 }

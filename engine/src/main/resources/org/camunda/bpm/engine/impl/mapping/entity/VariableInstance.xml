@@ -525,9 +525,11 @@
     <bind name="date" value="'REMOVAL_TIME_'"/>
     <bind name="reportPeriodUnitName" value="'MINUTE'"/>
     delete ${limitBeforeWithoutOffset} from ${prefix}ACT_GE_BYTEARRAY
-    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
-    <include refid="andWhereMinuteInDateBetweenSql"/>
-    AND ID_ IN (SELECT ID_ FROM ${prefix}ACT_GE_BYTEARRAY ${limitAfterWithoutOffset})
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_GE_BYTEARRAY
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
   </delete>
 
   <!-- BYTE ARRAY RESULTMAP -->
