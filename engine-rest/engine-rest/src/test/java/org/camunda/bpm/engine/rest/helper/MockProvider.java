@@ -904,6 +904,7 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_FAILURE_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_SUCCESS_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_DELETION_LOG = true;
+  public static final String EXAMPLE_JOB_CREATE_TIME = withTimezone("2015-01-01T00:00:00");
 
   public static Task createMockTask() {
     return mockTask().build();
@@ -1686,7 +1687,8 @@ public abstract class MockProvider {
       .dueDate(DateTimeUtil.parseDate(EXAMPLE_DUE_DATE))
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .priority(EXAMPLE_JOB_PRIORITY)
-      .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID);
+      .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
+      .createTime(DateTimeUtil.parseDate(EXAMPLE_JOB_CREATE_TIME));
   }
 
   public static List<Job> createMockJobs() {

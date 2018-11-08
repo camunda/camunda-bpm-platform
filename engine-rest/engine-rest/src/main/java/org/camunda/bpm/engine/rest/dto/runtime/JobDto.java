@@ -30,6 +30,7 @@ public class JobDto {
   protected boolean suspended;
   protected long priority;
   protected String tenantId;
+  protected Date createTime;
 
   public static JobDto fromJob(Job job) {
     JobDto dto = new JobDto();
@@ -45,6 +46,7 @@ public class JobDto {
     dto.suspended = job.isSuspended();
     dto.priority = job.getPriority();
     dto.tenantId = job.getTenantId();
+    dto.createTime = job.getCreateTime();
 
     return dto;
   }
@@ -95,6 +97,10 @@ public class JobDto {
 
   public String getTenantId() {
     return tenantId;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
   }
 
 }

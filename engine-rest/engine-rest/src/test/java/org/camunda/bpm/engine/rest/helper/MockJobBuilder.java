@@ -33,6 +33,7 @@ public class MockJobBuilder {
 	protected long priority;
 	protected String jobDefinitionId;
 	protected String tenantId;
+	protected Date createTime;
 
 	public MockJobBuilder id(String id) {
 		this.id = id;
@@ -94,6 +95,11 @@ public class MockJobBuilder {
 	  return this;
 	}
 
+	public MockJobBuilder createTime(Date createTime) {
+		this.createTime = createTime;
+		return this;
+	}
+
 	public Job build() {
 		Job mockJob = mock(Job.class);
 		when(mockJob.getId()).thenReturn(id);
@@ -108,6 +114,7 @@ public class MockJobBuilder {
 		when(mockJob.getPriority()).thenReturn(priority);
 		when(mockJob.getJobDefinitionId()).thenReturn(jobDefinitionId);
 		when(mockJob.getTenantId()).thenReturn(tenantId);
+		when(mockJob.getCreateTime()).thenReturn(createTime);
 		return mockJob;
 	}
 

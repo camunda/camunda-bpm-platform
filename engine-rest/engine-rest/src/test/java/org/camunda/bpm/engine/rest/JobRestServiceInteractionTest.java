@@ -46,7 +46,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -110,6 +110,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .priority(MockProvider.EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID)
       .tenantId(MockProvider.EXAMPLE_TENANT_ID)
+      .createTime(DateTimeUtil.parseDate(MockProvider.EXAMPLE_JOB_CREATE_TIME))
       .build();
 
     when(mockQuery.singleResult()).thenReturn(mockedJob);
@@ -214,6 +215,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
       .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("createTime", equalTo(MockProvider.EXAMPLE_JOB_CREATE_TIME))
     .when().get(SINGLE_JOB_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);
