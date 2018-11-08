@@ -57,7 +57,6 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
     // assume
     assertThat(historyService.createHistoricVariableInstanceQuery().singleResult(), nullValue());
 
-    asyncThread.makeContinue();
     asyncThread.waitUntilDone();
 
     // then
