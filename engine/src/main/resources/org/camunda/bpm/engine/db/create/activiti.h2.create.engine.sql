@@ -95,6 +95,7 @@ create table ACT_RU_JOB (
     PRIORITY_ bigint NOT NULL DEFAULT 0,
     SEQUENCE_COUNTER_ integer,
     TENANT_ID_ varchar(64),
+    CREATE_TIME_ timestamp,
     primary key (ID_)
 );
 

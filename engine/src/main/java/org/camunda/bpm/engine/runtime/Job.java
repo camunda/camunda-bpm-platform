@@ -105,4 +105,7 @@ public interface Job {
    */
   String getTenantId();
 
+  /** The date/time when this job has been created */
+  Date getCreateTime();
+
 }

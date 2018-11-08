@@ -95,6 +95,7 @@ create table ACT_RU_JOB (
     PRIORITY_ bigint NOT NULL DEFAULT 0,
     SEQUENCE_COUNTER_ bigint,
     TENANT_ID_ varchar(64),
+    CREATE_TIME_ datetime(3),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

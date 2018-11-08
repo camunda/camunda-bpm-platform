@@ -112,6 +112,7 @@
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <discriminator javaType="string" column="TYPE_">
       <case value="message" resultMap="messageResultMap"/>
@@ -385,6 +386,7 @@
             PRIORITY_,
             SEQUENCE_COUNTER_,
             TENANT_ID_,
+            CREATE_TIME_,
             REV_
           )
     values (#{id, jdbcType=VARCHAR},
@@ -409,6 +411,7 @@
             #{priority, jdbcType=BIGINT},
             #{sequenceCounter, jdbcType=BIGINT},
             #{tenantId, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP},
             1
     )
   </insert>
@@ -485,6 +488,7 @@
             PRIORITY_,
             SEQUENCE_COUNTER_,
             TENANT_ID_,
+            CREATE_TIME_,
             REV_
             )
     values (#{id, jdbcType=VARCHAR},
@@ -508,6 +512,7 @@
             #{priority, jdbcType=BIGINT},
             #{sequenceCounter, jdbcType=BIGINT},
             #{tenantId, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP},
             1
     )
   </insert>
@@ -560,6 +565,7 @@
         PRIORITY_,
         SEQUENCE_COUNTER_,
         TENANT_ID_,
+        CREATE_TIME_,
         REV_
         )
         values (#{id, jdbcType=VARCHAR},
@@ -583,6 +589,7 @@
         #{priority, jdbcType=BIGINT},
         #{sequenceCounter, jdbcType=BIGINT},
         #{tenantId, jdbcType=VARCHAR},
+        #{createTime, jdbcType=TIMESTAMP},
         1
         )
     </insert>

@@ -51,6 +51,8 @@ public class JobManager extends AbstractManager {
   }
 
   public void insertJob(JobEntity job) {
+    job.setCreateTime(ClockUtil.getCurrentTime());
+
     getDbEntityManager().insert(job);
     getHistoricJobLogManager().fireJobCreatedEvent(job);
   }

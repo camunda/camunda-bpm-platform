@@ -95,6 +95,7 @@ create table ACT_RU_JOB (
     JOB_DEF_ID_ nvarchar(64),
     SEQUENCE_COUNTER_ numeric(19,0),
     TENANT_ID_ nvarchar(64),
+    CREATE_TIME_ datetime2,
     primary key (ID_)
 );
 

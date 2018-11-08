@@ -106,6 +106,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   protected String tenantId;
 
+  protected Date createTime;
+
   // runtime state /////////////////////////////
   protected String activityId;
   protected JobDefinition jobDefinition;
@@ -604,6 +606,14 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
   }
 
   protected void ensureActivityIdInitialized() {
