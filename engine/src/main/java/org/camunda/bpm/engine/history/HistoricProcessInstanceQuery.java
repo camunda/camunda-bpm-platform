@@ -234,6 +234,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Order by the duration of the process instance (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricProcessInstanceQuery orderByProcessInstanceDuration();
 
+  /** Only select historic process instances that are top level process instances. */
+  HistoricProcessInstanceQuery rootProcessInstances();
+
   /** Only select historic process instances started by the given process
    * instance. {@link ProcessInstance) ids and {@link HistoricProcessInstance}
    * ids match. */

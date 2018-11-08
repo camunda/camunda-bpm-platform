@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.history;
 
-import org.apache.tools.ant.filters.LineContains.Contains;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -28,7 +27,9 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.ProcessInstanceQueryTest;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -204,6 +205,63 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException re) {
       assertTextPresent("Set of process instance ids is null", re.getMessage());
+    }
+  }
+
+  public void testQueryByRootProcessInstances() {
+    // given
+    String superProcess = "calling";
+    String subProcess = "called";
+    BpmnModelInstance callingInstance = ProcessModels.newModel(superProcess)
+      .startEvent()
+      .callActivity()
+      .calledElement(subProcess)
+      .endEvent()
+      .done();
+
+    BpmnModelInstance calledInstance = ProcessModels.newModel(subProcess)
+      .startEvent()
+      .userTask()
+      .endEvent()
+      .done();
+
+    deployment(callingInstance, calledInstance);
+    String processInstanceId1 = runtimeService.startProcessInstanceByKey(superProcess).getProcessInstanceId();
+
+    // when
+    List<HistoricProcessInstance> list = historyService
+        .createHistoricProcessInstanceQuery()
+        .rootProcessInstances()
+        .list();
+
+    // then
+    assertEquals(1, list.size());
+    assertEquals(processInstanceId1, list.get(0).getId());
+  }
+
+  public void testQueryByRootProcessInstancesAndSuperProcess() {
+    // when
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+        .rootProcessInstances()
+        .superProcessInstanceId("processInstanceId");
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId"));
+    }
+
+    // when
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+        .superProcessInstanceId("processInstanceId")
+        .rootProcessInstances();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId"));
     }
   }
 

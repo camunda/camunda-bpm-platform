@@ -363,6 +363,10 @@
       <if test="startedBy != null">
         and SELF.START_USER_ID_ = #{startedBy}
       </if>
+
+      <if test="isRootProcessInstances">
+        and SELF.SUPER_PROCESS_INSTANCE_ID_ is null
+      </if>
       <if test="superProcessInstanceId != null">
         and SELF.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
       </if>

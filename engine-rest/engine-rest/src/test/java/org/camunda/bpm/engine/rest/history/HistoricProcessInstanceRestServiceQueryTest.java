@@ -1816,4 +1816,34 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     verify(mockedQuery).active();
   }
 
+  @Test
+  public void testQueryByRootProcessInstances() {
+    given()
+      .queryParam("rootProcessInstances", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).rootProcessInstances();
+  }
+
+  @Test
+  public void testQueryByRootProcessInstancesAsPost() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("rootProcessInstances", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).rootProcessInstances();
+  }
+
 }

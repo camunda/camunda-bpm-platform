@@ -72,6 +72,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private List<String> processDefinitionKeyNotIn;
   private String processInstanceBusinessKey;
   private String processInstanceBusinessKeyLike;
+  private Boolean rootProcessInstances;
   private Boolean finished;
   private Boolean unfinished;
   private Boolean withIncidents;
@@ -159,6 +160,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam("processInstanceBusinessKeyLike")
   public void setProcessInstanceBusinessKeyLike(String processInstanceBusinessKeyLike) {
     this.processInstanceBusinessKeyLike = processInstanceBusinessKeyLike;
+  }
+
+  @CamundaQueryParam(value = "rootProcessInstances", converter = BooleanConverter.class)
+  public void setRootProcessInstances(Boolean rootProcessInstances) {
+    this.rootProcessInstances = rootProcessInstances;
   }
 
   @CamundaQueryParam(value = "finished", converter = BooleanConverter.class)
@@ -364,6 +370,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (processInstanceBusinessKeyLike != null) {
       query.processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);
+    }
+    if (rootProcessInstances != null && rootProcessInstances) {
+      query.rootProcessInstances();
     }
     if (finished != null && finished) {
       query.finished();

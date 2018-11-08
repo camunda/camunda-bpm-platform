@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
-import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
@@ -55,6 +55,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String incidentMessage;
   protected String incidentMessageLike;
   protected String startedBy;
+  protected boolean isRootProcessInstances;
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   protected String superCaseInstanceId;
@@ -207,9 +208,23 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return this;
   }
 
+  public HistoricProcessInstanceQuery rootProcessInstances() {
+    if (superProcessInstanceId != null) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+    }
+    if (superCaseInstanceId != null) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
+    }
+    isRootProcessInstances = true;
+    return this;
+  }
+
   public HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
-	 this.superProcessInstanceId = superProcessInstanceId;
-	 return this;
+    if (isRootProcessInstances) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+    }
+    this.superProcessInstanceId = superProcessInstanceId;
+    return this;
   }
 
   public HistoricProcessInstanceQuery subProcessInstanceId(String subProcessInstanceId) {
@@ -218,6 +233,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery superCaseInstanceId(String superCaseInstanceId) {
+    if (isRootProcessInstances) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
+    }
     this.superCaseInstanceId = superCaseInstanceId;
     return this;
   }
@@ -468,6 +486,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     cal.set(Calendar.MINUTE, 0);
     cal.set(Calendar.HOUR, 0);
     return cal.getTime();
+  }
+
+  public boolean isRootProcessInstances() {
+    return isRootProcessInstances;
   }
 
   public String getSubProcessInstanceId() {
