@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -100,6 +102,8 @@ public class HistoryCleanupHistoricBatchTest {
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+
+    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
   }
 
   @After
@@ -129,6 +133,7 @@ public class HistoryCleanupHistoricBatchTest {
 
   @After
   public void resetConfiguration() {
+    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(null);
   }

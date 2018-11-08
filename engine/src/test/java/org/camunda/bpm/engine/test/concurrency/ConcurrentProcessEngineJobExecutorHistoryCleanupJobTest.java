@@ -16,6 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
+
 /**
  * <p>Tests a concurrent attempt of a bootstrapping Process Engine to reconfigure
  * the HistoryCleanupJob while the JobExecutor tries to execute it.</p>
@@ -33,6 +35,8 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     Calendar timeOfDay = Calendar.getInstance();
     timeOfDay.set(Calendar.HOUR_OF_DAY, 17);
     ClockUtil.setCurrentTime(timeOfDay.getTime());
+
+    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
 
     super.setUp();
   }

@@ -47,11 +47,21 @@ import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
 
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
+
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
 
+  public void setUp() throws Exception {
+    super.setUp();
+    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
+  }
+
   @Override
   public void tearDown() {
+    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
+
     super.tearDown();
     clearDatabase();
     clearMetrics();

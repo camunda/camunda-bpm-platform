@@ -73,6 +73,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -142,6 +145,7 @@ public class HistoryCleanupTest {
     defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
     defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
     defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
+    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
   }
 
   @After
@@ -150,6 +154,7 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
+    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
