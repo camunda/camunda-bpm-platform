@@ -12,9 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import java.time.Clock;
-import java.time.Duration;
-import java.time.ZoneId;
+import org.joda.time.DateTimeUtils;
+
 import java.util.Date;
 
 
@@ -23,10 +22,8 @@ import java.util.Date;
  */
 public class ClockUtil {
 
-  private static Clock clock = Clock.system(ZoneId.systemDefault());
-
   public static void setCurrentTime(Date currentTime) {
-    clock = Clock.fixed(currentTime.toInstant(), ZoneId.systemDefault());
+    DateTimeUtils.setCurrentMillisFixed(currentTime.getTime());
   }
 
   public static void reset() {
@@ -38,16 +35,16 @@ public class ClockUtil {
   }
 
   public static Date now() {
-    return Date.from(clock.instant());
+    return new Date(DateTimeUtils.currentTimeMillis());
   }
 
-  public static Date offset(Duration duration) {
-    clock = Clock.offset(clock, duration);
-    return Date.from(clock.instant());
+  public static Date offset(Long offsetInMillis) {
+    DateTimeUtils.setCurrentMillisOffset(offsetInMillis);
+    return new Date(DateTimeUtils.currentTimeMillis());
   }
 
   public static Date resetClock() {
-    clock = Clock.system(ZoneId.of("CET"));
-    return Date.from(clock.instant());
+    DateTimeUtils.setCurrentMillisSystem();
+    return new Date(DateTimeUtils.currentTimeMillis());
   }
 }
