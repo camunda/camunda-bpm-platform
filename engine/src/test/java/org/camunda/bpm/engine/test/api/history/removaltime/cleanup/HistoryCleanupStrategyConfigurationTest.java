@@ -166,7 +166,7 @@ public class HistoryCleanupStrategyConfigurationTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("history removal time strategy cannot be set to 'none'.");
+    thrown.expectMessage("history removal time strategy cannot be set to 'none' in conjunction with 'removalTimeBased' history cleanup strategy.");
 
     // when
     engineConfiguration.initHistoryCleanup();

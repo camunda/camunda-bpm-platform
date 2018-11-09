@@ -914,7 +914,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy) &&
       HISTORY_REMOVAL_TIME_STRATEGY_NONE.equals(historyRemovalTimeStrategy)) {
       throw LOG.invalidPropertyValue("historyRemovalTimeStrategy", String.valueOf(historyRemovalTimeStrategy),
-        String.format("history removal time strategy cannot be set to '%s'", HISTORY_REMOVAL_TIME_STRATEGY_NONE));
+        String.format("history removal time strategy cannot be set to '%s' in conjunction with '%s' history cleanup strategy", HISTORY_REMOVAL_TIME_STRATEGY_NONE, HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
     }
   }
 
