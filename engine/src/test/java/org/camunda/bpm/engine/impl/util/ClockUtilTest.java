@@ -33,7 +33,7 @@ public class ClockUtilTest {
     }
 
     @Test
-    public void setCurrentTime_should_travel_in_time() {
+    public void setCurrentTime_should_freeze_time() {
         Instant target = Instant.now().plus(2L, ChronoUnit.DAYS);
 
         ClockUtil.setCurrentTime(Date.from(target));
@@ -77,5 +77,16 @@ public class ClockUtilTest {
         Thread.sleep(10000);
 
         assertThat(ClockUtil.now(), sameSecondOfMinute(Date.from(target.plusMillis(10000))));
+    }
+
+    @Test
+    public void time_should_freeze_with_setCurrentTime() throws InterruptedException {
+        Instant target = Instant.now().plus(2L, ChronoUnit.DAYS);
+
+        ClockUtil.setCurrentTime(Date.from(target));
+
+        Thread.sleep(10000);
+
+        assertThat(ClockUtil.now(), sameSecondOfMinute(Date.from(target)));
     }
 }

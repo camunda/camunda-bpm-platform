@@ -26,7 +26,7 @@ public class ClockUtil {
   private static Clock clock = Clock.system(ZoneId.systemDefault());
 
   public static void setCurrentTime(Date currentTime) {
-    offset(Duration.between(now().toInstant(), currentTime.toInstant()));
+    clock = Clock.fixed(currentTime.toInstant(), ZoneId.systemDefault());
   }
 
   public static void reset() {
