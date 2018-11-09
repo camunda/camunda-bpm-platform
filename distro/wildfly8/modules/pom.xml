@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>camunda-wildfly8-modules</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <name>camunda BPM - Wildfly 8 Modules</name>
 
   <properties>
@@ -287,6 +287,31 @@
         <configuration>
           <classesDirectory>${project.build.directory}/modules/</classesDirectory>
         </configuration>
+      </plugin>
+
+      <!-- assemble zip artifact -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <attach>true</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+              <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
