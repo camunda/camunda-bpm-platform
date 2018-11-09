@@ -24,7 +24,6 @@ import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 /**
@@ -66,7 +65,6 @@ public class TestPaAnnotatedEjb extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  @Ignore
   public void testPaAnnotatedEjb() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1");
 
