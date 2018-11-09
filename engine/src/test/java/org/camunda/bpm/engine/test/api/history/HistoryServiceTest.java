@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.history;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -247,7 +248,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
         .superProcessInstanceId("processInstanceId");
 
       fail("expected exception");
-    } catch (ProcessEngineException e) {
+    } catch (BadUserRequestException e) {
       // then
       assertTrue(e.getMessage().contains("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId"));
     }
@@ -259,7 +260,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
         .rootProcessInstances();
 
       fail("expected exception");
-    } catch (ProcessEngineException e) {
+    } catch (BadUserRequestException e) {
       // then
       assertTrue(e.getMessage().contains("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId"));
     }

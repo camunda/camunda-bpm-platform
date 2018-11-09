@@ -210,10 +210,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery rootProcessInstances() {
     if (superProcessInstanceId != null) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     if (superCaseInstanceId != null) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
+      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
     }
     isRootProcessInstances = true;
     return this;
@@ -221,7 +221,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
     if (isRootProcessInstances) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     this.superProcessInstanceId = superProcessInstanceId;
     return this;
@@ -234,7 +234,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery superCaseInstanceId(String superCaseInstanceId) {
     if (isRootProcessInstances) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
+      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
     }
     this.superCaseInstanceId = superCaseInstanceId;
     return this;
