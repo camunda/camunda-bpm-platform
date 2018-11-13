@@ -50,7 +50,7 @@
                   <version>${project.parent.version}</version>
                   <type>war</type>
                   <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.outputDirectory}/META-INF/resources</outputDirectory>
+                  <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/camunda</outputDirectory>
                   <excludes>META-INF/**</excludes>
                 </artifactItem>
               </artifactItems>
@@ -67,8 +67,9 @@
             <phase>generate-resources</phase>
             <configuration>
               <target>
-                <move file="${project.build.outputDirectory}/META-INF/resources/WEB-INF/securityFilterRules.json" todir="${project.build.outputDirectory}/META-INF/resources/" />
-                <delete dir="${project.build.outputDirectory}/META-INF/resources/WEB-INF" />
+                <move file="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/WEB-INF/securityFilterRules.json" todir="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/" />
+                <delete dir="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/WEB-INF" />
+                <move file="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/plugin" todir="${project.build.outputDirectory}/META-INF/resources/" />
               </target>
             </configuration>
             <goals>
