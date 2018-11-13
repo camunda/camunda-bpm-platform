@@ -13,7 +13,7 @@
 
   <fileSets>
     <fileSet>
-      <directory>src/main/modules</directory>
+      <directory>target/modules</directory>
       <outputDirectory></outputDirectory>
     </fileSet>
   </fileSets>
