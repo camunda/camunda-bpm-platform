@@ -46,6 +46,13 @@ public interface DeleteProcessDefinitionsBuilder {
   DeleteProcessDefinitionsBuilder skipCustomListeners();
 
   /**
+   * Specifies whether input/output mappings for tasks should be invoked
+   *
+   * @return the builder
+   */
+  DeleteProcessDefinitionsBuilder skipIoMappings();
+
+  /**
    * Performs the deletion of process definitions.
    *
    * @throws ProcessEngineException

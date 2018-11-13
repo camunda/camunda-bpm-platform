@@ -50,7 +50,8 @@ public interface ProcessDefinitionResource {
 
   @DELETE
   Response deleteProcessDefinition(@QueryParam("cascade") boolean cascade,
-                                   @QueryParam("skipCustomListeners") boolean skipCustomListeners);
+                                   @QueryParam("skipCustomListeners") boolean skipCustomListeners,
+                                   @QueryParam("skipIoMappings") boolean skipIoMappings);
 
   @POST
   @Path("/start")

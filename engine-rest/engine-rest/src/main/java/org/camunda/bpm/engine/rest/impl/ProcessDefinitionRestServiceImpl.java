@@ -195,33 +195,37 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
-  public void deleteProcessDefinitionsByKey(String processDefinitionKey, boolean cascade, boolean skipCustomListeners) {
+  public void deleteProcessDefinitionsByKey(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
     RepositoryService repositoryService = processEngine.getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
       .byKey(processDefinitionKey);
 
-    deleteProcessDefinitions(builder, cascade, skipCustomListeners);
+    deleteProcessDefinitions(builder, cascade, skipCustomListeners, skipIoMappings);
   }
 
   @Override
-  public void deleteProcessDefinitionsByKeyAndTenantId(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, String tenantId) {
+  public void deleteProcessDefinitionsByKeyAndTenantId(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings, String tenantId) {
     RepositoryService repositoryService = processEngine.getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
       .byKey(processDefinitionKey)
       .withTenantId(tenantId);
 
-    deleteProcessDefinitions(builder, cascade, skipCustomListeners);
+    deleteProcessDefinitions(builder, cascade, skipCustomListeners, skipIoMappings);
   }
 
-  private void deleteProcessDefinitions(DeleteProcessDefinitionsBuilder builder, boolean cascade, boolean skipCustomListeners) {
+  protected void deleteProcessDefinitions(DeleteProcessDefinitionsBuilder builder, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
     if (skipCustomListeners) {
       builder = builder.skipCustomListeners();
     }
 
     if (cascade) {
       builder = builder.cascade();
+    }
+
+    if (skipIoMappings) {
+      builder = builder.skipIoMappings();
     }
 
     try {

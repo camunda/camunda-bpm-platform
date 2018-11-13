@@ -37,10 +37,11 @@ public class DeleteProcessDefinitionsByKeyCmd extends AbstractDeleteProcessDefin
   private final String tenantId;
   private final boolean isTenantIdSet;
 
-  public DeleteProcessDefinitionsByKeyCmd(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, String tenantId, boolean isTenantIdSet) {
+  public DeleteProcessDefinitionsByKeyCmd(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings, String tenantId, boolean isTenantIdSet) {
     this.processDefinitionKey = processDefinitionKey;
     this.cascade = cascade;
     this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMappings = skipIoMappings;
     this.tenantId = tenantId;
     this.isTenantIdSet = isTenantIdSet;
   }
@@ -56,7 +57,7 @@ public class DeleteProcessDefinitionsByKeyCmd extends AbstractDeleteProcessDefin
 
     for (ProcessDefinition processDefinition: processDefinitions) {
       String processDefinitionId = processDefinition.getId();
-      deleteProcessDefinitionCmd(commandContext, processDefinitionId, cascade, skipCustomListeners);
+      deleteProcessDefinitionCmd(commandContext, processDefinitionId, cascade, skipCustomListeners, skipIoMappings);
     }
 
     return null;

@@ -132,6 +132,11 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   @Override
   public void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners) {
+    deleteProcessDefinition(processDefinitionId, cascade, skipCustomListeners, false);
+  }
+
+  @Override
+  public void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
     DeleteProcessDefinitionsBuilder builder = deleteProcessDefinitions().byIds(processDefinitionId);
 
     if (cascade) {
@@ -140,6 +145,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
     if (skipCustomListeners) {
       builder.skipCustomListeners();
+    }
+
+    if (skipIoMappings) {
+      builder.skipIoMappings();
     }
 
     builder.delete();

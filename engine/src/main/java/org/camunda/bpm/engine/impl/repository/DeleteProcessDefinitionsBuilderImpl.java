@@ -49,6 +49,7 @@ public class DeleteProcessDefinitionsBuilderImpl implements DeleteProcessDefinit
   private String tenantId;
   private boolean isTenantIdSet;
   private boolean skipCustomListeners;
+  protected boolean skipIoMappings;
 
   public DeleteProcessDefinitionsBuilderImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
@@ -96,14 +97,20 @@ public class DeleteProcessDefinitionsBuilderImpl implements DeleteProcessDefinit
   }
 
   @Override
+  public DeleteProcessDefinitionsBuilderImpl skipIoMappings() {
+    this.skipIoMappings = true;
+    return this;
+  }
+
+  @Override
   public void delete() {
     ensureOnlyOneNotNull(NullValueException.class, "'processDefinitionKey' or 'processDefinitionIds' cannot be null", processDefinitionKey, processDefinitionIds);
 
     Command<Void> command;
     if (processDefinitionKey != null) {
-      command = new DeleteProcessDefinitionsByKeyCmd(processDefinitionKey, cascade, skipCustomListeners, tenantId, isTenantIdSet);
+      command = new DeleteProcessDefinitionsByKeyCmd(processDefinitionKey, cascade, skipCustomListeners, skipIoMappings, tenantId, isTenantIdSet);
     } else if (processDefinitionIds != null && !processDefinitionIds.isEmpty()) {
-      command = new DeleteProcessDefinitionsByIdsCmd(processDefinitionIds, cascade, skipCustomListeners);
+      command = new DeleteProcessDefinitionsByIdsCmd(processDefinitionIds, cascade, skipCustomListeners, skipIoMappings);
     } else {
       return;
     }

@@ -89,6 +89,14 @@ public class DeleteProcessDefinitionTest {
     }
   }
 
+  protected static final String IO_MAPPING_PROCESS_KEY = "ioMappingProcess";
+  protected static final BpmnModelInstance IO_MAPPING_PROCESS = Bpmn.createExecutableProcess(IO_MAPPING_PROCESS_KEY)
+    .startEvent()
+    .userTask()
+      .camundaOutputParameter("inputParameter", "${notExistentVariable}")
+    .endEvent()
+    .done();
+
   @Test
   public void testDeleteProcessDefinitionNullId() {
     // declare expected exception
@@ -369,6 +377,29 @@ public class DeleteProcessDefinitionTest {
   }
 
   @Test
+  public void testDeleteProcessDefinitionsByKeyWithIoMappingsSkipped() {
+    // given
+    testHelper.deploy(IO_MAPPING_PROCESS);
+    runtimeService.startProcessInstanceByKey(IO_MAPPING_PROCESS_KEY);
+
+    testHelper.deploy(IO_MAPPING_PROCESS);
+    runtimeService.startProcessInstanceByKey(IO_MAPPING_PROCESS_KEY);
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byKey(IO_MAPPING_PROCESS_KEY)
+      .withoutTenantId()
+      .cascade()
+      .skipIoMappings()
+      .delete();
+
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+
+    // then
+    assertThat(processDefinitions.size(), is(0));
+  }
+
+  @Test
   public void testDeleteProcessDefinitionsByNotExistingIds() {
     // then
     thrown.expect(NotFoundException.class);
@@ -484,6 +515,30 @@ public class DeleteProcessDefinitionTest {
 
     // then
     assertThat(IncrementCounterListener.counter, is(0));
+  }
+
+  @Test
+  public void testDeleteProcessDefinitionsByIdsWithIoMappingsSkipped() {
+    // given
+    testHelper.deploy(IO_MAPPING_PROCESS);
+    runtimeService.startProcessInstanceByKey(IO_MAPPING_PROCESS_KEY);
+
+    testHelper.deploy(IO_MAPPING_PROCESS);
+    runtimeService.startProcessInstanceByKey(IO_MAPPING_PROCESS_KEY);
+
+    String[] processDefinitionIds = findProcessDefinitionIdsByKey(IO_MAPPING_PROCESS_KEY);
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byIds(processDefinitionIds)
+      .cascade()
+      .skipIoMappings()
+      .delete();
+
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+
+    // then
+    assertThat(processDefinitions.size(), is(0));
   }
 
   private void deployTwoProcessDefinitions() {

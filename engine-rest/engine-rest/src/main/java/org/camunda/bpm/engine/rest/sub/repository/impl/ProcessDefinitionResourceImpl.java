@@ -102,11 +102,11 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   @Override
-  public Response deleteProcessDefinition(boolean cascade, boolean skipCustomListeners) {
+  public Response deleteProcessDefinition(boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
     RepositoryService repositoryService = engine.getRepositoryService();
 
     try {
-      repositoryService.deleteProcessDefinition(processDefinitionId, cascade, skipCustomListeners);
+      repositoryService.deleteProcessDefinition(processDefinitionId, cascade, skipCustomListeners, skipIoMappings);
     } catch (NotFoundException nfe) {
       throw new InvalidRequestException(Status.NOT_FOUND, nfe, nfe.getMessage());
     }

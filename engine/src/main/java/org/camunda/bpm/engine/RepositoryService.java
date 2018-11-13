@@ -188,6 +188,27 @@ public interface RepositoryService {
    */
   void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners);
 
+
+  /**
+   * Deletes the process definition which belongs to the given process definition id.
+   * Cascades the deletion if the cascade is set to true, the custom listener can be skipped if
+   * the third parameter is set to true, io mappings can be skipped if the forth parameter is set to true.
+   *
+   * @param processDefinitionId the id, which corresponds to the process definition
+   * @param cascade if set to true, all process instances (including) history are deleted
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   *            are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   *            Is only used if cascade set to true.
+   * @param skipIoMappings Specifies whether input/output mappings for tasks should be invoked
+   *
+   * @throws ProcessEngineException
+   *          If the process definition does not exist
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings);
+
   /**
    * Fluent builder to delete process definitions.
    *

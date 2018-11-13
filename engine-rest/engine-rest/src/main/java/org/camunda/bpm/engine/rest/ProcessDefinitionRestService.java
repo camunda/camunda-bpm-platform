@@ -88,12 +88,14 @@ public interface ProcessDefinitionRestService {
   @Path("/key/{key}/delete")
   void deleteProcessDefinitionsByKey(@PathParam("key") String processDefinitionKey,
                                      @QueryParam("cascade") boolean cascade,
-                                     @QueryParam("skipCustomListeners") boolean skipCustomListeners);
+                                     @QueryParam("skipCustomListeners") boolean skipCustomListeners,
+                                     @QueryParam("skipIoMappings") boolean skipIoMappings);
 
   @DELETE
   @Path("/key/{key}/tenant-id/{tenantId}/delete")
   void deleteProcessDefinitionsByKeyAndTenantId(@PathParam("key") String processDefinitionKey,
                                                 @QueryParam("cascade") boolean cascade,
                                                 @QueryParam("skipCustomListeners") boolean skipCustomListeners,
+                                                @QueryParam("skipIoMappings") boolean skipIoMappings,
                                                 @PathParam("tenantId") String tenantId);
 }
