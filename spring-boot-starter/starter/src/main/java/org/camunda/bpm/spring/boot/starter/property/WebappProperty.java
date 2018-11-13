@@ -5,8 +5,7 @@ import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.
 public class WebappProperty {
   private boolean indexRedirectEnabled = true;
 
-  // TODO: META-INF/resources/webjars/camunda}")
-  private String webjarClasspath = "/META-INF/resources";
+  private String webjarClasspath = "/META-INF/resources/webjars/camunda";
 
   private String securityConfigFile = "/securityFilterRules.json";
 
