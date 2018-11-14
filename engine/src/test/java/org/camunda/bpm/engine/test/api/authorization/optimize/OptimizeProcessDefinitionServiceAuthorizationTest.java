@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -186,6 +187,36 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
 
     // then
     assertThat(runningHistoricTaskInstances.size(), is(0));
+  }
+
+  public void testGetOperationsLogWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+
+    try {
+      // when
+      optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10);
+      fail("Exception expected: It should not be possible to retrieve the logs");
+    } catch (AuthorizationException e) {
+      // then
+      String exceptionMessage = e.getMessage();
+      assertTextPresent(userId, exceptionMessage);
+      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
+    }
+  }
+
+  public void testGetOperationsLogWithAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
+
+    // when
+    List<UserOperationLogEntry> operationLogEntries =
+      optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10);
+
+    // then
+    assertThat(operationLogEntries.size(), is(0));
   }
 
   public void testGetCompletedProcessInstancesWithoutAuthorization() {

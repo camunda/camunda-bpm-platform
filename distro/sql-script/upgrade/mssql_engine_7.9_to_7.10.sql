@@ -220,3 +220,5 @@ create index ACT_HI_BAT_RM_TIME on ACT_HI_BATCH(REMOVAL_TIME_);
 -- https://app.camunda.com/jira/browse/CAM-9499
 ALTER TABLE ACT_RU_JOB
   ADD CREATE_TIME_ datetime2;
+
+create index ACT_IDX_HI_OP_LOG_TIMESTAMP on ACT_HI_OP_LOG(TIMESTAMP_);

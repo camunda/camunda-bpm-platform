@@ -18,12 +18,14 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.history.optimize.HistoricOptimizeVariableUpdateDto;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 
@@ -140,6 +142,30 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
     List<HistoricTaskInstanceDto> result = new ArrayList<>();
     for (HistoricTaskInstance instance : historicTaskInstances) {
       HistoricTaskInstanceDto dto = HistoricTaskInstanceDto.fromHistoricTaskInstance(instance);
+      result.add(dto);
+    }
+    return result;
+  }
+
+  @GET
+  @Path("/user-operation")
+  public List<UserOperationLogEntryDto> getHistoricUserOperationLogs(@QueryParam("occurredAfter") String occurredAfterAsString,
+                                                                     @QueryParam("occurredAt") String occurredAtAsString,
+                                                                     @QueryParam("maxResults") int maxResults) {
+
+    Date occurredAfter = dateConverter.convertQueryParameterToType(occurredAfterAsString);
+    Date occurredAt = dateConverter.convertQueryParameterToType(occurredAtAsString);
+    maxResults = ensureValidMaxResults(maxResults);
+
+    ProcessEngineConfigurationImpl config =
+      (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+
+    List<UserOperationLogEntry> operationLogEntries =
+      config.getOptimizeService().getHistoricUserOperationLogs(occurredAfter, occurredAt, maxResults);
+
+    List<UserOperationLogEntryDto> result = new ArrayList<>();
+    for (UserOperationLogEntry logEntry : operationLogEntries) {
+      UserOperationLogEntryDto dto = UserOperationLogEntryDto.map(logEntry);
       result.add(dto);
     }
     return result;

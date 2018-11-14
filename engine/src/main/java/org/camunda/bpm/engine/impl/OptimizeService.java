@@ -17,10 +17,12 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricActivityInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricProcessInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricTaskInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricDecisionInstanceQueryCmd;
+import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricUserOperationsLogQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricVariableUpdateQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricActivityInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricProcessInstanceQueryCmd;
@@ -60,6 +62,14 @@ public class OptimizeService extends ServiceImpl {
                                                                     int maxResults) {
     return commandExecutor.execute(
       new OptimizeRunningHistoricTaskInstanceQueryCmd(startedAfter, startedAt, maxResults)
+    );
+  }
+
+  public List<UserOperationLogEntry> getHistoricUserOperationLogs(Date occurredAfter,
+                                                                  Date occurredAt,
+                                                                  int maxResults) {
+    return commandExecutor.execute(
+      new OptimizeHistoricUserOperationsLogQueryCmd(occurredAfter, occurredAt, maxResults)
     );
   }
 

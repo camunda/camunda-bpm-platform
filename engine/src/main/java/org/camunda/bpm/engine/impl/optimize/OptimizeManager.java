@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
@@ -85,6 +86,25 @@ public class OptimizeManager extends AbstractManager {
     params.put("maxResults", maxResults);
 
     return getDbEntityManager().selectList("selectRunningHistoricTaskInstancePage", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<UserOperationLogEntry> getHistoricUserOperationLogs(Date occurredAfter,
+                                                                  Date occurredAt,
+                                                                  int maxResults) {
+    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+
+    String[] operationTypes = new String[]{
+      UserOperationLogEntry.OPERATION_TYPE_ASSIGN,
+      UserOperationLogEntry.OPERATION_TYPE_CLAIM,
+      UserOperationLogEntry.OPERATION_TYPE_COMPLETE};
+    Map<String, Object> params = new HashMap<>();
+    params.put("occurredAfter", occurredAfter);
+    params.put("occurredAt", occurredAt);
+    params.put("operationTypes", operationTypes);
+    params.put("maxResults", maxResults);
+
+    return getDbEntityManager().selectList("selectHistoricUserOperationLogPage", params);
   }
 
   private void checkIsAuthorizedToReadHistoryOfProcessDefinitions() {

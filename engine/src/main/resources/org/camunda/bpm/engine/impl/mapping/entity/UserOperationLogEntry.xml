@@ -281,4 +281,27 @@
     </where>
   </sql>
 
+  <select id="selectHistoricUserOperationLogPage" resultMap="UserOperationLogResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_OP_LOG RES
+    <where>
+      <if test="parameter.occurredAfter != null">
+        RES.TIMESTAMP_ &gt; #{parameter.occurredAfter}
+      </if>
+      <if test="parameter.occurredAt != null">
+        and RES.TIMESTAMP_ = #{parameter.occurredAt}
+      </if>
+      <if test="parameter.operationTypes != null and parameter.operationTypes.length > 0">
+        and RES.OPERATION_TYPE_ in
+        <foreach item="item" index="index" collection="parameter.operationTypes" open="(" separator="," close=")">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+      </if>
+    </where>
+
+    ORDER BY RES.TIMESTAMP_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
 </mapper>
