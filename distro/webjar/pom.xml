@@ -66,10 +66,11 @@
           <execution>
             <phase>generate-resources</phase>
             <configuration>
+            <skip>${skip.frontend.build}</skip>
               <target>
                 <move file="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/WEB-INF/securityFilterRules.json" todir="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/" />
                 <delete dir="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/WEB-INF" />
-                <move file="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/plugin" todir="${project.build.outputDirectory}/META-INF/resources/" />
+                <move file="${project.build.outputDirectory}/META-INF/resources/webjars/camunda/plugin" tofile="${project.build.outputDirectory}/META-INF/resources/plugin" verbose="true" />
               </target>
             </configuration>
             <goals>
