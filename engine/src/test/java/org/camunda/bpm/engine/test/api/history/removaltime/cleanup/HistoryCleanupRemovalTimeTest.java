@@ -2156,7 +2156,9 @@ public class HistoryCleanupRemovalTimeTest {
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
+      .compact()
+      .singleResult();
 
     // then
     assertThat(report.getCleanableProcessInstanceCount(), is(5L));
@@ -2180,10 +2182,12 @@ public class HistoryCleanupRemovalTimeTest {
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
+      .compact()
+      .singleResult();
 
     // then
-    assertThat(report.getCleanableProcessInstanceCount(), is(0L));
+    assertThat(report, nullValue());
   }
 
   @Test
@@ -2212,6 +2216,7 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     CleanableHistoricDecisionInstanceReportResult report = historyService.createCleanableHistoricDecisionInstanceReport()
       .decisionDefinitionKeyIn("dish-decision")
+      .compact()
       .singleResult();
 
     // then
@@ -2244,6 +2249,7 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     CleanableHistoricDecisionInstanceReportResult report = historyService.createCleanableHistoricDecisionInstanceReport()
       .decisionDefinitionKeyIn("dish-decision")
+      .compact()
       .singleResult();
 
     // then
