@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -125,6 +126,66 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(0));
+  }
+
+  public void testGetCompletedTasksWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+
+    try {
+      // when
+      optimizeService.getCompletedHistoricTaskInstances(new Date(0L), null, 10);
+      fail("Exception expected: It should not be possible to retrieve the tasks");
+    } catch (AuthorizationException e) {
+      // then
+      String exceptionMessage = e.getMessage();
+      assertTextPresent(userId, exceptionMessage);
+      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
+    }
+  }
+
+  public void testGetCompletedTasksWithAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
+
+    // when
+    List<HistoricTaskInstance> completedHistoricTaskInstances =
+      optimizeService.getCompletedHistoricTaskInstances(new Date(0L), null, 10);
+
+    // then
+    assertThat(completedHistoricTaskInstances.size(), is(0));
+  }
+
+  public void testGetRunningTasksWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+
+    try {
+      // when
+      optimizeService.getRunningHistoricTaskInstances(new Date(0L), null, 10);
+      fail("Exception expected: It should not be possible to retrieve the tasks");
+    } catch (AuthorizationException e) {
+      // then
+      String exceptionMessage = e.getMessage();
+      assertTextPresent(userId, exceptionMessage);
+      assertTextPresent(READ_HISTORY.getName(), exceptionMessage);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), exceptionMessage);
+    }
+  }
+
+  public void testGetRunningTasksWithAuthorization() {
+    // given
+    startProcessInstanceByKey("process");
+    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
+
+    // when
+    List<HistoricTaskInstance> runningHistoricTaskInstances =
+      optimizeService.getRunningHistoricTaskInstances(new Date(0L), null, 10);
+
+    // then
+    assertThat(runningHistoricTaskInstances.size(), is(0));
   }
 
   public void testGetCompletedProcessInstancesWithoutAuthorization() {

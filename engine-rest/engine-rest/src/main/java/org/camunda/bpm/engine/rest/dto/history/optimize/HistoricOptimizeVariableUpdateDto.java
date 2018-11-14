@@ -10,10 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.history;
+package org.camunda.bpm.engine.rest.dto.history.optimize;
 
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.rest.dto.history.HistoricVariableUpdateDto;
 
 public class HistoricOptimizeVariableUpdateDto extends HistoricVariableUpdateDto {
 

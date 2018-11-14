@@ -15,13 +15,16 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricActivityInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricProcessInstanceQueryCmd;
+import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricTaskInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricDecisionInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricVariableUpdateQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricActivityInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricProcessInstanceQueryCmd;
+import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricTaskInstanceQueryCmd;
 
 import java.util.Date;
 import java.util.List;
@@ -41,6 +44,22 @@ public class OptimizeService extends ServiceImpl {
                                                                             int maxResults) {
     return commandExecutor.execute(
       new OptimizeRunningHistoricActivityInstanceQueryCmd(startedAfter, startedAt, maxResults)
+    );
+  }
+
+  public List<HistoricTaskInstance> getCompletedHistoricTaskInstances(Date finishedAfter,
+                                                                      Date finishedAt,
+                                                                      int maxResults) {
+    return commandExecutor.execute(
+      new OptimizeCompletedHistoricTaskInstanceQueryCmd(finishedAfter, finishedAt, maxResults)
+    );
+  }
+
+  public List<HistoricTaskInstance> getRunningHistoricTaskInstances(Date startedAfter,
+                                                                    Date startedAt,
+                                                                    int maxResults) {
+    return commandExecutor.execute(
+      new OptimizeRunningHistoricTaskInstanceQueryCmd(startedAfter, startedAt, maxResults)
     );
   }
 

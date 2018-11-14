@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.optimize;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -36,7 +37,7 @@ public class OptimizeManager extends AbstractManager {
                                                                               int maxResults) {
     checkIsAuthorizedToReadHistoryOfProcessDefinitions();
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("finishedAfter", finishedAfter);
     params.put("finishedAt", finishedAt);
     params.put("maxResults", maxResults);
@@ -50,12 +51,40 @@ public class OptimizeManager extends AbstractManager {
                                                                             int maxResults) {
     checkIsAuthorizedToReadHistoryOfProcessDefinitions();
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("startedAfter", startedAfter);
     params.put("startedAt", startedAt);
     params.put("maxResults", maxResults);
 
     return getDbEntityManager().selectList("selectRunningHistoricActivityPage", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricTaskInstance> getCompletedHistoricTaskInstances(Date finishedAfter,
+                                                                      Date finishedAt,
+                                                                      int maxResults) {
+    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("finishedAfter", finishedAfter);
+    params.put("finishedAt", finishedAt);
+    params.put("maxResults", maxResults);
+
+    return getDbEntityManager().selectList("selectCompletedHistoricTaskInstancePage", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricTaskInstance> getRunningHistoricTaskInstances(Date startedAfter,
+                                                                    Date startedAt,
+                                                                    int maxResults) {
+    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("startedAfter", startedAfter);
+    params.put("startedAt", startedAt);
+    params.put("maxResults", maxResults);
+
+    return getDbEntityManager().selectList("selectRunningHistoricTaskInstancePage", params);
   }
 
   private void checkIsAuthorizedToReadHistoryOfProcessDefinitions() {
@@ -68,7 +97,7 @@ public class OptimizeManager extends AbstractManager {
                                                                             int maxResults) {
     checkIsAuthorizedToReadHistoryOfProcessDefinitions();
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("finishedAfter", finishedAfter);
     params.put("finishedAt", finishedAt);
     params.put("maxResults", maxResults);
@@ -82,7 +111,7 @@ public class OptimizeManager extends AbstractManager {
                                                                           int maxResults) {
     checkIsAuthorizedToReadHistoryOfProcessDefinitions();
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("startedAfter", startedAfter);
     params.put("startedAt", startedAt);
     params.put("maxResults", maxResults);
@@ -96,7 +125,7 @@ public class OptimizeManager extends AbstractManager {
                                                                  int maxResults) {
     checkIsAuthorizedToReadHistoryOfProcessDefinitions();
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("occurredAfter", occurredAfter);
     params.put("occurredAt", occurredAt);
     params.put("maxResults", maxResults);
@@ -110,7 +139,7 @@ public class OptimizeManager extends AbstractManager {
                                                                      int maxResults) {
     checkIsAuthorizedToReadHistoryOfDecisionDefinitions();
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("evaluatedAfter", evaluatedAfter);
     params.put("evaluatedAt", evaluatedAt);
     params.put("maxResults", maxResults);
