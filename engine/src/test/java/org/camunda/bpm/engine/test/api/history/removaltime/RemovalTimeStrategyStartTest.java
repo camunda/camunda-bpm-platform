@@ -1563,16 +1563,32 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    // when
+    // when batch is started
     Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
 
-    // then
+    // then removal time is set
+    assertThat(historicBatch.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    String seedJobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(seedJobId);
+
+    String jobId = managementService.createJobQuery().list().get(0).getId();
+    managementService.executeJob(jobId);
+
+    String monitorJobId = managementService.createJobQuery().singleResult().getId();
+
+    // when batch is ended
+    managementService.executeJob(monitorJobId);
+
+    historicBatch = historyService.createHistoricBatchQuery().singleResult();
+
+    // then removal time is still set
     assertThat(historicBatch.getRemovalTime(), is(addDays(START_DATE, 5)));
 
     // cleanup
-    managementService.deleteBatch(batch.getId(), true);
+    historyService.deleteHistoricBatch(batch.getId());
   }
 
   @Test
