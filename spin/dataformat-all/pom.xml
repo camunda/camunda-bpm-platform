@@ -74,8 +74,16 @@
                   <shadedPattern>spinjar.com.sun</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>javax</pattern>
-                  <shadedPattern>spinjar.javax</shadedPattern>
+                  <pattern>javax.xml.stream</pattern>
+                  <shadedPattern>spinjar.javax.xml.stream</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.xml.bind</pattern>
+                  <shadedPattern>spinjar.javax.xml.bind</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.activation</pattern>
+                  <shadedPattern>spinjar.javax.activation</shadedPattern>
                 </relocation>
               </relocations>
               <transformers>
