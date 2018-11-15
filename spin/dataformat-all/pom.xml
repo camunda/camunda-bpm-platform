@@ -69,9 +69,22 @@
                   <pattern>org.objectweb</pattern>
                   <shadedPattern>spinjar.com.objectweb</shadedPattern>
                 </relocation>
+
                 <relocation>
-                  <pattern>com.sun</pattern>
-                  <shadedPattern>spinjar.com.sun</shadedPattern>
+                  <pattern>com.sun.istack</pattern>
+                  <shadedPattern>spinjar.com.sun.istack</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun.activation</pattern>
+                  <shadedPattern>spinjar.com.sun.activation</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun.xml.bind</pattern>
+                  <shadedPattern>spinjar.com.sun.xml.bind</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun.xml.txw2</pattern>
+                  <shadedPattern>spinjar.com.sun.xml.txw2</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>javax.xml.stream</pattern>
