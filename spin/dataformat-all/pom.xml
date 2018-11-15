@@ -23,11 +23,6 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
     </dependency>
@@ -73,6 +68,14 @@
                 <relocation>
                   <pattern>org.objectweb</pattern>
                   <shadedPattern>spinjar.com.objectweb</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.sun</pattern>
+                  <shadedPattern>spinjar.com.sun</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax</pattern>
+                  <shadedPattern>spinjar.javax</shadedPattern>
                 </relocation>
               </relocations>
               <transformers>
