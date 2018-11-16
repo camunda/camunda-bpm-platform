@@ -97,6 +97,16 @@
                   <include>com.sun.activation:javax.activation</include>
                 </includes>
               </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>com.sun.activation</pattern>
+                  <shadedPattern>camundajar.com.sun.activation</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.activation</pattern>
+                  <shadedPattern>camundajar.javax.activation</shadedPattern>
+                </relocation>
+              </relocations>
             </configuration>
           </execution>
         </executions>
