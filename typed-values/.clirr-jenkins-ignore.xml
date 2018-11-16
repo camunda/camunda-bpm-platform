@@ -11,4 +11,12 @@
     <differenceType>7012</differenceType>
     <method>*</method>
   </difference>
+  <difference>
+    <differenceType>8001</differenceType>
+    <className>com/sun/activation/**/*</className>
+  </difference>
+  <difference>
+    <differenceType>8001</differenceType>
+    <className>javax/activation/**/*</className>
+  </difference>
 </differences>
