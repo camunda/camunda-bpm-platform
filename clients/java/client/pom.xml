@@ -18,7 +18,7 @@
     <camunda.version>7.10.0-SNAPSHOT</camunda.version>
 
     <version.httpclient>4.5.5</version.httpclient>
-    <version.jackson>2.9.5</version.jackson>
+    <version.jackson>2.9.7</version.jackson>
 
     <version.plugin.surefire>2.16</version.plugin.surefire>
     <version.plugin.failsafe>2.22.0</version.plugin.failsafe>
