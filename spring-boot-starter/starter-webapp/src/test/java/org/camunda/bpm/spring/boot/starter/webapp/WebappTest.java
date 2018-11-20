@@ -48,7 +48,7 @@ public class WebappTest {
 
   @Test
   public void testAdminEndpointAvailable() {
-    final ResponseEntity<String> response = testRestTemplate.getForEntity("/app/admin", String.class);
+    final ResponseEntity<String> response = testRestTemplate.getForEntity("/app/admin/", String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
   }
