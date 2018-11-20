@@ -290,7 +290,7 @@ Batch.prototype.loadDetails = function(id, type) {
       obj.state = 'LOADED';
 
       if(type === 'runtime') {
-        this._loadFailedJobs(obj.data);
+        self._loadFailedJobs(obj.data);
       }
     };
 
