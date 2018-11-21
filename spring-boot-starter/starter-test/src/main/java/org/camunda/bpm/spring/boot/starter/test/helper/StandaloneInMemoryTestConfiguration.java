@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.MockExpressionManager;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,6 +44,7 @@ public class StandaloneInMemoryTestConfiguration extends StandaloneInMemProcessE
     expressionManager = new MockExpressionManager();
     databaseSchemaUpdate = DB_SCHEMA_UPDATE_DROP_CREATE;
     isDbMetricsReporterActivate = false;
+    historyLevel = HistoryLevel.HISTORY_LEVEL_FULL;
 
     getProcessEnginePlugins().addAll(plugins);
   }
