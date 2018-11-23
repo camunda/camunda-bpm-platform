@@ -12,7 +12,7 @@ In a nutshell you will be guided through the following steps:
 * [Java JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * [Apache Maven](https://maven.apache.org/download.cgi)
 * [Camunda Modeler >= 1.12.0](https://camunda.org/release/camunda-modeler/1.12.0/)
-* [Camunda BPM Platform >= 7.9.0](https://camunda.org/release/camunda-bpm/tomcat/7.9/camunda-bpm-tomcat-7.9.0.zip)
+* [Camunda BPM Platform](https://camunda.org/release/camunda-bpm/tomcat/7.10/camunda-bpm-tomcat-7.10.0.zip)
 * Camunda External Task Client
 
 First, make sure that you have downloaded and installed all the necessary prerequisites.
