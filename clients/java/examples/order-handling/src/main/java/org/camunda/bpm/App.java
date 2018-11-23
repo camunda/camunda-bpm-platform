@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class App {
 
-  public static void main(String... args) throws InterruptedException {
+  public static void main(String... args) {
     // bootstrap the client
     ExternalTaskClient client = ExternalTaskClient.create()
       .baseUrl("http://localhost:8080/engine-rest")
