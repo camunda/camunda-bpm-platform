@@ -35,5 +35,15 @@ The following Maven coordinate needs to be added to the projects `pom.xml`:
 </dependency>
 ```
 
+### JDK 9+ Support
+If you want to use a JDK higher than 1.8, please add the following dependency to the projects `pom.xml`:
+```xml
+<dependency>
+  <groupId>com.sun.xml.bind</groupId>
+  <artifactId>jaxb-impl</artifactId>
+  <version>2.2.4</version>
+</dependency>
+```
+
 ## License
 Unless otherwise specified this project is licensed under [Apache License Version 2.0](./LICENSE).
