@@ -67,7 +67,7 @@ Add the `camunda-external-task-client` dependency to the project's `pom.xml`:
 <dependency>
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-external-task-client</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
