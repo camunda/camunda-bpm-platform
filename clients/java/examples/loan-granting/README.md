@@ -15,7 +15,7 @@ In a nutshell you will be guided through the following steps:
 * [Camunda BPM Platform](https://camunda.org/release/camunda-bpm/tomcat/7.10/camunda-bpm-tomcat-7.10.0.zip)
 * Camunda External Task Client
 
-First, make sure that you have downloaded and installed all the necessary prerequisites.
+First, make sure that you have downloaded and installed all the necessary prerequisites. Please check the [compatibility matrix](https://docs.camunda.org/manual/user-guide/ext-client/compatibility-matrix/) if you use older client version.
 
 ## Start the Camunda BPM Platform
 * Microsoft Windows users need to run the `start-camunda.bat` file
