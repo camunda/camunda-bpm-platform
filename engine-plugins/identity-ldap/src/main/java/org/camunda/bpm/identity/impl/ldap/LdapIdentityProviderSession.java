@@ -94,38 +94,41 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   protected InitialLdapContext openContext(String userDn, String password) {
-    Hashtable<String, String> env = new Hashtable<String, String>();
-    env.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfiguration.getInitialContextFactory());
-    env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
-    env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
-    env.put(Context.SECURITY_PRINCIPAL, userDn);
-    env.put(Context.SECURITY_CREDENTIALS, password);
+	for (String serverUrl: ldapConfiguration.getServerUrl().split(";")) {
+	  Hashtable<String, String> env = new Hashtable<String, String>();
+	  env.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfiguration.getInitialContextFactory());
+	  env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
+	  env.put(Context.PROVIDER_URL, serverUrl);
+	  env.put(Context.SECURITY_PRINCIPAL, userDn);
+	  env.put(Context.SECURITY_CREDENTIALS, password);
 
-    // for anonymous login
-    if(ldapConfiguration.isAllowAnonymousLogin() && password.isEmpty()) {
-      env.put(Context.SECURITY_AUTHENTICATION, "none");
+	  // for anonymous login
+	  if(ldapConfiguration.isAllowAnonymousLogin() && password.isEmpty()) {
+	    env.put(Context.SECURITY_AUTHENTICATION, "none");
+	  }
+
+	  if(ldapConfiguration.isUseSsl()) {
+	    env.put(Context.SECURITY_PROTOCOL, "ssl");
+	  }
+
+	  // add additional properties
+	  Map<String, String> contextProperties = ldapConfiguration.getContextProperties();
+	  if(contextProperties != null) {
+        env.putAll(contextProperties);
+      }
+
+      try {
+        return new InitialLdapContext(env, null);
+
+      } catch(AuthenticationException e) {
+        LOG.log(Level.FINE, "Could not authenticate with LDAP server", e);
+
+      } catch(NamingException e) {
+        throw new IdentityProviderException("Could not connect to LDAP server", e);
+
+      }
     }
-
-    if(ldapConfiguration.isUseSsl()) {
-      env.put(Context.SECURITY_PROTOCOL, "ssl");
-    }
-
-    // add additional properties
-    Map<String, String> contextProperties = ldapConfiguration.getContextProperties();
-    if(contextProperties != null) {
-      env.putAll(contextProperties);
-    }
-
-    try {
-      return new InitialLdapContext(env, null);
-
-    } catch(AuthenticationException e) {
-      throw new LdapAuthenticationException("Could not authenticate with LDAP server", e);
-
-    } catch(NamingException e) {
-      throw new IdentityProviderException("Could not connect to LDAP server", e);
-
-    }
+    throw new LdapAuthenticationException("Could not authenticate with LDAP server. See logs.");
   }
 
   protected void ensureContextInitialized() {
