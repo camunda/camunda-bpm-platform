@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 public class CamundaBpmVersionTest {
 
-  private static final String CURRENT_VERSION = "7.11.0";
+  private static final String CURRENT_VERSION = "7.10.0";
 
   public static CamundaBpmVersion camundaBpmVersion(final String version) {
     final Package pkg = mock(Package.class);
