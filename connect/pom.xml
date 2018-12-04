@@ -31,7 +31,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
