@@ -13,7 +13,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <connect.version.old>1.0.7</connect.version.old>
+    <connect.version.old>1.1.0</connect.version.old>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
