@@ -25,6 +25,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -254,6 +255,26 @@ public class TopicSubscriptionIT {
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+  }
+
+  @Test
+  @Ignore("CAM-9577")
+  public void shouldNotApplyAnyFilter() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    processDefinition = engineRule.deploy("aTenantId", BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
+    engineRule.startProcessInstanceByKey(processDefinition.getKey(), "aTenantId");
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(2);
   }
 
   @Test
