@@ -12,7 +12,6 @@
   <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.10.0</name>
 
   <properties>
-    <camunda.version.current>7.10.0</camunda.version.current>
     <camunda.version.previous>7.9.0</camunda.version.previous>
   </properties>
 
@@ -110,7 +109,7 @@
                   <artifactItem>
                     <groupId>org.camunda.bpm.distro</groupId>
                     <artifactId>camunda-sql-scripts</artifactId>
-                    <version>${camunda.version.current}</version>
+                    <version>7.10.0</version>
                     <type>test-jar</type>
                     <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                     <overWrite>true</overWrite>
@@ -185,7 +184,7 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>${camunda.version.current}</versionString>
+                  <versionString>7.10.0</versionString>
                 </configuration>
               </execution>
               <execution>
