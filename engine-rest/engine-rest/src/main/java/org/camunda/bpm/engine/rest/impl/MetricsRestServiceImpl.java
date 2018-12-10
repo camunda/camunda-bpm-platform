@@ -45,6 +45,7 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   public static final String QUERY_PARAM_FIRST_RESULT = "firstResult";
   public static final String QUERY_PARAM_MAX_RESULTS = "maxResults";
   public static final String QUERY_PARAM_INTERVAL = "interval";
+  public static final String QUERY_PARAM_AGG_OVER_REPORTER = "aggregateOverReporter";
 
   public MetricsRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
@@ -104,6 +105,10 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
     if (queryParameters.getFirst(QUERY_PARAM_MAX_RESULTS) != null) {
       int maxResults = intConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_MAX_RESULTS));
       query.limit(maxResults);
+    }
+
+    if(queryParameters.getFirst(QUERY_PARAM_AGG_OVER_REPORTER) != null) {
+      query = query.aggregateOverReporter();
     }
   }
 

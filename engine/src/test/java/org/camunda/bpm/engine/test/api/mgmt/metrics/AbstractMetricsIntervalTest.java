@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
@@ -68,7 +67,7 @@ public abstract class AbstractMetricsIntervalTest {
   protected MetricsRegistry metricsRegistry;
   protected Random rand;
 
-  private void generateMeterData(long dataCount, long interval) {
+  protected void generateMeterData(long dataCount, long interval) {
     //set up for randomnes
     Set<String> metricNames = metricsRegistry.getMeters().keySet();
     metricsCount = metricNames.size();

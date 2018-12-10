@@ -139,7 +139,12 @@
     (
     SELECT
     NAME_,
-    REPORTER_,
+    <if test="aggregateOverReporter">
+      ${constant.null.reporter},
+    </if>
+    <if test="!aggregateOverReporter">
+      REPORTER_,
+    </if>
     VALUE_,
     FLOOR( (MILLISECONDS_ / 1000) / #{interval}) * #{interval} * 1000 as INTERVAL_
     <include refid="selectMeterLogsByQueryCriteriaSql"/>
