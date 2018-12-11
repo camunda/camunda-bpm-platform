@@ -10,6 +10,7 @@
 
   <artifactId>camunda-engine-dmn-root</artifactId>
   <name>camunda DMN - engine - root</name>
+  <inceptionYear>2015</inceptionYear>
   <packaging>pom</packaging>
 
   <modules>
@@ -148,6 +149,10 @@
           <acceptPomPackaging>true</acceptPomPackaging>
           <excludedScopes>test</excludedScopes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
