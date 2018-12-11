@@ -10,6 +10,7 @@
 
   <artifactId>camunda-commons-root</artifactId>
   <name>camunda Commons - Root Pom</name>
+  <inceptionYear>2014</inceptionYear>
   <packaging>pom</packaging>
 
   <modules>
@@ -100,6 +101,10 @@
           <acceptPomPackaging>true</acceptPomPackaging>
           <excludedScopes>test</excludedScopes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
