@@ -639,10 +639,6 @@
           GROUP BY PI.PROC_DEF_ID_
           ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
 
-        <if test="isCompact &amp;&amp; !isHistoryCleanupStrategyRemovalTimeBased">
-          WHERE FINISHED_ > 0
-        </if>
-
         GROUP BY RES.ID_,
           RES.KEY_,
           RES.NAME_,
@@ -652,9 +648,14 @@
           F.FINISHED_
 
     ) RES
-    <if test="isCompact &amp;&amp; isHistoryCleanupStrategyRemovalTimeBased">
-      WHERE RES.CLEANABLE_ > 0
-    </if>
+    <choose>
+      <when test="isCompact &amp;&amp; isHistoryCleanupStrategyRemovalTimeBased">
+        WHERE (RES.CLEANABLE_ > 0 OR FINISHED_ > 0)
+      </when>
+      <when test="isCompact &amp;&amp; !isHistoryCleanupStrategyRemovalTimeBased">
+        WHERE FINISHED_ > 0
+      </when>
+    </choose>
 
   </sql>
 

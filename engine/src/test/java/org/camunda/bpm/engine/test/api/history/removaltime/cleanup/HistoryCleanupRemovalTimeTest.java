@@ -68,7 +68,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -2143,7 +2142,7 @@ public class HistoryCleanupRemovalTimeTest {
   // report tests //////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @Test
-  public void shouldSeeCleanableProcessInstances() {
+  public void shouldSeeCleanableButNoFinishedProcessInstancesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
@@ -2166,10 +2165,39 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableProcessInstanceCount(), is(5L));
+    assertThat(report.getFinishedProcessInstanceCount(), is(0L));
   }
 
   @Test
-  public void shouldNotSeeCleanableProcessInstances() {
+  public void shouldSeeFinishedButNoCleanableProcessInstancesInReport() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
+      .initHistoryRemovalTime();
+
+    testRule.deploy(PROCESS);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+
+      String taskId = taskService.createTaskQuery().singleResult().getId();
+      taskService.complete(taskId);
+    }
+
+    // when
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
+      .compact()
+      .singleResult();
+
+    // then
+    assertThat(report.getFinishedProcessInstanceCount(), is(5L));
+    assertThat(report.getCleanableProcessInstanceCount(), is(0L));
+  }
+
+  @Test
+  public void shouldNotSeeCleanableProcessInstancesReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
@@ -2195,37 +2223,10 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   @Test
-  @Ignore("CAM-9579")
-  public void shouldSeeFinishedButNotCleanableProcessInstancesInReport() {
-    // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-      .initHistoryRemovalTime();
-
-    testRule.deploy(PROCESS);
-
-    for (int i = 0; i < 5; i++) {
-      runtimeService.startProcessInstanceByKey(PROCESS_KEY);
-
-      String taskId = taskService.createTaskQuery().singleResult().getId();
-      taskService.complete(taskId);
-    }
-
-    // when
-    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
-      .compact()
-      .singleResult();
-
-    // then
-    assertThat(report.getFinishedProcessInstanceCount(), is(5L));
-    assertThat(report.getCleanableProcessInstanceCount(), is(0L));
-  }
-
-  @Test
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
-  public void shouldSeeCleanableDecisionInstances() {
+  public void shouldSeeCleanableDecisionInstancesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
@@ -2252,13 +2253,14 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableDecisionInstanceCount(), is(5L));
+    assertThat(report.getFinishedDecisionInstanceCount(), is(5L));
   }
 
   @Test
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
-  public void shouldNotSeeCleanableDecisionInstances() {
+  public void shouldNotSeeCleanableDecisionInstancesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
@@ -2285,10 +2287,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableDecisionInstanceCount(), is(0L));
+    assertThat(report.getFinishedDecisionInstanceCount(), is(5L));
   }
 
   @Test
-  public void shouldSeeCleanableBatches() {
+  public void shouldSeeCleanableBatchesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
@@ -2312,13 +2315,14 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableBatchesCount(), is(1L));
+    assertThat(report.getFinishedBatchesCount(), is(0L));
 
     // cleanup
     managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
-  public void shouldNotSeeCleanableBatches() {
+  public void shouldNotSeeCleanableBatchesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
@@ -2342,6 +2346,7 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableBatchesCount(), is(0L));
+    assertThat(report.getFinishedBatchesCount(), is(0L));
 
     // cleanup
     managementService.deleteBatch(batch.getId(), true);
