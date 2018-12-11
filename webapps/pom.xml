@@ -14,6 +14,7 @@
   <groupId>org.camunda.bpm.webapp</groupId>
   <packaging>war</packaging>
   <name>camunda BPM - webapp - app</name>
+  <inceptionYear>2014</inceptionYear>
 
   <properties>
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
@@ -304,6 +305,10 @@
         <configuration>
           <excludedScopes>test</excludedScopes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
