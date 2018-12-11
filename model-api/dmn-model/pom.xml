@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
-    <version>3.1</version>
+    <version>3.2</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -13,6 +13,7 @@
   <artifactId>camunda-dmn-model</artifactId>
   <version>7.11.0-SNAPSHOT</version>
   <name>camunda BPM - DMN Model API</name>
+  <inceptionYear>2015</inceptionYear>
   <packaging>jar</packaging>
 
   <properties>
@@ -104,6 +105,10 @@
         <configuration>
           <excludedScopes>test</excludedScopes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
