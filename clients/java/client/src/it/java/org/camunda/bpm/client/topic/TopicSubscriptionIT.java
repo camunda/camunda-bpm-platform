@@ -258,7 +258,6 @@ public class TopicSubscriptionIT {
   }
 
   @Test
-  @Ignore("CAM-9577")
   public void shouldNotApplyAnyFilter() {
     // given
     engineRule.startProcessInstance(processDefinition.getId());

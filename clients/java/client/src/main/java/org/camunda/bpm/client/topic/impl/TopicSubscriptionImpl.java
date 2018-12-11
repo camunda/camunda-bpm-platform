@@ -111,7 +111,6 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   }
 
   public boolean isWithoutTenantId() {
-    withoutTenantId = true;
     return withoutTenantId;
   }
 
