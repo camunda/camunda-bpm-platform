@@ -139,10 +139,10 @@
     (
     SELECT
     NAME_,
-    <if test="aggregateOverReporter">
+    <if test="aggregateByReporter">
       ${constant.null.reporter},
     </if>
-    <if test="!aggregateOverReporter">
+    <if test="!aggregateByReporter">
       REPORTER_,
     </if>
     VALUE_,

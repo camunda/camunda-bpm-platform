@@ -38,7 +38,7 @@ public interface MetricIntervalValue {
   /**
    * Returns
    *        the reporter name of the metric, identifies the node which generates this metric.
-   *        'null' when the metrics are aggregated over reporter.
+   *        'null' when the metrics are aggregated by reporter.
    *
    * @return the reporter name
    */

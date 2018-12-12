@@ -44,7 +44,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   protected Long startDateMilliseconds;
   protected Long endDateMilliseconds;
   protected Long interval;
-  protected Boolean aggregateOverReporter;
+  protected Boolean aggregateByReporter;
 
   protected transient CommandExecutor commandExecutor;
 
@@ -136,8 +136,8 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   }
 
   @Override
-  public MetricsQuery aggregateOverReporter() {
-    aggregateOverReporter = true;
+  public MetricsQuery aggregateByReporter() {
+    aggregateByReporter = true;
     return this;
   }
 

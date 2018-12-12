@@ -167,7 +167,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testGetIntervalAggregation() {
     given()
-      .queryParam("aggregateOverReporter", true)
+      .queryParam("aggregateByReporter", true)
       .then()
         .expect()
           .statusCode(Status.OK.getStatusCode())
@@ -176,7 +176,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verify(meterQueryMock).name(null);
     verify(meterQueryMock).reporter(null);
-    verify(meterQueryMock).aggregateOverReporter();
+    verify(meterQueryMock).aggregateByReporter();
     verify(meterQueryMock, times(1)).interval();
     verifyNoMoreInteractions(meterQueryMock);
   }
@@ -243,7 +243,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
       .queryParam("firstResult", 10)
       .queryParam("startDate", DATE_FORMAT_WITH_TIMEZONE.format(new Date(0)))
       .queryParam("endDate", DATE_FORMAT_WITH_TIMEZONE.format(new Date(15 * 60 * 1000)))
-      .queryParam("aggregateOverReporter", true)
+      .queryParam("aggregateByReporter", true)
       .queryParam("interval", 300)
       .then()
         .expect()
@@ -257,7 +257,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(meterQueryMock).limit(10);
     verify(meterQueryMock).startDate(new Date(0));
     verify(meterQueryMock).endDate(new Date(15 * 60 * 1000));
-    verify(meterQueryMock).aggregateOverReporter();
+    verify(meterQueryMock).aggregateByReporter();
     verify(meterQueryMock, times(1)).interval(300);
     verifyNoMoreInteractions(meterQueryMock);
   }

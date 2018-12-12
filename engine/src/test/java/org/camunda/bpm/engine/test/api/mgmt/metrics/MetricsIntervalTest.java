@@ -508,7 +508,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     assertTrue(metrics.size() > 0);
 
     // when
-    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().aggregateOverReporter().interval();
+    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().aggregateByReporter().interval();
 
     // then
     assertEquals(metrics.size(), aggregatedMetrics.size());
@@ -531,7 +531,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     List<MetricIntervalValue> metrics = managementService.createMetricsQuery().interval();
 
     // when
-    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().aggregateOverReporter().interval();
+    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().aggregateByReporter().interval();
 
     // then
     // multiply by 3 because there are three reporters: 'REPORTER_ID' (check the #initMetrics()), reporter1 and reporter2
@@ -557,7 +557,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     int limit = 10;
     // when
     List<MetricIntervalValue> metrics = managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).limit(limit).interval();
-    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).limit(limit).aggregateOverReporter().interval();
+    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).limit(limit).aggregateByReporter().interval();
 
     // then aggregatedMetrics contains wider time interval
     assertTrue(metrics.get(limit - 1).getTimestamp().getTime() > aggregatedMetrics.get(limit - 1).getTimestamp().getTime());
