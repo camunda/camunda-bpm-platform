@@ -14,6 +14,7 @@
   <version>7.11.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Root Pom</name>
+  <inceptionYear>2013</inceptionYear>
 
   <description>
     This pom defines the modules that make up the build.
@@ -34,6 +35,10 @@
           <acceptPomPackaging>true</acceptPomPackaging>
           <excludedScopes>test</excludedScopes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

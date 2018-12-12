@@ -10,6 +10,7 @@
 
   <artifactId>camunda-parent</artifactId>
   <name>camunda BPM - Parent Pom</name>
+  <inceptionYear>2013</inceptionYear>
   <packaging>pom</packaging>
 
   <description>
@@ -575,6 +576,12 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
   <repositories>

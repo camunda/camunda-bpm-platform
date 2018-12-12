@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
+    Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,7 +16,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">
