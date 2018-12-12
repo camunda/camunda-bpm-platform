@@ -21,23 +21,35 @@ import java.util.List;
 
 import org.camunda.bpm.webapp.impl.security.auth.Authentication;
 import org.camunda.bpm.webapp.impl.security.filter.RequestMatcher.Match;
+import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
 import org.springframework.util.PathMatcher;
 
 /**
  * <p>A {@link SecurityFilterRule} that deleagates to a set of {@link PathMatcher}s</p>
+ *
+ * <p>How this thing works:
+ * <ul>
+ * <li> A path that is not listed in <code>deniedPaths</code> is always granted anonymous access
+ *  (even if the user is authenticated for a process engine).
+ * <li> A path that is listed in <code>deniedPaths</code> is then also checked against <code>allowedPaths</code>.
+ * <li> A path that is listed in <code>allowedPaths</code> is checked by the
+ *  corresponding {@link RequestAuthorizer} that can decide to grant/deny (identified or anonymous) access.
+ * <li> A path that is not listed in <code>allowedPaths</code> is always granted anonymous access
+ *  (via {@link FilterRules#authorize(String, String, List)})
  *
  * @author Daniel Meyer
  * @author nico.rehwaldt
  */
 public class PathFilterRule implements SecurityFilterRule {
 
-  protected List<RequestMatcher> allowedPaths = new ArrayList<RequestMatcher>();
-  protected List<RequestMatcher> deniedPaths = new ArrayList<RequestMatcher>();
+  protected List<RequestMatcher> allowedPaths = new ArrayList<>();
+  protected List<RequestMatcher> deniedPaths = new ArrayList<>();
 
   @Override
   public Authorization authorize(String requestMethod, String requestUri) {
 
     boolean secured = false;
+
 
     for (RequestMatcher pattern : deniedPaths) {
       Match match = pattern.match(requestMethod, requestUri);
