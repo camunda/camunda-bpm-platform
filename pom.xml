@@ -36,10 +36,6 @@
           <excludedScopes>test</excludedScopes>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-      </plugin>
     </plugins>
   </build>
 
@@ -206,6 +202,18 @@
         <module>parent</module>
         <module>bom</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>license-header-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
   </profiles>
