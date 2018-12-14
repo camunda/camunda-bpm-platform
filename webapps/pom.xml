@@ -306,10 +306,6 @@
           <excludedScopes>test</excludedScopes>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.mycila</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-      </plugin>
     </plugins>
   </build>
 
@@ -1049,6 +1045,18 @@
       <properties>
         <jdbcBatchProcessing>false</jdbcBatchProcessing>
       </properties>
+    </profile>
+
+    <profile>
+      <id>license-header-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
   </profiles>
