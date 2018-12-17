@@ -34,12 +34,4 @@
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>camunda-bpm-ee</id>
-      <name>camunda-bpm-ee</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
-    </repository>
-  </repositories>
-
 </project>
