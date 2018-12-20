@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -1093,10 +1093,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     String sortByNameAsc = "RES." + TaskQueryProperty.NAME.getName() + " " + Direction.ASCENDING.getName();
 
     JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
-    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
+    JsonObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
 
     // when I apply a specific ordering by one dimension
-    queryJson.put(JsonTaskQueryConverter.ORDER_BY, sortByNameAsc);
+    queryJson.addProperty(JsonTaskQueryConverter.ORDER_BY, sortByNameAsc);
     TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
 
     // then the ordering is applied accordingly
@@ -1122,10 +1122,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     String secondaryOrdering = sortByNameAsc + ", RES." + TaskQueryProperty.ASSIGNEE.getName() + " " + Direction.DESCENDING.getName();
 
     JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
-    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
+    JsonObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
 
     // when I apply a secondary ordering
-    queryJson.put(JsonTaskQueryConverter.ORDER_BY, secondaryOrdering);
+    queryJson.addProperty(JsonTaskQueryConverter.ORDER_BY, secondaryOrdering);
     TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
 
     // then the ordering is applied accordingly
@@ -1158,10 +1158,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     String orderingWithFunction = "LOWER(RES." + TaskQueryProperty.NAME.getName() + ") asc";
 
     JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
-    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
+    JsonObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
 
     // when I apply an ordering with a function
-    queryJson.put(JsonTaskQueryConverter.ORDER_BY, orderingWithFunction);
+    queryJson.addProperty(JsonTaskQueryConverter.ORDER_BY, orderingWithFunction);
     TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
 
     assertEquals(1, deserializedTaskQuery.getOrderingProperties().size());
@@ -1469,6 +1469,236 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     for (QueryOrderingProperty prop : ((TaskQueryImpl) filter.getQuery()).getOrderingProperties()) {
       assertTrue(prop instanceof VariableOrderProperty);
     }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testBooleanVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("booleanVariable", true));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("booleanVariable", true);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testIntVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("intVariable", 7));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("intVariable", 7);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testIntOutOfRangeVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("longVariable", Integer.MAX_VALUE+1L));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("longVariable", Integer.MAX_VALUE+1L);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDoubleVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("doubleVariable", 88.89D));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("doubleVariable", 88.89D);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testStringVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("stringVariable", "aVariableValue"));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("stringVariable", "aVariableValue");
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testNullVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("nullVariable", null));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("nullVariable", null);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDueDate() {
+    // given
+    Date date = new Date();
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    Task task = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult();
+
+    task.setDueDate(date);
+
+    taskService.saveTask(task);
+
+    TaskQuery query = taskService.createTaskQuery()
+      .dueDate(date);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  /**
+   * See CAM-9613
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void FAILING_testDateVariable() {
+    // given
+    Date date = new Date();
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("dateVariable", date));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("dateVariable", date);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  /**
+   * See CAM-9613
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void FAILING_testByteArrayVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("bytesVariable", "aByteArray".getBytes()));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("bytesVariable", "aByteArray".getBytes());
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  /**
+   * See CAM-9613
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void FAILING_testLongVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("longVariable", 7L));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("longVariable", 7L);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  /**
+   * See CAM-9613
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void FAILING_testShortVariable() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+      Variables.createVariables().putValue("shortVariable", (short) 7));
+
+    TaskQuery query = taskService.createTaskQuery()
+      .processVariableValueEquals("shortVariable", (short) 7);
+
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId()), is(1L));
   }
 
   protected void saveQuery(Query query) {

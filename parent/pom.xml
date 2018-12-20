@@ -28,6 +28,7 @@
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.0.12.Final</version.resteasy3>
     <version.jersey2>2.25.1</version.jersey2>
+    <version.gson>2.8.5</version.gson>
 
     <version.commonj>1.1.0</version.commonj>
     <version.bouncycastle>1.47</version.bouncycastle>
@@ -90,6 +91,12 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>${version.gson}</version>
+        <scope>compile</scope>
+      </dependency>
       <dependency>
         <groupId>cglib</groupId>
         <artifactId>cglib</artifactId>

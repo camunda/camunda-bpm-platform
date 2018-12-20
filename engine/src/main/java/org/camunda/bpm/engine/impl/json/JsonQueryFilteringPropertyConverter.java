@@ -20,7 +20,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.QueryEntityRelationCondition;
 import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
@@ -33,14 +33,14 @@ public class JsonQueryFilteringPropertyConverter extends JsonObjectConverter<Que
       new JsonQueryFilteringPropertyConverter();
 
   protected static JsonArrayConverter<List<QueryEntityRelationCondition>> ARRAY_CONVERTER =
-      new JsonArrayOfObjectsConverter<QueryEntityRelationCondition>(INSTANCE);
+    new JsonArrayOfObjectsConverter<>(INSTANCE);
 
   public static final String BASE_PROPERTY = "baseField";
   public static final String COMPARISON_PROPERTY = "comparisonField";
   public static final String SCALAR_VALUE = "value";
 
-  public JSONObject toJsonObject(QueryEntityRelationCondition filteringProperty) {
-    JSONObject jsonObject = new JSONObject();
+  public JsonObject toJsonObject(QueryEntityRelationCondition filteringProperty) {
+    JsonObject jsonObject = JsonUtil.createObject();
 
     JsonUtil.addField(jsonObject, BASE_PROPERTY, filteringProperty.getProperty().getName());
 
@@ -51,29 +51,29 @@ public class JsonQueryFilteringPropertyConverter extends JsonObjectConverter<Que
 
     Object scalarValue = filteringProperty.getScalarValue();
     if (scalarValue != null) {
-      JsonUtil.addField(jsonObject, SCALAR_VALUE, scalarValue);
+      JsonUtil.addFieldRawValue(jsonObject, SCALAR_VALUE, scalarValue);
     }
 
     return jsonObject;
   }
 
-  public QueryEntityRelationCondition toObject(JSONObject jsonObject) {
+  public QueryEntityRelationCondition toObject(JsonObject jsonObject) {
     // this is limited in that it allows only String values;
     // that is sufficient for current use case with task filters
     // but could be extended by a data type in the future
-    Object scalarValue = null;
+    String scalarValue = null;
     if (jsonObject.has(SCALAR_VALUE)) {
-      scalarValue = jsonObject.getString(SCALAR_VALUE);
+      scalarValue = JsonUtil.getString(jsonObject, SCALAR_VALUE);
     }
 
     QueryProperty baseProperty = null;
     if (jsonObject.has(BASE_PROPERTY)) {
-      baseProperty = new QueryPropertyImpl(jsonObject.getString(BASE_PROPERTY));
+      baseProperty = new QueryPropertyImpl(JsonUtil.getString(jsonObject, BASE_PROPERTY));
     }
 
     QueryProperty comparisonProperty = null;
     if (jsonObject.has(COMPARISON_PROPERTY)) {
-      comparisonProperty = new QueryPropertyImpl(jsonObject.getString(COMPARISON_PROPERTY));
+      comparisonProperty = new QueryPropertyImpl(JsonUtil.getString(jsonObject, COMPARISON_PROPERTY));
     }
 
     return new QueryEntityRelationCondition(baseProperty, comparisonProperty, scalarValue);

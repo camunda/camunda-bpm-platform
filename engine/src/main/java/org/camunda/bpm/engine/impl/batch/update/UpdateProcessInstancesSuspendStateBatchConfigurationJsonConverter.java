@@ -15,11 +15,10 @@
  */
 package org.camunda.bpm.engine.impl.batch.update;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 
 public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter extends JsonObjectConverter<UpdateProcessInstancesSuspendStateBatchConfiguration> {
 
@@ -28,28 +27,22 @@ public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter e
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
   public static final String SUSPENDING = "suspended";
 
-  public JSONObject toJsonObject(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
-    JSONObject json = new JSONObject();
+  public JsonObject toJsonObject(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
+    JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
     JsonUtil.addField(json, SUSPENDING, configuration.getSuspended());
     return json;
   }
 
-  public UpdateProcessInstancesSuspendStateBatchConfiguration toObject(JSONObject json) {
+  public UpdateProcessInstancesSuspendStateBatchConfiguration toObject(JsonObject json) {
     UpdateProcessInstancesSuspendStateBatchConfiguration configuration =
-      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), json.getBoolean(SUSPENDING));
+      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), JsonUtil.getBoolean(json, SUSPENDING));
 
     return configuration;
   }
 
-  protected List<String> readProcessInstanceIds(JSONObject jsonObject) {
-    List<Object> objects = JsonUtil.jsonArrayAsList(jsonObject.getJSONArray(PROCESS_INSTANCE_IDS));
-    List<String> processInstanceIds = new ArrayList<String>();
-    for (Object object : objects) {
-      processInstanceIds.add((String) object);
-    }
-    return processInstanceIds;
-
+  protected List<String> readProcessInstanceIds(JsonObject jsonObject) {
+    return JsonUtil.asList(JsonUtil.getArray(jsonObject, PROCESS_INSTANCE_IDS));
   }
 }

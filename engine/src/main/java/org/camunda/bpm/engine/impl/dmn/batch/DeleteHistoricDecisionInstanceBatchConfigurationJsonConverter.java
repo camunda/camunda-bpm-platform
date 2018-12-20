@@ -15,13 +15,12 @@
  */
 package org.camunda.bpm.engine.impl.dmn.batch;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 
 public class DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<BatchConfiguration> {
 
@@ -29,24 +28,19 @@ public class DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter exten
 
   public static final String HISTORIC_DECISION_INSTANCE_IDS = "historicDecisionInstanceIds";
 
-  public JSONObject toJsonObject(BatchConfiguration configuration) {
-    JSONObject json = new JSONObject();
+  public JsonObject toJsonObject(BatchConfiguration configuration) {
+    JsonObject json = JsonUtil.createObject();
     JsonUtil.addListField(json, HISTORIC_DECISION_INSTANCE_IDS, configuration.getIds());
     return json;
   }
 
-  public BatchConfiguration toObject(JSONObject json) {
+  public BatchConfiguration toObject(JsonObject json) {
     BatchConfiguration configuration = new BatchConfiguration(readDecisionInstanceIds(json));
     return configuration;
   }
 
-  protected List<String> readDecisionInstanceIds(JSONObject jsonObject) {
-    List<Object> objects = JsonUtil.jsonArrayAsList(jsonObject.getJSONArray(HISTORIC_DECISION_INSTANCE_IDS));
-    List<String> decisionInstanceIds = new ArrayList<String>();
-    for (Object object : objects) {
-      decisionInstanceIds.add((String) object);
-    }
-    return decisionInstanceIds;
+  protected List<String> readDecisionInstanceIds(JsonObject jsonNode) {
+    return JsonUtil.asList(JsonUtil.getArray(jsonNode, HISTORIC_DECISION_INSTANCE_IDS));
   }
 
 }

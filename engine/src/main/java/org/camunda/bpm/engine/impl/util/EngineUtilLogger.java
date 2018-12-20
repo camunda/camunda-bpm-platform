@@ -212,4 +212,10 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         "029",
         "Exception while parsing retry intervals '{}'", intervals, e.getMessage(), e);
   }
+
+  public void logJsonException(Exception e) {
+    logDebug(
+      "030",
+      "Exception while parsing JSON: {}", e.getMessage(), e);
+  }
 }

@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.json;
 
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 
 
 /**
@@ -27,7 +27,7 @@ public abstract class JsonObjectConverter <T> {
     return toJsonObject(object).toString();
   }
 
-  public abstract JSONObject toJsonObject(T object);
+  public abstract JsonObject toJsonObject(T object);
 
-  public abstract T toObject(JSONObject jsonString);
+  public abstract T toObject(JsonObject jsonString);
 }

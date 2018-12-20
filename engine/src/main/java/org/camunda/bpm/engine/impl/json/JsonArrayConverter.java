@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.json;
 
-import org.camunda.bpm.engine.impl.util.json.JSONArray;
+import com.google.gson.JsonArray;
 
 /**
  * @author Thorben Lindhauer
@@ -27,7 +27,7 @@ public abstract class JsonArrayConverter<T> {
     return toJsonArray(object).toString();
   }
 
-  public abstract JSONArray toJsonArray(T object);
+  public abstract JsonArray toJsonArray(T object);
 
-  public abstract T toObject(JSONArray jsonArray);
+  public abstract T toObject(JsonArray jsonArray);
 }

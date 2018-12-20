@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
+import com.google.gson.JsonObject;
 
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 
@@ -79,7 +80,7 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
   }
 
   public HistoryCleanupJobHandlerConfiguration newConfiguration(String canonicalString) {
-    JSONObject jsonObject = new JSONObject(canonicalString);
+    JsonObject jsonObject = JsonUtil.asObject(canonicalString);
     return HistoryCleanupJobHandlerConfiguration.fromJson(jsonObject);
   }
 

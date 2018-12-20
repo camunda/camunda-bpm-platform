@@ -15,11 +15,9 @@
  */
 package org.camunda.bpm.engine.impl.json;
 
-import java.util.List;
-
+import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.impl.migration.MigrationInstructionImpl;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 public class MigrationInstructionJsonConverter extends JsonObjectConverter<MigrationInstruction> {
@@ -30,8 +28,8 @@ public class MigrationInstructionJsonConverter extends JsonObjectConverter<Migra
   public static final String TARGET_ACTIVITY_IDS = "targetActivityIds";
   public static final String UPDATE_EVENT_TRIGGER = "updateEventTrigger";
 
-  public JSONObject toJsonObject(MigrationInstruction instruction) {
-    JSONObject json = new JSONObject();
+  public JsonObject toJsonObject(MigrationInstruction instruction) {
+    JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addArrayField(json, SOURCE_ACTIVITY_IDS, new String[]{instruction.getSourceActivityId()});
     JsonUtil.addArrayField(json, TARGET_ACTIVITY_IDS, new String[]{instruction.getTargetActivityId()});
@@ -40,22 +38,20 @@ public class MigrationInstructionJsonConverter extends JsonObjectConverter<Migra
     return json;
   }
 
-  public MigrationInstruction toObject(JSONObject json) {
+  public MigrationInstruction toObject(JsonObject json) {
     return new MigrationInstructionImpl(
       readSourceActivityId(json),
       readTargetActivityId(json),
-      json.getBoolean(UPDATE_EVENT_TRIGGER)
+      JsonUtil.getBoolean(json, UPDATE_EVENT_TRIGGER)
     );
   }
 
-  protected String readSourceActivityId(JSONObject json) {
-    List<Object> sourceActivityIds = JsonUtil.jsonArrayAsList(json.getJSONArray(SOURCE_ACTIVITY_IDS));
-    return (String) sourceActivityIds.get(0);
+  protected String readSourceActivityId(JsonObject json) {
+    return JsonUtil.getString(JsonUtil.getArray(json, SOURCE_ACTIVITY_IDS));
   }
 
-  protected String readTargetActivityId(JSONObject json) {
-    List<Object> targetActivityIds = JsonUtil.jsonArrayAsList(json.getJSONArray(TARGET_ACTIVITY_IDS));
-    return (String) targetActivityIds.get(0);
+  protected String readTargetActivityId(JsonObject json) {
+    return JsonUtil.getString(JsonUtil.getArray(json, TARGET_ACTIVITY_IDS));
   }
 
 

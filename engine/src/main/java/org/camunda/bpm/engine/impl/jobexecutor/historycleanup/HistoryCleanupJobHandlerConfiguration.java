@@ -18,7 +18,8 @@ package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 import java.util.Calendar;
 import java.util.Date;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 /**
  * @author Svetlana Dorokhova
@@ -55,24 +56,24 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
 
   @Override
   public String toCanonicalString() {
-    JSONObject json = new JSONObject();
-    json.put(JOB_CONFIG_COUNT_EMPTY_RUNS, countEmptyRuns);
-    json.put(JOB_CONFIG_EXECUTE_AT_ONCE, immediatelyDue);
-    json.put(JOB_CONFIG_MINUTE_FROM, minuteFrom);
-    json.put(JOB_CONFIG_MINUTE_TO, minuteTo);
+    JsonObject json = JsonUtil.createObject();
+    JsonUtil.addField(json, JOB_CONFIG_COUNT_EMPTY_RUNS, countEmptyRuns);
+    JsonUtil.addField(json, JOB_CONFIG_EXECUTE_AT_ONCE, immediatelyDue);
+    JsonUtil.addField(json, JOB_CONFIG_MINUTE_FROM, minuteFrom);
+    JsonUtil.addField(json, JOB_CONFIG_MINUTE_TO, minuteTo);
     return json.toString();
   }
 
-  public static HistoryCleanupJobHandlerConfiguration fromJson(JSONObject jsonObject) {
+  public static HistoryCleanupJobHandlerConfiguration fromJson(JsonObject jsonObject) {
     HistoryCleanupJobHandlerConfiguration config = new HistoryCleanupJobHandlerConfiguration();
     if (jsonObject.has(JOB_CONFIG_COUNT_EMPTY_RUNS)) {
-      config.setCountEmptyRuns(jsonObject.getInt(JOB_CONFIG_COUNT_EMPTY_RUNS));
+      config.setCountEmptyRuns(JsonUtil.getInt(jsonObject, JOB_CONFIG_COUNT_EMPTY_RUNS));
     }
     if (jsonObject.has(JOB_CONFIG_EXECUTE_AT_ONCE)) {
-      config.setImmediatelyDue(jsonObject.getBoolean(JOB_CONFIG_EXECUTE_AT_ONCE));
+      config.setImmediatelyDue(JsonUtil.getBoolean(jsonObject, JOB_CONFIG_EXECUTE_AT_ONCE));
     }
-    config.setMinuteFrom(jsonObject.getInt(JOB_CONFIG_MINUTE_FROM));
-    config.setMinuteTo(jsonObject.getInt(JOB_CONFIG_MINUTE_TO));
+    config.setMinuteFrom(JsonUtil.getInt(jsonObject, JOB_CONFIG_MINUTE_FROM));
+    config.setMinuteTo(JsonUtil.getInt(jsonObject, JOB_CONFIG_MINUTE_TO));
     return config;
   }
 

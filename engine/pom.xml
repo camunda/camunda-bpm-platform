@@ -101,6 +101,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -309,6 +314,40 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <configuration>
+          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+          <createSourcesJar>true</createSourcesJar>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <artifactSet>
+            <excludes>
+              <exclude>org.camunda.bpm.model:*</exclude>
+              <exclude>org.camunda.bpm.dmn:*</exclude>
+              <exclude>org.camunda.commons:*</exclude>
+
+              <exclude>org.springframework:*</exclude>
+              <exclude>org.slf4j:*</exclude>
+              <exclude>org.apache.commons:*</exclude>
+              <exclude>com.sun.mail:*</exclude>
+              <exclude>javax.activation:*</exclude>
+              <exclude>org.mybatis:mybatis:*</exclude>
+              <exclude>commons-logging:*</exclude>
+              <exclude>joda-time:*</exclude>
+            </excludes>
+          </artifactSet>
+          <relocations>
+            <relocation>
+              <pattern>com.google.gson</pattern>
+              <shadedPattern>camundajar.com.google.gson</shadedPattern>
+            </relocation>
+          </relocations>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+          </transformers>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.qa.rolling.update.scenarios.DeploymentWhichShouldBeDeletedScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.authorization.AuthorizationScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.callactivity.ProcessWithCallActivityScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.cleanup.HistoryCleanupScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.eventSubProcess.ProcessWithEventSubProcessScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.externalTask.ProcessWithExternalTaskScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.mulltiInstance.ProcessWithMultiInstanceCallActivityScenario;
@@ -71,6 +72,10 @@ public class TestFixture {
     runner.setupScenarios(ProcessWithMultiInstanceCallActivityScenario.class);
     runner.setupScenarios(ProcessWithExternalTaskScenario.class);
     runner.setupScenarios(ProcessWithEventSubProcessScenario.class);
+
+    if (RollingUpdateConstants.NEW_ENGINE_TAG.equals(currentFixtureTag)) { // create data with new engine
+      runner.setupScenarios(HistoryCleanupScenario.class);
+    }
 
     processEngine.close();
 
