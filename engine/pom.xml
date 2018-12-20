@@ -321,7 +321,7 @@
         <configuration>
           <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
           <createSourcesJar>true</createSourcesJar>
-          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
           <artifactSet>
             <excludes>
               <exclude>org.camunda.bpm.model:*</exclude>
