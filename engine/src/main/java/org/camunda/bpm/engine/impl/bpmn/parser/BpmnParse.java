@@ -1994,7 +1994,12 @@ public class BpmnParse extends Parse {
         Element sibling = siblingsMap.get(targetRef);
         if (sibling != null) {
           if (sibling.getTagName().equals(ActivityTypes.INTERMEDIATE_EVENT_CATCH)) {
-            parseIntermediateCatchEvent(sibling, scope, activity);
+            ActivityImpl catchEventActivity = parseIntermediateCatchEvent(sibling, scope, activity);
+
+            if (catchEventActivity != null) {
+              parseActivityInputOutput(sibling, catchEventActivity);
+            }
+
           } else {
             addError("Event based gateway can only be connected to elements of type intermediateCatchEvent", sibling);
           }
