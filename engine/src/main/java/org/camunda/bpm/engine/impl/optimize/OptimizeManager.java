@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -34,6 +35,11 @@ import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 public class OptimizeManager extends AbstractManager {
+
+  @SuppressWarnings("unchecked")
+  public List<ByteArrayEntity> getHistoricVariableUpdateByteArrays(List<String> byteArrayIds) {
+    return (List<ByteArrayEntity>) getDbEntityManager().selectList("selectByteArrays", byteArrayIds);
+  }
 
   @SuppressWarnings("unchecked")
   public List<HistoricActivityInstance> getCompletedHistoricActivityInstances(Date finishedAfter,

@@ -564,6 +564,14 @@
 
   <!-- BYTE ARRAY SELECT -->
 
+  <select id="selectByteArrays" resultMap="byteArrayResultMap">
+    select * from ${prefix}ACT_GE_BYTEARRAY
+    where
+      <bind name="listOfIds" value="parameter"/>
+      <bind name="fieldName" value="'ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </select>
+
   <select id="selectByteArray" parameterType="string" resultMap="byteArrayResultMap">
    select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
   </select>
@@ -580,6 +588,14 @@
     <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR"/>
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
+
+  <select id="selectByteArrays_postgres" resultMap="byteArrayResultMap_postgres">
+    select * from ${prefix}ACT_GE_BYTEARRAY
+    where
+      <bind name="listOfIds" value="parameter"/>
+      <bind name="fieldName" value="'ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </select>
 
   <select id="selectByteArray_postgres" parameterType="string" resultMap="byteArrayResultMap_postgres">
    select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}

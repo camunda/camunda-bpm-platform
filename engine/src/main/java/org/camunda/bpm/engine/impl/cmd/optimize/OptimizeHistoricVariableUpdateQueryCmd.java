@@ -15,6 +15,10 @@
  */
 package org.camunda.bpm.engine.impl.cmd.optimize;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -22,9 +26,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
-
-import java.util.Date;
-import java.util.List;
 
 public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<HistoricVariableUpdate>> {
 
@@ -43,33 +44,68 @@ public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<Hist
   public List<HistoricVariableUpdate> execute(CommandContext commandContext) {
     List<HistoricVariableUpdate> historicVariableUpdates =
       commandContext.getOptimizeManager().getHistoricVariableUpdates(occurredAfter, occurredAt, maxResults);
-    fetchVariableValues(historicVariableUpdates);
+    fetchVariableValues(historicVariableUpdates, commandContext);
     return historicVariableUpdates;
   }
 
-  private void fetchVariableValues(List<HistoricVariableUpdate> historicVariableUpdates) {
-    if (historicVariableUpdates!=null) {
-      for (HistoricVariableUpdate historicDetail: historicVariableUpdates) {
-        if (historicDetail instanceof HistoricDetailVariableInstanceUpdateEntity) {
-          HistoricDetailVariableInstanceUpdateEntity entity =
-            (HistoricDetailVariableInstanceUpdateEntity) historicDetail;
-          if (isNotByteArrayVariableType(entity)) {
-            try {
-              entity.getTypedValue(false);
-            } catch(Exception t) {
-              // do not fail if one of the variables fails to load
-              LOG.exceptionWhileGettingValueForVariable(t);
-            }
-          }
+  private void fetchVariableValues(List<HistoricVariableUpdate> historicVariableUpdates, CommandContext commandContext) {
+    if (historicVariableUpdates != null) {
 
-        }
+      List<String> byteArrayIds = getByteArrayIds(historicVariableUpdates);
+      if (!byteArrayIds.isEmpty()) {
+        // pre-fetch all byte arrays into dbEntityCache to avoid (n+1) number of queries
+        commandContext.getOptimizeManager().getHistoricVariableUpdateByteArrays(byteArrayIds);
       }
+
+      resolveTypedValues(historicVariableUpdates);
     }
   }
 
   protected boolean isNotByteArrayVariableType(HistoricDetailVariableInstanceUpdateEntity entity) {
     // do not fetch values for byte arrays/ blob variables (e.g. files or bytes)
     return !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
+  }
+
+  protected boolean isHistoricDetailVariableInstanceUpdateEntity(HistoricVariableUpdate variableUpdate) {
+    return variableUpdate instanceof HistoricDetailVariableInstanceUpdateEntity;
+  }
+
+  protected List<String> getByteArrayIds(List<HistoricVariableUpdate> variableUpdates) {
+    List<String> byteArrayIds = new ArrayList<String>();
+
+    for (HistoricVariableUpdate variableUpdate : variableUpdates) {
+      if (isHistoricDetailVariableInstanceUpdateEntity(variableUpdate)) {
+        HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) variableUpdate;
+
+        if (isNotByteArrayVariableType(entity)) {
+          String byteArrayId = entity.getByteArrayValueId();
+          if (byteArrayId != null) {
+            byteArrayIds.add(byteArrayId);
+          }
+        }
+
+      }
+    }
+
+    return byteArrayIds;
+  }
+
+  protected void resolveTypedValues(List<HistoricVariableUpdate> variableUpdates) {
+    for (HistoricVariableUpdate variableUpdate: variableUpdates) {
+      if (isHistoricDetailVariableInstanceUpdateEntity(variableUpdate)) {
+        HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) variableUpdate;
+
+        if (isNotByteArrayVariableType(entity)) {
+          try {
+            entity.getTypedValue(false);
+          } catch(Exception t) {
+            // do not fail if one of the variables fails to load
+            LOG.exceptionWhileGettingValueForVariable(t);
+          }
+        }
+
+      }
+    }
   }
 
 }
