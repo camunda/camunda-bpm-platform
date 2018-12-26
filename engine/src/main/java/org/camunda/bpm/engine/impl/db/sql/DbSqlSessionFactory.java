@@ -125,7 +125,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.datepart.minute", "MINUTE");
-    constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
     constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(H2, constants);
@@ -203,7 +202,6 @@ public class DbSqlSessionFactory implements SessionFactory {
       constants.put("constant.datepart.quarter", "QUARTER");
       constants.put("constant.datepart.month", "MONTH");
       constants.put("constant.datepart.minute", "MINUTE");
-      constants.put("constant.null.startTime", "null START_TIME_");
       constants.put("constant.varchar.cast", "'${key}'");
       constants.put("constant.null.reporter", "NULL AS REPORTER_");
       dbSpecificConstants.put(mysqlLikeDatabase, constants);
@@ -288,7 +286,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.datepart.minute", "MINUTE");
-    constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
     constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR) AS REPORTER_");
     dbSpecificConstants.put(POSTGRES, constants);
@@ -357,7 +354,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "'Q'");
     constants.put("constant.datepart.month", "'MM'");
     constants.put("constant.datepart.minute", "'MI'");
-    constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
     constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(ORACLE, constants);
@@ -430,7 +426,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.datepart.minute", "MINUTE");
-    constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
     constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
     constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR(255)) AS REPORTER_");
     dbSpecificConstants.put(DB2, constants);
@@ -488,7 +483,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.datepart.minute", "MINUTE");
-    constants.put("constant.null.startTime", "CAST(NULL AS datetime2) AS START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
     constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(MSSQL, constants);
