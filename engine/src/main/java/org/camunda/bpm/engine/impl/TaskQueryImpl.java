@@ -87,6 +87,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String processDefinitionNameLike;
   protected String processInstanceBusinessKey;
   protected String[] processInstanceBusinessKeys;
+  protected String[] variableNames;
   protected String processInstanceBusinessKeyLike;
   protected List<TaskQueryVariableValue> variables = new ArrayList<TaskQueryVariableValue>();
   protected Date dueDate;
@@ -442,6 +443,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys) {
     this.processInstanceBusinessKeys = processInstanceBusinessKeys;
+    return this;
+  }
+
+  @Override
+  public TaskQuery variableNames(String... variableNames) {
+    this.variableNames = variableNames;
     return this;
   }
 
@@ -1494,6 +1501,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public String[] getProcessInstanceBusinessKeys() {
     return processInstanceBusinessKeys;
+  }
+
+  public String[] getVariableNames() {
+    return variableNames;
   }
 
   public String getProcessInstanceBusinessKeyLike() {

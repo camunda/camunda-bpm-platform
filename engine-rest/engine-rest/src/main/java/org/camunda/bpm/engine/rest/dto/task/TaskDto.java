@@ -14,10 +14,13 @@ package org.camunda.bpm.engine.rest.dto.task;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class TaskDto {
 
@@ -42,6 +45,7 @@ public class TaskDto {
   private boolean suspended;
   private String formKey;
   private String tenantId;
+  private List<VariableInstanceDto> variables = new ArrayList<>();
 
   public String getId() {
     return id;
@@ -173,6 +177,14 @@ public class TaskDto {
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public List<VariableInstanceDto> getVariables() {
+    return variables;
+  }
+
+  public void setVariables(List<VariableInstanceDto> variables) {
+    this.variables = variables;
   }
 
   public static TaskDto fromEntity(Task task) {

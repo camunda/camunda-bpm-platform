@@ -429,6 +429,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * The syntax is that of SQL: for example usage: nameLike(%processDefinitionName%)*/
   TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike);
 
+  /** Select variables requested in variableNames. **/
+  TaskQuery variableNames(String... variableNames);
+
   /**
    * Only select tasks which have a local task variable with the given name
    * set to the given value.

@@ -189,6 +189,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   protected Boolean withCandidateUsers;
   protected Boolean withoutCandidateUsers;
 
+  private String[] variableNames;
+
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
   private List<VariableQueryParameterDto> caseInstanceVariables;
@@ -586,6 +588,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.candidateGroupsExpression = candidateGroupsExpression;
   }
 
+  @CamundaQueryParam(value="variableNames", converter = StringArrayConverter.class)
+  public void setVariableNames(String[] variableNames) {
+    this.variableNames = variableNames;
+  }
+
   @CamundaQueryParam(value = "taskVariables", converter = VariableListConverter.class)
   public void setTaskVariables(List<VariableQueryParameterDto> taskVariables) {
     this.taskVariables = taskVariables;
@@ -951,6 +958,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return candidateGroupsExpression;
   }
 
+  public String[] getVariableNames() {
+    return variableNames;
+  }
+
   public List<VariableQueryParameterDto> getTaskVariables() {
     return taskVariables;
   }
@@ -1219,6 +1230,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
     }
+    if (variableNames != null && variableNames.length > 0) {
+      query.variableNames(variableNames);
+    }
 
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
@@ -1479,6 +1493,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
 
     dto.processVariables = new ArrayList<VariableQueryParameterDto>();
+    dto.variableNames = taskQuery.getVariableNames();
     dto.taskVariables = new ArrayList<VariableQueryParameterDto>();
     dto.caseInstanceVariables = new ArrayList<VariableQueryParameterDto>();
     for (TaskQueryVariableValue variableValue : taskQuery.getVariables()) {

@@ -15,18 +15,16 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Variant;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -36,6 +34,8 @@ import org.camunda.bpm.engine.rest.sub.task.TaskReportResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskReportResourceImpl;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskResourceImpl;
+import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
@@ -94,10 +94,44 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     List<TaskDto> tasks = new ArrayList<TaskDto>();
     for (Task task : matchingTasks) {
       TaskDto returnTask = TaskDto.fromEntity(task);
+
+      if (queryDto.getVariableNames() != null) {
+        returnTask.getVariables().addAll(getVariablesFromTask(returnTask.getExecutionId(), queryDto.getVariableNames()));
+      }
+
       tasks.add(returnTask);
     }
 
     return tasks;
+  }
+
+  private List<VariableInstanceDto> getVariablesFromTask(String executionId, String[] variablesNames) {
+      List<VariableInstanceDto> instanceResults = new ArrayList<VariableInstanceDto>();
+
+      // Retrieve each variable
+      for (int i=0; i<variablesNames.length; i++) {
+        MultivaluedMap queryParameters = new MultivaluedHashMap();
+        queryParameters.add("executionIdIn", executionId);
+        queryParameters.add("variableName", variablesNames[i]);
+        VariableInstanceQueryDto queryDto = new VariableInstanceQueryDto(getObjectMapper(), queryParameters);
+
+        ProcessEngine engine = getProcessEngine();
+        queryDto.setObjectMapper(getObjectMapper());
+        VariableInstanceQuery query = queryDto.toQuery(engine);
+
+        // disable binary fetching and custom object deserialization by default.
+        query.disableBinaryFetching();
+        query.disableCustomObjectDeserialization();
+
+        List<VariableInstance> matchingInstances = query.list();
+
+        for (VariableInstance instance : matchingInstances) {
+          VariableInstanceDto resultInstance = VariableInstanceDto.fromVariableInstance(instance);
+          instanceResults.add(resultInstance);
+        }
+      }
+
+      return instanceResults;
   }
 
   protected List<Task> executeTaskQuery(Integer firstResult, Integer maxResults, TaskQuery query) {
