@@ -124,11 +124,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
           resourceName = resource.getDescription();
 
         } else {
-          try {
-            resourceName = resource.getFile().getAbsolutePath();
-          } catch (IOException e) {
-            resourceName = resource.getFilename();
-          }
+          resourceName = getFileResourceName(resource);
         }
 
         try {
@@ -145,6 +141,14 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
       }
 
       deploymentBuilder.deploy();
+    }
+  }
+
+  protected String getFileResourceName(Resource resource) {
+    try {
+      return resource.getFile().getAbsolutePath();
+    } catch (IOException e) {
+      return resource.getFilename();
     }
   }
 

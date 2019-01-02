@@ -18,7 +18,11 @@ package org.camunda.bpm.engine.spring.test.autodeployment;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -27,7 +31,6 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 
 /**
  * @author Tom Baeyens
@@ -53,6 +56,9 @@ public class SpringAutoDeployTest extends PvmTestCase {
 
   protected static final String CTX_TENANT_ID_PATH
       = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployTenantIdTest-context.xml";
+      
+  protected static final String CTX_CUSTOM_NAME_PATH
+      = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployCustomNameTest-context.xml";
 
 
   protected ApplicationContext applicationContext;
@@ -71,7 +77,7 @@ public class SpringAutoDeployTest extends PvmTestCase {
   }
 
   public void testBasicActivitiSpringIntegration() {
-    createAppContext("org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
+    createAppContext(CTX_PATH);
     List<ProcessDefinition> processDefinitions = repositoryService
       .createProcessDefinitionQuery()
       .list();
@@ -205,6 +211,12 @@ public class SpringAutoDeployTest extends PvmTestCase {
 
     assertEquals(1, deploymentQuery.withoutTenantId().count());
   }
+  
+  public void testAutoDeployCustomName() {
+    createAppContext(CTX_CUSTOM_NAME_PATH);
+    
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+  }
 
   // --Helper methods ----------------------------------------------------------
 
@@ -224,5 +236,5 @@ public class SpringAutoDeployTest extends PvmTestCase {
     }
     return true;
   }
-
+  
 }
