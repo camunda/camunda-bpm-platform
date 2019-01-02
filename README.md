@@ -82,7 +82,7 @@ Add the following lines to it:
 </activeProfiles>
 ```
 
-Apache Maven 3 and Java JDK 6/7/8 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
+Apache Maven 3 and Java JDK 7/8 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
 
 ```
 mvn clean install
