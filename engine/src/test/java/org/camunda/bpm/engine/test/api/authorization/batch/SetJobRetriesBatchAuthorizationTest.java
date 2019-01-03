@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,12 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
             .withCount(5)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE)
+            ).succeeds(),
+        AuthorizationScenarioWithCount.scenario()
+            .withCount(5)
+            .withAuthorizations(
+                grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_SET_JOB_RETRIES),
                 grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE)
             ).succeeds()
     );

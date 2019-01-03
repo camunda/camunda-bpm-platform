@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,8 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE)
         ),
       scenario()
         .withAuthorizations(
@@ -75,6 +76,11 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
       scenario()
         .withAuthorizations(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)
+        ),
+      scenario()
+        .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE),
           grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)
         )
         .succeeds()

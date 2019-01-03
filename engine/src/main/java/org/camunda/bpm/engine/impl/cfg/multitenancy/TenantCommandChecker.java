@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.cfg.multitenancy;
 
+import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -213,6 +214,10 @@ public class TenantCommandChecker implements CommandChecker {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("update the task '"+ task.getId() + "'");
     }
+  }
+
+  @Override
+  public void checkCreateBatch(Permission permission) {
   }
 
   @Override

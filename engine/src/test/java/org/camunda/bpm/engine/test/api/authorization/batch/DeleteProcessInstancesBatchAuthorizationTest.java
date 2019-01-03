@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,12 @@ public class DeleteProcessInstancesBatchAuthorizationTest extends AbstractBatchA
         scenario()
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
+            ).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
             ).succeeds(),

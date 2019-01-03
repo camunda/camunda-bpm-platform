@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.*;
 import static org.camunda.bpm.engine.authorization.Resources.*;
+
+import org.camunda.bpm.engine.authorization.Permission;
 
 /**
  * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
@@ -386,6 +388,17 @@ public class AuthorizationCommandChecker implements CommandChecker {
       }
 
     }
+  }
+
+  @Override
+  public void checkCreateBatch(Permission permission) {
+    CompositePermissionCheck createBatchPermission = new PermissionCheckBuilder()
+      .disjunctive()
+        .atomicCheckForResourceId(BATCH, null, permission)
+        .atomicCheckForResourceId(BATCH, null, CREATE)
+      .build();
+
+    getAuthorizationManager().checkAuthorization(createBatchPermission);
   }
 
   @Override

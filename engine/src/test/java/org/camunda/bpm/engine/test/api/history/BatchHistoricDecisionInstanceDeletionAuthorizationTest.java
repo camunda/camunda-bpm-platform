@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.test.api.history;
 
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.revoke;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -78,7 +79,8 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
         ),
       scenario()
         .withAuthorizations(
@@ -91,7 +93,21 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
         .withAuthorizations(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
           grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)
-        )
+        ),
+      scenario()
+        .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
+          grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)
+        ),
+      scenario()
+        .withAuthorizations(
+          revoke(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
+          )
+        .failsDueToRequired(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
+          )
         .succeeds()
     );
   }

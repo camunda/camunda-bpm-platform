@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,10 +106,18 @@ public class MigrateProcessInstanceAsyncTest {
           grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
         .succeeds(),
       scenario()
+        .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES),
+          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
+          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
+        .succeeds(),
+      scenario()
          .withAuthorizations(
            grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
          .failsDueToRequired(
-           grant(Resources.BATCH, "*", "userId", Permissions.CREATE)));
+           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+           grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES))
+         );
   }
 
   @Before

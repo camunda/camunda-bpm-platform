@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -42,7 +42,7 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
 
     ensureNotEmpty(BadUserRequestException.class, "externalTaskIds", externalTaskIds);
 
-    commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
+    checkPermissions(commandContext);
 
     writeUserOperationLog(commandContext,
         builder.getRetries(),
@@ -60,6 +60,12 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
     batch.createSeedJob();
 
     return batch;
+  }
+
+  protected void checkPermissions(CommandContext commandContext) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateBatch(Permissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES);
+    }
   }
 
   protected BatchEntity createBatch(CommandContext commandContext, Collection<String> processInstanceIds) {

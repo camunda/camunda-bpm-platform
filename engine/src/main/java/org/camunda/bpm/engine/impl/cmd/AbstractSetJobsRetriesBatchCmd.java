@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -44,7 +45,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
 
     ensureNotEmpty(BadUserRequestException.class, "jobIds", jobIds);
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
-    checkAuthorizations(commandContext);
+    checkAuthorizations(commandContext, Permissions.CREATE_BATCH_SET_JOB_RETRIES);
     writeUserOperationLog(commandContext,
         retries,
         jobIds.size(),

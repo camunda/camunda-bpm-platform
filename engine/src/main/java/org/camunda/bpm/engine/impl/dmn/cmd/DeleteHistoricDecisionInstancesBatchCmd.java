@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
@@ -78,7 +77,7 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     List<String> decisionInstanceIds = collectHistoricDecisionInstanceIds();
     ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstanceIds", decisionInstanceIds);
 
-    checkAuthorizations(commandContext);
+    checkAuthorizations(commandContext, Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES);
     writeUserOperationLog(commandContext, decisionInstanceIds.size());
 
     BatchEntity batch = createBatch(commandContext, decisionInstanceIds);

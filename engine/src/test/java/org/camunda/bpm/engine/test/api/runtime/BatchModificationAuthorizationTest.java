@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,22 @@ public class BatchModificationAuthorizationTest {
             ).succeeds(),
         scenario()
             .withAuthorizations(
+                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ, Permissions.UPDATE)
+            ).succeeds(),
+        scenario()
+            .withAuthorizations(
                 grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
+            ).failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
             ).failsDueToRequired(

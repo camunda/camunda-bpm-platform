@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.camunda.bpm.engine.impl.cmd.batch;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
@@ -80,7 +81,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
     List<String> processInstanceIds = collectProcessInstanceIds();
 
     ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", processInstanceIds);
-    checkAuthorizations(commandContext);
+    checkAuthorizations(commandContext, Permissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES);
     writeUserOperationLog(commandContext,
         deleteReason,
         processInstanceIds.size(),

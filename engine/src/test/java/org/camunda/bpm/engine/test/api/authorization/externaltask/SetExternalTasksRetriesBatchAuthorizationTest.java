@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,11 +69,17 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
         .withAuthorizations(
             grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ, Permissions.READ_INSTANCE))
         .failsDueToRequired(
-            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES)),
       scenario()
         .withAuthorizations(
             grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ, Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE),
             grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE))
+        .succeeds(),
+      scenario()
+        .withAuthorizations(
+            grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ, Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE),
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES))
         .succeeds(),
       scenario()
         .withAuthorizations(

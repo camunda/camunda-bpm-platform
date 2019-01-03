@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,18 @@
 package org.camunda.bpm.engine.test.api.authorization.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -54,7 +57,26 @@ public class MissingAuthorizationMatcher extends TypeSafeDiagnosingMatcher<Missi
     String resourceId = null;
     String resourceName = null;
 
-    for (Permission permission : authorization.getPermissions(Permissions.values())) {
+    // TODO adjust after resolving CAM-9623
+    List<Permission> values = new ArrayList<Permission>();
+    if (authorization.getResourceType() == Resources.BATCH.resourceType()) {
+      BatchPermissions[] batchPermissions = BatchPermissions.values();
+      for (BatchPermissions batchPermission : batchPermissions) {
+        values.add(batchPermission);
+      }
+      values.add(Permissions.CREATE);
+      values.add(Permissions.READ);
+      values.add(Permissions.UPDATE);
+      values.add(Permissions.DELETE);
+      values.add(Permissions.READ_HISTORY);
+      values.add(Permissions.DELETE_HISTORY);
+    }
+    else {
+      values.addAll(Arrays.asList(Permissions.values()));
+    }
+
+    Permission[] permissions = authorization.getPermissions(values.toArray(new Permission[values.size()]));
+    for (Permission permission : permissions) {
       if (permission != Permissions.NONE) {
         permissionName = permission.getName();
         break;

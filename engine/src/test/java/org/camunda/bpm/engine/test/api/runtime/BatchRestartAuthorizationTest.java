@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,8 @@ public class BatchRestartAuthorizationTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES)
         ),
       scenario()
         .withAuthorizations(
@@ -90,6 +91,12 @@ public class BatchRestartAuthorizationTest {
       scenario()
         .withAuthorizations(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
+          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
+        ),
+      scenario()
+        .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES),
           grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
           grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
         )
