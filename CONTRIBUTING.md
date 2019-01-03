@@ -77,7 +77,7 @@ Best practices for writing test cases:
 Every source file needs to contain the following license header at it's top:
 
 ```
-Copyright © $today.year camunda services GmbH and various authors (info@camunda.com)
+Copyright © $inceptionYear-$today.year camunda services GmbH and various authors (info@camunda.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -93,6 +93,8 @@ limitations under the License.
 ```
 
 The header can be added manually, it can be set through your IDE's settings so that it is added to new source files automatically, or by running `mvn clean install -Plicense-header-check`. The last option will run a License Header plugin that will go through all the source files and add a license header to the ones that don't have one. It will also re-format an incorrectly formatted license header.
+
+It should be noted that `Java` source files from a contribution, that do not contain a valid license header, will not be merged with the codebase.
 
 ## Commit Message Conventions
 
