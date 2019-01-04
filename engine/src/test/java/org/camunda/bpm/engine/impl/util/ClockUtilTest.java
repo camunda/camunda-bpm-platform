@@ -1,20 +1,19 @@
 package org.camunda.bpm.engine.impl.util;
 
 import org.joda.time.Duration;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
 
-import static org.exparity.hamcrest.date.DateMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /*
  * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copy of the License atØ
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,14 +25,21 @@ import static org.hamcrest.core.Is.is;
  */
 public class ClockUtilTest {
 
+    private static final long ONE_SECOND = 1000L;
+
+    @Before
+    public void setUp() throws Exception {
+        ClockUtil.resetClock();
+    }
+
     @Test
     public void now_should_return_current_time() {
-        assertThat(ClockUtil.now(), sameSecondOfMinute(new Date()));
+        assertThat(ClockUtil.now()).isCloseTo(new Date(), ONE_SECOND);
     }
 
     @Test
     public void getCurrentTime_should_return_same_value_as_now() {
-        assertThat(ClockUtil.getCurrentTime(), is(ClockUtil.now()));
+        assertThat(ClockUtil.getCurrentTime()).isCloseTo(ClockUtil.now(), 1000);
     }
 
     @Test
@@ -43,7 +49,7 @@ public class ClockUtilTest {
 
         ClockUtil.offset(duration.getMillis());
 
-        assertTimesAreInSameSecond(ClockUtil.now(), target);
+        assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
     }
 
     @Test
@@ -53,7 +59,7 @@ public class ClockUtilTest {
 
         ClockUtil.setCurrentTime(target);
 
-        assertTimesAreInSameSecond(ClockUtil.now(), target);
+        assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
     }
 
     @Test
@@ -63,10 +69,10 @@ public class ClockUtilTest {
 
         ClockUtil.offset(duration.getMillis());
 
-        assertTimesAreInSameSecond(ClockUtil.now(), target);
+        assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
 
-        assertTimesAreInSameSecond(ClockUtil.resetClock(), new Date());
-        assertTimesAreInSameSecond(ClockUtil.getCurrentTime(), new Date());
+        assertThat(ClockUtil.resetClock()).isCloseTo(new Date(), ONE_SECOND);
+        assertThat(ClockUtil.getCurrentTime()).isCloseTo(new Date(), ONE_SECOND);
     }
 
     @Test
@@ -76,11 +82,11 @@ public class ClockUtilTest {
 
         ClockUtil.offset(duration.getMillis());
 
-        assertTimesAreInSameSecond(ClockUtil.now(), target);
+        assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
 
         ClockUtil.reset();
 
-        assertTimesAreInSameSecond(ClockUtil.getCurrentTime(), new Date());
+        assertThat(ClockUtil.now()).isCloseTo(new Date(), ONE_SECOND);
     }
 
     @Test
@@ -91,11 +97,11 @@ public class ClockUtilTest {
 
         ClockUtil.offset(duration.getMillis());
 
-        assertTimesAreInSameSecond(ClockUtil.now(), target);
+        assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
 
         Thread.sleep(10000);
 
-        assertTimesAreInSameSecond(ClockUtil.now(), new Date(target.getTime() + Duration.standardSeconds(10).getMillis()));
+        assertThat(ClockUtil.now()).isCloseTo(new Date(target.getTime() + Duration.standardSeconds(10).getMillis()), ONE_SECOND);
     }
 
     @Test
@@ -107,15 +113,6 @@ public class ClockUtilTest {
 
         Thread.sleep(10000);
 
-        assertTimesAreInSameSecond(ClockUtil.now(), target);
-    }
-
-    private static void assertTimesAreInSameSecond(Date first, Date second) {
-        assertThat(first, sameSecondOfMinute(second));
-        assertThat(first, sameMinuteOfHour(second));
-        assertThat(first, sameHourOfDay(second));
-        assertThat(first, sameDayOfMonth(second));
-        assertThat(first, sameMonthOfYear(second));
-        assertThat(first, sameMonthOfYear(second));
+        assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
     }
 }
