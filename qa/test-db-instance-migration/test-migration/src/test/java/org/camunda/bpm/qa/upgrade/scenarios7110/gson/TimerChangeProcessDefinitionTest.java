@@ -67,8 +67,8 @@ public class TimerChangeProcessDefinitionTest {
 
     Job job = engineRule.getManagementService().createJobQuery()
       .timers()
-      .duedateLowerThan(new Date(1_363_608_000_001L))
-      .duedateHigherThan(new Date(1_363_607_999_999L))
+      .duedateLowerThan(new Date(1_363_608_001_000L))
+      .duedateHigherThan(new Date(1_363_607_999_000L))
       .singleResult();
 
     ClockUtil.setCurrentTime(FIXED_DATE_ONE);
@@ -101,8 +101,8 @@ public class TimerChangeProcessDefinitionTest {
 
     Job job = engineRule.getManagementService().createJobQuery()
       .timers()
-      .duedateLowerThan(new Date(1_363_608_500_001L))
-      .duedateHigherThan(new Date(1_363_608_499_999L))
+      .duedateLowerThan(new Date(1_363_608_501_000L))
+      .duedateHigherThan(new Date(1_363_608_499_000L))
       .singleResult();
 
     ClockUtil.setCurrentTime(FIXED_DATE_TWO);
@@ -143,8 +143,8 @@ public class TimerChangeProcessDefinitionTest {
     // given
     Job job = engineRule.getManagementService().createJobQuery()
       .timers()
-      .duedateLowerThan(new Date(1_363_608_600_001L))
-      .duedateHigherThan(new Date(1_363_608_599_999L))
+      .duedateLowerThan(new Date(1_363_608_601_000L))
+      .duedateHigherThan(new Date(1_363_608_599_000L))
       .singleResult();
 
     ClockUtil.setCurrentTime(FIXED_DATE_THREE);
