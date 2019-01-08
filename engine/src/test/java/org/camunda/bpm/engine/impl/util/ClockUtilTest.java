@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
-import org.joda.time.Duration;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +26,8 @@ import org.junit.Test;
 public class ClockUtilTest {
 
   private static final long ONE_SECOND = 1000L;
+  private static final long FIVE_SECONDS = 5000L;
+  private static final long TWO_DAYS = 172800000L;
 
   @Before
   public void setUp() throws Exception {
@@ -50,18 +51,18 @@ public class ClockUtilTest {
 
   @Test
   public void offsetShouldTravelInTime() {
-    Duration duration = Duration.standardDays(2);
-    Date target = new Date(new Date().getTime() + duration.getMillis());
+    long duration = TWO_DAYS;
+    Date target = new Date(new Date().getTime() + duration);
 
-    ClockUtil.offset(duration.getMillis());
+    ClockUtil.offset(duration);
 
     assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
   }
 
   @Test
   public void setCurrentTimeShouldFreezeTime() {
-    Duration duration = Duration.standardDays(2);
-    Date target = new Date(new Date().getTime() + duration.getMillis());
+    long duration = TWO_DAYS;
+    Date target = new Date(new Date().getTime() + duration);
 
     ClockUtil.setCurrentTime(target);
 
@@ -70,10 +71,10 @@ public class ClockUtilTest {
 
   @Test
   public void resetClockShouldResetToCurrentTime() {
-    Duration duration = Duration.standardDays(2);
-    Date target = new Date(new Date().getTime() + duration.getMillis());
+    long duration = TWO_DAYS;
+    Date target = new Date(new Date().getTime() + duration);
 
-    ClockUtil.offset(duration.getMillis());
+    ClockUtil.offset(duration);
 
     assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
 
@@ -83,10 +84,10 @@ public class ClockUtilTest {
 
   @Test
   public void resetShouldResetToCurrentTime() {
-    Duration duration = Duration.standardDays(2);
-    Date target = new Date(new Date().getTime() + duration.getMillis());
+    long duration = TWO_DAYS;
+    Date target = new Date(new Date().getTime() + duration);
 
-    ClockUtil.offset(duration.getMillis());
+    ClockUtil.offset(duration);
 
     assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
 
@@ -98,26 +99,26 @@ public class ClockUtilTest {
   @Test
   public void timeShouldMoveOnAfterTravel() throws InterruptedException {
     Date now = new Date();
-    Duration duration = Duration.standardDays(2);
-    Date target = new Date(now.getTime() + duration.getMillis());
+    long duration = TWO_DAYS;
+    Date target = new Date(now.getTime() + duration);
 
-    ClockUtil.offset(duration.getMillis());
+    ClockUtil.offset(duration);
 
     assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
 
-    Thread.sleep(10000);
+    Thread.sleep(FIVE_SECONDS);
 
-    assertThat(ClockUtil.now()).isCloseTo(new Date(target.getTime() + Duration.standardSeconds(10).getMillis()), ONE_SECOND);
+    assertThat(ClockUtil.now()).isCloseTo(new Date(target.getTime() + FIVE_SECONDS), ONE_SECOND);
   }
 
   @Test
   public void timeShouldFreezeWithSetCurrentTime() throws InterruptedException {
     Date now = new Date();
-    Duration duration = Duration.standardDays(2);
-    Date target = new Date(now.getTime() + duration.getMillis());
+    long duration = TWO_DAYS;
+    Date target = new Date(now.getTime() + duration);
     ClockUtil.setCurrentTime(target);
 
-    Thread.sleep(10000);
+    Thread.sleep(FIVE_SECONDS);
 
     assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
   }
