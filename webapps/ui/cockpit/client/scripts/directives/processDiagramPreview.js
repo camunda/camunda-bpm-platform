@@ -10,7 +10,8 @@ module.exports = ['ProcessDefinitionResource', 'debounce', function(ProcessDefin
   return {
     restrict: 'EAC',
     template: template,
-    controller: ['$scope', function($scope) {
+    controller: ['$scope', 'configuration', function($scope, configuration) {
+      $scope.bpmnJsConf = configuration.getBpmnJs();
       $scope.control = {};
     }],
     link: function(scope, element, attrs) {

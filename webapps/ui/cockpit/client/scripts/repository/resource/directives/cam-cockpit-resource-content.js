@@ -18,9 +18,12 @@ module.exports = [
 
       controller: [
         '$scope',
+        'configuration',
         function(
-        $scope
+        $scope,
+        configuration
       ) {
+          $scope.bpmnJsConf = configuration.getBpmnJs();
 
         // fields ////////////////////////////////////////////////////
 

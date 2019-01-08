@@ -8,7 +8,7 @@ var Service = ['$q', function($q) {
       var deferred = $q.defer();
 
       BpmnIO.prototype.options = {};
-      var moddle = BpmnIO.prototype._createModdle({});
+      var moddle = BpmnIO.prototype._createModdle({ moddleExtensions: (window.bpmnJsModdleExtensions || {}) });
       moddle.fromXML(bpmn20Xml, 'bpmn:Definitions', function(err, definitions, context) {
         deferred.resolve({
           definitions: definitions,
