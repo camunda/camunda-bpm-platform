@@ -160,6 +160,12 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       isRunning = false;
       condition.signal();
     }
+
+    try {
+      handlerThread.join();
+    } catch (InterruptedException e) {
+      LOG.log(Level.WARNING, "Shutting down the handler thread failed: {0}", e);
+    }
   }
 
   protected void suspend(long millis) {
