@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package org.camunda.bpm.engine.authorization;
  *  
  * <p>In camunda BPM, multiple permissions are grouped into an {@link Authorization}.
  * For efficient storage and checking of authorizations, the permissons that make
- * up an autorization are coded into a single integer. 
+ * up an authorization are coded into a single integer.
  * The implication of this design is that a permission must have a unique integer value 
  * and it must be a power of two, ie 2^0, 2^1, 2^2, 2^3, 2^4 ...
  * 
@@ -55,7 +55,7 @@ package org.camunda.bpm.engine.authorization;
  */
 public interface Permission {
   
-  /** returns the name of the perwission, ie. 'WRITE' */
+  /** returns the name of the permission, ie. 'WRITE' */
   String getName();
   
   /** returns the unique numeric value of the permission.
