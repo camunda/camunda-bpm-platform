@@ -30,7 +30,7 @@ public class ClockUtilTest {
 
   @Before
   public void setUp() throws Exception {
-    ClockUtil.resetClock();
+    ClockUtil.reset();
   }
 
   @AfterClass
