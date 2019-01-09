@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,10 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
 
   public void enterLicenseKey(URL licenseKeyFile) {
     logInfo("030", "Setting up license key: {}", licenseKeyFile);
+  }
+
+  public void enterLicenseKeyFailed(URL licenseKeyFile, Exception e) {
+    logWarn("031", "Failed setting up license key: {}", licenseKeyFile, e);
   }
 
   public void configureJobExecutorPool(Integer corePoolSize, Integer maxPoolSize) {

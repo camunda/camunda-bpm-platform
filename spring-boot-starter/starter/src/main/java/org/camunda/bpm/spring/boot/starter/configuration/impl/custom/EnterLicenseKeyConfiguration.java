@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,8 +72,9 @@ public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
       try (PreparedStatement statement = connection.prepareStatement(getSql(INSERT_SQL))) {
         statement.setString(1, licenseKey.get());
         statement.execute();
-        LOG.enterLicenseKey(fileUrl);
       }
+      connection.commit();
+      LOG.enterLicenseKey(fileUrl);
     } catch (SQLException ex) {
       throw new CamundaBpmNestedRuntimeException(ex.getMessage(), ex);
     }
@@ -99,6 +100,7 @@ public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
         .map(s -> s.replaceAll("\\n", ""))
         .map(String::trim);
     } catch (IOException e) {
+      LOG.enterLicenseKeyFailed(licenseFileUrl, e);
       return Optional.empty();
     }
   }
