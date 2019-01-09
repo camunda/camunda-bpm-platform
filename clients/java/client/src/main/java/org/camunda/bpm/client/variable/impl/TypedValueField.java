@@ -50,4 +50,9 @@ public class TypedValueField {
     this.valueInfo = valueInfo;
   }
 
+  @Override
+  public String toString() {
+    return "TypedValueField [type=" + type + ", value=" + value + ", valueInfo=" + valueInfo + "]";
+  }
+
 }

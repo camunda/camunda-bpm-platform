@@ -78,4 +78,14 @@ public class VariableValue<T extends TypedValue> {
     return serializer;
   }
 
+  @Override
+  public String toString() {
+    return "VariableValue ["
+        + "cachedValue=" + cachedValue + ", "
+        + "processInstanceId=" + processInstanceId + ", "
+        + "variableName=" + variableName + ", "
+        + "typedValueField=" + typedValueField + "]";
+  }
+
+  
 }

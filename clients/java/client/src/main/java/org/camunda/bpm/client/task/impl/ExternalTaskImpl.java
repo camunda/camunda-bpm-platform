@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.client.task.impl;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -277,5 +278,28 @@ public class ExternalTaskImpl implements ExternalTask {
     return (T) typedValue;
   }
 
+  @Override
+  public String toString() {
+    return "ExternalTaskImpl ["
+        + "activityId=" + activityId + ", "
+        + "activityInstanceId=" + activityInstanceId + ", "
+        + "businessKey=" + businessKey + ", "
+        + "errorDetails=" + errorDetails + ", "
+        + "errorMessage=" + errorMessage + ", "
+        + "executionId=" + executionId + ", "
+        + "id=" + id + ", "
+        + "lockExpirationTime=" + (lockExpirationTime == null ? null : DateFormat.getDateTimeInstance().format(lockExpirationTime)) + ", "
+        + "priority=" + priority + ", "
+        + "processDefinitionId=" + processDefinitionId + ", "
+        + "processDefinitionKey=" + processDefinitionKey + ", "
+        + "processInstanceId=" + processInstanceId + ", "
+        + "receivedVariableMap=" + receivedVariableMap + ", "
+        + "retries=" + retries + ", "
+        + "tenantId=" + tenantId + ", "
+        + "topicName=" + topicName + ", "
+        + "variables=" + variables + ", "
+        + "workerId=" + workerId + "]";
+  }
+  
 }
 
