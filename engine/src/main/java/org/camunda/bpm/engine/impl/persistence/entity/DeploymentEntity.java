@@ -198,22 +198,30 @@ public class DeploymentEntity implements Serializable, DeploymentWithDefinitions
 
   @Override
   public List<ProcessDefinition> getDeployedProcessDefinitions() {
-    return deployedArtifacts == null ? null : deployedArtifacts.get(ProcessDefinitionEntity.class);
+    final List<ProcessDefinition> processDefinitions = 
+      deployedArtifacts == null ? null : deployedArtifacts.get(ProcessDefinitionEntity.class);
+    return processDefinitions == null ? Collections.emptyList() : processDefinitions;
   }
 
   @Override
   public List<CaseDefinition> getDeployedCaseDefinitions() {
-    return deployedArtifacts == null ? null : deployedArtifacts.get(CaseDefinitionEntity.class);
+    final List<CaseDefinition> caseDefinitions = 
+      deployedArtifacts == null ? null : deployedArtifacts.get(CaseDefinitionEntity.class);
+    return caseDefinitions == null ? Collections.emptyList() : caseDefinitions;
   }
 
   @Override
   public List<DecisionDefinition> getDeployedDecisionDefinitions() {
-    return deployedArtifacts == null ? null : deployedArtifacts.get(DecisionDefinitionEntity.class);
+    final List<DecisionDefinition> decisionDefinitions = 
+      deployedArtifacts == null ? null : deployedArtifacts.get(DecisionDefinitionEntity.class);
+    return decisionDefinitions == null ? Collections.emptyList() : decisionDefinitions;
   }
 
   @Override
   public List<DecisionRequirementsDefinition> getDeployedDecisionRequirementsDefinitions() {
-    return deployedArtifacts == null ? null : deployedArtifacts.get(DecisionRequirementsDefinitionEntity.class);
+    final List<DecisionRequirementsDefinition> requirementsDefinitions =
+      deployedArtifacts == null ? null : deployedArtifacts.get(DecisionRequirementsDefinitionEntity.class);
+    return requirementsDefinitions == null ? Collections.emptyList() : requirementsDefinitions;
   }
 
   @Override
