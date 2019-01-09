@@ -26,6 +26,8 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
@@ -808,7 +810,9 @@ public interface ManagementService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          or no {@link ProcessInstancePermissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link ProcessDefinitionPermissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(String jobId, int retries);
 
@@ -825,7 +829,9 @@ public interface ManagementService {
    * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(List<String> jobIds, int retries);
 
@@ -928,7 +934,9 @@ public interface ManagementService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries);
 

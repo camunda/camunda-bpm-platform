@@ -70,7 +70,7 @@ public class SetJobRetriesCmd extends AbstractSetJobRetriesCmd implements Comman
     if (jobDefinition != null) {
       String processDefinitionId = jobDefinition.getProcessDefinitionId();
       for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-        checker.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
+        checker.checkUpdateRetriesProcessInstanceByProcessDefinitionId(processDefinitionId);
       }
     }
 

@@ -40,6 +40,8 @@ import static org.camunda.bpm.engine.authorization.Permissions.*;
 import static org.camunda.bpm.engine.authorization.Resources.*;
 
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 
 /**
  * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
@@ -118,6 +120,25 @@ public class AuthorizationCommandChecker implements CommandChecker {
       ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
       if (processDefinition != null) {
         checkUpdateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
+      }
+    }
+  }
+
+  @Override
+  public void checkUpdateRetriesProcessInstanceByProcessDefinitionId(String processDefinitionId) {
+    if (getAuthorizationManager().isAuthorizationEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null) {
+
+        CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder()
+            .disjunctive()
+              .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, ProcessInstancePermissions.RETRY_JOB)
+              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId, ProcessDefinitionPermissions.RETRY_JOB)
+              .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, UPDATE)
+              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId, UPDATE_INSTANCE)
+            .build();
+
+        getAuthorizationManager().checkAuthorization(retryJobPermission);
       }
     }
   }
@@ -215,7 +236,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
 
     // necessary permissions:
-    // - READ on PROCESS_INSTANCE
+    // - UPDATE on PROCESS_INSTANCE
 
     PermissionCheck firstCheck = getAuthorizationManager().newPermissionCheck();
     firstCheck.setPermission(UPDATE);
@@ -232,6 +253,24 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
+  }
+
+  @Override
+  public void checkUpdateRetriesJob(JobEntity job) {
+    if (job.getProcessDefinitionKey() == null) {
+      // "standalone" job: nothing to do!
+      return;
+    }
+
+    CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), ProcessInstancePermissions.RETRY_JOB)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(), ProcessDefinitionPermissions.RETRY_JOB)
+          .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(), UPDATE_INSTANCE)
+        .build();
+
+    getAuthorizationManager().checkAuthorization(retryJobPermission);
   }
 
   @Override
@@ -307,7 +346,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
       ExecutionEntity execution = task.getExecution();
       ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
-
 
       PermissionCheck readPermissionCheck = getAuthorizationManager().newPermissionCheck();
       readPermissionCheck.setPermission(READ);
@@ -392,11 +430,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkCreateBatch(Permission permission) {
-    CompositePermissionCheck createBatchPermission = new PermissionCheckBuilder()
-      .disjunctive()
-        .atomicCheckForResourceId(BATCH, null, permission)
-        .atomicCheckForResourceId(BATCH, null, CREATE)
-      .build();
+    CompositePermissionCheck createBatchPermission = new PermissionCheckBuilder().disjunctive().atomicCheckForResourceId(BATCH, null, permission)
+        .atomicCheckForResourceId(BATCH, null, CREATE).build();
 
     getAuthorizationManager().checkAuthorization(createBatchPermission);
   }
@@ -489,9 +524,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkDeleteHistoricDecisionInstance(HistoricDecisionInstance decisionInstance) {
-    getAuthorizationManager().checkAuthorization(
-        DELETE_HISTORY, DECISION_DEFINITION, decisionInstance.getDecisionDefinitionKey()
-    );
+    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionInstance.getDecisionDefinitionKey());
   }
 
   public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
@@ -546,18 +579,13 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (executionId != null) {
 
       // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
-      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_ASSIGN)
-          .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
-        .build();
+      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive().atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_ASSIGN).atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK).build();
 
       getAuthorizationManager().checkAuthorization(taskWorkPermission);
 
-    }
-    else {
+    } else {
 
       // if task does not exist in context of process
       // instance, then it is either a (a) standalone task
@@ -572,11 +600,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
       String caseExecutionId = task.getCaseExecutionId();
       if (caseExecutionId == null) {
         // standalone task
-        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-            .disjunctive()
-            .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
-            .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .build();
+        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive().atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
+            .atomicCheckForResourceId(TASK, taskId, UPDATE).build();
 
         getAuthorizationManager().checkAuthorization(taskWorkPermission);
       }
@@ -602,18 +627,13 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (executionId != null) {
 
       // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
-      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-          .disjunctive()
-          .atomicCheckForResourceId(TASK, taskId, TASK_WORK)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_WORK)
-          .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
-        .build();
+      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive().atomicCheckForResourceId(TASK, taskId, TASK_WORK)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_WORK).atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK).build();
 
       getAuthorizationManager().checkAuthorization(taskWorkPermission);
 
-    }
-    else {
+    } else {
 
       // if task does not exist in context of process
       // instance, then it is either a (a) standalone task
@@ -628,13 +648,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
       String caseExecutionId = task.getCaseExecutionId();
       if (caseExecutionId == null) {
         // standalone task
-        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-            .disjunctive()
-            .atomicCheckForResourceId(TASK, taskId, TASK_WORK)
-            .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .build();
+        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive().atomicCheckForResourceId(TASK, taskId, TASK_WORK)
+            .atomicCheckForResourceId(TASK, taskId, UPDATE).build();
 
-          getAuthorizationManager().checkAuthorization(taskWorkPermission);
+        getAuthorizationManager().checkAuthorization(taskWorkPermission);
       }
     }
   }

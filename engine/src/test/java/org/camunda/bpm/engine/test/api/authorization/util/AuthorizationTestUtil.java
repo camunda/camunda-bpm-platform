@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 
@@ -70,6 +72,10 @@ public class AuthorizationTestUtil {
     int resourceType = authorization.getResourceType();
     if (resourceType == Resources.BATCH.resourceType()) {
       return authorization.getPermissions(BatchPermissions.values());
+    } else if (resourceType == Resources.PROCESS_DEFINITION.resourceType()) {
+      return authorization.getPermissions(ProcessDefinitionPermissions.values());
+    } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
+      return authorization.getPermissions(ProcessInstancePermissions.values());
     } else {
       return authorization.getPermissions(Permissions.values());
     }

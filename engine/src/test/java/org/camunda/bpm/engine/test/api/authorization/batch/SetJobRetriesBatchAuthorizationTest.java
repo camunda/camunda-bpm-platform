@@ -17,6 +17,8 @@ package org.camunda.bpm.engine.test.api.authorization.batch;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -100,7 +102,9 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
             )
             .failsDueToRequired(
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.UPDATE),
-                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId", Permissions.UPDATE_INSTANCE)
+                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId", Permissions.UPDATE_INSTANCE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", ProcessInstancePermissions.RETRY_JOB),
+                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId", ProcessDefinitionPermissions.RETRY_JOB)
             ),
         AuthorizationScenarioWithCount.scenario()
             .withCount(5)

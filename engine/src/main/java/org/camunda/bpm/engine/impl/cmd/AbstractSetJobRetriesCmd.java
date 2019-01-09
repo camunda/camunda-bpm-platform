@@ -34,7 +34,7 @@ public class AbstractSetJobRetriesCmd {
         .findJobById(jobId);
     if (job != null) {
       for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-        checker.checkUpdateJob(job);
+        checker.checkUpdateRetriesJob(job);
       }
 
       if (job.isInInconsistentLockState()) {

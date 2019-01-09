@@ -74,6 +74,11 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
   /**
+   *  Checks if it is allowed to update a process instance's retries of the given process definition.
+   */
+  void checkUpdateRetriesProcessInstanceByProcessDefinitionId(String processDefinitionId);
+
+  /**
    * Checks if it is allowed to update a decision definition with given id.
    */
   void checkUpdateDecisionDefinitionById(String decisionDefinitionId);
@@ -127,6 +132,11 @@ public interface CommandChecker {
    * Checks if it is allowed to update the given job.
    */
   void checkUpdateJob(JobEntity job);
+
+  /**
+   * Checks if it is allowed to update a job retries.
+   */
+  void checkUpdateRetriesJob(JobEntity job);
 
   /**
    * Checks if it is allowed to read a process instance of the given execution.
