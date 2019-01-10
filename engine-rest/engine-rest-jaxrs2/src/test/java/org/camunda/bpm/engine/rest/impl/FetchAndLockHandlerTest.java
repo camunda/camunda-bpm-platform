@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,6 +111,11 @@ public class FetchAndLockHandlerTest {
   @After
   public void resetClock() {
     ClockUtil.reset();
+  }
+
+  @After
+  public void resetUniqueWorkerRequestParam() {
+    handler.parseUniqueWorkerRequestParam("false");
   }
 
   @Test
@@ -316,6 +321,48 @@ public class FetchAndLockHandlerTest {
   }
 
   @Test
+  public void shouldCancelPreviousPendingRequestWhenWorkerIdsEqual() {
+    // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+
+    handler.parseUniqueWorkerRequestParam("true");
+
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "aWorkerId"), asyncResponse, processEngine);
+    handler.acquire();
+
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "aWorkerId"), mock(AsyncResponse.class), processEngine);
+
+    // when
+    handler.acquire();
+
+    // then
+    verify(asyncResponse).cancel();
+    assertThat(handler.getPendingRequests().size(), is(1));
+  }
+
+  @Test
+  public void shouldNotCancelPreviousPendingRequestWhenWorkerIdsDiffer() {
+    // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+
+    handler.parseUniqueWorkerRequestParam("true");
+
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "aWorkerId"), asyncResponse, processEngine);
+    handler.acquire();
+
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "anotherWorkerId"), mock(AsyncResponse.class), processEngine);
+
+    // when
+    handler.acquire();
+
+    // then
+    verify(asyncResponse, never()).cancel();
+    assertThat(handler.getPendingRequests().size(), is(2));
+  }
+
+  @Test
   public void shouldResumeAsyncResponseDueToTooManyRequests() {
     // given
 
@@ -364,7 +411,7 @@ public class FetchAndLockHandlerTest {
     assertThat(argumentCaptor.getValue().getMessage(), is("Request rejected due to shutdown of application server."));
   }
 
-  protected FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
+  protected FetchExternalTasksExtendedDto createDto(Long responseTimeout, String workerId) {
     FetchExternalTasksExtendedDto externalTask = new FetchExternalTasksExtendedDto();
 
     FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topic = new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
@@ -372,7 +419,7 @@ public class FetchAndLockHandlerTest {
     topic.setLockDuration(12354L);
 
     externalTask.setMaxTasks(5);
-    externalTask.setWorkerId("aWorkerId");
+    externalTask.setWorkerId(workerId);
     externalTask.setTopics(Collections.singletonList(topic));
 
     if (responseTimeout != null) {
@@ -380,6 +427,10 @@ public class FetchAndLockHandlerTest {
     }
 
     return externalTask;
+  }
+
+  protected FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
+    return createDto(responseTimeout, "aWorkerId");
   }
 
   protected Date addSeconds(Date date, int seconds) {

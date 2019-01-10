@@ -23,6 +23,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 
@@ -48,6 +50,8 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   private final static Logger LOG = Logger.getLogger(FetchAndLockHandlerImpl.class.getName());
 
+  protected static final String UNIQUE_WORKER_REQUEST_PARAM_NAME = "fetch-and-lock-unique-worker-request";
+
   protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30 * 1000;
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_REQUEST_TIMEOUT = 1800000; // 30 minutes
@@ -56,10 +60,13 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
+  protected List<FetchAndLockRequest> newRequests = new ArrayList<FetchAndLockRequest>();
 
   protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
 
   protected volatile boolean isRunning = false;
+
+  protected boolean isUniqueWorkerRequest = false;
 
   public FetchAndLockHandlerImpl() {
     this.condition = new SingleConsumerCondition(handlerThread);
@@ -82,7 +89,16 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected void acquire() {
     LOG.log(Level.FINEST, "Acquire start");
 
-    queue.drainTo(pendingRequests);
+    queue.drainTo(newRequests);
+
+    if (!newRequests.isEmpty()) {
+      if (isUniqueWorkerRequest) {
+        removeDuplicates();
+      }
+
+      pendingRequests.addAll(newRequests);
+      newRequests.clear();
+    }
 
     LOG.log(Level.FINEST, "Number of pending requests {0}", pendingRequests.size());
 
@@ -136,6 +152,23 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       // if there are pending requests, try fetch periodically to ensure tasks created on other
       // cluster nodes and tasks with expired timeouts can be fetched in a timely manner
       suspend(Math.min(PENDING_REQUEST_FETCH_INTERVAL, waitTime));
+    }
+  }
+
+  protected void removeDuplicates() {
+    for (FetchAndLockRequest newRequest : newRequests) {
+      // remove any request from pendingRequests with the same worker id
+      Iterator<FetchAndLockRequest> iterator = pendingRequests.iterator();
+      while (iterator.hasNext()) {
+        FetchAndLockRequest pendingRequest = iterator.next();
+        if (pendingRequest.getDto().getWorkerId().equals(newRequest.getDto().getWorkerId())) {
+          AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
+          asyncResponse.cancel();
+
+          iterator.remove();
+        }
+      }
+
     }
   }
 
@@ -305,6 +338,26 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       asyncResponse.resume(processEngineException);
 
       LOG.log(Level.FINEST, "Resuming request with error {0}", processEngineException);
+    }
+  }
+
+  public void contextInitialized(ServletContextEvent servletContextEvent) {
+    ServletContext servletContext = null;
+
+    if (servletContextEvent != null) {
+      servletContext = servletContextEvent.getServletContext();
+
+      if (servletContext != null) {
+        parseUniqueWorkerRequestParam(servletContext.getInitParameter(UNIQUE_WORKER_REQUEST_PARAM_NAME));
+      }
+    }
+  }
+
+  protected void parseUniqueWorkerRequestParam(String uniqueWorkerRequestParam) {
+    if (uniqueWorkerRequestParam != null) {
+      isUniqueWorkerRequest = Boolean.valueOf(uniqueWorkerRequestParam);
+    } else {
+      isUniqueWorkerRequest = false; // default configuration
     }
   }
 

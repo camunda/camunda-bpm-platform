@@ -5,6 +5,14 @@
 
   <display-name>camunda bpm rest api</display-name>
 
+  <!-- Fetch And Lock Handler (long polling): Unique Worker Request (default value: false) -->
+  <!--
+  <context-param>
+    <param-name>fetch-and-lock-unique-worker-request</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  -->
+
   <listener>
     <listener-class>org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener</listener-class>
   </listener>
