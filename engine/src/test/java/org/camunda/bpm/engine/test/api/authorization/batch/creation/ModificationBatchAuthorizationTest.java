@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -44,7 +45,7 @@ public class ModificationBatchAuthorizationTest extends BatchCreationAuthorizati
             .withoutAuthorizations()
             .failsDueToRequired(
                 grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
             ),
         scenario()
             .withAuthorizations(
@@ -52,7 +53,7 @@ public class ModificationBatchAuthorizationTest extends BatchCreationAuthorizati
             ),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
             ).succeeds()
     );
   }

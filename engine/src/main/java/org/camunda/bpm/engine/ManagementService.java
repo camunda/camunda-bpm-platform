@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -840,7 +841,8 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(List<String> jobIds, int retries);
 
@@ -856,7 +858,8 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if jobQuery is null
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(JobQuery jobQuery, int retries);
 
@@ -876,7 +879,8 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if neither jobIds, nor jobQuery is provided or result in empty list
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries);
 
@@ -895,7 +899,8 @@ public interface ManagementService {
    * @param retries number of retries.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync (List<String> processInstanceIds, ProcessInstanceQuery query, int retries);
 

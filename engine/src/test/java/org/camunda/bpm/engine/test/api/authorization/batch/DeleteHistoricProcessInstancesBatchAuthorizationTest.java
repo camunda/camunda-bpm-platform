@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.test.api.authorization.batch;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -100,7 +101,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
         AuthorizationScenarioWithCount.scenario()
             .withCount(0L)
             .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES),
+                grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY),
                 grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY)
             ).succeeds()

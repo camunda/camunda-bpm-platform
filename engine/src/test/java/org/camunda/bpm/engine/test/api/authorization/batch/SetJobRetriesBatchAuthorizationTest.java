@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -117,7 +118,7 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
         AuthorizationScenarioWithCount.scenario()
             .withCount(5)
             .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_SET_JOB_RETRIES),
+                grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES),
                 grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE)
             ).succeeds()
     );

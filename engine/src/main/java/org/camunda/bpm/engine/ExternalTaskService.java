@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.camunda.bpm.engine;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -349,7 +350,8 @@ public interface ExternalTaskService {
    * @throws NotFoundException if no external task with one of the given id exists
    * @throws BadUserRequestException if the ids are null or the number of retries is negative
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES} permission on {@link Resources#BATCH}.
    */
   public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.camunda.bpm.engine.runtime;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -37,7 +38,8 @@ public interface UpdateProcessInstancesSuspensionStateBuilder extends UpdateProc
    *           If no process Instances are found
    *           If a process Instance is set to null
    * @throws AuthorizationException
-   *           if the user has no {@link Permissions#CREATE} permission
+   *           if the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE} permission
    *           on {@link Resources#BATCH}.
    */
   Batch activateAsync();
@@ -79,7 +81,8 @@ public interface UpdateProcessInstancesSuspensionStateBuilder extends UpdateProc
    *           If no process Instances are found
    *           If a process Instance is set to null
    * @throws AuthorizationException
-   *           if the user has no {@link Permissions#CREATE} permission
+   *           if the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE} permission
    *           on {@link Resources#BATCH}.
    */
   Batch suspendAsync();

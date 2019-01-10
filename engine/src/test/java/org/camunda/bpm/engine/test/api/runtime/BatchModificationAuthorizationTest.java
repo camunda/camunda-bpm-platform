@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 
 import java.util.Collection;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -68,7 +69,7 @@ public class BatchModificationAuthorizationTest {
             ).succeeds(),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ, Permissions.UPDATE)
             ).succeeds(),
@@ -83,7 +84,7 @@ public class BatchModificationAuthorizationTest {
             .succeeds(),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
             ).failsDueToRequired(

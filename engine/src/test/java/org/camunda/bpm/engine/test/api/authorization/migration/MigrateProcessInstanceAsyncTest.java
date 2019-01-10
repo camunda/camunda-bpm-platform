@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnMo
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -107,7 +108,7 @@ public class MigrateProcessInstanceAsyncTest {
         .succeeds(),
       scenario()
         .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES),
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES),
           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
           grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
         .succeeds(),
@@ -116,7 +117,7 @@ public class MigrateProcessInstanceAsyncTest {
            grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
          .failsDueToRequired(
            grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-           grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES))
+           grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES))
          );
   }
 

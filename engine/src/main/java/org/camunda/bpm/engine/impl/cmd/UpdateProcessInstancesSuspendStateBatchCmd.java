@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
@@ -95,7 +95,7 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
 
   protected void checkAuthorizations(CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(Permissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE);
+      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE);
     }
   }
 

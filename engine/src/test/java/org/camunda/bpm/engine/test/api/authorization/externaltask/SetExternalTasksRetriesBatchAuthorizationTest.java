@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -70,7 +71,7 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
             grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ, Permissions.READ_INSTANCE))
         .failsDueToRequired(
             grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES)),
+            grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES)),
       scenario()
         .withAuthorizations(
             grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ, Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE),
@@ -79,7 +80,7 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
       scenario()
         .withAuthorizations(
             grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ, Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE),
-            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES))
+            grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES))
         .succeeds(),
       scenario()
         .withAuthorizations(

@@ -17,7 +17,7 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES;
+import static org.camunda.bpm.engine.authorization.BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;

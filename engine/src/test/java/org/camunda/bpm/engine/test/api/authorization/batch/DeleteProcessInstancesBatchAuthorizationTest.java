@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -74,7 +75,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest extends AbstractBatchA
             ).succeeds(),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES),
+                grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
             ).succeeds(),

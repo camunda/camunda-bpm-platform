@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -39,7 +40,7 @@ public class HistoricProcessInstanceDeletionBatchAuthorizationTest extends Batch
             .withoutAuthorizations()
             .failsDueToRequired(
                 grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)
             ),
         scenario()
             .withAuthorizations(
@@ -47,7 +48,7 @@ public class HistoricProcessInstanceDeletionBatchAuthorizationTest extends Batch
             ),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)
             ).succeeds()
     );
   }

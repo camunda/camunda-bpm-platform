@@ -15,7 +15,50 @@
  */
 package org.camunda.bpm.engine.authorization;
 
+/**
+ * The set of built-in {@link Permission Permissions} for {@link Resources#BATCH Batch operations} in Camunda BPM.
+ *
+ * @author Yana Vasileva
+ *
+ */
 public enum BatchPermissions implements Permission {
+
+  /** The none permission means 'no action', 'doing nothing'.
+   * It does not mean that no permissions are granted. */
+  NONE("NONE", 0),
+
+  /**
+   * Indicates that  all interactions are permitted.
+   * If ALL is revoked it means that the user is not permitted
+   * to do everything, which means that at least one permission
+   * is revoked. This does not implicate that all individual
+   * permissions are revoked.
+   *
+   * Example: If the UPDATE permission is revoke also the ALL
+   * permission is revoked, because the user is not authorized
+   * to execute all actions anymore.
+   */
+  ALL("ALL", Integer.MAX_VALUE),
+
+  /** Indicates that READ interactions are permitted. */
+  READ("READ", 2),
+
+  /** Indicates that UPDATE interactions are permitted. */
+  UPDATE("UPDATE", 4),
+
+  /** Indicates that CREATE interactions are permitted. */
+  CREATE("CREATE", 8),
+
+  /** Indicates that DELETE interactions are permitted. */
+  DELETE("DELETE", 16),
+
+  /** Indicates that READ_HISTORY interactions are permitted. */
+  READ_HISTORY("READ_HISTORY", 4096),
+
+  /** Indicates that DELETE_HISTORY interactions are permitted. */
+  DELETE_HISTORY("DELETE_HISTORY", 8192),
+
+  // Create Batch specific permissions: //////////////////////
 
   /** Indicates that CREATE_BATCH_MIGRATE_PROCESS_INSTANCES interactions are permitted. */
   CREATE_BATCH_MIGRATE_PROCESS_INSTANCES("CREATE_BATCH_MIGRATE_PROCESS_INSTANCES", 32),

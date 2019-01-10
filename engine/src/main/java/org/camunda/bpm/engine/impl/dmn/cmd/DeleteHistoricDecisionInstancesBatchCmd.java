@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
@@ -77,7 +77,7 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     List<String> decisionInstanceIds = collectHistoricDecisionInstanceIds();
     ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstanceIds", decisionInstanceIds);
 
-    checkAuthorizations(commandContext, Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES);
+    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES);
     writeUserOperationLog(commandContext, decisionInstanceIds.size());
 
     BatchEntity batch = createBatch(commandContext, decisionInstanceIds);

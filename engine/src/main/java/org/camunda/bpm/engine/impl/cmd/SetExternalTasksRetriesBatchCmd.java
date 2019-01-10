@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
@@ -64,7 +64,7 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
 
   protected void checkPermissions(CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(Permissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES);
+      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES);
     }
   }
 

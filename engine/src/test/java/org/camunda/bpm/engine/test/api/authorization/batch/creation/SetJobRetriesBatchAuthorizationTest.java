@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -43,7 +44,7 @@ public class SetJobRetriesBatchAuthorizationTest extends BatchCreationAuthorizat
             .withoutAuthorizations()
             .failsDueToRequired(
                 grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_SET_JOB_RETRIES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)
             ),
         scenario()
             .withAuthorizations(
@@ -51,7 +52,7 @@ public class SetJobRetriesBatchAuthorizationTest extends BatchCreationAuthorizat
             ),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_SET_JOB_RETRIES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)
             ).succeeds()
     );
   }

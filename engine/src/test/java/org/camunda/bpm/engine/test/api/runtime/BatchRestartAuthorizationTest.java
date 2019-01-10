@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -71,7 +72,7 @@ public class BatchRestartAuthorizationTest {
         .withoutAuthorizations()
         .failsDueToRequired(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES)
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES)
         ),
       scenario()
         .withAuthorizations(
@@ -96,7 +97,7 @@ public class BatchRestartAuthorizationTest {
         ),
       scenario()
         .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES),
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES),
           grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
           grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
         )

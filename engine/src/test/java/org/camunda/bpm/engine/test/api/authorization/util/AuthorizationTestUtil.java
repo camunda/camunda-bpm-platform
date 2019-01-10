@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,11 @@ import static junit.framework.TestCase.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 
@@ -56,5 +60,18 @@ public class AuthorizationTestUtil {
     assertEquals(expectedPermissionName, info.getViolatedPermissionName());
     assertEquals(expectedResourceName, info.getResourceType());
     assertEquals(expectedResourceId, info.getResourceId());
+  }
+
+  /**
+   * @return the set of permission for the given authorization
+   */
+  public static Permission[] getPermissions(Authorization authorization)
+  {
+    int resourceType = authorization.getResourceType();
+    if (resourceType == Resources.BATCH.resourceType()) {
+      return authorization.getPermissions(BatchPermissions.values());
+    } else {
+      return authorization.getPermissions(Permissions.values());
+    }
   }
 }

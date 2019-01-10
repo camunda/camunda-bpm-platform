@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
@@ -37,7 +38,7 @@ public class CreateDeleteProcessInstancesBatchAuthorizationTest extends BatchCre
             .withoutAuthorizations()
             .failsDueToRequired(
                 grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)
             ),
         scenario()
             .withAuthorizations(
@@ -45,7 +46,7 @@ public class CreateDeleteProcessInstancesBatchAuthorizationTest extends BatchCre
             ),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)
             ).succeeds()
     );
   }

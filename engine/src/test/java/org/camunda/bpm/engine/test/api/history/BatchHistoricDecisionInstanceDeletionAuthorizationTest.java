@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -80,7 +81,7 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
         .withoutAuthorizations()
         .failsDueToRequired(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
         ),
       scenario()
         .withAuthorizations(
@@ -96,18 +97,18 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
         ),
       scenario()
         .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
           grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)
         ),
       scenario()
         .withAuthorizations(
-          revoke(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
+          revoke(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
           )
         .failsDueToRequired(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
-          )
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
+        )
         .succeeds()
     );
   }

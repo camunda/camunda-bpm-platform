@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ModificationBatchConfiguration;
 import org.camunda.bpm.engine.impl.ModificationBuilderImpl;
@@ -76,7 +76,7 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
 
   protected void checkPermissions(CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(Permissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
+      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
     }
   }
 

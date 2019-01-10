@@ -16,7 +16,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -45,7 +45,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
 
     ensureNotEmpty(BadUserRequestException.class, "jobIds", jobIds);
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
-    checkAuthorizations(commandContext, Permissions.CREATE_BATCH_SET_JOB_RETRIES);
+    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES);
     writeUserOperationLog(commandContext,
         retries,
         jobIds.size(),

@@ -16,6 +16,8 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.Collection;
+
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -63,7 +65,7 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
         .withoutAuthorizations()
         .failsDueToRequired(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE)
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE)
         ),
       scenario()
         .withAuthorizations(
@@ -80,7 +82,7 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
         ),
       scenario()
         .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE),
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE),
           grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)
         )
         .succeeds()

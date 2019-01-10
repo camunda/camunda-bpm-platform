@@ -73,10 +73,10 @@ public enum Permissions implements Permission {
   /** Indicates that DELETE_INSTANCE interactions are permitted. */
   DELETE_INSTANCE("DELETE_INSTANCE", 2048),
 
-  /** Indicates that UPDATE_INSTANCE interactions are permitted. */
+  /** Indicates that READ_HISTORY interactions are permitted. */
   READ_HISTORY("READ_HISTORY", 4096),
 
-  /** Indicates that DELETE_INSTANCE interactions are permitted. */
+  /** Indicates that DELETE_HISTORY interactions are permitted. */
   DELETE_HISTORY("DELETE_HISTORY", 8192),
 
   /** Indicates that TASK_WORK interactions are permitted */
@@ -86,34 +86,7 @@ public enum Permissions implements Permission {
   TASK_ASSIGN("TASK_ASSIGN", 32768),
 
   /** Indicates that MIGRATE_INSTANCE interactions are permitted */
-  MIGRATE_INSTANCE("MIGRATE_INSTANCE", 65536),
-
-  /** Indicates that CREATE_BATCH_MIGRATE_PROCESS_INSTANCES interactions are permitted. */
-  CREATE_BATCH_MIGRATE_PROCESS_INSTANCES("CREATE_BATCH_MIGRATE_PROCESS_INSTANCES", 32),
-
-  /** Indicates that CREATE_BATCH_MODIFY_PROCESS_INSTANCES interactions are permitted */
-  CREATE_BATCH_MODIFY_PROCESS_INSTANCES("CREATE_BATCH_MODIFY_PROCESS_INSTANCES", 64),
-
-  /** Indicates that CREATE_BATCH_RESTART_PROCESS_INSTANCES interactions are permitted */
-  CREATE_BATCH_RESTART_PROCESS_INSTANCES("CREATE_BATCH_RESTART_PROCESS_INSTANCES", 128),
-
-  /** Indicates that CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES interactions are permitted */
-  CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES("CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES", 256),
-
-  /** Indicates that CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES interactions are permitted. */
-  CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES("CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES", 512),
-
-  /** Indicates that CREATE_BATCH_DELETE_DECISION_INSTANCES interactions are permitted */
-  CREATE_BATCH_DELETE_DECISION_INSTANCES("CREATE_BATCH_DELETE_DECISION_INSTANCES", 1024),
-
-  /** Indicates that CREATE_BATCH_SET_JOB_RETRIES interactions are permitted */
-  CREATE_BATCH_SET_JOB_RETRIES("CREATE_BATCH_SET_JOB_RETRIES", 2048),
-
-  /** Indicates that CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES interactions are permitted */
-  CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES("CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES", 16384),
-
-  /** Indicates that CREATE_BATCH_SUSPEND_PROCESS_INSTANCES interactions are permitted */
-  CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE("CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE", 32768);
+  MIGRATE_INSTANCE("MIGRATE_INSTANCE", 65536);
 
   // implementation //////////////////////////
 
