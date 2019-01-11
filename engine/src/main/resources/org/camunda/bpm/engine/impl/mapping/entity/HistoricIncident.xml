@@ -101,6 +101,35 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricIncidentsByBatchId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_INCIDENT set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ID_ in (SELECT HI.ID_ from ${prefix}ACT_HI_INCIDENT HI
+      inner join ${prefix}ACT_HI_BATCH HB
+      on HI.JOB_DEF_ID_ in
+        (HB.SEED_JOB_DEF_ID_,
+         HB.MONITOR_JOB_DEF_ID_,
+         HB.BATCH_JOB_DEF_ID_)
+      where HB.ID_ = #{batchId})
+  </update>
+
+  <update id="updateHistoricIncidentsByBatchId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_INCIDENT as I
+      inner join ${prefix}ACT_HI_INCIDENT as HI
+        on HI.ID_ = I.ID_
+      inner join ${prefix}ACT_HI_BATCH as HB
+        on HI.JOB_DEF_ID_ in
+          (HB.SEED_JOB_DEF_ID_,
+          HB.MONITOR_JOB_DEF_ID_,
+          HB.BATCH_JOB_DEF_ID_)
+      set I.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+          I.CREATE_TIME_ = I.CREATE_TIME_
+      where HB.ID_ = #{batchId}
+  </update>
+
   <!-- HISTORIC INCIDENT DELETE -->
 
   <delete id="deleteHistoricIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">

@@ -15,7 +15,6 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -55,7 +54,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -1631,8 +1629,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
-  @Ignore("CAM-9629")
-  public void shouldResolveBatchIncident() {
+  public void shouldResolveBatchIncident_SeedJob() {
     // given
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     processEngineConfiguration.initHistoryCleanup();
@@ -1652,6 +1649,37 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
     assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
 
     // when
+    managementService.setJobRetries(jobLog.getJobId(), 0);
+
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // then
+    assertThat(historicIncident.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldResolveBatchIncident_BatchJob() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
+
+    // assume
+    assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
+
     runtimeService.deleteProcessInstance(processInstanceId, "aDeleteReason");
 
     managementService.executeJob(jobLog.getJobId());
@@ -1661,11 +1689,53 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
       .singleResult()
       .getId();
 
+    // when
     managementService.setJobRetries(jobId, 0);
 
-    try {
-      managementService.executeJob(jobId);
-    } catch (ProcessEngineException ignored) { }
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // then
+    assertThat(historicIncident.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldResolveBatchIncident_MonitorJob() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
+
+    // assume
+    assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    managementService.executeJob(jobLog.getJobId());
+
+    String jobId = managementService.createJobQuery()
+      .jobDefinitionId(batch.getBatchJobDefinitionId())
+      .singleResult()
+      .getId();
+    managementService.executeJob(jobId);
+
+    jobId = managementService.createJobQuery()
+      .jobDefinitionId(batch.getMonitorJobDefinitionId())
+      .singleResult()
+      .getId();
+
+    // when
+    managementService.setJobRetries(jobId, 0);
 
     HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
 

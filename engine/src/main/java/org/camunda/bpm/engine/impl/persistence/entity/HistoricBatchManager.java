@@ -60,6 +60,10 @@ public class HistoricBatchManager extends AbstractManager {
     return getDbEntityManager().selectById(HistoricBatchEntity.class, batchId);
   }
 
+  public HistoricBatchEntity findHistoricBatchByJobId(String jobId) {
+    return (HistoricBatchEntity) getDbEntityManager().selectOne("selectHistoricBatchByJobId", jobId);
+  }
+
   @SuppressWarnings("unchecked")
   public List<String> findHistoricBatchIdsForCleanup(Integer batchSize, Map<String, Integer> batchOperationsForHistoryCleanup, int minuteFrom, int minuteTo) {
     Map<String, Object> queryParameters = new HashMap<String, Object>();

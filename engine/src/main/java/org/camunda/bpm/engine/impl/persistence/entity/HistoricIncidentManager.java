@@ -106,4 +106,13 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
+  public void addRemovalTimeToHistoricIncidentsByBatchId(String batchId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("batchId", batchId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricIncidentEntity.class, "updateHistoricIncidentsByBatchId", parameters);
+  }
+
 }

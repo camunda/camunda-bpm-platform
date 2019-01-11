@@ -352,6 +352,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTenantId(incident.getTenantId());
     evt.setJobDefinitionId(incident.getJobDefinitionId());
 
+    String jobId = incident.getConfiguration();
+    if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
+      HistoricBatchEntity historicBatch = getHistoricBatchByJobId(jobId);
+      if (historicBatch != null) {
+        evt.setRemovalTime(historicBatch.getRemovalTime());
+      }
+    }
+
     IncidentEntity incidentEntity = (IncidentEntity) incident;
     ProcessDefinitionEntity definition = incidentEntity.getProcessDefinition();
     if (definition != null) {
@@ -965,6 +973,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       provideRemovalTime((HistoricBatchEntity) historicBatch);
 
       addRemovalTimeToHistoricJobLog((HistoricBatchEntity) historicBatch);
+      addRemovalTimeToHistoricIncidents((HistoricBatchEntity) historicBatch);
     }
 
     return historicBatch;
@@ -1235,12 +1244,27 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       .findHistoricBatchById(batchId);
   }
 
+  protected HistoricBatchEntity getHistoricBatchByJobId(String jobId) {
+    return Context.getCommandContext()
+      .getHistoricBatchManager()
+      .findHistoricBatchByJobId(jobId);
+  }
+
   protected void addRemovalTimeToHistoricJobLog(HistoricBatchEntity historicBatch) {
     Date removalTime = historicBatch.getRemovalTime();
     if (removalTime != null) {
       Context.getCommandContext()
         .getHistoricJobLogManager()
         .addRemovalTimeToJobLogByBatchId(historicBatch.getId(), removalTime);
+    }
+  }
+
+  protected void addRemovalTimeToHistoricIncidents(HistoricBatchEntity historicBatch) {
+    Date removalTime = historicBatch.getRemovalTime();
+    if (removalTime != null) {
+      Context.getCommandContext()
+        .getHistoricIncidentManager()
+        .addRemovalTimeToHistoricIncidentsByBatchId(historicBatch.getId(), removalTime);
     }
   }
 
