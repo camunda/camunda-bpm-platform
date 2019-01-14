@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2014-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package org.camunda.commons.utils;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author Sebastian Menski
@@ -81,6 +84,34 @@ public final class StringUtil {
       stringBuilder.append(parts[i]);
     }
     return stringBuilder.toString();
+  }
+  
+  /**
+   * Returns either the passed in String, or if the String is <code>null</code>, an empty String ("").
+   *
+   * <pre>
+   * StringUtils.defaultString(null)  = ""
+   * StringUtils.defaultString("")    = ""
+   * StringUtils.defaultString("bat") = "bat"
+   * </pre>
+   *
+   * @param text  the String to check, may be null
+   * @return the passed in String, or the empty String if it  was <code>null</code>
+   */
+  public static String defaultString(String text) {
+      return text == null ? "" : text;
+  }
+  
+  /**
+   * Fetches the stack trace of an exception as a String.
+   * 
+   * @param throwable to get the stack trace from
+   * @return the stack trace as String
+   */
+  public static String getStackTrace(Throwable throwable) {
+    StringWriter sw = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(sw, true));
+    return sw.toString();
   }
 
 }
