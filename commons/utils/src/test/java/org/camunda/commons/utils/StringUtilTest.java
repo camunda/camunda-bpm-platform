@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2014-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.commons.utils.StringUtil.isExpression;
 import static org.camunda.commons.utils.StringUtil.join;
 import static org.camunda.commons.utils.StringUtil.split;
+import static org.camunda.commons.utils.StringUtil.defaultString;
+import static org.camunda.commons.utils.StringUtil.getStackTrace;
 
 /**
  * @author Sebastian Menski
@@ -66,6 +68,21 @@ public class StringUtilTest {
     assertThat(join(",", "")).isEqualTo("");
     assertThat(join(null, (String[]) null)).isNull();
     assertThat(join("aax", "a", "b", "c")).isEqualTo("aaaxbaaxc");
+  }
+  
+  @Test
+  public void testDefaultString() {
+    assertThat(defaultString(null)).isEqualTo("");
+    assertThat(defaultString("")).isEqualTo("");
+    assertThat(defaultString("bat")).isEqualTo("bat");
+  }
+  
+  @Test
+  public void testGetStacktrace() {
+    Throwable th = new IllegalArgumentException("Wrong argument!", new NullPointerException("This shouldn't have been empty"));
+    assertThat(getStackTrace(th)).containsSequence("java.lang.IllegalArgumentException: Wrong argument!", 
+      "at org.camunda.commons.utils.StringUtilTest.testGetStacktrace(StringUtilTest.java:",
+      "Caused by: java.lang.NullPointerException: This shouldn't have been empty");
   }
 
 }
