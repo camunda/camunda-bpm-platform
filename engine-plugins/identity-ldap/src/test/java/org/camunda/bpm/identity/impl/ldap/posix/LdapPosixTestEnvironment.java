@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.camunda.bpm.identity.impl.ldap.posix;
 
 import java.io.File;
-import org.apache.commons.lang.StringUtils;
 import org.apache.directory.api.ldap.model.entry.Entry;
 
 import org.apache.directory.api.ldap.model.entry.Modification;
@@ -52,7 +51,7 @@ public class LdapPosixTestEnvironment extends LdapTestEnvironment {
     if (service.getAdminSession().exists(nis)) {
       Entry entry = service.getAdminSession().lookup(nis);
       Attribute nisDisabled = entry.get("m-disabled");
-      if (null != nisDisabled && StringUtils.equalsIgnoreCase(nisDisabled.getString(), "TRUE")) {
+      if (null != nisDisabled && "TRUE".equalsIgnoreCase(nisDisabled.getString())) {
         nisDisabled.remove("TRUE");
         nisDisabled.add("FALSE");
         List<Modification> modifications = new ArrayList<Modification>();
