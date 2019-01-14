@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ public class ActivitiStateHandlerRegistry extends ReceiveTaskActivityBehavior im
 	}
 
 	protected String registrationKey(String stateName, String processName) {
-		return (org.apache.commons.lang.StringUtils.defaultString(processName) +
-				":" + org.apache.commons.lang.StringUtils.defaultString(stateName)).toLowerCase();
+		return (org.camunda.commons.utils.StringUtil.defaultString(processName) +
+				":" + org.camunda.commons.utils.StringUtil.defaultString(stateName)).toLowerCase();
 	}
 
 	/**

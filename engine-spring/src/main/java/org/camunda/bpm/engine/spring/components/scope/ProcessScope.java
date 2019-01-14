@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import java.util.logging.Logger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.spring.components.aop.util.Scopifier;
+import org.camunda.commons.utils.StringUtil;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.scope.ScopedObject;
 import org.springframework.beans.BeansException;
@@ -102,7 +102,7 @@ public class ProcessScope implements Scope, InitializingBean, BeanFactoryPostPro
 			}
 			return createDirtyCheckingProxy(name, scopedObject);
 		} catch (Throwable th) {
-			logger.warning("couldn't return value from process scope! " + ExceptionUtils.getFullStackTrace(th));
+			logger.warning("couldn't return value from process scope! " + StringUtil.getStackTrace(th));
 		} finally {
 			if (executionEntity != null) {
 				logger.fine("set variable '" + name + "' on executionEntity# " + executionEntity.getId());

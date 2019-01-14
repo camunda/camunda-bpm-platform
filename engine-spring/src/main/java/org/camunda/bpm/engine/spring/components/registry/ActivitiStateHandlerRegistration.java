@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.camunda.bpm.engine.spring.components.registry;
 
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -97,7 +95,15 @@ public class ActivitiStateHandlerRegistration {
 	}
 
 	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
-	}
+  public String toString() {
+    return super.toString() + "["
+        + "processVariablesExpected=" + processVariablesExpected + ", "
+        + "handlerMethod=" + handlerMethod + ", "
+        + "handler=" + handler + ", "
+        + "stateName=" + stateName + ", "
+        + "beanName=" + beanName + ", "
+        + "processVariablesIndex=" + processVariablesIndex + ", "
+        + "processIdIndex=" + processIdIndex + ", "
+        + "processName=" + processName + "]";
+  }
 }
