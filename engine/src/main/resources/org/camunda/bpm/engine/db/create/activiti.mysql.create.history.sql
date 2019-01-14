@@ -1,5 +1,5 @@
 --
--- Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+-- Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -255,9 +255,9 @@ create table ACT_HI_INCIDENT (
 
 create table ACT_HI_JOB_LOG (
     ID_ varchar(64) not null,
-    TIMESTAMP_ timestamp not null,
+    TIMESTAMP_ datetime not null,
     JOB_ID_ varchar(64) not null,
-    JOB_DUEDATE_ timestamp NULL,
+    JOB_DUEDATE_ datetime NULL,
     JOB_RETRIES_ integer,
     JOB_PRIORITY_ bigint NOT NULL DEFAULT 0,
     JOB_EXCEPTION_MSG_ varchar(4000),

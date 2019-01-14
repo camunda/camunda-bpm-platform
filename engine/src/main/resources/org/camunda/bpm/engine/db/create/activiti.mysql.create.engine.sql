@@ -1,5 +1,5 @@
 --
--- Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+-- Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ create table ACT_GE_BYTEARRAY (
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
     NAME_ varchar(255),
-    DEPLOY_TIME_ timestamp,
+    DEPLOY_TIME_ datetime,
     SOURCE_ varchar(255),
     TENANT_ID_ varchar(64),
     primary key (ID_)
@@ -91,7 +91,7 @@ create table ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     TYPE_ varchar(255) NOT NULL,
-    LOCK_EXP_TIME_ timestamp NULL,
+    LOCK_EXP_TIME_ datetime NULL,
     LOCK_OWNER_ varchar(255),
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),
@@ -101,7 +101,7 @@ create table ACT_RU_JOB (
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
-    DUEDATE_ timestamp NULL,
+    DUEDATE_ datetime NULL,
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
@@ -165,7 +165,7 @@ create table ACT_RU_TASK (
     ASSIGNEE_ varchar(255),
     DELEGATION_ varchar(64),
     PRIORITY_ integer,
-    CREATE_TIME_ timestamp,
+    CREATE_TIME_ datetime,
     DUE_DATE_ datetime,
     FOLLOW_UP_DATE_ datetime,
     SUSPENSION_STATE_ integer,
@@ -216,7 +216,7 @@ create table ACT_RU_EVENT_SUBSCR (
     PROC_INST_ID_ varchar(64),
     ACTIVITY_ID_ varchar(255),
     CONFIGURATION_ varchar(255),
-    CREATED_ timestamp not null,
+    CREATED_ datetime not null,
     TENANT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -224,7 +224,7 @@ create table ACT_RU_EVENT_SUBSCR (
 create table ACT_RU_INCIDENT (
   ID_ varchar(64) not null,
   REV_ integer not null,
-  INCIDENT_TIMESTAMP_ timestamp not null,
+  INCIDENT_TIMESTAMP_ datetime not null,
   INCIDENT_MSG_ varchar(4000),
   INCIDENT_TYPE_ varchar(255) not null,
   EXECUTION_ID_ varchar(64),
@@ -267,7 +267,7 @@ create table ACT_RU_METER_LOG (
   NAME_ varchar(64) not null,
   REPORTER_ varchar(255),
   VALUE_ bigint,
-  TIMESTAMP_ timestamp,
+  TIMESTAMP_ datetime,
   MILLISECONDS_ bigint DEFAULT 0,
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -280,7 +280,7 @@ create table ACT_RU_EXT_TASK (
   RETRIES_ integer,
   ERROR_MSG_ varchar(4000),
   ERROR_DETAILS_ID_ varchar(64),
-  LOCK_EXP_TIME_ timestamp NULL,
+  LOCK_EXP_TIME_ datetime NULL,
   SUSPENSION_STATE_ integer,
   EXECUTION_ID_ varchar(64),
   PROC_INST_ID_ varchar(64),

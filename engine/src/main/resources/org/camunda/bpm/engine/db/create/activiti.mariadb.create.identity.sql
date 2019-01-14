@@ -1,5 +1,5 @@
 --
--- Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+-- Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ create table ACT_ID_USER (
     EMAIL_ varchar(255),
     PWD_ varchar(255),
     SALT_ varchar(255),
-    LOCK_EXP_TIME_ timestamp(3) NULL,
+    LOCK_EXP_TIME_ datetime(3) NULL,
     ATTEMPTS_ integer,
     PICTURE_ID_ varchar(64),
     primary key (ID_)
