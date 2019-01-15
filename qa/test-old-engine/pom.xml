@@ -131,6 +131,12 @@
             <artifactId>mybatis</artifactId>
             <version>3.4.4</version>
           </dependency>
+		  <!-- legacy dependency which was provided by the parent pom up to 7.10.x -->
+          <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+          </dependency>
          </dependencies>
       </dependencyManagement>
 
