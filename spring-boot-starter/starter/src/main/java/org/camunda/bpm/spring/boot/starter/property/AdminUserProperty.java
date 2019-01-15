@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 package org.camunda.bpm.spring.boot.starter.property;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.identity.User;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang.WordUtils.capitalize;
 import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.joinOn;
 
 
@@ -35,10 +34,10 @@ public class AdminUserProperty implements User {
     requireNonNull(getPassword(), "missing field: camunda.bpm.admin-user.password");
 
     if (StringUtils.isBlank(getFirstName())) {
-      setFirstName(capitalize(id));
+      setFirstName(StringUtils.capitalize(id));
     }
     if (StringUtils.isBlank(getLastName())) {
-      setLastName(capitalize(id));
+      setLastName(StringUtils.capitalize(id));
     }
     if (StringUtils.isBlank(getEmail())) {
       setEmail(id + "@localhost");

@@ -67,6 +67,11 @@
       <artifactId>spring-boot-starter-security</artifactId>
       <optional>true</optional>
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
 
     <dependency>
       <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
