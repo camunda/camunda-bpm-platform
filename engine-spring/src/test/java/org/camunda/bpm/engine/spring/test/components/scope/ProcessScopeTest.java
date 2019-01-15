@@ -59,23 +59,6 @@ public class ProcessScopeTest {
       assertTrue(message.contains("at org.camunda.bpm.engine.spring.components.scope.ProcessScope.getConversationId(ProcessScope.java:")); 
       assertTrue(message.contains("at org.camunda.bpm.engine.spring.components.scope.ProcessScope.get(ProcessScope.java:")); 
       assertTrue(message.contains("at org.camunda.bpm.engine.spring.test.components.scope.ProcessScopeTest.shouldLogExceptionStacktrace(ProcessScopeTest.java:")); 
-      assertTrue(message.contains("at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)")); 
-      assertTrue(message.contains("at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:")); 
-      assertTrue(message.contains("at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:")); 
-      assertTrue(message.contains("at java.lang.reflect.Method.invoke(Method.java:")); 
-      assertTrue(message.contains("at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:")); 
-      assertTrue(message.contains("at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:")); 
-      assertTrue(message.contains("at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:")); 
-      assertTrue(message.contains("at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:")); 
-      assertTrue(message.contains("at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.ParentRunner$3.run(ParentRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.ParentRunner.access$000(ParentRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:")); 
-      assertTrue(message.contains("at org.junit.runners.ParentRunner.run(ParentRunner.java:")); 
     }
   }
 }
