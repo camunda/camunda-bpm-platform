@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -290,6 +291,12 @@ public class AuthorizationManager extends AbstractManager {
       return true;
     }
 
+    for (PermissionCheck permissionCheck : permissionChecks) {
+      if (!isResourceValid(permissionCheck)) {
+        throw LOG.invalidResource(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
+      }
+    }
+
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
     boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthCheckEnabled(userId, groupIds);
@@ -324,6 +331,11 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, CompositePermissionCheck compositePermissionCheck) {
+    for (PermissionCheck permissionCheck : compositePermissionCheck.getAllPermissionChecks()) {
+      if (!isResourceValid(permissionCheck)) {
+        throw LOG.invalidResource(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
+      }
+    }
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
     boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthCheckEnabled(userId, groupIds);
@@ -341,6 +353,31 @@ public class AuthorizationManager extends AbstractManager {
       return true;
     }
   }
+
+  protected boolean isResourceValid(PermissionCheck permissionCheck) {
+    Resource[] permissionResources = permissionCheck.getPermission().getTypes();
+    Resource givenResource = permissionCheck.getResource();
+    return Arrays.asList(permissionResources).contains(givenResource);
+  }
+
+  public void validateResourceCompatibility(AuthorizationEntity authorization) {
+    int resourceType = authorization.getResourceType();
+    Set<Permission> perms = authorization.getPermissionSet();
+
+    boolean isValid = false;
+    for (Permission permission : perms) {
+      for (Resource resource : permission.getTypes()) {
+        if (resource.resourceType() == resourceType) {
+          isValid = true;
+        }
+      }
+      if (!isValid) {
+        throw LOG.invalidResource(resourceType, permission.getName());
+      }
+    }
+  }
+
+  // variable instance query /////////////////////////////
 
   // authorization checks on queries ////////////////////////////////
 

@@ -103,4 +103,13 @@ public enum ProcessDefinitionPermissions implements Permission {
     return id;
   }
 
+  @Override
+  public Resource[] getTypes() {
+    return new Resource[] { Resources.PROCESS_DEFINITION };
+  }
+
+  public static Permission forName(String name) {
+    Permission permission = valueOf(name);
+    return permission;
+  }
 }

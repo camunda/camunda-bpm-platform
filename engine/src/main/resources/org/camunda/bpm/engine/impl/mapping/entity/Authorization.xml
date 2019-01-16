@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-    Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+    Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -194,6 +194,17 @@
       </if>
       <if test="queryByPermission">
         and ${bitand1}RES.PERMS_${bitand2}#{permission}${bitand3} = #{permission}  
+      </if>
+
+      <if test="resourceTypes != null &amp;&amp; resourceTypes.size > 0">
+        and RES.RESOURCE_TYPE_ in
+        <foreach item="key"
+                collection="resourceTypes"
+                open="("
+                separator=","
+                close=")">
+          #{key.id}
+        </foreach>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

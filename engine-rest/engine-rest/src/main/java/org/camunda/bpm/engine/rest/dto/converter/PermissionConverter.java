@@ -16,8 +16,12 @@
 package org.camunda.bpm.engine.rest.dto.converter;
 
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.Resources;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +35,12 @@ import java.util.List;
  */
 public class PermissionConverter {
 
-  public static Permission[] getPermissionsForNames(String[] names) {
+  public static Permission[] getPermissionsForNames(String[] names, int resourceType) {
     
     final Permission[] permissions = new Permission[names.length];
     
     for (int i = 0; i < names.length; i++) {
-      permissions[i] = getPermissionForName(names[i]);      
+      permissions[i] = getPermissionForName(names[i], resourceType);
     }
         
     return permissions;    
@@ -71,15 +75,18 @@ public class PermissionConverter {
   }
 
   // permission provider SPI /////////////////////////////////////
-  
-  public static Permission[] getAllPermissions() {
+
+  public static Permission getPermissionForName(String name, int resourceType) {
     // TODO: make this configurable via SPI
-    return Permissions.values();
+    if (resourceType == Resources.BATCH.resourceType()) {
+      return BatchPermissions.forName(name);
+    } else if (resourceType == Resources.PROCESS_DEFINITION.resourceType()) {
+      return ProcessDefinitionPermissions.forName(name);
+    } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
+      return ProcessInstancePermissions.forName(name);
+    } else {
+      return Permissions.forName(name);
+    }
   }
-  
-  public static Permission getPermissionForName(String name) {
-    // TODO: make this configuratble via SPI       
-    return Permissions.forName(name);
-  }
-  
+
 }

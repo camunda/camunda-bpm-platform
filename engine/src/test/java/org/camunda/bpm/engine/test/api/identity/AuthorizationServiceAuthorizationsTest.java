@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,13 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTe
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -183,6 +188,130 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     // I can't see it
     assertEquals(0, authorizationService.createAuthorizationQuery().count());
 
+  }
+
+  public void testSaveAuthorizationWithInvalidResource() throws Exception {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("userId");
+    authorization.addPermission(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES);
+    authorization.setResource(Resources.APPLICATION);
+    authorization.setResourceId(ANY);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    try {
+      // when
+      authorizationService.saveAuthorization(authorization);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("The resource type with id:'0' is not valid for 'CREATE_BATCH_MIGRATE_PROCESS_INSTANCES' permission."));
+    }
+
+    // given
+    authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("userId");
+    authorization.addPermission(Permissions.ACCESS);
+    authorization.setResource(Resources.BATCH);
+
+    try {
+      // when
+      authorizationService.saveAuthorization(authorization);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("The resource type with id:'13' is not valid for 'ACCESS' permission."));
+    }
+  }
+
+  public void testSaveAuthorizationMultipleResourcesIncludingInvalidResource() throws Exception {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("userId");
+    authorization.addPermission(Permissions.READ_HISTORY);
+    authorization.addPermission(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES);
+    authorization.setResource(Resources.PROCESS_DEFINITION);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    try {
+      // when
+      authorizationService.saveAuthorization(authorization);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("The resource type with id:'6' is not valid for 'CREATE_BATCH_MIGRATE_PROCESS_INSTANCES' permission."));
+    }
+  }
+
+  public void testIsUserAuthorizedWithInvalidResource() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.addPermission(Permissions.ACCESS);
+    authorization.setResource(Resources.APPLICATION);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // then
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, Permissions.ACCESS, Resources.APPLICATION));
+    assertEquals(false, authorizationService.isUserAuthorized(userId, null, BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES, Resources.BATCH));
+    assertEquals(false, authorizationService.isUserAuthorized(userId, null, ProcessDefinitionPermissions.RETRY_JOB, Resources.PROCESS_DEFINITION));
+    assertEquals(false, authorizationService.isUserAuthorized(userId, null, ProcessInstancePermissions.RETRY_JOB, Resources.PROCESS_INSTANCE));
+    try {
+      authorizationService.isUserAuthorized(userId, null, BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES, Resources.APPLICATION);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("The resource type 'Application' is not valid"));
+      assertTrue(e.getMessage().contains(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES.getName()));
+    }
+    try {
+      authorizationService.isUserAuthorized(userId, null, ProcessDefinitionPermissions.RETRY_JOB, Resources.APPLICATION);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("The resource type 'Application' is not valid"));
+      assertTrue(e.getMessage().contains(ProcessDefinitionPermissions.RETRY_JOB.getName()));
+    }
+    try {
+      authorizationService.isUserAuthorized(userId, null, ProcessInstancePermissions.RETRY_JOB, Resources.APPLICATION);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("The resource type 'Application' is not valid"));
+      assertTrue(e.getMessage().contains(ProcessInstancePermissions.RETRY_JOB.getName()));
+    }
+
+  }
+
+  public void testIsUserAuthorizedWithInvalidResourceMultiplePermissions() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.addPermission(ProcessInstancePermissions.READ);
+    authorization.addPermission(ProcessInstancePermissions.RETRY_JOB);
+    authorization.setResource(Resources.PROCESS_INSTANCE);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // then
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, Permissions.READ, Resources.PROCESS_INSTANCE));
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, ProcessInstancePermissions.RETRY_JOB, Resources.PROCESS_INSTANCE));
+    assertEquals(false, authorizationService.isUserAuthorized(userId, null, BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES, Resources.BATCH));
+    assertEquals(false, authorizationService.isUserAuthorized(userId, null, ProcessDefinitionPermissions.RETRY_JOB, Resources.PROCESS_DEFINITION));
+    assertEquals(false, authorizationService.isUserAuthorized(userId, null, Permissions.ACCESS, Resources.APPLICATION));
+    try {
+      authorizationService.isUserAuthorized(userId, null, ProcessDefinitionPermissions.RETRY_JOB, Resources.PROCESS_INSTANCE);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("The resource type 'ProcessInstance' is not valid"));
+      assertTrue(e.getMessage().contains(ProcessDefinitionPermissions.RETRY_JOB.getName()));
+    }
   }
 
   protected void cleanupAfterTest() {

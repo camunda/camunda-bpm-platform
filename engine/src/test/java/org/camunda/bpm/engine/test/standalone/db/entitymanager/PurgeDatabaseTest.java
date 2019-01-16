@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.standalone.db.entitymanager;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.identity.TestPermissions;
 import org.camunda.bpm.engine.test.api.identity.TestResource;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -45,8 +47,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.authorization.Permissions.ALL;
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.impl.test.TestHelper.assertAndEnsureCleanDbAndCache;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -235,22 +235,22 @@ public class PurgeDatabaseTest {
     identityService.createTenantUserMembership("tenant2", "user2");
 
 
-    TestResource resource1 = new TestResource("resource1", 100);
+    Resource resource1 = TestResource.RESOURCE1;
     // create global authorization which grants all permissions to all users (on resource1):
     AuthorizationService authorizationService = engineRule.getAuthorizationService();
     Authorization globalAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     globalAuth.setResource(resource1);
     globalAuth.setResourceId(ANY);
-    globalAuth.addPermission(ALL);
+    globalAuth.addPermission(TestPermissions.ALL);
     authorizationService.saveAuthorization(globalAuth);
 
     //grant user read auth on resource2
-    TestResource resource2 = new TestResource("resource2", 200);
+    Resource resource2 = TestResource.RESOURCE2;
     Authorization userGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     userGrant.setUserId("user");
     userGrant.setResource(resource2);
     userGrant.setResourceId(ANY);
-    userGrant.addPermission(READ);
+    userGrant.addPermission(TestPermissions.READ);
     authorizationService.saveAuthorization(userGrant);
 
     identityService.setAuthenticatedUserId("user");

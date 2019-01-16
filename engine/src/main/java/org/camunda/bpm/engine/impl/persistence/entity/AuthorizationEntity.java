@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,8 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   protected Integer resourceType;
   protected String resourceId;  
 
+  private Set<Permission> permissionSet = new HashSet<>();
+
   public AuthorizationEntity() {
   }
   
@@ -83,10 +85,12 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   // grant / revoke methods ////////////////////////////
 
   public void addPermission(Permission p) {
+    permissionSet.add(p);
     permissions |= p.getValue();
   }
   
   public void removePermission(Permission p) {
+    permissionSet.add(p);
     permissions &= ~p.getValue();
   }
   
@@ -227,6 +231,10 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
 
   public int getPermissions() {
     return permissions;
+  }
+
+  public Set<Permission> getPermissionSet() {
+    return permissionSet;
   }
 
   public int getRevisionNext() {

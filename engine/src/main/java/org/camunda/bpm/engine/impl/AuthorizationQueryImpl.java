@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -42,6 +45,8 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   protected Integer authorizationType;
   protected boolean queryByPermission = false;
   protected boolean queryByResourceType = false;
+
+  private Set<Resource> resourceTypes = new HashSet<>();
 
   public AuthorizationQueryImpl() {
   }
@@ -88,6 +93,13 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
 
   public AuthorizationQuery hasPermission(Permission p) {
     queryByPermission = true;
+
+    if (resourceTypes.size() == 0) {
+      resourceTypes = new HashSet<Resource>(Arrays.asList(p.getTypes()));
+    } else {
+      resourceTypes.retainAll(new HashSet<Resource>(Arrays.asList(p.getTypes())));
+    }
+
     this.permission |= p.getValue();
     return this;
   }
@@ -96,7 +108,6 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     this.authorizationType = type;
     return this;
   }
-
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
@@ -108,6 +119,29 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     checkQueryOk();
     return commandContext.getAuthorizationManager()
         .selectAuthorizationByQueryCriteria(this);
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+        || containsIncompatiblePermissions()
+        || containsIncompatibleResourceType();
+  }
+
+  private boolean containsIncompatiblePermissions() {
+    return queryByPermission && resourceTypes.isEmpty();
+  }
+
+  private boolean containsIncompatibleResourceType() {
+    if (queryByResourceType && queryByPermission) {
+      for (Resource resource : resourceTypes) {
+        if (resource.resourceType() == resourceType) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   // getters ////////////////////////////
@@ -142,6 +176,10 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
 
   public boolean isQueryByResourceType() {
     return queryByResourceType;
+  }
+
+  public Set<Resource> getResourceTypes() {
+    return resourceTypes;
   }
 
   public AuthorizationQuery orderByResourceType() {

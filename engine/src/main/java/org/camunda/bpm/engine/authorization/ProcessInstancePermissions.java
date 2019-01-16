@@ -73,4 +73,13 @@ public enum ProcessInstancePermissions implements Permission {
     return id;
   }
 
+  @Override
+  public Resource[] getTypes() {
+    return new Resource[] { Resources.PROCESS_INSTANCE };
+  }
+
+  public static Permission forName(String name) {
+    Permission permission = valueOf(name);
+    return permission;
+  }
 }

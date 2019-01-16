@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import org.camunda.bpm.engine.authorization.Resource;
  * @author Daniel Meyer
  *
  */
-public class TestResource implements Resource {
+public enum TestResource implements Resource {
+  RESOURCE1("resource1", 100),
+  RESOURCE2("resource2", 101);
   
   protected int id;
   protected String name;
 
-  public TestResource(String name, int id) {
+  TestResource(String name, int id) {
     this.name = name;
     this.id = id;
   }

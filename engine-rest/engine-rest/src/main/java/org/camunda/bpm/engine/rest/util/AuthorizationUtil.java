@@ -29,12 +29,13 @@ public class AuthorizationUtil implements Permission, Resource {
   protected int resourceType;
   protected String permissionName;
   protected int permissionValue;
-  
+  protected Resource resource;
+
   public AuthorizationUtil(String resourceName, int resourceType, String permissionName) {
     this.resourceName = resourceName;
     this.resourceType = resourceType;
     this.permissionName = permissionName;
-    this.permissionValue = PermissionConverter.getPermissionForName(permissionName).getValue();
+    this.permissionValue = PermissionConverter.getPermissionForName(permissionName, resourceType).getValue();
   }
 
   public String resourceName() {
@@ -89,6 +90,10 @@ public class AuthorizationUtil implements Permission, Resource {
       return false;
     return true;
   }
-  
-  
+
+  @Override
+  public Resource[] getTypes() {
+    return new Resource[] { resource };
+  }
+
 }

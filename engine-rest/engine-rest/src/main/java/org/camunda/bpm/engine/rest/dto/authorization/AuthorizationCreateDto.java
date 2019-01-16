@@ -39,7 +39,7 @@ public class AuthorizationCreateDto {
     dbAuthorization.setUserId(dto.getUserId());
     dbAuthorization.setResourceType(dto.getResourceType());
     dbAuthorization.setResourceId(dto.getResourceId());
-    dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions()));
+    dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions(), dto.getResourceType()));
     
   }
     

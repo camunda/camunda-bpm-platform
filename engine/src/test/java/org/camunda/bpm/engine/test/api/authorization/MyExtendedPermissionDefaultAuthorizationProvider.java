@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public class MyExtendedPermissionDefaultAuthorizationProvider extends DefaultAut
 
   public AuthorizationEntity[] newTaskAssignee(Task task, String oldAssignee, String newAssignee) {
     AuthorizationEntity[] authorizations = super.newTaskAssignee(task, oldAssignee, newAssignee);
-    authorizations[0].addPermission(Permissions.DELETE_HISTORY);
+    authorizations[0].addPermission(Permissions.DELETE);
     return authorizations;
   }
 }

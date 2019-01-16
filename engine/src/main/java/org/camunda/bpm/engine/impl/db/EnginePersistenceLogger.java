@@ -708,4 +708,20 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         ));
   }
 
+  public BadUserRequestException invalidResource(String resourceType, String permission) {
+    return new BadUserRequestException(exceptionMessage(
+        "086",
+        "The resource type '{}' is not valid for '{}' permission.",
+        resourceType, permission
+        ));
+  }
+
+  public BadUserRequestException invalidResource(int resourceType, String permission) {
+    return new BadUserRequestException(exceptionMessage(
+        "087",
+        "The resource type with id:'{}' is not valid for '{}' permission.",
+        resourceType, permission
+        ));
+  }
+
 }

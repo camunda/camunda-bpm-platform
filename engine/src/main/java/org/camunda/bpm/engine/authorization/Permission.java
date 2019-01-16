@@ -62,4 +62,7 @@ public interface Permission {
    * Must be a power of 2. ie 2^0, 2^1, 2^2, 2^3, 2^4 ... */
   int getValue();
   
+  /** returns the resource types which are allowed for this permission */
+  Resource[] getTypes();
+
 }

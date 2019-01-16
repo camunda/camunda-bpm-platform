@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_REVOKE;
 import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.NONE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -42,6 +41,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -133,7 +133,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   public void testCreateAuthorizationWithUserId() {
 
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // initially, no authorization exists:
     assertEquals(0, authorizationService.createAuthorizationQuery().count());
@@ -156,7 +156,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   public void testCreateAuthorizationWithGroupId() {
 
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // initially, no authorization exists:
     assertEquals(0, authorizationService.createAuthorizationQuery().count());
@@ -179,7 +179,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   public void testInvalidCreateAuthorization() {
 
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // case 1: no user id & no group id ////////////
 
@@ -234,7 +234,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   public void testUniqueUserConstraints() {
 
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     Authorization authorization1 = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     Authorization authorization2 = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -286,7 +286,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   public void testUniqueGroupConstraints() {
 
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     Authorization authorization1 = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     Authorization authorization2 = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
@@ -339,7 +339,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   public void testGlobalUniqueConstraints() {
 
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     Authorization authorization1 = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     Authorization authorization2 = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -364,14 +364,14 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
   public void testUpdateNewAuthorization() {
 
-    TestResource resource1 = new TestResource("resource1",100);
-    TestResource resource2 = new TestResource("resource1",101);
+    Resource resource1 = TestResource.RESOURCE1;
+    Resource resource2 = TestResource.RESOURCE2;
 
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId("aUserId");
     authorization.setResource(resource1);
     authorization.setResourceId("aResourceId");
-    authorization.addPermission(ACCESS);
+    authorization.addPermission(TestPermissions.ACCESS);
 
     // save the authorization
     authorizationService.saveAuthorization(authorization);
@@ -381,13 +381,13 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("aUserId", savedAuthorization.getUserId());
     assertEquals(resource1.resourceType(), savedAuthorization.getResourceType());
     assertEquals("aResourceId", savedAuthorization.getResourceId());
-    assertTrue(savedAuthorization.isPermissionGranted(ACCESS));
+    assertTrue(savedAuthorization.isPermissionGranted(TestPermissions.ACCESS));
 
     // update authorization
     authorization.setUserId("anotherUserId");
     authorization.setResource(resource2);
     authorization.setResourceId("anotherResourceId");
-    authorization.addPermission(DELETE);
+    authorization.addPermission(TestPermissions.DELETE);
     authorizationService.saveAuthorization(authorization);
 
     // validate authorization updated
@@ -395,21 +395,20 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("anotherUserId", savedAuthorization.getUserId());
     assertEquals(resource2.resourceType(), savedAuthorization.getResourceType());
     assertEquals("anotherResourceId", savedAuthorization.getResourceId());
-    assertTrue(savedAuthorization.isPermissionGranted(ACCESS));
-    assertTrue(savedAuthorization.isPermissionGranted(DELETE));
+    assertTrue(savedAuthorization.isPermissionGranted(TestPermissions.ACCESS));
+    assertTrue(savedAuthorization.isPermissionGranted(TestPermissions.DELETE));
 
   }
 
   public void testUpdatePersistentAuthorization() {
 
-    TestResource resource1 = new TestResource("resource1",100);
-    TestResource resource2 = new TestResource("resource1",101);
-
+    Resource resource1 = TestResource.RESOURCE1;
+    Resource resource2 = TestResource.RESOURCE2;
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId("aUserId");
     authorization.setResource(resource1);
     authorization.setResourceId("aResourceId");
-    authorization.addPermission(ACCESS);
+    authorization.addPermission(TestPermissions.ACCESS);
 
     // save the authorization
     authorizationService.saveAuthorization(authorization);
@@ -419,13 +418,13 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("aUserId", savedAuthorization.getUserId());
     assertEquals(resource1.resourceType(), savedAuthorization.getResourceType());
     assertEquals("aResourceId", savedAuthorization.getResourceId());
-    assertTrue(savedAuthorization.isPermissionGranted(ACCESS));
+    assertTrue(savedAuthorization.isPermissionGranted(TestPermissions.ACCESS));
 
     // update authorization
     savedAuthorization.setUserId("anotherUserId");
     savedAuthorization.setResource(resource2);
     savedAuthorization.setResourceId("anotherResourceId");
-    savedAuthorization.addPermission(DELETE);
+    savedAuthorization.addPermission(TestPermissions.DELETE);
     authorizationService.saveAuthorization(savedAuthorization);
 
     // validate authorization updated
@@ -433,8 +432,8 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("anotherUserId", savedAuthorization.getUserId());
     assertEquals(resource2.resourceType(), savedAuthorization.getResourceType());
     assertEquals("anotherResourceId", savedAuthorization.getResourceId());
-    assertTrue(savedAuthorization.isPermissionGranted(ACCESS));
-    assertTrue(savedAuthorization.isPermissionGranted(DELETE));
+    assertTrue(savedAuthorization.isPermissionGranted(TestPermissions.ACCESS));
+    assertTrue(savedAuthorization.isPermissionGranted(TestPermissions.DELETE));
 
   }
 
@@ -574,33 +573,35 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testGlobalGrantAuthorizationCheck() {
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // create global authorization which grants all permissions to all users (on resource1):
     Authorization globalAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     globalAuth.setResource(resource1);
     globalAuth.setResourceId(ANY);
-    globalAuth.addPermission(ALL);
+    globalAuth.addPermission(TestPermissions.ALL);
     authorizationService.saveAuthorization(globalAuth);
 
     List<String> jonnysGroups = Arrays.asList(new String[]{"sales", "marketing"});
     List<String> someOneElsesGroups = Arrays.asList(new String[]{"marketing"});
 
     // this authorizes any user to do anything in this resource:
-    assertTrue(authorizationService.isUserAuthorized("jonny", null, ALL, resource1));
-    assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1));
-    assertTrue(authorizationService.isUserAuthorized("someone", null, CREATE, resource1));
-    assertTrue(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource1));
-    assertTrue(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1));
-    assertTrue(authorizationService.isUserAuthorized("jonny", null, ALL, resource1, "someId"));
-    assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1, "someId"));
-    assertTrue(authorizationService.isUserAuthorized("someone", null, CREATE, resource1, "someId"));
-    assertTrue(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1, "someOtherId"));
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    assertTrue(authorizationService.isUserAuthorized("jonny", null, TestPermissions.ALL, resource1));
+    assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, TestPermissions.ALL, resource1));
+    assertTrue(authorizationService.isUserAuthorized("someone", null, TestPermissions.ACCESS, resource1));
+    assertTrue(authorizationService.isUserAuthorized("someone", someOneElsesGroups, TestPermissions.ACCESS, resource1));
+    assertTrue(authorizationService.isUserAuthorized("someone else", null, TestPermissions.DELETE, resource1));
+    assertTrue(authorizationService.isUserAuthorized("jonny", null, TestPermissions.ALL, resource1, "someId"));
+    assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, TestPermissions.ALL, resource1, "someId"));
+    assertTrue(authorizationService.isUserAuthorized("someone", null, TestPermissions.ACCESS, resource1, "someId"));
+    assertTrue(authorizationService.isUserAuthorized("someone else", null, TestPermissions.DELETE, resource1, "someOtherId"));
+    processEngineConfiguration.setAuthorizationEnabled(true);
   }
 
   public void testDisabledAuthorizationCheck() {
     // given
-    TestResource resource1 = new TestResource("resource1", 100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // when
     boolean isAuthorized = authorizationService.isUserAuthorized("jonny", null, UPDATE, resource1);
@@ -659,7 +660,9 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     authorization.setResourceId(ANY);
     authorizationService.saveAuthorization(authorization);
 
+    processEngineConfiguration.setAuthorizationEnabled(true);
     assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, REPORT));
+    processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
   public void testDashboardResourceAuthorization() {
@@ -672,7 +675,9 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     authorization.setResourceId(ANY);
     authorizationService.saveAuthorization(authorization);
 
+    processEngineConfiguration.setAuthorizationEnabled(true);
     assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, DASHBOARD));
+    processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
   protected void cleanupAfterTest() {

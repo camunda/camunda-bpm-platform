@@ -69,7 +69,7 @@ public class AuthorizationDto {
     }
 
     if(dto.getPermissions() != null) {
-      dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions()));
+      dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions(), dto.getResourceType()));
     }
 
   }

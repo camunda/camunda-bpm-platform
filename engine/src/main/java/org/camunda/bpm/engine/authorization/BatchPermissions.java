@@ -105,4 +105,13 @@ public enum BatchPermissions implements Permission {
     return id;
   }
 
+  @Override
+  public Resource[] getTypes() {
+    return new Resource[] { Resources.BATCH };
+  }
+
+  public static Permission forName(String name) {
+    Permission permission = valueOf(name);
+    return permission;
+  }
 }
