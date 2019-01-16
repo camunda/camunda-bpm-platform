@@ -358,6 +358,17 @@ public interface HistoryService {
   Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query, String deleteReason);
 
   /**
+   * Deletes a historic variable instance by its id. 
+   * All related historic details are deleted as well.
+   * 
+   * @param variableInstanceId
+   *          the id of the variable instance
+   * @throws BadUserRequestException
+   *          when the historic variable instance is not found by the given id or if id is null
+   */
+  void deleteHistoricVariableInstance(String variableInstanceId);
+  
+  /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL
    */
   NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery();

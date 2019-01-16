@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-    Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+    Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -146,6 +146,7 @@
     <where>
       <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
       <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql"/>
+      <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
     </where>
   </delete>
 
@@ -159,6 +160,7 @@
       <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
         and D.TASK_ID_ is not null
       </if>
+      <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
     </where>
   </delete>
 
@@ -170,6 +172,7 @@
       <where>
         <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
         <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql"/>
+        <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
         and BYTEARRAY_ID_ is not NULL
       </where>)
   </delete>
@@ -181,6 +184,7 @@
       <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
       <where>
         <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
+        <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
         and D.BYTEARRAY_ID_ is not NULL
       </where>
   </delete>
@@ -453,6 +457,12 @@
           <bind name="listOfIds" value="taskCaseInstanceIds"/>
           <bind name="fieldName" value="'T.CASE_INST_ID_'"/>
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    </if>
+  </sql>
+  
+  <sql id="selectHistoricDetailsVariableInstanceByIdSql">
+    <if test="variableInstanceId != null">
+      and VAR_INST_ID_ = #{variableInstanceId}
     </if>
   </sql>
 
