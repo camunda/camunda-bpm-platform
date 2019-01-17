@@ -677,6 +677,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
   
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { 
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testDeleteHistoricVariableAndDetails() {
@@ -723,6 +724,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, secondDetailsQuery.count());
   }
   
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testDeleteHistoricVariableAndDetailsOnRunningInstance() {
     // given
