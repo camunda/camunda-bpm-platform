@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -313,5 +314,10 @@ public interface CommandChecker {
    * Checks if it is allowed to read the given historic external task log.
    */
   void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog);
+
+  /**
+   * Checks if it is allowed to delete the given historic variable instance.
+   */
+  void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable);
 
 }
