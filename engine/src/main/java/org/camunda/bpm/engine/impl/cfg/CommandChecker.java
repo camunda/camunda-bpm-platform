@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -319,5 +320,10 @@ public interface CommandChecker {
    * Checks if it is allowed to delete the given historic variable instance.
    */
   void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable);
+
+  /**
+   * Checks if it is allowed to delete the historic variable instances of the given process instance.
+   */
+  void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance);
 
 }

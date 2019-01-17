@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
@@ -461,6 +462,65 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     deleteTask(taskId, true);
     
     // XXX if CAM-6570 is implemented, there should be a check for variables of standalone tasks here as well
+  }
+  
+  // delete historic variable instances (process variables) /////////////////////////////////////////////
+  public void testDeleteHistoricProcessVariableInstancesWithoutAuthorization() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    
+    try {
+      // when
+      historyService.deleteHistoricVariableInstancesByProcessInstanceId(instance.getId());
+      fail("Exception expected: It should not be possible to delete the historic variable instance");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(DELETE_HISTORY.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+  
+  public void testDeleteHistoricProcessVariableInstancesWithDeleteHistoryPermissionOnProcessDefinition() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, DELETE_HISTORY);
+    
+    try {
+      // when
+      historyService.deleteHistoricVariableInstancesByProcessInstanceId(instance.getId());
+      // then (permission granted)
+    } catch (AuthorizationException e) {
+      fail("It should be possible to delete the historic variable instance with granted permissions");
+    }
+  }
+  
+  // delete deployment (cascade = false)
+  public void testDeleteHistoricProcessVariableInstancesAfterDeletingDeployment() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+    
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, DELETE_HISTORY);
+    
+    disableAuthorization();
+    repositoryService.deleteDeployment(deploymentId);
+    enableAuthorization();
+
+    try {
+      // when
+      historyService.deleteHistoricVariableInstancesByProcessInstanceId(instance.getId());
+      // then (permission granted)
+    } catch (AuthorizationException e) {
+      fail("It should be possible to delete the historic variable instance with granted permissions after the process definition is deleted");
+    }
+    
+    cleanUpAfterDeploymentDeletion();
   }
 
   // helper ////////////////////////////////////////////////////////

@@ -698,4 +698,9 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
     // XXX if CAM-6570 is implemented, there should be a check for variables of standalone tasks here as well
   }
+  
+  @Override
+  public void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance) {
+    checkDeleteHistoricProcessInstance(instance);
+  }
 }

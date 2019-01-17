@@ -359,7 +359,7 @@ public interface HistoryService {
 
   /**
    * Deletes a historic variable instance by its id. 
-   * All related historic details are deleted as well.
+   * All related historic details (variable updates, form properties) are deleted as well.
    * 
    * @param variableInstanceId
    *          the id of the variable instance
@@ -367,6 +367,16 @@ public interface HistoryService {
    *          when the historic variable instance is not found by the given id or if id is null
    */
   void deleteHistoricVariableInstance(String variableInstanceId);
+  
+  /**
+   * Deletes all historic variables and historic details (variable updates, form properties) of a process instance.
+   *
+   * @param processInstanceId
+   *          the id of the process instance
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
   
   /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL

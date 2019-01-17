@@ -495,6 +495,70 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     
     cleanUpAfterVariableInstanceTest(processInstanceIdOne, processInstanceIdTwo);
   }
+  
+  @Test
+  public void failToDeleteHistoricVariableInstancesNoAuthenticatedTenants() {
+    testRule.deployForTenant(TENANT_ONE, BPMN_ONETASK_PROCESS);
+    String processInstanceId = startProcessInstance(null);
+    runtimeService.setVariable(processInstanceId, "myVariable", "testValue");
+    runtimeService.setVariable(processInstanceId, "myVariable", "testValue2");
+
+    identityService.setAuthentication("user", null, null);
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot delete the historic variable instances of process instance '" + processInstanceId + "' because it belongs to no authenticated tenant.");
+
+    historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+    cleanUpAfterVariableInstanceTest(processInstanceId);
+  }
+
+  @Test
+  public void deleteHistoricVariableInstancesWithAuthenticatedTenant() {
+    testRule.deployForTenant(TENANT_ONE, BPMN_ONETASK_PROCESS);
+    String processInstanceId = startProcessInstance(null);
+    runtimeService.setVariable(processInstanceId, "myVariable", "testValue");
+    runtimeService.setVariable(processInstanceId, "myVariable", "testValue2");
+    
+    HistoricVariableInstanceQuery variableQuery = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId);
+    assertThat(variableQuery.count(), is(1L));
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+    assertThat(variableQuery.count(), is(0L));
+    cleanUpAfterVariableInstanceTest(processInstanceId);
+  }
+
+  @Test
+  public void deleteHistoricVariableInstancesWithDisabledTenantCheck() {
+    testRule.deployForTenant(TENANT_ONE, BPMN_ONETASK_PROCESS);
+    testRule.deployForTenant(TENANT_TWO, BPMN_ONETASK_PROCESS);
+
+    String processInstanceIdOne = startProcessInstance(TENANT_ONE);
+    String processInstanceIdTwo = startProcessInstance(TENANT_TWO);
+    
+    runtimeService.setVariable(processInstanceIdOne, "myVariable", "testValue");
+    runtimeService.setVariable(processInstanceIdOne, "mySecondVariable", "testValue2");
+    runtimeService.setVariable(processInstanceIdTwo, "myVariable", "testValue");
+    runtimeService.setVariable(processInstanceIdTwo, "mySecondVariable", "testValue2");
+    HistoricVariableInstanceQuery variableQueryOne = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIdOne);
+    HistoricVariableInstanceQuery variableQueryTwo = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIdTwo);
+    
+    assertThat(variableQueryOne.count(), is(2L));
+    assertThat(variableQueryTwo.count(), is(2L));
+
+    identityService.setAuthentication("user", null, null);
+    processEngineConfiguration.setTenantCheckEnabled(false);
+
+    historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceIdOne);
+    assertThat(variableQueryOne.count(), is(0L));
+    assertThat(variableQueryTwo.count(), is(2L));
+    
+    historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceIdTwo);
+    assertThat(variableQueryTwo.count(), is(0L));;
+    
+    cleanUpAfterVariableInstanceTest(processInstanceIdOne, processInstanceIdTwo);
+  }
 
   // helper //////////////////////////////////////////////////////////
 

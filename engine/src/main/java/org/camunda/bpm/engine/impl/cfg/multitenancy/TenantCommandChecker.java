@@ -403,6 +403,13 @@ public class TenantCommandChecker implements CommandChecker {
       throw LOG.exceptionCommandWithUnauthorizedTenant("delete the historic variable instance '" + variable.getId() + "'");
     }
   }
+  
+  @Override
+  public void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance) {
+    if (instance != null && !getTenantManager().isAuthenticatedTenant(instance.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("delete the historic variable instances of process instance '"+ instance.getId() + "'");
+    }
+  }
 
   @Override
   public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
