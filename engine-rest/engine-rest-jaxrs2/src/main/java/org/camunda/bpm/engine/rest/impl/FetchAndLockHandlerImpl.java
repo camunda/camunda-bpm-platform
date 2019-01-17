@@ -52,15 +52,15 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   protected static final String UNIQUE_WORKER_REQUEST_PARAM_NAME = "fetch-and-lock-unique-worker-request";
 
-  protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30 * 1000;
+  protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30L * 1000;
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_REQUEST_TIMEOUT = 1800000; // 30 minutes
 
   protected SingleConsumerCondition condition;
 
-  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
-  protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
-  protected List<FetchAndLockRequest> newRequests = new ArrayList<FetchAndLockRequest>();
+  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<>(200);
+  protected List<FetchAndLockRequest> pendingRequests = new ArrayList<>();
+  protected List<FetchAndLockRequest> newRequests = new ArrayList<>();
 
   protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
 
@@ -78,7 +78,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       try {
         acquire();
       }
-      catch (Throwable e) {
+      catch (Exception e) {
         // what ever happens, don't leave the loop
       }
     }
@@ -214,7 +214,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       if (queue.isEmpty() && isRunning) {
         LOG.log(Level.FINEST, "Suspend acquisition for {0}ms", millis);
         condition.await(millis);
-        LOG.log(Level.FINEST, "Acquisition woke up", millis);
+        LOG.log(Level.FINEST, "Acquisition woke up");
       }
     }
     finally {
@@ -249,7 +249,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       List<LockedExternalTaskDto> lockedTasks = executeFetchAndLock(fetchingDto, processEngine);
       result = FetchAndLockResult.successful(lockedTasks);
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       result = FetchAndLockResult.failed(e);
     }
     finally {

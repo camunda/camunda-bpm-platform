@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -332,11 +332,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
       String resourceType = getDbFilter().getResourceType();
       AbstractQueryDto<?> queryDto = getQueryDtoForQuery(queryString, resourceType);
       queryDto.setObjectMapper(getObjectMapper());
-      if (queryDto != null) {
-        return queryDto.toQuery(processEngine);
-      } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to convert query for resource type '" + resourceType + "'.");
-      }
+      return queryDto.toQuery(processEngine);
     }
   }
 
@@ -350,7 +346,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   }
 
   protected List<Object> convertToDtoList(List<?> entities) {
-    List<Object> dtoList = new ArrayList<Object>();
+    List<Object> dtoList = new ArrayList<>();
     for (Object entity : entities) {
       dtoList.add(convertToDto(entity));
     }
@@ -416,13 +412,13 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
   protected List<HalResource<?>> getVariableValuesForTask(HalTask halTask, Map<String, List<VariableInstance>> variableInstances) {
     // converted variables values
-    List<HalResource<?>> variableValues = new ArrayList<HalResource<?>>();
+    List<HalResource<?>> variableValues = new ArrayList<>();
 
     // variable scope ids to check, ordered by visibility
     LinkedHashSet<String> variableScopeIds = getVariableScopeIds(halTask);
 
     // names of already converted variables
-    Set<String> knownVariableNames = new HashSet<String>();
+    Set<String> knownVariableNames = new HashSet<>();
 
     for (String variableScopeId : variableScopeIds) {
       if (variableInstances.containsKey(variableScopeId)) {
@@ -474,7 +470,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
   private List<String> collectVariableNames(List<Map<String, Object>> variables) {
     if (variables != null && !variables.isEmpty()) {
-      List<String> variableNames = new ArrayList<String>();
+      List<String> variableNames = new ArrayList<>();
       for (Map<String, Object> variable : variables) {
         variableNames.add((String) variable.get(PROPERTIES_VARIABLES_NAME_KEY));
       }
@@ -488,7 +484,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   protected LinkedHashSet<String> getVariableScopeIds(HalTask... halTasks) {
     // collect scope ids
     // the ordering is important because it specifies which variables are visible from a single task
-    LinkedHashSet<String> variableScopeIds = new LinkedHashSet<String>();
+    LinkedHashSet<String> variableScopeIds = new LinkedHashSet<>();
     if (halTasks != null && halTasks.length > 0) {
       for (HalTask halTask : halTasks) {
         variableScopeIds.add(halTask.getId());
@@ -507,7 +503,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
 
   protected Map<String, List<VariableInstance>> getSortedVariableInstances(Collection<String> variableNames, Collection<String> variableScopeIds) {
     List<VariableInstance> variableInstances = queryVariablesInstancesByVariableScopeIds(variableNames, variableScopeIds);
-    Map<String, List<VariableInstance>> sortedVariableInstances = new HashMap<String, List<VariableInstance>>();
+    Map<String, List<VariableInstance>> sortedVariableInstances = new HashMap<>();
     for (VariableInstance variableInstance : variableInstances) {
       String variableScopeId = ((VariableInstanceEntity) variableInstance).getVariableScopeId();
       if (!sortedVariableInstances.containsKey(variableScopeId)) {

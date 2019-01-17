@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,7 +312,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
         throw LOG.wrongDbVersionException(ProcessEngine.VERSION, dbVersion);
       }
 
-      List<String> missingComponents = new ArrayList<String>();
+      List<String> missingComponents = new ArrayList<>();
       if (!isEngineTablePresent()) {
         missingComponents.add("engine");
       }
@@ -497,7 +497,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   @Override
   public List<String> getTableNamesPresent() {
-    List<String> tableNames = new ArrayList<String>();
+    List<String> tableNames = new ArrayList<>();
 
     try {
       ResultSet tablesRs = null;
@@ -545,7 +545,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected List<String> getTablesPresentInOracleDatabase() throws SQLException {
-    List<String> tableNames = new ArrayList<String>();
+    List<String> tableNames = new ArrayList<>();
     Connection connection = null;
     PreparedStatement prepStat = null;
     ResultSet tablesRs = null;
@@ -645,7 +645,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
       BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
       String line = readNextTrimmedLine(reader);
 
-      List<String> logLines = new ArrayList<String>();
+      List<String> logLines = new ArrayList<>();
 
       while (line != null) {
         if (line.startsWith("# ")) {
@@ -715,12 +715,12 @@ public class DbSqlSession extends AbstractPersistenceSession {
       }
 
       // Message returned from MySQL and Oracle
-      if (((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
+      if ((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
         return true;
       }
 
       // Message returned from Postgres
-      if (((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("does not exist") != -1)) {
+      if ((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("does not exist") != -1)) {
         return true;
       }
     }

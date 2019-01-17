@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class LogUtil {
   }
 
   private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-  private static Map<Integer, String> threadIndents = new HashMap<Integer, String>();
+  private static Map<Integer, String> threadIndents = new HashMap<>();
   private static ThreadLogMode threadLogMode = ThreadLogMode.NONE;
 
   public static ThreadLogMode getThreadLogMode() {
@@ -123,7 +123,7 @@ public class LogUtil {
     }
 
     protected static String getThreadIndent(int threadId) {
-      Integer threadIdInteger = new Integer(threadId);
+      Integer threadIdInteger = Integer.valueOf(threadId);
       if (threadLogMode==ThreadLogMode.NONE) {
         return "";
       }
@@ -145,6 +145,6 @@ public class LogUtil {
   }
 
   public static void resetThreadIndents() {
-    threadIndents = new HashMap<Integer, String>();
+    threadIndents = new HashMap<>();
   }
 }

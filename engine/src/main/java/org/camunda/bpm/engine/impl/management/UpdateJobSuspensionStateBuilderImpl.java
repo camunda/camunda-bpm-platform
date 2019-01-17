@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ public class UpdateJobSuspensionStateBuilderImpl
     ensureOnlyOneNotNull("Need to specify either a job id, a job definition id, a process instance id, a process definition id or a process definition key.", jobId,
         jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey);
 
-    if (isProcessDefinitionTenantIdSet & (jobId != null || jobDefinitionId != null || processInstanceId != null || processDefinitionId != null)) {
+    if (isProcessDefinitionTenantIdSet && (jobId != null || jobDefinitionId != null || processInstanceId != null || processDefinitionId != null)) {
       throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
 

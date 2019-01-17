@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -674,7 +674,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     do {
       if (exCause instanceof BatchExecutorException) {
         final List<SQLException> relatedSqlExceptions = ExceptionUtil.findRelatedSqlExceptions(exCause);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (SQLException sqlException : relatedSqlExceptions) {
           sb.append(sqlException).append("\n");
         }

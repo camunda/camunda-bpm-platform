@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected boolean unfinished;
   protected boolean processFinished;
   protected boolean processUnfinished;
-  protected List<TaskQueryVariableValue> variables = new ArrayList<TaskQueryVariableValue>();
+  protected List<TaskQueryVariableValue> variables = new ArrayList<>();
   protected Date dueDate;
   protected Date dueAfter;
   protected Date dueBefore;
@@ -381,7 +381,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
     ensureNotNull("name", name);
-    System.out.println("add var");
     if(value == null || isBoolean(value)) {
       // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
       switch(operator) {
