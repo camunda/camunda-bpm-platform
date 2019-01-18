@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 
 /**
  * <p>LDAP {@link ReadOnlyIdentityProvider}.</p>
@@ -88,7 +89,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         initialContext.close();
       } catch (Exception e) {
         // ignore
-        LOG.log(Level.FINE, "exception while closing LDAP DIR CTX", e);
+        LdapPluginLogger.INSTANCE.exceptionWhenClosingLdapCOntext(e);
       }
     }
   }
@@ -246,9 +247,9 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       List<User> userList = new ArrayList<>();
 
       StringBuilder resultLogger = new StringBuilder();
-      if (LOG.isLoggable(Level.FINE))
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
       {
-        resultLogger.append("LDAP group query results: [");
+        resultLogger.append("LDAP user query results: [");
       }
 
       while (enumeration.hasMoreElements() && (userList.size() < query.getMaxResults() || ignorePagination)) {
@@ -260,18 +261,14 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
         if (userId == null)
         {
-          LOG.severe("LDAP user query returned a user with id null. This user will be ignored. "
-              + "This indicates a misconfiguration of the LDAP plugin or a problem with the LDAP service."
-              + " Enable DEBUG/FINE logging for details.");
-          // log sensitive data only on FINE
-          LOG.fine(String.format("Invalid user: %s based on search result %s", user, result));
+          LdapPluginLogger.INSTANCE.invalidLdapUserReturned(user, result);
         }
         else
         {
           if(isAuthenticatedUser(user) || isAuthorized(READ, USER, userId)) {
 
             if(resultCount >= query.getFirstResult() || ignorePagination) {
-              if (LOG.isLoggable(Level.FINE))
+              if (LdapPluginLogger.INSTANCE.isDebugEnabled())
               {
                 resultLogger.append(user);
                 resultLogger.append(" based on ");
@@ -287,10 +284,10 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         }
       }
 
-      if (LOG.isLoggable(Level.FINE))
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
       {
         resultLogger.append("]");
-        LOG.fine(resultLogger.toString());
+        LdapPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
       }
 
       return userList;
@@ -437,7 +434,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       List<Group> groupList = new ArrayList<>();
 
       StringBuilder resultLogger = new StringBuilder();
-      if (LOG.isLoggable(Level.FINE))
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
       {
         resultLogger.append("LDAP group query results: [");
       }
@@ -451,18 +448,14 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
         if (groupId == null)
         {
-          LOG.severe("LDAP group query returned a group with id null. This group will be ignored. "
-              + "This indicates a misconfiguration of the LDAP plugin or a problem with the LDAP service."
-              + " Enable DEBUG/FINE logging for details.");
-          // log sensitive data only on FINE
-          LOG.fine(String.format("Invalid group: %s based on search result %s", group, result));
+          LdapPluginLogger.INSTANCE.invalidLdapGroupReturned(group, result);
         }
         else
         {
           if(isAuthorized(READ, GROUP, groupId)) {
 
             if(resultCount >= query.getFirstResult()) {
-              if (LOG.isLoggable(Level.FINE))
+              if (LdapPluginLogger.INSTANCE.isDebugEnabled())
               {
                 resultLogger.append(group);
                 resultLogger.append(" based on ");
@@ -478,10 +471,10 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         }
       }
 
-      if (LOG.isLoggable(Level.FINE))
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
       {
         resultLogger.append("]");
-        LOG.fine(resultLogger.toString());
+        LdapPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
       }
 
       return groupList;

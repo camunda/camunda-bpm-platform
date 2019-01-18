@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,17 @@ import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.InvalidNameException;
 import javax.naming.NamingException;
 import java.io.*;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.api.ldap.model.schema.SchemaManager;
 import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
 import org.apache.directory.api.ldap.schema.extractor.SchemaLdifExtractor;
@@ -66,7 +64,7 @@ import org.apache.commons.io.FileUtils;
  */
 public class LdapTestEnvironment {
 
-  private final static Logger LOG = Logger.getLogger(LdapTestEnvironment.class.getName());
+  private final static Logger LOG = LoggerFactory.getLogger(LdapTestEnvironment.class.getName());
 
   private static final String BASE_DN = "o=camunda,c=org";
 
@@ -91,7 +89,7 @@ public class LdapTestEnvironment {
 
     // Extract the schema on disk (a brand new one) and load the registries
     if (schemaPartitionDirectory.exists()) {
-      LOG.log(Level.INFO, "schema partition already exists, skipping schema extraction");
+      LOG.info("schema partition already exists, skipping schema extraction");
     } else {
       SchemaLdifExtractor extractor = new DefaultSchemaLdifExtractor(instanceLayout.getPartitionsDirectory());
       extractor.extractOrCopy();
@@ -323,7 +321,7 @@ public class LdapTestEnvironment {
         FileUtils.deleteDirectory(workingDirectory);
       }
     } catch (Exception e) {
-      LOG.log(Level.SEVERE, "exception while shutting down ldap", e);
+      LOG.error("exception while shutting down ldap", e);
     }
   }
 

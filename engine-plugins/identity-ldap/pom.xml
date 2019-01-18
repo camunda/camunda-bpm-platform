@@ -18,6 +18,10 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-logging</artifactId>
+    </dependency>
 
     <!-- LDAP Libraries to start test server -->
     <dependency>
