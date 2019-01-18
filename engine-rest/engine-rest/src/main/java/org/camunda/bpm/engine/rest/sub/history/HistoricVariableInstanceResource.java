@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.history;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -42,5 +43,7 @@ public interface HistoricVariableInstanceResource {
   @GET
   @Path("/data")
   public Response getResourceBinary();
-
+  
+  @DELETE
+  public Response deleteVariableInstance();
 }

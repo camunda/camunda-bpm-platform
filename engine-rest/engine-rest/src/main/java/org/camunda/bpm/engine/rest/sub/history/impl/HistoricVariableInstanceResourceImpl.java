@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,16 @@
  */
 package org.camunda.bpm.engine.rest.sub.history.impl;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.AbstractResourceProvider;
 import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -68,6 +73,16 @@ public class HistoricVariableInstanceResourceImpl extends
   @Override
   protected String getResourceNameForErrorMessage() {
     return "Historic variable instance";
+  }
+  
+  @Override
+  public Response deleteVariableInstance() {
+    try {
+      getEngine().getHistoryService().deleteHistoricVariableInstance(id);
+    } catch (NotFoundException nfe) {
+      throw new InvalidRequestException(Status.NOT_FOUND, nfe, nfe.getMessage());
+    }
+    return Response.noContent().build();
   }
 
 }

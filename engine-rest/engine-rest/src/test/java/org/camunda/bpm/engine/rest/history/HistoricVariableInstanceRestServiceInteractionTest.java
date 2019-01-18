@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.when;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
@@ -354,5 +356,33 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
     .and().contentType(ContentType.TEXT)
     .and().body(is(equalTo(new String())))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
+  }
+  
+  @Test
+  public void testDeleteSingleVariableInstanceById() {
+    HistoricVariableInstance variableInstanceMock = MockProvider.mockHistoricVariableInstance().build();
+    
+    given()
+      .pathParam("id", variableInstanceMock.getId())
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(VARIABLE_INSTANCE_URL);
+
+    verify(historyServiceMock).deleteHistoricVariableInstance(variableInstanceMock.getId());
+  }
+  
+  @Test
+  public void testDeleteNonExistingVariableInstanceById() {
+    doThrow(new NotFoundException("No historic variable instance found with id: 'NON_EXISTING_ID'"))
+    .when(historyServiceMock).deleteHistoricVariableInstance("NON_EXISTING_ID");
+    
+    given()
+      .pathParam("id", "NON_EXISTING_ID")
+    .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("No historic variable instance found with id: 'NON_EXISTING_ID'"))
+    .when()
+      .delete(VARIABLE_INSTANCE_URL);
   }
 }

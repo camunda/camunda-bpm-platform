@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -43,7 +44,7 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
     ensureNotEmpty(BadUserRequestException.class,"variableInstanceId", variableInstanceId);
 
     HistoricVariableInstanceEntity variable = commandContext.getHistoricVariableInstanceManager().findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
-    ensureNotNull("No historic variable instance found with id: " + variableInstanceId, "variable", variable);
+    ensureNotNull(NotFoundException.class, "No historic variable instance found with id: " + variableInstanceId, "variable", variable);
     
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricVariableInstance(variable);
