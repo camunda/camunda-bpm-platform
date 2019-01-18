@@ -155,7 +155,7 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
 
       identityService.setAuthenticatedUserId("oscar");
 
-      Set<String> groupNames = new HashSet<String>();
+      Set<String> groupNames = new HashSet<>();
       List<Group> groups = identityService.createGroupQuery().listPage(0, 2);
       assertEquals(2, groups.size());
       checkPagingResults(groupNames, groups.get(0).getId(), groups.get(1).getId());

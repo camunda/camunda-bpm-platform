@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   protected InitialLdapContext openContext(String userDn, String password) {
-    Hashtable<String, String> env = new Hashtable<String, String>();
+    Hashtable<String, String> env = new Hashtable<>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfiguration.getInitialContextFactory());
     env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
     env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
@@ -181,7 +181,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     try {
       enumeration = initialContext.search(baseDn, groupSearchFilter, ldapConfiguration.getSearchControls());
 
-      List<String> groupMemberList = new ArrayList<String>();
+      List<String> groupMemberList = new ArrayList<>();
 
       // first find group
       while (enumeration.hasMoreElements()) {
@@ -197,7 +197,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         }
       }
 
-      List<User> userList = new ArrayList<User>();
+      List<User> userList = new ArrayList<>();
       String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
       int memberCount = 0;
       for (String memberId : groupMemberList) {
@@ -243,20 +243,54 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       // perform client-side paging
       int resultCount = 0;
-      List<User> userList = new ArrayList<User>();
+      List<User> userList = new ArrayList<>();
+
+      StringBuilder resultLogger = new StringBuilder();
+      if (LOG.isLoggable(Level.FINE))
+      {
+        resultLogger.append("LDAP group query results: [");
+      }
+
       while (enumeration.hasMoreElements() && (userList.size() < query.getMaxResults() || ignorePagination)) {
         SearchResult result = enumeration.nextElement();
 
         UserEntity user = transformUser(result);
 
-        if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
+        String userId = user.getId();
 
-          if(resultCount >= query.getFirstResult() || ignorePagination) {
-            userList.add(user);
-          }
-
-          resultCount ++;
+        if (userId == null)
+        {
+          LOG.severe("LDAP user query returned a user with id null. This user will be ignored. "
+              + "This indicates a misconfiguration of the LDAP plugin or a problem with the LDAP service."
+              + " Enable DEBUG/FINE logging for details.");
+          // log sensitive data only on FINE
+          LOG.fine(String.format("Invalid user: %s based on search result %s", user, result));
         }
+        else
+        {
+          if(isAuthenticatedUser(user) || isAuthorized(READ, USER, userId)) {
+
+            if(resultCount >= query.getFirstResult() || ignorePagination) {
+              if (LOG.isLoggable(Level.FINE))
+              {
+                resultLogger.append(user);
+                resultLogger.append(" based on ");
+                resultLogger.append(result);
+                resultLogger.append(", ");
+              }
+
+              userList.add(user);
+            }
+
+            resultCount ++;
+          }
+        }
+      }
+
+      if (LOG.isLoggable(Level.FINE))
+      {
+        resultLogger.append("]");
+        LOG.fine(resultLogger.toString());
       }
 
       return userList;
@@ -400,21 +434,54 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       // perform client-side paging
       int resultCount = 0;
-      List<Group> groupList = new ArrayList<Group>();
+      List<Group> groupList = new ArrayList<>();
+
+      StringBuilder resultLogger = new StringBuilder();
+      if (LOG.isLoggable(Level.FINE))
+      {
+        resultLogger.append("LDAP group query results: [");
+      }
+
       while (enumeration.hasMoreElements() && groupList.size() < query.getMaxResults()) {
         SearchResult result = enumeration.nextElement();
 
         GroupEntity group = transformGroup(result);
 
-        if(isAuthorized(READ, GROUP, group.getId())) {
+        String groupId = group.getId();
 
-          if(resultCount >= query.getFirstResult()) {
-            groupList.add(group);
-          }
-
-          resultCount ++;
+        if (groupId == null)
+        {
+          LOG.severe("LDAP group query returned a group with id null. This group will be ignored. "
+              + "This indicates a misconfiguration of the LDAP plugin or a problem with the LDAP service."
+              + " Enable DEBUG/FINE logging for details.");
+          // log sensitive data only on FINE
+          LOG.fine(String.format("Invalid group: %s based on search result %s", group, result));
         }
+        else
+        {
+          if(isAuthorized(READ, GROUP, groupId)) {
 
+            if(resultCount >= query.getFirstResult()) {
+              if (LOG.isLoggable(Level.FINE))
+              {
+                resultLogger.append(group);
+                resultLogger.append(" based on ");
+                resultLogger.append(result);
+                resultLogger.append(", ");
+              }
+
+              groupList.add(group);
+            }
+
+            resultCount ++;
+          }
+        }
+      }
+
+      if (LOG.isLoggable(Level.FINE))
+      {
+        resultLogger.append("]");
+        LOG.fine(resultLogger.toString());
       }
 
       return groupList;
@@ -537,7 +604,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   protected void applyRequestControls(AbstractQuery<?, ?> query) {
 
     try {
-      List<Control> controls = new ArrayList<Control>();
+      List<Control> controls = new ArrayList<>();
 
       List<QueryOrderingProperty> orderBy = query.getOrderingProperties();
       if(orderBy != null) {

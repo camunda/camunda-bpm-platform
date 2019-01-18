@@ -15,6 +15,8 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import java.util.ArrayList;
+
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
@@ -23,13 +25,11 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  */
 public abstract class LdapIdentityProviderTest extends PluggableProcessEngineTestCase {
 
-  protected static LdapTestEnvironment ldapTestEnvironment;
+  protected LdapTestEnvironment ldapTestEnvironment;
 
   protected void setUp() throws Exception {
-    if(ldapTestEnvironment == null) {
-      ldapTestEnvironment = new LdapTestEnvironment();
-      ldapTestEnvironment.init();
-    }
+    ldapTestEnvironment = new LdapTestEnvironment();
+    ldapTestEnvironment.init();
     super.setUp();
   }
 

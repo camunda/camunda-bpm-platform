@@ -32,10 +32,13 @@ import javax.naming.NamingException;
 import java.io.*;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.api.ldap.model.schema.SchemaManager;
 import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
 import org.apache.directory.api.ldap.schema.extractor.SchemaLdifExtractor;
@@ -250,7 +253,8 @@ public class LdapTestEnvironment {
     }
   }
 
-  protected void createGroup(String name) throws InvalidNameException, Exception, NamingException {
+  public void createGroup(String name) throws InvalidNameException, Exception, NamingException
+  {
     Dn dn = new Dn("ou=" + name + ",o=camunda,c=org");
     if (!service.getAdminSession().exists(dn)) {
       Entry entry = service.newEntry(dn);
@@ -302,7 +306,7 @@ public class LdapTestEnvironment {
    */
   protected void addIndex(Partition partition, String... attrs) {
     // Index some attributes on the apache partition
-    Set<Index<?, String>> indexedAttributes = new HashSet<Index<?, String>>();
+    Set<Index<?, String>> indexedAttributes = new HashSet<>();
 
     for (String attribute : attrs) {
       indexedAttributes.add(new JdbmIndex<String>(attribute, false));
