@@ -358,13 +358,18 @@ public interface HistoryService {
   Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query, String deleteReason);
 
   /**
-   * Deletes a historic variable instance by its id. 
-   * All related historic details (variable updates, form properties) are deleted as well.
+   * Deletes a historic variable instance by its id. All related historic
+   * details (variable updates, form properties) are deleted as well.
    * 
    * @param variableInstanceId
    *          the id of the variable instance
    * @throws BadUserRequestException
-   *          when the historic variable instance is not found by the given id or if id is null
+   *           when the historic variable instance is not found by the given id
+   *           or if id is null
+   * @throws AuthorizationException
+   *           If the variable instance has a process definition key and
+   *           the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricVariableInstance(String variableInstanceId);
   

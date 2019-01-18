@@ -446,8 +446,11 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot delete the historic variable instance '" + variableInstanceId + "' because it belongs to no authenticated tenant.");
 
-    historyService.deleteHistoricVariableInstance(variableInstanceId);
-    cleanUpAfterVariableInstanceTest(processInstanceId);
+    try {
+      historyService.deleteHistoricVariableInstance(variableInstanceId);
+    } finally {
+      cleanUpAfterVariableInstanceTest(processInstanceId);
+    }
   }
 
   @Test
@@ -508,8 +511,11 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot delete the historic variable instances of process instance '" + processInstanceId + "' because it belongs to no authenticated tenant.");
 
-    historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
-    cleanUpAfterVariableInstanceTest(processInstanceId);
+    try {
+      historyService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+    } finally {
+      cleanUpAfterVariableInstanceTest(processInstanceId);
+    }
   }
 
   @Test
@@ -614,8 +620,12 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
   }
   
   protected void cleanUpAfterVariableInstanceTest(String... processInstanceIds) {
+    processEngineConfiguration.setTenantCheckEnabled(false);
     for (String processInstanceId : processInstanceIds) {
-      taskService.complete(taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId());
+      Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+      if (task != null) {
+        taskService.complete(task.getId());
+      }
       historyService.deleteHistoricProcessInstance(processInstanceId);
     }
 
@@ -623,6 +633,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
     assertThat(query.count(), is(0L));
+    processEngineConfiguration.setTenantCheckEnabled(true);
   }
 
 }
