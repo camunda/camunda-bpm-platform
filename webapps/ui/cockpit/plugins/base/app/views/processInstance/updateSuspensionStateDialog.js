@@ -1,7 +1,7 @@
   'use strict';
 
   module.exports = [
-    '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processInstance', '$translate',
+    '$scope', '$http', '$filter', 'Uri', 'Notifications', '$uibModalInstance', 'processInstance', '$translate',
     function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processInstance, $translate) {
 
       var BEFORE_UPDATE = 'BEFORE_UPDATE',
@@ -24,7 +24,7 @@
 
         data.suspended = !processInstance.suspended;
 
-        $http.put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/suspended/'), data).success(function() {
+        $http.put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/suspended/'), data).then(function() {
           $scope.status = UPDATE_SUCCESS;
 
           Notifications.addMessage({
@@ -33,7 +33,7 @@
             exclusive: true
           });
 
-        }).error(function(data) {
+        }).catch(function(data) {
           $scope.status = UPDATE_FAILED;
 
           Notifications.addError({

@@ -7,7 +7,7 @@
       <strong class="variable-label"
               ng-class="{'undefined' : !variablesByName[info.name] && filterProperties.showUndefinedVariable}"
               tooltip-placement="top"
-              tooltip="{{ info.name }}">
+              uib-tooltip="{{ info.name }}">
         {{ info.label }}:
       </strong>
     </span>
@@ -28,7 +28,7 @@
       <span class="variable-value"
             ng-switch-when="Date"
             tooltip-placement="top"
-            tooltip="{{ variablesByName[info.name].value | camDate }}">
+            uib-tooltip="{{ variablesByName[info.name].value | camDate }}">
         {{ variablesByName[info.name].value | camDate }}
       </span>
 
@@ -72,7 +72,7 @@
       <span class="variable-value"
             ng-switch-default
             tooltip-placement="top"
-            tooltip="{{ variablesByName[info.name].value }}">
+            uib-tooltip="{{ variablesByName[info.name].value }}">
         {{ variablesByName[info.name].value }}
       </span>
     </span>

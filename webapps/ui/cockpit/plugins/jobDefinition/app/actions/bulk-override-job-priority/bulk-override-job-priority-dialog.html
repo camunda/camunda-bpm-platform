@@ -23,7 +23,7 @@
                  for="execute">
             {{ 'BULK_OVERRIDE_EXECUTE' | translate }}
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="{{ 'BULK_OVERRIDE_EXECUTE_TOOLTIP' | translate }}"
+                  uib-tooltip="{{ 'BULK_OVERRIDE_EXECUTE_TOOLTIP' | translate }}"
                   tooltip-placement="right">
             </span>
           </label>
@@ -56,7 +56,7 @@
                  for="priority">
             {{ 'BULK_OVERRIDE_PRIORITY' | translate }}
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="{{ 'BULK_OVERRIDE_PRIORITY_TOOLTIP' | translate }}"
+                  uib-tooltip="{{ 'BULK_OVERRIDE_PRIORITY_TOOLTIP' | translate }}"
                   tooltip-placement="right">
             </span>
           </label>
@@ -79,7 +79,7 @@
                  for="includeJobsPriority">
             {{ 'BULK_OVERRIDE_INCLUDE_EXISTING_JOB' | translate }}
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="{{ 'BULK_OVERRIDE_INCLUDE_EXISTING_JOB_TOOLTIP' | translate }}"
+                  uib-tooltip="{{ 'BULK_OVERRIDE_INCLUDE_EXISTING_JOB_TOOLTIP' | translate }}"
                   tooltip-placement="right">
             </span>
           </label>
@@ -136,7 +136,7 @@
       </tbody>
     </table>
 
-    <pagination ng-if="summarizePages.total > summarizePages.size"
+    <ul uib-pagination ng-if="summarizePages.total > summarizePages.size"
                 class="pagination-sm"
 
                 page="summarizePages.current"
@@ -146,7 +146,7 @@
                 items-per-page="summarizePages.size"
 
                 max-size="7"
-                boundary-links="true"></pagination>
+                boundary-links="true"></ul>
   </div>
 </div>
 

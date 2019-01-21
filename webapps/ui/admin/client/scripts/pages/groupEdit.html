@@ -86,7 +86,7 @@
           ng-show="show('group') && availableOperations.delete">
       <div class="h4">{{ 'GROUP_EDIT_DELETE_GROUP' | translate }}</div>
 
-      <div class="alert alert-danger">
+      <div uib-alert class="alert alert-danger">
         <strong>{{ 'GROUP_EDIT_WARNING' | translate }}:</strong> {{ 'GROUP_EDIT_WARNING_DELETE' | translate }}
       </div>
 
@@ -186,7 +186,7 @@
         </table>
       </div><!-- /cam-widget-loader -->
 
-      <pagination ng-if="groupUserPages.total > groupUserPages.size"
+      <ul uib-pagination ng-if="groupUserPages.total > groupUserPages.size"
                   class="pagination-sm"
 
                   ng-model="groupUserPages.current"
@@ -201,7 +201,7 @@
                   next-text="&rsaquo;"
                   last-text="&raquo;"
                   previous-text="&lsaquo;"
-                  first-text="&laquo;"></pagination>
+                  first-text="&laquo;"></ul>
 
     </div>
   </div>

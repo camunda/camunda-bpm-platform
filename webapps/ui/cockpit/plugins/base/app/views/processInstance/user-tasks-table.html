@@ -44,7 +44,7 @@
         <td class="task-id uuid"
             cam-widget-clipboard="userTask.id">
           <a ng-href="{{ getTasklistHref(userTask) }}"
-             tooltip="{{ 'PLUGIN_USER_TASKS_LINK_TO_TASKLIST' | translate }}">{{ userTask.id }}</a>
+             uib-tooltip="{{ 'PLUGIN_USER_TASKS_LINK_TO_TASKLIST' | translate }}">{{ userTask.id }}</a>
         </td>
 
         <td class="action">
@@ -52,14 +52,14 @@
              ng-model="userTask"
              class="btn btn-default action-button change-group-identity-links"
              tooltip-placement="left"
-             tooltip="{{ 'PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP' | translate:'{ value: userTask.name || userTask.id }' }}">
+             uib-tooltip="{{ 'PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP' | translate:'{ value: userTask.name || userTask.id }' }}">
             <span class="glyphicon glyphicon-th"></span>
           </a>
           <a ng-click="changeUserIdentityLinks()"
              ng-model="userTask"
              class="btn btn-default action-button change-user-identity-links"
              tooltip-placement="left"
-             tooltip="{{ 'PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP' | translate:'{ value: userTask.name || userTask.id }' }}">
+             uib-tooltip="{{ 'PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP' | translate:'{ value: userTask.name || userTask.id }' }}">
             <span class="glyphicon glyphicon-user"></span>
           </a>
         </td>
@@ -68,7 +68,7 @@
   </table>
 
 
-  <pagination ng-if="pages.total > pages.size"
+  <ul uib-pagination ng-if="pages.total > pages.size"
               class="pagination-sm"
 
               page="pages.current"
@@ -78,6 +78,6 @@
               items-per-page="pages.size"
 
               max-size="7"
-              boundary-links="true"></pagination>
+              boundary-links="true"></ul>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/user-tasks-table.html -->

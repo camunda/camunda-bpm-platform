@@ -1,7 +1,7 @@
   'use strict';
 
   module.exports = [
-    '$tooltipProvider',
+    '$uibTooltipProvider',
     function(
     $tooltipProvider
   ) {

@@ -28,14 +28,14 @@
           <label class="control-label col-xs-4"
                  for="includeInstancesValue">{{'PLUGIN_SUSPENSION_INCLUDE_INSTANCES' | translate}}
             <!-- activation -->
-            <span tooltip="{{'PLUGIN_SUSPENSION_INCLUDING_MESSAGE_1' | translate}}"
+            <span uib-tooltip="{{'PLUGIN_SUSPENSION_INCLUDING_MESSAGE_1' | translate}}"
                   tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>
             </span>
 
             <!-- suspension -->
-            <span tooltip="{{'PLUGIN_SUSPENSION_INCLUDING_MESSAGE_2' | translate}}"
+            <span uib-tooltip="{{'PLUGIN_SUSPENSION_INCLUDING_MESSAGE_2' | translate}}"
                   tooltip-placement="right"
                   ng-hide="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>
@@ -54,12 +54,12 @@
 
         <div class="form-group">
           <label class="control-label col-xs-4" for="executeImmediately">{{'PLUGIN_SUSPENSION_EXECUTE' | translate}}
-            <span tooltip="{{'PLUGIN_SUSPENSION_DECIDE_ACTIVATION' | translate}}"
+            <span uib-tooltip="{{'PLUGIN_SUSPENSION_DECIDE_ACTIVATION' | translate}}"
                   tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>
             </span>
-            <span tooltip="{{'PLUGIN_SUSPENSION_DECIDE_SUSPENSION' | translate}}"
+            <span uib-tooltip="{{'PLUGIN_SUSPENSION_DECIDE_SUSPENSION' | translate}}"
                   tooltip-placement="right"
                   ng-hide="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>

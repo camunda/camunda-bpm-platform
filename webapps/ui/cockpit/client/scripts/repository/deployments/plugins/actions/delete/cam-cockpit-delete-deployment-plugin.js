@@ -7,7 +7,7 @@ var modalTemplate = fs.readFileSync(__dirname + '/modals/cam-cockpit-delete-depl
 
 var Controller = [
   '$scope',
-  '$modal',
+  '$uibModal',
   '$rootScope',
   function(
     $scope,

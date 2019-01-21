@@ -8,7 +8,7 @@ var showHelpTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-shortcu
 
 var Controller = [
   '$scope',
-  '$modal',
+  '$uibModal',
   function(
   $scope,
   $modal

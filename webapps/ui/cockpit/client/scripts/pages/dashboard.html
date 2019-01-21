@@ -7,7 +7,7 @@
 
       <section class="actual"
                ng-class="{'loading': loadingActual,'section-collapsed': !actualActive}">
-        <button tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
+        <button uib-tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('actual')">
           <span class="glyphicon"
@@ -77,7 +77,7 @@
       <section class="statistics"
                ng-class="{'section-collapsed': !statisticsActive}"
                ng-if="statisticsPlugins.length">
-        <button tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
+        <button uib-tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('statistics')">
           <span class="glyphicon"
@@ -107,7 +107,7 @@
       <section class="metrics"
                ng-class="{'section-collapsed': !metricsActive}"
                ng-if="metricsPlugins.length">
-        <button tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
+        <button uib-tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('metrics')">
           <span class="glyphicon"
@@ -157,7 +157,7 @@
       <section class="deployed no-metrics"
                ng-class="{'loading': loadingDeployed,'section-collapsed': !deployedActive}"
                ng-if="!metricsPlugins.length">
-        <button tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
+        <button uib-tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('deployed')">
           <span class="glyphicon"
@@ -221,7 +221,7 @@
     <section class="col-xs-12 col-sm-4 col-lg-2 deployed"
              ng-class="{'loading': loadingDeployed, 'section-collapsed': !deployedActive}"
              ng-if="metricsPlugins.length">
-      <button tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
+      <button uib-tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
               class="section-toggle btn btn-link btn-sm"
               ng-click="toggleSection('deployed')">
         <span class="glyphicon"
@@ -287,7 +287,7 @@
   <section class="deprecate"
            ng-if="deprecateDashboardProviders.length"
            ng-class="{'section-collapsed': !deprecateActive}">
-    <button tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
+    <button uib-tooltip="{{ 'DASHBOARD_TOGGLE_SECTION' | translate }}"
             class="section-toggle btn btn-link btn-sm"
             ng-click="toggleSection('deprecate')">
       <span class="glyphicon"

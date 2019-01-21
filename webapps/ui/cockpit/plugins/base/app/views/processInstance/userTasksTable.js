@@ -59,7 +59,7 @@ module.exports = function(ngModule) {
   }
 
   ngModule.controller('UserTaskController', [
-    '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal', '$translate', 'localConf', 'Uri',
+    '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$uibModal', '$translate', 'localConf', 'Uri',
     function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal, $translate, localConf, Uri) {
 
       // input: processInstance, processData
@@ -330,7 +330,7 @@ module.exports = function(ngModule) {
     }]);
 
   ngModule.controller('IdentityLinksController', [
-    '$modalInstance', 'camAPI', '$scope', 'Notifications', 'userTask', 'identityLinks', 'decorator',
+    '$uibModalInstance', 'camAPI', '$scope', 'Notifications', 'userTask', 'identityLinks', 'decorator',
     function($modalInstance,   camAPI,   $scope,   Notifications,   userTask,   identityLinks,   decorator) {
 
       var Task = camAPI.resource('task');

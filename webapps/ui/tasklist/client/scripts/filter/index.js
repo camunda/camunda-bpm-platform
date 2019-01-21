@@ -23,7 +23,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   /* modals */
     camTasklistFilterModal = require('./modals/cam-tasklist-filter-modal');
 
-
 var filterModule = angular.module('cam.tasklist.filter', [
   'ui.bootstrap'
 ]);

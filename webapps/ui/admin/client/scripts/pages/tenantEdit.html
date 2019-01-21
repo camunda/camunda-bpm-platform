@@ -58,7 +58,7 @@
           ng-show="show('tenant') && availableOperations.delete">
       <div class="h4">{{ 'TENANTS_DELETE_TENANT' | translate }}</div>
 
-      <div class="alert alert-danger">
+      <div uib-alert class="alert alert-danger">
         <strong>{{ 'TENANTS_WARNING' | translate }}</strong> {{ 'TENANTS_DELETING_TENANT_UNDONE' | translate }}
       </div>
 
@@ -103,7 +103,7 @@
         </table>
       </div><!-- /cam-widget-loader -->
 
-      <pagination ng-if="tenantUserPages.total > tenantUserPages.size"
+      <ul uib-pagination ng-if="tenantUserPages.total > tenantUserPages.size"
                   class="pagination-sm"
 
                   ng-model="tenantUserPages.current"
@@ -118,7 +118,7 @@
                   next-text="&rsaquo;"
                   last-text="&raquo;"
                   previous-text="&lsaquo;"
-                  first-text="&laquo;"></pagination>
+                  first-text="&laquo;"></ul>
 
     </div>
 
@@ -148,7 +148,7 @@
         </table>
       </div><!-- /cam-widget-loader -->
 
-      <pagination ng-if="tenantGroupPages.total > tenantGroupPages.size"
+      <ul uib-pagination ng-if="tenantGroupPages.total > tenantGroupPages.size"
                   class="pagination-sm"
 
                   ng-model="tenantGroupPages.current"
@@ -163,7 +163,7 @@
                   next-text="&rsaquo;"
                   last-text="&raquo;"
                   previous-text="&lsaquo;"
-                  first-text="&laquo;"></pagination>
+                  first-text="&laquo;"></ul>
 
     </div>
   </div>

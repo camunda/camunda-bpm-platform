@@ -1,7 +1,7 @@
   'use strict';
 
   module.exports = [
-    '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', '$modalInstance', 'authorizationToDelete', 'formatPermissions', 'getResource', 'getType',
+    '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', '$uibModalInstance', 'authorizationToDelete', 'formatPermissions', 'getResource', 'getType',
     function($scope,   $q,   $location,   Uri,   Notifications,   AuthorizationResource,   $modalInstance,   authorizationToDelete,   formatPermissions,   getResource,   getType) {
 
       var DELETE_SUCCESS = 'SUCCESS';

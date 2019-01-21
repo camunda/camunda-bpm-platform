@@ -5,7 +5,7 @@
 </div>
 
 <div ng-show="state.$error"
-     class="alert alert-danger"
+     uib-alert class="alert alert-danger"
      role="alert">
   <span class="glyphicon glyphicon-exclamation-sign"></span>
   <strong class="status">{{ 'FAILURE' | translate }}:</strong>
@@ -55,7 +55,7 @@
 
             <h5 class="assignee"
                 ng-if="task.assignee"
-                tooltip="task.assignee">
+                uib-tooltip="task.assignee">
               {{ assigneeDisplayedName(task); }}
             </h5>
           </div>
@@ -68,7 +68,7 @@
                     ng-class="{overdue: task.due && (task.due < now) }">
                 {{ 'DUE' | translate }}
                 <span tooltip-placement="top"
-                      tooltip="{{ task.due | camDate:'long' }}"
+                      uib-tooltip="{{ task.due | camDate:'long' }}"
                       am-time-ago="task.due">{{ task.due }}</span>
               </span>
 
@@ -77,21 +77,21 @@
                     ng-class="{overdue: task.followUp && (task.followUp < now) }">
                 {{ 'FOLLOW_UP' | translate }}
                 <span tooltip-placement="top"
-                      tooltip="{{ task.followUp | camDate:'long' }}"
+                      uib-tooltip="{{ task.followUp | camDate:'long' }}"
                       am-time-ago="task.followUp">{{ task.followUp }}</span>
               </span>
 
               <span class="creation-date">
                 {{ 'CREATION' | translate }}
                 <span tooltip-placement="top"
-                      tooltip="{{ task.created | camDate:'long' }}"
+                      uib-tooltip="{{ task.created | camDate:'long' }}"
                       am-time-ago="task.created">{{ task.created }}</span>
               </span>
             </div>
 
             <div class="priority"
                  tooltip-placement="right"
-                 tooltip="{{ 'PRIORITY' | translate }}">
+                 uib-tooltip="{{ 'PRIORITY' | translate }}">
               {{ task.priority }}
             </div>
           </div>
@@ -107,7 +107,7 @@
             <div class="shutter actions"
                  ng-click="toggle(delta, $event)"
                  tooltip-placement="bottom"
-                 tooltip="{{ (!!expanded[delta] ? 'SHOW_LESS' : 'SHOW_MORE') | translate }}">
+                 uib-tooltip="{{ (!!expanded[delta] ? 'SHOW_LESS' : 'SHOW_MORE') | translate }}">
               <a class="glyphicon"
                  ng-class="{'glyphicon-menu-up': expanded[delta], 'glyphicon-menu-down': !expanded[delta]}"
                  href>
@@ -120,7 +120,7 @@
   </div>
 </div>
 
-<pagination ng-show="state.$loaded && totalItems > pageSize"
+<ul uib-pagination ng-show="state.$loaded && totalItems > pageSize"
             total-items="totalItems"
             items-per-page="pageSize"
             max-size="5"
@@ -131,4 +131,4 @@
             next-text="&rsaquo;"
             last-text="&raquo;"
             previous-text="&lsaquo;"
-            first-text="&laquo;"></pagination>
+            first-text="&laquo;"></ul>

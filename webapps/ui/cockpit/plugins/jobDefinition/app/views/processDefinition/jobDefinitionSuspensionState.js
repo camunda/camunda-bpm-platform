@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'jobDefinition', '$translate', 'fixDate',
+  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$uibModalInstance', 'jobDefinition', '$translate', 'fixDate',
   function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   jobDefinition, $translate, fixDate) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
@@ -36,7 +36,7 @@ module.exports = [
       data.includeJobs = $scope.data.includeJobs;
       data.executionDate = !$scope.data.executeImmediately ? fixDate($scope.data.executionDate) : null;
 
-      $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).success(function() {
+      $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).then(function() {
         $scope.status = UPDATE_SUCCESS;
 
         if ($scope.data.executeImmediately) {
@@ -45,7 +45,7 @@ module.exports = [
           Notifications.addMessage({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_MESSAGES_2'), 'exclusive': true });
         }
 
-      }).error(function(data) {
+      }).catch(function(data) {
         $scope.status = UPDATE_FAILED;
 
         if ($scope.data.executeImmediately) {

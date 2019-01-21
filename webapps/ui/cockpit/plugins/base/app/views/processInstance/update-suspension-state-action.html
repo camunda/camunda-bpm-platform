@@ -2,7 +2,7 @@
 <a class="btn btn-default btn-toolbar btn-suspend-action"
    href
    ng-click="openDialog()"
-   tooltip="{{ 'PLUGIN_UPDATE_ACTION_TOOLTIP_1' | translate }}"
+   uib-tooltip="{{ 'PLUGIN_UPDATE_ACTION_TOOLTIP_1' | translate }}"
    tooltip-placement="left"
    ng-show="!processInstance.suspended">
   <span class="glyphicon glyphicon-pause"></span>
@@ -10,7 +10,7 @@
 <a class="btn btn-default btn-toolbar"
    href
    ng-click="openDialog()"
-   tooltip="{{ 'PLUGIN_UPDATE_ACTION_TOOLTIP_2' | translate }}"
+   uib-tooltip="{{ 'PLUGIN_UPDATE_ACTION_TOOLTIP_2' | translate }}"
    tooltip-placement="left"
    ng-hide="!processInstance.suspended">
   <span class="glyphicon glyphicon-play"></span>

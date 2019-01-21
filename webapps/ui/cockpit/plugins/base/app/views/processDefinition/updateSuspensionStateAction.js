@@ -12,7 +12,7 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
     label: 'PLUGIN_UPDATE_SUSPENSION_STATE',
     template: actionTemplate,
     controller: [
-      '$scope', '$rootScope', '$modal',
+      '$scope', '$rootScope', '$uibModal',
       function($scope,   $rootScope,   $modal) {
 
         $scope.openDialog = function() {

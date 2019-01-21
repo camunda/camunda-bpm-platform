@@ -1,7 +1,7 @@
   'use strict';
   module.exports = [
     '$scope', '$location', 'Notifications', 'ProcessInstanceResource',
-    '$modalInstance', 'processInstance', 'processData', 'Views', '$translate',
+    '$uibModalInstance', 'processInstance', 'processData', 'Views', '$translate',
     'configuration',
     function($scope,   $location,   Notifications,   ProcessInstanceResource,
       $modalInstance,   processInstance,   processData,   Views, $translate,

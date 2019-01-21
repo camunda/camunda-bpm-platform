@@ -3,7 +3,7 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList', '$translate',
+  '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$uibModalInstance', 'member', 'memberId', 'idList', '$translate',
   function($scope,   $q,   $location,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList, $translate) {
 
     var GroupResource = camAPI.resource('group');

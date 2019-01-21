@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions', '$timeout', '$translate',
+  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$uibModalInstance', 'jobDefinitions', '$timeout', '$translate',
   function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions, $timeout, $translate) {
 
     $scope.hasNoJobDefinitions = jobDefinitions.length === 0;

@@ -24,7 +24,7 @@
              ng-href="{{ getProcessInstanceUrl(processInstance, { tab: 'incidents-tab' }) }}"></a>
           <span class="badge badge-warning badge-suspended"
                 ng-show="processInstance.suspended"
-                tooltip="{{'PLUGIN_PROCESS_INSTANCE_SUSPENDED' | translate}}"
+                uib-tooltip="{{'PLUGIN_PROCESS_INSTANCE_SUSPENDED' | translate}}"
                 tooltip-placement="left">
             <span class="glyphicon glyphicon-pause white"></span>
           </span>

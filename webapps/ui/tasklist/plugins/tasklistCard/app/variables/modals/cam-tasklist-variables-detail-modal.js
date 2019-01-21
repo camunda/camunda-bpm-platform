@@ -34,10 +34,10 @@ module.exports = [
       $http({
         method: 'GET',
         url: Uri.appUri('engine://engine/:engine'+$scope.variable._links.self.href)
-      }).success(function(data) {
-        $scope.valueDeserialized = JSON.stringify(data.value);
-      }).error(function(data) {
-        $scope.deserializationError = data.message;
+      }).then(function(response) {
+        $scope.valueDeserialized = JSON.stringify(response.data.value);
+      }).catch(function(response) {
+        $scope.deserializationError = response.data.message;
       });
 
       break;

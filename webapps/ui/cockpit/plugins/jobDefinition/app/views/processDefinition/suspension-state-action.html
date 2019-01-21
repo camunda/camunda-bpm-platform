@@ -2,14 +2,14 @@
 <a class="btn btn-default action-button"
    ng-click="openSuspensionStateDialog(jobDefinition)"
    ng-show="jobDefinition.suspended"
-   tooltip="{{ 'PLUGIN_JOBDEFINITION_STATE_ACTION_TOOLTIP_1' | translate }}"
+   uib-tooltip="{{ 'PLUGIN_JOBDEFINITION_STATE_ACTION_TOOLTIP_1' | translate }}"
    tooltip-placement="left">
   <span class="glyphicon glyphicon-play"></span>
 </a>
 <a class="btn btn-default action-button"
    ng-click="openSuspensionStateDialog(jobDefinition)"
    ng-hide="jobDefinition.suspended"
-   tooltip="{{ 'PLUGIN_JOBDEFINITION_STATE_ACTION_TOOLTIP_2' | translate }}"
+   uib-tooltip="{{ 'PLUGIN_JOBDEFINITION_STATE_ACTION_TOOLTIP_2' | translate }}"
    tooltip-placement="left">
   <span class="glyphicon glyphicon-pause"></span>
 </a>

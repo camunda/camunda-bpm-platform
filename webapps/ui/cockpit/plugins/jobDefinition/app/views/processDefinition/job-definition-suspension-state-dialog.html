@@ -31,14 +31,14 @@
             {{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB' | translate }}
             <!-- activation -->
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="{{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB_TOOLTIP_1' | translate }}"
+                  uib-tooltip="{{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB_TOOLTIP_1' | translate }}"
                   tooltip-placement="right"
                   ng-show="jobDefinition.suspended">
             </span>
 
             <!-- suspension -->
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="{{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB_TOOLTIP_2' | translate }}"
+                  uib-tooltip="{{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB_TOOLTIP_2' | translate }}"
                   tooltip-placement="right"
                   ng-hide="jobDefinition.suspended">
             </span>
@@ -60,13 +60,13 @@
                  for="executeImmediately">
             {{ 'PLUGIN_JOBDEFINITION_EXECUTE' | translate }}
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="{{ 'PLUGIN_JOBDEFINITION_EXECUTE_TOOLTIP_1' | translate }}"
+                  uib-tooltip="{{ 'PLUGIN_JOBDEFINITION_EXECUTE_TOOLTIP_1' | translate }}"
                   tooltip-placement="right"
                   ng-show="jobDefinition.suspended">
             </span>
 
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="{{ 'PLUGIN_JOBDEFINITION_EXECUTE_TOOLTIP_2' | translate }}"
+                  uib-tooltip="{{ 'PLUGIN_JOBDEFINITION_EXECUTE_TOOLTIP_2' | translate }}"
                   tooltip-placement="right"
                   ng-hide="jobDefinition.suspended">
             </span>

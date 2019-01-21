@@ -1,7 +1,7 @@
   'use strict';
 
   module.exports = [
-    '$scope', '$location', 'Notifications', 'JobResource', '$modalInstance', 'incident', '$translate',
+    '$scope', '$location', 'Notifications', 'JobResource', '$uibModalInstance', 'incident', '$translate',
     function($scope,   $location,   Notifications,   JobResource,   $modalInstance,   incident, $translate) {
 
       var FINISHED = 'finished',

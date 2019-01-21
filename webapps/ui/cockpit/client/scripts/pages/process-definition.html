@@ -26,14 +26,16 @@
                 class="glyphicon glyphicon-refresh animate-spin"></span>
 
           <div class="dropdown"
-               ng-if="instanceStatistics.$loaded && allDefinitions.length > 1">
+               ng-if="instanceStatistics.$loaded && allDefinitions.length > 1"
+               uib-dropdown>
             <a href
-               class="dropdown-toggle">
+               class="dropdown-toggle"
+               uib-dropdown-toggle>
               {{ processDefinition.version }}
               <span class="caret"></span>
             </a>
 
-            <ul class="dropdown-menu">
+            <ul uib-dropdown-menu class="dropdown-menu">
               <li ng-repeat="definition in allDefinitions">
                 <a ng-href="#/process-definition/{{ definition.id }}">
                   {{ definition.version }}
@@ -104,7 +106,7 @@
                  class="instance-upgrade-link"
                  ng-if="hasMigrationPlugin && !isLatestVersion() && instanceStatistics.current.count > 0">
                 <span class="glyphicon glyphicon-arrow-up"
-                      tooltip="{{ 'PROCESS_DEFINITION_TOOLTIP_MIGRATE_PROCESS' | translate }}"></span>
+                      uib-tooltip="{{ 'PROCESS_DEFINITION_TOOLTIP_MIGRATE_PROCESS' | translate }}"></span>
               </a>
             </li>
             <li>
@@ -114,7 +116,7 @@
                  class="instance-upgrade-link"
                  ng-if="hasMigrationPlugin && isLatestVersion() && instanceStatistics.all.count !== instanceStatistics.current.count">
                 <span class="glyphicon glyphicon-arrow-up"
-                      tooltip="{{ 'PROCESS_DEFINITION_TOOLTIP_MIGRATE_PROCESS' | translate }}"></span>
+                      uib-tooltip="{{ 'PROCESS_DEFINITION_TOOLTIP_MIGRATE_PROCESS' | translate }}"></span>
               </a>
             </li>
           </ul>

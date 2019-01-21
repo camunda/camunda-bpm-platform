@@ -6,7 +6,7 @@
     {{ 'LOADING' | translate }}
   </div>
 
-  <div ng-show="authorizationState.$error" class="alert alert-danger" role="alert">
+  <div ng-show="authorizationState.$error" uib-alert class="alert alert-danger" role="alert">
     <span class="glyphicon glyphicon-exclamation-sign"></span>
     <strong class="status">{{ 'FAILURE' | translate }}:</strong>
     <span class="message">{{ 'FILTER_FORM_PERMISSIONS_LOADING_FAILURE' | translate }}</span>
@@ -14,7 +14,7 @@
 
   <div ng-show="authorizationState.$loaded && !authorizationState.$error">
 
-    <div class="alert alert-warning">
+    <div uib-alert class="alert alert-warning">
       <span class="glyphicon glyphicon-exclamation-sign"></span>
       <span>{{ 'FILTER_FORM_PERMISSIONS_EDIT_HINT' | translate }}</span>
     </div>
@@ -93,7 +93,7 @@
           <button class="btn btn-default"
                   type="button"
                   tooltip-append-to-body="false"
-                  tooltip="{{ 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP' | translate }}: {{ (newPermission.type === 'user' ? 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER' : 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_GROUP') | translate }}"
+                  uib-tooltip="{{ 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP' | translate }}: {{ (newPermission.type === 'user' ? 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER' : 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_GROUP') | translate }}"
                   ng-click="switchType()"
                   ng-disabled="isGlobalReadAuthorization">
             <span class="glyphicon"

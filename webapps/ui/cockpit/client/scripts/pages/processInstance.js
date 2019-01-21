@@ -634,7 +634,7 @@ var RouteConfig = [
                 var id = $route.current.params['id'];
 
                 $http.get(Uri.appUri('engine://engine/:engine/history/process-instance/') + id)
-                .success (function(result) {
+                .then (function(result) {
 
                   var path;
                   var search;
@@ -655,7 +655,7 @@ var RouteConfig = [
                     message = message + $translate.instant('PROCESS_INSTANCE_MESSAGE_3');
                   }
                   else {
-                    path = '/process-definition/' + result.processDefinitionId;
+                    path = '/process-definition/' + result.data.processDefinitionId;
 
                     message = message + $translate.instant('PROCESS_INSTANCE_MESSAGE_4');
                   }
@@ -673,7 +673,7 @@ var RouteConfig = [
                   });
 
                 })
-                .error (function() {
+                .catch (function() {
 
                   $location.path('/dashboard');
                   $location.search({});

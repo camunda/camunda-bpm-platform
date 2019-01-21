@@ -7,7 +7,7 @@ var template = fs.readFileSync(__dirname + '/variable-inspect-dialog.html', 'utf
 
 var Controller = [
   '$http',
-  '$modalInstance',
+  '$uibModalInstance',
   '$scope',
   'Notifications',
   'Uri',
@@ -146,11 +146,11 @@ var Controller = [
         url: Uri.appUri(basePath),
         data: variableUpdate
       })
-      .success(function() {
+      .then(function() {
         $scope.status = CHANGE_SUCCESS;
         addMessage(variable);
       })
-      .error(function() {
+      .catch(function() {
         $scope.status = BEFORE_CHANGE;
         addError(variable);
       });
@@ -194,7 +194,8 @@ var Controller = [
         method: 'GET',
         url: Uri.appUri('engine://engine/:engine/' + (history ? 'history/' : '') + 'variable-instance/' + variable.id)
       })
-      .success(function(data) {
+      .then(function(data) {
+        data = data.data;
         if (!data.errorMessage) {
           initialDeserializedValue = JSON.stringify(data.value);
           $scope.currentDeserializedValue = angular.copy(initialDeserializedValue);
@@ -202,7 +203,7 @@ var Controller = [
         else {
           $scope.deserializationError = data.errorMessage;
         }
-      }).error(function(err) {
+      }).catch(function(err) {
         $scope.deserializationError = err.message;
       });
 

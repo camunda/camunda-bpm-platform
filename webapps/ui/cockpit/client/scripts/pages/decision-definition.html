@@ -25,14 +25,16 @@
                 class="glyphicon glyphicon-refresh animate-spin"></span>
 
           <div class="dropdown"
-               ng-if="allDefinitions && allDefinitions.length > 1">
+               ng-if="allDefinitions && allDefinitions.length > 1"
+               uib-dropdown>
             <a href
-               class="dropdown-toggle">
+               class="dropdown-toggle"
+               uib-dropdown-toggle>
               {{ decisionDefinition.version }}
               <span class="caret"></span>
             </a>
 
-            <ul class="dropdown-menu">
+            <ul uib-dropdown-menu class="dropdown-menu">
               <li ng-repeat="definition in allDefinitions">
                 <a ng-href="#/decision-definition/{{ definition.id }}">
                   {{ definition.version }}

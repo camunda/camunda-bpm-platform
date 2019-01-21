@@ -13,7 +13,7 @@ module.exports = [
   'page',
   'camAPI',
   '$location',
-  '$modal',
+  '$uibModal',
   '$translate',
   'Notifications',
   'localConf',

@@ -16,7 +16,7 @@
 
     {{ 'REPOSITORY_DEPLOYMENTS_DELETE_THIS_DEPLOYMENT' | translate }}
 
-    <div class="alert alert-info" ng-show="hasInstances()">
+    <div uib-alert class="alert alert-info" ng-show="hasInstances()">
       {{ 'REPOSITORY_DEPLOYMENTS_DELETE_ENABLE_CASCADE' | translate:'{info: getInfoSnippet()}' }} <code>{{ 'REPOSITORY_DEPLOYMENTS_DELETE_CASCADE' | translate }}</code> {{ 'REPOSITORY_DEPLOYMENTS_DELETE_FLAG' | translate }}
     </div>
 
@@ -31,7 +31,7 @@
                for="cascade">
           {{ 'REPOSITORY_DEPLOYMENTS_DELETE_CASCADE' | translate }}
           <span class="glyphicon glyphicon-question-sign"
-                tooltip="{{ 'REPOSITORY_DEPLOYMENTS_DELETE_CASCADE_TOOLTIP' | translate }}"
+                uib-tooltip="{{ 'REPOSITORY_DEPLOYMENTS_DELETE_CASCADE_TOOLTIP' | translate }}"
                 tooltip-placement="right">
           </span>
         </label>
@@ -53,7 +53,7 @@
                for="skipCustomListeners">
           {{ 'REPOSITORY_DEPLOYMENTS_DELETE_SKIP' | translate }}
           <span class="glyphicon glyphicon-question-sign"
-                tooltip="{{ 'REPOSITORY_DEPLOYMENTS_DELETE_SKIP_TOOLTIP' | translate }}"
+                uib-tooltip="{{ 'REPOSITORY_DEPLOYMENTS_DELETE_SKIP_TOOLTIP' | translate }}"
                 tooltip-placement="right">
           </span>
         </label>
@@ -74,7 +74,7 @@
                for="skipIoMappings">
           {{ 'REPOSITORY_DEPLOYMENTS_DELETE_MAPPING' | translate }}
           <span class="glyphicon glyphicon-question-sign"
-                tooltip="{{ 'REPOSITORY_DEPLOYMENTS_DELETE_MAPPING_TOOLTIP' | translate }}"
+                uib-tooltip="{{ 'REPOSITORY_DEPLOYMENTS_DELETE_MAPPING_TOOLTIP' | translate }}"
                 tooltip-placement="right">
           </span>
         </label>

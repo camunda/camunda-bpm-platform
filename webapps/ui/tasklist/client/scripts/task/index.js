@@ -26,7 +26,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   /* API */
     apiClient = require('../api/index');
 
-require('camunda-commons-ui/vendor/ui-bootstrap-tpls-0.11.2-camunda');
+require('camunda-commons-ui/vendor/ui-bootstrap-tpls-2.5.0-camunda');
 require('angular-moment');
 
 var taskModule = angular.module('cam.tasklist.task', [

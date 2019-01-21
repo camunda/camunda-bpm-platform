@@ -5,7 +5,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/variable-upload-dialog.html', 'utf8');
 
 var Controller = [
-  '$modalInstance',
+  '$uibModalInstance',
   '$scope',
   'Notifications',
   'Uri',

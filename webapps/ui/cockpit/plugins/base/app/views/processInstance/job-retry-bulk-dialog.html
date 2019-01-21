@@ -46,7 +46,7 @@
         </table>
 
 
-        <pagination ng-if="jobPages.total > jobPages.size"
+        <ul uib-pagination ng-if="jobPages.total > jobPages.size"
                     class="pagination-sm"
 
                     page="jobPages.current"
@@ -56,7 +56,7 @@
                     items-per-page="jobPages.size"
 
                     max-size="7"
-                    boundary-links="true"></pagination>
+                    boundary-links="true"></ul>
       </div>
     </fieldset>
   </form>
@@ -94,7 +94,7 @@
     </table>
 
 
-    <pagination ng-if="summarizePages.total > summarizePages.size"
+    <ul uib-pagination ng-if="summarizePages.total > summarizePages.size"
                 class="pagination-sm"
 
                 page="summarizePages.current"
@@ -104,7 +104,7 @@
                 items-per-page="summarizePages.size"
 
                 max-size="7"
-                boundary-links="true"></pagination>
+                boundary-links="true"></ul>
   </div>
 
 </div>
