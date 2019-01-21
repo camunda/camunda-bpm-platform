@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,10 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,7 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.List;
+
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -92,4 +95,8 @@ public interface HistoricProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto deleteAsync(DeleteHistoricProcessInstancesDto dto);
+  
+  @DELETE
+  @Path("/{id}/variable-instances")
+  Response deleteHistoricVariableInstancesByProcessInstanceId(@PathParam("id") String processInstanceId);
 }

@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -44,7 +45,7 @@ public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Co
     ensureNotEmpty(BadUserRequestException.class,"processInstanceId", processInstanceId);
 
     HistoricProcessInstanceEntity instance = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstance(processInstanceId);
-    ensureNotNull("No historic process instance found with id: " + processInstanceId, "instance", instance);
+    ensureNotNull(NotFoundException.class, "No historic process instance found with id: " + processInstanceId, "instance", instance);
     
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricVariableInstancesByProcessInstance(instance);
