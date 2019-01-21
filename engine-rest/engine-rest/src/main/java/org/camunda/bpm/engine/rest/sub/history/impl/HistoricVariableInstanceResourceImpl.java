@@ -79,9 +79,10 @@ public class HistoricVariableInstanceResourceImpl extends
   public Response deleteVariableInstance() {
     try {
       getEngine().getHistoryService().deleteHistoricVariableInstance(id);
-    } catch (NotFoundException nfe) {
+    } catch (NotFoundException nfe) { // rewrite status code from bad request (400) to not found (404)
       throw new InvalidRequestException(Status.NOT_FOUND, nfe, nfe.getMessage());
     }
+    // return no content (204) since resource is deleted
     return Response.noContent().build();
   }
 
