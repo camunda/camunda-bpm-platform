@@ -9,7 +9,7 @@ var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-m
 
 var Controller = [
   '$scope',
-  '$modal',
+  '$uibModal',
   '$q',
   'camAPI',
   'dataDepend',

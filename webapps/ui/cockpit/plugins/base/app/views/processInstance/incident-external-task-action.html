@@ -2,7 +2,7 @@
 <a class="btn btn-default action-button"
    ng-click="openExternalTaskRetryDialog(incident)"
    ng-show="incident.incidentType === 'failedExternalTask' && incident.configuration"
-   tooltip="{{ 'PLUGIN_INC_EXTERNAL_TOOLTIP_RETRIES' | translate }}"
+   uib-tooltip="{{ 'PLUGIN_INC_EXTERNAL_TOOLTIP_RETRIES' | translate }}"
    tooltip-placement="left">
   <span class="glyphicon glyphicon-repeat"></span>
 </a>

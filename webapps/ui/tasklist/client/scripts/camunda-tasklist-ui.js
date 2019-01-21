@@ -69,6 +69,12 @@ module.exports = function(pluginDependencies) {
 
   var tasklistApp = angular.module('cam.tasklist', ngDeps);
 
+  var LocationConfig = ['$locationProvider', function($locationProvider) {
+    $locationProvider.hashPrefix('');
+  }];
+
+  tasklistApp.config(LocationConfig);
+
   tasklistApp.factory('assignNotification', require('./services/cam-tasklist-assign-notification'));
   tasklistApp.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camTasklistConf, 'Tasklist'));
 

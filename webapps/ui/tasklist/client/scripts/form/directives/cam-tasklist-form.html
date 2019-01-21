@@ -8,7 +8,7 @@
      ng-show="tasklistForm && $loaded"
      ng-class="{ 'disabled-form': options.disableForm, 'task-removed': taskRemoved}">
 
-  <div ng-show="tasklistForm.$error" class="alert alert-danger" role="alert">
+  <div ng-show="tasklistForm.$error" uib-alert class="alert alert-danger" role="alert">
     <span class="glyphicon glyphicon-exclamation-sign"></span>
     <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
     <span class="message">{{ tasklistForm.$error.message | translate }}</span>
@@ -40,7 +40,7 @@
             ng-click="save($event)"
             ng-hide="tasklistForm.type === 'generic'"
             tooltip-placement="top"
-            tooltip="{{ 'SAVE_HINT' | translate }}"
+            uib-tooltip="{{ 'SAVE_HINT' | translate }}"
             ng-disabled="!$dirty">
       {{ 'SAVE' | translate }}
     </button>

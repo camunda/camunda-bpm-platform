@@ -8,7 +8,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   // AngularJS DI
 module.exports = [
-  '$modal',
+  '$uibModal',
   '$window',
   'Uri',
   function(

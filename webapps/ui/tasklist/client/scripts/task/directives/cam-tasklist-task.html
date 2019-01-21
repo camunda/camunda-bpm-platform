@@ -19,7 +19,7 @@
       <div class="col-xs-12">
         <div class="tenant-id"
              ng-if="task.tenantId"
-             tooltip="{{ task.tenantId }}">
+             uib-tooltip="{{ task.tenantId }}">
           {{ task.tenantId }}
         </div>
 
@@ -37,7 +37,7 @@
           <a class="instance-link"  ng-if="instanceLink"
             ng-href="{{instanceLink}}" class="ng-binding" href="{{instanceLink}}">
             <span tooltip-placement="top"
-                  tooltip="{{ 'INSTANCE_LINK' | translate }}"
+                  uib-tooltip="{{ 'INSTANCE_LINK' | translate }}"
                   class="glyphicon glyphicon-new-window">
               </span>
           </a>
@@ -51,7 +51,7 @@
     </header>
 
     <div class="task-removed-alert">
-      <div class="alert alert-info row">
+      <div uib-alert class="alert alert-info row">
         <div class="col-xs-8 text-padded">
           {{ 'TASK_HAS_BEEN_REMOVED' | translate }}
         </div>

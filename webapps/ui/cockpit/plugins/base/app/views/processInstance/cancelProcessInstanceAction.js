@@ -7,8 +7,8 @@ var actionTemplate = fs.readFileSync(__dirname + '/cancel-process-instance-actio
 
 module.exports = function(ngModule) {
   ngModule.controller('CancelProcessInstanceActionController', [
-    '$scope', '$http', 'search', 'Uri', '$modal',
-    function($scope,   $http,   search,   Uri,   $modal) {
+    '$scope', 'search', 'Uri', '$uibModal',
+    function($scope,   search,   Uri,   $modal) {
 
       $scope.openDialog = function() {
         $modal.open({

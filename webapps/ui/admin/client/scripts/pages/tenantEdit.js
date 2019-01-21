@@ -15,7 +15,7 @@ var Controller = [
   'camAPI',
   'Notifications',
   '$location',
-  '$modal',
+  '$uibModal',
   'unescape',
   '$translate',
   function(

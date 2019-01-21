@@ -7,7 +7,7 @@ var editGroupsFormTemplate = fs.readFileSync(__dirname + '/../modals/cam-tasklis
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  '$modal',
+  '$uibModal',
   '$timeout',
   'camAPI',
   'fixDate',

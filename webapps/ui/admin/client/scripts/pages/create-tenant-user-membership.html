@@ -47,7 +47,7 @@
     </tbody>
   </table>
 
-  <pagination ng-if="modalPages.total > modalPages.size && status !== 'SUCCESS'"
+  <ul uib-pagination ng-if="modalPages.total > modalPages.size && status !== 'SUCCESS'"
               class="pagination-sm"
 
               ng-model="modalPages.current"
@@ -62,7 +62,7 @@
               next-text="&rsaquo;"
               last-text="&raquo;"
               previous-text="&lsaquo;"
-              first-text="&laquo;"></pagination>
+              first-text="&laquo;"></ul>
 
   <p ng-show="availableTenants.length == 0">
     {{ 'USER_MEMBERSHIP_TENANT_MESSAGE_AVAILABLE_TENANTS' | translate }} <a href="#/tenant-create" ng-click="close">{{ 'USER_MEMBERSHIP_TENANT_MESSAGE_HERE' | translate }}</a>.

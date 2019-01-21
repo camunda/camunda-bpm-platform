@@ -13,12 +13,12 @@
           on-cancel-editing="cancelEditingFollowUpDate(this)"
           value="task.followUp">
       <span tooltip-placement="top"
-            tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
+            uib-tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
             class="glyphicon glyphicon-calendar"></span>
 
       <span ng-if="task.followUp"
             tooltip-placement="top"
-            tooltip="{{ task.followUp | camDate:'long' }}"
+            uib-tooltip="{{ task.followUp | camDate:'long' }}"
             am-time-ago="task.followUp">{{ task.followUp }}</span>
       <a ng-if="!task.followUp"
          translate="SET_FOLLOW_UP_DATE">Set follow up</a>
@@ -27,7 +27,7 @@
     <a href
        ng-if="task.followUp && !editingState.followUp"
        tooltip-placement="top"
-       tooltip="{{ 'RESET_FOLLOW_UP_DATE' | translate }}"
+       uib-tooltip="{{ 'RESET_FOLLOW_UP_DATE' | translate }}"
        ng-click="resetFollowUpDate()"
        class="reset-follow-up-date glyphicon glyphicon-remove">
     </a>
@@ -48,12 +48,12 @@
           value="task.due">
 
       <span tooltip-placement="top"
-            tooltip="{{ 'DUE_DATE' | translate }}"
+            uib-tooltip="{{ 'DUE_DATE' | translate }}"
             class="glyphicon glyphicon-bell"></span>
 
       <span ng-if="task.due"
             tooltip-placement="top"
-            tooltip="{{ task.due | camDate:'long' }}"
+            uib-tooltip="{{ task.due | camDate:'long' }}"
             am-time-ago="task.due">{{ task.due }}</span>
 
       <a ng-if="!task.due"
@@ -63,7 +63,7 @@
     <a href
        ng-if="task.due && !editingState.due"
        tooltip-placement="top"
-       tooltip="{{ 'RESET_DUE_DATE' | translate }}"
+       uib-tooltip="{{ 'RESET_DUE_DATE' | translate }}"
        ng-click="resetDueDate()"
        class="reset-due-date glyphicon glyphicon-remove">
     </a>
@@ -75,7 +75,7 @@
   <li class="groups">
     <span ng-click="editGroups()">
       <span tooltip-placement="top"
-            tooltip="{{ 'GROUPS' | translate }}"
+            uib-tooltip="{{ 'GROUPS' | translate }}"
             class="glyphicon glyphicon-th"></span>
 
       <a href ng-if="groupNames.length > 0">
@@ -92,7 +92,7 @@
   <li class="assignee set-value"
       ng-if="!task.assignee">
     <span tooltip-placement="top"
-          tooltip="{{ 'ASSIGNEE' | translate }}"
+          uib-tooltip="{{ 'ASSIGNEE' | translate }}"
           class="glyphicon glyphicon-user"></span>
 
     <a href
@@ -117,7 +117,7 @@
           value="assignee.id">
 
       <span tooltip-placement="top"
-            tooltip="{{ 'ASSIGNEE' | translate }}"
+            uib-tooltip="{{ 'ASSIGNEE' | translate }}"
             class="glyphicon glyphicon-user"></span>
       <span ng-if="assignee.firstName || assignee.lastName">{{ assignee.firstName }} {{ assignee.lastName }}</span>
       <span ng-if="!(assignee.firstName || assignee.lastName)">{{ assignee.id }}</span>
@@ -126,7 +126,7 @@
     <a href
        ng-if="isAssignee && !editingState.assignee"
        tooltip-placement="top"
-       tooltip="{{ 'UNCLAIM_TASK' | translate }}"
+       uib-tooltip="{{ 'UNCLAIM_TASK' | translate }}"
        ng-click="unclaim()"
        class="unclaim glyphicon glyphicon-remove">
     </a>
@@ -134,7 +134,7 @@
     <a href
        ng-if="!isAssignee && !editingState.assignee"
        tooltip-placement="top"
-       tooltip="{{ 'RESET_TASK_ASSIGNEE' | translate }}"
+       uib-tooltip="{{ 'RESET_TASK_ASSIGNEE' | translate }}"
        ng-click="resetAssignee()"
        class="reset-assignee glyphicon glyphicon-remove">
     </a>

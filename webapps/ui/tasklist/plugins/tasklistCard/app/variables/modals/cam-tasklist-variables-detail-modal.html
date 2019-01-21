@@ -39,7 +39,7 @@
     </textarea>
   </div>
   <div ng-show="selectedTab === 'deserialized'" class="tab-content">
-    <div class="alert alert-warning"
+    <div uib-alert class="alert alert-warning"
          role="alert" 
          ng-show="deserializationError">
       <strong>{{ 'DESERIALIZATION_ERROR' | translate }}</strong>:

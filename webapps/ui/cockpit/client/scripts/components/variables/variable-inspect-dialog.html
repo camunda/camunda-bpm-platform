@@ -43,7 +43,7 @@
       </textarea>
 
       <div ng-if="selectedTab === 'deserialized'">
-        <div class="alert alert-danger"
+        <div uib-alert class="alert alert-danger"
              ng-show="deserializationError">
           <strong>{{ 'VARIABLE_INSPECT_DESERIALIZED_ERROR' | translate }}</strong>
           {{deserializationError}}
@@ -81,7 +81,7 @@
 
   </div>
 
-  <div class="alert alert-warning"
+  <div uib-alert class="alert alert-warning"
        ng-show="status === 'confirmChange'">
     <span class="glyphicon glyphicon-alert"></span>
     <strong>{{ 'VARIABLE_INSPECT_WARNING' | translate }}</strong>

@@ -1,6 +1,6 @@
 <div class="form-pane">
 
-  <div ng-if="taskFormState.$error" class="alert alert-danger" role="alert">
+  <div ng-if="taskFormState.$error" uib-alert class="alert alert-danger" role="alert">
     <span class="glyphicon glyphicon-exclamation-sign"></span>
     <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
     <span class="message">{{ taskFormState.$error.message }}</span>

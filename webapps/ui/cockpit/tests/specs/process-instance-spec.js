@@ -579,7 +579,7 @@ describe.skip('Cockpit Process Instance Spec', function() {
       var eqOperator = instancePage
         .search
         .formElement()
-        .element(by.cssContainingText('[tooltip="Operator"]', '='));
+        .element(by.cssContainingText('[uib-tooltip="Operator"]', '='));
 
       expect(eqOperator.isDisplayed()).to.eventually.be.true;
     });
@@ -592,7 +592,7 @@ describe.skip('Cockpit Process Instance Spec', function() {
       var likeOperator = instancePage
         .search
         .formElement()
-        .element(by.cssContainingText('[tooltip="Operator"]', 'like'));
+        .element(by.cssContainingText('[uib-tooltip="Operator"]', 'like'));
 
       expect(likeOperator.isDisplayed()).to.eventually.be.true;
     });

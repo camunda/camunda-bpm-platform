@@ -12,7 +12,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     label: 'Add Variable Action',
     template: actionTemplate,
     controller: [
-      '$scope', '$modal', '$rootScope',
+      '$scope', '$uibModal', '$rootScope',
       function($scope, $modal, $rootScope) {
         $scope.openDialog = function() {
           var dialog = $modal.open({

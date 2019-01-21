@@ -9,7 +9,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/authorization', {
     template: template,
     controller: [
-      '$scope', 'page',      '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location', '$translate',
+      '$scope', 'page',      '$routeParams', '$uibModal', 'AuthorizationResource', 'Notifications', '$location', '$translate',
       function($scope,   pageService, $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location, $translate) {
 
         $scope.$root.showBreadcrumbs = true;

@@ -27,7 +27,7 @@
         <a ng-if="incident.rootCauseIncidentMessage"
            href="{{ getJobStacktraceUrl(incident) }}"
            target="_blank"
-           tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
+           uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
            tooltip-placement="top"
            class="auto-cutoff">
           {{ incident.rootCauseIncidentMessage }}
@@ -35,13 +35,13 @@
         <a ng-if="!incident.rootCauseIncidentMessage"
            href="{{ getJobStacktraceUrl(incident) }}"
            target="_blank"
-           tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
+           uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
            tooltip-placement="top">
           <i>Message is null.</i>
         </a>
       </td>
       <td class="message"
-          tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
+          uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
           tooltip-placement="top"
           ng-if="incident.incidentType === 'failedExternalTask'">
         <span external-task-error-message-link="incident.rootCauseIncidentConfiguration">

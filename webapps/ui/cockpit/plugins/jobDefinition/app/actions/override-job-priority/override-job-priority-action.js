@@ -11,7 +11,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     id: 'job-definition-override-job-priority-action',
     template: actionTemplate,
     controller: [
-      '$scope', '$rootScope', '$modal',
+      '$scope', '$rootScope', '$uibModal',
       function($scope,   $rootScope,   $modal) {
 
         $scope.openDialog = function(jobDefinition) {

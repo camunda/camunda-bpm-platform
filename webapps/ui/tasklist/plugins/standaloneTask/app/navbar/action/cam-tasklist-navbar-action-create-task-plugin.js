@@ -7,7 +7,7 @@ var createTaskModalTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-
 
 var Controller = [
   '$scope',
-  '$modal',
+  '$uibModal',
   '$timeout',
   function(
     $scope,

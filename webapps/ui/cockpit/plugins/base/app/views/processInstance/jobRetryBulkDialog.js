@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobResource', '$modalInstance', 'processData', 'processInstance', '$translate',
+  '$scope', '$q', 'Notifications', 'JobResource', '$uibModalInstance', 'processData', 'processInstance', '$translate',
   function($scope,   $q,   Notifications,   JobResource,   $modalInstance,   processData,   processInstance, $translate) {
 
     var jobRetriesData = processData.newChild($scope);

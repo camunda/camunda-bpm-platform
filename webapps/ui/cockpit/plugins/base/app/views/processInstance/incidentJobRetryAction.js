@@ -11,7 +11,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     id: 'increase-incident-job-retry',
     template: actionTemplate,
     controller: [
-      '$scope', '$rootScope', 'search', '$modal',
+      '$scope', '$rootScope', 'search', '$uibModal',
       function($scope, $rootScope, search, $modal) {
 
         $scope.openJobRetryDialog = function(incident) {

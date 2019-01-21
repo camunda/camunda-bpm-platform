@@ -48,6 +48,12 @@ module.exports = function(pluginDependencies) {
     return uri;
   }
 
+  var LocationConfig = ['$locationProvider', function($locationProvider) {
+    $locationProvider.hashPrefix('');
+  }];
+
+  appNgModule.config(LocationConfig);
+
   var ModuleConfig = [
     '$routeProvider',
     'UriProvider',

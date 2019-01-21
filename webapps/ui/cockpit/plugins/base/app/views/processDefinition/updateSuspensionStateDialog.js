@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processDefinition','fixDate', '$translate',
+  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$uibModalInstance', 'processDefinition','fixDate', '$translate',
   function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processDefinition, fixDate, $translate) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
@@ -39,7 +39,7 @@ module.exports = [
 
       $http
       .put(Uri.appUri('engine://engine/:engine/process-definition/' + processDefinition.id + '/suspended/'), data)
-      .success(function() {
+      .then(function() {
         $scope.status = UPDATE_SUCCESS;
 
         if ($scope.data.executeImmediately) {
@@ -56,7 +56,7 @@ module.exports = [
           });
         }
 
-      }).error(function(response) {
+      }).catch(function(response) {
         $scope.status = UPDATE_FAILED;
         var errorMessage;
         if($scope.data.executeImmediately) {

@@ -28,9 +28,8 @@ var iconNames = {
 
 var Directive = [
   '$compile',
-  '$http',
   '$filter',
-  function($compile, $http, $filter) {
+  function($compile, $filter) {
     return {
       restrict: 'EAC',
 

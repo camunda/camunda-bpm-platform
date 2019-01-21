@@ -120,7 +120,7 @@
                ng-model="filter.properties.refresh"
                type="checkbox"
                tooltip-append-to-body="false"
-               tooltip="{{ 'FILTER_REFRESH_TOOLTIP' | translate }}"
+               uib-tooltip="{{ 'FILTER_REFRESH_TOOLTIP' | translate }}"
                ng-disabled="filter.id && !accesses.update" />
         {{ 'FILTER_REFRESH_LABEL' | translate }}
       </label>

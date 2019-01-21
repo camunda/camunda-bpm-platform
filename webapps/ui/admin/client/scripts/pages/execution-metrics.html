@@ -1,7 +1,7 @@
 <form name="form">
   <h3>{{ 'EXECUTION_METRICS' | translate }}</h3>  
 
-  <div class="alert alert-info">
+  <div uib-alert class="alert alert-info">
     <p>
       {{ 'EXECUTION_METRICS_INFO_1' | translate }} <strong>{{ 'EXECUTION_METRICS_FNI' | translate }}</strong> {{ 'EXECUTION_METRICS_AND' | translate }}
       <strong>{{ 'EXECUTION_METRICS_EDE' | translate }}</strong> {{ 'EXECUTION_METRICS_INFO_2' | translate }}
@@ -29,7 +29,7 @@
       </label>
       <input type="text"
              name="endDate"
-             ui-datepicker-popup
+             uib-datepicker-popup
              ng-model="endDate"
              ng-change="handleDateChange()"
              ng-required="true"

@@ -6,7 +6,7 @@ var addCommentFormTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-c
 
 var Controller = [
   '$scope',
-  '$modal',
+  '$uibModal',
   function(
     $scope,
     $modal

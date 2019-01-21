@@ -29,8 +29,8 @@
   "dependencies": {
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend#8e3b66914c611069e3698fd5d4275e6cf8055d01",
     "angular-moment": "0.9.0",
-    "angular-route": "1.2.29",
-    "bootstrap": "3.3.6",
+    "angular-route": "1.7.5",
+    "bootstrap": "3.4.0",
     "bpmn-font": "0.2.0",
     "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
@@ -43,7 +43,7 @@
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define#aaa450a66e4d1a0588819804e1098c541bed585d"
   },
   "devDependencies": {
-    "angular-mocks": "1.2.32",
+    "angular-mocks": "1.7.5",
     "brfs": "1.4.2",
     "browserify": "13.1.0",
     "chai": "2.0.0",

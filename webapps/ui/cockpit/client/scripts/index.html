@@ -73,10 +73,12 @@
         </li>
 
         <li class="dropdown"
-            ng-if="dropdownActions.length">
+            ng-if="dropdownActions.length"
+            uib-dropdown>
           <a class="dropdown-toggle"
+             uib-dropdown-toggle
              href>{{ 'COCKPIT_MORE' | translate}} <i class="caret"></i></a>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu" uib-dropdown-menu>
             <li ng-repeat="actionProvider in dropdownActions"
                 ng-if="actionProvider.pagePath && actionProvider.accessible"
                 ng-class="activeClass(actionProvider)">

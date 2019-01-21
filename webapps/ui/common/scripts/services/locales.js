@@ -34,18 +34,18 @@ module.exports = function(ngModule, appRoot, appName) {
             method: 'GET',
             params: { '_' : now }
           }, options.$http))
-            .success(function(data) {
-              configuration.set(cacheKey, JSON.stringify(data));
+            .then(function(response) {
+              configuration.set(cacheKey, JSON.stringify(response.data));
               if (!cachedLocalesData) {
 
                 if(typeof options.callback === 'function') {
-                  options.callback(null, data, options.key);
+                  options.callback(null, response.data, options.key);
                 }
 
-                deferred.resolve(data.labels);
+                deferred.resolve(response.data.labels);
               }
             })
-            .error(function(data) {
+            .catch(function(response) {
               // error notification
               Notifications.addError({
                 status: 'Error in localization configuration',
@@ -55,7 +55,7 @@ module.exports = function(ngModule, appRoot, appName) {
               if (!cachedLocalesData) {
 
                 if(typeof options.callback === 'function') {
-                  options.callback(data, null, options.key);
+                  options.callback(response.data, null, options.key);
                 }
 
                 deferred.reject(options.key);
@@ -98,7 +98,7 @@ module.exports = function(ngModule, appRoot, appName) {
                               nav.systemLanguage ||
                               nav.userLanguage
                             ) || '').split('-');
-        var idx = avail.indexOf(angular.lowercase(browserLang[0]));
+        var idx = avail.indexOf(browserLang[0].toLowerCase());
         if (idx > -1) {
           return avail[idx];
         } else {

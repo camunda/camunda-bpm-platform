@@ -34,7 +34,7 @@
     <span ng-if="(crumb.type === 'processDefinition' && crumb.processDefinition.suspended) || (crumb.type === 'processInstance' && crumb.processInstance.suspended)"
           ng-show="!crumb.hidden"
           class="badge badge-warning badge-suspended"
-          tooltip="{{ 'BREAD_CRUMBS_CURRENTLY_SUSPENDED' | translate }}"
+          uib-tooltip="{{ 'BREAD_CRUMBS_CURRENTLY_SUSPENDED' | translate }}"
           tooltip-placement="bottom">
       <span class="glyphicon glyphicon-pause white"></span>
     </span>
@@ -57,17 +57,19 @@
 
     <span ng-if="!!crumb.choices && crumb.choices.length > 2"
           ng-show="!crumb.hidden"
-          class="dropdown">
+          class="dropdown"
+          uib-dropdown>
       <span class="divider">:</span>
 
       <a class="dropdown-toggle"
+         uib-dropdown-toggle
          ng-show="!crumb.hidden"
          href>
         {{ getActiveChoice(crumb.choices) }}
         <span class="caret"></span>
       </a>
 
-      <ul class="dropdown-menu dropdown-menu-right" ng-show="!crumb.hidden">
+      <ul class="dropdown-menu dropdown-menu-right" ng-show="!crumb.hidden" uib-dropdown-menu>
         <li ng-repeat="choice in crumb.choices"
             ng-class="{active: choice.active}">
           <a href ng-click="selectChoice($event, choice)">{{ choice.label }}</a>

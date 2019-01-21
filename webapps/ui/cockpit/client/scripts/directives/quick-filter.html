@@ -5,7 +5,7 @@
        ng-if="showNameFilter">
     <label class="input-group">
       <span class="input-group-addon"
-            tooltip="{{ 'QUICK_FILTER_TOOLTIP_CLICK_HERE' | translate }}">
+            uib-tooltip="{{ 'QUICK_FILTER_TOOLTIP_CLICK_HERE' | translate }}">
         <span class="glyphicon glyphicon-filter"
               ng-click="clearName()"></span>
       </span>
@@ -17,7 +17,7 @@
     </label>
     <button class="btn btn-sm btn-link btn-control-link"
             type="button"
-            tooltip="{{ 'QUICK_FILTER_TOOLTIP_FILTERS_ACTIVITY' | translate }}">
+            uib-tooltip="{{ 'QUICK_FILTER_TOOLTIP_FILTERS_ACTIVITY' | translate }}">
       <span class="glyphicon glyphicon-question-sign"></span>
     </button>
   </div>
@@ -29,7 +29,7 @@
     <ul class="list-inline">
       <li>
         <label class="btn btn-default btn-xs running"
-               tooltip="{{ 'QUICK_FILTER_TOOLTIP_RUNNING_ACTIVITY' | translate }}"
+               uib-tooltip="{{ 'QUICK_FILTER_TOOLTIP_RUNNING_ACTIVITY' | translate }}"
                tooltip-placement="bottom">
           <span class="glyphicon glyphicon-adjust"></span>
           <input ng-change="search()"
@@ -41,7 +41,7 @@
 
       <li>
         <label class="btn btn-default btn-xs completed"
-               tooltip="{{ 'QUICK_FILTER_TOOLTIP_COMPLETED_ACTIVITY' | translate }}"
+               uib-tooltip="{{ 'QUICK_FILTER_TOOLTIP_COMPLETED_ACTIVITY' | translate }}"
                tooltip-placement="bottom">
           <span class="glyphicon glyphicon-ok-circle"></span>
           <input ng-change="search()"
@@ -53,7 +53,7 @@
 
       <li>
         <label class="btn btn-default btn-xs canceled"
-               tooltip="{{ 'QUICK_FILTER_TOOLTIP_CANCELED_ACTIVITY' | translate }}"
+               uib-tooltip="{{ 'QUICK_FILTER_TOOLTIP_CANCELED_ACTIVITY' | translate }}"
                tooltip-placement="bottom">
           <span class="glyphicon glyphicon-ban-circle"></span>
           <input ng-change="search()"

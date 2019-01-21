@@ -8,7 +8,7 @@
     <div class="user-profile-info">
       <h4 class="user-profile-name"
           ng-if="user.firstName || user.lastName"
-          tooltip="{{'USERNAME_FOR_AUTHENTICATION' | translate:'{ username: user.id }'}}">{{ user.firstName }} {{ user.lastName }}</h4>
+          uib-tooltip="{{'USERNAME_FOR_AUTHENTICATION' | translate:'{ username: user.id }'}}">{{ user.firstName }} {{ user.lastName }}</h4>
       <h4 class="user-profile-name"
           ng-if="!user.firstName && !user.lastName">{{ user.id }}</h4>
       <div class="user-profile-email">{{ user.email }}</div>

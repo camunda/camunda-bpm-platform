@@ -30,7 +30,7 @@
             </tr>
           </tbody>
         </table>
-        <pagination ng-if="ctrl.getBatchCount('runtime') > ctrl.getPageSize()"
+        <ul uib-pagination ng-if="ctrl.getBatchCount('runtime') > ctrl.getPageSize()"
                     class="pagination-sm"
 
                     page="ctrl.getCurrentPage('runtime')"
@@ -41,7 +41,7 @@
                     items-per-page="ctrl.getPageSize()"
 
                     max-size="7"
-                    boundary-links="true"></pagination>
+                    boundary-links="true"></ul>
       </div>
 
       <h3>{{ 'BATCHES_PROGRESS_END' | translate }}</h3>
@@ -65,7 +65,7 @@
             </tr>
           </tbody>
         </table>
-        <pagination ng-if="ctrl.getBatchCount('history') > ctrl.getPageSize()"
+        <ul uib-pagination ng-if="ctrl.getBatchCount('history') > ctrl.getPageSize()"
                     class="pagination-sm"
 
                     page="ctrl.getCurrentPage('history')"
@@ -76,7 +76,7 @@
                     items-per-page="ctrl.getPageSize()"
 
                     max-size="7"
-                    boundary-links="true"></pagination>
+                    boundary-links="true"></ul>
       </div>
     </div>
 
@@ -98,28 +98,28 @@
                 <a ng-if="ctrl.getSelectionType() == 'runtime' && !ctrl.getSuspendedState()"
                    ng-click="ctrl.toggleSuspension()"
                    class="btn btn-default"
-                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_SUSPEND_BATCH' | translate }}">
+                   uib-tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_SUSPEND_BATCH' | translate }}">
                   <span class="glyphicon glyphicon-pause"></span>
                 </a>
 
                 <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getSuspendedState()"
                    ng-click="ctrl.toggleSuspension()"
                    class="btn btn-default"
-                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_ACTIVATE_BATCH' | translate }}">
+                   uib-tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_ACTIVATE_BATCH' | translate }}">
                   <span class="glyphicon glyphicon-play"></span>
                 </a>
 
                 <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getJobs().length > 0"
                    class="btn btn-default action-button"
                    ng-click="ctrl.retryAll()"
-                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_INCREMENT_NUMBER' | translate }}">
+                   uib-tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_INCREMENT_NUMBER' | translate }}">
                   <span class="glyphicon glyphicon-repeat"></span>
                 </a>
 
                 <a ng-if="ctrl.getSelectionType() == 'runtime'"
                    class="btn btn-danger action-button"
                    ng-click="ctrl.openDeleteModal()"
-                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_BATCH' | translate }}">
+                   uib-tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_BATCH' | translate }}">
                   <span class="glyphicon glyphicon-trash"></span>
                 </a>
               </div>
@@ -163,18 +163,18 @@
                     {{job.exceptionMessage.substr(0, 120)}}…
                     <a ng-href="{{ctrl.getStacktraceUrl(job)}}"
                        target="_blank"
-                       tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_OPEN_STACK' | translate }}">{{ 'BATCHES_PROGRESS_FULL_STACK_TRACE' | translate }}</a>
+                       uib-tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_OPEN_STACK' | translate }}">{{ 'BATCHES_PROGRESS_FULL_STACK_TRACE' | translate }}</a>
                   </td>
                   <td>
                     <div class="btn-group btn-group-sm">
                       <a class="btn btn-default action-button"
                          ng-click="ctrl.retryJob(job)"
-                         tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_INCREMENT_RETRIES' | translate }}">
+                         uib-tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_INCREMENT_RETRIES' | translate }}">
                         <span class="glyphicon glyphicon-repeat"></span>
                       </a>
                       <a class="btn btn-default action-button"
                          ng-click="ctrl.deleteJob(job)"
-                         tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_JOB' | translate }}">
+                         uib-tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_JOB' | translate }}">
                         <span class="glyphicon glyphicon-trash"></span>
                       </a>
                     </div>
@@ -182,7 +182,7 @@
                 </tr>
               </tbody>
             </table>
-            <pagination ng-if="ctrl.getJobCount() > ctrl.getPageSize()"
+            <ul uib-pagination ng-if="ctrl.getJobCount() > ctrl.getPageSize()"
                         class="pagination-sm"
 
                         page="ctrl.getCurrentPage('job')"
@@ -193,7 +193,7 @@
                         items-per-page="ctrl.getPageSize()"
 
                         max-size="7"
-                        boundary-links="true"></pagination>
+                        boundary-links="true"></ul>
           </div>
         </div>
       </div>

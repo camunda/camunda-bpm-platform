@@ -2,7 +2,7 @@
 <a class="btn btn-default action-button"
    ng-click="openJobRetryDialog(incident)"
    ng-show="incident.incidentType === 'failedJob' && incident.configuration"
-   tooltip="{{ 'PLUGIN_INC_JOB_RETRY_TOOLTIP_RETRIES' | translate }}"
+   uib-tooltip="{{ 'PLUGIN_INC_JOB_RETRY_TOOLTIP_RETRIES' | translate }}"
    tooltip-placement="left">
   <span class="glyphicon glyphicon-repeat"></span>
 </a>

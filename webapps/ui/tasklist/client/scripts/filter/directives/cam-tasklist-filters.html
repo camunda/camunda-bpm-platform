@@ -4,7 +4,7 @@
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-show="state.$error" class="alert alert-danger" role="alert">
+<div ng-show="state.$error" uib-alert class="alert alert-danger" role="alert">
   <span class="glyphicon glyphicon-exclamation-sign"></span>
   <strong class="status">{{ 'FAILURE' | translate }}:</strong>
   <span class="message">{{ 'FILTERS_LOADING_FAILURE' | translate }}</span>
@@ -34,7 +34,7 @@
        ng-click="focus(filter)">
 
     <h4 class="name"
-        tooltip="{{ filter.properties.description }}"
+        uib-tooltip="{{ filter.properties.description }}"
         tooltip-placement="top">
       <a href
          ng-style="{color: filter.properties.color}">
@@ -48,7 +48,7 @@
     <div class="actions"
          ng-style="{visibility: isFocused(filter) ? 'visible' : 'hidden'}">
       <a ng-click="openModal($event, filter)"
-         tooltip="{{ 'FILTER_DETAILS' | translate }}"
+         uib-tooltip="{{ 'FILTER_DETAILS' | translate }}"
          tooltip-placement="top"
          href>
         <span class="glyphicon glyphicon-pencil"></span>

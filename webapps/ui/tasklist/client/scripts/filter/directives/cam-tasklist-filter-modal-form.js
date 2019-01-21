@@ -42,7 +42,7 @@ module.exports = [function() {
         $scope.registerPostFilterSavedProvider = $scope.registerPostFilterSavedProvider() || noop;
 
         var opened = GENERAL_ACCORDION;
-        $scope.accordion = {
+        $scope.group = {
           general       : opened === GENERAL_ACCORDION,
           permission    : opened === PERMISSION_ACCORDION,
           criteria      : opened === CRITERIA_ACCORDION,

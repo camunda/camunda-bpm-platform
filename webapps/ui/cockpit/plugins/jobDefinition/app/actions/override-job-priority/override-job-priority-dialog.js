@@ -3,7 +3,7 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinition', '$translate',
+  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$uibModalInstance', 'jobDefinition', '$translate',
   function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinition, $translate) {
 
     var SUCCESS = 'SUCCESS',

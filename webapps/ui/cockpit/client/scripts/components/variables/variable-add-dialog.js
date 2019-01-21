@@ -6,8 +6,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/variable-add-dialog.html', 'utf8');
 
 var Controller = [
-  '$http',
-  '$modalInstance',
+  '$uibModalInstance',
   '$scope',
   'Notifications',
   'Uri',
@@ -17,7 +16,6 @@ var Controller = [
   '$translate',
   'camAPI',
   function(
-    $http,
     $modalInstance,
     $scope,
     Notifications,

@@ -7,7 +7,7 @@ var actionTemplate = fs.readFileSync(__dirname + '/job-retry-bulk-action.html', 
 
 module.exports = function(ngModule) {
   ngModule.controller('JobRetryActionController', [
-    '$scope', '$modal',
+    '$scope', '$uibModal',
     function($scope,   $modal) {
       $scope.openDialog = function() {
         $modal.open({

@@ -15,7 +15,7 @@
 
   <div ng-transclude></div>
 
-  <pagination ng-if="Searchable.pages.total > Searchable.pages.size"
+  <ul uib-pagination ng-if="Searchable.pages.total > Searchable.pages.size"
               class="pagination-sm"
               page="Searchable.pages.current"
               ng-model="Searchable.pages.current"
@@ -23,5 +23,5 @@
               items-per-page="Searchable.pages.size"
               max-size="7"
               boundary-links="true">
-  </pagination>
+  </ul>
 </div>

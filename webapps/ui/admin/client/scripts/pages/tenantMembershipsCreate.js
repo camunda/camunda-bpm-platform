@@ -3,7 +3,7 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  '$scope', '$q', '$location', 'search', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList', '$translate',
+  '$scope', '$q', '$location', 'search', 'Uri', 'Notifications', 'camAPI', '$uibModalInstance', 'member', 'memberId', 'idList', '$translate',
   function($scope,   $q,   $location,   search,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList, $translate) {
 
     var modalPages = $scope.modalPages = {

@@ -6,7 +6,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
 
 var Directive = [
-  '$http', '$q', '$modal', 'search', 'Uri', 'Views', '$translate', 'localConf',
+  '$http', '$q', '$uibModal', 'search', 'Uri', 'Views', '$translate', 'localConf',
   function($http, $q, $modal, search, Uri, Views, $translate, localConf) {
 
     var Link = function linkFunction(scope) {
@@ -137,8 +137,8 @@ var Directive = [
         var baseUrl = scope.incidentsContext === 'history' ? baseHistoricUrl : baseRuntimeUrl;
 
         // get the 'count' of incidents
-        $http.post(Uri.appUri(baseUrl + 'count'), params).success(function(data) {
-          scope.pages.total = data.count;
+        $http.post(Uri.appUri(baseUrl + 'count'), params).then(function(response) {
+          scope.pages.total = response.data.count;
         });
 
         // get the incidents
