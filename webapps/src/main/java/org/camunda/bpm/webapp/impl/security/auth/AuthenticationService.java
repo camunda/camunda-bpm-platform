@@ -70,7 +70,7 @@ public class AuthenticationService {
     // check user's app authorizations
     AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
-    HashSet<String> authorizedApps = new HashSet<String>();
+    HashSet<String> authorizedApps = new HashSet<>();
     authorizedApps.add(APP_WELCOME);
 
     if (processEngine.getProcessEngineConfiguration().isAuthorizationEnabled()) {
@@ -99,9 +99,12 @@ public class AuthenticationService {
       .includingGroupsOfUser(true)
       .list();
 
-    List<String> tenantIds = new ArrayList<String>();
+    List<String> tenantIds = new ArrayList<>();
     for(Tenant tenant : tenants) {
-      tenantIds.add(tenant.getId());
+      if (tenant != null && tenant.getId() != null)
+      {
+        tenantIds.add(tenant.getId());
+      }
     }
     return tenantIds;
   }
@@ -111,9 +114,12 @@ public class AuthenticationService {
       .groupMember(userId)
       .list();
 
-    List<String> groupIds = new ArrayList<String>();
+    List<String> groupIds = new ArrayList<>();
     for (Group group : groups) {
-      groupIds.add(group.getId());
+      if (group != null && group.getId() != null)
+      {
+        groupIds.add(group.getId());
+      }
     }
     return groupIds;
   }
