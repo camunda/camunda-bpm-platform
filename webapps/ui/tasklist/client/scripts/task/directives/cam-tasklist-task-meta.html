@@ -8,7 +8,7 @@
           class="followup-date"
           ng-class="{overdue: task.followUp && (task.followUp < now) }"
           type="datetime"
-          change="saveFollowUpDate(this)"
+          change="saveFollowUpDate(varValue)"
           on-start-editing="startEditingFollowUpDate(this)"
           on-cancel-editing="cancelEditingFollowUpDate(this)"
           value="task.followUp">
@@ -42,7 +42,7 @@
           class="due-date"
           ng-class="{overdue: task.due && (task.due < now) }"
           type="datetime"
-          change="saveDueDate(this)"
+          change="saveDueDate(varValue)"
           on-start-editing="startEditingDueDate(this)"
           on-cancel-editing="cancelEditingDueDate(this)"
           value="task.due">

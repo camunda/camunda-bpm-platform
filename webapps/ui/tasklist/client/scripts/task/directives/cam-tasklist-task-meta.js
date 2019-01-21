@@ -85,9 +85,9 @@ module.exports = [
         }
 
         function saveDate(propName) {
-          return function(inlineFieldScope) {
+          return function(varValue) {
             setEditingState(propName, false);
-            $scope.task[propName] = inlineFieldScope.varValue;
+            $scope.task[propName] = varValue;
 
             updateTask();
 
