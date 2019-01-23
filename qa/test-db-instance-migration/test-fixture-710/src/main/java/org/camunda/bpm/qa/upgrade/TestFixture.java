@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.camunda.bpm.qa.upgrade.gson.ProcessInstanceModificationScenario;
 import org.camunda.bpm.qa.upgrade.gson.TaskFilterScenario;
 import org.camunda.bpm.qa.upgrade.gson.TaskFilterVariablesScenario;
 import org.camunda.bpm.qa.upgrade.gson.TimerChangeJobDefinitionScenario;
+import org.camunda.bpm.qa.upgrade.gson.TimerChangeProcessDefinitionScenario;
 import org.camunda.bpm.qa.upgrade.gson.batch.DeleteHistoricDecisionsBatchScenario;
 import org.camunda.bpm.qa.upgrade.gson.batch.DeleteHistoricProcessInstancesBatchScenario;
 import org.camunda.bpm.qa.upgrade.gson.batch.DeleteProcessInstancesBatchScenario;
@@ -30,8 +31,15 @@ import org.camunda.bpm.qa.upgrade.gson.batch.ModificationBatchScenario;
 import org.camunda.bpm.qa.upgrade.gson.batch.RestartProcessInstanceBatchScenario;
 import org.camunda.bpm.qa.upgrade.gson.batch.SetExternalTaskRetriesBatchScenario;
 import org.camunda.bpm.qa.upgrade.gson.batch.SetJobRetriesBatchScenario;
-import org.camunda.bpm.qa.upgrade.gson.TimerChangeProcessDefinitionScenario;
 import org.camunda.bpm.qa.upgrade.gson.batch.UpdateProcessInstanceSuspendStateBatchScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.DeploymentDeployTimeScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.EventSubscriptionCreateTimeScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.ExternalTaskLockExpTimeScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.IncidentTimestampScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.JobTimestampsScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.MeterLogTimestampScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.TaskCreateTimeScenario;
+import org.camunda.bpm.qa.upgrade.timestamp.UserLockExpTimeScenario;
 
 /**
  * @author Tassilo Weidner
@@ -65,6 +73,14 @@ public class TestFixture {
     runner.setupScenarios(MigrationBatchScenario.class);
     runner.setupScenarios(TaskFilterScenario.class);
     runner.setupScenarios(TaskFilterVariablesScenario.class);
+    runner.setupScenarios(DeploymentDeployTimeScenario.class);
+    runner.setupScenarios(JobTimestampsScenario.class);
+    runner.setupScenarios(IncidentTimestampScenario.class);
+    runner.setupScenarios(TaskCreateTimeScenario.class);
+    runner.setupScenarios(ExternalTaskLockExpTimeScenario.class);
+    runner.setupScenarios(EventSubscriptionCreateTimeScenario.class);
+    runner.setupScenarios(MeterLogTimestampScenario.class);
+    runner.setupScenarios(UserLockExpTimeScenario.class);
 
     processEngine.close();
   }
