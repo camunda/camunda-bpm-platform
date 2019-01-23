@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,17 +73,17 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
       .then()
         .expect()
           .body("[0].name", equalTo("metricName"))
-          .body("[0].timestamp", equalTo(withTimezone("1970-01-01T01:45:00")))
+          .body("[0].timestamp", equalTo(withTimezone(new Date(15 * 60 * 1000 * 3))))
           .body("[0].reporter", equalTo("REPORTER"))
           .body("[0].value", equalTo(23))
 
           .body("[1].name", equalTo("metricName"))
-          .body("[1].timestamp", equalTo(withTimezone("1970-01-01T01:30:00")))
+          .body("[1].timestamp", equalTo(withTimezone(new Date(15 * 60 * 1000 * 2))))
           .body("[1].reporter", equalTo("REPORTER"))
           .body("[1].value", equalTo(22))
 
           .body("[2].name", equalTo("metricName"))
-          .body("[2].timestamp", equalTo(withTimezone("1970-01-01T01:15:00")))
+          .body("[2].timestamp", equalTo(withTimezone(new Date(15 * 60 * 1000 * 1))))
           .body("[2].reporter", equalTo("REPORTER"))
           .body("[2].value", equalTo(21))
           .statusCode(Status.OK.getStatusCode())
