@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -29,10 +30,11 @@ import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCheckResultDto
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCreateDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationQueryDto;
+import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
 import org.camunda.bpm.engine.rest.sub.authorization.impl.AuthorizationResourceImpl;
-import org.camunda.bpm.engine.rest.util.AuthorizationUtil;
+import org.camunda.bpm.engine.rest.util.ResourceUtil;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
@@ -77,18 +79,19 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
     // create new authorization dto implementing both Permission and Resource
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(resourceName, resourceType, permissionName);
+    ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
+    Permission permission = PermissionConverter.getPermissionForName(permissionName, resourceType);
 
     boolean isUserAuthorized = false;
     if(resourceId == null || Authorization.ANY.equals(resourceId)) {
-      isUserAuthorized = authorizationService.isUserAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), authorizationUtil, authorizationUtil);
+      isUserAuthorized = authorizationService.isUserAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource);
 
     } else {
-      isUserAuthorized = authorizationService.isUserAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), authorizationUtil, authorizationUtil, resourceId);
+      isUserAuthorized = authorizationService.isUserAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
 
     }
 
-    return new AuthorizationCheckResultDto(isUserAuthorized, authorizationUtil, resourceId);
+    return new AuthorizationCheckResultDto(isUserAuthorized, permissionName, resource, resourceId);
   }
 
   public AuthorizationResource getAuthorization(String id) {

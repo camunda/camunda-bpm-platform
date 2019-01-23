@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,8 +50,9 @@ import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
+import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.util.AuthorizationUtil;
+import org.camunda.bpm.engine.rest.util.ResourceUtil;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -95,8 +96,9 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
-    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil)).thenReturn(true);
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = PermissionConverter.getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource)).thenReturn(true);
 
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
@@ -109,7 +111,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("authorized", equalTo(true))
     .when().get(AUTH_CHECK_PATH);
 
-    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource);
     verify(identityServiceMock, times(1)).getCurrentAuthentication();
 
   }
@@ -121,8 +123,9 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
-    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil)).thenReturn(false);
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = PermissionConverter.getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource)).thenReturn(false);
 
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
@@ -135,7 +138,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("authorized", equalTo(false))
     .when().get(AUTH_CHECK_PATH);
 
-    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource);
     verify(identityServiceMock, times(1)).getCurrentAuthentication();
   }
 
@@ -146,8 +149,9 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
-    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil, MockProvider.EXAMPLE_RESOURCE_ID)).thenReturn(true);
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = PermissionConverter.getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource, MockProvider.EXAMPLE_RESOURCE_ID)).thenReturn(true);
 
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
@@ -161,7 +165,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("authorized", equalTo(true))
     .when().get(AUTH_CHECK_PATH);
 
-    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil, MockProvider.EXAMPLE_RESOURCE_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource, MockProvider.EXAMPLE_RESOURCE_ID);
     verify(identityServiceMock, times(1)).getCurrentAuthentication();
 
   }
@@ -173,8 +177,9 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
-    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil, MockProvider.EXAMPLE_RESOURCE_ID)).thenReturn(false);
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = PermissionConverter.getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource, MockProvider.EXAMPLE_RESOURCE_ID)).thenReturn(false);
 
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
@@ -188,7 +193,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("authorized", equalTo(false))
     .when().get(AUTH_CHECK_PATH);
 
-    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil, MockProvider.EXAMPLE_RESOURCE_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource, MockProvider.EXAMPLE_RESOURCE_ID);
     verify(identityServiceMock, times(1)).getCurrentAuthentication();
 
   }
@@ -201,8 +206,9 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(null);
 
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
-    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil)).thenReturn(false);
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = PermissionConverter.getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource)).thenReturn(false);
 
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)

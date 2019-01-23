@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.authorization;
 
-import org.camunda.bpm.engine.rest.util.AuthorizationUtil;
+import org.camunda.bpm.engine.rest.util.ResourceUtil;
 
 /**
  * @author Daniel Meyer
@@ -32,10 +32,10 @@ public class AuthorizationCheckResultDto {
   public AuthorizationCheckResultDto() {
   }
   
-  public AuthorizationCheckResultDto(boolean userAuthorized, AuthorizationUtil authorizationUtil, String resourceId) {
+  public AuthorizationCheckResultDto(boolean userAuthorized, String permissionName, ResourceUtil resource, String resourceId) {
     isAuthorized = userAuthorized;
-    permissionName = authorizationUtil.getName();
-    resourceName = authorizationUtil.resourceName();    
+    this.permissionName = permissionName;
+    resourceName = resource.resourceName();
     this.resourceId = resourceId;
   }
   

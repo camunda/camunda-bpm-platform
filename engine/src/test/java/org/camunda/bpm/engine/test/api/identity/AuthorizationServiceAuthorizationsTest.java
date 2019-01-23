@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -314,10 +315,50 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     }
   }
 
+  public void testIsUserAuthorizedWithValidResourceImpl() {
+    // given
+
+    ResourceImpl resource = new ResourceImpl("authorization", 0);
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.addPermission(Permissions.ACCESS);
+    authorization.setResource(Resources.APPLICATION);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // then
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, Permissions.ACCESS, resource));
+  }
+
   protected void cleanupAfterTest() {
     for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
+  }
+
+  class ResourceImpl implements Resource {
+
+    String resourceName;
+    int resourceType;
+
+    public ResourceImpl(String resourceName, int resourceType) {
+      this.resourceName = resourceName;
+      this.resourceType = resourceType;
+    }
+
+    @Override
+    public String resourceName() {
+      return resourceName;
+    }
+
+    @Override
+    public int resourceType() {
+      return resourceType;
+    }
+
   }
 
 }

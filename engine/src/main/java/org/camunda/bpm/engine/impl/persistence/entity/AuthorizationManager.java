@@ -34,7 +34,6 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -292,8 +291,8 @@ public class AuthorizationManager extends AbstractManager {
     }
 
     for (PermissionCheck permissionCheck : permissionChecks) {
-      if (!isResourceValid(permissionCheck)) {
-        throw LOG.invalidResource(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
+      if (!isResourceValidForPermission(permissionCheck)) {
+        throw LOG.invalidResourceForPermission(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
       }
     }
 
@@ -332,8 +331,8 @@ public class AuthorizationManager extends AbstractManager {
 
   public boolean isAuthorized(String userId, List<String> groupIds, CompositePermissionCheck compositePermissionCheck) {
     for (PermissionCheck permissionCheck : compositePermissionCheck.getAllPermissionChecks()) {
-      if (!isResourceValid(permissionCheck)) {
-        throw LOG.invalidResource(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
+      if (!isResourceValidForPermission(permissionCheck)) {
+        throw LOG.invalidResourceForPermission(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
       }
     }
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
@@ -354,30 +353,35 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  protected boolean isResourceValid(PermissionCheck permissionCheck) {
+  protected boolean isResourceValidForPermission(PermissionCheck permissionCheck) {
     Resource[] permissionResources = permissionCheck.getPermission().getTypes();
     Resource givenResource = permissionCheck.getResource();
-    return Arrays.asList(permissionResources).contains(givenResource);
+    for (Resource resource : permissionResources) {
+      if (givenResource.resourceType() == resource.resourceType()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void validateResourceCompatibility(AuthorizationEntity authorization) {
     int resourceType = authorization.getResourceType();
-    Set<Permission> perms = authorization.getPermissionSet();
+    Set<Permission> permissionSet = authorization.getPermissionSet();
 
-    boolean isValid = false;
-    for (Permission permission : perms) {
+    for (Permission permission : permissionSet) {
+      boolean isAuthorizationResourceValid = false;
       for (Resource resource : permission.getTypes()) {
-        if (resource.resourceType() == resourceType) {
-          isValid = true;
+        if (resourceType == resource.resourceType()) {
+          isAuthorizationResourceValid = true;
+          break;
         }
       }
-      if (!isValid) {
-        throw LOG.invalidResource(resourceType, permission.getName());
+      if (!isAuthorizationResourceValid) {
+        throw LOG.invalidResourceForAuthorization(resourceType, permission.getName());
       }
     }
   }
 
-  // variable instance query /////////////////////////////
 
   // authorization checks on queries ////////////////////////////////
 
