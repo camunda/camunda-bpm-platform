@@ -40,6 +40,10 @@ public abstract class DateTimeUtils {
     }
   }
 
+  public static String withTimezone(Date date) {
+      return DATE_FORMAT_WITH_TIMEZONE.format(date);
+  }
+
   public static Date updateTime(Date now, Date newTime) {
     Calendar c = Calendar.getInstance();
     c.setTime(now);
