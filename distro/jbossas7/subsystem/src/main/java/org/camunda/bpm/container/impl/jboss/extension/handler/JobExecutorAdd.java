@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,12 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYP
 import java.util.List;
 import java.util.Locale;
 
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscExecutorService;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
@@ -64,12 +66,9 @@ public class JobExecutorAdd extends AbstractAddStepHandler implements Descriptio
 
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-      String jobExecutorThreadPoolName = "default";
-      if (operation.hasDefined(THREAD_POOL_NAME)) {
-         jobExecutorThreadPoolName = operation.get(THREAD_POOL_NAME).asString();
-      }
-      
-      model.get(THREAD_POOL_NAME).set(jobExecutorThreadPoolName);
+    for (AttributeDefinition attr : SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES) {
+      attr.validateAndSet(operation, model);
+    }
   }
   
   
@@ -82,7 +81,7 @@ public class JobExecutorAdd extends AbstractAddStepHandler implements Descriptio
       throw new ProcessEngineException("Unable to configure threadpool for ContainerJobExecutorService, missing element '" + THREAD_POOL_NAME + "' in JobExecutor configuration.");
     }
     
-    String jobExecutorThreadPoolName = operation.get(THREAD_POOL_NAME).asString();
+    String jobExecutorThreadPoolName = SubsystemAttributeDefinitons.THREAD_POOL_NAME.resolveModelAttribute(context, model).asString();
 
     MscExecutorService service = new MscExecutorService();
     ServiceController<MscExecutorService> serviceController = context.getServiceTarget().addService(ServiceNames.forMscExecutorService(), service)

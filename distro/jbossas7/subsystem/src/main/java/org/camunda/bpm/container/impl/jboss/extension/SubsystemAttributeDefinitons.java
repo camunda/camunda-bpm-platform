@@ -17,8 +17,12 @@ package org.camunda.bpm.container.impl.jboss.extension;
 
 import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jboss.util.CustomMarshaller;
-import org.camunda.bpm.container.impl.jboss.util.FixedObjectTypeAttributeDefinition;
-import org.jboss.as.controller.*;
+import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.ObjectListAttributeDefinition;
+import org.jboss.as.controller.ObjectTypeAttributeDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
+import org.jboss.as.controller.SimpleMapAttributeDefinition;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
@@ -30,14 +34,9 @@ public class SubsystemAttributeDefinitons {
   public static final String DEFAULT_PROCESS_ENGINE_CONFIGURATION_CLASS = ManagedJtaProcessEngineConfiguration.class.getName();
   public static final String DEFAULT_ACQUISITION_STRATEGY = "SEQUENTIAL";
   public static final String DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME = "job-executor-tp";
-  public static final int DEFAULT_CORE_THREADS = 3;
-  public static final int DEFAULT_MAX_THREADS = 5;
-  public static final int DEFAULT_QUEUE_LENGTH = 10;
-  public static final int DEFAULT_KEEPALIVE_TIME = 10;
-  public static final boolean DEFAULT_ALLOW_CORE_TIMEOUT = true;
 
   // general
-  public static final SimpleAttributeDefinition NAME =
+  public static final SimpleAttributeDefinition NAME = 
     new SimpleAttributeDefinitionBuilder(ModelConstants.NAME, ModelType.STRING, false)
       .setDefaultValue(new ModelNode("default"))
       .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
@@ -50,25 +49,25 @@ public class SubsystemAttributeDefinitons {
       .build();
 
   // process engine
-  public static final SimpleAttributeDefinition DEFAULT =
+  public static final SimpleAttributeDefinition DEFAULT = 
     new SimpleAttributeDefinitionBuilder(ModelConstants.DEFAULT, ModelType.BOOLEAN, true)
       .setDefaultValue(new ModelNode(false))
       .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
       .setAllowExpression(true)
       .build();
-  public static final AttributeDefinition DATASOURCE =
+  public static final AttributeDefinition DATASOURCE = 
     new SimpleAttributeDefinitionBuilder(ModelConstants.DATASOURCE, ModelType.STRING, false)
       .setDefaultValue(new ModelNode(DEFAULT_DATASOURCE))
       .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
       .setAllowExpression(true)
       .build();
-  public static final AttributeDefinition HISTORY_LEVEL =
+  public static final AttributeDefinition HISTORY_LEVEL = 
     new SimpleAttributeDefinitionBuilder(ModelConstants.HISTORY_LEVEL, ModelType.STRING, true)
       .setDefaultValue(new ModelNode(DEFAULT_HISTORY_LEVEL))
       .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
       .setAllowExpression(true)
       .build();
-  public static final AttributeDefinition CONFIGURATION =
+  public static final AttributeDefinition CONFIGURATION = 
     new SimpleAttributeDefinitionBuilder(ModelConstants.CONFIGURATION, ModelType.STRING, true)
       .setDefaultValue(new ModelNode(DEFAULT_PROCESS_ENGINE_CONFIGURATION_CLASS))
       .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
@@ -76,44 +75,12 @@ public class SubsystemAttributeDefinitons {
       .build();
 
   // job executor
-  @Deprecated
   public static final AttributeDefinition THREAD_POOL_NAME =
     new SimpleAttributeDefinitionBuilder(ModelConstants.THREAD_POOL_NAME, ModelType.STRING, true)
       .setDefaultValue(new ModelNode(DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME))
       .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
       .setAllowExpression(true)
       .build();
-  public static final AttributeDefinition CORE_THREADS =
-    new SimpleAttributeDefinitionBuilder(ModelConstants.CORE_THREADS, ModelType.INT, false)
-      .setDefaultValue(new ModelNode(DEFAULT_CORE_THREADS))
-      .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-      .setAllowExpression(true)
-      .build();
-  public static final AttributeDefinition MAX_THREADS =
-    new SimpleAttributeDefinitionBuilder(ModelConstants.MAX_THREADS, ModelType.INT, false)
-      .setDefaultValue(new ModelNode(DEFAULT_MAX_THREADS))
-      .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-      .setAllowExpression(true)
-      .build();
-  public static final AttributeDefinition QUEUE_LENGTH =
-    new SimpleAttributeDefinitionBuilder(ModelConstants.QUEUE_LENGTH, ModelType.INT, false)
-      .setDefaultValue(new ModelNode(DEFAULT_QUEUE_LENGTH))
-      .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-      .setAllowExpression(true)
-      .build();
-  public static final AttributeDefinition KEEPALIVE_TIME =
-    new SimpleAttributeDefinitionBuilder(ModelConstants.KEEPALIVE_TIME, ModelType.INT, true)
-      .setDefaultValue(new ModelNode(DEFAULT_KEEPALIVE_TIME))
-      .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-      .setAllowExpression(true)
-      .build();
-  public static final AttributeDefinition ALLOW_CORE_TIMEOUT =
-    new SimpleAttributeDefinitionBuilder(ModelConstants.ALLOW_CORE_TIMEOUT, ModelType.BOOLEAN, true)
-      .setDefaultValue(new ModelNode(DEFAULT_ALLOW_CORE_TIMEOUT))
-      .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-      .setAllowExpression(true)
-      .build();
-
   @Deprecated
   public static final AttributeDefinition ACQUISITION_STRATEGY =
     new SimpleAttributeDefinitionBuilder(ModelConstants.ACQUISITION_STRATEGY, ModelType.STRING, true)
@@ -124,19 +91,18 @@ public class SubsystemAttributeDefinitons {
 
   public static final SimpleAttributeDefinition PLUGIN_CLASS =
     new SimpleAttributeDefinitionBuilder(ModelConstants.PLUGIN_CLASS, ModelType.STRING, true)
-        .setAttributeMarshaller(CustomMarshaller.ATTRIBUTE_AS_ELEMENT)
-        .setAllowExpression(true)
-        .build();
+      .setAttributeMarshaller(CustomMarshaller.ATTRIBUTE_AS_ELEMENT)
+      .setAllowExpression(true)
+      .build();
 
   public static final AttributeDefinition[] PLUGIN_ATTRIBUTES = new AttributeDefinition[] {
       PLUGIN_CLASS,
       PROPERTIES
   };
 
-  public static final FixedObjectTypeAttributeDefinition PLUGIN = 
-    FixedObjectTypeAttributeDefinition.Builder.of(ModelConstants.PLUGIN, PLUGIN_ATTRIBUTES)
+  public static final ObjectTypeAttributeDefinition PLUGIN = 
+    ObjectTypeAttributeDefinition.Builder.of(ModelConstants.PLUGIN, PLUGIN_ATTRIBUTES)
       .setAttributeMarshaller(CustomMarshaller.OBJECT_AS_ELEMENT)
-      .setAttributeParser(AttributeParser.LIST)
       .setRequires(ModelConstants.PLUGIN_CLASS)
       .setAllowNull(true)
       .setRestartAllServices()
@@ -152,11 +118,6 @@ public class SubsystemAttributeDefinitons {
 
   public static final AttributeDefinition[] JOB_EXECUTOR_ATTRIBUTES = new AttributeDefinition[] {
       THREAD_POOL_NAME,
-      CORE_THREADS,
-      MAX_THREADS,
-      QUEUE_LENGTH,
-      KEEPALIVE_TIME,
-      ALLOW_CORE_TIMEOUT
   };
 
   public static final AttributeDefinition[] JOB_ACQUISITION_ATTRIBUTES = new AttributeDefinition[] {

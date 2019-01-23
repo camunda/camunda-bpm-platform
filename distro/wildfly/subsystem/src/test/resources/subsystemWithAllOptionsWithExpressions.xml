@@ -1,0 +1,40 @@
+<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+	<process-engines>
+		<process-engine name="__test" default="${org.camunda.bpm.jboss.process-engine.test.isDefault}">
+			<datasource>${org.camunda.bpm.jboss.process-engine.test.datasource}</datasource>
+			<history-level>${org.camunda.bpm.jboss.process-engine.test.history-level}</history-level>
+      <configuration>${org.camunda.bpm.jboss.process-engine.test.configuration}</configuration>
+			<properties>
+				<property name="job-acquisition-name">${org.camunda.bpm.jboss.process-engine.test.property.job-acquisition-name}</property>
+			</properties>
+      <plugins>
+        <plugin>
+          <class>${org.camunda.bpm.jboss.process-engine.test.plugin.ldap.class}</class>
+          <properties>
+            <property name="test">${org.camunda.bpm.jboss.process-engine.test.plugin.ldap.property.test}</property>
+            <property name="number">${org.camunda.bpm.jboss.process-engine.test.plugin.ldap.property.number}</property>
+            <property name="bool">${org.camunda.bpm.jboss.process-engine.test.plugin.ldap.property.bool}</property>
+          </properties>
+        </plugin>
+      </plugins>
+		</process-engine>
+	</process-engines>
+	<job-executor>
+	  <thread-pool-name>${org.camunda.bpm.jboss.job-executor.thread-pool-name}</thread-pool-name>
+    <core-threads>${org.camunda.bpm.jboss.job-executor.core-threads}</core-threads>
+    <max-threads>${org.camunda.bpm.jboss.job-executor.max-threads}</max-threads>
+    <queue-length>${org.camunda.bpm.jboss.job-executor.queue-length}</queue-length>
+    <keepalive-time>${org.camunda.bpm.jboss.job-executor.keepalive-time}</keepalive-time>
+    <allow-core-timeout>${org.camunda.bpm.jboss.job-executor.allow-core-timeout}</allow-core-timeout>
+		<job-acquisitions>
+			<job-acquisition name="default">
+				<acquisition-strategy>${org.camunda.bpm.jboss.job-executor.job-acquisition.default.acquisition-strategy}</acquisition-strategy>                
+				<properties>
+					<property name="lockTimeInMillis">${org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.lockTimeInMillis}</property>
+					<property name="waitTimeInMillis">${org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.waitTimeInMillis}</property>
+					<property name="maxJobsPerAcquisition">${org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.maxJobsPerAcquisition}</property>
+				</properties>
+			</job-acquisition>
+		</job-acquisitions>
+	</job-executor>
+</subsystem>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,16 @@ import java.io.IOException;
  *
  * @author christian.lipphardt@camunda.com
  */
-public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
+public class BpmPlatformSubsystemEnginesAndJobExecutorTest extends AbstractSubsystemBaseTest {
 
-  public BpmPlatformSubsystemTest() {
+  public BpmPlatformSubsystemEnginesAndJobExecutorTest() {
     super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension());
   }
 
   @Override
   protected String getSubsystemXml() throws IOException {
     try {
-//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY);
-//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES);
-      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS);
-//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_DUPLICATE_ENGINE_NAMES);
+      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR);
     } catch (Exception e) {
       e.printStackTrace();
     }
