@@ -31,6 +31,8 @@ import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithParallelGatew
 import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithParallelGatewayScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithUserTaskAndTimerScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithUserTaskScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.timestamp.IncidentTimestampUpdateScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.timestamp.JobTimestampsUpdateScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioRunner;
 
 /**
@@ -72,6 +74,8 @@ public class TestFixture {
     runner.setupScenarios(ProcessWithMultiInstanceCallActivityScenario.class);
     runner.setupScenarios(ProcessWithExternalTaskScenario.class);
     runner.setupScenarios(ProcessWithEventSubProcessScenario.class);
+    runner.setupScenarios(JobTimestampsUpdateScenario.class);
+    runner.setupScenarios(IncidentTimestampUpdateScenario.class);
 
     if (RollingUpdateConstants.NEW_ENGINE_TAG.equals(currentFixtureTag)) { // create data with new engine
       runner.setupScenarios(HistoryCleanupScenario.class);
