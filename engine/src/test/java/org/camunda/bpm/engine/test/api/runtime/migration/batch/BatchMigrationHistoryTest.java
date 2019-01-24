@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +48,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class BatchMigrationHistoryTest {
 
@@ -55,9 +61,6 @@ public class BatchMigrationHistoryTest {
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
 
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule);
-
   protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
@@ -66,11 +69,37 @@ public class BatchMigrationHistoryTest {
   protected ProcessDefinition sourceProcessDefinition;
   protected ProcessDefinition targetProcessDefinition;
 
+  protected boolean defaultEnsureJobDueDateSet;
+
+  @Parameterized.Parameter(0)
+  public boolean ensureJobDueDateSet;
+
+  @Parameterized.Parameter(1)
+  public Date currentTime;
+
+  @Parameterized.Parameters(name = "Job DueDate is set: {0}")
+  public static Collection<Object[]> scenarios() throws ParseException {
+    return Arrays.asList(new Object[][] {
+      { false, null },
+      { true, START_DATE }
+    });
+  }
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule);
+
   @Before
   public void initServices() {
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
     historyService = engineRule.getHistoryService();
+  }
+
+  @Before
+  public void setupConfiguration() {
+    configuration = engineRule.getProcessEngineConfiguration();
+    defaultEnsureJobDueDateSet = configuration.isEnsureJobDueDateNotNull();
+    configuration.setEnsureJobDueDateNotNull(ensureJobDueDateSet);
   }
 
   @Before
@@ -86,6 +115,11 @@ public class BatchMigrationHistoryTest {
   @After
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
+  }
+
+  @After
+  public void resetConfiguration() {
+    configuration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
   }
 
   @Test
@@ -141,7 +175,7 @@ public class BatchMigrationHistoryTest {
     assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(jobLog.getJobDueDate(), currentTime);
 
     // when the seed job is executed
     Date executionDate = helper.addSecondsToClock(12);
@@ -158,7 +192,7 @@ public class BatchMigrationHistoryTest {
     assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(jobLog.getJobDueDate(), currentTime);
 
   }
 
@@ -178,7 +212,7 @@ public class BatchMigrationHistoryTest {
     assertCommonMonitorJobLogProperties(batch, jobLog);
     assertTrue(jobLog.isCreationLog());
     assertEquals(START_DATE, jobLog.getTimestamp());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(jobLog.getJobDueDate(), currentTime);
 
     // when the monitor job is executed
     Date executionDate = helper.addSecondsToClock(15);
@@ -193,7 +227,7 @@ public class BatchMigrationHistoryTest {
     assertCommonMonitorJobLogProperties(batch, jobLog);
     assertTrue(jobLog.isSuccessLog());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(jobLog.getJobDueDate(), currentTime);
 
     // and a creation job log for the new monitor job was created with due date
     monitorJob = helper.getMonitorJob(batch);
@@ -244,7 +278,7 @@ public class BatchMigrationHistoryTest {
     assertEquals(sourceDeploymentId, jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(jobLog.getJobDueDate(), currentTime);
 
     jobLog = helper.getHistoricBatchJobLog(batch).get(1);
     assertNotNull(jobLog);
@@ -256,7 +290,7 @@ public class BatchMigrationHistoryTest {
     assertEquals(sourceDeploymentId, jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(jobLog.getJobDueDate(), currentTime);
   }
 
   @Test

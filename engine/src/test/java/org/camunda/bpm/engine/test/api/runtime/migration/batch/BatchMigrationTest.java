@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -57,7 +42,6 @@ import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
-import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.hamcrest.CoreMatchers;
@@ -67,16 +51,35 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
+@RunWith(Parameterized.class)
 public class BatchMigrationTest {
+
+  protected static final Date TEST_DATE = new Date(1457326800000L);
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule).around(testRule);
 
   protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
@@ -85,12 +88,39 @@ public class BatchMigrationTest {
 
   protected int defaultBatchJobsPerSeed;
   protected int defaultInvocationsPerBatchJob;
+  protected boolean defaultEnsureJobDueDateSet;
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule).around(testRule);
+
+  @Parameterized.Parameter(0)
+  public boolean ensureJobDueDateSet;
+
+  @Parameterized.Parameter(1)
+  public Date currentTime;
+
+  @Parameterized.Parameters(name = "Job DueDate is set: {0}")
+  public static Collection<Object[]> scenarios() throws ParseException {
+    return Arrays.asList(new Object[][] {
+      { false, null },
+      { true, TEST_DATE }
+    });
+  }
 
   @Before
   public void initServices() {
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
     historyService = engineRule.getHistoryService();
+  }
+
+  @Before
+  public void storeEngineSettings() {
+    configuration = engineRule.getProcessEngineConfiguration();
+    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
+    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
+    defaultEnsureJobDueDateSet = configuration.isEnsureJobDueDateNotNull();
+    configuration.setEnsureJobDueDateNotNull(ensureJobDueDateSet);
   }
 
   @After
@@ -103,18 +133,11 @@ public class BatchMigrationTest {
     ClockUtil.reset();
   }
 
-  @Before
-  public void storeEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
-    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
-    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
-  }
-
   @After
   public void restoreEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+    configuration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
   }
 
 
@@ -249,6 +272,8 @@ public class BatchMigrationTest {
 
   @Test
   public void testSeedJobCreation() {
+    ClockUtil.setCurrentTime(TEST_DATE);
+
     // when
     Batch batch = helper.migrateProcessInstancesAsync(10);
 
@@ -267,7 +292,7 @@ public class BatchMigrationTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertNull(seedJob.getDuedate());
+    assertEquals(seedJob.getDuedate(), currentTime);
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -281,6 +306,8 @@ public class BatchMigrationTest {
 
   @Test
   public void testMigrationJobsCreation() {
+    ClockUtil.setCurrentTime(TEST_DATE);
+
     // reduce number of batch jobs per seed to not have to create a lot of instances
     engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(10);
 
@@ -298,7 +325,7 @@ public class BatchMigrationTest {
 
     for (Job migrationJob : migrationJobs) {
       assertEquals(migrationJobDefinition.getId(), migrationJob.getJobDefinitionId());
-      assertNull(migrationJob.getDuedate());
+      assertEquals(migrationJob.getDuedate(), currentTime);
       assertEquals(sourceDeploymentId, migrationJob.getDeploymentId());
       assertNull(migrationJob.getProcessDefinitionId());
       assertNull(migrationJob.getProcessDefinitionKey());
@@ -449,16 +476,18 @@ public class BatchMigrationTest {
 
   @Test
   public void testMonitorJobPollingForCompletion() {
+    ClockUtil.setCurrentTime(TEST_DATE);
+
     Batch batch = helper.migrateProcessInstancesAsync(10);
 
     // when the seed job creates the monitor job
-    Date createDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
+    Date createDate = TEST_DATE;
     helper.executeSeedJob(batch);
 
     // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
     assertNotNull(monitorJob);
-    assertNull(monitorJob.getDuedate());
+    assertEquals(monitorJob.getDuedate(), currentTime);
 
     // when the monitor job is executed
     helper.executeMonitorJob(batch);

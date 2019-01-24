@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,6 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
@@ -31,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -46,11 +40,26 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+@RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class BatchHistoricDecisionInstanceDeletionTest {
 
   protected static String DECISION = "decision";
+  protected static final Date TEST_DATE = new Date(1457326800000L);
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
@@ -64,14 +73,31 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
   private int defaultBatchJobsPerSeed;
   private int defaultInvocationsPerBatchJob;
+  private boolean defaultEnsureJobDueDateSet;
 
+  protected ProcessEngineConfigurationImpl configuration;
   protected DecisionService decisionService;
   protected HistoryService historyService;
 
   protected List<String> decisionInstanceIds;
 
+  @Parameterized.Parameter(0)
+  public boolean ensureJobDueDateSet;
+
+  @Parameterized.Parameter(1)
+  public Date currentTime;
+
+  @Parameterized.Parameters(name = "Job DueDate is set: {0}")
+  public static Collection<Object[]> scenarios() throws ParseException {
+    return Arrays.asList(new Object[][] {
+      { false, null },
+      { true, TEST_DATE }
+    });
+  }
+
   @Before
   public void setup() {
+    ClockUtil.setCurrentTime(TEST_DATE);
     historyService = rule.getHistoryService();
     decisionService = rule.getDecisionService();
     decisionInstanceIds = new ArrayList<String>();
@@ -79,9 +105,11 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
   @Before
   public void storeEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
+    configuration = rule.getProcessEngineConfiguration();
+    defaultEnsureJobDueDateSet = configuration.isEnsureJobDueDateNotNull();
     defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
     defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
+    configuration.setEnsureJobDueDateNotNull(ensureJobDueDateSet);
   }
 
   @Before
@@ -104,14 +132,15 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
   @After
   public void restoreEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+    configuration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
   }
 
   @After
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
+    ClockUtil.reset();
   }
 
   @Test
@@ -198,7 +227,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertNull(seedJob.getDuedate());
+    assertEquals(seedJob.getDuedate(), currentTime);
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -234,7 +263,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertNull(seedJob.getDuedate());
+    assertEquals(seedJob.getDuedate(), currentTime);
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -270,7 +299,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertNull(seedJob.getDuedate());
+    assertEquals(seedJob.getDuedate(), currentTime);
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -301,7 +330,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     for (Job deletionJob : deletionJobs) {
       assertEquals(deletionJobDefinition.getId(), deletionJob.getJobDefinitionId());
-      assertNull(deletionJob.getDuedate());
+      assertEquals(deletionJob.getDuedate(), currentTime);
       assertNull(deletionJob.getProcessDefinitionId());
       assertNull(deletionJob.getProcessDefinitionKey());
       assertNull(deletionJob.getProcessInstanceId());
@@ -334,7 +363,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     for (Job deletionJob : deletionJobs) {
       assertEquals(deletionJobDefinition.getId(), deletionJob.getJobDefinitionId());
-      assertNull(deletionJob.getDuedate());
+      assertEquals(deletionJob.getDuedate(), currentTime);
       assertNull(deletionJob.getProcessDefinitionId());
       assertNull(deletionJob.getProcessDefinitionKey());
       assertNull(deletionJob.getProcessInstanceId());
@@ -367,7 +396,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     for (Job deletionJob : deletionJobs) {
       assertEquals(deletionJobDefinition.getId(), deletionJob.getJobDefinitionId());
-      assertNull(deletionJob.getDuedate());
+      assertEquals(deletionJob.getDuedate(), currentTime);
       assertNull(deletionJob.getProcessDefinitionId());
       assertNull(deletionJob.getProcessDefinitionKey());
       assertNull(deletionJob.getProcessInstanceId());

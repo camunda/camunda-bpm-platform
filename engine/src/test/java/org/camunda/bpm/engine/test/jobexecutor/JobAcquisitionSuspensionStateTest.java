@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,12 +45,15 @@ public class JobAcquisitionSuspensionStateTest extends PluggableProcessEngineTes
 
   protected CommandExecutor commandExecutor;
   protected String jobId;
+  private boolean defaultEnsureJobDueDateSet;
 
-  protected void setUp() throws Exception {
+  public void setUp() throws Exception {
     commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    defaultEnsureJobDueDateSet = processEngineConfiguration.isEnsureJobDueDateNotNull();
   }
 
-  protected void tearDown() throws Exception {
+
+  public void tearDown() throws Exception {
     if (jobId != null) {
       commandExecutor.execute(new Command<Void>() {
         public Void execute(CommandContext commandContext) {
@@ -59,9 +64,13 @@ public class JobAcquisitionSuspensionStateTest extends PluggableProcessEngineTes
         }
       });
     }
+
+    processEngineConfiguration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
   }
 
   public void testJobAcquisitionForJobsWithoutSuspensionStateSet() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(false);
+
     final String processInstanceId = "1";
     final String myCustomTimerEntity = "myCustomTimerEntity";
     final String jobId = "2";
@@ -91,6 +100,88 @@ public class JobAcquisitionSuspensionStateTest extends PluggableProcessEngineTes
               "'" + TimerStartEventJobHandler.TYPE + "'," +
               "'" + myCustomTimerEntity + "'" +
               ")";
+
+          int updateResult = statement.executeUpdate(insertStatementString);
+          assertEquals(1, updateResult);
+          connection.commit();
+
+          JobAcquisitionSuspensionStateTest.this.jobId = jobId;
+          statement.close();
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        } finally {
+          try {
+            if (statement != null) {
+              statement.close();
+            }
+            if (rs != null) {
+              rs.close();
+            }
+            if (connection != null) {
+              connection.close();
+            }
+          } catch (SQLException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        return null;
+      }
+    });
+
+    // it is picked up by the acquisition queries
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        JobManager jobManager = commandContext.getJobManager();
+
+        List<JobEntity> executableJobs = jobManager.findNextJobsToExecute(new Page(0, 1));
+
+        assertEquals(1, executableJobs.size());
+        assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfigurationRaw());
+        assertEquals(SuspensionState.ACTIVE.getStateCode(), executableJobs.get(0).getSuspensionState());
+
+        executableJobs = jobManager.findJobsByProcessInstanceId(processInstanceId);
+        assertEquals(1, executableJobs.size());
+        assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfigurationRaw());
+        assertEquals(SuspensionState.ACTIVE.getStateCode(), executableJobs.get(0).getSuspensionState());
+        return null;
+      }
+    });
+
+
+  }
+
+  public void testJobAcquisitionForJobsWithDueDateSetAndWithoutSuspensionStateSet() {
+    final String processInstanceId = "1";
+    final String myCustomTimerEntity = "myCustomTimerEntity";
+    final String jobId = "2";
+
+    // we insert a timer job without specifying a suspension state
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet rs = null;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD'T'HH:mm:ss");
+        String tablePrefix = commandContext.getProcessEngineConfiguration().getDatabaseTablePrefix();
+
+        try {
+          SqlSession sqlSession = commandContext.getDbSqlSession().getSqlSession();
+          connection = sqlSession.getConnection();
+          statement = connection
+            .createStatement();
+          String insertStatementString = "INSERT INTO " + tablePrefix + "ACT_RU_JOB(ID_, REV_, RETRIES_, PROCESS_INSTANCE_ID_, TYPE_, EXCLUSIVE_, HANDLER_TYPE_, HANDLER_CFG_, DUEDATE_) " +
+            "VALUES (" +
+            "'" + jobId + "'," +
+            "1," +
+            "3," +
+            "'" + processInstanceId + "'," +
+            "'timer'," +
+            DbSqlSessionFactory.databaseSpecificTrueConstant.get(processEngineConfiguration.getDatabaseType()) + "," +
+            "'" + TimerStartEventJobHandler.TYPE + "'," +
+            "'" + myCustomTimerEntity + "'," +
+            "'" + sdf.format(new Date()) + "'" +
+            ")";
 
           int updateResult = statement.executeUpdate(insertStatementString);
           assertEquals(1, updateResult);

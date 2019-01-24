@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
   private boolean jobExecutorAcquireByDueDate;
   private boolean jobExecutorAcquireByPriority;
   private boolean jobExecutorPreferTimerJobs;
+  private boolean jobEnsureDueDateSet;
 
   @Before
   public void initServices() {
@@ -58,6 +59,7 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
     jobExecutorAcquireByDueDate = configuration.isJobExecutorAcquireByDueDate();
     jobExecutorAcquireByPriority = configuration.isJobExecutorAcquireByPriority();
     jobExecutorPreferTimerJobs = configuration.isJobExecutorPreferTimerJobs();
+    jobEnsureDueDateSet = configuration.isEnsureJobDueDateNotNull();
   }
 
   @Before
@@ -70,6 +72,7 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
     configuration.setJobExecutorAcquireByDueDate(jobExecutorAcquireByDueDate);
     configuration.setJobExecutorAcquireByPriority(jobExecutorAcquireByPriority);
     configuration.setJobExecutorPreferTimerJobs(jobExecutorPreferTimerJobs);
+    configuration.setEnsureJobDueDateNotNull(jobEnsureDueDateSet);
   }
 
   @After

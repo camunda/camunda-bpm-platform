@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-    Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+    Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -160,7 +160,12 @@
     from ${prefix}ACT_RU_JOB RES
 
     where (RES.RETRIES_ &gt; 0)
-      and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
+      and (
+      <if test="!parameter.alwaysSetDueDate">
+          RES.DUEDATE_ is null or
+      </if>
+          RES.DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP}
+      )
       and (RES.LOCK_OWNER_ is null or RES.LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and RES.SUSPENSION_STATE_ = 1
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,6 +207,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jobExecutorAcquireByDueDate = false;
   protected boolean jobExecutorAcquireByPriority = false;
 
+  protected boolean ensureJobDueDateNotNull = false;
   protected boolean producePrioritizedJobs = true;
   protected boolean producePrioritizedExternalTasks = true;
 
@@ -852,6 +853,14 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setValueTypeResolver(ValueTypeResolver valueTypeResolver) {
     this.valueTypeResolver = valueTypeResolver;
     return this;
+  }
+
+  public boolean isEnsureJobDueDateNotNull() {
+    return ensureJobDueDateNotNull;
+  }
+
+  public void setEnsureJobDueDateNotNull(boolean ensureJobDueDateNotNull) {
+    this.ensureJobDueDateNotNull = ensureJobDueDateNotNull;
   }
 
   public boolean isProducePrioritizedJobs() {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,7 +188,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   public Date resolveDueDate(S context) {
     ProcessEngineConfiguration processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if (processEngineConfiguration != null && processEngineConfiguration.isJobExecutorAcquireByDueDate()) {
+    if (processEngineConfiguration != null && (processEngineConfiguration.isJobExecutorAcquireByDueDate() || processEngineConfiguration.isEnsureJobDueDateNotNull())) {
       return ClockUtil.getCurrentTime();
     }
     else {

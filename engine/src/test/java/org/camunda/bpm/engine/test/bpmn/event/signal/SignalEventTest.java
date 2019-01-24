@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -86,6 +87,8 @@ public class SignalEventTest {
   private ManagementService managementService;
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
+  protected boolean defaultEnsureJobDueDateSet;
+
   @Before
   public void init() {
     runtimeService = engineRule.getRuntimeService();
@@ -93,6 +96,12 @@ public class SignalEventTest {
     repositoryService = engineRule.getRepositoryService();
     managementService = engineRule.getManagementService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    defaultEnsureJobDueDateSet = processEngineConfiguration.isEnsureJobDueDateNotNull();
+  }
+
+  @After
+  public void resetConfiguration() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
   }
 
   @Deployment(resources = {
@@ -466,10 +475,47 @@ public class SignalEventTest {
   }
 
   @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
+  @Test
+  public void testAsyncSignalStartEventJobProperties() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(false);
+
+    ProcessDefinition catchingProcessDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("startBySignal")
+      .singleResult();
+
+    // given a process instance that throws a signal asynchronously
+    runtimeService.startProcessInstanceByKey("throwSignalAsync");
+    // where the throwing instance ends immediately
+
+    // then there is not yet a catching process instance
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    // but there is a job for the asynchronous continuation
+    Job asyncJob = managementService.createJobQuery().singleResult();
+    assertEquals(catchingProcessDefinition.getId(), asyncJob.getProcessDefinitionId());
+    assertEquals(catchingProcessDefinition.getKey(), asyncJob.getProcessDefinitionKey());
+    assertNull(asyncJob.getExceptionMessage());
+    assertNull(asyncJob.getExecutionId());
+    assertNull(asyncJob.getJobDefinitionId());
+    assertEquals(0, asyncJob.getPriority());
+    assertNull(asyncJob.getProcessInstanceId());
+    assertEquals(3, asyncJob.getRetries());
+    assertNull(asyncJob.getDuedate());
+    assertNull(asyncJob.getDeploymentId());
+  }
+
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
   @Test
-  public void testAsyncSignalStartEventJobProperties() {
+  public void testAsyncSignalStartEventJobPropertiesDueDateSet() {
+    Date testTime = new Date(1457326800000L);
+    ClockUtil.setCurrentTime(testTime);
+    processEngineConfiguration.setEnsureJobDueDateNotNull(true);
+
     ProcessDefinition catchingProcessDefinition = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("startBySignal")
@@ -492,7 +538,7 @@ public class SignalEventTest {
     assertEquals(0, asyncJob.getPriority());
     assertNull(asyncJob.getProcessInstanceId());
     assertEquals(3, asyncJob.getRetries());
-    assertNull(asyncJob.getDuedate());
+    assertEquals(asyncJob.getDuedate(), testTime);
     assertNull(asyncJob.getDeploymentId());
   }
 

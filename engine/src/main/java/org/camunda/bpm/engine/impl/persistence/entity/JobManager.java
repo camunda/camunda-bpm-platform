@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,6 +169,7 @@ public class JobManager extends AbstractManager {
     Map<String,Object> params = new HashMap<String, Object>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
+    params.put("alwaysSetDueDate", isEnsureJobDueDateNotNull());
     params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
     if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
@@ -351,4 +352,7 @@ public class JobManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
+  protected boolean isEnsureJobDueDateNotNull() {
+    return Context.getProcessEngineConfiguration().isEnsureJobDueDateNotNull();
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,61 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-
-import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+@RunWith(Parameterized.class)
 public class JobExecutorAcquireJobsDefaultTest extends AbstractJobExecutorAcquireJobsTest {
+
+  @Parameterized.Parameter(0)
+  public boolean ensureJobDueDateSet;
+
+  @Parameterized.Parameter(1)
+  public Date currentTime;
+
+  @Parameterized.Parameters(name = "Job DueDate is set: {0}")
+  public static Collection<Object[]> scenarios() throws ParseException {
+    return Arrays.asList(new Object[][] {
+      { false, null },
+      { true, ClockTestUtil.setClockToDateWithoutMilliseconds() }
+    });
+  }
+
+  @Before
+  public void setUp() {
+    rule.getProcessEngineConfiguration().setEnsureJobDueDateNotNull(ensureJobDueDateSet);
+  }
 
   @Test
   public void testProcessEngineConfiguration() {
     assertFalse(configuration.isJobExecutorPreferTimerJobs());
     assertFalse(configuration.isJobExecutorAcquireByDueDate());
+    assertEquals(configuration.isEnsureJobDueDateNotNull(), ensureJobDueDateSet);
   }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
-  public void testMessageJobHasNoDueDateSet() {
+  public void testJobDueDateValue() {
+    // when
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    List<JobEntity> jobList = findAcquirableJobs();
 
-    Job job = managementService.createJobQuery().singleResult();
-    assertNull(job.getDuedate());
+    // then
+    assertEquals(jobList.size(), 1);
+    assertEquals(jobList.get(0).getDuedate(), currentTime);
   }
-
 }
