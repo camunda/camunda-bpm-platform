@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
 /**
@@ -725,12 +726,18 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   public void testSetJobRetriesByJobDefinitionIdWithUpdateInstancePermissionOnProcessDefinition() {
     // given
-    String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
-    String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
+    ProcessInstance processInstance = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId, UPDATE_INSTANCE);
+    String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
+
+    disableAuthorization();
+    managementService.setJobRetries(jobId, 0);
+    enableAuthorization();
+
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
 
     // when
-    managementService.setJobRetries(jobId, 1);
+    managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
 
     // then
     Job job = selectJobById(jobId);
@@ -740,12 +747,18 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   public void testSetJobRetriesByJobDefinitionIdWithRetryJobPermissionOnProcessDefinition() {
     // given
-    String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, ProcessDefinitionPermissions.RETRY_JOB);
-    String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
+    ProcessInstance processInstance = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId, ProcessDefinitionPermissions.RETRY_JOB);
+    String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
+
+    disableAuthorization();
+    managementService.setJobRetries(jobId, 0);
+    enableAuthorization();
+
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
 
     // when
-    managementService.setJobRetries(jobId, 1);
+    managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
 
     // then
     Job job = selectJobById(jobId);
@@ -759,8 +772,14 @@ public class JobAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+
+    disableAuthorization();
+    managementService.setJobRetries(jobId, 0);
+    enableAuthorization();
+
     // when
-    managementService.setJobRetries(jobId, 1);
+    managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
 
     // then
     Job job = selectJobById(jobId);
@@ -774,8 +793,14 @@ public class JobAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, ProcessDefinitionPermissions.RETRY_JOB);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+
+    disableAuthorization();
+    managementService.setJobRetries(jobId, 0);
+    enableAuthorization();
+
     // when
-    managementService.setJobRetries(jobId, 1);
+    managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
 
     // then
     Job job = selectJobById(jobId);

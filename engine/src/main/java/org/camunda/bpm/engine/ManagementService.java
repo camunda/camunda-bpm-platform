@@ -810,9 +810,9 @@ public interface ManagementService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link ProcessInstancePermissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link ProcessDefinitionPermissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link ProcessInstancePermissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link ProcessDefinitionPermissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(String jobId, int retries);
 
@@ -829,9 +829,9 @@ public interface ManagementService {
    * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(List<String> jobIds, int retries);
 
@@ -934,9 +934,9 @@ public interface ManagementService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries);
 

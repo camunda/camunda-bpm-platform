@@ -36,13 +36,23 @@ import org.camunda.bpm.engine.authorization.Resources;
  */
 public class AuthorizationTestUtil {
 
+  protected static final int BATCH = Resources.BATCH.resourceType();
+  protected static final int PROCESS_DEFINITION = Resources.PROCESS_DEFINITION.resourceType();
+  protected static final int PROCESS_INSTANCE = Resources.PROCESS_INSTANCE.resourceType();
 
   protected static Map<Integer, Resource> resourcesByType = new HashMap<Integer, Resource>();
+  protected static Map<Integer, Permission[]> permissionMap = new HashMap<Integer, Permission[]>();
 
   static {
     for (Resource resource : Resources.values()) {
       resourcesByType.put(resource.resourceType(), resource);
     }
+  }
+
+  static {
+    permissionMap.put(BATCH, BatchPermissions.values());
+    permissionMap.put(PROCESS_DEFINITION, ProcessDefinitionPermissions.values());
+    permissionMap.put(PROCESS_INSTANCE, ProcessInstancePermissions.values());
   }
 
   public static Resource getResourceByType(int type) {
@@ -70,12 +80,9 @@ public class AuthorizationTestUtil {
   public static Permission[] getPermissions(Authorization authorization)
   {
     int resourceType = authorization.getResourceType();
-    if (resourceType == Resources.BATCH.resourceType()) {
-      return authorization.getPermissions(BatchPermissions.values());
-    } else if (resourceType == Resources.PROCESS_DEFINITION.resourceType()) {
-      return authorization.getPermissions(ProcessDefinitionPermissions.values());
-    } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
-      return authorization.getPermissions(ProcessInstancePermissions.values());
+    if (resourceType == BATCH || resourceType == PROCESS_DEFINITION || resourceType == PROCESS_INSTANCE) {
+      Permission[] permissionsForType = permissionMap.get(resourceType);
+      return authorization.getPermissions(permissionsForType);
     } else {
       return authorization.getPermissions(Permissions.values());
     }

@@ -137,9 +137,7 @@ public class TenantCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateRetriesJob(JobEntity job) {
-    if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
-      throw LOG.exceptionCommandWithUnauthorizedTenant("update the job '"+ job.getId() + "'");
-    }
+    checkUpdateJob(job);
   }
 
   @Override
