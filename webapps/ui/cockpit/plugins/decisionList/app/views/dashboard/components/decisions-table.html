@@ -1,7 +1,15 @@
 <section>
   <div class="inner">
     <header ng-if="decisionCount">
-      <h1 class="section-title">{{ (decisionCount > 1 ? 'PLUGIN_DECISION_TABLE_TITLE_DEFINITIONS' : 'PLUGIN_DECISION_TABLE_TITLE_DEFINITION' | translate:'{count: decisionCount}') }}</h1>
+      <h1 class="section-title"
+          ng-if="decisionCount > 1"
+          translate="PLUGIN_DECISION_TABLE_TITLE_DEFINITIONS"
+          translate-values='{count: decisionCount}'></h1>
+
+      <h1 class="section-title"
+          ng-if="decisionCount <= 1"
+          translate="PLUGIN_DECISION_TABLE_TITLE_DEFINITION"
+          translate-values='{count: decisionCount}'></h1>
     </header>
 
     <header class='header-empty' ng-if="!decisionCount">
