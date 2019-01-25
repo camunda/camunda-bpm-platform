@@ -47,5 +47,11 @@ window.camCockpitConf = {
   //     // with a file called 'module.js' in it defining the 'my-custom-module' AMD module
   //     myCustomModule: 'my-custom-module/module'
   //   }
+  // },
+  // historicProcessInstancesSearch: {
+  //   defaultFilter: {
+  //     lastDays: 5,
+  //     event: 'started'
+  //   }
   // }
 };

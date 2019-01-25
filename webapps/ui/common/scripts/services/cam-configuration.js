@@ -111,6 +111,10 @@ module.exports = function(config, app) {
       return config['bpmnJs'];
     };
 
+    this.getHistoricProcessInstancesSearch = function() {
+      return (config['historicProcessInstancesSearch'] || {})['defaultFilter'];
+    };
+
     this.$get = function() {
       return this;
     };
