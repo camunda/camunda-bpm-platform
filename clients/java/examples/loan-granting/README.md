@@ -101,7 +101,6 @@ client.subscribe("creditScoreChecker")
 
   }).open();
 
-Thread.sleep(1000 * 60 * 5);
 ```
 
 Now, just run your application. The client starts to continuously fetch and lock for External Task instances.
