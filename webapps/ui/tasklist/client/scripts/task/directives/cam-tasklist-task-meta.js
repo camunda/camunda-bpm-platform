@@ -275,18 +275,18 @@ module.exports = [
         $scope.startEditingAssignee = notifyOnStartEditing('assignee');
         $scope.cancelEditingAssignee = notifyOnCancelEditing('assignee');
 
-        $scope.assign = function(inlineFieldScope) {
+        $scope.assign = function(varValue) {
           var original = $scope.assignee ? $scope.assignee.id : '';
 
           validateAssignee($element.find('.assignee input')[0], function() {
             if (!$scope.validAssignee) {
-              inlineFieldScope.varValue = original;
+              varValue = original;
               $scope.validAssignee = true;
               return;
             }
             setEditingState('assignee', false);
 
-            var newAssignee = inlineFieldScope.varValue.trim();
+            var newAssignee = varValue.trim();
 
             if (!newAssignee) {
               if ($scope.isAssignee) {
