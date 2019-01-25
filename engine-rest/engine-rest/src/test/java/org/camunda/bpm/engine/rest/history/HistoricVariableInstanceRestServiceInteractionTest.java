@@ -360,16 +360,14 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
   
   @Test
   public void testDeleteSingleVariableInstanceById() {
-    HistoricVariableInstance variableInstanceMock = MockProvider.mockHistoricVariableInstance().build();
-    
     given()
-      .pathParam("id", variableInstanceMock.getId())
+      .pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .delete(VARIABLE_INSTANCE_URL);
 
-    verify(historyServiceMock).deleteHistoricVariableInstance(variableInstanceMock.getId());
+    verify(historyServiceMock).deleteHistoricVariableInstance(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID);
   }
   
   @Test

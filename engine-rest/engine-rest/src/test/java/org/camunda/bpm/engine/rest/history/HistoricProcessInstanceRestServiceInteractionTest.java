@@ -253,16 +253,14 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   
   @Test
   public void testDeleteAllVariablesByProcessInstanceId() {
-    HistoricVariableInstance variableInstanceMock = MockProvider.mockHistoricVariableInstance().build();
-    
     given()
-      .pathParam("id", variableInstanceMock.getId())
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .delete(HISTORIC_SINGLE_PROCESS_INSTANCE_VARIABLES_URL);
 
-    verify(historyServiceMock).deleteHistoricVariableInstancesByProcessInstanceId(variableInstanceMock.getId());
+    verify(historyServiceMock).deleteHistoricVariableInstancesByProcessInstanceId(EXAMPLE_PROCESS_INSTANCE_ID);
   }
   
   @Test
