@@ -112,7 +112,7 @@ module.exports = function(config, app) {
     };
 
     this.getHistoricProcessInstancesSearch = function() {
-      return (config['historicProcessInstancesSearch'] || {})['defaultFilter'];
+      return (config['defaultFilter'] || {})['historicProcessDefinitionInstancesSearch'];
     };
 
     this.$get = function() {
