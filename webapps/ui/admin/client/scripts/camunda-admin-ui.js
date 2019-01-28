@@ -42,18 +42,18 @@ module.exports = function(pluginDependencies) {
     return uri;
   }
 
-  var LocationConfig = ['$locationProvider', function($locationProvider) {
-    $locationProvider.hashPrefix('');
-  }];
-
-  appNgModule.config(LocationConfig);
-
   var ModuleConfig = [
     '$routeProvider',
     'UriProvider',
+    '$uibModalProvider',
+    '$uibTooltipProvider',
+    '$locationProvider',
     function(
       $routeProvider,
-      UriProvider
+      UriProvider,
+      $modalProvider,
+      $tooltipProvider,
+      $locationProvider
     ) {
       $routeProvider.otherwise({ redirectTo: '/' });
 
@@ -74,6 +74,20 @@ module.exports = function(pluginDependencies) {
           throw new Error('no process engine selected');
         }
       }]);
+
+      $modalProvider.options = {
+        animation:    true,
+        backdrop:     true,
+        keyboard:     true
+      };
+
+      $tooltipProvider.options({
+        animation:    true,
+        popupDelay:   100,
+        appendToBody: true
+      });
+
+      $locationProvider.hashPrefix('');
     }];
 
   appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camAdminConf, 'Admin'));
