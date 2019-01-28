@@ -69,11 +69,31 @@ module.exports = function(pluginDependencies) {
 
   var tasklistApp = angular.module('cam.tasklist', ngDeps);
 
-  var LocationConfig = ['$locationProvider', function($locationProvider) {
-    $locationProvider.hashPrefix('');
-  }];
+  var ModuleConfig = [
+    '$uibModalProvider',
+    '$uibTooltipProvider',
+    '$locationProvider',
+    function(
+      $modalProvider,
+      $tooltipProvider,
+      $locationProvider
+    ) {
+      $modalProvider.options = {
+        animation:    true,
+        backdrop:     true,
+        keyboard:     true
+      };
 
-  tasklistApp.config(LocationConfig);
+      $tooltipProvider.options({
+        animation:    true,
+        popupDelay:   100,
+        appendToBody: true
+      });
+
+      $locationProvider.hashPrefix('');
+    }];
+
+  tasklistApp.config(ModuleConfig);
 
   tasklistApp.factory('assignNotification', require('./services/cam-tasklist-assign-notification'));
   tasklistApp.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camTasklistConf, 'Tasklist'));
