@@ -48,8 +48,8 @@ window.camCockpitConf = {
   //     myCustomModule: 'my-custom-module/module'
   //   }
   // },
-  // historicProcessInstancesSearch: {
-  //   defaultFilter: {
+  // defaultFilter: {
+  //   historicProcessDefinitionInstancesSearch: {
   //     lastDays: 5,
   //     event: 'started'
   //   }
