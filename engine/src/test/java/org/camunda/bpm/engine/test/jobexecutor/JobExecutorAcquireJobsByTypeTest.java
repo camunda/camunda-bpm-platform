@@ -65,7 +65,9 @@ public class JobExecutorAcquireJobsByTypeTest extends AbstractJobExecutorAcquire
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
 
     Job job = managementService.createJobQuery().singleResult();
-    assertEquals(job.getDuedate(), ClockUtil.getCurrentTime());
+
+    // time is fixed for the purposes of the test
+    assertEquals(ClockUtil.getCurrentTime(), job.getDuedate());
   }
 
   @Test

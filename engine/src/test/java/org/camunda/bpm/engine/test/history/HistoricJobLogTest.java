@@ -275,7 +275,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(historicJob);
 
-    assertEquals(historicJob.getJobDueDate(), testDate);
+    assertEquals(testDate, historicJob.getJobDueDate());
 
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
@@ -342,7 +342,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(historicJob);
 
-    assertEquals(historicJob.getJobDueDate(), testDate);
+    assertEquals(testDate, historicJob.getJobDueDate());
 
     assertEquals(anotherJob.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
@@ -511,7 +511,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(historicJob);
 
-    assertEquals(historicJob.getJobDueDate(), testDate);
+    assertEquals(testDate, historicJob.getJobDueDate());
 
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());

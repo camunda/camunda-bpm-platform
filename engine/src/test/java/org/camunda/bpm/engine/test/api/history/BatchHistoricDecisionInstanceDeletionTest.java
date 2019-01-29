@@ -227,7 +227,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertEquals(seedJob.getDuedate(), currentTime);
+    assertEquals(currentTime, seedJob.getDuedate());
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -263,7 +263,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertEquals(seedJob.getDuedate(), currentTime);
+    assertEquals(currentTime, seedJob.getDuedate());
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -299,7 +299,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertEquals(seedJob.getDuedate(), currentTime);
+    assertEquals(currentTime, seedJob.getDuedate());
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -330,7 +330,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     for (Job deletionJob : deletionJobs) {
       assertEquals(deletionJobDefinition.getId(), deletionJob.getJobDefinitionId());
-      assertEquals(deletionJob.getDuedate(), currentTime);
+      assertEquals(currentTime, deletionJob.getDuedate());
       assertNull(deletionJob.getProcessDefinitionId());
       assertNull(deletionJob.getProcessDefinitionKey());
       assertNull(deletionJob.getProcessInstanceId());
@@ -363,7 +363,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     for (Job deletionJob : deletionJobs) {
       assertEquals(deletionJobDefinition.getId(), deletionJob.getJobDefinitionId());
-      assertEquals(deletionJob.getDuedate(), currentTime);
+      assertEquals(currentTime, deletionJob.getDuedate());
       assertNull(deletionJob.getProcessDefinitionId());
       assertNull(deletionJob.getProcessDefinitionKey());
       assertNull(deletionJob.getProcessInstanceId());
@@ -396,7 +396,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     for (Job deletionJob : deletionJobs) {
       assertEquals(deletionJobDefinition.getId(), deletionJob.getJobDefinitionId());
-      assertEquals(deletionJob.getDuedate(), currentTime);
+      assertEquals(currentTime, deletionJob.getDuedate());
       assertNull(deletionJob.getProcessDefinitionId());
       assertNull(deletionJob.getProcessDefinitionKey());
       assertNull(deletionJob.getProcessInstanceId());

@@ -58,7 +58,7 @@ public class JobExecutorAcquireJobsDefaultTest extends AbstractJobExecutorAcquir
   public void testProcessEngineConfiguration() {
     assertFalse(configuration.isJobExecutorPreferTimerJobs());
     assertFalse(configuration.isJobExecutorAcquireByDueDate());
-    assertEquals(configuration.isEnsureJobDueDateNotNull(), ensureJobDueDateSet);
+    assertEquals(ensureJobDueDateSet, configuration.isEnsureJobDueDateNotNull());
   }
 
   @Test
@@ -69,7 +69,7 @@ public class JobExecutorAcquireJobsDefaultTest extends AbstractJobExecutorAcquir
     List<JobEntity> jobList = findAcquirableJobs();
 
     // then
-    assertEquals(jobList.size(), 1);
-    assertEquals(jobList.get(0).getDuedate(), currentTime);
+    assertEquals(1, jobList.size());
+    assertEquals(currentTime, jobList.get(0).getDuedate());
   }
 }

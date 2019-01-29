@@ -538,7 +538,7 @@ public class SignalEventTest {
     assertEquals(0, asyncJob.getPriority());
     assertNull(asyncJob.getProcessInstanceId());
     assertEquals(3, asyncJob.getRetries());
-    assertEquals(asyncJob.getDuedate(), testTime);
+    assertEquals(testTime, asyncJob.getDuedate());
     assertNull(asyncJob.getDeploymentId());
   }
 

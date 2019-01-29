@@ -292,7 +292,7 @@ public class BatchMigrationTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertEquals(seedJob.getDuedate(), currentTime);
+    assertEquals(currentTime, seedJob.getDuedate());
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -325,7 +325,7 @@ public class BatchMigrationTest {
 
     for (Job migrationJob : migrationJobs) {
       assertEquals(migrationJobDefinition.getId(), migrationJob.getJobDefinitionId());
-      assertEquals(migrationJob.getDuedate(), currentTime);
+      assertEquals(currentTime, migrationJob.getDuedate());
       assertEquals(sourceDeploymentId, migrationJob.getDeploymentId());
       assertNull(migrationJob.getProcessDefinitionId());
       assertNull(migrationJob.getProcessDefinitionKey());
@@ -487,7 +487,7 @@ public class BatchMigrationTest {
     // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
     assertNotNull(monitorJob);
-    assertEquals(monitorJob.getDuedate(), currentTime);
+    assertEquals(currentTime, monitorJob.getDuedate());
 
     // when the monitor job is executed
     helper.executeMonitorJob(batch);

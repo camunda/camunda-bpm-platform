@@ -195,7 +195,7 @@ public class BatchModificationHistoryTest {
     assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertEquals(jobLog.getJobDueDate(), currentTime);
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     // when the seed job is executed
     Date executionDate = helper.addSecondsToClock(12);
@@ -212,7 +212,7 @@ public class BatchModificationHistoryTest {
     assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertEquals(jobLog.getJobDueDate(), currentTime);
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
   }
 
@@ -233,7 +233,7 @@ public class BatchModificationHistoryTest {
     assertCommonMonitorJobLogProperties(batch, jobLog);
     assertTrue(jobLog.isCreationLog());
     assertEquals(START_DATE, jobLog.getTimestamp());
-    assertEquals(jobLog.getJobDueDate(), currentTime);
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     // when the monitor job is executed
     Date executionDate = helper.addSecondsToClock(15);
@@ -248,7 +248,7 @@ public class BatchModificationHistoryTest {
     assertCommonMonitorJobLogProperties(batch, jobLog);
     assertTrue(jobLog.isSuccessLog());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertEquals(jobLog.getJobDueDate(), currentTime);
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     // and a creation job log for the new monitor job was created with due date
     monitorJob = helper.getMonitorJob(batch);
@@ -298,7 +298,7 @@ public class BatchModificationHistoryTest {
     assertEquals(processDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertEquals(jobLog.getJobDueDate(), currentTime);
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     jobLog = helper.getHistoricBatchJobLog(batch).get(1);
     assertNotNull(jobLog);
@@ -310,7 +310,7 @@ public class BatchModificationHistoryTest {
     assertEquals(processDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertEquals(jobLog.getJobDueDate(), currentTime);
+    assertEquals(currentTime, jobLog.getJobDueDate());
   }
 
   @Test

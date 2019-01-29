@@ -566,10 +566,10 @@ public class RestartProcessInstanceAsyncTest {
     Date createDate = testDate;
     helper.executeSeedJob(batch);
 
-    // then the monitor job has a no due date set
+    // then the monitor job has the create date as due date set
     Job monitorJob = helper.getMonitorJob(batch);
     assertNotNull(monitorJob);
-    assertEquals(monitorJob.getDuedate(), testDate);
+    assertEquals(testDate, monitorJob.getDuedate());
 
     // when the monitor job is executed
     helper.executeMonitorJob(batch);

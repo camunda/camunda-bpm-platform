@@ -278,7 +278,7 @@ public class ModificationExecutionAsyncTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertEquals(seedJob.getDuedate(), currentTime);
+    assertEquals(currentTime, seedJob.getDuedate());
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -305,7 +305,7 @@ public class ModificationExecutionAsyncTest {
 
     for (Job modificationJob : modificationJobs) {
       assertEquals(modificationJobDefinition.getId(), modificationJob.getJobDefinitionId());
-      assertEquals(modificationJob.getDuedate(), currentTime);
+      assertEquals(currentTime, modificationJob.getDuedate());
       assertNull(modificationJob.getProcessDefinitionId());
       assertNull(modificationJob.getProcessDefinitionKey());
       assertNull(modificationJob.getProcessInstanceId());
@@ -639,7 +639,7 @@ public class ModificationExecutionAsyncTest {
     // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
     assertNotNull(monitorJob);
-    assertEquals(monitorJob.getDuedate(), currentTime);
+    assertEquals(currentTime, monitorJob.getDuedate());
 
     // when the monitor job is executed
     helper.executeMonitorJob(batch);
