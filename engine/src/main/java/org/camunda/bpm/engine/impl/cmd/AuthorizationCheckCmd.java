@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permission;
@@ -43,11 +44,18 @@ public class AuthorizationCheckCmd implements Command<Boolean> {
     this.permission = permission;
     this.resource = resource;
     this.resourceId = resourceId;
+    validate(userId, groupIds, permission, resource);
   }
 
   public Boolean execute(CommandContext commandContext) {
     final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();    
     return authorizationManager.isAuthorized(userId, groupIds, permission, resource, resourceId);
+  }
+
+  protected void validate(String userId, List<String> groupIds, Permission permission, Resource resource) {
+    ensureAtLeastOneNotNull("Authorization must have a 'userId' or/and a 'groupId'.", userId, groupIds);
+    ensureNotNull("Invalid permission for an authorization", "authorization.getResource()", permission);
+    ensureNotNull("Invalid resource for an authorization", "authorization.getResource()", resource);
   }
 
 }

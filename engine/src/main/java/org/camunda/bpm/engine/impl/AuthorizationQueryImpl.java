@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 
 /**
  * @author Daniel Meyer
@@ -46,7 +47,7 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   protected boolean queryByPermission = false;
   protected boolean queryByResourceType = false;
 
-  private Set<Resource> resourceTypes = new HashSet<>();
+  private Set<Resource> resourcesIntersection = new HashSet<>();
 
   public AuthorizationQueryImpl() {
   }
@@ -94,10 +95,10 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   public AuthorizationQuery hasPermission(Permission p) {
     queryByPermission = true;
 
-    if (resourceTypes.size() == 0) {
-      resourceTypes = new HashSet<Resource>(Arrays.asList(p.getTypes()));
+    if (resourcesIntersection.size() == 0) {
+      resourcesIntersection.addAll(Arrays.asList(p.getTypes()));
     } else {
-      resourceTypes.retainAll(new HashSet<Resource>(Arrays.asList(p.getTypes())));
+      resourcesIntersection.retainAll(new HashSet<Resource>(Arrays.asList(p.getTypes())));
     }
 
     this.permission |= p.getValue();
@@ -128,18 +129,22 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
         || containsIncompatibleResourceType();
   }
 
+  /**
+   * check whether there are any compatible resources
+   * for all of the filtered permission parameters
+   */
   private boolean containsIncompatiblePermissions() {
-    return queryByPermission && resourceTypes.isEmpty();
+    return queryByPermission && resourcesIntersection.isEmpty();
   }
 
+  /**
+   * check whether the permissions' resources
+   * are compatible to the filtered resource parameter
+   */
   private boolean containsIncompatibleResourceType() {
     if (queryByResourceType && queryByPermission) {
-      for (Resource resource : resourceTypes) {
-        if (resource.resourceType() == resourceType) {
-          return false;
-        }
-      }
-      return true;
+      Resource[] resources = resourcesIntersection.toArray(new Resource[resourcesIntersection.size()]);
+      return !ResourceTypeUtil.resourceIsContainedInArray(resourceType, resources);
     }
     return false;
   }
@@ -178,8 +183,8 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     return queryByResourceType;
   }
 
-  public Set<Resource> getResourceTypes() {
-    return resourceTypes;
+  public Set<Resource> getResourcesIntersection() {
+    return resourcesIntersection;
   }
 
   public AuthorizationQuery orderByResourceType() {

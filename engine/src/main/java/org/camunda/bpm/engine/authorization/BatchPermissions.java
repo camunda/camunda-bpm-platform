@@ -87,6 +87,8 @@ public enum BatchPermissions implements Permission {
   /** Indicates that CREATE_BATCH_SUSPEND_PROCESS_INSTANCES interactions are permitted */
   CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE("CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE", 32768);
 
+  private static final Resource[] RESOURCES = new Resource[] { Resources.BATCH };
+
   private String name;
   private int id;
 
@@ -107,7 +109,7 @@ public enum BatchPermissions implements Permission {
 
   @Override
   public Resource[] getTypes() {
-    return new Resource[] { Resources.BATCH };
+    return RESOURCES;
   }
 
   public static Permission forName(String name) {

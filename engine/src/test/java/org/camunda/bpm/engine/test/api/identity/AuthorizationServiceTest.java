@@ -19,8 +19,8 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_REVOKE;
-import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.NONE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -39,9 +39,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -440,58 +444,59 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
   public void testPermissions() {
 
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.USER);
 
     assertEquals(1, authorization.getPermissions(Permissions.values()).length);
 
-    assertFalse(authorization.isPermissionGranted(ACCESS));
+    assertFalse(authorization.isPermissionGranted(CREATE));
     assertFalse(authorization.isPermissionGranted(DELETE));
     assertFalse(authorization.isPermissionGranted(READ));
     assertFalse(authorization.isPermissionGranted(UPDATE));
 
-    authorization.addPermission(ACCESS);
-    assertTrue(authorization.isPermissionGranted(ACCESS));
+    authorization.addPermission(CREATE);
+    assertTrue(authorization.isPermissionGranted(CREATE));
     assertFalse(authorization.isPermissionGranted(DELETE));
     assertFalse(authorization.isPermissionGranted(READ));
     assertFalse(authorization.isPermissionGranted(UPDATE));
 
     authorization.addPermission(DELETE);
-    assertTrue(authorization.isPermissionGranted(ACCESS));
+    assertTrue(authorization.isPermissionGranted(CREATE));
     assertTrue(authorization.isPermissionGranted(DELETE));
     assertFalse(authorization.isPermissionGranted(READ));
     assertFalse(authorization.isPermissionGranted(UPDATE));
 
     authorization.addPermission(READ);
-    assertTrue(authorization.isPermissionGranted(ACCESS));
+    assertTrue(authorization.isPermissionGranted(CREATE));
     assertTrue(authorization.isPermissionGranted(DELETE));
     assertTrue(authorization.isPermissionGranted(READ));
     assertFalse(authorization.isPermissionGranted(UPDATE));
 
     authorization.addPermission(UPDATE);
-    assertTrue(authorization.isPermissionGranted(ACCESS));
+    assertTrue(authorization.isPermissionGranted(CREATE));
     assertTrue(authorization.isPermissionGranted(DELETE));
     assertTrue(authorization.isPermissionGranted(READ));
     assertTrue(authorization.isPermissionGranted(UPDATE));
 
-    authorization.removePermission(ACCESS);
-    assertFalse(authorization.isPermissionGranted(ACCESS));
+    authorization.removePermission(CREATE);
+    assertFalse(authorization.isPermissionGranted(CREATE));
     assertTrue(authorization.isPermissionGranted(DELETE));
     assertTrue(authorization.isPermissionGranted(READ));
     assertTrue(authorization.isPermissionGranted(UPDATE));
 
     authorization.removePermission(DELETE);
-    assertFalse(authorization.isPermissionGranted(ACCESS));
+    assertFalse(authorization.isPermissionGranted(CREATE));
     assertFalse(authorization.isPermissionGranted(DELETE));
     assertTrue(authorization.isPermissionGranted(READ));
     assertTrue(authorization.isPermissionGranted(UPDATE));
 
     authorization.removePermission(READ);
-    assertFalse(authorization.isPermissionGranted(ACCESS));
+    assertFalse(authorization.isPermissionGranted(CREATE));
     assertFalse(authorization.isPermissionGranted(DELETE));
     assertFalse(authorization.isPermissionGranted(READ));
     assertTrue(authorization.isPermissionGranted(UPDATE));
 
     authorization.removePermission(UPDATE);
-    assertFalse(authorization.isPermissionGranted(ACCESS));
+    assertFalse(authorization.isPermissionGranted(CREATE));
     assertFalse(authorization.isPermissionGranted(DELETE));
     assertFalse(authorization.isPermissionGranted(READ));
     assertFalse(authorization.isPermissionGranted(UPDATE));
@@ -501,6 +506,8 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
   public void testGrantAuthPermissions() {
 
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.DEPLOYMENT);
+
     assertFalse(authorization.isPermissionGranted(ALL));
     assertTrue(authorization.isPermissionGranted(NONE));
     List<Permission> perms = Arrays.asList(authorization.getPermissions(Permissions.values()));
@@ -527,6 +534,8 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
   public void testGlobalAuthPermissions() {
 
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.DEPLOYMENT);
+
     assertFalse(authorization.isPermissionGranted(ALL));
     assertTrue(authorization.isPermissionGranted(NONE));
     List<Permission> perms = Arrays.asList(authorization.getPermissions(Permissions.values()));
@@ -553,6 +562,8 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
   public void testRevokeAuthPermissions() {
 
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_REVOKE);
+    authorization.setResource(Resources.DEPLOYMENT);
+
     assertFalse(authorization.isPermissionRevoked(ALL));
     List<Permission> perms = Arrays.asList(authorization.getPermissions(Permissions.values()));
     assertEquals(0, perms.size());
@@ -622,7 +633,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
         callables.add(new Callable<Exception>() {
           public Exception call() throws Exception {
             try {
-              authorizationService.isUserAuthorized(null, null, null, null, null);
+              authorizationService.isUserAuthorized("jonny", null, UPDATE, TestResource.RESOURCE1, ANY);
             }
             catch (Exception e) {
               return e;
@@ -678,6 +689,122 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(true);
     assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, DASHBOARD));
     processEngineConfiguration.setAuthorizationEnabled(false);
+  }
+
+  public void testIsPermissionGrantedAccess() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.addPermission(Permissions.ACCESS);
+    authorization.setResource(Resources.APPLICATION);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    Authorization authorizationResult = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
+    assertTrue(authorizationResult.isPermissionGranted(Permissions.ACCESS));
+    assertFalse(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionGranted(ProcessInstancePermissions.RETRY_JOB));
+    assertFalse(authorizationResult.isPermissionGranted(ProcessDefinitionPermissions.RETRY_JOB));
+  }
+
+  public void testIsPermissionGrantedRetryJob() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.addPermission(ProcessInstancePermissions.RETRY_JOB);
+    authorization.setResource(Resources.PROCESS_INSTANCE);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    Authorization authorizationResult = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
+    assertTrue(authorizationResult.isPermissionGranted(ProcessInstancePermissions.RETRY_JOB));
+    assertFalse(authorizationResult.isPermissionGranted(Permissions.ACCESS));
+    assertFalse(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionGranted(ProcessDefinitionPermissions.RETRY_JOB));
+  }
+
+  public void testIsPermissionGrantedBatchResource() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.addPermission(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES);
+    authorization.addPermission(BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES);
+    authorization.addPermission(BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES);
+    authorization.setResource(Resources.BATCH);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    Authorization authorizationResult = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
+    assertTrue(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES));
+    assertTrue(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES));
+    assertTrue(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionGranted(Permissions.ACCESS));
+    assertFalse(authorizationResult.isPermissionGranted(Permissions.CREATE));
+  }
+
+  public void testIsPermissionRevokedAccess() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.removePermission(Permissions.ACCESS);
+    authorization.setResource(Resources.APPLICATION);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    Authorization authorizationResult = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
+    assertTrue(authorizationResult.isPermissionRevoked(Permissions.ACCESS));
+    assertFalse(authorizationResult.isPermissionRevoked(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionRevoked(ProcessInstancePermissions.RETRY_JOB));
+    assertFalse(authorizationResult.isPermissionRevoked(ProcessDefinitionPermissions.RETRY_JOB));
+  }
+
+  public void testIsPermissionRevokedRetryJob() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.removePermission(ProcessInstancePermissions.RETRY_JOB);
+    authorization.setResource(Resources.PROCESS_INSTANCE);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    Authorization authorizationResult = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
+    assertTrue(authorizationResult.isPermissionRevoked(ProcessInstancePermissions.RETRY_JOB));
+    assertFalse(authorizationResult.isPermissionRevoked(Permissions.ACCESS));
+    assertFalse(authorizationResult.isPermissionRevoked(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionRevoked(ProcessDefinitionPermissions.RETRY_JOB));
+  }
+
+  public void testIsPermissionRevokedBatchResource() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
+    String userId = "userId";
+    authorization.setUserId(userId);
+    authorization.removePermission(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES);
+    authorization.removePermission(BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES);
+    authorization.removePermission(BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES);
+    authorization.setResource(Resources.BATCH);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    Authorization authorizationResult = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
+    assertTrue(authorizationResult.isPermissionRevoked(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES));
+    assertTrue(authorizationResult.isPermissionRevoked(BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES));
+    assertTrue(authorizationResult.isPermissionRevoked(BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionRevoked(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES));
+    assertFalse(authorizationResult.isPermissionRevoked(Permissions.ACCESS));
+    assertFalse(authorizationResult.isPermissionRevoked(Permissions.CREATE));
   }
 
   protected void cleanupAfterTest() {

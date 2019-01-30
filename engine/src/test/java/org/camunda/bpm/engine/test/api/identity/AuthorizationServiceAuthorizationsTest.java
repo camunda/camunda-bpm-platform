@@ -191,7 +191,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
 
   }
 
-  public void testSaveAuthorizationWithInvalidResource() throws Exception {
+  public void testSaveAuthorizationAddPermissionWithInvalidResource() throws Exception {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId("userId");
@@ -244,6 +244,100 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       // then
       assertTrue(e.getMessage().contains("The resource type with id:'6' is not valid for 'CREATE_BATCH_MIGRATE_PROCESS_INSTANCES' permission."));
     }
+  }
+
+  public void testSaveAuthorizationRemovePermissionWithInvalidResource() throws Exception {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
+    authorization.setUserId("userId");
+    authorization.removePermission(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES);
+    authorization.setResource(Resources.PROCESS_DEFINITION);
+    authorization.setResourceId(ANY);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    try {
+      // when
+      authorizationService.saveAuthorization(authorization);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("The resource type with id:'6' is not valid for 'CREATE_BATCH_MIGRATE_PROCESS_INSTANCES' permission."));
+    }
+
+    // given
+    authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
+    authorization.setUserId("userId");
+    authorization.addPermission(Permissions.ACCESS);
+    authorization.setResource(Resources.PROCESS_DEFINITION);
+
+    try {
+      // when
+      authorizationService.saveAuthorization(authorization);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("The resource type with id:'6' is not valid for 'ACCESS' permission."));
+    }
+  }
+
+  public void testSaveAuthorizationSetPermissionsWithInvalidResource() throws Exception {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("userId");
+    authorization.setPermissions(new BatchPermissions[] { BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES });
+    authorization.setResource(Resources.PROCESS_INSTANCE);
+    authorization.setResourceId(ANY);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    try {
+      // when
+      authorizationService.saveAuthorization(authorization);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("The resource type with id:'8' is not valid for 'CREATE_BATCH_MIGRATE_PROCESS_INSTANCES' permission."));
+    }
+
+    // given
+    authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("userId");
+    authorization.setPermissions(new Permissions[] { Permissions.CREATE, Permissions.ACCESS });
+    authorization.setResource(Resources.PROCESS_INSTANCE);
+
+    try {
+      // when
+      authorizationService.saveAuthorization(authorization);
+      fail("expected exception");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("The resource type with id:'8' is not valid for 'ACCESS' permission."));
+    }
+  }
+
+  public void testSaveAuthorizationSetPermissionsWithValidResource() throws Exception {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("userId");
+    authorization.addPermission(Permissions.ACCESS);
+    // 'ACCESS' is not allowed for Batches
+    // however, it will be reset by next line, so saveAuthorization will be successful
+    authorization.setPermissions(
+        new BatchPermissions[] { BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES, BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES });
+    authorization.setResource(Resources.BATCH);
+    authorization.setResourceId(ANY);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // when
+    authorizationService.saveAuthorization(authorization);
+
+    // then
+    Authorization authorizationResult = authorizationService.createAuthorizationQuery().resourceType(Resources.BATCH).singleResult();
+    assertNotNull(authorizationResult);
+    assertTrue(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES));
+    assertTrue(authorizationResult.isPermissionGranted(BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES));
   }
 
   public void testIsUserAuthorizedWithInvalidResource() {
@@ -317,7 +411,6 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
 
   public void testIsUserAuthorizedWithValidResourceImpl() {
     // given
-
     ResourceImpl resource = new ResourceImpl("authorization", 0);
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     String userId = "userId";

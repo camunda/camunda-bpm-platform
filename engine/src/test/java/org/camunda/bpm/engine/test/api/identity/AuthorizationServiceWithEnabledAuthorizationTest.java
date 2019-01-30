@@ -17,6 +17,7 @@ package org.camunda.bpm.engine.test.api.identity;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
@@ -181,9 +182,31 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1));
   }
 
-  public void testNullAuthorizationCheck() {
-    Resource resource1 = TestResource.RESOURCE1;
-    assertFalse(authorizationService.isUserAuthorized(null, null, UPDATE, resource1));
+  public void testNullAuthorizationCheckUserGroup() {
+    try {
+      authorizationService.isUserAuthorized(null, null, UPDATE, TestResource.RESOURCE1);
+      fail("Expected NullValueException");
+    } catch (NullValueException e) {
+      assertTrue(e.getMessage().contains("Authorization must have a 'userId' or/and a 'groupId'"));
+    }
+  }
+
+  public void testNullAuthorizationCheckPermission() {
+    try {
+      authorizationService.isUserAuthorized("jonny", null, null, TestResource.RESOURCE1);
+      fail("Expected NullValueException");
+    } catch (NullValueException e) {
+      assertTrue(e.getMessage().contains("Invalid permission for an authorization"));
+    }
+  }
+
+  public void testNullAuthorizationCheckResource() {
+    try {
+      authorizationService.isUserAuthorized("jonny", null, UPDATE, null);
+      fail("Expected NullValueException");
+    } catch (NullValueException e) {
+      assertTrue(e.getMessage().contains("Invalid resource for an authorization"));
+    }
   }
 
   public void testUserOverrideGroupOverrideGlobalAuthorizationCheck() {

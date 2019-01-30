@@ -15,6 +15,8 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
 /**
@@ -52,7 +55,7 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   protected Integer resourceType;
   protected String resourceId;  
 
-  private Set<Permission> permissionSet = new HashSet<>();
+  private Set<Permission> cachedPermissions = new HashSet<>();
 
   public AuthorizationEntity() {
   }
@@ -68,6 +71,8 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   }
 
   protected void resetPermissions() {
+    cachedPermissions = new HashSet<>();
+
     if(authorizationType == AUTH_TYPE_GLOBAL) {
       this.permissions = Permissions.NONE.getValue();
       
@@ -85,12 +90,12 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   // grant / revoke methods ////////////////////////////
 
   public void addPermission(Permission p) {
-    permissionSet.add(p);
+    cachedPermissions.add(p);
     permissions |= p.getValue();
   }
   
   public void removePermission(Permission p) {
-    permissionSet.add(p);
+    cachedPermissions.add(p);
     permissions &= ~p.getValue();
   }
   
@@ -98,12 +103,24 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     if(AUTH_TYPE_REVOKE == authorizationType) {
       throw LOG.permissionStateException("isPermissionGranted", "REVOKE");
     }
+
+    ensureNotNull("Authorization 'resourceType' cannot be null", "authorization.getResource()", resourceType);
+
+    if (!ResourceTypeUtil.resourceIsContainedInArray(resourceType, p.getTypes())) {
+      return false;
+    }
     return (permissions & p.getValue()) == p.getValue();    
   }
   
   public boolean isPermissionRevoked(Permission p) {
     if(AUTH_TYPE_GRANT == authorizationType) {
       throw LOG.permissionStateException("isPermissionRevoked", "GRANT");
+    }
+
+    ensureNotNull("Authorization 'resourceType' cannot be null", "authorization.getResource()", resourceType);
+
+    if (!ResourceTypeUtil.resourceIsContainedInArray(resourceType, p.getTypes())) {
+      return false;
     }
     return (permissions & p.getValue()) != p.getValue();    
   }
@@ -233,8 +250,8 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     return permissions;
   }
 
-  public Set<Permission> getPermissionSet() {
-    return permissionSet;
+  public Set<Permission> getCachedPermissions() {
+    return cachedPermissions;
   }
 
   public int getRevisionNext() {

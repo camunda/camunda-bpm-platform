@@ -91,6 +91,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 /**
@@ -356,27 +357,15 @@ public class AuthorizationManager extends AbstractManager {
   protected boolean isResourceValidForPermission(PermissionCheck permissionCheck) {
     Resource[] permissionResources = permissionCheck.getPermission().getTypes();
     Resource givenResource = permissionCheck.getResource();
-    for (Resource resource : permissionResources) {
-      if (givenResource.resourceType() == resource.resourceType()) {
-        return true;
-      }
-    }
-    return false;
+    return ResourceTypeUtil.resourceIsContainedInArray(givenResource.resourceType(), permissionResources);
   }
 
   public void validateResourceCompatibility(AuthorizationEntity authorization) {
     int resourceType = authorization.getResourceType();
-    Set<Permission> permissionSet = authorization.getPermissionSet();
+    Set<Permission> permissionSet = authorization.getCachedPermissions();
 
     for (Permission permission : permissionSet) {
-      boolean isAuthorizationResourceValid = false;
-      for (Resource resource : permission.getTypes()) {
-        if (resourceType == resource.resourceType()) {
-          isAuthorizationResourceValid = true;
-          break;
-        }
-      }
-      if (!isAuthorizationResourceValid) {
+      if (!ResourceTypeUtil.resourceIsContainedInArray(resourceType, permission.getTypes())) {
         throw LOG.invalidResourceForAuthorization(resourceType, permission.getName());
       }
     }

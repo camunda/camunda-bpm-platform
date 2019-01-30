@@ -85,6 +85,8 @@ public enum ProcessDefinitionPermissions implements Permission {
   /** Indicates that RETRY_JOB interactions are permitted. */
   RETRY_JOB("RETRY_JOB", 32);
 
+  private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_DEFINITION };
+
   private String name;
   private int id;
 
@@ -105,7 +107,7 @@ public enum ProcessDefinitionPermissions implements Permission {
 
   @Override
   public Resource[] getTypes() {
-    return new Resource[] { Resources.PROCESS_DEFINITION };
+    return RESOURCES;
   }
 
   public static Permission forName(String name) {

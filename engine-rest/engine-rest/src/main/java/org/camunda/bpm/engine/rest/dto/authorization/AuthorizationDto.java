@@ -16,8 +16,12 @@
 package org.camunda.bpm.engine.rest.dto.authorization;
 
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 
 import java.util.ArrayList;
@@ -45,7 +49,7 @@ public class AuthorizationDto {
     authorizationDto.setId(dbAuthorization.getId());
     authorizationDto.setType(dbAuthorization.getAuthorizationType());
 
-    Permission[] dbPermissions = dbAuthorization.getPermissions(Permissions.values());
+    Permission[] dbPermissions = getPermissions(dbAuthorization);
     authorizationDto.setPermissions(PermissionConverter.getNamesForPermissions(dbAuthorization, dbPermissions));
 
     authorizationDto.setUserId(dbAuthorization.getUserId());
@@ -127,6 +131,19 @@ public class AuthorizationDto {
   }
   public void setResourceId(String resourceId) {
     this.resourceId = resourceId;
+  }
+
+  private static Permission[] getPermissions(Authorization dbAuthorization) {
+    int givenResourceType = dbAuthorization.getResourceType();
+    if (givenResourceType == Resources.BATCH.resourceType()) {
+      return dbAuthorization.getPermissions(BatchPermissions.values());
+    } else if (givenResourceType == Resources.PROCESS_DEFINITION.resourceType()) {
+      return dbAuthorization.getPermissions(ProcessDefinitionPermissions.values());
+    } else if (givenResourceType == Resources.PROCESS_INSTANCE.resourceType()) {
+      return dbAuthorization.getPermissions(ProcessInstancePermissions.values());
+    } else {
+      return dbAuthorization.getPermissions(Permissions.values());
+    }
   }
 
 }

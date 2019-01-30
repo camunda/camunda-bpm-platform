@@ -196,10 +196,10 @@
         and ${bitand1}RES.PERMS_${bitand2}#{permission}${bitand3} = #{permission}  
       </if>
 
-      <if test="resourceTypes != null &amp;&amp; resourceTypes.size > 0">
+      <if test="!queryByResourceType &amp;&amp; resourcesIntersection != null &amp;&amp; resourcesIntersection.size > 0">
         and RES.RESOURCE_TYPE_ in
         <foreach item="key"
-                collection="resourceTypes"
+                collection="resourcesIntersection"
                 open="("
                 separator=","
                 close=")">
