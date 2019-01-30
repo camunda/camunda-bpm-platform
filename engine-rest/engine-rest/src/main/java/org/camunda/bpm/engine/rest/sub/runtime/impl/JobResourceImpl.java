@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -102,6 +101,20 @@ public class JobResourceImpl implements JobResource {
       managementService.setJobDuedate(jobId, dto.getDuedate());
     } catch (AuthorizationException e) {
       throw e;
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+  }
+  
+  @Override
+  public void recalculateDuedate(boolean creationDateBased) {
+    try {
+      ManagementService managementService = engine.getManagementService();
+      managementService.recalculateJobDuedate(jobId, creationDateBased);
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch(NotFoundException e) {// rewrite status code from bad request (400) to not found (404)
+      throw new InvalidRequestException(Status.NOT_FOUND, e, e.getMessage());
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
     }

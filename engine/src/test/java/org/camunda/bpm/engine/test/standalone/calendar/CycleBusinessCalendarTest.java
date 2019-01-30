@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,14 @@ import java.util.Date;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.junit.After;
 
 public class CycleBusinessCalendarTest extends PvmTestCase {
+  
+  @After
+  public void tearDown() {
+    ClockUtil.reset();
+  }
 
   public void testSimpleCron() throws Exception {
     CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar();
@@ -46,6 +52,32 @@ public class CycleBusinessCalendarTest extends PvmTestCase {
     ClockUtil.setCurrentTime(now);
 
     Date duedate = businessCalendar.resolveDuedate("R/P2DT5H70M");
+
+    Date expectedDuedate = simpleDateFormat.parse("2010 06 13 - 23:33");
+
+    assertEquals(expectedDuedate, duedate);
+  }
+  
+  public void testSimpleCronWithStartDate() throws Exception {
+    CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy MM dd - HH:mm");
+    Date now = simpleDateFormat.parse("2011 03 11 - 17:23");
+
+    Date duedate = businessCalendar.resolveDuedate("0 0 0 1 * ?", now);
+
+    Date expectedDuedate = simpleDateFormat.parse("2011 04 1 - 00:00");
+
+    assertEquals(expectedDuedate, duedate);
+  }
+
+  public void testSimpleDurationWithStartDate() throws Exception {
+    CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy MM dd - HH:mm");
+    Date now = simpleDateFormat.parse("2010 06 11 - 17:23");
+
+    Date duedate = businessCalendar.resolveDuedate("R/P2DT5H70M", now);
 
     Date expectedDuedate = simpleDateFormat.parse("2010 06 13 - 23:33");
 

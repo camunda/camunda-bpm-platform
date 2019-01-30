@@ -953,6 +953,22 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobDuedate(String jobId, Date newDuedate);
+  
+  /**
+   * Triggers the recalculation for the job with the provided id.
+   * 
+   * @param jobId id of job to recalculate, must neither be null nor empty.
+   * @param creationDateBased
+   *          indicates whether the recalculation should be based on the
+   *          creation date of the job or the current date
+   * 
+   * @throws AuthorizationException
+   *           If the user has no {@link Permissions#UPDATE} permission on
+   *           {@link Resources#PROCESS_INSTANCE} or no
+   *           {@link Permissions#UPDATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
+   */
+  void recalculateJobDuedate(String jobId, boolean creationDateBased);
 
   /**
    * Sets a new priority for the job with the provided id.

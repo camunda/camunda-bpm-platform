@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void setJobDuedate(String jobId, Date newDuedate) {
     commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate));
+  }
+  
+  public void recalculateJobDuedate(String jobId, boolean creationDateBased) {
+    commandExecutor.execute(new RecalculateJobDuedateCmd(jobId, creationDateBased));
   }
 
   public void setJobPriority(String jobId, long priority) {

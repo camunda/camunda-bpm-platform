@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,18 @@ import java.util.Date;
 import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.junit.After;
 
 /**
  * @author Tom Baeyens
  */
 public class DurationBusinessCalendarTest extends PvmTestCase {
 
+  @After
+  public void tearDown() {
+    ClockUtil.reset();
+  }
+  
   public void testSimpleDuration() throws Exception {
     DurationBusinessCalendar businessCalendar = new DurationBusinessCalendar();
 
@@ -35,6 +41,19 @@ public class DurationBusinessCalendarTest extends PvmTestCase {
     ClockUtil.setCurrentTime(now);
 
     Date duedate = businessCalendar.resolveDuedate("P2DT5H70M");
+
+    Date expectedDuedate = simpleDateFormat.parse("2010 06 13 - 23:33");
+
+    assertEquals(expectedDuedate, duedate);
+  }
+  
+  public void testSimpleDurationWithStartDate() throws Exception {
+    DurationBusinessCalendar businessCalendar = new DurationBusinessCalendar();
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy MM dd - HH:mm");
+    Date now = simpleDateFormat.parse("2010 06 11 - 17:23");
+
+    Date duedate = businessCalendar.resolveDuedate("P2DT5H70M", now);
 
     Date expectedDuedate = simpleDateFormat.parse("2010 06 13 - 23:33");
 

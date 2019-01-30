@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
+
+import static org.junit.Assert.assertNotEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -41,6 +43,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
+import org.joda.time.LocalDateTime;
 
 /**
  * @author Joram Barrez
@@ -194,6 +197,71 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     executeAllJobs();
 
     List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+    assertEquals(1, pi.size());
+
+    assertEquals(0, jobQuery.count());
+  }
+  
+  @Deployment
+  public void testRecalculateExpressionStartTimerEvent() throws Exception {
+    // given
+    JobQuery jobQuery = managementService.createJobQuery();
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+    assertEquals(1, jobQuery.count());
+    assertEquals(0, processInstanceQuery.count());
+    
+    Job job = jobQuery.singleResult();
+    Date oldDate = job.getDuedate();
+    
+    // when
+    moveByMinutes(1);
+    managementService.recalculateJobDuedate(job.getId(), false);
+    
+    // then
+    assertEquals(1, jobQuery.count());
+    assertEquals(0, processInstanceQuery.count());
+    
+    Date newDate = jobQuery.singleResult().getDuedate();
+    assertNotEquals(oldDate, newDate);
+    assertTrue(oldDate.before(newDate));
+
+    // move the clock forward 2 hours and 1 minute
+    moveByMinutes(121);
+    executeAllJobs();
+
+    List<ProcessInstance> pi = processInstanceQuery.list();
+    assertEquals(1, pi.size());
+
+    assertEquals(0, jobQuery.count());
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testRecalculateExpressionStartTimerEvent.bpmn20.xml")
+  public void testRecalculateUnchangedExpressionStartTimerEventCreationDateBased() throws Exception {
+    // given
+    JobQuery jobQuery = managementService.createJobQuery();
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+    assertEquals(1, jobQuery.count());
+    assertEquals(0, processInstanceQuery.count());
+    
+    Job job = jobQuery.singleResult();
+    Date oldDate = job.getDuedate();
+    
+    // when
+    moveByMinutes(1);
+    managementService.recalculateJobDuedate(job.getId(), true);
+    
+    // then due date should be the same
+    assertEquals(1, jobQuery.count());
+    assertEquals(0, processInstanceQuery.count());
+    
+    Date newDate = jobQuery.singleResult().getDuedate();
+    assertEquals(oldDate, newDate);
+
+    // move the clock forward 2 hours and 1 minute
+    moveByMinutes(121);
+    executeAllJobs();
+
+    List<ProcessInstance> pi = processInstanceQuery.list();
     assertEquals(1, pi.size());
 
     assertEquals(0, jobQuery.count());
@@ -1112,7 +1180,100 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     String anotherJobId = jobQuery.singleResult().getId();
     assertFalse(jobId.equals(anotherJobId));
   }
+  
+  public void testRecalculateTimeCycleExpressionCurrentDateBased() throws Exception {
+    // given
+    Mocks.register("cycle", "R/PT15M");
 
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent().timerWithCycle("${cycle}")
+        .userTask("aTaskName")
+      .endEvent()
+      .done();
+
+    deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+    
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    Job job = jobQuery.singleResult();
+    String jobId = job.getId();
+    Date oldDuedate = job.getDuedate();
+
+    // when
+    moveByMinutes(1);
+    managementService.recalculateJobDuedate(jobId, false);
+
+    // then
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(jobId, jobUpdated.getId());
+    assertNotEquals(oldDuedate, jobUpdated.getDuedate());
+    assertTrue(oldDuedate.before(jobUpdated.getDuedate()));
+    
+    // when
+    Mocks.register("cycle", "R/PT10M");
+    managementService.recalculateJobDuedate(jobId, false);
+
+    // then
+    jobUpdated = jobQuery.singleResult();
+    assertEquals(jobId, jobUpdated.getId());
+    assertNotEquals(oldDuedate, jobUpdated.getDuedate());
+    assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
+    
+    Mocks.reset();
+  }
+  
+  public void testRecalculateTimeCycleExpressionCreationDateBased() throws Exception {
+    // given
+    Mocks.register("cycle", "R/PT15M");
+
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent().timerWithCycle("${cycle}")
+        .userTask("aTaskName")
+      .endEvent()
+      .done();
+
+    deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+    
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+
+    Job job = jobQuery.singleResult();
+    String jobId = job.getId();
+    Date oldDuedate = job.getDuedate();
+
+    // when
+    moveByMinutes(1);
+    managementService.recalculateJobDuedate(jobId, true);
+
+    // then
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(jobId, jobUpdated.getId());
+    assertEquals(oldDuedate, jobUpdated.getDuedate());
+    
+    // when
+    Mocks.register("cycle", "R/PT10M");
+    managementService.recalculateJobDuedate(jobId, true);
+
+    // then
+    jobUpdated = jobQuery.singleResult();
+    assertEquals(jobId, jobUpdated.getId());
+    assertNotEquals(oldDuedate, jobUpdated.getDuedate());
+    assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
+    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(10).toDate();
+    assertEquals(expectedDate, jobUpdated.getDuedate());
+    
+    Mocks.reset();
+  }
+  
   @Deployment
   public void testFailingTimeCycle() throws Exception {
     // given
@@ -1278,6 +1439,84 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     managementService.executeJob(jobId);
 
     // then
+    assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
+  }
+  
+  public void testRecalculateNonInterruptingWithUnchangedDurationExpressionInEventSubprocessCurrentDateBased() throws Exception {
+    // given
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent()
+        .userTask()
+      .endEvent().done();
+
+    processBuilder.eventSubProcess()
+      .startEvent().interrupting(false).timerWithDuration("${duration}")
+        .userTask("taskInSubprocess")
+      .endEvent();
+
+    deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+
+    runtimeService.startProcessInstanceByKey("process", 
+        Variables.createVariables().putValue("duration", "PT60S"));
+    
+    JobQuery jobQuery = managementService.createJobQuery();
+    Job job = jobQuery.singleResult();
+    String jobId = job.getId();
+    Date oldDueDate = job.getDuedate();
+    
+    // when
+    moveByMinutes(1);
+    managementService.recalculateJobDuedate(jobId, false);
+
+    // then
+    assertEquals(1L, jobQuery.count());
+    assertNotEquals(oldDueDate, jobQuery.singleResult().getDuedate());
+    
+    managementService.executeJob(jobId);
+    assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
+  }
+  
+  public void testRecalculateNonInterruptingWithChangedDurationExpressionInEventSubprocessCreationDateBased() throws Exception {
+    // given
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
+
+    BpmnModelInstance modelInstance = processBuilder
+      .startEvent()
+        .userTask()
+      .endEvent().done();
+
+    processBuilder.eventSubProcess()
+      .startEvent().interrupting(false).timerWithDuration("${duration}")
+        .userTask("taskInSubprocess")
+      .endEvent();
+
+    deploymentId = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", modelInstance).deploy()
+      .getId();
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", 
+        Variables.createVariables().putValue("duration", "PT60S"));
+    
+    JobQuery jobQuery = managementService.createJobQuery();
+    Job job = jobQuery.singleResult();
+    String jobId = job.getId();
+    Date oldDueDate = job.getDuedate();
+    
+    // when
+    runtimeService.setVariable(pi.getId(), "duration", "PT2M");
+    managementService.recalculateJobDuedate(jobId, true);
+
+    // then
+    assertEquals(1L, jobQuery.count());
+    assertTrue(oldDueDate.before(jobQuery.singleResult().getDuedate()));
+    Date expectedDate = LocalDateTime.fromDateFields(jobQuery.singleResult().getCreateTime()).plusMinutes(2).toDate();
+    assertTrue(expectedDate.equals(jobQuery.singleResult().getDuedate()));
+    
+    managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
 
