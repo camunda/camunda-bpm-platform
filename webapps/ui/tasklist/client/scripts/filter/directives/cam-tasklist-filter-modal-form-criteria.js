@@ -126,7 +126,11 @@ module.exports = [function() {
         nestedForms.push(_form);
       };
 
-        // criterion interaction ///////////////////////////////////////////////
+      $scope.clearKey = function(queryParam) {
+        queryParam.key = getCriterionName(queryParam.key);
+      };
+
+      // criterion interaction ///////////////////////////////////////////////
 
       $scope.addCriterion = function() {
         var _emptyCriteria = copy(emptyCriterion);

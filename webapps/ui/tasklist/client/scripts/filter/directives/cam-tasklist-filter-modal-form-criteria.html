@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <div ng-repeat="(delta, queryParam) in query" class="row" ng-if="isQueryParameter(queryParam)">
+  <div ng-repeat="(delta, queryParam) in query" class="row" ng-if="isQueryParameter(queryParam)" ng-init="clearKey(queryParam)">
 
     <div ng-form name="criteriaFieldForm">
       <div ng-init="addForm(this.criteriaFieldForm)"></div>
