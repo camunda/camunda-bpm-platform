@@ -28,7 +28,8 @@ module.exports = ['camAPI', '$window' , 'Notifications', '$translate', function(
           var timeToLive = getAndCorrectTimeToLiveValue();
 
           updateValue(timeToLive)
-            .then(customOnChange);
+            .then(customOnChange)
+            .catch(function() {});
         });
       };
 
@@ -38,7 +39,8 @@ module.exports = ['camAPI', '$window' , 'Notifications', '$translate', function(
             lastValue = null;
             $scope.definition.historyTimeToLive = null;
             customOnChange();
-          });
+          })
+          .catch(function() {});
       };
 
       $scope.format = function(property) {
@@ -65,7 +67,8 @@ module.exports = ['camAPI', '$window' , 'Notifications', '$translate', function(
         })
         .then(function() {
           lastValue = getAndCorrectTimeToLiveValue();
-        });
+        })
+        .catch(function() {});
       }
 
       function getAndCorrectTimeToLiveValue() {

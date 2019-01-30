@@ -30,7 +30,7 @@
             exclusive: true,
             scope: $scope
           });
-        });
+        }).catch(function() {});
       }
 
       $scope.submit = function() {

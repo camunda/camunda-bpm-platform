@@ -18,7 +18,7 @@ module.exports = function(ngModule) {
           size: 'lg',
           controller: 'JobRetriesController',
           template: dialogTemplate
-        });
+        }).result.catch(function() {});
       };
     }]);
 

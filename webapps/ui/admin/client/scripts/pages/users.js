@@ -69,8 +69,8 @@ var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', '$tra
         $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
         return total;
-      });
-    });
+      }).catch(angular.noop);
+    }).catch(angular.noop);
   }
 
   $scope.availableOperations = {};
@@ -78,7 +78,7 @@ var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', '$tra
     angular.forEach(response.links, function(link) {
       $scope.availableOperations[link.rel] = true;
     });
-  });
+  }).catch(angular.noop);
 
   $scope.$root.showBreadcrumbs = true;
 

@@ -28,7 +28,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               // refresh filter and all views
               $scope.processData.set('filter', angular.extend({}, $scope.filter));
             }
-          });
+          }).catch(angular.noop);
 
         };
 

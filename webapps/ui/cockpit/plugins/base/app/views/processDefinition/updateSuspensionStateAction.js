@@ -36,7 +36,7 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
 
               $scope.processData.set('filter', angular.extend({}, $scope.filter));
             }
-          });
+          }).catch(angular.noop);
         };
 
       }],

@@ -18,7 +18,7 @@ module.exports = function(ngModule) {
           },
           controller: 'CancelProcessInstanceController',
           template: dialogTemplate
-        });
+        }).result.catch(function() {});
       };
     }]);
 

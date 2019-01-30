@@ -157,7 +157,7 @@ module.exports = function(ngModule) {
 
         TaskResource.count(params).$promise.then(function(response) {
           pages.total = response.count;
-        });
+        }).catch(angular.noop);
 
         TaskResource.query(pagingParams, params).$promise.then(function(response) {
           for (var i = 0, task; (task = response[i]); i++) {
@@ -167,7 +167,7 @@ module.exports = function(ngModule) {
 
           $scope.userTasks = response;
           $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
-        });
+        }).catch(angular.noop);
 
       }
 
@@ -278,7 +278,7 @@ module.exports = function(ngModule) {
             controller: 'IdentityLinksController',
             template: identityLinksTemplate,
             windowClass:  'identity-link-modal'
-          });
+          }).result.catch(angular.noop);
         });
 
       };

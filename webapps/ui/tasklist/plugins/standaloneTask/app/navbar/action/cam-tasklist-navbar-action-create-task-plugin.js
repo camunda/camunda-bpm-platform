@@ -37,7 +37,7 @@ var Controller = [
             document.querySelectorAll('div.modal-content input')[0].focus();
           });
         });
-      });
+      }).catch(function() {});
     };
 
   }];

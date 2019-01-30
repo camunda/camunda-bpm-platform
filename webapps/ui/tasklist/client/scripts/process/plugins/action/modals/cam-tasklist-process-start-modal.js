@@ -28,7 +28,7 @@ module.exports = [
           message: (err ? err.message : ''),
           scope: $scope
         });
-      });
+      }).catch(angular.noop);
     }
 
     function successNotification(src) {
@@ -37,7 +37,7 @@ module.exports = [
           duration: 3000,
           status: translated
         });
-      });
+      }).catch(angular.noop);
     }
 
     // setup ////////////////////////////////////////////////////////////////////////

@@ -360,7 +360,7 @@ module.exports = [
               return callback(errors);
             }
 
-          });
+          }).catch(angular.noop);
 
         };
 

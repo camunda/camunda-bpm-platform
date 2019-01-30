@@ -33,7 +33,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               $scope.processData.set('filter', angular.extend({}, $scope.filter));
               $rootScope.$broadcast('cam-common:cam-searchable:query-force-change');
             }
-          });
+          }).catch(angular.noop);
         };
       }],
     priority: 10

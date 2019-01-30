@@ -136,8 +136,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
                   $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
                   return total;
-                });
-            });
+                }).catch(angular.noop);
+            }).catch(angular.noop);
         }
 
         function saveLocal(sortObj) {

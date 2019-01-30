@@ -238,7 +238,7 @@ module.exports = [
           exclusive: exclusive,
           scope: $scope
         });
-      });
+      }).catch(angular.noop);
     }
 
     $scope.submit = function() {

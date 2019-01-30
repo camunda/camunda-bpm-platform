@@ -139,7 +139,7 @@ var Directive = [
         // get the 'count' of incidents
         $http.post(Uri.appUri(baseUrl + 'count'), params).then(function(response) {
           scope.pages.total = response.data.count;
-        });
+        }).catch(angular.noop);
 
         // get the incidents
         scope.loadingState = 'LOADING';
@@ -155,7 +155,7 @@ var Directive = [
 
             scope.incidents = data;
             scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
-          });
+          }).catch(angular.noop);
       }
 
       scope.getIncidentType = function(incident) {

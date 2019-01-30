@@ -349,8 +349,8 @@ module.exports = function(ngModule) {
                 });
                 $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
                 return $scope.total;
-              });
-          });
+              }).catch(angular.noop);
+          }).catch(angular.noop);
       }
 
       function saveLocal(sortObj) {

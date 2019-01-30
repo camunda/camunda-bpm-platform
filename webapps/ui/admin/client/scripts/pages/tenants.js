@@ -69,8 +69,8 @@ var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', '
         $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
         return total;
-      });
-    });
+      }).catch(angular.noop);
+    }).catch(angular.noop);
   }
 
   $scope.availableOperations = {};
