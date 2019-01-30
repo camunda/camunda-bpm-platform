@@ -191,10 +191,10 @@ module.exports = [ '$routeProvider', function($routeProvider) {
                   engines.forEach(function(engine) {
                     AuthenticationService.logout(engine.name);
                   });
-                });
+                }).catch(angular.noop);
               }
             });
-          });
+          }).catch(angular.noop);
         };
 
         // Unlock User
@@ -358,7 +358,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
             if (result == 'SUCCESS') {
               dialogCfg.callback();
             }
-          });
+          }).catch(angular.noop);
         };
 
         var prepareResolveObject = function(listObj) {

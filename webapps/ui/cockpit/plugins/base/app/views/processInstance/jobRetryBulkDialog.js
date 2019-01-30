@@ -87,8 +87,8 @@ module.exports = [
             $scope.allJobsSelected = true;
             $scope.selectAllJobs(true);
           }
-        });
-      });
+        }).catch(angular.noop);
+      }).catch(angular.noop);
     }
 
     $scope.$watch('summarizePages.current', function(newValue) {
@@ -163,7 +163,7 @@ module.exports = [
         }
 
         $scope.status = FINISHED;
-      });
+      }).catch(angular.noop);
     };
 
     function doRetry(selectedFailedJobIds) {

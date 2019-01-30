@@ -36,7 +36,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               processData.changed('jobDefinitions');
               processData.set('filter', angular.extend({}, $scope.filter));
             }
-          });
+          }).catch(angular.noop);
         };
       }],
     priority: 10

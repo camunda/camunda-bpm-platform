@@ -81,7 +81,7 @@ module.exports = function(ngModule) {
 
             $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
             $scope.calledProcessInstances = response;
-          });
+          }).catch(angular.noop);
       }
     }]);
 

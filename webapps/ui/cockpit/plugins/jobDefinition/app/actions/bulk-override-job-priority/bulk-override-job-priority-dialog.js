@@ -15,7 +15,7 @@ module.exports = [
             message: 'This process definition has no job definitions associated with. The job priority cannot be overridden.',
             exclusive: true
           });
-        }, 0));
+        }, 0)).catch(angular.noop);
     }
 
     $scope.status;
@@ -111,7 +111,7 @@ module.exports = [
         }
 
         $scope.status = FINISHED;
-      });
+      }).catch(angular.noop);
     }
 
     function doOverride(jobDefinitions) {

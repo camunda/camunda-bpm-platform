@@ -57,7 +57,7 @@ ProcessInstanceRuntimeTab.prototype.onLoad = function(pages, activityIds) {
     this.tasks = data.list;
 
     return data;
-  }).bind(this));
+  }).bind(this)).catch(function() {});
 };
 
 ProcessInstanceRuntimeTab.prototype.getActivityParams = function(activityIds) {

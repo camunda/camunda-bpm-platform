@@ -73,7 +73,7 @@ module.exports = [
               exclusive: true,
               scope: $scope
             });
-          });
+          }).catch(angular.noop);
         }
         else {
           $scope.$close();

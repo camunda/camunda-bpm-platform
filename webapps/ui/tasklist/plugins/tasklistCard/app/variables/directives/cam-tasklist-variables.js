@@ -44,7 +44,7 @@ module.exports = [
             },
 
             controller: 'camTasklistVariablesDetailsModalCtrl'
-          });
+          }).result.catch(angular.noop);
         };
 
         scope.download = function(variable, $event) {

@@ -307,7 +307,7 @@ var Controller = [
         var superInstance = response[0];
 
         done(null, superInstance);
-      });
+      }).catch(angular.noop);
     }
 
     $rootScope.showBreadcrumbs = true;

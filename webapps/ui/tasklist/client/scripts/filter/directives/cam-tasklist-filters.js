@@ -120,7 +120,7 @@ module.exports = [function() {
                   status: translated,
                   message: err.message || ''
                 });
-              });
+              }).catch(function() {});
             });
         };
 

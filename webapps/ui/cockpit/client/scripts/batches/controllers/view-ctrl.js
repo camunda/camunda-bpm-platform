@@ -66,10 +66,12 @@ module.exports = [
     });
 
     events.on('deleteModal:open', function(deleteModal) {
-      deleteModal.instance = $modal.open({
+      var modal = deleteModal.instance = $modal.open({
         template: deleteModalTemplate,
         controller: deleteModalCtrl
       });
+
+      modal.result.catch(function() {});
     });
 
     events.on('batch:delete:failed', function(err) {

@@ -27,7 +27,7 @@
               unsafe: true,
               message: msg.slice(0,-2)
             });
-          });
+          }).catch(function() {});
         }
       });
     };

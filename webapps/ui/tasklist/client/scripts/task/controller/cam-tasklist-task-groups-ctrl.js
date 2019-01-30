@@ -47,7 +47,7 @@ module.exports = [
       messages.initGroupsFailed   = result.INIT_GROUPS_FAILURE;
       messages.addGroupFailed     = result.ADD_GROUP_FAILED;
       messages.removeGroupFailed  = result.REMOVE_GROUP_FAILED;
-    });
+    }).catch(angular.noop);
 
     // observe ////////////////////////////////////////////////////////
 

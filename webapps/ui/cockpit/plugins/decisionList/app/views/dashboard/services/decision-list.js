@@ -31,7 +31,7 @@ module.exports = [
           results.decisions = connectDrdsToDecisionDefinitions(results.drds, results.decisions);
 
           return results;
-        });
+        }).catch(function() {});
     }
 
     function connectDrdsToDecisionDefinitions(drds, decisions) {

@@ -61,7 +61,7 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
               $scope.showBusinessKey = true;
               $scope.businessKey = res.businessKey;
             }
-          });
+          }).catch(angular.noop);
       } else {
         $scope.showBusinessKey = true;
       }
@@ -111,7 +111,7 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
                 message: err.message,
                 scope: $scope
               });
-            });
+            }).catch(angular.noop);
           }
 
           var variableAdded = false;
@@ -138,7 +138,7 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
                 status: translated,
                 scope: $scope
               });
-            });
+            }).catch(angular.noop);
           }
         });
       };

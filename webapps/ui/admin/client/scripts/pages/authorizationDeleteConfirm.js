@@ -23,6 +23,6 @@
       $scope.performDelete = function() {
         AuthorizationResource.delete({ action: authorizationToDelete.id }).$promise.then(function() {
           $scope.status = DELETE_SUCCESS;
-        });
+        }).catch(function() {});
       };
     }];

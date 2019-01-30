@@ -38,7 +38,7 @@
           ].concat(trail);
 
           breadcrumbTrails(superProcessInstance, fetchSuperInstance, trail, index, urlSuffix);
-        });
+        }).catch(function() {});
         }
 
         fetchSuperInstance(processInstance, handleSuperProcessInstance);

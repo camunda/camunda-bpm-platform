@@ -42,7 +42,7 @@ var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location',
         function() {
           Notifications.addError({ status: $translate.instant('NOTIFICATIONS_STATUS_ERROR'), message: $translate.instant('SETUP_COULD_NOT_CREATE_USER')});
         }
-      );
+      ).catch(function() {});
   };
 
 }];

@@ -263,7 +263,7 @@ var Controller = [
             });
           }
         });
-      });
+      }).catch(angular.noop);
     };
 
     // tenant membership dialog /////////////////////////
@@ -279,7 +279,7 @@ var Controller = [
         if (result == 'SUCCESS') {
           dialogCfg.callback();
         }
-      });
+      }).catch(angular.noop);
     };
 
     var prepareResolveObject = function(listObj) {

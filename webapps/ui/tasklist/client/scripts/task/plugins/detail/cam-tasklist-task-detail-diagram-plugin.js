@@ -30,13 +30,13 @@ var Controller = [
         return getDefinition($q, ProcessDefinition, processDefinition)
           .then(function(xml) {
             return xml.bpmn20Xml;
-          });
+          }).catch(function() {});
       }
 
       return getDefinition($q, CaseDefinition, caseDefinition)
         .then(function(xml) {
           return xml.cmmnXml;
-        });
+        }).catch(function() {});
     }]);
 
     diagramData.provide('diagram',

@@ -250,7 +250,7 @@ var Controller = [
             });
           }
         });
-      });
+      }).catch(angular.noop);
     };
 
     // page controls ////////////////////////////////////

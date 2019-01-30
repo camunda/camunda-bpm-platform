@@ -29,7 +29,7 @@ var Controller = [
         }
       }).result.then(function() {
         $rootScope.$broadcast('cam-common:cam-searchable:query-force-change');
-      });
+      }).catch(function() {});
     };
 
   }];

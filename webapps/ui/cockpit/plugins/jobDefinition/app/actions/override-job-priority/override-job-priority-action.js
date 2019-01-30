@@ -29,7 +29,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               $scope.processData.changed('jobDefinitions');
               $scope.processData.set('filter', angular.extend({}, $scope.filter));
             }
-          });
+          }).catch(angular.noop);
         };
       }],
     priority: 10

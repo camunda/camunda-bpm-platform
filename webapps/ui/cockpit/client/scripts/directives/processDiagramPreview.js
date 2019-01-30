@@ -43,7 +43,7 @@ module.exports = ['ProcessDefinitionResource', 'debounce', function(ProcessDefin
               debouncedZoom();
             });
 
-          });
+          }).catch(angular.noop);
         }
       });
 

@@ -76,7 +76,7 @@ module.exports = [ function() {
               exclusive: true,
               scope: $scope
             });
-          });
+          }).catch(angular.noop);
         }
 
         $scope.errorHandler = function(status, err) {
@@ -87,7 +87,7 @@ module.exports = [ function() {
               err.message = translated;
               errorNotification(status, err);
               clearTask(true);
-            });
+            }).catch(angular.noop);
 
           }
           else if (_status === 'SUBMISSION_PREVENTED') {
