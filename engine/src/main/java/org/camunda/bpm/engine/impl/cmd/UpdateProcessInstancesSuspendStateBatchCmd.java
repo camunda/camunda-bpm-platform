@@ -95,7 +95,7 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
 
   protected void checkAuthorizations(CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE);
+      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND);
     }
   }
 

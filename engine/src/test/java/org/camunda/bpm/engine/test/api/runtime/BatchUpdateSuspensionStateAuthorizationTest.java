@@ -65,7 +65,7 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
         .withoutAuthorizations()
         .failsDueToRequired(
           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE)
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND)
         ),
       scenario()
         .withAuthorizations(
@@ -82,7 +82,7 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
         ),
       scenario()
         .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND_STATE),
+          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND),
           grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)
         )
         .succeeds()
