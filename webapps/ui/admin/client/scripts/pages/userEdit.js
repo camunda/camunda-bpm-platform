@@ -417,6 +417,12 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           $location.search({'tab': 'profile'});
           $location.replace();
         }
+
+        // translate
+        $scope.translate = function(token, object) {
+          return $translate.instant(token, object);
+        };
+
       }],
     authentication: 'required',
     reloadOnSearch: false

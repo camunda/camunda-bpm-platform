@@ -334,6 +334,11 @@ var Controller = [
       $location.replace();
     }
 
+    // translate
+    $scope.translate = function(token, object) {
+      return $translate.instant(token, object);
+    };
+
   }];
 
 module.exports = [ '$routeProvider', function($routeProvider) {

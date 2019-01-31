@@ -285,7 +285,7 @@
   "TENANTS_WARNING":"Warning:",
   "TENANTS_DELETING_TENANT_UNDONE": "deleting a tenant cannot be undone.",
   "TENANTS_TENANT_USERS": "Tenant Users",
-  "TENANTS_NO_USERS": "Tenant {{tenants}} does not currently have any users.",
+  "TENANTS_NO_USERS": "Tenant {{tenant}} does not currently have any users.",
   "TENANTS_NAME":"Name",
   "TENANTS_USERNAME":"Username",
   "TENANTS_TENANT_GROUPS": "Tenant Groups",

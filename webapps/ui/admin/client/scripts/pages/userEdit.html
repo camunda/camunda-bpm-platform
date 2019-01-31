@@ -247,13 +247,14 @@
       <form class="form-horizontal"
             name="updateGroupMemberships">
 
-        <div class="h4">
-          {{ 'USERS_FIRSTNAME_LASTNAME_GROUPS' | translate:'{firstname: user.firstName, lastname: user.lastName}' }}
+        <div class="h4"
+             translate="USERS_FIRSTNAME_LASTNAME_GROUPS"
+             translate-values='{firstname: user.firstName, lastname: user.lastName}'>
         </div>
 
         <div cam-widget-loader
              loading-state="{{ groupLoadingState }}"
-             text-empty="{{ 'USERS_NOT_MEMBER_GROUP' | translate:'{firstname: user.firstName, lastname:user.lastName}' }}">
+             text-empty="{{ translate('USERS_NOT_MEMBER_GROUP', { firstname: user.firstName, lastname: user.lastName }) }}">
           <table class="cam-table"
                  ng-hide="groupList.length == 0">
             <thead cam-sortable-table-header
@@ -309,13 +310,14 @@
       <form class="form-horizontal"
             name="updateTenantMemberships">
 
-        <div class="h4">
-          {{ 'USERS_FIRSTNAME_LASTNAME_TENANTS' | translate:'{firstname: user.firstName, lastname: user.lastName}' }}
+        <div class="h4"
+             translate="USERS_FIRSTNAME_LASTNAME_TENANTS"
+             translate-values='{firstname: user.firstName, lastname: user.lastName}'>
         </div>
 
         <div cam-widget-loader
              loading-state="{{ tenantLoadingState }}"
-             text-empty="{{ 'USERS_NOT_MEMBER_TENTANT' | translate:'{firstname: user.firstName, lastname: user.lastName}' }}">
+             text-empty="{{ translate('USERS_NOT_MEMBER_TENTANT', { firstname: user.firstName, lastname: user.lastName }) }}">
           <table class="cam-table"
                  ng-hide="tenantList.length == 0">
             <thead cam-sortable-table-header
