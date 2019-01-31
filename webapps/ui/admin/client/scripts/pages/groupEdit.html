@@ -103,13 +103,14 @@
       <form class="form-horizontal"
             name="updateTenantMemberships">
 
-        <div class="h4">
-          {{ 'GROUP_EDIT_TENANTS' | translate:'{ group: group.name }' }}
+        <div class="h4"
+             translate="GROUP_EDIT_TENANTS"
+             translate-values="{ group: group.name }">
         </div>
 
         <div cam-widget-loader
              loading-state="{{ tenantLoadingState }}"
-             text-empty="{{ 'GROUP_EDIT_MESSAGE_GROUP' | translate:'{ group: group.name }' }}">
+             text-empty="{{ translate('GROUP_EDIT_MESSAGE_GROUP', { group: group.name }) }}">
           <table class="cam-table"
                  ng-hide="tenantList.length == 0">
             <thead cam-sortable-table-header
@@ -159,7 +160,7 @@
 
       <div cam-widget-loader
            loading-state="{{ userLoadingState }}"
-           text-empty="{{ 'GROUP_EDIT_MESSAGE_USERS' | translate:'{group: group.name}' }}">
+           text-empty="{{ translate('GROUP_EDIT_MESSAGE_USERS', {group: group.name}) }}">
         <table class="cam-table">
           <thead cam-sortable-table-header
                  default-sort-by="userId"

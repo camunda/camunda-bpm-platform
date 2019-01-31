@@ -76,7 +76,7 @@
 
       <div cam-widget-loader
            loading-state="{{ userLoadingState }}"
-           text-empty="{{ 'TENANTS_NO_USERS' | translate:'{tenant: tenant.name }' }}">
+           text-empty="{{ translate('TENANTS_NO_USERS', { tenant: tenant.name }) }}">
         <table class="cam-table">
           <thead cam-sortable-table-header
                  default-sort-by="userId"
@@ -127,7 +127,7 @@
 
       <div cam-widget-loader
            loading-state="{{ groupLoadingState }}"
-           text-empty="{{ 'TENANTS_NO_GROUPS' | translate:'{ tenant: tenant.name }' }}">
+           text-empty="{{ translate('TENANTS_NO_GROUPS', { tenant: tenant.name }) }}">
         <table class="cam-table">
           <thead cam-sortable-table-header
                  default-sort-by="name"
