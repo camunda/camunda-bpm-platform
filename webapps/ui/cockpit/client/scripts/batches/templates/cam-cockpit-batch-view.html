@@ -18,14 +18,14 @@
               <td class="type">{{batch.type}}</td>
               <td class="failed">{{ ctrl.getProgressAbsolute(batch, 'failed') }}</td>
               <td>
-                <progress>
+                <uib-progress>
                   <div class="processed">{{ ctrl.getProgressRoundedPercentage(batch, 'success') }}%</div>
-                  <bar value="ctrl.getProgressPercentage(batch, 'success')"
+                  <uib-bar value="ctrl.getProgressPercentage(batch, 'success')"
                        type="success"
                        ng-if="ctrl.getProgressAbsolute(batch, 'success') > 0"
                        class="jobs jobs-success">
-                  </bar>
-                </progress>
+                  </uib-bar>
+                </uib-progress>
               </td>
             </tr>
           </tbody>
