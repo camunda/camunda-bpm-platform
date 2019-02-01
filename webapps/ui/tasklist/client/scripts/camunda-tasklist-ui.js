@@ -73,10 +73,12 @@ module.exports = function(pluginDependencies) {
     '$uibModalProvider',
     '$uibTooltipProvider',
     '$locationProvider',
+    '$animateProvider',
     function(
       $modalProvider,
       $tooltipProvider,
-      $locationProvider
+      $locationProvider,
+      $animateProvider
     ) {
       $modalProvider.options = {
         animation:    true,
@@ -91,6 +93,8 @@ module.exports = function(pluginDependencies) {
       });
 
       $locationProvider.hashPrefix('');
+
+      $animateProvider.classNameFilter(/angular-animate/);
     }];
 
   tasklistApp.config(ModuleConfig);
