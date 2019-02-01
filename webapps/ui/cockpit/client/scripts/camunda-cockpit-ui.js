@@ -54,12 +54,14 @@ module.exports = function(pluginDependencies) {
     '$uibModalProvider',
     '$uibTooltipProvider',
     '$locationProvider',
+    '$animateProvider',
     function(
       $routeProvider,
       UriProvider,
       $modalProvider,
       $tooltipProvider,
-      $locationProvider
+      $locationProvider,
+      $animateProvider
     ) {
       $routeProvider.otherwise({ redirectTo: '/dashboard' });
 
@@ -96,6 +98,8 @@ module.exports = function(pluginDependencies) {
       });
 
       $locationProvider.hashPrefix('');
+
+      $animateProvider.classNameFilter(/angular-animate/);
     }];
 
   appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camCockpitConf, 'Cockpit'));
