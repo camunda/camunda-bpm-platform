@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -1425,8 +1427,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void suspendProcessInstanceById(String processInstanceId);
 
@@ -1460,7 +1465,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void suspendProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
@@ -1494,7 +1503,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void suspendProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
@@ -1510,8 +1523,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void activateProcessInstanceById(String processInstanceId);
 
@@ -1527,7 +1543,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          if the process definition id is null
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void activateProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
@@ -1543,7 +1563,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          if the process definition id is null
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void activateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 

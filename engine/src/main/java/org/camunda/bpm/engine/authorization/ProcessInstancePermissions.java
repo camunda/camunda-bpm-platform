@@ -53,7 +53,10 @@ public enum ProcessInstancePermissions implements Permission {
   DELETE("DELETE", 16),
 
   /** Indicates that RETRY_JOB interactions are permitted. */
-  RETRY_JOB("RETRY_JOB", 32);
+  RETRY_JOB("RETRY_JOB", 32),
+
+  /** Indicates that SUSPEND interactions are permitted. */
+  SUSPEND("SUSPEND", 64);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_INSTANCE };
   private String name;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -328,10 +330,14 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          and if <code>suspendProcessInstances</code> is set to <code>true</code> and the user have no
-   *          {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no
-   *          {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           <li>If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *           <li>and if <code>suspendProcessInstances</code> is set to <code>true</code> and the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    *
    * @see RuntimeService#suspendProcessInstanceById(String)
    */
@@ -372,10 +378,14 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          and if <code>suspendProcessInstances</code> is set to <code>true</code> and the user have no
-   *          {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no
-   *          {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           <li>If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *           <li>and if <code>suspendProcessInstances</code> is set to <code>true</code> and the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    *
    * @see RuntimeService#suspendProcessInstanceById(String)
    */
@@ -407,10 +417,14 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          and if <code>activateProcessInstances</code> is set to <code>true</code> and the user have no
-   *          {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no
-   *          {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           <li>If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *           <li>and if <code>suspendProcessInstances</code> is set to <code>true</code> and the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    *
    * @see RuntimeService#activateProcessInstanceById(String)
    */
@@ -442,10 +456,14 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          and if <code>activateProcessInstances</code> is set to <code>true</code> and the user have no
-   *          {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no
-   *          {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           <li>If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *           <li>and if <code>suspendProcessInstances</code> is set to <code>true</code> and the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    *
    * @see RuntimeService#activateProcessInstanceById(String)
    */

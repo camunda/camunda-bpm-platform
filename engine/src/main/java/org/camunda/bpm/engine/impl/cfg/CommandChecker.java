@@ -81,6 +81,11 @@ public interface CommandChecker {
   void checkUpdateRetriesProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
   /**
+   * Checks if it is allowed to update a process instance's suspension state of the given process definition.
+   */
+  void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(String processDefinitionId);
+
+  /**
    * Checks if it is allowed to update a decision definition with given id.
    */
   void checkUpdateDecisionDefinitionById(String decisionDefinitionId);
@@ -110,9 +115,19 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
   /**
+   * Checks if it is allowed to update a process instance's suspension state of the given process definition.
+   */
+  void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
    * Checks if it is allowed to update a process instance of the given process instance id.
    */
   void checkUpdateProcessInstanceById(String processInstanceId);
+
+  /**
+   * Checks if it is allowed to update a process instance's suspension state.
+   */
+  void checkUpdateProcessInstanceSuspensionStateById(String processInstanceId);
 
   /**
    * Checks if it is allowed to update a process instance of the given execution.

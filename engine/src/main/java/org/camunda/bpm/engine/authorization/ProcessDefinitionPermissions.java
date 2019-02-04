@@ -83,7 +83,10 @@ public enum ProcessDefinitionPermissions implements Permission {
   MIGRATE_INSTANCE("MIGRATE_INSTANCE", 65536),
 
   /** Indicates that RETRY_JOB interactions are permitted. */
-  RETRY_JOB("RETRY_JOB", 32);
+  RETRY_JOB("RETRY_JOB", 32),
+
+  /** Indicates that SUSPEND_INSTANCE interactions are permitted. */
+  SUSPEND_INSTANCE("SUSPEND_INSTANCE", 131072);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_DEFINITION };
 

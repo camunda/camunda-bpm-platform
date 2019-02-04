@@ -113,12 +113,12 @@ public class TenantCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateRetriesProcessInstanceByProcessDefinitionId(String processDefinitionId) {
-    if (getTenantManager().isTenantCheckEnabled()) {
-      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
-      if (processDefinition != null && !getTenantManager().isAuthenticatedTenant(processDefinition.getTenantId())) {
-        throw LOG.exceptionCommandWithUnauthorizedTenant("update the process definition '"+ processDefinitionId + "'");
-      }
-    }
+    checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
+  }
+
+  @Override
+  public void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(String processDefinitionId) {
+    checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
   }
 
   @Override
@@ -145,6 +145,10 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(String processDefinitionKey) {
+  }
+
+  @Override
   public void checkUpdateProcessInstanceById(String processInstanceId) {
     if (getTenantManager().isTenantCheckEnabled()) {
       ExecutionEntity execution = findExecutionById(processInstanceId);
@@ -154,6 +158,10 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkUpdateProcessInstanceSuspensionStateById(String processInstanceId) {
+    checkUpdateProcessInstanceById(processInstanceId);
+  }
 
   @Override
   public void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
