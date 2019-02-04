@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.BatchUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Batch> {
@@ -68,20 +70,13 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
     BatchEntity batch = new BatchEntity();
 
     batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(calculateSize(processEngineConfiguration, (UpdateProcessInstancesSuspendStateBatchConfiguration) configuration));
+    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, (UpdateProcessInstancesSuspendStateBatchConfiguration) configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
     commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
-  }
-
-  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, UpdateProcessInstancesSuspendStateBatchConfiguration batchConfiguration) {
-    int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
-    int processInstanceCount = batchConfiguration.getIds().size();
-
-    return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {

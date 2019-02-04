@@ -16,6 +16,13 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
@@ -29,14 +36,8 @@ import org.camunda.bpm.engine.impl.migration.AbstractMigrationCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.util.BatchUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> {
 
@@ -108,7 +109,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(calculateSize(processEngineConfiguration, configuration));
+    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
@@ -116,13 +117,6 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
-  }
-
-  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, MigrationBatchConfiguration batchConfiguration) {
-    int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
-    int processInstanceCount = batchConfiguration.getIds().size();
-
-    return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
   @SuppressWarnings("unchecked")

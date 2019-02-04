@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.util.BatchUtil;
 
 import java.util.List;
 
@@ -39,20 +40,13 @@ public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(calculateSize(processEngineConfiguration, configuration));
+    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
     commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
-  }
-
-  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, BatchConfiguration batchConfiguration) {
-    int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
-    int processInstanceCount = batchConfiguration.getIds().size();
-
-    return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
   protected abstract BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids);

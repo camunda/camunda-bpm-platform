@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.util.BatchUtil;
 
 public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd<Batch> {
 
@@ -75,7 +76,7 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
   }
 
   protected void checkPermissions(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
     }
   }
@@ -92,7 +93,7 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
     BatchEntity batch = new BatchEntity();
 
     batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(calculateSize(processEngineConfiguration, configuration));
+    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
@@ -100,13 +101,6 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
     commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
-  }
-
-  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, ModificationBatchConfiguration batchConfiguration) {
-    int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
-    int processInstanceCount = batchConfiguration.getIds().size();
-
-    return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
   @SuppressWarnings("unchecked")
