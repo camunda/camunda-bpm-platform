@@ -36,7 +36,6 @@ public interface MetricsRestService {
 
   public static final String PATH = "/metrics";
 
-  @Produces(MediaType.APPLICATION_JSON)
   @Path("/{name}")
   MetricsResource getMetrics(@PathParam("name") String name);
 
