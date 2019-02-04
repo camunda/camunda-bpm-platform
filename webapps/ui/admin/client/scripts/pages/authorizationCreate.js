@@ -9,7 +9,7 @@ module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI',
   $scope.addNewAuthorization = function() {
     $scope.authorizations.push({
       inUpdate: true,
-      type: 1,
+      type: '1',
       resourceType: Number($scope.selectedResourceType),
       resourceId: '*',
       permissions: ['ALL'],
