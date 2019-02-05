@@ -38,7 +38,7 @@
 
           Notifications.addError({
             status: $translate.instant('PLUGIN_UPDATE_DIALOG_STATUS_FINISHED'),
-            message: $translate.instant('PLUGIN_UPDATE_DIALOG_ERROR_1', { message: data.message }),
+            message: $translate.instant('PLUGIN_UPDATE_DIALOG_ERROR_1', { message: data.data.message }),
             exclusive: true
           });
         });
