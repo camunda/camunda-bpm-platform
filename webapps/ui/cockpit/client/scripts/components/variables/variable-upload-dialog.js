@@ -12,7 +12,7 @@ var Controller = [
   'basePath',
   'variable',
   '$translate',
-  '$browser',
+  '$cookies',
   function(
     $modalInstance,
     $scope,
@@ -21,7 +21,7 @@ var Controller = [
     basePath,
     variable,
     $translate,
-    $browser
+    $cookies
   ) {
 
     var BEFORE_UPLOAD = 'beforeUpload',
@@ -101,7 +101,7 @@ var Controller = [
       xhr.addEventListener('abort', uploadFailed, false);
       xhr.open('POST', Uri.appUri(basePath + '/data'));
 
-      var token = $browser.cookies()['XSRF-TOKEN'];
+      var token = $cookies.get('XSRF-TOKEN');
       if (token) {
         xhr.setRequestHeader('X-XSRF-TOKEN', token);
       }
