@@ -81,12 +81,19 @@ public class PermissionsTest {
       assertThat(values.add(value))
           .overridingErrorMessage("The value '%s' of '%s' permission is not unique. Abother permission already has this value.", value, permission)
           .isTrue();
-      if (value != Integer.MAX_VALUE) {
-        // value is even
-        assertThat((value & 1))
-            .overridingErrorMessage("The value '%s' of '%s' permission is invalid. The values must be power of 2.", value, permission)
-            .isZero();
+      if (value != Integer.MAX_VALUE && value != 0) {
+        // value is power of 2
+        assertThat(isPowerOfTwo(value))
+          .overridingErrorMessage("The value '%s' of '%s' permission is invalid. The values must be power of 2.", value, permission)
+          .isTrue();
       }
     }
+  }
+
+  private boolean isPowerOfTwo(int value) {
+    if (value <= 0) {
+      return false;
+    }
+    return (value & (value - 1)) == 0;
   }
 }
