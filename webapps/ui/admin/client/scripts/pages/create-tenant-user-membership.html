@@ -91,8 +91,9 @@
   <button class="btn btn-primary"
           ng-click="createUserMemberships()"
           ng-disabled="status !== 'beforeCreate' || checkedItemsCount === 0"
-          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableTenants.length == 0">
-    {{ 'USER_MEMBERSHIP_TENANT_ADD' | translate: '{ itemsCount: checkedItemsCount }' }}
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableTenants.length == 0"
+          translate="USER_MEMBERSHIP_TENANT_ADD"
+          translate-values="{ itemsCount: checkedItemsCount }">
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->

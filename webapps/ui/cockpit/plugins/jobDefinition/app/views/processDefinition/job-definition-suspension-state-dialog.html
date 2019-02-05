@@ -136,14 +136,16 @@
     <p ng-show="jobDefinition.suspended && data.executeImmediately">
       {{ 'PLUGIN_JOBDEFINITION_LEGEND_1' | translate }}
     </p>
-    <p ng-show="jobDefinition.suspended && !data.executeImmediately">
-      {{ 'PLUGIN_JOBDEFINITION_LEGEND_2' | translate:' { data: (data.executionDate | camDate) }' }}
+    <p ng-show="jobDefinition.suspended && !data.executeImmediately"
+       translate="PLUGIN_JOBDEFINITION_LEGEND_2"
+       translate-values="{ data: (data.executionDate | camDate) }">
     </p>
     <p ng-show="!jobDefinition.suspended && data.executeImmediately">
       {{ 'PLUGIN_JOBDEFINITION_LEGEND_3' | translate }}
     </p>
-    <p ng-show="!jobDefinition.suspended && !data.executeImmediately">
-      {{ 'PLUGIN_JOBDEFINITION_LEGEND_4' | translate:' { data: (data.executionDate | camDate) }' }}
+    <p ng-show="!jobDefinition.suspended && !data.executeImmediately"
+       translate="PLUGIN_JOBDEFINITION_LEGEND_4"
+       translate-values="{ data: (data.executionDate | camDate) }">
     </p>
   </div>
 
@@ -151,14 +153,16 @@
     <p ng-show="jobDefinition.suspended && data.executeImmediately">
       {{ 'PLUGIN_JOBDEFINITION_LEGEND_5' | translate }}
     </p>
-    <p ng-show="jobDefinition.suspended && !data.executeImmediately">
-      {{ 'PLUGIN_JOBDEFINITION_LEGEND_6' | translate:' { data: (data.executionDate | camDate) }' }}
+    <p ng-show="jobDefinition.suspended && !data.executeImmediately"
+       translate="PLUGIN_JOBDEFINITION_LEGEND_6"
+       translate-values="{ data: (data.executionDate | camDate) }">
     </p>
     <p ng-show="!jobDefinition.suspended && data.executeImmediately">
       {{ 'PLUGIN_JOBDEFINITION_LEGEND_7' | translate }}
     </p>
-    <p ng-show="!jobDefinition.suspended && !data.executeImmediately">
-      {{ 'PLUGIN_JOBDEFINITION_LEGEND_8' | translate:' { data: (data.executionDate | camDate) }' }}
+    <p ng-show="!jobDefinition.suspended && !data.executeImmediately"
+       translate="PLUGIN_JOBDEFINITION_LEGEND_8"
+       translate-values="{ data: (data.executionDate | camDate) }">
     </p>
   </div>
 </div>

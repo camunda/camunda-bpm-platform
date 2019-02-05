@@ -103,8 +103,9 @@
   </div>
 
   <div ng-show="status === 'SUCCESS'">
-    <p ng-show="setJobPriority">
-      {{ 'PLUGIN_JOBDEFINITION_ACTION_TEXT_2' | translate: ' {data: data.priority}' }}
+    <p ng-show="setJobPriority"
+       translate="PLUGIN_JOBDEFINITION_ACTION_TEXT_2"
+       translate-values="{data: data.priority}">
     </p>
     <p ng-hide="setJobPriority">
       {{ 'PLUGIN_JOBDEFINITION_ACTION_TEXT_3' | translate }}
@@ -112,8 +113,9 @@
   </div>
 
   <div ng-show="status === 'FAIL'">
-    <p ng-show="setJobPriority">
-      {{ 'PLUGIN_JOBDEFINITION_ACTION_TEXT_4' | translate: ' {data: data.priority}' }}
+    <p ng-show="setJobPriority"
+       translate="PLUGIN_JOBDEFINITION_ACTION_TEXT_4"
+       translate-values="{data: data.priority}">
     </p>
     <p ng-hide="setJobPriority">
       {{ 'PLUGIN_JOBDEFINITION_ACTION_TEXT_5' | translate }}

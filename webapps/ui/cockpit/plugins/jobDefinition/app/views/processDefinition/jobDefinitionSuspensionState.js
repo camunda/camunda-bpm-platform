@@ -49,9 +49,9 @@ module.exports = [
         $scope.status = UPDATE_FAILED;
 
         if ($scope.data.executeImmediately) {
-          Notifications.addError({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_1', { message: data.message }), 'exclusive': true });
+          Notifications.addError({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_1', { message: data.data.message }), 'exclusive': true });
         } else {
-          Notifications.addError({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_2', { message: data.message }), 'exclusive': true });
+          Notifications.addError({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_2', { message: data.data.message }), 'exclusive': true });
         }
       });
     };

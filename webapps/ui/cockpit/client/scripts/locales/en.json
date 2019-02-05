@@ -155,7 +155,7 @@
   "BATCHES_PROGRESS_EXCEPTION" : "Exception",
   "BATCHES_PROGRESS_ACTIONS" : "Actions",
   "BATCHES_PROGRESS_FULL_STACK_TRACE" : "Full stack trace",
-  "BATCHES_PROGRESS_FAILED" : "Failed {{jobs}}",
+  "BATCHES_PROGRESS_FAILED" : "(Failed {{jobs}})",
 
   "BATCHES_DELETE_TITLE" : "Delete Batch",
   "BATCHES_DELETE_LEGEND" : "Do you really want to delete this batch and all related jobs and job definitions?",
@@ -181,7 +181,7 @@
   "VARIABLE_ADD_VARIABLE_SUPPORTED" : "Supported pattern 'yyyy-MM-ddTHH:mm:ss'.",
   "VARIABLE_ADD_VARIABLE_ONLY" : "Only a {{type}} value is allowed.",
   "VARIABLE_ADD_STATUS_SUCCESS_PROCESS" : "The variable \"{{name}}\" has been added to the process instance successfully.",
-  "VARIABLE_ADD_STATUS_SUCCESS_CASE" : "The variable \"{{name}}\" has been added to the process instance successfully.",
+  "VARIABLE_ADD_STATUS_SUCCESS_CASE" : "The variable \"{{name}}\" has been added to the case instance successfully.",
   "VARIABLE_ADD_STATUS_FAIL_PROCESS" : "The variable \"{{name}}\" could not be added to the process instance.",
   "VARIABLE_ADD_STATUS_FAIL_CASE" : "The variable \"{{name}}\" could not be added to the case instance.",
   "VARIABLE_ADD_CLOSE" : "Close",

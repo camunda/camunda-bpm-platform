@@ -120,7 +120,10 @@
           ng-click="retryFailedJobs(selectedFailedJobIds)"
           ng-disabled="!failedJobs || !failedJobs.length || !selectedFailedJobIds.length"
           ng-hide="status === 'finished' || status === 'performing'">
-    {{ 'PLUGIN_JOB_RETRY_BULK_RETRY' | translate }} <span ng-if="selectedFailedJobIds.length > 1">{{ 'PLUGIN_JOB_RETRY_BULK_JOBS' | translate:'{count: selectedFailedJobIds.length}' }}</span>
+    {{ 'PLUGIN_JOB_RETRY_BULK_RETRY' | translate }}
+    <span ng-if="selectedFailedJobIds.length > 1"
+          translate="PLUGIN_JOB_RETRY_BULK_JOBS"
+          translate-values="{count: selectedFailedJobIds.length}"></span>
   </button>
 
   <button class="btn btn-primary"

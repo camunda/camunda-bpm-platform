@@ -327,6 +327,11 @@ module.exports = function(ngModule) {
         return taskIdIdToExceptionMessageMap[userTask.id];
       };
 
+      // translate
+      $scope.translate = function(token, object) {
+        return $translate.instant(token, object);
+      };
+
     }]);
 
   ngModule.controller('IdentityLinksController', [

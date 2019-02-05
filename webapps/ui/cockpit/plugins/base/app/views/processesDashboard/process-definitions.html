@@ -122,9 +122,19 @@
             </span>
 
             <span class="tile-footer">
-              <span ng-if="pd.instances >= 0" class="instances">
-                {{ pd.instances === 1 ? 'PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCE' : 'PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCES'
-                | translate:'{ instances: (pd.instances === 0 ? "No" : pd.instances) }' }}
+              <span ng-if="!pd.instances || pd.instances === 0"
+                    class="instances"
+                    translate="PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCES"
+                    translate-values="{ instances: 'No' }">
+              </span>
+              <span ng-if="pd.instances === 1"
+                    class="instances">
+                {{ 'PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCE' | translate }}
+              </span>
+              <span ng-if="pd.instances > 1"
+                    class="instances"
+                    translate="PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCES"
+                    translate-values="{ instances: pd.instances }">
               </span>
               <span ng-if="pd.instances == undefined" class="instances">
                 <span class="glyphicon glyphicon-refresh animate-spin"></span>
