@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,12 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
       FormPart part = payload.getNamedPart(name);
 
       if (!RESERVED_KEYWORDS.contains(name)) {
-        deploymentBuilder.addInputStream(part.getFileName(), new ByteArrayInputStream(part.getBinaryContent()));
+        String fileName = part.getFileName();
+        if (fileName != null) {
+          deploymentBuilder.addInputStream(part.getFileName(), new ByteArrayInputStream(part.getBinaryContent()));
+        } else {
+          throw new InvalidRequestException(Status.BAD_REQUEST, "No deployment resources found for file name " + name + ".");
+        }
       }
     }
 
