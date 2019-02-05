@@ -52,14 +52,14 @@
              ng-model="userTask"
              class="btn btn-default action-button change-group-identity-links"
              tooltip-placement="left"
-             uib-tooltip="{{ 'PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP' | translate:'{ value: userTask.name || userTask.id }' }}">
+             uib-tooltip="{{ translate('PLUGIN_USER_TASKS_MANAGE_GROUP_TOOLTIP', { value: userTask.name || userTask.id }) }}">
             <span class="glyphicon glyphicon-th"></span>
           </a>
           <a ng-click="changeUserIdentityLinks()"
              ng-model="userTask"
              class="btn btn-default action-button change-user-identity-links"
              tooltip-placement="left"
-             uib-tooltip="{{ 'PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP' | translate:'{ value: userTask.name || userTask.id }' }}">
+             uib-tooltip="{{ translate('PLUGIN_USER_TASKS_MANAGE_USER_TOOLTIP', { value: userTask.name || userTask.id }) }}">
             <span class="glyphicon glyphicon-user"></span>
           </a>
         </td>

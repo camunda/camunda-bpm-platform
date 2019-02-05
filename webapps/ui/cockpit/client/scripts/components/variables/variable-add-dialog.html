@@ -58,8 +58,9 @@
           </p>
 
           <p class="invalid"
-             ng-show="this.addVariableForm.editIntegerValue.$error.numeric || this.addVariableForm.editFloatValue.$error.numeric">
-            {{ 'VARIABLE_ADD_VARIABLE_ONLY' | translate:'{ type : newVariable.type }' }}
+             ng-show="this.addVariableForm.editIntegerValue.$error.numeric || this.addVariableForm.editFloatValue.$error.numeric"
+             translate="VARIABLE_ADD_VARIABLE_ONLY"
+             translate-values="{ type : newVariable.type }">
           </p>
         </div>
       </div>
@@ -67,12 +68,24 @@
     </fieldset>
   </form>
 
-  <div ng-show="status === 'SUCCESS'">
-    {{ isProcessInstance ? 'VARIABLE_ADD_STATUS_SUCCESS_PROCESS' : 'VARIABLE_ADD_STATUS_SUCCESS_CASE' | translate:'{ name: newVariable.name }' }}
+  <div ng-if="status === 'SUCCESS' && isProcessInstance"
+       translate="VARIABLE_ADD_STATUS_SUCCESS_PROCESS"
+       translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-show="status === 'FAIL'">
-    {{ isProcessInstance ? 'VARIABLE_ADD_STATUS_FAIL_PROCESS' : 'VARIABLE_ADD_STATUS_FAIL_CASE' | translate:'{ name: newVariable.name }' }}
+  <div ng-if="status === 'SUCCESS' && !isProcessInstance"
+       translate="VARIABLE_ADD_STATUS_SUCCESS_CASE"
+       translate-values="{ name: newVariable.name }">
+  </div>
+
+  <div ng-show="status === 'FAIL' && isProcessInstance"
+       translate="VARIABLE_ADD_STATUS_FAIL_PROCESS"
+       translate-values="{ name: newVariable.name }">
+  </div>
+
+  <div ng-show="status === 'FAIL' && !isProcessInstance"
+       translate="VARIABLE_ADD_STATUS_FAIL_CASE"
+       translate-values="{ name: newVariable.name }">
   </div>
 
 </div>

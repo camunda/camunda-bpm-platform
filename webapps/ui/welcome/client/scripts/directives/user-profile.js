@@ -132,6 +132,12 @@ module.exports = ['camAPI', 'Notifications', '$translate', function(camAPI, Noti
           }
         });
       };
+
+      // translate
+      $scope.translate = function(token, object) {
+        return $translate.instant(token, object);
+      };
+
     }
   };
 }];

@@ -30,8 +30,9 @@ This feature is unsupported in your Browser.
 
   </div>
 
-  <div ng-show="status === 'performUpload'">
-    {{ 'VARIABLE_UPLOAD_PROGRESS' | translate:'{progress: progress}' }}
+  <div ng-show="status === 'performUpload'"
+       translate="VARIABLE_UPLOAD_PROGRESS"
+       translate-values="{progress: progress}">
   </div>
 
 </div>
