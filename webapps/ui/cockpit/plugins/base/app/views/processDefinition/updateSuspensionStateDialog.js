@@ -60,9 +60,9 @@ module.exports = [
         $scope.status = UPDATE_FAILED;
         var errorMessage;
         if($scope.data.executeImmediately) {
-          errorMessage = $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_3', { message: response.message });
+          errorMessage = $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_3', { message: response.data.message });
         } else {
-          errorMessage = $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_4', { message: response.message });
+          errorMessage = $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_4', { message: response.data.message });
         }
         Notifications.addError({
           status: $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_STATUS_FINISHED'),
