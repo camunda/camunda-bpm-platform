@@ -157,14 +157,14 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
     List<Job> jobs = jobQuery.list();
     assertEquals(1, jobs.size());
     Job job = jobs.get(0);
-    Date oldDate = job.getDuedate();
     
-    // After recalculation of the timer, the job's duedate should be the same
+    // After recalculation of the timer, the job's duedate should be based on the creation date
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.SECONDS.toMillis(5)));
     managementService.recalculateJobDuedate(job.getId(), true);
     Job jobUpdated = jobQuery.singleResult();
     assertEquals(job.getId(), jobUpdated.getId());
-    assertEquals(oldDate, jobUpdated.getDuedate());
+    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusHours(1).toDate();
+    assertEquals(expectedDate, jobUpdated.getDuedate());
 
     // After setting the clock to time '1 hour and 15 seconds', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.SECONDS.toMillis(15L)));
@@ -234,8 +234,8 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
     assertNotEquals(oldDate, jobUpdated.getDuedate());
     assertEquals(LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate(), jobUpdated.getDuedate());
 
-    // After setting the clock to time '15 minutes', the timer should fire
-    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.MINUTES.toMillis(15L)));
+    // After setting the clock to time '16 minutes', the timer should fire
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.MINUTES.toMillis(16L)));
     waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 

@@ -108,8 +108,8 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     assertNotEquals(firstDate, job.getDuedate());
     assertTrue(firstDate.after(job.getDuedate()));
     
-    // After waiting for fifteen minutes the timer should fire
-    ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(15L)));
+    // After waiting for sixteen minutes the timer should fire
+    ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));
     waitForJobExecutorToProcessAllJobs(5000L);
 
     assertEquals(0, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
@@ -141,8 +141,8 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     Date expectedDate = LocalDateTime.fromDateFields(job.getCreateTime()).plusMinutes(15).toDate();
     assertEquals(expectedDate, job.getDuedate());
     
-    // After waiting for fifteen minutes the timer should fire
-    ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(15L)));
+    // After waiting for sixteen minutes the timer should fire
+    ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));
     waitForJobExecutorToProcessAllJobs(5000L);
 
     assertEquals(0, managementService.createJobQuery().processInstanceId(pi1.getId()).count());

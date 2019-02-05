@@ -1257,7 +1257,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // then
     Job jobUpdated = jobQuery.singleResult();
     assertEquals(jobId, jobUpdated.getId());
-    assertEquals(oldDuedate, jobUpdated.getDuedate());
+    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate();
+    assertEquals(expectedDate, jobUpdated.getDuedate());
     
     // when
     Mocks.register("cycle", "R/PT10M");
@@ -1268,7 +1269,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
-    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(10).toDate();
+    expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(10).toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
     
     Mocks.reset();
@@ -1461,7 +1462,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
       .getId();
 
     runtimeService.startProcessInstanceByKey("process", 
-        Variables.createVariables().putValue("duration", "PT60S"));
+        Variables.createVariables().putValue("duration", "PT70S"));
     
     JobQuery jobQuery = managementService.createJobQuery();
     Job job = jobQuery.singleResult();
@@ -1474,7 +1475,9 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(1L, jobQuery.count());
-    assertNotEquals(oldDueDate, jobQuery.singleResult().getDuedate());
+    Date newDuedate = jobQuery.singleResult().getDuedate();
+    assertNotEquals(oldDueDate, newDuedate);
+    assertTrue(oldDueDate.before(newDuedate));
     
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
@@ -1512,9 +1515,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(1L, jobQuery.count());
-    assertTrue(oldDueDate.before(jobQuery.singleResult().getDuedate()));
+    Date newDuedate = jobQuery.singleResult().getDuedate();
     Date expectedDate = LocalDateTime.fromDateFields(jobQuery.singleResult().getCreateTime()).plusMinutes(2).toDate();
-    assertTrue(expectedDate.equals(jobQuery.singleResult().getDuedate()));
+    assertTrue(oldDueDate.before(newDuedate));
+    assertTrue(expectedDate.equals(newDuedate));
     
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
