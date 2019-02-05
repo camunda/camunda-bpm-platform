@@ -243,19 +243,17 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
     
-    Job job = jobQuery.singleResult();
-    Date oldDate = job.getDuedate();
-    
     // when
     moveByMinutes(1);
-    managementService.recalculateJobDuedate(job.getId(), true);
+    managementService.recalculateJobDuedate(jobQuery.singleResult().getId(), true);
     
-    // then due date should be the same
+    // then due date should be based on the creation time
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
     
-    Date newDate = jobQuery.singleResult().getDuedate();
-    assertEquals(oldDate, newDate);
+    Job jobUpdated = jobQuery.singleResult();
+    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusHours(2).toDate();
+    assertEquals(expectedDate, jobUpdated.getDuedate());
 
     // move the clock forward 2 hours and 1 minute
     moveByMinutes(121);
