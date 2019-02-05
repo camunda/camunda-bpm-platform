@@ -229,6 +229,20 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateProcessInstanceVariables(ExecutionEntity execution) {
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), ProcessInstancePermissions.UPDATE_VARIABLE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.UPDATE_INSTANCE_VARIABLE)
+          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
+        .build();
+
+    getAuthorizationManager().checkAuthorization(suspensionStatePermission);
+  }
+
+  @Override
   public void checkUpdateProcessInstanceSuspensionStateById(String processInstanceId) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
     if (execution != null) {

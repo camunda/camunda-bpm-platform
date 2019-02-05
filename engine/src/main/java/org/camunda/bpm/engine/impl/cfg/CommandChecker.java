@@ -134,6 +134,11 @@ public interface CommandChecker {
    */
   void checkUpdateProcessInstance(ExecutionEntity execution);
 
+  /**
+   * Checks if it is allowed to update a process instance's variables of the given execution.
+   */
+  void checkUpdateProcessInstanceVariables(ExecutionEntity execution);
+
   void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition);
 
   void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition);

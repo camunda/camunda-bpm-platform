@@ -1246,8 +1246,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void setVariable(String executionId, String variableName, Object value);
 
@@ -1263,8 +1266,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void setVariableLocal(String executionId, String variableName, Object value);
 
@@ -1278,8 +1284,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void setVariables(String executionId, Map<String, ? extends Object> variables);
 
@@ -1292,8 +1301,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
 
@@ -1306,8 +1318,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void removeVariable(String executionId, String variableName);
 
@@ -1320,8 +1335,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void removeVariableLocal(String executionId, String variableName);
 
@@ -1334,8 +1352,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void removeVariables(String executionId, Collection<String> variableNames);
 
@@ -1348,8 +1369,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has none of the following:
+   *          <li>{@link ProcessInstancePermissions#UPDATE_VARIABLE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link ProcessDefinitionPermissions#UPDATE_INSTANCE_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void removeVariablesLocal(String executionId, Collection<String> variableNames);
 

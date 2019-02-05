@@ -86,7 +86,10 @@ public enum ProcessDefinitionPermissions implements Permission {
   RETRY_JOB("RETRY_JOB", 32),
 
   /** Indicates that SUSPEND_INSTANCE interactions are permitted. */
-  SUSPEND_INSTANCE("SUSPEND_INSTANCE", 131072);
+  SUSPEND_INSTANCE("SUSPEND_INSTANCE", 131072),
+
+  /** Indicates that UPDATE_INSTANCE_VARIABLE interactions are permitted. */
+  UPDATE_INSTANCE_VARIABLE("UPDATE_INSTANCE_VARIABLE", 262144);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_DEFINITION };
 

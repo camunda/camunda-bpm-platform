@@ -56,7 +56,10 @@ public enum ProcessInstancePermissions implements Permission {
   RETRY_JOB("RETRY_JOB", 32),
 
   /** Indicates that SUSPEND interactions are permitted. */
-  SUSPEND("SUSPEND", 64);
+  SUSPEND("SUSPEND", 64),
+
+  /** Indicates that UPDATE_VARIABLE interactions are permitted. */
+  UPDATE_VARIABLE("UPDATE_VARIABLE", 128);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_INSTANCE };
   private String name;

@@ -129,6 +129,11 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateProcessInstanceVariables(ExecutionEntity execution) {
+    checkUpdateProcessInstance(execution);
+  }
+
+  @Override
   public void checkUpdateJob(JobEntity job) {
     if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("update the job '"+ job.getId() + "'");
