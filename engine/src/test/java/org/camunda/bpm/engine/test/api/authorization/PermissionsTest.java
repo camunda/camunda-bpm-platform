@@ -35,8 +35,8 @@ public class PermissionsTest {
   public void testNewPermissionsIntegrityToOld() {
     for (Permissions permission : Permissions.values()) {
       String permissionName = permission.getName();
-      Permission resolvedPermission = null;
       for (Resource resource : permission.getTypes()) {
+        Permission resolvedPermission = null;
         int resourceType = resource.resourceType();
         if (resourceType == Resources.BATCH.resourceType()) {
           resolvedPermission = BatchPermissions.forName(permissionName);
@@ -45,7 +45,7 @@ public class PermissionsTest {
         } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
           resolvedPermission = ProcessInstancePermissions.forName(permissionName);
         } else {
-          break;
+          continue;
         }
         assertThat(resolvedPermission).isNotNull();
         assertThat(resolvedPermission.getValue()).isEqualTo(permission.getValue());
@@ -55,31 +55,31 @@ public class PermissionsTest {
 
   @Test
   public void testPermissionsValues() {
-    verifyValueAreUniqueAndEven(Permissions.values());
+    verifyValuesAreUniqueAndPowerOfTwo(Permissions.values());
   }
 
   @Test
   public void testBatchPermissionsValues() {
-    verifyValueAreUniqueAndEven(BatchPermissions.values());
+    verifyValuesAreUniqueAndPowerOfTwo(BatchPermissions.values());
   }
 
   @Test
   public void testProcessInstancePermissionsValues() {
-    verifyValueAreUniqueAndEven(ProcessInstancePermissions.values());
+    verifyValuesAreUniqueAndPowerOfTwo(ProcessInstancePermissions.values());
   }
 
   @Test
   public void testProcessDefinitionPermissionsValues() {
-    verifyValueAreUniqueAndEven(ProcessDefinitionPermissions.values());
+    verifyValuesAreUniqueAndPowerOfTwo(ProcessDefinitionPermissions.values());
   }
 
-  private void verifyValueAreUniqueAndEven(Permission[] permissions) {
+  private void verifyValuesAreUniqueAndPowerOfTwo(Permission[] permissions) {
     Set<Integer> values = new HashSet<>();
     for (Permission permission : permissions) {
       int value = permission.getValue();
       // value is unique
       assertThat(values.add(value))
-          .overridingErrorMessage("The value '%s' of '%s' permission is not unique. Abother permission already has this value.", value, permission)
+          .overridingErrorMessage("The value '%s' of '%s' permission is not unique. Another permission already has this value.", value, permission)
           .isTrue();
       if (value != Integer.MAX_VALUE && value != 0) {
         // value is power of 2
@@ -91,9 +91,6 @@ public class PermissionsTest {
   }
 
   private boolean isPowerOfTwo(int value) {
-    if (value <= 0) {
-      return false;
-    }
-    return (value & (value - 1)) == 0;
+    return value > 0 && (value & (value - 1)) == 0;
   }
 }
