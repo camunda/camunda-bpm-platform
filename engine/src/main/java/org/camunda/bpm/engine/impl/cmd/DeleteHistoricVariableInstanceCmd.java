@@ -22,10 +22,13 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
  * @author Tobias Metzke
@@ -33,6 +36,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEn
  */
 public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Serializable {
 
+  private static final long serialVersionUID = 1L;
   private String variableInstanceId;
 
   public DeleteHistoricVariableInstanceCmd(String variableInstanceId) {
@@ -57,6 +61,17 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
     commandContext
       .getHistoricVariableInstanceManager()
       .deleteHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
+    
+    // create user operation log
+    ResourceDefinitionEntity<?> definition = null;
+    if (variable.getProcessDefinitionId() != null) {
+      definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(variable.getProcessDefinitionId());
+    } else if (variable.getCaseDefinitionId() != null) {
+      definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedCaseDefinitionById(variable.getCaseDefinitionId());
+    }
+    commandContext.getOperationLogManager().logHistoricVariableOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY, variable, definition, new PropertyChange("name", null, variable.getName()));
+    
     return null;
   }
 }

@@ -23,10 +23,13 @@ import java.util.Arrays;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
  * @author Tobias Metzke
@@ -34,6 +37,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEnt
  */
 public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Command<Void>, Serializable {
 
+  private static final long serialVersionUID = 1L;
   private String processInstanceId;
 
   public DeleteHistoricVariableInstancesByProcessInstanceIdCmd(String processInstanceId) {
@@ -53,6 +57,11 @@ public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Co
 
     commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceIds(Arrays.asList(processInstanceId));
     commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(Arrays.asList(processInstanceId));
+    
+    // create user operation log
+    ResourceDefinitionEntity<?> definition =  commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(instance.getProcessDefinitionId());
+    commandContext.getOperationLogManager().logHistoricVariableOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY, instance, definition, PropertyChange.EMPTY_CHANGE);
+    
     return null;
   }
 }

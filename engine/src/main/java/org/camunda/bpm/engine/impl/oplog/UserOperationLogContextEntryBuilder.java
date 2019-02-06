@@ -23,6 +23,9 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -140,6 +143,73 @@ public class UserOperationLogContextEntryBuilder {
     entry.setCaseInstanceId(processInstance.getCaseInstanceId());
 
     ResourceDefinitionEntity definition = processInstance.getProcessDefinition();
+    if (definition != null) {
+      entry.setProcessDefinitionKey(definition.getKey());
+      entry.setDeploymentId(definition.getDeploymentId());
+    }
+
+    return this;
+  }
+  
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricProcessInstanceEntity processInstance, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+    entry.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
+    entry.setProcessInstanceId(processInstance.getProcessInstanceId());
+    entry.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+    entry.setExecutionId(processInstance.getId());
+    entry.setCaseInstanceId(processInstance.getCaseInstanceId());
+
+    if (definition != null) {
+      entry.setProcessDefinitionKey(definition.getKey());
+      entry.setDeploymentId(definition.getDeploymentId());
+    }
+
+    return this;
+  }
+  
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricCaseInstanceEntity caseInstance, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+    entry.setRootProcessInstanceId(caseInstance.getRootProcessInstanceId());
+    entry.setProcessInstanceId(caseInstance.getProcessInstanceId());
+    entry.setProcessDefinitionId(caseInstance.getProcessDefinitionId());
+    entry.setExecutionId(caseInstance.getId());
+    entry.setCaseInstanceId(caseInstance.getCaseInstanceId());
+    entry.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
+
+    if (definition != null) {
+      entry.setProcessDefinitionKey(definition.getKey());
+      entry.setDeploymentId(definition.getDeploymentId());
+    }
+
+    return this;
+  }
+  
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricTaskInstanceEntity taskInstance, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+    entry.setRootProcessInstanceId(taskInstance.getRootProcessInstanceId());
+    entry.setProcessInstanceId(taskInstance.getProcessInstanceId());
+    entry.setProcessDefinitionId(taskInstance.getProcessDefinitionId());
+    entry.setExecutionId(taskInstance.getId());
+    entry.setCaseInstanceId(taskInstance.getCaseInstanceId());
+
     if (definition != null) {
       entry.setProcessDefinitionKey(definition.getKey());
       entry.setDeploymentId(definition.getDeploymentId());

@@ -111,6 +111,7 @@ public interface UserOperationLogEntry {
 
   public static String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
   public static String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
+  public static String OPERATION_TYPE_DELETE_VARIABLE_HISTORY = "DeleteVariableHistory";
 
   public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
   public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";

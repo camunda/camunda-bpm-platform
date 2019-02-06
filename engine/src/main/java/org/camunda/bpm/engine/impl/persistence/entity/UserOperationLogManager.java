@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -289,6 +290,47 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       else if (taskId != null) {
         TaskEntity task = getTaskManager().findTaskById(taskId);
         entryBuilder.inContextOf(task, Arrays.asList(propertyChange));
+      }
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logHistoricVariableOperation(String operation, HistoricProcessInstanceEntity historicProcessInstance, ResourceDefinitionEntity<?> definition, PropertyChange propertyChange) {
+    if(isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.VARIABLE)
+          .propertyChanges(propertyChange);
+
+      entryBuilder.inContextOf(historicProcessInstance, definition, Arrays.asList(propertyChange));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logHistoricVariableOperation(String operation, HistoricVariableInstanceEntity historicVariableInstance, ResourceDefinitionEntity<?> definition, PropertyChange propertyChange) {
+    if(isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.VARIABLE)
+          .propertyChanges(propertyChange);
+
+      if (historicVariableInstance.getProcessInstanceId() != null) {
+        HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceManager().findHistoricProcessInstance(historicVariableInstance.getProcessInstanceId());
+        entryBuilder.inContextOf(historicProcessInstance, definition, Arrays.asList(propertyChange));
+      } else if (historicVariableInstance.getCaseInstanceId() != null) {
+        HistoricCaseInstanceEntity historicCaseInstance = getHistoricCaseInstanceManager().findHistoricCaseInstance(historicVariableInstance.getCaseInstanceId());
+        entryBuilder.inContextOf(historicCaseInstance, definition, Arrays.asList(propertyChange));
+      } if (historicVariableInstance.getTaskId() != null) {
+        HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceManager().findHistoricTaskInstanceById(historicVariableInstance.getTaskId());
+        entryBuilder.inContextOf(historicTaskInstance, definition, Arrays.asList(propertyChange));
       }
 
       context.addEntry(entryBuilder.create());
