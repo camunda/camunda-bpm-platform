@@ -89,6 +89,7 @@ module.exports = function(ngModule, appRoot, appName) {
 
       $translateProvider.registerAvailableLanguageKeys(avail);
       $translateProvider.fallbackLanguage(fallback);
+      $translateProvider.useSanitizeValueStrategy('escapeParameters');
 
       $translateProvider.determinePreferredLanguage(function() {
         var nav = window.navigator;
