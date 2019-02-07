@@ -27,4 +27,5 @@ public class ResourceTypeUtil {
     }
     return false;
   }
+
 }

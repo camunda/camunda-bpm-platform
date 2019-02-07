@@ -16,12 +16,12 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#PROCESS_DEFINITION Process definition} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#TASK Process definition} in Camunda BPM.
  *
  * @author Yana Vasileva
  *
  */
-public enum ProcessDefinitionPermissions implements Permission {
+public enum TaskPermissions implements Permission {
 
   /** The none permission means 'no action', 'doing nothing'.
    * It does not mean that no permissions are granted. */
@@ -46,32 +46,14 @@ public enum ProcessDefinitionPermissions implements Permission {
   /** Indicates that UPDATE interactions are permitted. */
   UPDATE("UPDATE", 4),
 
+  /** Indicates that CREATE interactions are permitted. */
+  CREATE("CREATE", 8),
+
   /** Indicates that DELETE interactions are permitted. */
   DELETE("DELETE", 16),
 
-  /** Indicates that READ_TASK interactions are permitted. */
-  READ_TASK("READ_TASK", 64),
-
-  /** Indicates that UPDATE_TASK interactions are permitted. */
-  UPDATE_TASK("UPDATE_TASK", 128),
-
-  /** Indicates that CREATE_INSTANCE interactions are permitted. */
-  CREATE_INSTANCE("CREATE_INSTANCE", 256),
-
-  /** Indicates that READ_INSTANCE interactions are permitted. */
-  READ_INSTANCE("READ_INSTANCE", 512),
-
-  /** Indicates that UPDATE_INSTANCE interactions are permitted. */
-  UPDATE_INSTANCE("UPDATE_INSTANCE", 1024),
-
-  /** Indicates that DELETE_INSTANCE interactions are permitted. */
-  DELETE_INSTANCE("DELETE_INSTANCE", 2048),
-
   /** Indicates that READ_HISTORY interactions are permitted. */
   READ_HISTORY("READ_HISTORY", 4096),
-
-  /** Indicates that DELETE_HISTORY interactions are permitted. */
-  DELETE_HISTORY("DELETE_HISTORY", 8192),
 
   /** Indicates that TASK_WORK interactions are permitted */
   TASK_WORK("TASK_WORK", 16384),
@@ -79,27 +61,15 @@ public enum ProcessDefinitionPermissions implements Permission {
   /** Indicates that TASK_ASSIGN interactions are permitted */
   TASK_ASSIGN("TASK_ASSIGN", 32768),
 
-  /** Indicates that MIGRATE_INSTANCE interactions are permitted */
-  MIGRATE_INSTANCE("MIGRATE_INSTANCE", 65536),
+  /** Indicates that UPDATE_VARIABLE interactions are permitted. */
+  UPDATE_VARIABLE("UPDATE_VARIABLE", 32);
 
-  /** Indicates that RETRY_JOB interactions are permitted. */
-  RETRY_JOB("RETRY_JOB", 32),
-
-  /** Indicates that SUSPEND_INSTANCE interactions are permitted. */
-  SUSPEND_INSTANCE("SUSPEND_INSTANCE", 131072),
-
-  /** Indicates that UPDATE_INSTANCE_VARIABLE interactions are permitted. */
-  UPDATE_INSTANCE_VARIABLE("UPDATE_INSTANCE_VARIABLE", 262144),
-
-  /** Indicates that UPDATE_TASK_VARIABLE interactions are permitted. */
-  UPDATE_TASK_VARIABLE("UPDATE_TASK_VARIABLE", 524288);
-
-  private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_DEFINITION };
+  private static final Resource[] RESOURCES = new Resource[] { Resources.TASK };
 
   private String name;
   private int id;
 
-  private ProcessDefinitionPermissions(String name, int id) {
+  private TaskPermissions(String name, int id) {
     this.name = name;
     this.id = id;
   }

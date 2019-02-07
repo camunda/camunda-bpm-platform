@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.BATCH;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
@@ -212,6 +213,36 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
     int resourceType = PROCESS_INSTANCE.resourceType();
     String resourceName = PROCESS_INSTANCE.resourceName();
+    ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
+    Permission permission = PermissionConverter.getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, resourceType);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource)).thenReturn(true);
+
+    given()
+        .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
+        .queryParam("resourceName", resourceName)
+        .queryParam("resourceType", resourceType)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+        .contentType(MediaType.APPLICATION_JSON)
+        .body("permissionName", equalTo(MockProvider.EXAMPLE_PERMISSION_NAME))
+        .body("resourceName", equalTo(resourceName))
+        .body("resourceId", equalTo(null))
+        .body("authorized", equalTo(true))
+    .when().get(AUTH_CHECK_PATH);
+
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource);
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+
+  }
+
+  @Test
+  public void testIsUserAuthorizedTaskResource() {
+
+    List<String> exampleGroups = new ArrayList<String>();
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+    int resourceType = TASK.resourceType();
+    String resourceName = TASK.resourceName();
     ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
     Permission permission = PermissionConverter.getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, resourceType);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource)).thenReturn(true);

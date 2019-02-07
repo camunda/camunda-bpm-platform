@@ -65,7 +65,7 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
 
   protected void checkSetTaskVariables(TaskEntity task) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkUpdateTask(task);
+      checker.checkUpdateTaskVariable(task);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.task.Attachment;
@@ -497,9 +499,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariable(String taskId, String variableName, Object value);
 
@@ -511,9 +518,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariables(String taskId, Map<String, ? extends Object> variables);
 
@@ -524,9 +536,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariableLocal(String taskId, String variableName, Object value);
 
@@ -537,9 +554,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariablesLocal(String taskId, Map<String, ? extends Object> variables);
 
@@ -825,9 +847,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariable(String taskId, String variableName);
 
@@ -838,9 +865,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariableLocal(String taskId, String variableName);
 
@@ -851,9 +883,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariables(String taskId, Collection<String> variableNames);
 
@@ -864,9 +901,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariablesLocal(String taskId, Collection<String> variableNames);
 

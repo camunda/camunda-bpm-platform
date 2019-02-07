@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class PermissionConverter {
         
     return permissions;    
   }
-  
+
   public static String[] getNamesForPermissions(Authorization authorization, Permission[] permissions) {
 
     int type = authorization.getAuthorizationType();
@@ -84,7 +85,9 @@ public class PermissionConverter {
       return ProcessDefinitionPermissions.forName(name);
     } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
       return ProcessInstancePermissions.forName(name);
-    } else {
+    } else if (resourceType == Resources.TASK.resourceType()) {
+      return TaskPermissions.forName(name);
+    }else {
       return Permissions.forName(name);
     }
   }

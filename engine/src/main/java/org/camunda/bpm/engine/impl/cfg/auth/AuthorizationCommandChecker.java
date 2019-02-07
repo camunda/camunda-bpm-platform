@@ -42,6 +42,7 @@ import static org.camunda.bpm.engine.authorization.Resources.*;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 
 /**
  * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
@@ -403,7 +404,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
-  public void checkUpdateTask(TaskEntity task) {
+  public void checkUpdateTaskVariable(TaskEntity task) {
     String taskId = task.getId();
 
     String executionId = task.getExecutionId();
@@ -411,24 +412,23 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
       // if task exists in context of a process instance
       // then check the following permissions:
+      // - UPDATE_VARIABLE on TASK
+      // - UPDATE_TASK_VARIABLE on PROCESS_DEFINITION
       // - UPDATE on TASK
       // - UPDATE_TASK on PROCESS_DEFINITION
 
       ExecutionEntity execution = task.getExecution();
       ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
 
-      PermissionCheck updatePermissionCheck = new PermissionCheck();
-      updatePermissionCheck.setPermission(UPDATE);
-      updatePermissionCheck.setResource(TASK);
-      updatePermissionCheck.setResourceId(taskId);
+      CompositePermissionCheck updateTaskPermissionCheck = new PermissionCheckBuilder()
+          .disjunctive()
+            .atomicCheckForResourceId(TASK, taskId, TaskPermissions.UPDATE_VARIABLE)
+            .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.UPDATE_TASK_VARIABLE)
+            .atomicCheckForResourceId(TASK, taskId, UPDATE)
+            .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_TASK)
+          .build();
 
-      PermissionCheck updateTaskPermissionCheck = new PermissionCheck();
-      updateTaskPermissionCheck.setPermission(UPDATE_TASK);
-      updateTaskPermissionCheck.setResource(PROCESS_DEFINITION);
-      updateTaskPermissionCheck.setResourceId(processDefinition.getKey());
-      updateTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
-
-      getAuthorizationManager().checkAuthorization(updatePermissionCheck, updateTaskPermissionCheck);
+      getAuthorizationManager().checkAuthorization(updateTaskPermissionCheck);
 
     } else {
 
@@ -445,7 +445,13 @@ public class AuthorizationCommandChecker implements CommandChecker {
       String caseExecutionId = task.getCaseExecutionId();
       if (caseExecutionId == null) {
         // standalone task
-        getAuthorizationManager().checkAuthorization(UPDATE, TASK, taskId);
+        CompositePermissionCheck updateTaskPermissionCheck = new PermissionCheckBuilder()
+            .disjunctive()
+              .atomicCheckForResourceId(TASK, taskId, TaskPermissions.UPDATE_VARIABLE)
+              .atomicCheckForResourceId(TASK, taskId, UPDATE)
+            .build();
+
+        getAuthorizationManager().checkAuthorization(updateTaskPermissionCheck);
       }
 
     }

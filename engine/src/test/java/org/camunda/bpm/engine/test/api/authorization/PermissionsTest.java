@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.junit.Test;
 
 public class PermissionsTest {
@@ -44,6 +45,8 @@ public class PermissionsTest {
           resolvedPermission = ProcessDefinitionPermissions.forName(permissionName);
         } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
           resolvedPermission = ProcessInstancePermissions.forName(permissionName);
+        } else if (resourceType == Resources.TASK.resourceType()) {
+          resolvedPermission = TaskPermissions.forName(permissionName);
         } else {
           continue;
         }
@@ -71,6 +74,11 @@ public class PermissionsTest {
   @Test
   public void testProcessDefinitionPermissionsValues() {
     verifyValuesAreUniqueAndPowerOfTwo(ProcessDefinitionPermissions.values());
+  }
+
+  @Test
+  public void testTaskPermissionsValues() {
+    verifyValuesAreUniqueAndPowerOfTwo(TaskPermissions.values());
   }
 
   private void verifyValuesAreUniqueAndPowerOfTwo(Permission[] permissions) {

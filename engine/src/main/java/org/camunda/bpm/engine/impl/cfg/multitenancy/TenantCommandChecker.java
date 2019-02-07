@@ -238,7 +238,7 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkUpdateTask(TaskEntity task) {
+  public void checkUpdateTaskVariable(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("update the task '"+ task.getId() + "'");
     }

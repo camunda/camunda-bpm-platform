@@ -176,9 +176,9 @@ public interface CommandChecker {
   void checkReadTask(TaskEntity task);
 
   /**
-   * Check if it is allowed to update a task
+   * Check if it is allowed to update a task's variable
    */
-  void checkUpdateTask(TaskEntity task);
+  void checkUpdateTaskVariable(TaskEntity task);
 
   /**
    * Check if it is allowed to create a batch
