@@ -91,6 +91,6 @@ public class PermissionsTest {
   }
 
   private boolean isPowerOfTwo(int value) {
-    return value > 0 && (value & (value - 1)) == 0;
+    return value > 1 && (value & (value - 1)) == 0;
   }
 }
