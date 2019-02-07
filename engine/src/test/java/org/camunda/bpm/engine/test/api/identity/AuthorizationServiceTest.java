@@ -49,7 +49,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.test.api.authorization.MyResourceAuthorizationProvider;
 
 /**
  * @author Daniel Meyer
@@ -662,8 +661,6 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testReportResourceAuthorization() {
-    MyResourceAuthorizationProvider.clearProperties();
-
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
     authorization.addPermission(ALL);
@@ -676,9 +673,26 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
-  public void testDashboardResourceAuthorization() {
-    MyResourceAuthorizationProvider.clearProperties();
+  public void testReportResourcePermissions() {
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId(userId);
+    authorization.addPermission(CREATE);
+    authorization.addPermission(READ);
+    authorization.addPermission(UPDATE);
+    authorization.addPermission(DELETE);
+    authorization.setResource(REPORT);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
 
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, CREATE, REPORT));
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, READ, REPORT));
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, UPDATE, REPORT));
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, DELETE, REPORT));
+    processEngineConfiguration.setAuthorizationEnabled(false);
+  }
+
+  public void testDashboardResourceAuthorization() {
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
     authorization.addPermission(ALL);
@@ -688,6 +702,25 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
     processEngineConfiguration.setAuthorizationEnabled(true);
     assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, DASHBOARD));
+    processEngineConfiguration.setAuthorizationEnabled(false);
+  }
+
+  public void testDashboardResourcePermission() {
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId(userId);
+    authorization.addPermission(CREATE);
+    authorization.addPermission(READ);
+    authorization.addPermission(UPDATE);
+    authorization.addPermission(DELETE);
+    authorization.setResource(DASHBOARD);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, CREATE, DASHBOARD));
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, READ, DASHBOARD));
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, UPDATE, DASHBOARD));
+    assertEquals(true, authorizationService.isUserAuthorized(userId, null, DELETE, DASHBOARD));
     processEngineConfiguration.setAuthorizationEnabled(false);
   }
 
