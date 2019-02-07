@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -64,10 +65,14 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
     
     // create user operation log
     ResourceDefinitionEntity<?> definition = null;
-    if (variable.getProcessDefinitionId() != null) {
-      definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(variable.getProcessDefinitionId());
-    } else if (variable.getCaseDefinitionId() != null) {
-      definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedCaseDefinitionById(variable.getCaseDefinitionId());
+    try {
+      if (variable.getProcessDefinitionId() != null) {
+        definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(variable.getProcessDefinitionId());
+      } else if (variable.getCaseDefinitionId() != null) {
+        definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedCaseDefinitionById(variable.getCaseDefinitionId());
+      }
+    } catch (NullValueException nve) {
+      // definition has been deleted already
     }
     commandContext.getOperationLogManager().logHistoricVariableOperation(
         UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY, variable, definition, new PropertyChange("name", null, variable.getName()));

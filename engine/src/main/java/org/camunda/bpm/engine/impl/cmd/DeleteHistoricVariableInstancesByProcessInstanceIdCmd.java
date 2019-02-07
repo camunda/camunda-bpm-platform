@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -59,7 +60,12 @@ public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Co
     commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(Arrays.asList(processInstanceId));
     
     // create user operation log
-    ResourceDefinitionEntity<?> definition =  commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(instance.getProcessDefinitionId());
+    ResourceDefinitionEntity<?> definition = null;
+    try {
+      definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(instance.getProcessDefinitionId());
+    } catch (NullValueException nve) {
+      // definition has been deleted already
+    }
     commandContext.getOperationLogManager().logHistoricVariableOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY, instance, definition, PropertyChange.EMPTY_CHANGE);
     
     return null;
