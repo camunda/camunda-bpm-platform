@@ -803,6 +803,106 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("testValue4", variableQuery.singleResult().getValue());
   }
   
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testDeleteHistoricVariableAndDetailsFromCase() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+    caseService.setVariable(caseInstanceId, "myVariable", 1);
+    caseService.setVariable(caseInstanceId, "myVariable", 2);
+    caseService.setVariable(caseInstanceId, "myVariable", 3);
+    
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricDetailQuery detailsQuery = historyService.createHistoricDetailQuery()
+        .caseInstanceId(caseInstanceId)
+        .variableInstanceId(variableInstance.getId());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(3, detailsQuery.count());
+
+    // when
+    historyService.deleteHistoricVariableInstance(variableInstance.getId());
+
+    // then
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(0, detailsQuery.count());
+  }
+  
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testDeleteHistoricVariableAndDetailsFromCaseAndSetAgain() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+    caseService.setVariable(caseInstanceId, "myVariable", 1);
+    caseService.setVariable(caseInstanceId, "myVariable", 2);
+    caseService.setVariable(caseInstanceId, "myVariable", 3);
+    
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricDetailQuery detailsQuery = historyService.createHistoricDetailQuery()
+        .caseInstanceId(caseInstanceId)
+        .variableInstanceId(variableInstance.getId());
+    historyService.deleteHistoricVariableInstance(variableInstance.getId());
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(0, detailsQuery.count());
+
+    // when
+    caseService.setVariable(caseInstanceId, "myVariable", 4);
+
+    // then
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(1, detailsQuery.count());
+  }
+  
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testDeleteHistoricVariableAndDetailsFromStandaloneTask() {
+    // given
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskService.setVariable(task.getId(), "testVariable", "testValue");
+    taskService.setVariable(task.getId(), "testVariable", "testValue2");
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricDetailQuery detailsQuery = historyService.createHistoricDetailQuery()
+        .taskId(task.getId())
+        .variableInstanceId(variableInstance.getId());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(2, detailsQuery.count());
+    
+    // when
+    historyService.deleteHistoricVariableInstance(variableInstance.getId());
+    
+    // then
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(0, detailsQuery.count());
+    
+    taskService.deleteTask(task.getId(), true);
+  }
+  
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testDeleteHistoricVariableAndDetailsFromStandaloneTaskAndSetAgain() {
+    // given
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskService.setVariable(task.getId(), "testVariable", "testValue");
+    taskService.setVariable(task.getId(), "testVariable", "testValue2");
+    
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricDetailQuery detailsQuery = historyService.createHistoricDetailQuery()
+        .taskId(task.getId())
+        .variableInstanceId(variableInstance.getId());
+    
+    historyService.deleteHistoricVariableInstance(variableInstance.getId());
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(0, detailsQuery.count());
+    
+    // when
+    taskService.setVariable(task.getId(), "testVariable", "testValue3");
+    
+    // then
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(1, detailsQuery.count());
+    
+    taskService.deleteTask(task.getId(), true);
+  }
+  
   public void testDeleteUnknownHistoricVariable() {
     try {
       // when
