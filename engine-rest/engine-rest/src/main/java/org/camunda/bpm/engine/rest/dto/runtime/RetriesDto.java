@@ -17,13 +17,13 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 public class RetriesDto {
 
-  private int retries;
+  private Integer retries;
 
-  public int getRetries() {
+  public Integer getRetries() {
     return retries;
   }
 
-  public void setRetries(int retries) {
+  public void setRetries(Integer retries) {
     this.retries = retries;
   }
 }

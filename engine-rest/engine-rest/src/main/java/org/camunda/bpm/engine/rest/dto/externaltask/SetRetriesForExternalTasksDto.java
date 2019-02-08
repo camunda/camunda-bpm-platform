@@ -28,7 +28,7 @@ public class SetRetriesForExternalTasksDto {
   protected ProcessInstanceQueryDto processInstanceQuery;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
 
-  protected int retries;
+  protected Integer retries;
 
   public List<String> getExternalTaskIds() {
     return externalTaskIds;
@@ -70,11 +70,11 @@ public class SetRetriesForExternalTasksDto {
     this.historicProcessInstanceQuery = historicProcessInstanceQueryDto;
   }
 
-  public int getRetries() {
+  public Integer getRetries() {
     return retries;
   }
 
-  public void setRetries(int retries) {
+  public void setRetries(Integer retries) {
     this.retries = retries;
   }
 }

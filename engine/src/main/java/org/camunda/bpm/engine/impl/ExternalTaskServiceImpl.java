@@ -99,7 +99,7 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     return commandExecutor.execute(new GetExternalTaskErrorDetailsCmd(externalTaskId));
   }
 
-  public void setRetries(String externalTaskId, int retries) {
+  public void setRetries(String externalTaskId, Integer retries) {
     setRetries(externalTaskId, retries, true);
   }
 

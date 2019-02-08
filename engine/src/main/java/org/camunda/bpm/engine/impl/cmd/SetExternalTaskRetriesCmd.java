@@ -31,10 +31,10 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  */
 public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
 
-  protected int retries;
+  protected Integer retries;
   protected boolean writeUserOperationLog;
 
-  public SetExternalTaskRetriesCmd(String externalTaskId, int retries, boolean writeUserOperationLog) {
+  public SetExternalTaskRetriesCmd(String externalTaskId, Integer retries, boolean writeUserOperationLog) {
     super(externalTaskId);
     this.retries = retries;
     this.writeUserOperationLog = writeUserOperationLog;
