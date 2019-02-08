@@ -76,12 +76,16 @@ module.exports = [function() {
             .then(function(res) {
               $scope.deployments = res.items;
 
-              $scope.loadingState = 'LOADED';
+              $scope.$apply(function() {
+                $scope.loadingState = 'LOADED';
+              });
 
               return res.count;
             })
             .catch(function() {
-              $scope.loadingState = 'ERROR';
+              $scope.$apply(function() {
+                $scope.loadingState = 'ERROR';
+              });
             });
         };
 
