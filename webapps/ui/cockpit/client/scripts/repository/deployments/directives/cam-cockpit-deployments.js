@@ -76,16 +76,22 @@ module.exports = [function() {
             .then(function(res) {
               $scope.deployments = res.items;
 
-              $scope.$apply(function() {
-                $scope.loadingState = 'LOADED';
-              });
+              var phase = $scope.$root.$$phase;
+              if(phase !== '$apply' && phase !== '$digest') {
+                $scope.$apply(function() {
+                  $scope.loadingState = 'LOADED';
+                });
+              }
 
               return res.count;
             })
             .catch(function() {
-              $scope.$apply(function() {
-                $scope.loadingState = 'ERROR';
-              });
+              var phase = $scope.$root.$$phase;
+              if(phase !== '$apply' && phase !== '$digest') {
+                $scope.$apply(function() {
+                  $scope.loadingState = 'ERROR';
+                });
+              }
             });
         };
 
