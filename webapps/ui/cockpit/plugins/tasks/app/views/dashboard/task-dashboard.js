@@ -58,7 +58,7 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
           var resourceCallback = function(err, res) {
             if (err) {
               Notifications.addError({
-                status: $translate.instant('PLUGIN_TASK_ASSIGNED_ERR_COULD_NOT', {err: getErrorStatus}),
+                status: $translate.instant('PLUGIN_TASK_ASSIGNED_ERR_COULD_NOT', {err: getErrorStatus()}),
                 message: err.toString()
               });
               deferred.reject(err);
