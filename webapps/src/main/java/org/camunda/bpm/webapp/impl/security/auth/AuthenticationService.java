@@ -54,8 +54,17 @@ public class AuthenticationService {
 
   public Authentication createAuthenticate(ProcessEngine processEngine, String username, List<String> groupIds, List<String> tenantIds) {
 
-    User user = processEngine.getIdentityService().createUserQuery().userId(username).singleResult();
-    String userId = user.getId();
+    String userId = username;
+
+    User user = processEngine.getIdentityService()
+        .createUserQuery()
+        .userId(username)
+        .singleResult();
+
+    if (user != null && user.getId() != null && !user.getId().isEmpty()) {
+      userId = user.getId();
+    }
+
     // make sure authentication is executed without authentication :)
     processEngine.getIdentityService().clearAuthentication();
 
