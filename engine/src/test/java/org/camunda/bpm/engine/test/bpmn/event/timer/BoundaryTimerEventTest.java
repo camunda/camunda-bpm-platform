@@ -15,9 +15,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -136,7 +135,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
     assertNotEquals(oldDate, jobUpdated.getDuedate());
     assertTrue(oldDate.before(jobUpdated.getDuedate()));
     Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusHours(1).toDate();
-    assertThat(jobUpdated.getDuedate(), is(expectedDate));
+    assertThat(jobUpdated.getDuedate()).isCloseTo(expectedDate, 1000l);
 
     // After setting the clock to time '1 hour and 6 min', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.MINUTES.toMillis(6L)));
@@ -151,7 +150,6 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
   public void testRecalculateUnchangedExpressionOnTimerCreationDateBased(){
     // Set the clock fixed
     Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
 
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put("duedate", "PT1H");

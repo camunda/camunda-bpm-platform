@@ -15,10 +15,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -228,7 +226,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertNotEquals(oldDate, newDate);
     assertTrue(oldDate.before(newDate));
     Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusHours(2).toDate();
-    assertThat(newDate, is(expectedDate));
+    assertThat(newDate).isCloseTo(expectedDate, 1000l);
 
     // move the clock forward 2 hours and 2 min
     moveByMinutes(122);
@@ -1483,7 +1481,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertNotEquals(oldDueDate, newDuedate);
     assertTrue(oldDueDate.before(newDuedate));
     Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusSeconds(70).toDate();
-    assertThat(newDuedate, is(expectedDate));
+    assertThat(newDuedate).isCloseTo(expectedDate, 1000l);
     
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());

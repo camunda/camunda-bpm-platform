@@ -15,10 +15,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -111,7 +109,7 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     assertNotEquals(firstDate, job.getDuedate());
     assertTrue(firstDate.after(job.getDuedate()));
     Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusMinutes(15).toDate();
-    assertThat(job.getDuedate(), is(expectedDate));
+    assertThat(job.getDuedate()).isCloseTo(expectedDate, 1000l);
     
     // After waiting for sixteen minutes the timer should fire
     ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));
