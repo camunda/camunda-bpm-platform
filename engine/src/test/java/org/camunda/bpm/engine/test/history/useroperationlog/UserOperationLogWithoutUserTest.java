@@ -15,12 +15,14 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  * @author Roman Smirnov
@@ -295,6 +297,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
   
   @Deployment(resources = PROCESS_PATH)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testDeleteHistoricVariable() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -312,6 +315,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
   
   @Deployment(resources = PROCESS_PATH)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testDeleteAllHistoricVariables() {
     // given
     String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
@@ -328,6 +332,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testQueryDeleteVariableHistoryOperationOnCase() {
     // given
     CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
@@ -343,6 +348,7 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
     verifyNoUserOperationLogged();
   }
   
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
     // given
     Task task = taskService.newTask();
