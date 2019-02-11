@@ -86,6 +86,16 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateProcessDefinitionSuspensionStateById(String processDefinitionId) {
+    if (getAuthorizationManager().isAuthorizationEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null) {
+        checkUpdateProcessDefinitionSuspensionStateByKey(processDefinition.getKey());
+      }
+    }
+  }
+
+  @Override
   public void checkUpdateDecisionDefinitionById(String decisionDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
       DecisionDefinitionEntity decisionDefinition = findLatestDecisionDefinitionById(decisionDefinitionId);
@@ -98,6 +108,17 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkUpdateProcessDefinitionByKey(String processDefinitionKey) {
     getAuthorizationManager().checkAuthorization(UPDATE, PROCESS_DEFINITION, processDefinitionKey);
+  }
+
+  @Override
+  public void checkUpdateProcessDefinitionSuspensionStateByKey(String processDefinitionKey) {
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, ProcessDefinitionPermissions.SUSPEND)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, UPDATE)
+        .build();
+
+    getAuthorizationManager().checkAuthorization(suspensionStatePermission);
   }
 
   @Override

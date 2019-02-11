@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.util.Date;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 
 /**
@@ -57,13 +59,18 @@ public interface UpdateProcessDefinitionSuspensionStateBuilder {
    * @throws ProcessEngineException
    *           If no such processDefinition can be found.
    * @throws AuthorizationException
-   *           <li>if the user has no {@link Permissions#UPDATE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}</li>
-   *           <li>if {@link #includeProcessInstances(boolean)} is set to
-   *           <code>true</code> and the user have no {@link Permissions#UPDATE}
-   *           permission on {@link Resources#PROCESS_INSTANCE} or no
-   *           {@link Permissions#UPDATE_INSTANCE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}.</li>
+   *           <li>if the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
+   *           <li>if {@link #includeProcessInstances(boolean)} is set to <code>true</code> and the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void activate();
 
@@ -75,13 +82,18 @@ public interface UpdateProcessDefinitionSuspensionStateBuilder {
    * @throws ProcessEngineException
    *           If no such processDefinition can be found.
    * @throws AuthorizationException
-   *           <li>if the user has no {@link Permissions#UPDATE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}</li>
-   *           <li>if {@link #includeProcessInstances(boolean)} is set to
-   *           <code>true</code> and the user have no {@link Permissions#UPDATE}
-   *           permission on {@link Resources#PROCESS_INSTANCE} or no
-   *           {@link Permissions#UPDATE_INSTANCE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}.</li>
+   *           <li>if the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
+   *           <li>if {@link #includeProcessInstances(boolean)} is set to <code>true</code> and the user has none of the following:</li>
+   *           <ul>
+   *           <li>{@link ProcessInstancePermissions#SUSPEND} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link ProcessDefinitionPermissions#SUSPEND_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void suspend();
 

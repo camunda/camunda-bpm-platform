@@ -82,7 +82,16 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateProcessDefinitionSuspensionStateById(String processDefinitionId) {
+    checkUpdateProcessDefinitionById(processDefinitionId);
+  }
+
+  @Override
   public void checkUpdateProcessDefinitionByKey(String processDefinitionKey) {
+  }
+
+  @Override
+  public void checkUpdateProcessDefinitionSuspensionStateByKey(String processDefinitionKey) {
   }
 
   @Override

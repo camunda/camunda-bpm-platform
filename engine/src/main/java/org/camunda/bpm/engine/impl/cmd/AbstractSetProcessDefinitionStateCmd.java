@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,18 +69,18 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       if (processDefinitionId != null) {
-        checker.checkUpdateProcessDefinitionById(processDefinitionId);
+        checker.checkUpdateProcessDefinitionSuspensionStateById(processDefinitionId);
 
         if (includeSubResources) {
-          checker.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
+          checker.checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(processDefinitionId);
         }
       } else
 
         if (processDefinitionKey != null) {
-          checker.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+          checker.checkUpdateProcessDefinitionSuspensionStateByKey(processDefinitionKey);
 
           if (includeSubResources) {
-            checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+            checker.checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(processDefinitionKey);
           }
         }
     }

@@ -71,6 +71,11 @@ public interface CommandChecker {
   void checkUpdateProcessDefinitionById(String processDefinitionId);
 
   /**
+   * Checks if it is allowed to update the suspension state of a process definition.
+   */
+  void checkUpdateProcessDefinitionSuspensionStateById(String processDefinitionId);
+
+  /**
    * Checks if it is allowed to update a process instance of the given process definition id.
    */
   void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId);
@@ -94,6 +99,11 @@ public interface CommandChecker {
    * Checks if it is allowed to update a process definition of the given process definition key.
    */
   void checkUpdateProcessDefinitionByKey(String processDefinitionKey);
+
+  /**
+   * Checks if it is allowed to update the suspension state of a process definition.
+   */
+  void checkUpdateProcessDefinitionSuspensionStateByKey(String processDefinitionKey);
 
   /**
    * Checks if it is allowed to delete a process definition, which corresponds to the given id.

@@ -309,7 +309,9 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has none of the following:
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void suspendProcessDefinitionById(String processDefinitionId);
 
@@ -357,7 +359,9 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has none of the following:
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void suspendProcessDefinitionByKey(String processDefinitionKey);
 
@@ -399,7 +403,9 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found or if the process definition is already in state active.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has none of the following:
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void activateProcessDefinitionById(String processDefinitionId);
 
@@ -438,7 +444,9 @@ public interface RepositoryService {
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has none of the following:
+   *          <li>{@link ProcessDefinitionPermissions#SUSPEND} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li>{@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void activateProcessDefinitionByKey(String processDefinitionKey);
 

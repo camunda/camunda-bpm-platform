@@ -85,6 +85,9 @@ public enum ProcessDefinitionPermissions implements Permission {
   /** Indicates that RETRY_JOB interactions are permitted. */
   RETRY_JOB("RETRY_JOB", 32),
 
+  /** Indicates that SUSPEND interactions are permitted. */
+  SUSPEND("SUSPEND", 1048576),
+
   /** Indicates that SUSPEND_INSTANCE interactions are permitted. */
   SUSPEND_INSTANCE("SUSPEND_INSTANCE", 131072),
 
