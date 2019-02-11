@@ -15,7 +15,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -100,6 +102,7 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After variable change and recalculation, there should still be one timer only, with a changed due date
     moveByMinutes(1);
+    Date currentTime = ClockUtil.getCurrentTime();
     runtimeService.setVariable(pi1.getProcessInstanceId(), "duration", "PT15M");
     processEngine.getManagementService().recalculateJobDuedate(job.getId(), false);
     
@@ -107,6 +110,8 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     job = jobQuery.singleResult();
     assertNotEquals(firstDate, job.getDuedate());
     assertTrue(firstDate.after(job.getDuedate()));
+    Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusMinutes(15).toDate();
+    assertThat(job.getDuedate(), is(expectedDate));
     
     // After waiting for sixteen minutes the timer should fire
     ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));

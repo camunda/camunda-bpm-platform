@@ -16,6 +16,8 @@
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -126,15 +128,18 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
     Date oldDate = job.getDuedate();
     
     // After recalculation of the timer, the job's duedate should be changed
-    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.SECONDS.toMillis(5)));
+    Date currentTime = new Date(startTime.getTime() + TimeUnit.MINUTES.toMillis(5));
+    ClockUtil.setCurrentTime(currentTime);
     managementService.recalculateJobDuedate(job.getId(), false);
     Job jobUpdated = jobQuery.singleResult();
     assertEquals(job.getId(), jobUpdated.getId());
     assertNotEquals(oldDate, jobUpdated.getDuedate());
     assertTrue(oldDate.before(jobUpdated.getDuedate()));
+    Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusHours(1).toDate();
+    assertThat(jobUpdated.getDuedate(), is(expectedDate));
 
-    // After setting the clock to time '1 hour and 15 seconds', the second timer should fire
-    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.SECONDS.toMillis(15L)));
+    // After setting the clock to time '1 hour and 6 min', the second timer should fire
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.MINUTES.toMillis(6L)));
     waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(0L, jobQuery.count());
 
@@ -146,6 +151,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
   public void testRecalculateUnchangedExpressionOnTimerCreationDateBased(){
     // Set the clock fixed
     Date startTime = new Date();
+    ClockUtil.setCurrentTime(startTime);
 
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put("duedate", "PT1H");

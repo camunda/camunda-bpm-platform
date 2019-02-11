@@ -15,7 +15,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -214,7 +216,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     Date oldDate = job.getDuedate();
     
     // when
-    moveByMinutes(1);
+    moveByMinutes(2);
+    Date currentTime = ClockUtil.getCurrentTime();
     managementService.recalculateJobDuedate(job.getId(), false);
     
     // then
@@ -224,9 +227,11 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     Date newDate = jobQuery.singleResult().getDuedate();
     assertNotEquals(oldDate, newDate);
     assertTrue(oldDate.before(newDate));
+    Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusHours(2).toDate();
+    assertThat(newDate, is(expectedDate));
 
-    // move the clock forward 2 hours and 1 minute
-    moveByMinutes(121);
+    // move the clock forward 2 hours and 2 min
+    moveByMinutes(122);
     executeAllJobs();
 
     List<ProcessInstance> pi = processInstanceQuery.list();
@@ -1468,7 +1473,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     Date oldDueDate = job.getDuedate();
     
     // when
-    moveByMinutes(1);
+    moveByMinutes(2);
+    Date currentTime = ClockUtil.getCurrentTime();
     managementService.recalculateJobDuedate(jobId, false);
 
     // then
@@ -1476,6 +1482,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     Date newDuedate = jobQuery.singleResult().getDuedate();
     assertNotEquals(oldDueDate, newDuedate);
     assertTrue(oldDueDate.before(newDuedate));
+    Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusSeconds(70).toDate();
+    assertThat(newDuedate, is(expectedDate));
     
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
