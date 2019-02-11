@@ -17,7 +17,9 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
@@ -32,26 +34,35 @@ import org.junit.Test;
 
 public class PermissionsTest {
 
+  private static final Map<Integer, Class<? extends Enum<? extends Permission>>> PERMISSION_ENUMS = new HashMap<>();
+  
+  static {
+    PERMISSION_ENUMS.put(Resources.BATCH.resourceType(), BatchPermissions.class);
+    PERMISSION_ENUMS.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
+    PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
+    PERMISSION_ENUMS.put(Resources.TASK.resourceType(), TaskPermissions.class);
+  }
+  
   @Test
   public void testNewPermissionsIntegrityToOld() {
     for (Permissions permission : Permissions.values()) {
       String permissionName = permission.getName();
       for (Resource resource : permission.getTypes()) {
-        Permission resolvedPermission = null;
-        int resourceType = resource.resourceType();
-        if (resourceType == Resources.BATCH.resourceType()) {
-          resolvedPermission = BatchPermissions.forName(permissionName);
-        } else if (resourceType == Resources.PROCESS_DEFINITION.resourceType()) {
-          resolvedPermission = ProcessDefinitionPermissions.forName(permissionName);
-        } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
-          resolvedPermission = ProcessInstancePermissions.forName(permissionName);
-        } else if (resourceType == Resources.TASK.resourceType()) {
-          resolvedPermission = TaskPermissions.forName(permissionName);
-        } else {
-          continue;
+        Class<? extends Enum<?>> clazz = PERMISSION_ENUMS.get(resource.resourceType());
+        if (clazz != null) {
+          Permission resolvedPermission = null;
+          for (Enum<?> enumCandidate : clazz.getEnumConstants()) {
+            if (enumCandidate.toString().equals(permissionName)) {
+              resolvedPermission = (Permission) enumCandidate;
+              break;
+            }
+          }
+          assertThat(resolvedPermission)
+            .overridingErrorMessage("Permission %s for resource %s not found in new enum %s", permission, resource, clazz.getSimpleName())
+            .isNotNull();
+            
+          assertThat(resolvedPermission.getValue()).isEqualTo(permission.getValue());
         }
-        assertThat(resolvedPermission).isNotNull();
-        assertThat(resolvedPermission.getValue()).isEqualTo(permission.getValue());
       }
     }
   }
