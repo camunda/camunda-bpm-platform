@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
@@ -57,21 +58,34 @@ public class RecalculateJobDuedateCmd implements Command<Void>, Serializable {
     this.creationDateBased = creationDateBased;
   }
 
-  public Void execute(CommandContext commandContext) {
-    JobEntity job = commandContext.getJobManager().findJobById(jobId);
+  public Void execute(final CommandContext commandContext) {
+    final JobEntity job = commandContext.getJobManager().findJobById(jobId);
     ensureNotNull(NotFoundException.class, "No job found with id '" + jobId + "'", "job", job);
 
     // allow timer jobs only
     checkJobType(job);
     
-    TimerDeclarationImpl timerDeclaration = findTimerDeclaration(commandContext, job);
-    
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateJob(job);
     }
 
-    TimerEntity timer = (TimerEntity) job;
-    timerDeclaration.resolveAndSetDuedate(timer.getExecution(), timer, creationDateBased);
+    // prepare recalculation
+    final TimerDeclarationImpl timerDeclaration = findTimerDeclaration(commandContext, job);
+    final TimerEntity timer = (TimerEntity) job;
+    Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        timerDeclaration.resolveAndSetDuedate(timer.getExecution(), timer, creationDateBased);
+      }
+    };
+    
+    // run recalculation in correct context
+    ProcessDefinitionEntity contextDefinition = commandContext
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(job.getProcessDefinitionId());
+    ProcessApplicationContextUtil.doContextSwitch(runnable, contextDefinition);
+    
     return null;
   }
 
