@@ -22,9 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -151,7 +150,7 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
   
-  public UserOperationLogContextEntryBuilder inContextOf(HistoricProcessInstanceEntity processInstance, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+  public UserOperationLogContextEntryBuilder inContextOf(HistoryEvent historyEvent, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
 
     if (propertyChanges == null || propertyChanges.isEmpty()) {
       if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
@@ -159,62 +158,29 @@ public class UserOperationLogContextEntryBuilder {
       }
     }
     entry.setPropertyChanges(propertyChanges);
-    entry.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
-    entry.setProcessInstanceId(processInstance.getProcessInstanceId());
-    entry.setProcessDefinitionId(processInstance.getProcessDefinitionId());
-    entry.setExecutionId(processInstance.getId());
-    entry.setCaseInstanceId(processInstance.getCaseInstanceId());
+    entry.setRootProcessInstanceId(historyEvent.getRootProcessInstanceId());
+    entry.setProcessDefinitionId(historyEvent.getProcessDefinitionId());
+    entry.setProcessInstanceId(historyEvent.getProcessInstanceId());
+    entry.setExecutionId(historyEvent.getId());
+    entry.setCaseDefinitionId(historyEvent.getCaseDefinitionId());
+    entry.setCaseInstanceId(historyEvent.getCaseInstanceId());
+    entry.setCaseExecutionId(historyEvent.getCaseExecutionId());
 
     if (definition != null) {
-      entry.setProcessDefinitionKey(definition.getKey());
+      if (definition instanceof ProcessDefinitionEntity) {
+        entry.setProcessDefinitionKey(definition.getKey());
+      }
       entry.setDeploymentId(definition.getDeploymentId());
     }
 
     return this;
   }
-  
-  public UserOperationLogContextEntryBuilder inContextOf(HistoricCaseInstanceEntity caseInstance, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
 
-    if (propertyChanges == null || propertyChanges.isEmpty()) {
-      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
-        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
-      }
-    }
-    entry.setPropertyChanges(propertyChanges);
-    entry.setRootProcessInstanceId(caseInstance.getRootProcessInstanceId());
-    entry.setProcessInstanceId(caseInstance.getProcessInstanceId());
-    entry.setProcessDefinitionId(caseInstance.getProcessDefinitionId());
-    entry.setExecutionId(caseInstance.getId());
-    entry.setCaseInstanceId(caseInstance.getCaseInstanceId());
-    entry.setCaseDefinitionId(caseInstance.getCaseDefinitionId());
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricTaskInstanceEntity task, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
 
-    if (definition != null) {
-      entry.setProcessDefinitionKey(definition.getKey());
-      entry.setDeploymentId(definition.getDeploymentId());
-    }
-
-    return this;
-  }
-  
-  public UserOperationLogContextEntryBuilder inContextOf(HistoricTaskInstanceEntity taskInstance, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
-
-    if (propertyChanges == null || propertyChanges.isEmpty()) {
-      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
-        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
-      }
-    }
-    entry.setPropertyChanges(propertyChanges);
-    entry.setRootProcessInstanceId(taskInstance.getRootProcessInstanceId());
-    entry.setProcessInstanceId(taskInstance.getProcessInstanceId());
-    entry.setProcessDefinitionId(taskInstance.getProcessDefinitionId());
-    entry.setExecutionId(taskInstance.getId());
-    entry.setCaseInstanceId(taskInstance.getCaseInstanceId());
-
-    if (definition != null) {
-      entry.setProcessDefinitionKey(definition.getKey());
-      entry.setDeploymentId(definition.getDeploymentId());
-    }
-
+    inContextOf((HistoryEvent) task, definition, propertyChanges);
+    entry.setTaskId(task.getId());
+    
     return this;
   }
 
