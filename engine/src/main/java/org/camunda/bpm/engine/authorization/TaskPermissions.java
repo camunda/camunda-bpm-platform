@@ -16,7 +16,7 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#TASK Process definition} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#TASK Task} in Camunda BPM.
  *
  * @author Yana Vasileva
  *
