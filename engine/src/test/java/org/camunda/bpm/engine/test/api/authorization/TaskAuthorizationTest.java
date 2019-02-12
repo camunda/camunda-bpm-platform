@@ -7982,7 +7982,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariableWithReadPermissionOnTask() {
+  public void testStandaloneTaskSetVariableWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -7993,7 +7993,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariableWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskSetVariableWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8043,7 +8043,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskSetVariableWithReadPermissionOnTask() {
+  public void testProcessTaskSetVariableWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8052,7 +8052,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariable(taskId);
   }
 
-  public void testProcessTaskSetVariableWithReadPermissionOnAnyTask() {
+  public void testProcessTaskSetVariableWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8061,7 +8061,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariable(taskId);
   }
 
-  public void testProcessTaskSetVariableWithReadTaskPermissionOnProcessDefinition() {
+  public void testProcessTaskSetVariableWithUpdateTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8070,7 +8070,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariable(taskId);
   }
 
-  public void testProcessTaskSetVariableWithReadTaskPermissionOnAnyProcessDefinition() {
+  public void testProcessTaskSetVariableWithUpdateTaskPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8149,7 +8149,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariableLocalWithReadPermissionOnTask() {
+  public void testStandaloneTaskSetVariableLocalWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8160,7 +8160,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariableLocalWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskSetVariableLocalWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8210,7 +8210,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskSetVariableLocalWithReadPermissionOnTask() {
+  public void testProcessTaskSetVariableLocalWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8219,7 +8219,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariableLocal(taskId);
   }
 
-  public void testProcessTaskSetVariableLocalWithReadPermissionOnAnyTask() {
+  public void testProcessTaskSetVariableLocalWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8228,7 +8228,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariableLocal(taskId);
   }
 
-  public void testProcessTaskSetVariableLocalWithReadTaskPermissionOnProcessDefinition() {
+  public void testProcessTaskSetVariableLocalWithUpdateTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8237,7 +8237,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariableLocal(taskId);
   }
 
-  public void testProcessTaskSetVariableLocalWithReadTaskPermissionOnAnyProcessDefinition() {
+  public void testProcessTaskSetVariableLocalWithUpdateTaskPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8316,7 +8316,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariablesWithReadPermissionOnTask() {
+  public void testStandaloneTaskSetVariablesWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8327,7 +8327,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariablesWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskSetVariablesWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8377,7 +8377,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskSetVariablesWithReadPermissionOnTask() {
+  public void testProcessTaskSetVariablesWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8386,7 +8386,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariables(taskId);
   }
 
-  public void testProcessTaskSetVariablesWithReadPermissionOnAnyTask() {
+  public void testProcessTaskSetVariablesWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8395,7 +8395,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariables(taskId);
   }
 
-  public void testProcessTaskSetVariablesWithReadTaskPermissionOnProcessDefinition() {
+  public void testProcessTaskSetVariablesWithUpdateTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8404,7 +8404,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariables(taskId);
   }
 
-  public void testProcessTaskSetVariablesWithReadTaskPermissionOnAnyProcessDefinition() {
+  public void testProcessTaskSetVariablesWithUpdateTaskPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8483,7 +8483,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariablesLocalWithReadPermissionOnTask() {
+  public void testStandaloneTaskSetVariablesLocalWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8494,7 +8494,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariablesLocalWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskSetVariablesLocalWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8544,7 +8544,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskSetVariablesLocalWithReadPermissionOnTask() {
+  public void testProcessTaskSetVariablesLocalWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8553,7 +8553,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariablesLocal(taskId);
   }
 
-  public void testProcessTaskSetVariablesLocalWithReadPermissionOnAnyTask() {
+  public void testProcessTaskSetVariablesLocalWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8562,7 +8562,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariablesLocal(taskId);
   }
 
-  public void testProcessTaskSetVariablesLocalWithReadTaskPermissionOnProcessDefinition() {
+  public void testProcessTaskSetVariablesLocalWithUpdateTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8571,7 +8571,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifySetVariablesLocal(taskId);
   }
 
-  public void testProcessTaskSetVariablesLocalWithReadTaskPermissionOnAnyProcessDefinition() {
+  public void testProcessTaskSetVariablesLocalWithUpdateTaskPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8649,7 +8649,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskRemoveVariableWithReadPermissionOnTask() {
+  public void testStandaloneTaskRemoveVariableWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8660,7 +8660,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskRemoveVariableWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskRemoveVariableWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8710,7 +8710,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskRemoveVariableWithReadPermissionOnTask() {
+  public void testProcessTaskRemoveVariableWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -8719,7 +8719,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariable(taskId);
   }
 
-  public void testProcessTaskRemoveVariableWithReadPermissionOnAnyTask() {
+  public void testProcessTaskRemoveVariableWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -8728,7 +8728,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariable(taskId);
   }
 
-  public void testProcessTaskRemoveVariableWithReadInstancePermissionOnProcessDefinition() {
+  public void testProcessTaskRemoveVariableWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -8737,7 +8737,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariable(taskId);
   }
 
-  public void testProcessTaskRemoveVariableWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testProcessTaskRemoveVariableWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -8817,7 +8817,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-  public void testStandaloneTaskRemoveVariableLocalWithReadPermissionOnTask() {
+  public void testStandaloneTaskRemoveVariableLocalWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8835,7 +8835,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-  public void testStandaloneTaskRemoveVariableLocalWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskRemoveVariableLocalWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -8905,7 +8905,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskRemoveVariableLocalWithReadPermissionOnTask() {
+  public void testProcessTaskRemoveVariableLocalWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8918,7 +8918,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariableLocal(taskId);
   }
 
-  public void testProcessTaskRemoveVariableLocalWithReadPermissionOnAnyTask() {
+  public void testProcessTaskRemoveVariableLocalWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8931,7 +8931,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariableLocal(taskId);
   }
 
-  public void testProcessTaskRemoveVariableLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testProcessTaskRemoveVariableLocalWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8944,7 +8944,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariableLocal(taskId);
   }
 
-  public void testProcessTaskRemoveVariableLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testProcessTaskRemoveVariableLocalWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -9047,7 +9047,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskRemoveVariablesWithReadPermissionOnTask() {
+  public void testStandaloneTaskRemoveVariablesWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -9058,7 +9058,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskRemoveVariablesWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskRemoveVariablesWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -9108,7 +9108,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskRemoveVariablesWithReadPermissionOnTask() {
+  public void testProcessTaskRemoveVariablesWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -9117,7 +9117,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariables(taskId);
   }
 
-  public void testProcessTaskRemoveVariablesWithReadPermissionOnAnyTask() {
+  public void testProcessTaskRemoveVariablesWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -9126,7 +9126,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariables(taskId);
   }
 
-  public void testProcessTaskRemoveVariablesWithReadInstancePermissionOnProcessDefinition() {
+  public void testProcessTaskRemoveVariablesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -9135,7 +9135,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariables(taskId);
   }
 
-  public void testProcessTaskRemoveVariablesWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testProcessTaskRemoveVariablesWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
@@ -9215,7 +9215,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-  public void testStandaloneTaskRemoveVariablesLocalWithReadPermissionOnTask() {
+  public void testStandaloneTaskRemoveVariablesLocalWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -9233,7 +9233,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-  public void testStandaloneTaskRemoveVariablesLocalWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskRemoveVariablesLocalWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -9303,7 +9303,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskRemoveVariablesLocalWithReadPermissionOnTask() {
+  public void testProcessTaskRemoveVariablesLocalWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -9316,7 +9316,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariablesLocal(taskId);
   }
 
-  public void testProcessTaskRemoveVariablesLocalWithReadPermissionOnAnyTask() {
+  public void testProcessTaskRemoveVariablesLocalWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -9329,7 +9329,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariablesLocal(taskId);
   }
 
-  public void testProcessTaskRemoveVariablesLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testProcessTaskRemoveVariablesLocalWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -9342,7 +9342,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyRemoveVariablesLocal(taskId);
   }
 
-  public void testProcessTaskRemoveVariablesLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testProcessTaskRemoveVariablesLocalWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -9474,7 +9474,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-  public void testStandaloneTaskUpdateVariablesLocalWithReadPermissionOnTask() {
+  public void testStandaloneTaskUpdateVariablesLocalWithUpdatePermissionOnTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -9489,7 +9489,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-  public void testStandaloneTaskUpdateVariablesLocalWithReadPermissionOnAnyTask() {
+  public void testStandaloneTaskUpdateVariablesLocalWithUpdatePermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
