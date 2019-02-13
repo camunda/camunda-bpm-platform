@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.test.pa;
+package org.camunda.bpm.spring.boot.starter.test.nonpa;
 
-import org.camunda.bpm.spring.boot.starter.annotation.EnableProcessApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.springframework.stereotype.Component;
 
-/**
- * Test process application.
- *
- * @author Svetlana Dorokhova.
- */
-@SpringBootApplication
-@EnableProcessApplication
-public class TestProcessApplication {
+@Component("eventingServiceTask")
+public class EventingServiceTask implements JavaDelegate {
+
+  @Override
+  public void execute(DelegateExecution delegateExecution) throws Exception {
+    // NOTHING TO DO HERE
+  }
 }

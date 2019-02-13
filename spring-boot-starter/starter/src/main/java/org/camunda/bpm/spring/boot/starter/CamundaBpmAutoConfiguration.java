@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,20 +35,21 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
 @EnableConfigurationProperties({
-    CamundaBpmProperties.class,
-    ManagementProperties.class
+  CamundaBpmProperties.class,
+  ManagementProperties.class
 })
 @Import({
-    CamundaBpmConfiguration.class,
-    CamundaBpmActuatorConfiguration.class,
-    CamundaBpmPluginConfiguration.class,
-    SpringProcessEngineServicesConfiguration.class
+  CamundaBpmConfiguration.class,
+  CamundaBpmActuatorConfiguration.class,
+  CamundaBpmPluginConfiguration.class,
+  SpringProcessEngineServicesConfiguration.class
 })
 @Configuration
 @ConditionalOnProperty(prefix = CamundaBpmProperties.PREFIX, name = "enabled", matchIfMissing = true)
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
 public class CamundaBpmAutoConfiguration {
 
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Configuration
   class ProcessEngineConfigurationImplDependingConfiguration {
 

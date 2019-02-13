@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,9 +52,9 @@ public class DefaultDeploymentConfigurationTest {
     defaultDeploymentConfiguration.preInit(configuration);
 
     final Resource[] resources = configuration.getDeploymentResources();
-    assertThat(resources).hasSize(6);
+    assertThat(resources).hasSize(7);
 
-    assertThat(filenames(resources)).containsOnly("async-service-task.bpmn", "test.cmmn10.xml", "test.bpmn", "test.cmmn", "test.bpmn20.xml", "check-order.dmn");
+    assertThat(filenames(resources)).containsOnly("async-service-task.bpmn", "test.cmmn10.xml", "test.bpmn", "test.cmmn", "test.bpmn20.xml", "check-order.dmn", "eventing.bpmn");
   }
 
   private Set<String> filenames(Resource[] resources) {

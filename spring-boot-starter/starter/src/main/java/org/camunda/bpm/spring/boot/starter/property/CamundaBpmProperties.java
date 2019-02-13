@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ public class CamundaBpmProperties {
   private URL licenseFile;
 
   /**
-   * decativate camunda auto configuration
+   * deactivate camunda auto configuration
    */
   private boolean enabled = true;
 
@@ -110,6 +110,12 @@ public class CamundaBpmProperties {
    */
   @NestedConfigurationProperty
   private DatabaseProperty database = new DatabaseProperty();
+
+  /**
+   * Spring eventing configuration
+   */
+  @NestedConfigurationProperty
+  private EventingProperty eventing = new EventingProperty();
 
   /**
    * JPA configuration
@@ -217,6 +223,14 @@ public class CamundaBpmProperties {
 
   public void setDatabase(DatabaseProperty database) {
     this.database = database;
+  }
+
+  public EventingProperty getEventing() {
+    return eventing;
+  }
+
+  public void setEventing(EventingProperty eventing) {
+    this.eventing = eventing;
   }
 
   public JpaProperty getJpa() {
