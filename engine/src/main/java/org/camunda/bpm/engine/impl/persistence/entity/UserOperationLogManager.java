@@ -322,16 +322,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.VARIABLE)
           .propertyChanges(propertyChange);
 
-      if (historicVariableInstance.getProcessInstanceId() != null) {
-        HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceManager().findHistoricProcessInstance(historicVariableInstance.getProcessInstanceId());
-        entryBuilder.inContextOf(historicProcessInstance, definition, Arrays.asList(propertyChange));
-      } else if (historicVariableInstance.getCaseInstanceId() != null) {
-        HistoricCaseInstanceEntity historicCaseInstance = getHistoricCaseInstanceManager().findHistoricCaseInstance(historicVariableInstance.getCaseInstanceId());
-        entryBuilder.inContextOf(historicCaseInstance, definition, Arrays.asList(propertyChange));
-      } if (historicVariableInstance.getTaskId() != null) {
-        HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceManager().findHistoricTaskInstanceById(historicVariableInstance.getTaskId());
-        entryBuilder.inContextOf(historicTaskInstance, definition, Arrays.asList(propertyChange));
-      }
+      entryBuilder.inContextOf(historicVariableInstance, definition, Arrays.asList(propertyChange));
 
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);

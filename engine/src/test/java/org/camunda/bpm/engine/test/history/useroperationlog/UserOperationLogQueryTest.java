@@ -932,8 +932,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
-    verifyVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -948,8 +948,42 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
-    verifyVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+  }
+  
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryDeleteVariableHistoryOperationOnTaskOfRunningInstance() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.setVariable(processTaskId, "testVariable", "test");
+    taskService.setVariable(processTaskId, "testVariable", "test2");
+    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
+
+    // when
+    historyService.deleteHistoricVariableInstance(variableInstanceId);
+
+    // then
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+  }
+  
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryDeleteVariableHistoryOperationOnTaskOfHistoricInstance() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.setVariable(processTaskId, "testVariable", "test");
+    runtimeService.deleteProcessInstance(process.getId(), "none");
+    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
+
+    // when
+    historyService.deleteHistoricVariableInstance(variableInstanceId);
+
+    // then
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -965,15 +999,25 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
 
     // then
-    String operationType = UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY;
-    UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
-    assertEquals(1, logQuery.count());
+    verfiySingleCaseVariableOperationAsserts(caseInstance);
+    verifySingleVariableOperationPropertyChange("name", "myVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+  }
 
-    UserOperationLogEntry logEntry = logQuery.singleResult();
-    assertEquals(caseInstance.getCaseDefinitionId(), logEntry.getCaseDefinitionId());
-    assertEquals(caseInstance.getCaseInstanceId(), logEntry.getCaseInstanceId());
-    assertEquals(deploymentId, logEntry.getDeploymentId());
-    verifyVariableOperationPropertyChange("name", "myVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryDeleteVariableHistoryOperationOnTaskOfCase() {
+    // given
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.setVariable(processTaskId, "myVariable", "1");
+    taskService.setVariable(processTaskId, "myVariable", "2");
+    taskService.setVariable(processTaskId, "myVariable", "3");
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    
+    // when
+    historyService.deleteHistoricVariableInstance(variableInstance.getId());
+
+    verfiySingleCaseVariableOperationAsserts(caseInstance);
+    verifySingleVariableOperationPropertyChange("name", "myVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
   public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
@@ -993,9 +1037,9 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(1, logQuery.count());
 
     UserOperationLogEntry logEntry = logQuery.singleResult();
-    assertEquals(task.getId(), logEntry.getExecutionId());
+    assertEquals(task.getId(), logEntry.getTaskId());
     assertEquals(deploymentId, logEntry.getDeploymentId());
-    verifyVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
     
     taskService.deleteTask(task.getId(), true);
   }
@@ -1014,7 +1058,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1030,7 +1074,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1050,7 +1094,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1068,7 +1112,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
   // --------------- CMMN --------------------
@@ -1260,12 +1304,46 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     }
   }
   
-  private void verifyVariableOperationPropertyChange(String property, String newValue, String operationType) {
+  private void verifyHistoricVariableOperationAsserts(int countAssertValue, String operationType) {
+    UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
+    assertEquals(countAssertValue, logQuery.count());
+
+    if(countAssertValue > 1) {
+      List<UserOperationLogEntry> logEntryList = logQuery.list();
+
+      for (UserOperationLogEntry logEntry : logEntryList) {
+        assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
+        assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+        assertEquals(deploymentId, logEntry.getDeploymentId());
+        assertNull(logEntry.getTaskId());
+      }
+    } else {
+      UserOperationLogEntry logEntry = logQuery.singleResult();
+      assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
+      assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+      assertEquals(deploymentId, logEntry.getDeploymentId());
+      assertNull(logEntry.getTaskId());
+    }
+  }
+  
+  private void verifySingleVariableOperationPropertyChange(String property, String newValue, String operationType) {
     UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
     assertEquals(1, logQuery.count());
     UserOperationLogEntry logEntry = logQuery.singleResult();
     assertEquals(property, logEntry.getProperty());
     assertEquals(newValue, logEntry.getNewValue());
+  }
+  
+  private void verfiySingleCaseVariableOperationAsserts(CaseInstance caseInstance) {
+    String operationType = UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY;
+    UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
+    assertEquals(1, logQuery.count());
+
+    UserOperationLogEntry logEntry = logQuery.singleResult();
+    assertEquals(caseInstance.getCaseDefinitionId(), logEntry.getCaseDefinitionId());
+    assertEquals(caseInstance.getCaseInstanceId(), logEntry.getCaseInstanceId());
+    assertEquals(deploymentId, logEntry.getDeploymentId());
+    assertNull(logEntry.getTaskId());
   }
 
   private UserOperationLogQuery query() {

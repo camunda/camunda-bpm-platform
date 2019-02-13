@@ -291,6 +291,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   
   // ----- DELETE VARIABLE HISTORY -----
   
+  @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariableHistoryOperationOnRunningInstance() {
     // given
@@ -306,6 +307,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
+  @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariableHistoryOperationOnHistoryInstance() {
     // given
@@ -321,6 +323,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryDeleteVariableHistoryOperationOnCase() {
     // given
@@ -337,6 +340,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
+  @Test
   public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
     // given
     Task task = taskService.newTask();
@@ -354,6 +358,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     taskService.deleteTask(task.getId(), true);
   }
   
+  @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariablesHistoryOperationOnRunningInstance() {
     // given
@@ -371,6 +376,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
+  @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariablesHistoryOperationOnHistoryInstance() {
     // given
@@ -387,6 +393,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
 
+  @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariableAndVariablesHistoryOperationOnRunningInstance() {
     // given
@@ -407,6 +414,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
   }
   
+  @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryDeleteVariableAndVariablesHistoryOperationOnHistoryInstance() {
     // given
