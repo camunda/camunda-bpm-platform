@@ -316,7 +316,7 @@ public interface ExternalTaskService {
    *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>
    */
-  public void setRetries(String externalTaskId, Integer retries);
+  public void setRetries(String externalTaskId, int retries);
 
   /**
    * Sets the retries for external tasks. If the new value is 0, a new incident with a <code>null</code>

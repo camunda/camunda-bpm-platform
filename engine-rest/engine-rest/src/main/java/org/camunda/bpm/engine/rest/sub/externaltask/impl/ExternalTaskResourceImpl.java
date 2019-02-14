@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
 import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -84,7 +85,7 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
     Integer retries = dto.getRetries();
     
     if (retries == null) {
-      throw new RestException(Status.BAD_REQUEST, "The number of retries cannot be null.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "The number of retries cannot be null.");
     }
 
     try {

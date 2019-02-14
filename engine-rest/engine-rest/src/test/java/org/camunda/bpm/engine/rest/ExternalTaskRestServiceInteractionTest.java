@@ -34,6 +34,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1282,6 +1283,51 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
     verify(updateRetriesBuilder).setAsync(-5);
     verifyNoMoreInteractions(updateRetriesBuilder);
+  }
+  
+  @Test
+  public void testSetNullRetriesForExternalTasks() {
+    List<String> externalTaskIds = null;
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("retries", null);
+    parameters.put("externalTaskIds", externalTaskIds);
+    
+    // test set retries to null synchronous
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(parameters)
+    .then()
+    .expect()
+    .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+    .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+    
+    verify(updateRetriesBuilder, never()).set(anyInt());
+    
+    // test set retries to null asynchronous
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(parameters)
+    .then()
+    .expect()
+    .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+    .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+    
+    verify(updateRetriesBuilder, never()).setAsync(anyInt());
+    
+    // test set retries to null on single task
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(parameters)
+    .pathParam("id", "anExternalTaskId")
+    .then()
+    .expect()
+    .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+    .put(RETRIES_EXTERNAL_TASK_URL);
+    
+    verify(externalTaskService, never()).setRetries(anyString() ,anyInt());
   }
 
   @Test
