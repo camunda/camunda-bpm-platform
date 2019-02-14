@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -448,10 +448,29 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
 
   /**
    * Only select tasks which have a local task variable with the given name
+   * set to the given value. The check is done in a case-insensitive way.
+   */
+  TaskQuery taskVariableValueEqualsCaseInsensitive(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which have a local task variable with the given name
+   * set to anything other than the given value. The check is done in a case-insensitive way.
+   */
+  TaskQuery taskVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which have a local task variable with the given name
    * matching the given value.
    * The syntax is that of SQL: for example usage: valueLike(%value%)
    */
   TaskQuery taskVariableValueLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which have a local task variable with the given name
+   * matching the given value. The check is done in a case-insensitive way.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)
+   */
+  TaskQuery taskVariableValueLikeCaseInsensitive(String variableName, String variableValue);
 
   /**
    * Only select tasks which have a local task variable with the given name
@@ -482,6 +501,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * with the given name set to the given value.
    */
   TaskQuery processVariableValueEquals(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name set to the given value. The check is done in a case-insensitive way.
+   */
+  TaskQuery processVariableValueEqualsCaseInsensitive(String variableName, String variableValue);
 
   /**
    * Only select tasks which have a variable with the given name, but
@@ -493,9 +518,21 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
 
   /**
    * Only select tasks which are part of a process that have a variable
+   * with the given name set to the given value. The check is done in a case-insensitive way.
+   */
+  TaskQuery processVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
    * with the given name and matching the given value.
    * The syntax is that of SQL: for example usage: valueLike(%value%)*/
   TaskQuery processVariableValueLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and matching the given value. The check is done in a case-insensitive way.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)*/
+  TaskQuery processVariableValueLikeCaseInsensitive(String variableName, String variableValue);
 
   /**
    * Only select tasks which are part of a process that have a variable
@@ -532,6 +569,14 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * @param name name of the variable, cannot be null.
    */
   TaskQuery caseInstanceVariableValueEquals(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a case instance that have a variable
+   * with the given name set to the given value. The check is done in a case-insensitive way.
+   *
+   * @param name name of the variable, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueEqualsCaseInsensitive(String variableName, String variableValue);
 
   /**
    * Only select tasks which are part of a case instance that have a variable
@@ -545,6 +590,15 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * @param name name of the variable, cannot be null.
    */
   TaskQuery caseInstanceVariableValueNotEquals(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a case instance that have a variable
+   * with the given name, but with a different value than the passed value. The 
+   * check is done in a case-insensitive way.
+   *
+   * @param name name of the variable, cannot be null.
+   */
+  TaskQuery caseInstanceVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue);
 
   /**
    * Only select tasks which are part of a case instance that have a variable value
@@ -559,6 +613,20 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * starts with (string%), ends with (%string) or contains (%string%).
    */
   TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a case instance that have a variable value
+   * like the given value. The check is done in a case-insensitive way.
+   *
+   * This can be used on string variables only.
+   *
+   * @param name variable name, cannot be null.
+   *
+   * @param value variable value. The string can include the
+   * wildcard character '%' to express like-strategy:
+   * starts with (string%), ends with (%string) or contains (%string%).
+   */
+  TaskQuery caseInstanceVariableValueLikeCaseInsensitive(String variableName, String variableValue);
 
 
   /**

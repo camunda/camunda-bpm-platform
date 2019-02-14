@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1243,6 +1243,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.taskVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.taskVariableValueLike(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          query.taskVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          try {
+            query.taskVariableValueEqualsCaseInsensitive(variableName, (String) variableValue);
+          }catch (ClassCastException e) {
+            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());          }
+        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          try {
+            query.taskVariableValueNotEqualsCaseInsensitive(variableName, (String) variableValue);
+          } catch (ClassCastException e) {
+            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
+          }
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid task variable comparator specified: " + op);
         }
@@ -1270,6 +1283,20 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.processVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.processVariableValueLike(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          query.processVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          try {
+            query.processVariableValueEqualsCaseInsensitive(variableName, (String) variableValue);
+          }catch (ClassCastException e) {
+            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
+          }
+        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          try {
+            query.processVariableValueNotEqualsCaseInsensitive(variableName, (String) variableValue);
+          } catch (ClassCastException e) {
+            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
+          }
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
@@ -1297,10 +1324,23 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.caseInstanceVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.caseInstanceVariableValueLike(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          try {
+            query.caseInstanceVariableValueEqualsCaseInsensitive(variableName, (String) variableValue);
+          }catch (ClassCastException e) {
+            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
+          }
+        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
+          try {
+            query.caseInstanceVariableValueNotEqualsCaseInsensitive(variableName, (String) variableValue);
+          } catch (ClassCastException e) {
+            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
+          }
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid case variable comparator specified: " + op);
         }
-
       }
     }
   }

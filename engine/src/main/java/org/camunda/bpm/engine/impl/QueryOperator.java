@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,5 +28,8 @@ public enum QueryOperator {
   GREATER_THAN_OR_EQUAL,
   LESS_THAN,
   LESS_THAN_OR_EQUAL,
-  LIKE
+  LIKE,
+  EQUALS_CASE_INSENSITIVE,
+  NOT_EQUALS_CASE_INSENSITIVE, 
+  LIKE_CASE_INSENSITIVE
 }

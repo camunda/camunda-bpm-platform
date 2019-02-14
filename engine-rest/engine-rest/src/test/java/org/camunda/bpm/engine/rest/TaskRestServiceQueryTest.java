@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,12 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
   protected static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
+  
+  private static final String SAMPLE_VAR_NAME = "varName";
+  private static final String SAMPLE_VAR_VALUE = "varValue";
+  
   private TaskQuery mockQuery;
-
+  
   @Before
   public void setUpRuntimeData() {
     mockQuery = setUpMockTaskQuery(MockProvider.createMockTasks());
@@ -99,6 +103,31 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     when(processEngine.getTaskService().createTaskQuery()).thenReturn(sampleTaskQuery);
 
     return sampleTaskQuery;
+  }
+  
+  private void makePostCall(Map<String, Object> json) {
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(TASK_QUERY_URL);
+  }
+  
+  private Map<String, Object> prepareVariablesForCaseInsensitivePostCall(String variableType, String operator) {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", operator);
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put(variableType, variables);
+    return json;
   }
 
   @Test
@@ -995,6 +1024,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).taskVariableValueNotEquals(variableName, variableValue);
   }
+  
+  @Test
+  public void testTaskVariableParametersCaseInsensitiveAsPost() {
+    // query case-insensitively with the EQUALS_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("taskVariables", "eqci"));
+    verify(mockQuery).taskVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+
+    // query case-insensitively with the NOT_EQUALS_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("taskVariables", "neqci"));
+    verify(mockQuery).taskVariableValueNotEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+
+    // query case-insensitively with the LIKE_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("taskVariables", "likeci"));
+    verify(mockQuery).taskVariableValueLikeCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  }
 
   @Test
   public void testProcessVariableParameters() {
@@ -1100,6 +1144,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testProcessVariableParametersCaseInsensitiveAsPost() {
+    // query case-insensitively with the EQUALS_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("processVariables", "eqci"));
+    verify(mockQuery).processVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+    
+    // query case-insensitively with the NOT_EQUALS_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("processVariables", "neqci"));
+    verify(mockQuery).processVariableValueNotEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+
+    // query case-insensitively with the LIKE_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("processVariables", "likeci"));
+    verify(mockQuery).processVariableValueLikeCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  }
+  
+  @Test
   public void testCaseVariableParameters() {
     // equals
     String variableName = "varName";
@@ -1200,6 +1259,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).caseInstanceVariableValueNotEquals(variableName, variableValue);
+  }
+  
+  @Test
+  public void testCaseInstanceVariableParametersCaseInsensitiveAsPost() {
+    // query case-insensitively with the EQUALS_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("caseInstanceVariables", "eqci"));
+    verify(mockQuery).caseInstanceVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+
+    // query case-insensitively with the NOT_EQUALS_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("caseInstanceVariables", "neqci"));
+    verify(mockQuery).caseInstanceVariableValueNotEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+
+    // query case-insensitively with the LIKE_CASE_INSENSITIVE operator
+    makePostCall(prepareVariablesForCaseInsensitivePostCall("caseInstanceVariables", "likeci"));
+    verify(mockQuery).caseInstanceVariableValueLikeCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
 
   @Test

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-    Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+    Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
   <!-- This snippet is used by all queries that allow filtering by variable values -->
   <sql id="variableValueConditions">
 
-    <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
+    <if test="queryVariableValue.operatorName.contains('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
     (
     <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
       <trim prefix="(" prefixOverrides="and" suffix=")">
@@ -35,12 +35,19 @@
         </if>
          
         <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
-          and ${varPrefix}TEXT_ is not null and ${varPrefix}TEXT_
+          and ${varPrefix}TEXT_ is not null and 
           <choose>
-            <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+          	<when test="queryVariableValue.operatorName.contains('CASE_INSENSITIVE')">UPPER(${varPrefix}TEXT_)</when>
+          	<otherwise>${varPrefix}TEXT_</otherwise>
+          </choose>
+          <choose>
+            <when test="queryVariableValue.operatorName.contains('LIKE')">LIKE</when>
             <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
           </choose>
-          #{valueCondition.textValue}
+          <choose>
+          	<when test="queryVariableValue.operatorName.contains('CASE_INSENSITIVE')">UPPER(#{valueCondition.textValue})</when>
+          	<otherwise>#{valueCondition.textValue}</otherwise>
+          </choose>
           <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE ${escapeChar}</if>
         </if>
         <if test="valueCondition.textValue2 != null">
@@ -82,6 +89,8 @@
       <when test="queryVariableValue.operatorName.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
       <when test="queryVariableValue.operatorName.equals('LESS_THAN')">&lt;</when>
       <when test="queryVariableValue.operatorName.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+      <when test="queryVariableValue.operatorName.equals('EQUALS_CASE_INSENSITIVE')">&lt;=</when>
+      <when test="queryVariableValue.operatorName.equals('NOT_EQUALS_CASE_INSENSITIVE')">&lt;=</when><!-- Note: NOT_EQUALS is handled by negating the condition -->
    </choose>
   </sql>
   
