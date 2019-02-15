@@ -46,7 +46,7 @@ import org.camunda.bpm.engine.identity.User;
  * and resource:</p>
  * <pre>
  * authorization.addPermission(Permissions.READ);
- * authorization.addPermission(Permissions.WRITE);
+ * authorization.addPermission(Permissions.UPDATE);
  * authorization.addPermission(Permissions.DELETE);
  * </pre>
  * <p>On top of the built-in permissions, camunda BPM allows using custom
