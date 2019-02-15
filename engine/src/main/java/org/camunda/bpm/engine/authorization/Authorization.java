@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import org.camunda.bpm.engine.identity.User;
  * and resource:</p>
  * <pre>
  * authorization.addPermission(Permissions.READ);
- * authorization.addPermission(Permissions.WRITE);
+ * authorization.addPermission(Permissions.UPDATE);
  * authorization.addPermission(Permissions.DELETE);
  * </pre>
  * <p>On top of the built-in permissions, camunda BPM allows using custom

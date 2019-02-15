@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.authorization.Resources;
  * <h2>Creating an authorization</h2>
  * <p>An authorization is created between a user/group and a resource. It describes 
  * the user/group's <em>permissions</em> to access that resource. An authorization may 
- * express different permissions, such as the permission to READ, WRITE, DELETE the 
+ * express different permissions, such as the permission to READ, UPDATE, DELETE the 
  * resource. (See {@link Authorization} for details).</p>
  * 
  * <h2>Granting / revoking permissions</h2>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,12 +55,12 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
    *   .resourceType("processDefinition")
    *   .resourceId("2313")
    *   .hasPermission(Permissions.READ)
-   *   .hasPermission(Permissions.WRITE)
+   *   .hasPermission(Permissions.UPDATE)
    *   .hasPermission(Permissions.DELETE)
    *   .list();
    * </pre>
    * 
-   * Selects all Authorization objects which provide READ,WRITE,DELETE 
+   * Selects all Authorization objects which provide READ,UPDATE,DELETE 
    * Permissions for the given user. 
    * 
    */

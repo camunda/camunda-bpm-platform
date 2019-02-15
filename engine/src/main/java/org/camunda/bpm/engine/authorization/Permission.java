@@ -55,7 +55,7 @@ package org.camunda.bpm.engine.authorization;
  */
 public interface Permission {
   
-  /** returns the name of the permission, ie. 'WRITE' */
+  /** returns the name of the permission, ie. 'UPDATE' */
   String getName();
   
   /** returns the unique numeric value of the permission.
