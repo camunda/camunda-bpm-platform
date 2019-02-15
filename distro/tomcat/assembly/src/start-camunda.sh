@@ -2,7 +2,13 @@
 
 export CATALINA_HOME="$(dirname "$0")/server/apache-tomcat-${version.tomcat}"
 
-BROWSERS="gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
+UNAME=`which uname`
+if [ -n "$UNAME" -a "`$UNAME`" = "Darwin" ]
+then
+	BROWSERS="open"
+else
+	BROWSERS="xdg-open gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
+fi
 
 echo "starting camunda BPM platform on Tomcat Application Server";
 
