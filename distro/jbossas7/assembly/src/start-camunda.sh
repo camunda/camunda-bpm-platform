@@ -2,7 +2,13 @@
 
 export JBOSS_HOME="$(dirname "$0")/server/jboss-as-${version.jboss.as}"
 
-BROWSERS="gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
+UNAME=`which uname`
+if [ -n "$UNAME" -a "`$UNAME`" = "Darwin" ]
+then
+	BROWSERS="open"
+else
+	BROWSERS="xdg-open gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
+fi
 
 if type -p java; then
     echo "found java executable in PATH"
