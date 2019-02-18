@@ -21,9 +21,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
+import org.camunda.bpm.engine.cdi.annotation.ProcessVariableTyped;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.variable.value.StringValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Tobias Metzke
@@ -35,8 +37,8 @@ public class TimerExpressionBean implements Serializable {
   private static final long serialVersionUID = 1L;
   
   @Inject
-  @ProcessVariable
-  private Object timerExpression;
+  @ProcessVariableTyped(value="timerExpression")
+  private TypedValue timerExpression;
   
   @Inject
   RuntimeService runtimeService;
@@ -48,12 +50,15 @@ public class TimerExpressionBean implements Serializable {
           .variableName("timerExpression")
           .singleResult();
       if (variable != null) {
-        timerExpression = String.valueOf(variable.getValue());
+        timerExpression = variable.getTypedValue();
       }
     }
     if (timerExpression == null) {
       throw new NullValueException("no variable 'timerExpression' found");
     }
-    return String.valueOf(timerExpression);
+    if (timerExpression instanceof StringValue) {
+      return ((StringValue) timerExpression).getValue();
+    }
+    return String.valueOf(timerExpression.getValue());
   }
 }
