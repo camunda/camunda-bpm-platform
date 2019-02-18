@@ -356,6 +356,15 @@ public abstract class ProcessEngineConfiguration {
    */
   protected boolean skipHistoryOptimisticLockingExceptions = true;
 
+  /**
+   * If the value of this flag is set to <code>true</code>,
+   * READ_INSTANCE_VARIABLE,
+   * READ_HISTORY_VARIABLE, or
+   * READ_TASK_VARIABLE
+   * will be required to fetch variables in case the autorizations are enabled.
+   */
+  protected boolean ensureSpecificVariablePermission = false;
+
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
   }
@@ -910,6 +919,14 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setSkipHistoryOptimisticLockingExceptions(boolean skipHistoryOptimisticLockingExceptions) {
     this.skipHistoryOptimisticLockingExceptions = skipHistoryOptimisticLockingExceptions;
     return this;
+  }
+
+  public boolean isEnsureSpecificVariablePermission() {
+    return ensureSpecificVariablePermission;
+  }
+
+  public void setEnsureSpecificVariablePermission(boolean ensureSpecificVariablePermission) {
+    this.ensureSpecificVariablePermission = ensureSpecificVariablePermission;
   }
 
 }

@@ -17,6 +17,7 @@ package org.camunda.bpm.engine;
 
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
@@ -102,7 +103,15 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricDetail}s. */
   HistoricDetailQuery createHistoricDetailQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricVariableInstance}s. */
+  /**
+   * Creates a new programmatic query to search for {@link HistoricVariableInstance}s.
+   * <p>
+   * If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION} or
+   * if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> and 
+   * the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}
+   * then the result of the query is empty.
+   * </p>
+   */
   HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
   /** Creates a new programmatic query to search for {@link UserOperationLogEntry} instances. */

@@ -952,8 +952,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   Map<String, Object> getVariables(String executionId);
 
@@ -967,8 +969,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *
@@ -986,8 +990,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *
@@ -1005,8 +1011,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   Map<String, Object> getVariablesLocal(String executionId);
 
@@ -1022,8 +1030,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   VariableMap getVariablesLocalTyped(String executionId);
 
@@ -1040,8 +1050,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    */
@@ -1058,8 +1070,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   Map<String,Object> getVariables(String executionId, Collection<String> variableNames);
 
@@ -1074,8 +1088,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *
@@ -1093,8 +1109,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   Map<String,Object> getVariablesLocal(String executionId, Collection<String> variableNames);
 
@@ -1109,8 +1127,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *
@@ -1129,8 +1149,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   Object getVariable(String executionId, String variableName);
 
@@ -1146,8 +1168,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *
@@ -1167,8 +1191,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *
@@ -1187,8 +1213,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   Object getVariableLocal(String executionId, String variableName);
 
@@ -1204,8 +1232,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *
@@ -1225,8 +1255,10 @@ public interface RuntimeService {
    * @throws ProcessEngineException
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE} or
+   *          <li>the user has no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *
    * @since 7.2
    *

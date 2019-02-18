@@ -23,6 +23,8 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_HISTORY_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.BATCH;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
@@ -636,11 +638,15 @@ public class AuthorizationManager extends AbstractManager {
 
     if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
+      Permission readPermission = READ_INSTANCE;
+      if (isEnsureSpecificVariablePermission()) {
+        readPermission = READ_INSTANCE_VARIABLE;
+      }
 
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
               .disjunctive()
               .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
+              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", readPermission)
               .atomicCheck(TASK, "RES.TASK_ID_", READ)
               .build();
         addPermissionCheck(query.getAuthCheck(), permissionCheck);
@@ -684,7 +690,11 @@ public class AuthorizationManager extends AbstractManager {
   // historic variable instance query ////////////////////////////////
 
   public void configureHistoricVariableInstanceQuery(HistoricVariableInstanceQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    Permission readPermission = READ_HISTORY;
+    if (isEnsureSpecificVariablePermission()) {
+      readPermission = READ_HISTORY_VARIABLE;
+    }
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_",  readPermission);
   }
 
   // historic detail query ////////////////////////////////
@@ -923,6 +933,10 @@ public class AuthorizationManager extends AbstractManager {
         && currentAuthentication != null
         && currentAuthentication.getUserId() != null;
 
+  }
+
+  public boolean isEnsureSpecificVariablePermission() {
+    return Context.getProcessEngineConfiguration().isEnsureSpecificVariablePermission();
   }
 
 }

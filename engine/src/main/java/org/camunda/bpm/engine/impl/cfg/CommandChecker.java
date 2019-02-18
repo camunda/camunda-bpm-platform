@@ -176,6 +176,11 @@ public interface CommandChecker {
   void checkReadProcessInstance(ExecutionEntity execution);
 
   /**
+   * Checks if it is allowed to read a process instance's variables of the given execution.
+   */
+  void checkReadProcessInstanceVariable(ExecutionEntity execution);
+
+  /**
    * Check if it is allowed to delete a process instance of the given execution.
    */
   void checkDeleteProcessInstance(ExecutionEntity execution);
@@ -184,6 +189,11 @@ public interface CommandChecker {
    * Check if it is allowed to read a task.
    */
   void checkReadTask(TaskEntity task);
+
+  /**
+   * Check if it is allowed to read a task's variable.
+   */
+  void checkReadTaskVariable(TaskEntity task);
 
   /**
    * Check if it is allowed to update a task's variable

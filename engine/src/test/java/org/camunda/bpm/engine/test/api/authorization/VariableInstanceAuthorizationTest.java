@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Permissions.*;
 import static org.camunda.bpm.engine.authorization.Resources.*;
+
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+
 import static org.camunda.bpm.engine.authorization.Authorization.*;
 
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -33,6 +36,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   protected static final String CASE_KEY = "oneTaskCase";
 
   protected String deploymentId;
+  protected boolean ensureSpecificVariablePermission;
 
   @Override
   public void setUp() throws Exception {
@@ -40,12 +44,14 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
     super.setUp();
+    ensureSpecificVariablePermission = processEngineConfiguration.isEnsureSpecificVariablePermission();
   }
 
   @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
+    processEngineConfiguration.setEnsureSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   public void testProcessVariableQueryWithoutAuthorization() {
@@ -143,6 +149,23 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, variable.getProcessInstanceId());
   }
 
+  public void testProcessVariableQueryWithReadInstancesVariablePermissionOnOneTaskProcess() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    VariableInstance variable = query.singleResult();
+    assertNotNull(variable);
+    assertEquals(processInstanceId, variable.getProcessInstanceId());
+  }
+
   public void testProcessLocalTaskVariableQueryWithReadPermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -208,6 +231,25 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, variable.getProcessInstanceId());
   }
 
+  public void testProcessLocalTaskVariableQueryWithReadPermissionVariableOnOneProcessTask() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    String taskId = selectSingleTask().getId();
+    setTaskVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    VariableInstance variable = query.singleResult();
+    assertNotNull(variable);
+    assertEquals(processInstanceId, variable.getProcessInstanceId());
+  }
+
   public void testStandaloneTaskVariableQueryWithReadPermissionOnTask() {
     // given
     String taskId = "myTask";
@@ -259,6 +301,10 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
 
   protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
+  }
+
+  protected void setReadInstanceVariableAsDefaultReadPermission() {
+    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
   }
 
 }

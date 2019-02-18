@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,8 +195,10 @@ public interface FormService {
    * @return a map of VariableInstances.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or
+   *          <li>the user has no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   VariableMap getTaskFormVariables(String taskId);
 
@@ -218,8 +220,10 @@ public interface FormService {
    * @return a map of VariableInstances.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or
+   *          <li>the user has no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *          <li> if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> the user has no
+   *          {@link ProcessDefinitionPermisions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   VariableMap getTaskFormVariables(String taskId, Collection<String> formVariables, boolean deserializeObjectValues);
 

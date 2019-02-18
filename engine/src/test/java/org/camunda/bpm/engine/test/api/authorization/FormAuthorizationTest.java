@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_TASK_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
@@ -47,6 +48,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
   protected static final String CASE_KEY = "oneTaskCase";
 
   protected String deploymentId;
+  protected boolean ensureSpecificVariablePermission;
 
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
@@ -56,11 +58,13 @@ public class FormAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/api/authorization/renderedFormProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
     super.setUp();
+    ensureSpecificVariablePermission = processEngineConfiguration.isEnsureSpecificVariablePermission();
   }
 
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
+    processEngineConfiguration.setEnsureSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // get start form data ///////////////////////////////////////////
@@ -523,6 +527,25 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
+
+    try {
+      // when (2)
+      formService.getTaskFormVariables(taskId);
+      fail("Exception expected: It should not possible to get task form variables");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetTaskFormVariablesWithReadPermissionOnTask() {
@@ -559,6 +582,21 @@ public class FormAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, READ);
     createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK);
+
+    // when
+    VariableMap variables = formService.getTaskFormVariables(taskId);
+
+    // then
+    assertNotNull(variables);
+    assertEquals(1, variables.size());
+  }
+
+  public void testProcessTaskGetTaskFormVariablesWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
+    startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK_VARIABLE);
 
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);

@@ -26,6 +26,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
 import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_TASK_VARIABLE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.UPDATE_TASK_VARIABLE;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.UPDATE_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
@@ -72,6 +73,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   protected static final String CANDIDATE_GROUPS_PROCESS_KEY = "candidateGroupsProcess";
   protected static final String INVALID_PERMISSION = "invalidPermission";
   protected String deploymentId;
+  protected boolean ensureSpecificVariablePermission;
 
   @Override
   public void setUp() throws Exception {
@@ -82,6 +84,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/api/authorization/candidateUsersProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/candidateGroupsProcess.bpmn20.xml").getId();
     super.setUp();
+    ensureSpecificVariablePermission = processEngineConfiguration.isEnsureSpecificVariablePermission();
   }
 
   @Override
@@ -99,6 +102,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
         return null;
       }
     });
+
+    processEngineConfiguration.setEnsureSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // task query ///////////////////////////////////////////////////////
@@ -5871,6 +5876,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariable(taskId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariableWithReadPermissionOnTask() {
@@ -5917,6 +5941,34 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+
+    // when
+    Object variable = taskService.getVariable(taskId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
+  public void testProcessTaskGetVariableWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    // when
+    Object variable = taskService.getVariable(taskId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
+  public void testProcessTaskGetVariableWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
 
     // when
     Object variable = taskService.getVariable(taskId, VARIABLE_NAME);
@@ -6022,6 +6074,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariableLocal(taskId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariableLocalWithReadPermissionOnTask() {
@@ -6080,6 +6151,42 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Object variable = taskService.getVariableLocal(taskId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
+  public void testProcessTaskGetVariableLocalWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Object variable = taskService.getVariableLocal(taskId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
+  public void testProcessTaskGetVariableLocalWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
 
     disableAuthorization();
     taskService.setVariablesLocal(taskId, getVariables());
@@ -6195,6 +6302,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariableTyped(taskId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariableTypedWithReadPermissionOnTask() {
@@ -6244,6 +6370,36 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+
+    // when
+    TypedValue typedValue = taskService.getVariableTyped(taskId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
+  public void testProcessTaskGetVariableTypedWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    // when
+    TypedValue typedValue = taskService.getVariableTyped(taskId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
+  public void testProcessTaskGetVariableTypedWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
 
     // when
     TypedValue typedValue = taskService.getVariableTyped(taskId, VARIABLE_NAME);
@@ -6353,6 +6509,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariableLocalTyped(taskId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariableLocalTypedWithReadPermissionOnTask() {
@@ -6414,6 +6589,45 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    TypedValue typedValue = taskService.getVariableLocalTyped(taskId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
+
+  public void testProcessTaskGetVariableLocalTypedWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    TypedValue typedValue = taskService.getVariableLocalTyped(taskId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
+  public void testProcessTaskGetVariableLocalTypedWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
 
     disableAuthorization();
     taskService.setVariablesLocal(taskId, getVariables());
@@ -6537,6 +6751,26 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariables(taskId);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
   }
 
   public void testProcessTaskGetVariablesWithReadPermissionOnTask() {
@@ -6605,6 +6839,35 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
 
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
+  }
+
+
+  public void testProcessTaskGetVariablesWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    // when
+    Map<String, Object> variables = taskService.getVariables(taskId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testProcessTaskGetVariablesWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
+
+    // when
+    Map<String, Object> variables = taskService.getVariables(taskId);
+
+    // then
+    verifyGetVariables(variables);
   }
 
   // TaskService#getVariables() (case task) ////////////////////////////////////////////
@@ -6716,6 +6979,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariablesLocal(taskId);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariablesLocalWithReadPermissionOnTask() {
@@ -6800,6 +7082,43 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
 
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
+  }
+
+
+  public void testProcessTaskGetVariablesLocalWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocal(taskId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testProcessTaskGetVariablesLocalWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocal(taskId);
+
+    // then
+    verifyGetVariables(variables);
   }
 
   // TaskService#getVariablesLocal() (case task) ////////////////////////////////////////////
@@ -6915,6 +7234,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariablesTyped(taskId);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariablesTypedWithReadPermissionOnTask() {
@@ -6985,6 +7323,34 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+
+  public void testProcessTaskGetVariablesTypedWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    // when
+    VariableMap variables = taskService.getVariablesTyped(taskId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testProcessTaskGetVariablesTypedWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
+
+    // when
+    VariableMap variables = taskService.getVariablesTyped(taskId);
+
+    // then
+    verifyGetVariables(variables);
+  }
   // TaskService#getVariablesTyped() (case task) ////////////////////////////////////////////
 
   public void testCaseTaskGetVariablesTyped() {
@@ -7094,6 +7460,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariablesLocalTyped(taskId);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariablesLocalTypedWithReadPermissionOnTask() {
@@ -7178,6 +7563,42 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
 
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
+  }
+
+  public void testProcessTaskGetVariablesLocalTypedWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testProcessTaskGetVariablesLocalTypedWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId);
+
+    // then
+    verifyGetVariables(variables);
   }
 
   // TaskService#getVariablesLocalTyped() (case task) ////////////////////////////////////////////
@@ -7293,6 +7714,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariables(taskId, Arrays.asList(VARIABLE_NAME));
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariablesByNameWithReadPermissionOnTask() {
@@ -7361,6 +7801,34 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
 
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
+  }
+
+  public void testProcessTaskGetVariablesByNameWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    // when
+    Map<String, Object> variables = taskService.getVariables(taskId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testProcessTaskGetVariablesByNameWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
+
+    // when
+    Map<String, Object> variables = taskService.getVariables(taskId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyGetVariables(variables);
   }
 
   // TaskService#getVariables() (case task) ////////////////////////////////////////////
@@ -7469,6 +7937,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(taskId, message);
       assertTextPresent(TASK.resourceName(), message);
       assertTextPresent(READ_TASK.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariablesLocal(taskId, Arrays.asList(VARIABLE_NAME));
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -7671,6 +8158,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariablesTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariablesTypedByNameWithReadPermissionOnTask() {
@@ -7739,6 +8245,34 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
 
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
+  }
+
+  public void testProcessTaskGetVariablesTypedByNameWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    // when
+    VariableMap variables = taskService.getVariablesTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testProcessTaskGetVariablesTypedByNameWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
+
+    // when
+    VariableMap variables = taskService.getVariablesTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
   }
 
   // TaskService#getVariables() (case task) ////////////////////////////////////////////
@@ -7850,6 +8384,25 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadInstanceVariableAsDefaultReadPermission();
+
+    try {
+      // when (2)
+      taskService.getVariablesLocalTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetVariablesLocalTypedByNameWithReadPermissionOnTask() {
@@ -7934,6 +8487,43 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
 
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
+  }
+
+
+  public void testProcessTaskGetVariablesLocalTypedByNameWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testProcessTaskGetVariablesLocalTypedByNameWithReadTaskVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadInstanceVariableAsDefaultReadPermission();
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK_VARIABLE);
+
+    disableAuthorization();
+    taskService.setVariablesLocal(taskId, getVariables());
+    enableAuthorization();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
   }
 
   // TaskService#getVariablesLocal() (case task) ////////////////////////////////////////////
@@ -10159,6 +10749,19 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then (3)
     verifyVariableInstanceCountDisabledAuthorization(0);
+  }
+
+
+  protected void verifyGetVariables(Map<String, Object> variables) {
+    assertNotNull(variables);
+    assertFalse(variables.isEmpty());
+    assertEquals(1, variables.size());
+
+    assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
+  }
+
+  protected void setReadInstanceVariableAsDefaultReadPermission() {
+    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
   }
 
 }

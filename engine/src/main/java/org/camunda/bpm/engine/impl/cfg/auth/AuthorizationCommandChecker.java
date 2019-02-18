@@ -333,22 +333,36 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
     // necessary permissions:
     // - READ on PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = new PermissionCheck();
-    firstCheck.setPermission(READ);
-    firstCheck.setResource(PROCESS_INSTANCE);
-    firstCheck.setResourceId(execution.getProcessInstanceId());
-
     // ... OR ...
-
     // - READ_INSTANCE on PROCESS_DEFINITION
-    PermissionCheck secondCheck = new PermissionCheck();
-    secondCheck.setPermission(READ_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
+    CompositePermissionCheck readProcessInstancePermission = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), READ)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), READ_INSTANCE)
+        .build();
 
-    getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
+    getAuthorizationManager().checkAuthorization(readProcessInstancePermission);
+  }
+
+  @Override
+  public void checkReadProcessInstanceVariable(ExecutionEntity execution) {
+    if (getAuthorizationManager().isEnsureSpecificVariablePermission()) {
+      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+
+      // necessary permissions:
+      // - READ on PROCESS_INSTANCE
+      // ... OR ...
+      // - READ_INSTANCE_VARIABLE on PROCESS_DEFINITION
+      CompositePermissionCheck readProcessInstancePermission = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), READ)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE)
+          .build();
+
+      getAuthorizationManager().checkAuthorization(readProcessInstancePermission);
+    } else {
+      checkReadProcessInstance(execution);
+    }
   }
 
   public void checkReadJob(JobEntity job) {
@@ -392,18 +406,13 @@ public class AuthorizationCommandChecker implements CommandChecker {
       ExecutionEntity execution = task.getExecution();
       ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
-      PermissionCheck readPermissionCheck = getAuthorizationManager().newPermissionCheck();
-      readPermissionCheck.setPermission(READ);
-      readPermissionCheck.setResource(TASK);
-      readPermissionCheck.setResourceId(taskId);
+      CompositePermissionCheck readTaskPermission = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheckForResourceId(TASK, taskId, TaskPermissions.READ)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), READ_TASK)
+        .build();
 
-      PermissionCheck readTaskPermissionCheck = getAuthorizationManager().newPermissionCheck();
-      readTaskPermissionCheck.setPermission(READ_TASK);
-      readTaskPermissionCheck.setResource(PROCESS_DEFINITION);
-      readTaskPermissionCheck.setResourceId(processDefinition.getKey());
-      readTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
-
-      getAuthorizationManager().checkAuthorization(readPermissionCheck, readTaskPermissionCheck);
+      getAuthorizationManager().checkAuthorization(readTaskPermission);
 
     } else {
 
@@ -423,6 +432,36 @@ public class AuthorizationCommandChecker implements CommandChecker {
       }
 
     }
+  }
+
+  @Override
+  public void checkReadTaskVariable(TaskEntity task) {
+    String taskId = task.getId();
+    String executionId = task.getExecutionId();
+
+    if(getAuthorizationManager().isEnsureSpecificVariablePermission() && executionId != null) {
+      // if task exists in context of a process instance
+      // then check the following permissions:
+      // - READ on TASK
+      // - READ_TASK_VARIABLE on PROCESS_DEFINITION
+
+      ExecutionEntity execution = task.getExecution();
+      ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
+
+      CompositePermissionCheck readTaskPermission = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheckForResourceId(TASK, taskId, TaskPermissions.READ)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.READ_TASK_VARIABLE)
+        .build();
+
+      getAuthorizationManager().checkAuthorization(readTaskPermission);
+    } else {
+      // the default READ_TASK permission should be applied, or
+      // the task is standalone, or
+      // the task is in the context of case instance
+      checkReadTask(task);
+    }
+
   }
 
   public void checkUpdateTaskVariable(TaskEntity task) {
@@ -774,4 +813,5 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance) {
     checkDeleteHistoricProcessInstance(instance);
   }
+
 }

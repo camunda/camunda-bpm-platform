@@ -95,7 +95,16 @@ public enum ProcessDefinitionPermissions implements Permission {
   UPDATE_INSTANCE_VARIABLE("UPDATE_INSTANCE_VARIABLE", 262144),
 
   /** Indicates that UPDATE_TASK_VARIABLE interactions are permitted. */
-  UPDATE_TASK_VARIABLE("UPDATE_TASK_VARIABLE", 524288);
+  UPDATE_TASK_VARIABLE("UPDATE_TASK_VARIABLE", 524288),
+
+  /** Indicates that READ_INSTANCE_VARIABLE interactions are permitted. */
+  READ_INSTANCE_VARIABLE("READ_INSTANCE_VARIABLE", 2097152),
+
+  /** Indicates that READ_HISTORY_VARIABLE interactions are permitted. */
+  READ_HISTORY_VARIABLE("READ_HISTORY_VARIABLE", 4194304),
+
+  /** Indicates that READ_TASK_VARIABLE interactions are permitted. */
+  READ_TASK_VARIABLE("READ_TASK_VARIABLE", 8388608);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.PROCESS_DEFINITION };
 

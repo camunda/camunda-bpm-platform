@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_HISTORY_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   protected static final String CASE_KEY = "oneTaskCase";
 
   protected String deploymentId;
+  protected boolean ensureSpecificVariablePermission;
 
   @Override
   public void setUp() throws Exception {
@@ -51,6 +53,9 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
+
+    ensureSpecificVariablePermission = processEngineConfiguration.isEnsureSpecificVariablePermission();
+
     super.setUp();
   }
 
@@ -58,6 +63,8 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
+
+    processEngineConfiguration.setEnsureSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // historic variable instance query (standalone task) /////////////////////////////////////////////
@@ -130,18 +137,51 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 1);
   }
 
+  public void testSimpleQueryWithReadHistoryVariablePermissionOnProcessDefinition() {
+    // given
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY_VARIABLE);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testSimpleQueryWithReadHistoryVariablePermissionOnAnyProcessDefinition() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY_VARIABLE);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testSimpleQueryWithMultipleReadHistoryVariable() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY_VARIABLE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY_VARIABLE);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
   // historic variable instance query (multiple process instances) ////////////////////////
 
   public void testQueryWithoutAuthorization() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
+    startMultipleProcessInstances();
 
     // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -151,15 +191,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   }
 
   public void testQueryWithReadHistoryPermissionOnProcessDefinition() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
+    startMultipleProcessInstances();
 
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
@@ -172,16 +204,37 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
 
   public void testQueryWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
+    startMultipleProcessInstances();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 7);
+  }
+
+  public void testQueryWithReadHistoryVariablePermissionOnProcessDefinition() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startMultipleProcessInstances();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY_VARIABLE);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 3);
+  }
+
+  public void testQueryWithReadHistoryVariablePermissionOnAnyProcessDefinition() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startMultipleProcessInstances();
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY_VARIABLE);
 
     // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -206,32 +259,9 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   // historic variable instance query (mixed variables) ////////////////////////////////////
 
   public void testMixedQueryWithoutAuthorization() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    startMultipleProcessInstances();
 
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-
-    createTask("one");
-    createTask("two");
-    createTask("three");
-    createTask("four");
-    createTask("five");
-
-    disableAuthorization();
-    taskService.setVariables("one", getVariables());
-    taskService.setVariables("two", getVariables());
-    taskService.setVariables("three", getVariables());
-    taskService.setVariables("four", getVariables());
-    taskService.setVariables("five", getVariables());
-    enableAuthorization();
-
-    createCaseInstanceByKey(CASE_KEY, getVariables());
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    setupMultipleMixedVariables();
 
     // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -247,32 +277,9 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   }
 
   public void testMixedQueryWithReadHistoryPermissionOnProcessDefinition() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    startMultipleProcessInstances();
 
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-
-    createTask("one");
-    createTask("two");
-    createTask("three");
-    createTask("four");
-    createTask("five");
-
-    disableAuthorization();
-    taskService.setVariables("one", getVariables());
-    taskService.setVariables("two", getVariables());
-    taskService.setVariables("three", getVariables());
-    taskService.setVariables("four", getVariables());
-    taskService.setVariables("five", getVariables());
-    enableAuthorization();
-
-    createCaseInstanceByKey(CASE_KEY, getVariables());
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    setupMultipleMixedVariables();
 
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
@@ -290,34 +297,55 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   }
 
   public void testMixedQueryWithReadHistoryPermissionOnAnyProcessDefinition() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    startMultipleProcessInstances();
 
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
-
-    createTask("one");
-    createTask("two");
-    createTask("three");
-    createTask("four");
-    createTask("five");
-
-    disableAuthorization();
-    taskService.setVariables("one", getVariables());
-    taskService.setVariables("two", getVariables());
-    taskService.setVariables("three", getVariables());
-    taskService.setVariables("four", getVariables());
-    taskService.setVariables("five", getVariables());
-    enableAuthorization();
-
-    createCaseInstanceByKey(CASE_KEY, getVariables());
-    createCaseInstanceByKey(CASE_KEY, getVariables());
+    setupMultipleMixedVariables();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 14);
+
+    deleteTask("one", true);
+    deleteTask("two", true);
+    deleteTask("three", true);
+    deleteTask("four", true);
+    deleteTask("five", true);
+  }
+
+  public void testMixedQueryWithReadHistoryVariablePermissionOnProcessDefinition() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startMultipleProcessInstances();
+
+    setupMultipleMixedVariables();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY_VARIABLE);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 10);
+
+    deleteTask("one", true);
+    deleteTask("two", true);
+    deleteTask("three", true);
+    deleteTask("four", true);
+    deleteTask("five", true);
+  }
+
+  public void testMixedQueryWithReadHistoryVariablePermissionOnAnyProcessDefinition() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startMultipleProcessInstances();
+
+    setupMultipleMixedVariables();
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY_VARIABLE);
 
     // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -340,6 +368,34 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    disableAuthorization();
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+    enableAuthorization();
+
+    disableAuthorization();
+    repositoryService.deleteDeployment(deploymentId);
+    enableAuthorization();
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 3);
+
+    cleanUpAfterDeploymentDeletion();
+  }
+
+  public void testQueryAfterDeletingDeploymentWithReadHistoryVariable() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY_VARIABLE);
 
     disableAuthorization();
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -563,6 +619,40 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
     enableAuthorization();
+  }
+
+  protected void startMultipleProcessInstances() {
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
+    startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY, getVariables());
+  }
+
+  protected void setupMultipleMixedVariables() {
+    createTask("one");
+    createTask("two");
+    createTask("three");
+    createTask("four");
+    createTask("five");
+
+    disableAuthorization();
+    taskService.setVariables("one", getVariables());
+    taskService.setVariables("two", getVariables());
+    taskService.setVariables("three", getVariables());
+    taskService.setVariables("four", getVariables());
+    taskService.setVariables("five", getVariables());
+    enableAuthorization();
+
+    createCaseInstanceByKey(CASE_KEY, getVariables());
+    createCaseInstanceByKey(CASE_KEY, getVariables());
+  }
+
+  protected void setReadHistoryVariableAsDefaultReadPermission() {
+    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
   }
 
 }

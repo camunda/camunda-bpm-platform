@@ -217,6 +217,11 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkReadProcessInstanceVariable(ExecutionEntity execution) {
+    checkReadProcessInstance(execution);
+  }
+
   public void checkDeleteProcessInstance(ExecutionEntity execution) {
     if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("delete the process instance '"+ execution.getId() + "'");
@@ -244,6 +249,11 @@ public class TenantCommandChecker implements CommandChecker {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("read the task '"+ task.getId() + "'");
     }
+  }
+
+  @Override
+  public void checkReadTaskVariable(TaskEntity task) {
+    checkReadTask(task);
   }
 
   @Override
