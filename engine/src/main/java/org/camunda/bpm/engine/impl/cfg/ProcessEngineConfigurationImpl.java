@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1452,6 +1452,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("dbSpecificIfNullFunction", DbSqlSessionFactory.databaseSpecificIfNull.get(databaseType));
 
       properties.put("dayComparator", DbSqlSessionFactory.databaseSpecificDaysComparator.get(databaseType));
+
+      properties.put("collationForCaseSensitivity", DbSqlSessionFactory.databaseSpecificCollationForCaseSensitivity.get(databaseType));
 
       Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
       for (Entry<String, String> entry : constants.entrySet()) {

@@ -82,6 +82,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<String, String>();
+
   static {
 
     String defaultOrderBy = "order by ${internalOrderBy}";
@@ -118,6 +120,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     databaseSpecificDaysComparator.put(H2, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
+    databaseSpecificCollationForCaseSensitivity.put(H2, "");
+    
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
@@ -162,6 +166,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificIfNull.put(mysqlLikeDatabase, "IFNULL");
 
       databaseSpecificDaysComparator.put(mysqlLikeDatabase, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
+
+      databaseSpecificCollationForCaseSensitivity.put(mysqlLikeDatabase, "");
 
       addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
@@ -239,6 +245,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificIfNull.put(POSTGRES, "COALESCE");
 
     databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
+
+    databaseSpecificCollationForCaseSensitivity.put(POSTGRES, "");
 
     addDatabaseSpecificStatement(POSTGRES, "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "updateByteArray", "updateByteArray_postgres");
@@ -324,6 +332,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     databaseSpecificDaysComparator.put(ORACLE, "${date} <= #{currentTimestamp} - ${days}");
 
+    databaseSpecificCollationForCaseSensitivity.put(ORACLE, "");
+
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceCountByTaskNameReport", "selectHistoricTaskInstanceCountByTaskNameReport_oracle");
@@ -392,6 +402,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificIfNull.put(DB2, "NVL");
 
     databaseSpecificDaysComparator.put(DB2, "${date} + ${days} DAYS <= #{currentTimestamp}");
+
+    databaseSpecificCollationForCaseSensitivity.put(DB2, "");
 
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
@@ -465,6 +477,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificIfNull.put(MSSQL, "ISNULL");
 
     databaseSpecificDaysComparator.put(MSSQL, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
+
+    databaseSpecificCollationForCaseSensitivity.put(MSSQL, "COLLATE Latin1_General_CS_AS");
 
     addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
