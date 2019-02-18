@@ -450,13 +450,13 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks which have a local task variable with the given name
    * set to the given value. The check is done in a case-insensitive way.
    */
-  TaskQuery taskVariableValueEqualsCaseInsensitive(String variableName, String variableValue);
+  TaskQuery taskVariableValueEqualsCaseInsensitive(String variableName, Object variableValue);
 
   /**
    * Only select tasks which have a local task variable with the given name
    * set to anything other than the given value. The check is done in a case-insensitive way.
    */
-  TaskQuery taskVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue);
+  TaskQuery taskVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue);
 
   /**
    * Only select tasks which have a local task variable with the given name
@@ -506,7 +506,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks which are part of a process that have a variable
    * with the given name set to the given value. The check is done in a case-insensitive way.
    */
-  TaskQuery processVariableValueEqualsCaseInsensitive(String variableName, String variableValue);
+  TaskQuery processVariableValueEqualsCaseInsensitive(String variableName, Object variableValue);
 
   /**
    * Only select tasks which have a variable with the given name, but
@@ -520,7 +520,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks which are part of a process that have a variable
    * with the given name set to the given value. The check is done in a case-insensitive way.
    */
-  TaskQuery processVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue);
+  TaskQuery processVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue);
 
   /**
    * Only select tasks which are part of a process that have a variable
@@ -576,7 +576,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *
    * @param name name of the variable, cannot be null.
    */
-  TaskQuery caseInstanceVariableValueEqualsCaseInsensitive(String variableName, String variableValue);
+  TaskQuery caseInstanceVariableValueEqualsCaseInsensitive(String variableName, Object variableValue);
 
   /**
    * Only select tasks which are part of a case instance that have a variable
@@ -598,7 +598,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *
    * @param name name of the variable, cannot be null.
    */
-  TaskQuery caseInstanceVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue);
+  TaskQuery caseInstanceVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue);
 
   /**
    * Only select tasks which are part of a case instance that have a variable value

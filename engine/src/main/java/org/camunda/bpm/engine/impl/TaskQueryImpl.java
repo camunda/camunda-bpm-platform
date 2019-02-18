@@ -621,13 +621,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
   
   @Override
-  public TaskQuery taskVariableValueEqualsCaseInsensitive(String variableName, String variableValue) {
+  public TaskQuery taskVariableValueEqualsCaseInsensitive(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.EQUALS_CASE_INSENSITIVE, true, false);
     return this;
   }
 
   @Override
-  public TaskQuery taskVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue) {
+  public TaskQuery taskVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_CASE_INSENSITIVE, true, false);
     return this;
   }
@@ -681,13 +681,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery processVariableValueEqualsCaseInsensitive(String variableName, String variableValue) {
+  public TaskQuery processVariableValueEqualsCaseInsensitive(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.EQUALS_CASE_INSENSITIVE, false, true);
     return this;
   }
 
   @Override
-  public TaskQuery processVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue) {
+  public TaskQuery processVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_CASE_INSENSITIVE, false, true);
     return this;
   }
@@ -741,13 +741,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery caseInstanceVariableValueEqualsCaseInsensitive(String variableName, String variableValue) {
+  public TaskQuery caseInstanceVariableValueEqualsCaseInsensitive(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.EQUALS_CASE_INSENSITIVE, false, false);
     return this;
   }
   
   @Override
-  public TaskQuery caseInstanceVariableValueNotEqualsCaseInsensitive(String variableName, String variableValue) {
+  public TaskQuery caseInstanceVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_CASE_INSENSITIVE, false, false);
     return this;
   }
