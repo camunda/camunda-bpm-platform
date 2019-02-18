@@ -104,31 +104,6 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     return sampleTaskQuery;
   }
-  
-  private void makePostCall(Map<String, Object> json) {
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(json)
-      .header("accept", MediaType.APPLICATION_JSON)
-    .expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(TASK_QUERY_URL);
-  }
-  
-  private Map<String, Object> prepareVariablesForCaseInsensitivePostCall(String variableType, String operator) {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
-    variableJson.put("name", SAMPLE_VAR_NAME);
-    variableJson.put("operator", operator);
-    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
-
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
-    variables.add(variableJson);
-
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put(variableType, variables);
-    return json;
-  }
 
   @Test
   public void testEmptyQuery() {
@@ -1026,17 +1001,77 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testTaskVariableParametersCaseInsensitiveAsPost() {
-    // query case-insensitively with the EQUALS_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("taskVariables", "eqci"));
-    verify(mockQuery).taskVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  public void testTaskVariableParametersEqualsCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "eqci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
 
-    // query case-insensitively with the NOT_EQUALS_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("taskVariables", "neqci"));
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("taskVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
+    verify(mockQuery).taskVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());  
+  }
+  
+  @Test
+  public void testTaskVariableParametersNotEqualsCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "neqci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("taskVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
     verify(mockQuery).taskVariableValueNotEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  }
 
-    // query case-insensitively with the LIKE_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("taskVariables", "likeci"));
+  @Test
+  public void testTaskVariableParametersLikeCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "likeci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("taskVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
     verify(mockQuery).taskVariableValueLikeCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
 
@@ -1144,17 +1179,75 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testProcessVariableParametersCaseInsensitiveAsPost() {
-    // query case-insensitively with the EQUALS_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("processVariables", "eqci"));
-    verify(mockQuery).processVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
-    
-    // query case-insensitively with the NOT_EQUALS_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("processVariables", "neqci"));
-    verify(mockQuery).processVariableValueNotEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  public void testProcessVariableParametersEqualsCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "eqci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
 
-    // query case-insensitively with the LIKE_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("processVariables", "likeci"));
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
+    verify(mockQuery).processVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  }
+  @Test
+  public void testProcessVariableParametersNotEqualsCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "neqci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
+    verify(mockQuery).processVariableValueNotEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  }
+  @Test
+  public void testProcessVariableParametersLikeCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "likeci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+
     verify(mockQuery).processVariableValueLikeCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
   
@@ -1262,17 +1355,77 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testCaseInstanceVariableParametersCaseInsensitiveAsPost() {
-    // query case-insensitively with the EQUALS_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("caseInstanceVariables", "eqci"));
+  public void testCaseInstanceVariableParametersEqualsCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "eqci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
     verify(mockQuery).caseInstanceVariableValueEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
-
-    // query case-insensitively with the NOT_EQUALS_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("caseInstanceVariables", "neqci"));
+  }
+  
+  @Test
+  public void testCaseInstanceVariableParametersNotEqualsCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "neqci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
     verify(mockQuery).caseInstanceVariableValueNotEqualsCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
-
-    // query case-insensitively with the LIKE_CASE_INSENSITIVE operator
-    makePostCall(prepareVariablesForCaseInsensitivePostCall("caseInstanceVariables", "likeci"));
+  }
+  
+  @Test
+  public void testCaseInstanceVariableParametersLikeCaseInsensitiveAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "likeci");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseInstanceVariables", variables);
+    
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+    
     verify(mockQuery).caseInstanceVariableValueLikeCaseInsensitive(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
 

@@ -1246,16 +1246,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
           query.taskVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
         } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          try {
-            query.taskVariableValueEqualsCaseInsensitive(variableName, (String) variableValue);
-          }catch (ClassCastException e) {
-            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());          }
+            query.taskVariableValueEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
         } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          try {
-            query.taskVariableValueNotEqualsCaseInsensitive(variableName, (String) variableValue);
-          } catch (ClassCastException e) {
-            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
-          }
+            query.taskVariableValueNotEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid task variable comparator specified: " + op);
         }
@@ -1286,17 +1279,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
           query.processVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
         } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          try {
-            query.processVariableValueEqualsCaseInsensitive(variableName, (String) variableValue);
-          }catch (ClassCastException e) {
-            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
-          }
+            query.processVariableValueEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
         } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          try {
-            query.processVariableValueNotEqualsCaseInsensitive(variableName, (String) variableValue);
-          } catch (ClassCastException e) {
-            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
-          }
+            query.processVariableValueNotEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
@@ -1327,17 +1312,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
           query.caseInstanceVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
         } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          try {
-            query.caseInstanceVariableValueEqualsCaseInsensitive(variableName, (String) variableValue);
-          }catch (ClassCastException e) {
-            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
-          }
+            query.caseInstanceVariableValueEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
         } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          try {
-            query.caseInstanceVariableValueNotEqualsCaseInsensitive(variableName, (String) variableValue);
-          } catch (ClassCastException e) {
-            throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid parameter value type. Expected String but got " + variableValue.getClass());
-          }
+            query.caseInstanceVariableValueNotEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid case variable comparator specified: " + op);
         }
