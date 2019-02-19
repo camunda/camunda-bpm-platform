@@ -36,6 +36,8 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response.Status;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -408,6 +410,7 @@ public class FetchAndLockHandlerTest {
     // then
     ArgumentCaptor<InvalidRequestException> argumentCaptor = ArgumentCaptor.forClass(InvalidRequestException.class);
     verify(asyncResponse).resume(argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue().getStatus(), is(Status.INTERNAL_SERVER_ERROR));
     assertThat(argumentCaptor.getValue().getMessage(), is("Request rejected due to shutdown of application server."));
   }
 
