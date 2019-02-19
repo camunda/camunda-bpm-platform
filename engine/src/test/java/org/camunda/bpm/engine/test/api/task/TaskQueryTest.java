@@ -920,6 +920,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     
     taskService.setVariablesLocal(task.getId(), variables);
     
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
     assertEquals(1, taskService.createTaskQuery().taskVariableValueLikeCaseInsensitive("stringVar", "stringVal%".toLowerCase()).count());
     assertEquals(1, taskService.createTaskQuery().taskVariableValueLikeCaseInsensitive("stringVar", "%ngValue".toLowerCase()).count());
     assertEquals(1, taskService.createTaskQuery().taskVariableValueLikeCaseInsensitive("stringVar", "%ngVal%".toLowerCase()).count());
@@ -929,7 +930,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeCaseInsensitive("stringVar", "%ngVar%".toLowerCase()).count());
 
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeCaseInsensitive("stringVar", "stringVal".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeCaseInsensitive("nonExistingVar", "string%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeCaseInsensitive("nonExistingVar", "stringVal%".toLowerCase()).count());
     
     // test with null value
     try {
@@ -1179,6 +1180,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     variables.put("stringVar", "stringValue");
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueLikeCaseInsensitive("stringVar", "stringVal%".toLowerCase()).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueLikeCaseInsensitive("stringVar", "%ngValue".toLowerCase()).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueLikeCaseInsensitive("stringVar", "%ngVal%".toLowerCase()).count());
@@ -1188,7 +1190,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().processVariableValueLikeCaseInsensitive("stringVar", "%ngVar%".toLowerCase()).count());
     
     assertEquals(0, taskService.createTaskQuery().processVariableValueLikeCaseInsensitive("stringVar", "stringVal".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().processVariableValueLikeCaseInsensitive("nonExistingVar", "string%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLikeCaseInsensitive("nonExistingVar", "stringVal%".toLowerCase()).count());
     
     // test with null value
     try {
@@ -3682,6 +3684,28 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     query.caseInstanceVariableValueLike("aStringValue", "%b%");
 
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueLikeCaseInsensitive() {
+    String caseDefinitionId = getCaseDefinitionId();
+    
+    caseService
+    .withCaseDefinition(caseDefinitionId)
+    .setVariable("aStringVariable", "aStringValue")
+    .create();
+    
+    TaskQuery query = taskService.createTaskQuery();
+    
+    query.caseInstanceVariableValueLike("aStringVariable", "aString%".toLowerCase());
+    
+    verifyQueryResults(query, 0);
+    
+    query = taskService.createTaskQuery();
+    
+    query.caseInstanceVariableValueLikeCaseInsensitive("aStringVariable", "aString%".toLowerCase());
+    
     verifyQueryResults(query, 1);
   }
 

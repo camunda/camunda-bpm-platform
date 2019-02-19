@@ -915,7 +915,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
 
-    // greater then
+    // equals case-insensitive
+    queryValue = variableName + "_eqci_" + variableValue;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).taskVariableValueEqualsCaseInsensitive(variableName, variableValue);
+
+    // greater than
     queryValue = variableName + "_gt_" + variableValue;
 
     given()
@@ -929,7 +943,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).taskVariableValueGreaterThan(variableName, variableValue);
 
-    // greater then equals
+    // greater than equals
     queryValue = variableName + "_gteq_" + variableValue;
 
     given()
@@ -943,7 +957,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).taskVariableValueGreaterThanOrEquals(variableName, variableValue);
 
-    // lower then
+    // lower than
     queryValue = variableName + "_lt_" + variableValue;
 
     given()
@@ -957,7 +971,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).taskVariableValueLessThan(variableName, variableValue);
 
-    // lower then equals
+    // lower than equals
     queryValue = variableName + "_lteq_" + variableValue;
 
     given()
@@ -984,6 +998,20 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).taskVariableValueLike(variableName, variableValue);
+    
+    // like case-insensitive
+    queryValue = variableName + "_likeci_" + variableValue;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).taskVariableValueLikeCaseInsensitive(variableName, variableValue);
 
     // not equals
     queryValue = variableName + "_neq_" + variableValue;
@@ -998,6 +1026,20 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).taskVariableValueNotEquals(variableName, variableValue);
+    
+    // not equals case-insensitive
+    queryValue = variableName + "_neqci_" + variableValue;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).taskVariableValueNotEqualsCaseInsensitive(variableName, variableValue);
   }
   
   @Test
@@ -1093,7 +1135,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).processVariableValueEquals(variableName, variableValue);
 
-    // greater then
+    //equals case-insensitive
+    queryValue = variableName + "_eqci_" + variableValue;
+    
+    given()
+    .queryParam("processVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).processVariableValueEqualsCaseInsensitive(variableName, variableValue);
+
+    // greater than
     queryValue = variableName + "_gt_" + variableValue;
 
     given()
@@ -1107,7 +1163,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).processVariableValueGreaterThan(variableName, variableValue);
 
-    // greater then equals
+    // greater than equals
     queryValue = variableName + "_gteq_" + variableValue;
 
     given()
@@ -1121,7 +1177,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).processVariableValueGreaterThanOrEquals(variableName, variableValue);
 
-    // lower then
+    // lower than
     queryValue = variableName + "_lt_" + variableValue;
 
     given()
@@ -1135,7 +1191,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).processVariableValueLessThan(variableName, variableValue);
 
-    // lower then equals
+    // lower than equals
     queryValue = variableName + "_lteq_" + variableValue;
 
     given()
@@ -1162,6 +1218,20 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).processVariableValueLike(variableName, variableValue);
+    
+    // like case-insensitive
+    queryValue = variableName + "_likeci_" + variableValue;
+    
+    given()
+    .queryParam("processVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).processVariableValueLikeCaseInsensitive(variableName, variableValue);
 
     // not equals
     queryValue = variableName + "_neq_" + variableValue;
@@ -1176,6 +1246,20 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).processVariableValueNotEquals(variableName, variableValue);
+    
+    // not equals case-insensitive
+    queryValue = variableName + "_neqci_" + variableValue;
+    
+    given()
+    .queryParam("processVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).processVariableValueNotEqualsCaseInsensitive(variableName, variableValue);
   }
 
   @Test
@@ -1268,8 +1352,22 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).caseInstanceVariableValueEquals(variableName, variableValue);
+    
+    // equals case-insensitive
+    queryValue = variableName + "_eqci_" + variableValue;
+    
+    given()
+    .queryParam("caseInstanceVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).caseInstanceVariableValueEqualsCaseInsensitive(variableName, variableValue);
 
-    // greater then
+    // greater than
     queryValue = variableName + "_gt_" + variableValue;
 
     given()
@@ -1283,7 +1381,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).caseInstanceVariableValueGreaterThan(variableName, variableValue);
 
-    // greater then equals
+    // greater than equals
     queryValue = variableName + "_gteq_" + variableValue;
 
     given()
@@ -1297,7 +1395,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).caseInstanceVariableValueGreaterThanOrEquals(variableName, variableValue);
 
-    // lower then
+    // lower than
     queryValue = variableName + "_lt_" + variableValue;
 
     given()
@@ -1311,7 +1409,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).caseInstanceVariableValueLessThan(variableName, variableValue);
 
-    // lower then equals
+    // lower than equals
     queryValue = variableName + "_lteq_" + variableValue;
 
     given()
@@ -1338,6 +1436,20 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).caseInstanceVariableValueLike(variableName, variableValue);
+    
+    // like case-insensitive
+    queryValue = variableName + "_likeci_" + variableValue;
+    
+    given()
+    .queryParam("caseInstanceVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).caseInstanceVariableValueLikeCaseInsensitive(variableName, variableValue);
 
     // not equals
     queryValue = variableName + "_neq_" + variableValue;
@@ -1352,6 +1464,20 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
         .get(TASK_QUERY_URL);
 
     verify(mockQuery).caseInstanceVariableValueNotEquals(variableName, variableValue);
+    
+    // not equals case-insensitive
+    queryValue = variableName + "_neqci_" + variableValue;
+    
+    given()
+    .queryParam("caseInstanceVariables", queryValue)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(TASK_QUERY_URL);
+    
+    verify(mockQuery).caseInstanceVariableValueNotEqualsCaseInsensitive(variableName, variableValue);
   }
   
   @Test
