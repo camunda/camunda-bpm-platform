@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.util.SingleConsumerCondition;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
 
@@ -267,21 +268,15 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
     return LockedExternalTaskDto.fromLockedExternalTasks(externalTasks);
   }
 
-  protected void invalidRequest(AsyncResponse asyncResponse, String message) {
-    InvalidRequestException invalidRequestException = new InvalidRequestException(Status.BAD_REQUEST, message);
-    asyncResponse.resume(invalidRequestException);
-  }
-
   protected void errorTooManyRequests(AsyncResponse asyncResponse) {
     String errorMessage = "At the moment the server has to handle too many requests at the same time. Please try again later.";
-    InvalidRequestException invalidRequestException = new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, errorMessage);
-    asyncResponse.resume(invalidRequestException);
+    asyncResponse.resume(new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, errorMessage));
   }
 
   protected void rejectPendingRequests() {
     for (FetchAndLockRequest pendingRequest : pendingRequests) {
       AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
-      invalidRequest(asyncResponse, "Request rejected due to shutdown of application server.");
+      asyncResponse.resume(new RestException(Status.INTERNAL_SERVER_ERROR, "Request rejected due to shutdown of application server."));
     }
   }
 
@@ -300,8 +295,8 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   public void addPendingRequest(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse, ProcessEngine processEngine) {
     Long asyncResponseTimeout = dto.getAsyncResponseTimeout();
     if (asyncResponseTimeout != null && asyncResponseTimeout > MAX_REQUEST_TIMEOUT) {
-      invalidRequest(asyncResponse, "The asynchronous response timeout cannot be set to a value greater than "
-        + MAX_REQUEST_TIMEOUT + " milliseconds");
+      asyncResponse.resume(new InvalidRequestException(Status.BAD_REQUEST, "The asynchronous response timeout cannot be set to a value greater than "
+          + MAX_REQUEST_TIMEOUT + " milliseconds"));
       return;
     }
 
