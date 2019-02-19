@@ -17,7 +17,7 @@
     <!-- should be updated during a release together with the camunda.version tag in the project pom -->
     <camunda.version>7.11.0-SNAPSHOT</camunda.version>
 
-    <version.httpclient>4.5.5</version.httpclient>
+    <version.httpclient>4.5.7</version.httpclient>
     <version.jackson>2.9.7</version.jackson>
 
     <version.plugin.surefire>2.16</version.plugin.surefire>
