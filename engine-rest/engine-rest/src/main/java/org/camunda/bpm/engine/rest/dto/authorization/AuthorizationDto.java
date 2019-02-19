@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 
 import java.util.ArrayList;
@@ -141,6 +142,8 @@ public class AuthorizationDto {
       return dbAuthorization.getPermissions(ProcessDefinitionPermissions.values());
     } else if (givenResourceType == Resources.PROCESS_INSTANCE.resourceType()) {
       return dbAuthorization.getPermissions(ProcessInstancePermissions.values());
+    } else if (givenResourceType == Resources.TASK.resourceType()) {
+      return dbAuthorization.getPermissions(TaskPermissions.values());
     } else {
       return dbAuthorization.getPermissions(Permissions.values());
     }

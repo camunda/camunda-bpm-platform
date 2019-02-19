@@ -39,6 +39,7 @@ public class AuthorizationTestUtil {
   protected static final int BATCH = Resources.BATCH.resourceType();
   protected static final int PROCESS_DEFINITION = Resources.PROCESS_DEFINITION.resourceType();
   protected static final int PROCESS_INSTANCE = Resources.PROCESS_INSTANCE.resourceType();
+  protected static final int TASK = Resources.TASK.resourceType();
 
   protected static Map<Integer, Resource> resourcesByType = new HashMap<Integer, Resource>();
   protected static Map<Integer, Permission[]> permissionMap = new HashMap<Integer, Permission[]>();
@@ -80,7 +81,7 @@ public class AuthorizationTestUtil {
   public static Permission[] getPermissions(Authorization authorization)
   {
     int resourceType = authorization.getResourceType();
-    if (resourceType == BATCH || resourceType == PROCESS_DEFINITION || resourceType == PROCESS_INSTANCE) {
+    if (resourceType == BATCH || resourceType == PROCESS_DEFINITION || resourceType == PROCESS_INSTANCE || resourceType == TASK) {
       Permission[] permissionsForType = permissionMap.get(resourceType);
       return authorization.getPermissions(permissionsForType);
     } else {
