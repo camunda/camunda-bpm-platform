@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.After;
@@ -408,7 +409,7 @@ public class FetchAndLockHandlerTest {
     handler.rejectPendingRequests();
 
     // then
-    ArgumentCaptor<InvalidRequestException> argumentCaptor = ArgumentCaptor.forClass(InvalidRequestException.class);
+    ArgumentCaptor<RestException> argumentCaptor = ArgumentCaptor.forClass(RestException.class);
     verify(asyncResponse).resume(argumentCaptor.capture());
     assertThat(argumentCaptor.getValue().getStatus(), is(Status.INTERNAL_SERVER_ERROR));
     assertThat(argumentCaptor.getValue().getMessage(), is("Request rejected due to shutdown of application server."));
