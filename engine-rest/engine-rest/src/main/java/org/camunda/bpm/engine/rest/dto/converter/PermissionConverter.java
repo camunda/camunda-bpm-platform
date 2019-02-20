@@ -16,13 +16,9 @@
 package org.camunda.bpm.engine.rest.dto.converter;
 
 import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
-import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
-import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,17 +75,7 @@ public class PermissionConverter {
 
   public static Permission getPermissionForName(String name, int resourceType) {
     // TODO: make this configurable via SPI
-    if (resourceType == Resources.BATCH.resourceType()) {
-      return BatchPermissions.forName(name);
-    } else if (resourceType == Resources.PROCESS_DEFINITION.resourceType()) {
-      return ProcessDefinitionPermissions.forName(name);
-    } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
-      return ProcessInstancePermissions.forName(name);
-    } else if (resourceType == Resources.TASK.resourceType()) {
-      return TaskPermissions.forName(name);
-    }else {
-      return Permissions.forName(name);
-    }
+    return ResourceTypeUtil.getPermissionForNameByResourceType(name, resourceType);
   }
 
 }

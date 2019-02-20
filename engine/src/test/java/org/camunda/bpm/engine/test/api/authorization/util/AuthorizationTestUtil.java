@@ -21,15 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
-import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 
 /**
  * @author Thorben Lindhauer
@@ -37,25 +33,12 @@ import org.camunda.bpm.engine.authorization.TaskPermissions;
  */
 public class AuthorizationTestUtil {
 
-  protected static final int BATCH = Resources.BATCH.resourceType();
-  protected static final int PROCESS_DEFINITION = Resources.PROCESS_DEFINITION.resourceType();
-  protected static final int PROCESS_INSTANCE = Resources.PROCESS_INSTANCE.resourceType();
-  protected static final int TASK = Resources.TASK.resourceType();
-
   protected static Map<Integer, Resource> resourcesByType = new HashMap<Integer, Resource>();
-  protected static Map<Integer, Permission[]> permissionMap = new HashMap<Integer, Permission[]>();
 
   static {
     for (Resource resource : Resources.values()) {
       resourcesByType.put(resource.resourceType(), resource);
     }
-  }
-
-  static {
-    permissionMap.put(BATCH, BatchPermissions.values());
-    permissionMap.put(PROCESS_DEFINITION, ProcessDefinitionPermissions.values());
-    permissionMap.put(PROCESS_INSTANCE, ProcessInstancePermissions.values());
-    permissionMap.put(TASK, TaskPermissions.values());
   }
 
   public static Resource getResourceByType(int type) {
@@ -83,11 +66,8 @@ public class AuthorizationTestUtil {
   public static Permission[] getPermissions(Authorization authorization)
   {
     int resourceType = authorization.getResourceType();
-    if (resourceType == BATCH || resourceType == PROCESS_DEFINITION || resourceType == PROCESS_INSTANCE || resourceType == TASK) {
-      Permission[] permissionsForType = permissionMap.get(resourceType);
-      return authorization.getPermissions(permissionsForType);
-    } else {
-      return authorization.getPermissions(Permissions.values());
-    }
+    Permission[] permissionsByResourceType = ResourceTypeUtil.getPermissionsByResourceType(resourceType);
+
+    return authorization.getPermissions(permissionsByResourceType);
   }
 }

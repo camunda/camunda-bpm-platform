@@ -15,9 +15,36 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.camunda.bpm.engine.authorization.BatchPermissions;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 
 public class ResourceTypeUtil {
+
+  private static final Map<Integer, Class<? extends Enum<? extends Permission>>> permissionEnums = new HashMap<>();
+
+  static {
+    permissionEnums.put(Resources.BATCH.resourceType(), BatchPermissions.class);
+    permissionEnums.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
+    permissionEnums.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
+    permissionEnums.put(Resources.TASK.resourceType(), TaskPermissions.class);
+
+    // the rest
+    for (Resource resource : Resources.values()) {
+      int resourceType = resource.resourceType();
+      if (!permissionEnums.containsKey(resourceType)) {
+        permissionEnums.put(resourceType, Permissions.class);
+      }
+    }
+  }
 
   public static boolean resourceIsContainedInArray(Integer resourceTypeId, Resource[] list) {
     for (Resource resource : list) {
@@ -28,4 +55,29 @@ public class ResourceTypeUtil {
     return false;
   }
 
+  public static Map<Integer, Class<? extends Enum<? extends Permission>>> getPermissionEnums() {
+    return permissionEnums;
+  }
+
+  public static Permission[] getPermissionsByResourceType(int givenResourceType) {
+    Class<? extends Enum<? extends Permission>> clazz = permissionEnums.get(givenResourceType);
+    if (clazz == null) {
+      return Permissions.values();
+    }
+    return ((Permission[]) clazz.getEnumConstants());
+  }
+
+  public static Permission getPermissionForNameByResourceType(String name, int resourceType) {
+    if (resourceType == Resources.BATCH.resourceType()) {
+      return BatchPermissions.forName(name);
+    } else if (resourceType == Resources.PROCESS_DEFINITION.resourceType()) {
+      return ProcessDefinitionPermissions.forName(name);
+    } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
+      return ProcessInstancePermissions.forName(name);
+    } else if (resourceType == Resources.TASK.resourceType()) {
+      return TaskPermissions.forName(name);
+    } else {
+      return Permissions.forName(name);
+    }
+  }
 }

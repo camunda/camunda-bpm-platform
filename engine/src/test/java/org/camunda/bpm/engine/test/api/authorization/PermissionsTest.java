@@ -17,39 +17,24 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
-import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 import org.junit.Test;
 
 public class PermissionsTest {
 
-  private static final Map<Integer, Class<? extends Enum<? extends Permission>>> PERMISSION_ENUMS = new HashMap<>();
-  
-  static {
-    PERMISSION_ENUMS.put(Resources.BATCH.resourceType(), BatchPermissions.class);
-    PERMISSION_ENUMS.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
-    PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
-    PERMISSION_ENUMS.put(Resources.TASK.resourceType(), TaskPermissions.class);
-  }
-  
   @Test
   public void testNewPermissionsIntegrityToOld() {
     for (Permissions permission : Permissions.values()) {
       String permissionName = permission.getName();
       for (Resource resource : permission.getTypes()) {
-        Class<? extends Enum<?>> clazz = PERMISSION_ENUMS.get(resource.resourceType());
-        if (clazz != null) {
+        Class<? extends Enum<?>> clazz = ResourceTypeUtil.getPermissionEnums().get(resource.resourceType());
+        if (clazz != null && !clazz.getSimpleName().equals(Permissions.class.getSimpleName())) {
           Permission resolvedPermission = null;
           for (Enum<?> enumCandidate : clazz.getEnumConstants()) {
             if (enumCandidate.toString().equals(permissionName)) {
@@ -69,41 +54,30 @@ public class PermissionsTest {
 
   @Test
   public void testPermissionsValues() {
-    verifyValuesAreUniqueAndPowerOfTwo(Permissions.values());
+    verifyValuesAreUniqueAndPowerOfTwo(Permissions.values(), Permissions.class.getSimpleName());
   }
 
   @Test
-  public void testBatchPermissionsValues() {
-    verifyValuesAreUniqueAndPowerOfTwo(BatchPermissions.values());
+  public void testRestOfPermissionsEnumValues() {
+    for (Class<? extends Enum<? extends Permission>> permissionsClass : ResourceTypeUtil.getPermissionEnums().values()) {
+      if(!permissionsClass.getSimpleName().equals(Permissions.class.getSimpleName())) {
+        verifyValuesAreUniqueAndPowerOfTwo((Permission[])permissionsClass.getEnumConstants(), permissionsClass.getSimpleName());
+      }
+    }
   }
 
-  @Test
-  public void testProcessInstancePermissionsValues() {
-    verifyValuesAreUniqueAndPowerOfTwo(ProcessInstancePermissions.values());
-  }
-
-  @Test
-  public void testProcessDefinitionPermissionsValues() {
-    verifyValuesAreUniqueAndPowerOfTwo(ProcessDefinitionPermissions.values());
-  }
-
-  @Test
-  public void testTaskPermissionsValues() {
-    verifyValuesAreUniqueAndPowerOfTwo(TaskPermissions.values());
-  }
-
-  private void verifyValuesAreUniqueAndPowerOfTwo(Permission[] permissions) {
+  private void verifyValuesAreUniqueAndPowerOfTwo(Permission[] permissions, String className) {
     Set<Integer> values = new HashSet<>();
     for (Permission permission : permissions) {
       int value = permission.getValue();
       // value is unique
       assertThat(values.add(value))
-          .overridingErrorMessage("The value '%s' of '%s' permission is not unique. Another permission already has this value.", value, permission)
+          .overridingErrorMessage("The value '%s' of '%s' permission is not unique for '%s' permission enum. Another permission already has this value.", value, permission, className)
           .isTrue();
       if (value != Integer.MAX_VALUE && value != 0) {
         // value is power of 2
         assertThat(isPowerOfTwo(value))
-          .overridingErrorMessage("The value '%s' of '%s' permission is invalid. The values must be power of 2.", value, permission)
+          .overridingErrorMessage("The value '%s' of '%s' permission is invalid for '%s' permission enum. The values must be power of 2.", value, permission, className)
           .isTrue();
       }
     }
