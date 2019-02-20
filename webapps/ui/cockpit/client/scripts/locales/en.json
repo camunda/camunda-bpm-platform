@@ -810,5 +810,20 @@
   "BREAD_CRUMBS_CURRENTLY_SUSPENDED" : "Currently suspended",
   "BREAD_CRUMBS_RUNTIME" : "Runtime",
 
-  "PIE_CHART_NO_DATA" : "No Data"
+  "PIE_CHART_NO_DATA" : "No Data",
+  
+  "PLUGIN_JOBS": "Jobs",
+  "PLUGIN_JOBS_LABEL": "Jobs",
+  "PLUGIN_JOBS_ID": "Job ID",
+  "PLUGIN_JOBS_DATE": "Due Date",
+  "PLUGIN_JOBS_RECALCULATE": "Recalculate",
+  "PLUGIN_JOBS_NO_JOBS": "No Jobs",
+  "PLUGIN_JOBS_TOGGLE": "Use Job creation time instead of current time",
+  "PLUGIN_JOB_RECALCULATE_CREATION_TIME": "Recalculate job due date using its creation time",
+  "PLUGIN_JOB_RECALCULATE_CURRENT_TIME": "Recalculate job due date using current time",
+  "PLUGIN_JOBS_LOADING_ERROR": "Could not load Jobs",
+  "PLUGIN_JOBS_RECALCULATE_ERROR": "Error",
+  "PLUGIN_JOBS_RECALCULATE_ERROR_MESSAGE": "Recalculation was not successful.",
+  "PLUGIN_JOBS_RECALCULATE_SUCCESS": "Success",
+  "PLUGIN_JOBS_RECALCULATE_SUCCESS_MESSAGE": "Due date was recalculated successfully."
 }

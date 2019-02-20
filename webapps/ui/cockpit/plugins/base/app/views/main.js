@@ -40,7 +40,8 @@ var angular = require('angular'),
     updateSuspensionStateActionPI = require('./processInstance/updateSuspensionStateAction'),
     updateSuspensionStateDialogPI = require('./processInstance/updateSuspensionStateDialog'),
     incidentJobRetryAction = require('./processInstance/incidentJobRetryAction'),
-    incidentExternalTaskRetryAction = require('./processInstance/incident-externalTask-retry-action');
+    incidentExternalTaskRetryAction = require('./processInstance/incident-externalTask-retry-action'),
+    jobsTab = require('./processInstance/jobsTab');
 
 var ngModule = angular.module('cockpit.plugin.base.views', [
   camCommon.name,
@@ -78,5 +79,6 @@ ngModule.config(updateSuspensionStateActionPI);
 ngModule.controller('UpdateProcessInstanceSuspensionStateController', updateSuspensionStateDialogPI);
 ngModule.config(incidentJobRetryAction);
 ngModule.config(incidentExternalTaskRetryAction);
+ngModule.config(jobsTab);
 
 module.exports = ngModule;
