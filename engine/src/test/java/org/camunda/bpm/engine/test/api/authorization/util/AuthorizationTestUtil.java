@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 
 /**
  * @author Thorben Lindhauer
@@ -54,6 +55,7 @@ public class AuthorizationTestUtil {
     permissionMap.put(BATCH, BatchPermissions.values());
     permissionMap.put(PROCESS_DEFINITION, ProcessDefinitionPermissions.values());
     permissionMap.put(PROCESS_INSTANCE, ProcessInstancePermissions.values());
+    permissionMap.put(TASK, TaskPermissions.values());
   }
 
   public static Resource getResourceByType(int type) {
