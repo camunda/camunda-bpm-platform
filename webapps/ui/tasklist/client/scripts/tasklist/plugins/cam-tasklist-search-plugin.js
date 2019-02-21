@@ -45,7 +45,7 @@ var sanitizeValue = function(value, operator, search) {
   } else if(operator == 'in') {
     return value.split(',');
   } else if(search.allowDates && simpleDateExp.test(value)) {
-    return moment(value).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+    return moment(value, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
   }
   return value;
 };

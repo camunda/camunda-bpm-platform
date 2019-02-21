@@ -261,7 +261,7 @@ function sanitizeValue(value, operator, search) {
   if(operator.toLowerCase() === 'like' && !wildCardExp.test(value.replace(specialWildCardCharExp, ''))) {
     return '%'+value+'%';
   } else if(search.allowDates && simpleDateExp.test(value)) {
-    return moment(value).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+    return moment(value, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
   }
   return value;
 }

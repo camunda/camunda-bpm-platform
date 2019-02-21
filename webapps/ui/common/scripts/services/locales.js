@@ -81,8 +81,7 @@ module.exports = function(ngModule, appRoot, appName) {
         suffix: '.json',
         callback: function(err, data, locale) {
           if(!err && data && data.dateLocales) {
-              // Deprecation warning: moment.lang is deprecated. Use moment.locale instead.
-            moment.locale(locale || fallback, data.dateLocales);
+            moment.updateLocale(locale || fallback, data.dateLocales);
           }
         }
       });
