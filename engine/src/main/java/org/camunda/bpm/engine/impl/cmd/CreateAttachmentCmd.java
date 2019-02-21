@@ -37,7 +37,6 @@ import org.camunda.bpm.engine.task.Attachment;
 
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
 
 
 /**
@@ -75,7 +74,6 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     } else {
       ensureNotNull("taskId or processInstanceId has to be provided", this.processInstanceId);
       List<ExecutionEntity> executionsByProcessInstanceId = commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
-      ensureNumberOfElements("processInstances",executionsByProcessInstanceId,1);
       processInstance = executionsByProcessInstanceId.get(0);
     }
 
