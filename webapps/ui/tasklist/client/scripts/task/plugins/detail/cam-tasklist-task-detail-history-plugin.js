@@ -8,7 +8,7 @@ var moment = require('camunda-commons-ui/vendor/moment');
 
 var findOrCreateDay = function(days, timestamp) {
   var day = jquery.grep(days, function(elem) {
-    return moment(elem.date, moment.ISO_8601).format('YYYY-MM-DD') === moment(timestamp).format('YYYY-MM-DD');
+    return moment(elem.date, moment.ISO_8601).format('YYYY-MM-DD') === moment(timestamp, moment.ISO_8601).format('YYYY-MM-DD');
   });
   if(day.length > 0) {
     return day[0];
