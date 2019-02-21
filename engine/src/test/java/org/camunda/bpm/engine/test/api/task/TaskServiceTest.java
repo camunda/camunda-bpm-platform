@@ -363,6 +363,40 @@ public class TaskServiceTest {
       taskService.deleteTask(taskId, true);
     }
   }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testProcessAttachmentsOneProcessExecution() {
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+      // create attachment
+      Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+
+      assertEquals("weatherforcast", attachment.getName());
+      assertEquals("temperatures and more", attachment.getDescription());
+      assertEquals("web page", attachment.getType());
+      assertNull(attachment.getTaskId());
+      assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
+      assertEquals("http://weather.com", attachment.getUrl());
+      assertNull(taskService.getAttachmentContent(attachment.getId()));
+    }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml"})
+  public void testProcessAttachmentsTwoProcessExecutions() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoParallelTasksProcess");
+    
+    // create attachment
+    Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+    
+    assertEquals("weatherforcast", attachment.getName());
+    assertEquals("temperatures and more", attachment.getDescription());
+    assertEquals("web page", attachment.getType());
+    assertNull(attachment.getTaskId());
+    assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
+    assertEquals("http://weather.com", attachment.getUrl());
+    assertNull(taskService.getAttachmentContent(attachment.getId()));
+  }
 
   @Test
   public void testSaveAttachment() {
