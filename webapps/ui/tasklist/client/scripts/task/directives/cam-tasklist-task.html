@@ -28,11 +28,11 @@
           <div class="definition-name">
           <h4 class="process-definition"
               ng-if="task.processDefinitionId">
-            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }} (v. {{ task._embedded.processDefinition[0].version }})
             </h4>
           <h4 class="case-definition"
               ng-if="task.caseDefinitionId">
-            {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
+            {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }} (v. {{ task._embedded.caseDefinition[0].version }})
           </h4>
           <a class="instance-link"  ng-if="instanceLink"
             ng-href="{{instanceLink}}" class="ng-binding" href="{{instanceLink}}">
