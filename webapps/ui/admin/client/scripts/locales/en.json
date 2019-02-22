@@ -310,7 +310,7 @@
   "USERS_CREATE_USER" : "Create User",
   "USERS_CREATE" : "Create",
   "USERS_CREATE_SUCCESS" : "Created new user {{user}}",
-  "USERS_CREATE_FAILED" : "Failed to create user. Check if it already exists.",
+  "USERS_CREATE_FAILED" : "Failed to create user: {{ message }}",
 
   "SYSTEM_SYSTEM":"System",
 
