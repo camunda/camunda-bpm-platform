@@ -6,7 +6,7 @@
     </exclude-subsystems>
     <dependencies>
       <module name="org.camunda.spin.camunda-spin-dataformat-json-jackson" services="import" />
-      <module name="com.fasterxml.jackson.core.jackson-databind" slot="2.9.7" />
+      <module name="com.fasterxml.jackson.core.jackson-databind" slot="2.9.8" />
     </dependencies>
   </deployment>
 </jboss-deployment-structure>

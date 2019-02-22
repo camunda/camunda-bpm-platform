@@ -15,7 +15,7 @@
   <name>camunda BPM - engine - REST - Root</name>
 
   <properties>
-    <jackson.version>2.9.7</jackson.version>
+    <jackson.version>2.9.8</jackson.version>
   </properties>
 
   <modules>
