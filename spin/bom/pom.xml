@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.spin</groupId>
   <artifactId>camunda-spin-bom</artifactId>
-  <version>1.7.0-SNAPSHOT</version>
+  <version>1.6.6-SNAPSHOT</version>
   <name>camunda spin - bom</name>
   <packaging>pom</packaging>
 
