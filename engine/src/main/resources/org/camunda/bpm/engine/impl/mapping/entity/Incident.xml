@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-    Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+    Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -210,22 +210,6 @@
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
-    </set>
-    <where>
-      ID_ = #{id, jdbcType=VARCHAR}
-      and REV_ = #{revision, jdbcType=INTEGER}
-    </where>
-  </update>
-
-  <update id="updateIncident_mysql" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
-    update ${prefix}ACT_RU_INCIDENT
-    <set>
-      REV_ = #{revisionNext, jdbcType=INTEGER},
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
-      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
-      INCIDENT_TIMESTAMP_ = INCIDENT_TIMESTAMP_
     </set>
     <where>
       ID_ = #{id, jdbcType=VARCHAR}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
-    Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+    Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -82,28 +82,10 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
-  <update id="updateJobLogByRootProcessInstanceId_mysql"
-          parameterType="java.util.Map">
-      update ${prefix}ACT_HI_JOB_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-      TIMESTAMP_ = TIMESTAMP_
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
-  </update>
-
   <update id="updateJobLogByBatchId"
           parameterType="java.util.Map">
       update ${prefix}ACT_HI_JOB_LOG set
       REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
-  </update>
-
-  <update id="updateJobLogByBatchId_mysql"
-          parameterType="java.util.Map">
-      update ${prefix}ACT_HI_JOB_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-      TIMESTAMP_ = TIMESTAMP_
 
       where JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
   </update>
