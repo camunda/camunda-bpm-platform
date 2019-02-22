@@ -3348,7 +3348,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then (2)
       String message = e.getMessage();
-      System.out.println(message);
       assertTextPresent(userId, message);
       assertTextPresent(READ.getName(), message);
       assertTextPresent(processInstanceId, message);

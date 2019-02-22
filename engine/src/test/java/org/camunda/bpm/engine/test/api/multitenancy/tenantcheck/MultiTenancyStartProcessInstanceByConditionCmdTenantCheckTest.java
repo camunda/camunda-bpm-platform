@@ -182,8 +182,6 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    System.out.println(engineRule.getProcessEngineConfiguration().isAuthorizationEnabled());
-
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", "bar");
 
