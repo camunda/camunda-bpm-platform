@@ -62,7 +62,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
         };
 
         var recalculateDate = function(job, useCreationDate) {
-          jobProvider.recalculateDuedate({id: job.id +3, creationDateBased: useCreationDate}, function(err) {
+          jobProvider.recalculateDuedate({id: job.id, creationDateBased: useCreationDate}, function(err) {
             if(err) {
               Notifications.addError({
                 status: $translate.instant('PLUGIN_JOBS_RECALCULATE_ERROR'),
