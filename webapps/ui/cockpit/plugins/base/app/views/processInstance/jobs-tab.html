@@ -10,7 +10,7 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
       <tr>
         <th>{{ 'PLUGIN_JOBS_ID' | translate }}</th>
         <th>{{ 'PLUGIN_JOBS_DATE' | translate }}</th>
-        <th>{{ 'PLUGIN_JOBS_RECALCULATE' | translate }}</th>
+        <th>{{ 'PLUGIN_JOBS_ACTION' | translate }}</th>
       </tr>
     </thead>
     
@@ -20,24 +20,16 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
           {{job.id}}
         </td>
         <td class="date">
-          {{job.dueDate | date:'medium'}}
+          {{job.dueDate | camDate}}
         </td>
         <td>
             <a class="btn btn-sm btn-default action-button"
-               ng-click="recalculateDateFromCreationTime(job)"
-               uib-tooltip="{{ 'PLUGIN_JOB_RECALCULATE_CREATION_TIME' | translate}}"
+               ng-click="openRecalculationWindow(job)"
+               uib-tooltip="{{ 'PLUGIN_JOB_RECALCULATE_TOOLTIP' | translate }}"
                tooltip-placement="left">
 
-              <span class="glyphicon glyphicon-repeat"></span>
+              <span class="glyphicon glyphicon-time"></span>
             </a>  
-
-            <a class="btn btn-sm btn-default action-button"
-               ng-click="recalculateDateFromCurrentTime(job)"
-               uib-tooltip="{{ 'PLUGIN_JOB_RECALCULATE_CURRENT_TIME' | translate}}"
-               tooltip-placement="left">
-
-              <span class="glyphicon glyphicon-refresh"></span>
-            </a>
         </td>
       </tr>
     </tbody>

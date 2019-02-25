@@ -815,6 +815,8 @@
   "PLUGIN_JOBS": "Jobs",
   "PLUGIN_JOBS_LABEL": "Jobs",
   "PLUGIN_JOBS_ID": "Job ID",
+  "PLUGIN_JOBS_CLOSE": "Close",
+  "PLUGIN_JOBS_ACTION": "Action",
   "PLUGIN_JOBS_DATE": "Due Date",
   "PLUGIN_JOBS_RECALCULATE": "Recalculate",
   "PLUGIN_JOBS_NO_JOBS": "No Jobs",
@@ -825,5 +827,14 @@
   "PLUGIN_JOBS_RECALCULATE_ERROR": "Error",
   "PLUGIN_JOBS_RECALCULATE_ERROR_MESSAGE": "Recalculation was not successful.",
   "PLUGIN_JOBS_RECALCULATE_SUCCESS": "Success",
-  "PLUGIN_JOBS_RECALCULATE_SUCCESS_MESSAGE": "Due date was recalculated successfully."
+  "PLUGIN_JOBS_RECALCULATE_SUCCESS_MESSAGE": "Due date was recalculated successfully.",
+  "PLUGIN_JOBS_MODAL_TITLE": "Recalculate timer due date",
+  "PLUGIN_JOBS_MODAL_DESCRIPTION": "Select one of the following options to recalculate this timer:",
+  "PLUGIN_JOBS_SPECIFIC_DATE": "Set a specific duedate:",
+  "PLUGIN_JOBS_FROM_CREATION": "Recalculate duedate from creation time",
+  "PLUGIN_JOBS_FROM_NOW": "Recalculate duedate from current time",
+  "PLUGIN_JOBS_SET_DUEDATE_ERROR_MESSAGE": "Duedate could not be set successfully. Make sure the Date format is correct.",
+  "PLUGIN_JOBS_SET_DUEDATE_SUCCESS_MESSAGE": "Duedate was set successfully.",
+  "PLUGIN_JOB_RECALCULATE_TOOLTIP": "Recalculate duedate for this Job.",
+  "PLUGIN_JOBS_VALID_PATTERN": "Supported pattern 'yyyy-MM-ddTHH:mm:ss."
 }
