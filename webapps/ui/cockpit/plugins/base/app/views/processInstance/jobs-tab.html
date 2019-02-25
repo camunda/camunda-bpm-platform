@@ -25,6 +25,7 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
         <td>
             <a class="btn btn-sm btn-default action-button"
                ng-click="openRecalculationWindow(job)"
+               ng-if="job.dueDate"
                uib-tooltip="{{ 'PLUGIN_JOB_RECALCULATE_TOOLTIP' | translate }}"
                tooltip-placement="left">
 
