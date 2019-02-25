@@ -1,0 +1,54 @@
+<!-- # CE - camunda-bpm-webapp/ui/cockpit/plugins/base/app/views/processInstance/jobs-reschedule-modal.html -->
+<div class="modal-header">
+  <h3 class="modal-title">{{ 'PLUGIN_JOBS_MODAL_TITLE' | translate  }}</h3>
+</div>
+
+<div class="modal-body">
+  <div notifications-panel></div>
+  {{ 'PLUGIN_JOBS_MODAL_DESCRIPTION' | translate }} 
+  <form name="rescheduleJobDuedateForm">
+    <fieldset>
+
+      <div class="form-group">
+        <label class="control-label col-xs-7">  
+          <input type="radio" ng-model="recalculationType" value="specific">
+            {{ 'PLUGIN_JOBS_SPECIFIC_DATE' | translate }} 
+        </label>
+        <div class="col-xs-5">
+          <input date type="text" ng-model="date" name="dateValue" ng-disabled="recalculationType!=='specific'">
+          <p class="invalid" ng-show="this.rescheduleJobDuedateForm.$error.datePattern">
+           {{ 'PLUGIN_JOBS_VALID_PATTERN' | translate }}
+          </p>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="control-label col-xs-12">
+          <input type="radio" ng-model="recalculationType" value="creation">
+          {{ 'PLUGIN_JOBS_FROM_CREATION' | translate }} 
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-xs-12">
+          <input type="radio" ng-model="recalculationType" value="now">
+          {{ 'PLUGIN_JOBS_FROM_NOW' | translate }} 
+        </label>
+     </div>
+    </fieldset>
+  </form>
+</div>
+
+<div class="modal-footer">
+   <button ng-click="$dismiss()"
+          class="btn btn-default">
+    {{ 'PLUGIN_JOBS_CLOSE' | translate }}
+  </button>
+  <button ng-click="submit()"
+          class="btn btn-primary"
+          ng-disabled="!isValid()">
+   
+    {{ 'PLUGIN_JOBS_RECALCULATE' | translate }} 
+  </button> 
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/cockpit/plugins/base/app/views/processInstance/jobs-reschedule-modal.html -->
