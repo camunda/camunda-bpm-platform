@@ -35,8 +35,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               firstResult = (page - 1) * count;
           
           var queryParams = {
-            'processInstanceId': processInstance.id, 
-            'timers': true,
+            'processInstanceId': processInstance.id,
             firstResult: firstResult,
             maxResults: count
           };
