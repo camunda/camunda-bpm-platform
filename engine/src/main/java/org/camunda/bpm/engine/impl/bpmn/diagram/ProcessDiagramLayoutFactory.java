@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,10 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.diagram;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import javax.imageio.ImageIO;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.repository.DiagramElement;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.DiagramNode;
@@ -42,6 +27,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Provides positions and dimensions of elements in a process diagram as
@@ -76,7 +75,7 @@ public class ProcessDiagramLayoutFactory {
    * Provides positions and dimensions of elements in a BPMN process diagram as
    * provided by {@link RepositoryService#getProcessDiagram(String)}.
    *
-   * @param bpmnXmlStream
+   * @param bpmnModel
    *          BPMN 2.0 XML document
    * @param imageStream
    *          BPMN 2.0 diagram in PNG format (JPEG and other formats supported
@@ -109,10 +108,7 @@ public class ProcessDiagramLayoutFactory {
   
   protected Document parseXml(InputStream bpmnXmlStream) {
     // Initiate DocumentBuilderFactory
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    // Get one that understands namespaces
-    factory.setNamespaceAware(true);
-  
+    DocumentBuilderFactory factory = getConfiguredDocumentBuilderFactory();
     DocumentBuilder builder;
     Document bpmnModel;
     try {
@@ -372,4 +368,31 @@ public class ProcessDiagramLayoutFactory {
             && "5.0".equals(bpmnModel.getDocumentElement().getAttribute("exporterVersion"));
   }
 
+  protected DocumentBuilderFactory getConfiguredDocumentBuilderFactory() {
+
+    boolean isXxeParsingEnabled = Context.getProcessEngineConfiguration().isEnableXxeProcessing();
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+    Map<String, Boolean> xxeFeatures = new HashMap<>(4);
+    xxeFeatures.put("http://apache.org/xml/features/disallow-doctype-decl", !isXxeParsingEnabled);
+    xxeFeatures.put("http://xml.org/sax/features/external-general-entities", isXxeParsingEnabled);
+    xxeFeatures.put("http://xml.org/sax/features/external-parameter-entities", isXxeParsingEnabled);
+    xxeFeatures.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", isXxeParsingEnabled);
+
+    // Configure XXE Processing
+    try {
+      for (Map.Entry<String, Boolean> feature : xxeFeatures.entrySet()) {
+        factory.setFeature(feature.getKey(), feature.getValue());
+      }
+    } catch (Exception e) {
+      throw new ProcessEngineException("Error while configuring BPMN parser.", e);
+    }
+    factory.setXIncludeAware(isXxeParsingEnabled);
+    factory.setExpandEntityReferences(isXxeParsingEnabled);
+
+    // Get a factory that understands namespaces
+    factory.setNamespaceAware(true);
+
+    return factory;
+  }
 }
