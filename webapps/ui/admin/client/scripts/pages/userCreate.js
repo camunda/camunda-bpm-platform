@@ -46,11 +46,13 @@ var Controller = ['$scope', 'page', 'UserResource', 'Notifications', '$location'
     UserResource.createUser(user).$promise.then(function() {
       Notifications.addMessage({ type: 'success', status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'), message: $translate.instant('USERS_CREATE_SUCCESS', {user: user.profile.id})});
       $location.path('/users');
-    },
-      function(err) {
-        Notifications.addError({ status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'), message: $translate.instant('USERS_CREATE_FAILED', {message: err.data.message}) });
-      }
-      );
+    }, function(err) {
+      Notifications.addError({
+        status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
+        message: $translate.instant('USERS_CREATE_FAILED', {message: err.data.message}),
+        exclusive: true
+      });
+    });
   };
 
 }];
