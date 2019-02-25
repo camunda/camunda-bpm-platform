@@ -3,7 +3,18 @@
 var $ = require('jquery');
 var angular = require('camunda-commons-ui/vendor/angular');
 
-require('jquery-ui/draggable');
+require('jquery-ui');
+
+require('jquery-ui/ui/widgets/mouse');
+require('jquery-ui/ui/data');
+require('jquery-ui/ui/plugin');
+require('jquery-ui/ui/safe-active-element');
+require('jquery-ui/ui/safe-blur');
+require('jquery-ui/ui/scroll-parent');
+require('jquery-ui/ui/version');
+require('jquery-ui/ui/widget');
+
+require('jquery-ui/ui/widgets/draggable');
 
 module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
   return {

@@ -36,7 +36,7 @@
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
     "events": "1.1.0",
     "jquery": "2.1.1",
-    "jquery-ui": "1.10.5",
+    "jquery-ui": "1.12.1",
     "lodash.debounce": "4.0.8",
     "mousetrap": "1.5.3",
     "requirejs": "2.1.22",
