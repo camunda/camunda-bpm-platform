@@ -1243,12 +1243,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.taskVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.taskVariableValueLike(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          query.taskVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-            query.taskVariableValueEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
-        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-            query.taskVariableValueNotEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.LIKE_IGNORE_CASE_OPERATOR_NAME)) {
+          query.taskVariableValueLikeIgnoreCase(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
+            query.taskVariableValueEqualsIgnoreCase(variableName, String.valueOf(variableValue));
+        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
+            query.taskVariableValueNotEqualsIgnoreCase(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid task variable comparator specified: " + op);
         }
@@ -1276,12 +1276,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.processVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.processVariableValueLike(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          query.processVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-            query.processVariableValueEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
-        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-            query.processVariableValueNotEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.LIKE_IGNORE_CASE_OPERATOR_NAME)) {
+          query.processVariableValueLikeIgnoreCase(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
+            query.processVariableValueEqualsIgnoreCase(variableName, String.valueOf(variableValue));
+        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
+            query.processVariableValueNotEqualsIgnoreCase(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
@@ -1309,12 +1309,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.caseInstanceVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.caseInstanceVariableValueLike(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.LIKE_CASE_INSENSITIVE_OPERATOR_NAME)) {
-          query.caseInstanceVariableValueLikeCaseInsensitive(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-            query.caseInstanceVariableValueEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
-        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_CASE_INSENSITIVE_OPERATOR_NAME)) {
-            query.caseInstanceVariableValueNotEqualsCaseInsensitive(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.LIKE_IGNORE_CASE_OPERATOR_NAME)) {
+          query.caseInstanceVariableValueLikeIgnoreCase(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
+            query.caseInstanceVariableValueEqualsIgnoreCase(variableName, String.valueOf(variableValue));
+        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
+            query.caseInstanceVariableValueNotEqualsIgnoreCase(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid case variable comparator specified: " + op);
         }

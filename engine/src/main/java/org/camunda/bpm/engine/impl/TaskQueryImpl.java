@@ -621,14 +621,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
   
   @Override
-  public TaskQuery taskVariableValueEqualsCaseInsensitive(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.EQUALS_CASE_INSENSITIVE, true, false);
+  public TaskQuery taskVariableValueEqualsIgnoreCase(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.EQUALS_IGNORE_CASE, true, false);
     return this;
   }
 
   @Override
-  public TaskQuery taskVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_CASE_INSENSITIVE, true, false);
+  public TaskQuery taskVariableValueNotEqualsIgnoreCase(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_IGNORE_CASE, true, false);
     return this;
   }
 
@@ -639,8 +639,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery taskVariableValueLikeCaseInsensitive(String variableName, String variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LIKE_CASE_INSENSITIVE, true, false);
+  public TaskQuery taskVariableValueLikeIgnoreCase(String variableName, String variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LIKE_IGNORE_CASE, true, false);
     return this;
   }
 
@@ -681,14 +681,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery processVariableValueEqualsCaseInsensitive(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.EQUALS_CASE_INSENSITIVE, false, true);
+  public TaskQuery processVariableValueEqualsIgnoreCase(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.EQUALS_IGNORE_CASE, false, true);
     return this;
   }
 
   @Override
-  public TaskQuery processVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_CASE_INSENSITIVE, false, true);
+  public TaskQuery processVariableValueNotEqualsIgnoreCase(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_IGNORE_CASE, false, true);
     return this;
   }
 
@@ -699,8 +699,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
   
   @Override
-  public TaskQuery processVariableValueLikeCaseInsensitive(String variableName, String variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LIKE_CASE_INSENSITIVE, false, true);
+  public TaskQuery processVariableValueLikeIgnoreCase(String variableName, String variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LIKE_IGNORE_CASE, false, true);
     return this;
   }
 
@@ -741,14 +741,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery caseInstanceVariableValueEqualsCaseInsensitive(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.EQUALS_CASE_INSENSITIVE, false, false);
+  public TaskQuery caseInstanceVariableValueEqualsIgnoreCase(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.EQUALS_IGNORE_CASE, false, false);
     return this;
   }
   
   @Override
-  public TaskQuery caseInstanceVariableValueNotEqualsCaseInsensitive(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_CASE_INSENSITIVE, false, false);
+  public TaskQuery caseInstanceVariableValueNotEqualsIgnoreCase(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS_IGNORE_CASE, false, false);
     return this;
   }
 
@@ -759,8 +759,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery caseInstanceVariableValueLikeCaseInsensitive(String variableName, String variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.LIKE_CASE_INSENSITIVE, false, false);
+  public TaskQuery caseInstanceVariableValueLikeIgnoreCase(String variableName, String variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LIKE_IGNORE_CASE, false, false);
     return this;
   }
 
@@ -1106,7 +1106,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       }
     }
     
-    if(operator.name().contains("CASE_INSENSITIVE") && (value == null || !String.class.isAssignableFrom(value.getClass()))) {
+    if(operator.name().contains("IGNORE_CASE") && (value == null || !String.class.isAssignableFrom(value.getClass()))) {
       throw new ProcessEngineException("Case-Insensitive queries can only be made with variables of type String");
     }
     
