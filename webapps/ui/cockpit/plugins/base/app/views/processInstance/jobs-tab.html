@@ -36,6 +36,22 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
         </td>
         <td>
             <a class="btn btn-sm btn-default action-button"
+               ng-click="toggleSuspension(job)"
+               ng-if="job.suspended"
+               uib-tooltip="{{ 'PLUGIN_JOBS_RESUME_TOOLTIP' | translate }}"
+               tooltip-placement="left">
+
+              <span class="glyphicon glyphicon-play"></span>
+            </a>
+            <a class="btn btn-sm btn-default action-button"
+               ng-click="toggleSuspension(job)"
+               ng-if="!job.suspended"
+               uib-tooltip="{{ 'PLUGIN_JOBS_SUSPEND_TOOLTIP' | translate }}"
+               tooltip-placement="left">
+
+              <span class="glyphicon glyphicon-pause"></span>
+            </a>   
+            <a class="btn btn-sm btn-default action-button"
                ng-click="openRecalculationWindow(job)"
                ng-if="job.dueDate"
                uib-tooltip="{{ 'PLUGIN_JOB_RECALCULATE_TOOLTIP' | translate }}"

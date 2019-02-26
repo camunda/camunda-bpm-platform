@@ -820,6 +820,8 @@
   "PLUGIN_JOBS_DATE": "Due Date",
   "PLUGIN_JOBS_RECALCULATE": "Recalculate",
   "PLUGIN_JOBS_NO_JOBS": "No Jobs",
+  "PLUGIN_JOBS_SUCCESS": "Success",
+  "PLUGIN_JOBS_ERROR": "Error",
   "PLUGIN_JOBS_TOGGLE": "Use Job creation time instead of current time",
   "PLUGIN_JOB_RECALCULATE_CREATION_TIME": "Recalculate job due date using its creation time",
   "PLUGIN_JOB_RECALCULATE_CURRENT_TIME": "Recalculate job due date using current time",
@@ -839,5 +841,9 @@
   "PLUGIN_JOBS_VALID_PATTERN": "Supported pattern 'yyyy-MM-ddTHH:mm:ss.",
   "PLUGIN_JOBS_CREATION_DATE": "Creation Date",
   "PLUGIN_JOBS_RETRIES": "Retries",
-  "PLUGIN_JOBS_ACTIVITY": "Activity"
+  "PLUGIN_JOBS_ACTIVITY": "Activity",
+  "PLUGIN_JOBS_SUSPEND_TOOLTIP": "Suspend",
+  "PLUGIN_JOBS_RESUME_TOOLTIP": "Resume",
+  "PLUGIN_JOBS_SUSPEND_SUCCESS": "The suspension state of the job has been updated successfully.",
+  "PLUGIN_JOBS_SUSPEND_FAILURE": "Could not update the suspension state of the job."
 }
