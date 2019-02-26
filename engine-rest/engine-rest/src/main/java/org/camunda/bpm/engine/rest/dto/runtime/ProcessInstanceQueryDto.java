@@ -26,6 +26,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -80,12 +81,18 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   private List<VariableQueryParameterDto> variables;
 
-  public ProcessInstanceQueryDto() {
+  private List<ProcessInstanceQueryDto> orQueries;
 
+  public ProcessInstanceQueryDto() {
   }
 
   public ProcessInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("orQueries")
+  public void setOrQueries(List<ProcessInstanceQueryDto> orQueries) {
+    this.orQueries = orQueries;
   }
 
   public Set<String> getProcessInstanceIds() {
@@ -296,9 +303,20 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     return engine.getRuntimeService().createProcessInstanceQuery();
   }
 
+  public List<ProcessInstanceQueryDto> getOrQueries() {
+    return orQueries;
+  }
+
   @Override
   protected void applyFilters(ProcessInstanceQuery query) {
-
+    if (orQueries != null) {
+      for (ProcessInstanceQueryDto orQueryDto: orQueries) {
+        ProcessInstanceQueryImpl orQuery = new ProcessInstanceQueryImpl();
+        orQuery.setOrQueryActive();
+        orQueryDto.applyFilters(orQuery);
+        ((ProcessInstanceQueryImpl) query).addOrQuery(orQuery);
+      }
+    }
     if (processInstanceIds != null) {
       query.processInstanceIds(processInstanceIds);
     }

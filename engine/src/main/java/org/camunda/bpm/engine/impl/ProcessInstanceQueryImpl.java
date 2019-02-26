@@ -19,13 +19,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -36,6 +40,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
  * @author Frederik Heremans
  * @author Falko Menge
  * @author Daniel Meyer
+ * @author Fabian Bahle
  */
 public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessInstanceQuery, ProcessInstance> implements ProcessInstanceQuery, Serializable {
 
@@ -62,6 +67,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+
+  // or query /////////////////////////////
+  protected List<ProcessInstanceQueryImpl> queries = new ArrayList<ProcessInstanceQueryImpl>(Arrays.asList(this));
+  protected boolean isOrQueryActive = false;
 
   public ProcessInstanceQueryImpl() {
   }
@@ -241,8 +250,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+    checkQueryOk();
+
     return commandContext
       .getExecutionManager()
       .findProcessInstanceCountByQueryCriteria(this);
@@ -250,19 +261,45 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   @Override
   public List<ProcessInstance> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+    checkQueryOk();
+
     return commandContext
       .getExecutionManager()
       .findProcessInstancesByQueryCriteria(this, page);
   }
 
   public List<String> executeIdsList(CommandContext commandContext) {
-    checkQueryOk();
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+    checkQueryOk();
+
     return commandContext
       .getExecutionManager()
       .findProcessInstancesIdsByQueryCriteria(this);
+  }
+
+  protected void ensureOrExpressionsEvaluated() {
+    // skips first query as it has already been evaluated
+    for (int i = 1; i < queries.size(); i++) {
+      queries.get(i).validate();
+      queries.get(i).evaluateExpressions();
+    }
+  }
+
+  @Override
+  protected void ensureVariablesInitialized() {
+    super.ensureVariablesInitialized();
+
+    if (!queries.isEmpty()) {
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
+      for (ProcessInstanceQueryImpl orQuery: queries) {
+        for (QueryVariableValue var : orQuery.queryVariableValues) {
+          var.initialize(variableSerializers);
+        }
+      }
+    }
   }
 
   //getters /////////////////////////////////////////////////////////////////
@@ -273,6 +310,27 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public List<ProcessInstanceQueryImpl> getQueries() {
+    return queries;
+  }
+
+  public void addOrQuery(ProcessInstanceQueryImpl orQuery) {
+    orQuery.isOrQueryActive = true;
+    this.queries.add(orQuery);
+  }
+
+  public void setOrQueryActive() {
+    isOrQueryActive = true;
+  }
+
+  public boolean isOrQueryActive() {
+    return isOrQueryActive;
+  }
+
+  public String[] getActivityIds() {
+    return activityIds;
   }
 
   public String getBusinessKey() {
@@ -339,7 +397,33 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return subCaseInstanceId;
   }
 
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
   public boolean isRootProcessInstances() {
     return isRootProcessInstances;
+  }
+
+  @Override
+  public ProcessInstanceQuery or() {
+    if (this != queries.get(0)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set or() within 'or' query");
+    }
+
+    ProcessInstanceQueryImpl orQuery = new ProcessInstanceQueryImpl();
+    orQuery.isOrQueryActive = true;
+    orQuery.queries = queries;
+    queries.add(orQuery);
+    return orQuery;
+  }
+
+  @Override
+  public ProcessInstanceQuery endOr() {
+    if (!queries.isEmpty() && this != queries.get(queries.size()-1)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set endOr() before or()");
+    }
+
+    return queries.get(0);
   }
 }

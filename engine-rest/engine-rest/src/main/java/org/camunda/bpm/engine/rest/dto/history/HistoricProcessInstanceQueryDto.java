@@ -17,12 +17,15 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
@@ -36,6 +39,9 @@ import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import static java.lang.Boolean.TRUE;
+
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
+
 
 public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricProcessInstanceQuery> {
 
@@ -110,10 +116,17 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
   private List<VariableQueryParameterDto> variables;
 
+  private List<HistoricProcessInstanceQueryDto> orQueries;
+
   public HistoricProcessInstanceQueryDto() {}
 
   public HistoricProcessInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("orQueries")
+  public void setOrQueries(List<HistoricProcessInstanceQueryDto> orQueries) {
+    this.orQueries = orQueries;
   }
 
   @CamundaQueryParam("processInstanceId")
@@ -344,9 +357,20 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     return engine.getHistoryService().createHistoricProcessInstanceQuery();
   }
 
+  public List<HistoricProcessInstanceQueryDto> getOrQueries() {
+    return orQueries;
+  }
+
   @Override
   protected void applyFilters(HistoricProcessInstanceQuery query) {
-
+    if (orQueries != null) {
+      for (HistoricProcessInstanceQueryDto orQueryDto: orQueries) {
+        HistoricProcessInstanceQueryImpl orQuery = new HistoricProcessInstanceQueryImpl();
+        orQuery.setOrQueryActive();
+        orQueryDto.applyFilters(orQuery);
+        ((HistoricProcessInstanceQueryImpl) query).addOrQuery(orQuery);
+      }
+    }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
