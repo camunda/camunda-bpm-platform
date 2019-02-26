@@ -20,13 +20,13 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
     <tbody>
       <tr ng-repeat="job in jobs">
         <td class="id">
-          {{job.id}}
+            <span cam-widget-clipboard="job.id">{{job.id}}</span>
         </td>
         <td class="date">
-          {{job.dueDate | camDate}}
+            <span cam-widget-clipboard="job.dueDate | camDate">{{job.dueDate | camDate}}</span>
         </td>
         <td>
-          {{job.createTime | camDate}}
+            <span cam-widget-clipboard="job.createTime | camDate">{{job.createTime | camDate}}</span>
         </td>
         <td>
           {{job.retries}}
