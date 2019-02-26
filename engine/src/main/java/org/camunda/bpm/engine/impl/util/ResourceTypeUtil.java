@@ -29,19 +29,19 @@ import org.camunda.bpm.engine.authorization.TaskPermissions;
 
 public class ResourceTypeUtil {
 
-  private static final Map<Integer, Class<? extends Enum<? extends Permission>>> permissionEnums = new HashMap<>();
+  private static final Map<Integer, Class<? extends Enum<? extends Permission>>> PERMISSION_ENUMS = new HashMap<>();
 
   static {
-    permissionEnums.put(Resources.BATCH.resourceType(), BatchPermissions.class);
-    permissionEnums.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
-    permissionEnums.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
-    permissionEnums.put(Resources.TASK.resourceType(), TaskPermissions.class);
+    PERMISSION_ENUMS.put(Resources.BATCH.resourceType(), BatchPermissions.class);
+    PERMISSION_ENUMS.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
+    PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
+    PERMISSION_ENUMS.put(Resources.TASK.resourceType(), TaskPermissions.class);
 
     // the rest
     for (Resource resource : Resources.values()) {
       int resourceType = resource.resourceType();
-      if (!permissionEnums.containsKey(resourceType)) {
-        permissionEnums.put(resourceType, Permissions.class);
+      if (!PERMISSION_ENUMS.containsKey(resourceType)) {
+        PERMISSION_ENUMS.put(resourceType, Permissions.class);
       }
     }
   }
@@ -56,11 +56,11 @@ public class ResourceTypeUtil {
   }
 
   public static Map<Integer, Class<? extends Enum<? extends Permission>>> getPermissionEnums() {
-    return permissionEnums;
+    return PERMISSION_ENUMS;
   }
 
   public static Permission[] getPermissionsByResourceType(int givenResourceType) {
-    Class<? extends Enum<? extends Permission>> clazz = permissionEnums.get(givenResourceType);
+    Class<? extends Enum<? extends Permission>> clazz = PERMISSION_ENUMS.get(givenResourceType);
     if (clazz == null) {
       return Permissions.values();
     }

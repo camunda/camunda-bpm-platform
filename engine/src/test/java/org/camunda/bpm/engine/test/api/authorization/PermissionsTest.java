@@ -34,7 +34,7 @@ public class PermissionsTest {
       String permissionName = permission.getName();
       for (Resource resource : permission.getTypes()) {
         Class<? extends Enum<?>> clazz = ResourceTypeUtil.getPermissionEnums().get(resource.resourceType());
-        if (clazz != null && !clazz.getSimpleName().equals(Permissions.class.getSimpleName())) {
+        if (clazz != null && !clazz.equals(Permissions.class)) {
           Permission resolvedPermission = null;
           for (Enum<?> enumCandidate : clazz.getEnumConstants()) {
             if (enumCandidate.toString().equals(permissionName)) {
@@ -60,7 +60,7 @@ public class PermissionsTest {
   @Test
   public void testRestOfPermissionsEnumValues() {
     for (Class<? extends Enum<? extends Permission>> permissionsClass : ResourceTypeUtil.getPermissionEnums().values()) {
-      if(!permissionsClass.getSimpleName().equals(Permissions.class.getSimpleName())) {
+      if(!permissionsClass.equals(Permissions.class)) {
         verifyValuesAreUniqueAndPowerOfTwo((Permission[])permissionsClass.getEnumConstants(), permissionsClass.getSimpleName());
       }
     }
