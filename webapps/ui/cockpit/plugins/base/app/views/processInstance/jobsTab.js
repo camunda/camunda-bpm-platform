@@ -99,6 +99,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                 message: $translate.instant('PLUGIN_JOBS_RECALCULATE_SUCCESS_MESSAGE'),
                 exclusive: true
               });
+              updateJob(job);
             }
           });
         };
@@ -118,7 +119,18 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                 message: $translate.instant('PLUGIN_JOBS_RSET_DUEDATE_SUCCESS_MESSAGE'),
                 exclusive: true
               });
+              updateJob(job);
             }
+          });
+        };
+
+        var updateJob = function(job) {
+          jobProvider.get(job.id, function(err, res) {
+            if(res) {
+              //use cached activityName to avoid unnecessary requests
+              res.activityName = job.activityName;
+              $scope.jobs[$scope.jobs.indexOf(job)] = res;
+            } 
           });
         };
 
@@ -152,6 +164,29 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               }],
             template: jobRescheduleTemplate
           }).result.catch(angular.noop);
+        };
+
+        $scope.toggleSuspension = function(job) {
+          jobProvider.suspended({'id': job.id, 'suspended': !job.suspended}, function(err) {
+            if(err) {
+              Notifications.addError({
+                status: $translate.instant('PLUGIN_JOBS_ERROR'),
+                message: $translate.instant('PLUGIN_JOBS_SUSPEND_FAILURE'),
+                exclusive: false,
+                duration: 5000
+              });              
+            }
+            else {
+              updateJob(job);
+              Notifications.addMessage({
+                status: $translate.instant('PLUGIN_JOBS_SUCCESS'),
+                message: $translate.instant('PLUGIN_JOBS_SUSPEND_SUCCESS'),
+                exclusive: false,
+                duration: 5000
+              });
+            }
+            
+          });
         };
 
         var updateActivityNames = function() {
