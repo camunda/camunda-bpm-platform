@@ -52,6 +52,14 @@ public class ProcessDiagramLayoutFactory {
 
   private static final int GREY_THRESHOLD = 175;
 
+  // Parser features and their values needed to disable XXE Parsing
+  private static final Map<String, Boolean> XXE_FEATURES = new HashMap<String, Boolean>(4) {{
+    put("http://apache.org/xml/features/disallow-doctype-decl", true);
+    put("http://xml.org/sax/features/external-general-entities", false);
+    put("http://xml.org/sax/features/external-parameter-entities", false);
+    put("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+  }};
+
   /**
    * Provides positions and dimensions of elements in a process diagram as
    * provided by {@link RepositoryService#getProcessDiagram(String)}.
@@ -373,16 +381,10 @@ public class ProcessDiagramLayoutFactory {
     boolean isXxeParsingEnabled = Context.getProcessEngineConfiguration().isEnableXxeProcessing();
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-    Map<String, Boolean> xxeFeatures = new HashMap<>(4);
-    xxeFeatures.put("http://apache.org/xml/features/disallow-doctype-decl", !isXxeParsingEnabled);
-    xxeFeatures.put("http://xml.org/sax/features/external-general-entities", isXxeParsingEnabled);
-    xxeFeatures.put("http://xml.org/sax/features/external-parameter-entities", isXxeParsingEnabled);
-    xxeFeatures.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", isXxeParsingEnabled);
-
     // Configure XXE Processing
     try {
-      for (Map.Entry<String, Boolean> feature : xxeFeatures.entrySet()) {
-        factory.setFeature(feature.getKey(), feature.getValue());
+      for (Map.Entry<String, Boolean> feature : XXE_FEATURES.entrySet()) {
+        factory.setFeature(feature.getKey(), isXxeParsingEnabled ^ feature.getValue());
       }
     } catch (Exception e) {
       throw new ProcessEngineException("Error while configuring BPMN parser.", e);

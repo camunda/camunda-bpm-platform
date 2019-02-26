@@ -357,6 +357,7 @@
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
 
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+                <exclude>**/ProcessDiagramParseTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>

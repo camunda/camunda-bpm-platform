@@ -54,7 +54,6 @@ public class ProcessDiagramParseTest {
   public void setUp() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     xxeProcessingValue = processEngineConfiguration.isEnableXxeProcessing();
-    processEngineConfiguration.setEnableXxeProcessing(false);
   }
 
   @After
@@ -64,11 +63,7 @@ public class ProcessDiagramParseTest {
 
   @Test
   public void testXxeParsingIsDisabled() {
-    // assume that XXE Processing is disabled in the configuration (default)
-    assertThat("XXE Processing should be disabled for secure engine operation!",
-      engineRule.getProcessEngineConfiguration().isEnableXxeProcessing(),
-      is(false)
-    );
+    processEngineConfiguration.setEnableXxeProcessing(false);
 
     try {
       final InputStream bpmnXmlStream = new FileInputStream(
@@ -93,7 +88,38 @@ public class ProcessDiagramParseTest {
     } catch (Exception e) {
       // then
       assertThat(e.getMessage(), containsString("Error while parsing BPMN model"));
-      assertThat(e.getCause().getMessage(), containsString("DOCTYPE is disallowed"));
+      assertThat(e.getCause().getMessage(), containsString("http://apache.org/xml/features/disallow-doctype-decl"));
+    }
+  }
+
+  @Test
+  public void testXxeParsingIsEnabled() {
+    processEngineConfiguration.setEnableXxeProcessing(true);
+
+    try {
+      final InputStream bpmnXmlStream = new FileInputStream(
+        resourcePath + ".bpmn20.xml");
+      final InputStream imageStream = new FileInputStream(
+        resourcePath + ".png");
+
+      assertNotNull(bpmnXmlStream);
+
+      // when we run this in the ProcessEngine context
+      DiagramLayout processDiagramLayout = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired()
+        .execute(new Command<DiagramLayout>() {
+          @Override
+          public DiagramLayout execute(CommandContext commandContext) {
+            return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(bpmnXmlStream, imageStream);
+          }
+        });
+      fail("The test model contains a DOCTYPE declaration! The test should fail.");
+    } catch (FileNotFoundException ex) {
+      fail("The test BPMN model file is missing. " + ex.getMessage());
+    } catch (Exception e) {
+      // then
+      assertThat(e.getMessage(), containsString("Error while parsing BPMN model"));
+      assertThat(e.getCause().getMessage(), containsString("file.txt"));
     }
   }
 }
