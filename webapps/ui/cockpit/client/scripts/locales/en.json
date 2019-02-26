@@ -836,5 +836,8 @@
   "PLUGIN_JOBS_SET_DUEDATE_ERROR_MESSAGE": "Duedate could not be set successfully. Make sure the Date format is correct.",
   "PLUGIN_JOBS_SET_DUEDATE_SUCCESS_MESSAGE": "Duedate was set successfully.",
   "PLUGIN_JOB_RECALCULATE_TOOLTIP": "Recalculate duedate for this Job.",
-  "PLUGIN_JOBS_VALID_PATTERN": "Supported pattern 'yyyy-MM-ddTHH:mm:ss."
+  "PLUGIN_JOBS_VALID_PATTERN": "Supported pattern 'yyyy-MM-ddTHH:mm:ss.",
+  "PLUGIN_JOBS_CREATION_DATE": "Creation Date",
+  "PLUGIN_JOBS_RETRIES": "Retries",
+  "PLUGIN_JOBS_ACTIVITY": "Activity"
 }

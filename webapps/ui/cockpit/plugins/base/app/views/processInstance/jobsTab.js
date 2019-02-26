@@ -15,14 +15,16 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     template: jobsTemplate,
     priority: 0,
     controller:  [
-      '$scope', 'camAPI', 'Notifications', '$translate', '$uibModal',
+      '$scope', 'camAPI', 'Notifications', '$translate', '$uibModal', 
       function($scope, camAPI, Notifications, $translate, $modal) {
 
         var jobProvider = camAPI.resource('job');
+        var jobDefinitionProvider = camAPI.resource('job-definition');
         var processInstance = $scope.processInstance;
 
         $scope.pages = {size: 50, total: 0, current: 1};
         $scope.options = {useJobCreationDate: true};
+        $scope.bpmnElements = [];
 
         $scope.onPaginationChange = function(pages) {
           $scope.pages.current = pages.current;
@@ -59,8 +61,26 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             });
           } 
           else {
-            $scope.loadingState = res.length ? 'LOADED' : 'EMPTY';
+            //Load Job definitions
             $scope.jobs = res;
+
+            jobDefinitionProvider.list({'processInstanceId': processInstance.definitionId}, function(err, res) {
+              var processDefinitions = res.items;
+              
+              $scope.jobs = $scope.jobs.map(function(job) {
+                var definition = processDefinitions.filter(function(definition) {
+                  return definition.id === job.jobDefinitionId;
+                })[0];
+
+                if(definition) {
+                  job.activityId = definition.activityId;
+                }
+                return job;
+              });
+
+              updateActivityNames();
+              $scope.loadingState = $scope.jobs.length ? 'LOADED' : 'EMPTY';
+            });
           }
         };
 
@@ -133,6 +153,21 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             template: jobRescheduleTemplate
           }).result.catch(angular.noop);
         };
+
+        var updateActivityNames = function() {
+          //map job names to bpmn element name
+          angular.forEach($scope.jobs, function(job) {
+            var activityId = job.activityId,
+                bpmnElement = $scope.bpmnElements[activityId];
+
+            job.activityName = (bpmnElement && (bpmnElement.name || bpmnElement.id)) || activityId;
+          });
+        };
+
+        $scope.processData.observe(['bpmnElements'], function(bpmnElements) {          
+          $scope.bpmnElements = bpmnElements;
+          updateActivityNames();
+        });
 
         $scope.loadingState = 'LOADING';
         
