@@ -360,8 +360,9 @@ public abstract class ProcessEngineConfiguration {
    * If the value of this flag is set to <code>true</code>,
    * READ_INSTANCE_VARIABLE,
    * READ_HISTORY_VARIABLE, or
-   * READ_TASK_VARIABLE
-   * will be required to fetch variables in case the autorizations are enabled.
+   * READ_TASK_VARIABLE on Process Definition resource, and
+   * READ_VARIABLE on Task resource
+   * will be required to fetch variables when the autorizations are enabled.
    */
   protected boolean enforceSpecificVariablePermission = false;
 
