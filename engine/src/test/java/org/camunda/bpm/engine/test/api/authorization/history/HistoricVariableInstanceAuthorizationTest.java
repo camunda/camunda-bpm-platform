@@ -54,7 +54,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
         "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
 
-    ensureSpecificVariablePermission = processEngineConfiguration.isEnsureSpecificVariablePermission();
+    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
 
     super.setUp();
   }
@@ -64,7 +64,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     super.tearDown();
     deleteDeployment(deploymentId);
 
-    processEngineConfiguration.setEnsureSpecificVariablePermission(ensureSpecificVariablePermission);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // historic variable instance query (standalone task) /////////////////////////////////////////////
@@ -652,7 +652,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   }
 
   protected void setReadHistoryVariableAsDefaultReadPermission() {
-    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
   }
 
 }

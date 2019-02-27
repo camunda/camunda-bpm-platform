@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_TASK_VARIABLE;
+import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
@@ -57,14 +58,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/api/form/task.form",
         "org/camunda/bpm/engine/test/api/authorization/renderedFormProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
+    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
     super.setUp();
-    ensureSpecificVariablePermission = processEngineConfiguration.isEnsureSpecificVariablePermission();
   }
 
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
-    processEngineConfiguration.setEnsureSpecificVariablePermission(ensureSpecificVariablePermission);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // get start form data ///////////////////////////////////////////
@@ -254,6 +255,22 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TASK.resourceName(), message);
     }
 
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      formService.getTaskFormData(taskId);
+      fail("Exception expected: It should not possible to get task form data");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_VARIABLE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+    }
+
     deleteTask(taskId, true);
   }
 
@@ -262,6 +279,23 @@ public class FormAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
     createGrantAuthorization(TASK, taskId, userId, READ);
+
+    // when
+    TaskFormData taskFormData = formService.getTaskFormData(taskId);
+
+    // then
+    // Standalone task, no TaskFormData available
+    assertNull(taskFormData);
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskGetTaskFormDataWithReadVariablePermission() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, userId, READ_VARIABLE);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -295,6 +329,25 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      formService.getTaskFormData(taskId);
+      fail("Exception expected: It should not possible to get task form data");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_VARIABLE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetTaskFormDataWithReadPermissionOnTask() {
@@ -315,6 +368,34 @@ public class FormAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ_TASK);
+
+    // when
+    TaskFormData taskFormData = formService.getTaskFormData(taskId);
+
+    // then
+    assertNotNull(taskFormData);
+  }
+
+  public void testProcessTaskGetTaskFormDataWithReadVariablePermissionOnTask() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, userId, READ_VARIABLE);
+
+    // when
+    TaskFormData taskFormData = formService.getTaskFormData(taskId);
+
+    // then
+    assertNotNull(taskFormData);
+  }
+
+  public void testProcessTaskGetTaskFormDataWithReadTaskVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ_TASK_VARIABLE);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -371,6 +452,23 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TASK.resourceName(), message);
     }
 
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      formService.getRenderedTaskForm(taskId);
+      fail("Exception expected: It should not possible to get rendered task form");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_VARIABLE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+    }
+
+
     deleteTask(taskId, true);
   }
 
@@ -379,6 +477,22 @@ public class FormAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
     createGrantAuthorization(TASK, taskId, userId, READ);
+
+    try {
+      // when
+      // Standalone task, no TaskFormData available
+      formService.getRenderedTaskForm(taskId);
+    } catch (NullValueException e) {}
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskGetTaskRenderedFormWithReadVariablePermission() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, userId, READ_VARIABLE);
 
     try {
       // when
@@ -411,6 +525,25 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      formService.getRenderedTaskForm(taskId);
+      fail("Exception expected: It should not possible to get rendered task form");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_VARIABLE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(READ_TASK_VARIABLE.getName(), message);
+      assertTextPresent(RENDERED_FORM_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testProcessTaskGetRenderedTaskFormWithReadPermissionOnTask() {
@@ -431,6 +564,34 @@ public class FormAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK);
+
+    // when
+    Object taskForm = formService.getRenderedTaskForm(taskId);
+
+    // then
+    assertNotNull(taskForm);
+  }
+
+  public void testProcessTaskGetRenderedTaskFormWithReadTaskVariablesPermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK_VARIABLE);
+
+    // when
+    Object taskForm = formService.getRenderedTaskForm(taskId);
+
+    // then
+    assertNotNull(taskForm);
+  }
+
+  public void testProcessTaskGetRenderedTaskFormWithReadVariablePermissionOnTask() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, userId, READ_VARIABLE);
 
     // when
     Object taskForm = formService.getRenderedTaskForm(taskId);
@@ -487,6 +648,22 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TASK.resourceName(), message);
     }
 
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      formService.getTaskFormVariables(taskId);
+      fail("Exception expected: It should not possible to get task form variables");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_VARIABLE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+    }
+
     deleteTask(taskId, true);
   }
 
@@ -495,6 +672,22 @@ public class FormAuthorizationTest extends AuthorizationTest {
     String taskId = "myTask";
     createTask(taskId);
     createGrantAuthorization(TASK, taskId, userId, READ);
+
+    // when
+    VariableMap variables = formService.getTaskFormVariables(taskId);
+
+    // then
+    assertNotNull(variables);
+
+    deleteTask(taskId, true);
+  }
+
+  public void testStandaloneTaskGetTaskFormVariablesWithReadVariablePermission() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String taskId = "myTask";
+    createTask(taskId);
+    createGrantAuthorization(TASK, taskId, userId, READ_VARIABLE);
 
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);
@@ -529,7 +722,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     }
 
     // given (2)
-    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
 
     try {
       // when (2)
@@ -539,7 +732,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
       // then (2)
       String message = e.getMessage();
       assertTextPresent(userId, message);
-      assertTextPresent(READ.getName(), message);
+      assertTextPresent(READ_VARIABLE.getName(), message);
       assertTextPresent(taskId, message);
       assertTextPresent(TASK.resourceName(), message);
       assertTextPresent(READ_TASK_VARIABLE.getName(), message);
@@ -591,9 +784,24 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertEquals(1, variables.size());
   }
 
+  public void testProcessTaskGetTaskFormVariablesWithReadVariablePermissionOnTask() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, userId, READ_VARIABLE);
+  
+    // when
+    VariableMap variables = formService.getTaskFormVariables(taskId);
+  
+    // then
+    assertNotNull(variables);
+    assertEquals(1, variables.size());
+  }
+
   public void testProcessTaskGetTaskFormVariablesWithReadTaskVariablePermissionOnProcessDefinition() {
     // given
-    processEngineConfiguration.setEnsureSpecificVariablePermission(true);
+    setReadVariableAsDefaultReadVariablePermission();
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK_VARIABLE);
@@ -870,4 +1078,9 @@ public class FormAuthorizationTest extends AuthorizationTest {
     }
   }
 
+  // helper ////////////////////////////////////////////////////////////////////////////////
+
+  protected void setReadVariableAsDefaultReadVariablePermission() {
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+  }
 }

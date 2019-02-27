@@ -363,7 +363,7 @@ public abstract class ProcessEngineConfiguration {
    * READ_TASK_VARIABLE
    * will be required to fetch variables in case the autorizations are enabled.
    */
-  protected boolean ensureSpecificVariablePermission = false;
+  protected boolean enforceSpecificVariablePermission = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -921,12 +921,12 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public boolean isEnsureSpecificVariablePermission() {
-    return ensureSpecificVariablePermission;
+  public boolean isEnforceSpecificVariablePermission() {
+    return enforceSpecificVariablePermission;
   }
 
-  public void setEnsureSpecificVariablePermission(boolean ensureSpecificVariablePermission) {
-    this.ensureSpecificVariablePermission = ensureSpecificVariablePermission;
+  public void setEnforceSpecificVariablePermission(boolean ensureSpecificVariablePermission) {
+    this.enforceSpecificVariablePermission = ensureSpecificVariablePermission;
   }
 
 }

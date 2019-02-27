@@ -62,7 +62,10 @@ public enum TaskPermissions implements Permission {
   TASK_ASSIGN("TASK_ASSIGN", 32768),
 
   /** Indicates that UPDATE_VARIABLE interactions are permitted. */
-  UPDATE_VARIABLE("UPDATE_VARIABLE", 32);
+  UPDATE_VARIABLE("UPDATE_VARIABLE", 32),
+
+  /** Indicates that READ_VARIABLE interactions are permitted. */
+  READ_VARIABLE("READ_VARIABLE", 64);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.TASK };
 

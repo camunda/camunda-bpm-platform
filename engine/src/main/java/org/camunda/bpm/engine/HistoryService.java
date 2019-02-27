@@ -65,7 +65,6 @@ import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-
 import java.util.List;
 
 /**
@@ -106,10 +105,10 @@ public interface HistoryService {
   /**
    * Creates a new programmatic query to search for {@link HistoricVariableInstance}s.
    * <p>
-   * If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION} or
-   * if <code>ensureSpecificVariablePermission</code> is set to <code>true</code> and 
-   * the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}
-   * then the result of the query is empty.
+   * The result of the query is empty:
+   * <li>if the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION} or</li>
+   * <li>the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}
+   * in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission} is enabled.</li>
    * </p>
    */
   HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();

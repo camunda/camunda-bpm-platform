@@ -51,7 +51,7 @@ public class GetRenderedTaskFormCmd  implements Command<Object>, Serializable {
     ensureNotNull("Task '" + taskId + "' not found", "task", task);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkReadTask(task);
+      checker.checkReadTaskVariable(task);
     }
     ensureNotNull("Task form definition for '" + taskId + "' not found", "task.getTaskDefinition()", task.getTaskDefinition());
 

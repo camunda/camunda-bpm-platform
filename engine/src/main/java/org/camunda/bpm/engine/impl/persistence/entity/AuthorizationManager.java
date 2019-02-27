@@ -25,6 +25,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_HISTORY_VARIABLE;
+import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.BATCH;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
@@ -638,17 +639,21 @@ public class AuthorizationManager extends AbstractManager {
 
     if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
-      Permission readPermission = READ_INSTANCE;
+      CompositePermissionCheck permissionCheck;
       if (isEnsureSpecificVariablePermission()) {
-        readPermission = READ_INSTANCE_VARIABLE;
-      }
-
-      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+        permissionCheck = new PermissionCheckBuilder()
+            .disjunctive()
+            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE_VARIABLE)
+            .atomicCheck(TASK, "RES.TASK_ID_", READ_VARIABLE)
+            .build();
+      } else {
+        permissionCheck = new PermissionCheckBuilder()
               .disjunctive()
               .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", readPermission)
+              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
               .atomicCheck(TASK, "RES.TASK_ID_", READ)
               .build();
+      }
         addPermissionCheck(query.getAuthCheck(), permissionCheck);
     }
   }
@@ -936,7 +941,7 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isEnsureSpecificVariablePermission() {
-    return Context.getProcessEngineConfiguration().isEnsureSpecificVariablePermission();
+    return Context.getProcessEngineConfiguration().isEnforceSpecificVariablePermission();
   }
 
 }

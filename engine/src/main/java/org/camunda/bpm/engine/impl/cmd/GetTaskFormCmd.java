@@ -46,7 +46,7 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
     ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkReadTask(task);
+      checker.checkReadTaskVariable(task);
     }
 
     if (task.getTaskDefinition() != null) {
