@@ -6,15 +6,10 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
 
   <table class="jobs-tab cam-table">
 
-    <thead>
-      <tr>
-        <th>{{ 'PLUGIN_JOBS_ID' | translate }}</th>
-        <th>{{ 'PLUGIN_JOBS_DATE' | translate }}</th>
-        <th>{{ 'PLUGIN_JOBS_CREATION_DATE' | translate }}</th>
-        <th>{{ 'PLUGIN_JOBS_RETRIES' | translate }}</th>
-        <th>{{ 'PLUGIN_JOBS_ACTIVITY' | translate }}</th>
-        <th>{{ 'PLUGIN_JOBS_ACTION' | translate }}</th>
-      </tr>
+    <thead sortable-table-head
+      head-columns="headColumns"
+      on-sort-change="onSortChange(sortObj)"
+      default-sort="sorting">
     </thead>
     
     <tbody>
@@ -30,7 +25,7 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
         </td>
         <td>
           {{job.retries}}
-        </td>
+        </td> 
         <td>
           {{job.activityName}}
         </td>
