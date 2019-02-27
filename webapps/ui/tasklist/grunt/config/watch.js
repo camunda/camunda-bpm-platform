@@ -52,7 +52,7 @@ module.exports = function(config, watchConf) {
   watchConf.tasklist_dependencies = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
+        '<%= pkg.gruntConfig.enTranslationDir %>/**/*.json',
       ],
       tasks: [
         'localescompile:tasklist_locales'

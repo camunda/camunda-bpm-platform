@@ -16,7 +16,8 @@
     "pluginBuildTarget": "target/webapp/plugin",
     "pluginSourceDir": "ui",
     "libTargetDir": "target/webapp/lib",
-    "commonsUiDir": "node_modules/camunda-commons-ui"
+    "commonsUiDir": "node_modules/camunda-commons-ui",
+    "enTranslationDir": "node_modules/camunda-webapp-translations"
   },
   "browserify": {
     "transform": [
@@ -34,6 +35,7 @@
     "bpmn-font": "0.2.0",
     "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
+    "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#master",
     "events": "1.1.0",
     "jquery": "3.3.1",
     "jquery-ui": "1.12.1",

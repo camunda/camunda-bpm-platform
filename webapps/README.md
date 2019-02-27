@@ -40,7 +40,11 @@ Has tools to work with the REST API and forms (included transitively via camunda
 
 ### [camunda-commons-ui](https://github.com/camunda/camunda-commons-ui)
 
-Contains resources like images, [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules and locales for the translation of the Tasklist interface texts.
+Contains resources like images, [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules.
+
+### [camunda-webapp-translations](https://github.com/camunda/camunda-webapp-translations)
+
+Contains the translation files for all application texts in different languages.
 
 
 ## Development
