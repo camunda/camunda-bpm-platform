@@ -69,7 +69,7 @@
     "karma-mocha-reporter": "2.2.0",
     "license-checker": "^16.0.0",
     "load-grunt-tasks": "0.4.0",
-    "lodash": "2.4.1",
+    "lodash": "4.17.11",
     "mocha": "2.1.0",
     "mocha-multi": "0.7.2",
     "mocha-proshot": "1.0.1",
