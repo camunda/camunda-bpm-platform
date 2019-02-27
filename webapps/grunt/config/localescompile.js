@@ -8,9 +8,7 @@ module.exports = function(config, localesConfig, pathConfig) {
         anOption: 'for production'
       },
       src: [
-        '<%= pkg.gruntConfig.commonsUiDir %>/resources/locales/*.json',
-        '<%= pkg.gruntConfig.commonsUiDir %>/lib/**/locales/*.json',
-        pathConfig.sourceDir + '/scripts/**/locales/*.json'
+        '<%= pkg.gruntConfig.enTranslationDir %>/' + pathConfig.appName + '/en.json'
       ]
   };
 };
