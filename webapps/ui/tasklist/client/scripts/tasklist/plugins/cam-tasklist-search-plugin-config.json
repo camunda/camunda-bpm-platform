@@ -439,6 +439,14 @@
         "value": "="
       },
       {
+        "key": "eqic",
+        "value": "= (ignore case)"
+      },
+      {
+        "key": "neqic",
+        "value": "!= (ignore case)"
+      },
+      {
         "key": "neq",
         "value": "!="
       },
@@ -461,6 +469,10 @@
       {
         "key": "like",
         "value": "like"
+      },
+      {
+        "key": "likeic",
+        "value": "like (ignore case)"
       }
     ],
     "undefined": [
