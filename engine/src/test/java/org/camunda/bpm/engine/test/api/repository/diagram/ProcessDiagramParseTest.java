@@ -32,7 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -74,7 +73,7 @@ public class ProcessDiagramParseTest {
       assertNotNull(bpmnXmlStream);
 
       // when we run this in the ProcessEngine context
-      DiagramLayout processDiagramLayout = engineRule.getProcessEngineConfiguration()
+      engineRule.getProcessEngineConfiguration()
         .getCommandExecutorTxRequired()
         .execute(new Command<DiagramLayout>() {
           @Override
@@ -105,7 +104,7 @@ public class ProcessDiagramParseTest {
       assertNotNull(bpmnXmlStream);
 
       // when we run this in the ProcessEngine context
-      DiagramLayout processDiagramLayout = engineRule.getProcessEngineConfiguration()
+      engineRule.getProcessEngineConfiguration()
         .getCommandExecutorTxRequired()
         .execute(new Command<DiagramLayout>() {
           @Override
