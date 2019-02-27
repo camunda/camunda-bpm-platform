@@ -15,8 +15,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     template: jobsTemplate,
     priority: 0,
     controller:  [
-      '$scope', 'camAPI', 'Notifications', '$translate', '$uibModal', 
-      function($scope, camAPI, Notifications, $translate, $modal) {
+      '$scope', 'camAPI', 'Notifications', '$translate', '$uibModal', 'localConf',
+      function($scope, camAPI, Notifications, $translate, $modal, localConf) {
 
         var jobProvider = camAPI.resource('job');
         var jobDefinitionProvider = camAPI.resource('job-definition');
@@ -26,12 +26,37 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
         $scope.options = {useJobCreationDate: true};
         $scope.bpmnElements = [];
 
+        var sorting = $scope.sorting = loadLocal({ sortBy: 'jobId', sortOrder: 'desc' });
+
+        $scope.headColumns = [
+          { class: 'id', request: 'jobId', sortable: true, content: $translate.instant('PLUGIN_JOBS_ID') },
+          { class: 'dueDate', request: 'jobDueDate', sortable: true, content: $translate.instant('PLUGIN_JOBS_DATE') },
+          { class: 'createTime', request: 'createTime', sortable: false, content: $translate.instant('PLUGIN_JOBS_CREATION_DATE') },
+          { class: 'retries', request: 'jobRetries', sortable: true, content: $translate.instant('PLUGIN_JOBS_RETRIES') },
+          { class: 'activityName', request: 'activityName', sortable: false, content: $translate.instant('PLUGIN_JOBS_ACTIVITY') },
+          { class: 'action', request: '', sortable: false, content: $translate.instant('PLUGIN_JOBS_ACTION') }
+        ];
+
+        function loadLocal(defaultValue) {
+          return localConf.get('sortPIJobsTab', defaultValue);
+        }
+
+        $scope.onSortChange = function(sortObj) {
+          sorting = sortObj;
+          saveLocal(sorting);
+          updateView(sorting);
+        };
+  
+        function saveLocal(sorting) {
+          localConf.set('sortPIJobsTab', sorting);
+        }
+
         $scope.onPaginationChange = function(pages) {
           $scope.pages.current = pages.current;
-          updateView();
+          updateView(sorting);
         };
 
-        var updateView = function() {
+        var updateView = function(sorting) {
           var page =  $scope.pages.current,
               count =  $scope.pages.size,
               firstResult = (page - 1) * count;
@@ -39,7 +64,11 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           var queryParams = {
             'processInstanceId': processInstance.id,
             firstResult: firstResult,
-            maxResults: count
+            maxResults: count,
+            sorting: [{
+              sortBy: sorting.sortBy,
+              sortOrder: sorting.sortOrder
+            }]
           };
 
           //get 'count' of jobs
@@ -65,8 +94,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             $scope.jobs = res;
 
             jobDefinitionProvider.list({'processInstanceId': processInstance.definitionId}, function(err, res) {
-              var processDefinitions = res.items;
-              
+              var processDefinitions = res;
               $scope.jobs = $scope.jobs.map(function(job) {
                 var definition = processDefinitions.filter(function(definition) {
                   return definition.id === job.jobDefinitionId;
