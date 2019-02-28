@@ -1,7 +1,7 @@
 {
   "name": "camunda-bpm-webapp",
   "private": true,
-  "version": "7.11.0-alpha2",
+  "version": "7.11.0-SNAPSHOT",
   "gruntConfig": {
     "connectPort": 8020,
     "livereloadPort": 8021,
@@ -32,8 +32,8 @@
     "angular-route": "1.7.7",
     "bootstrap": "3.4.1",
     "bpmn-font": "0.2.0",
-    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#7.11.0-alpha2",
-    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#7.11.0-alpha2",
+    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
     "events": "1.1.0",
     "jquery": "3.3.1",
     "jquery-ui": "1.12.1",
