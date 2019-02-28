@@ -38,6 +38,7 @@ import java.lang.annotation.RetentionPolicy;
  *   &#64;Deployment(resources = {
  *     "org/example/processOne.bpmn20.xml",
  *     "org/example/processTwo.bpmn20.xml",
+ *     "org/example/scripts/*.groovy",
  *     "org/example/some.other.resource" })
  *   public void testForADeploymentWithASingleResource() {
  *     // a deployment will be available in the engine repository
@@ -71,7 +72,9 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Deployment {
 
-  /** Specify resources that make up the process definition. */
+  /** Specify resources that make up the process definition.
+   *  Supports ant-style patterns to specify multiple resources.
+   * */
   public String[] resources() default {};
 
 }

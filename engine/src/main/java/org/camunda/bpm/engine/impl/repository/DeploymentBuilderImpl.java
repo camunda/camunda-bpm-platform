@@ -15,13 +15,16 @@
  */
 package org.camunda.bpm.engine.impl.repository;
 
-import java.io.ByteArrayOutputStream;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URI;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -56,6 +59,9 @@ import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.util.AntPathMatcher;
 
 /**
  * @author Tom Baeyens
@@ -77,9 +83,13 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   protected Set<String> deployments = new HashSet<String>();
   protected Map<String, Set<String>> deploymentResourcesById = new HashMap<String, Set<String>>();
   protected Map<String, Set<String>> deploymentResourcesByName = new HashMap<String, Set<String>>();
+  private final AntPathMatcher antPathMatcher;
+  private final PathMatchingResourcePatternResolver resourcesResolver;
 
   public DeploymentBuilderImpl(RepositoryServiceImpl repositoryService) {
     this.repositoryService = repositoryService;
+    this.antPathMatcher = new AntPathMatcher();
+    this.resourcesResolver = new PathMatchingResourcePatternResolver();
   }
 
   public DeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
@@ -90,9 +100,52 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
 
   public DeploymentBuilder addClasspathResource(String resource) {
-    InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
-    ensureNotNull("resource '" + resource + "' not found", "inputStream", inputStream);
-    return addInputStream(resource, inputStream);
+    if (antPathMatcher.isPattern(resource)) {
+      return addClasspathRessourcesByPattern(resource);
+    }
+    else {
+      InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
+      ensureNotNull("resource '" + resource + "' not found", "inputStream", inputStream);
+      return addInputStream(resource, inputStream);
+    }
+  }
+
+  /**
+   * Uses {@link PathMatchingResourcePatternResolver} to load resources in jar dependencies or target dir, according
+   * to an ant-style pattern
+   *
+   * @param pattern ant-style pattern
+   * @return the builder with the matched resources
+   */
+  private DeploymentBuilder addClasspathRessourcesByPattern(String pattern) {
+    try {
+      Resource root = resourcesResolver.getResource("");
+      Resource[] resources = resourcesResolver.getResources("classpath*:" + pattern);
+      ensureNotEmpty("resource '" + pattern + "' not found", "resources", Arrays.asList(resources));
+      for (Resource resource :
+              resources) {
+        if (resource.isReadable()) {
+          InputStream inputStream = resource.getInputStream();
+          ensureNotNull("resource '" + pattern + "' not found", "inputStream", inputStream);
+          addInputStream(relativePath(resource.getURI(), root.getURI()), inputStream);
+        }
+      }
+    } catch (IOException e) {
+      throw new ProcessEngineException("Error while reading resource '" + pattern + "'", e);
+    }
+    return this;
+  }
+
+  private String relativePath(URI uri, URI root) {
+    if (uri.getScheme().equals("jar")) {
+      String uriAsString = uri.toString();
+      int startOfRelativePath = uriAsString.lastIndexOf("!") + 1 ;
+      return uriAsString.substring(startOfRelativePath);
+    }
+    else if (uri.getScheme().equals("file")) {
+      return uri.toString().replace(root.toString(), "");
+    }
+    throw new ProcessEngineException("Loading resources by pattern with scheme '" + uri.getScheme() + "' is not supported.");
   }
 
   public DeploymentBuilder addString(String resourceName, String text) {
