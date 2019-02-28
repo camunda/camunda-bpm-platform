@@ -27,7 +27,9 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
           {{job.retries}}
         </td> 
         <td>
-          {{job.activityName}}
+          <a ng-href="#/process-instance/{{ processInstance.id }}/runtime?activityIds={{job.activityId}}&amp;tab=jobs-tab">
+            {{job.activityName}}
+          </a>
         </td>
         <td>
             <a class="btn btn-sm btn-default action-button"
