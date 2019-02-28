@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,9 +26,11 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
@@ -38,6 +41,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
  * @author Tom Baeyens
  * @author Falko Menge
  * @author Bernd Ruecker
+ * @author Fabian Bahle
  */
 public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> implements HistoricProcessInstanceQuery {
 
@@ -81,6 +85,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   protected String caseInstanceId;
 
+  protected List<HistoricProcessInstanceQueryImpl> queries = new ArrayList<HistoricProcessInstanceQueryImpl>(Arrays.asList(this));
+  protected boolean isOrQueryActive = false;
+
   public HistoricProcessInstanceQueryImpl() {
   }
 
@@ -114,6 +121,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return this;
   }
 
+  @Override
   public HistoricProcessInstanceQuery processDefinitionNameLike(String nameLike) {
     this.processDefinitionNameLike = nameLike;
     return this;
@@ -316,27 +324,76 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+    checkQueryOk();
+
     return commandContext
       .getHistoricProcessInstanceManager()
       .findHistoricProcessInstanceCountByQueryCriteria(this);
   }
 
   public List<HistoricProcessInstance> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+    checkQueryOk();
+
     return commandContext
       .getHistoricProcessInstanceManager()
       .findHistoricProcessInstancesByQueryCriteria(this, page);
   }
 
   public List<String> executeIdsList(CommandContext commandContext) {
-    checkQueryOk();
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+    checkQueryOk();
+
     return commandContext
         .getHistoricProcessInstanceManager()
         .findHistoricProcessInstanceIds(this);
+  }
+
+  protected void ensureOrExpressionsEvaluated() {
+    // skips first query as it has already been evaluated
+    for (int i = 1; i < queries.size(); i++) {
+      queries.get(i).validate();
+      queries.get(i).evaluateExpressions();
+    }
+  }
+
+  @Override
+  protected void ensureVariablesInitialized() {
+    super.ensureVariablesInitialized();
+
+    if (!queries.isEmpty()) {
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
+      for (HistoricProcessInstanceQueryImpl orQuery: queries) {
+        for (QueryVariableValue var : orQuery.queryVariableValues) {
+          var.initialize(variableSerializers);
+        }
+      }
+    }
+  }
+
+  public List<HistoricProcessInstanceQueryImpl> getQueries() {
+    return queries;
+  }
+
+  public void addOrQuery(HistoricProcessInstanceQueryImpl orQuery) {
+    orQuery.isOrQueryActive = true;
+    this.queries.add(orQuery);
+  }
+
+  public void setOrQueryActive() {
+    isOrQueryActive = true;
+  }
+
+  public boolean isOrQueryActive() {
+    return isOrQueryActive;
+  }
+
+  public String[] getActiveActivityIds() {
+    return activeActivityIds;
   }
 
   public String getBusinessKey() {
@@ -347,8 +404,36 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return businessKeyLike;
   }
 
+  public String[] getExecutedActivityIds() {
+    return executedActivityIds;
+  }
+
+  public Date getExecutedActivityAfter() {
+    return executedActivityAfter;
+  }
+
+  public Date getExecutedActivityBefore() {
+    return executedActivityBefore;
+  }
+
+  public Date getExecutedJobAfter() {
+    return executedJobAfter;
+  }
+
+  public Date getExecutedJobBefore() {
+    return executedJobBefore;
+  }
+
   public boolean isOpen() {
     return unfinished;
+  }
+
+  public boolean isUnfinished() {
+    return unfinished;
+  }
+
+  public boolean isFinished() {
+    return finished;
   }
 
   public String getProcessDefinitionId() {
@@ -425,6 +510,58 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public String getIncidentMessageLike() {
     return this.incidentMessageLike;
+  }
+
+  public String getIncidentStatus() {
+    return incidentStatus;
+  }
+
+  public String getState() {
+    return state;
+  }
+
+  public Date getFinishDateBy() {
+    return finishDateBy;
+  }
+
+  public Date getStartDateBy() {
+    return startDateBy;
+  }
+
+  public Date getStartDateOn() {
+    return startDateOn;
+  }
+
+  public Date getStartDateOnBegin() {
+    return startDateOnBegin;
+  }
+
+  public Date getStartDateOnEnd() {
+    return startDateOnEnd;
+  }
+
+  public Date getFinishDateOn() {
+    return finishDateOn;
+  }
+
+  public Date getFinishDateOnBegin() {
+    return finishDateOnBegin;
+  }
+
+  public Date getFinishDateOnEnd() {
+    return finishDateOnEnd;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public boolean getIsTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public boolean isWithIncidents() {
+    return withIncidents;
   }
 
   public boolean isWithRootIncidents() {
@@ -579,5 +716,27 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_INTERNALLY_TERMINATED;
     return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery or() {
+    if (this != queries.get(0)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set or() within 'or' query");
+    }
+
+    HistoricProcessInstanceQueryImpl orQuery = new HistoricProcessInstanceQueryImpl();
+    orQuery.isOrQueryActive = true;
+    orQuery.queries = queries;
+    queries.add(orQuery);
+    return orQuery;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery endOr() {
+    if (!queries.isEmpty() && this != queries.get(queries.size()-1)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set endOr() before or()");
+    }
+
+    return queries.get(0);
   }
 }
