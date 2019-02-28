@@ -1,1 +1,1 @@
-buildMavenAndDeployToMavenCentral([jdk:7, licenseCheck:true])
+buildMavenAndDeployToMavenCentral([jdk:7, mvn:3.5, licenseCheck:true])
