@@ -171,7 +171,7 @@ module.exports = function(grunt) {
     }
   });
 
-  require('./grunt/tasks/compileLibs')(grunt, true);
+  require('camunda-commons-ui/grunt/tasks/compileLibs')(grunt);
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
   require('camunda-commons-ui/grunt/tasks/persistify')(grunt);
   require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt);
