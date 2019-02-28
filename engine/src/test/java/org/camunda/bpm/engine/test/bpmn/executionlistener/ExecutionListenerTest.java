@@ -483,13 +483,15 @@ public class ExecutionListenerTest {
     
     // then
     assertProcessEnded(processInstance.getId());
-    HistoricVariableInstance endVariable = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("finished")
-        .singleResult();
-    assertNotNull(endVariable);
-    assertNotNull(endVariable.getValue());
-    assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstance endVariable = historyService.createHistoricVariableInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .variableName("finished")
+          .singleResult();
+      assertNotNull(endVariable);
+      assertNotNull(endVariable.getValue());
+      assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+    }
   }
   
   @Test
@@ -505,12 +507,15 @@ public class ExecutionListenerTest {
     runtimeService.deleteProcessInstance(processInstance.getId(), "myReason");
     
     // then
-    HistoricVariableInstance endVariable = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("canceled")
-        .singleResult();
-    assertNotNull(endVariable);
-    assertNotNull(endVariable.getValue());
-    assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+    assertProcessEnded(processInstance.getId());
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstance endVariable = historyService.createHistoricVariableInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .variableName("canceled")
+          .singleResult();
+      assertNotNull(endVariable);
+      assertNotNull(endVariable.getValue());
+      assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+    }
   }
 }
