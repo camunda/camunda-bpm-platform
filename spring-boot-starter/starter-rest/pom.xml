@@ -44,6 +44,7 @@
       <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
       <groupId>${project.groupId}</groupId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
