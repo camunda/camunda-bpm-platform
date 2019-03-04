@@ -55,7 +55,7 @@ public class CompleteTaskCmd implements Command<Map<String, Object>>, Serializab
       task.setExecutionVariables(variables);
     }
     
-    Map<String, Object> taskVariables = task.getVariables();
+    Map<String, Object> taskVariables = task.getVariablesTyped(false);
 
     completeTask(task);
 

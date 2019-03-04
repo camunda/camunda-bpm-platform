@@ -68,7 +68,7 @@ public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializ
       task.setVariables(properties);
     }
 
-    Map<String, Object> taskVariables = task.getVariables();
+    Map<String, Object> taskVariables = task.getVariablesTyped(false);
 
     // complete or resolve the task
     if (DelegationState.PENDING.equals(task.getDelegationState())) {
