@@ -119,7 +119,7 @@ public class ExternalTaskClientLogger extends BaseLogger {
             "008", "Exception while {}: The task could not be found", actionName));
         case 500:
           String processEngineError = e.getCause().getMessage();
-          String exceptionReason = (processEngineError != null && !processEngineError.isEmpty())? "Reason: " + processEngineError : "";
+          String exceptionReason = (processEngineError != null && !processEngineError.isEmpty())? " Reason: " + processEngineError : "";
           return new NotResumedException(exceptionMessage(
             "009", "Exception while {}: The corresponding process instance could not be resumed.{}", actionName, exceptionReason), processEngineError);
         default:
