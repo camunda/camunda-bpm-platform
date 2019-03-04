@@ -293,6 +293,28 @@ public interface TaskService {
   void complete(String taskId, Map<String, Object> variables);
 
   /**
+   * Marks a task as done and continues process execution.
+   *
+   * This method is typically called by a task list user interface
+   * after a task form has been submitted by the
+   * {@link Task#getAssignee() assignee}
+   * and the required task parameters have been provided.
+   *
+   * @param taskId the id of the task to complete, cannot be null.
+   * @param variables task parameters. May be null or empty.
+   *
+   * @return All task variables with their current value
+   *
+   * @throws ProcessEngineException
+   *          when no task exists with the given id.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
+  Map<String, Object> completeWithVariablesInReturn(String taskId, Map<String, Object> variables);
+
+  /**
    * Changes the assignee of the given task to the given userId.
    * No check is done whether the user is known by the identity component.
    *

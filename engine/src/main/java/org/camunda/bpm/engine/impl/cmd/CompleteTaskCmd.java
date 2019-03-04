@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 /**
  * @author Joram Barrez
  */
-public class CompleteTaskCmd implements Command<Void>, Serializable {
+public class CompleteTaskCmd implements Command<Map<String, Object>>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
     this.variables = variables;
   }
 
-  public Void execute(CommandContext commandContext) {
+  public Map<String, Object> execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
     TaskManager taskManager = commandContext.getTaskManager();
@@ -54,10 +54,12 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
     if (variables != null) {
       task.setExecutionVariables(variables);
     }
+    
+    Map<String, Object> taskVariables = task.getVariables();
 
     completeTask(task);
 
-    return null;
+    return taskVariables.isEmpty() ? null : taskVariables;
   }
 
   protected void completeTask(TaskEntity task) {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,13 +92,21 @@ public class TaskResourceImpl implements TaskResource {
   }
 
   @Override
-  public void complete(CompleteTaskDto dto) {
+  public Response complete(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
 
     try {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
+      if (dto.isWithVariablesInReturn()) {
+        Map<String, Object> taskVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+        return Response
+            .ok(taskVariables)
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+      }
       taskService.complete(taskId, variables);
-
+      return Response.noContent().build();
+      
     } catch (RestException e) {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
       throw new InvalidRequestException(e.getStatus(), e, errorMessage);
@@ -115,7 +123,7 @@ public class TaskResourceImpl implements TaskResource {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
   }
-
+  
   public void submit(CompleteTaskDto dto) {
     FormService formService = engine.getFormService();
 
