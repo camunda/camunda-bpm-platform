@@ -350,6 +350,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME, embeddedProcessDefinition.get("name"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION, embeddedProcessDefinition.get("description"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, embeddedProcessDefinition.get("version"));
+    Assert.assertEquals(MockProvider.EXAMPLE_VERSION_TAG, embeddedProcessDefinition.get("versionTag"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME, embeddedProcessDefinition.get("resource"));
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, embeddedProcessDefinition.get("deploymentId"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, embeddedProcessDefinition.get("diagram"));

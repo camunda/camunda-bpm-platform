@@ -48,6 +48,7 @@ public class HalProcessDefinition extends HalResource<HalProcessDefinition> impl
   protected String category;
   protected String description;
   protected String name;
+  protected String versionTag;
   protected int version;
   protected String resource;
   protected String deploymentId;
@@ -64,6 +65,7 @@ public class HalProcessDefinition extends HalResource<HalProcessDefinition> impl
     halProcDef.description = processDefinition.getDescription();
     halProcDef.name = processDefinition.getName();
     halProcDef.version = processDefinition.getVersion();
+    halProcDef.versionTag = processDefinition.getVersionTag();
     halProcDef.resource = processDefinition.getResourceName();
     halProcDef.deploymentId = processDefinition.getDeploymentId();
     halProcDef.diagram = processDefinition.getDiagramResourceName();
@@ -99,6 +101,10 @@ public class HalProcessDefinition extends HalResource<HalProcessDefinition> impl
 
   public int getVersion() {
     return version;
+  }
+
+  public String getVersionTag() {
+    return versionTag;
   }
 
   public String getResource() {
