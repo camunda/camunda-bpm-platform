@@ -176,6 +176,18 @@ public interface FormService {
    *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void submitTaskForm(String taskId, Map<String, Object> properties);
+  
+  /**
+   * Completes a task with the user data that was entered as properties in a task form.
+   *
+   * @param taskId
+   * @param properties
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  Map<String, Object> submitTaskFormWithVariablesInReturn(String taskId, Map<String, Object> properties);
 
   /**
    * Retrieves a list of all variables for rendering a start from. The method takes into account

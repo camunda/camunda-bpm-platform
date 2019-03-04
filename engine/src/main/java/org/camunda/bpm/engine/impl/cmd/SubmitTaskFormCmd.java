@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SubmitTaskFormCmd implements Command<Object>, Serializable {
+public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     this.properties = Variables.fromMap(properties);
   }
 
-  public Object execute(CommandContext commandContext) {
+  public Map<String, Object> execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
     TaskManager taskManager = commandContext.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
@@ -68,6 +68,8 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
       task.setVariables(properties);
     }
 
+    Map<String, Object> taskVariables = task.getVariables();
+
     // complete or resolve the task
     if (DelegationState.PENDING.equals(task.getDelegationState())) {
       task.resolve();
@@ -77,6 +79,6 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     }
 
-    return null;
+    return taskVariables.isEmpty() ? null : taskVariables;
   }
 }
