@@ -140,4 +140,9 @@ public enum Permissions implements Permission {
     return resourceTypes;
   }
 
+  public static Permission forName(String name) {
+    Permission permission = valueOf(name);
+    return permission;
+  }
+
 }
