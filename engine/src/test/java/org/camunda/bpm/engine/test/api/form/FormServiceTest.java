@@ -975,7 +975,44 @@ public class FormServiceTest {
     if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
       assertEquals(0, historyService.createHistoricDetailQuery().formFields().count());
     }
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml"})
+  @Test
+  public void testSubmitTaskFormWithVariablesInReturn() {
+    String processVarName = "processVar";
+    String processVarValue = "processVarValue";
 
+    String taskVarName = "taskVar";
+    String taskVarValue1 = "taskVarValue1";
+    String taskVarValue2 = "taskVarValue2";
+
+    String additionalVar = "additionalVar";
+    String additionalVarValue = "additionalVarValue";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(processVarName, processVarValue);
+    runtimeService.startProcessInstanceByKey("twoParallelTasksProcess", variables);
+    
+    Task firstTask = taskService.createTaskQuery().taskName("First Task").singleResult();
+    taskService.setVariableLocal(firstTask.getId(), taskVarName, taskVarValue1);
+    Task secondTask = taskService.createTaskQuery().taskName("Second Task").singleResult();
+    taskService.setVariableLocal(secondTask.getId(), taskVarName, taskVarValue2);
+    
+    Map<String, Object> vars = formService.submitTaskFormWithVariablesInReturn(firstTask.getId(), null);
+
+    assertEquals(2, vars.size());
+    assertTrue(vars.containsValue(processVarValue));
+    assertTrue(vars.containsValue(taskVarValue1));
+
+    Map<String, Object> additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put(additionalVar, additionalVarValue);
+
+    vars = formService.submitTaskFormWithVariablesInReturn(secondTask.getId(), additionalVariables);
+    assertEquals(3, vars.size());
+    assertTrue(vars.containsValue(processVarValue));
+    assertTrue(vars.containsValue(taskVarValue2));
+    assertTrue(vars.containsValue(additionalVarValue));
   }
 
   @Deployment
