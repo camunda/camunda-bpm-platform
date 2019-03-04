@@ -18,7 +18,8 @@ text-empty="{{ 'PLUGIN_JOBS_NO_JOBS' | translate }}">
             <span cam-widget-clipboard="job.id">{{job.id}}</span>
         </td>
         <td class="date">
-            <span cam-widget-clipboard="job.dueDate | camDate">{{job.dueDate | camDate}}</span>
+            <span ng-if="job.dueDate" cam-widget-clipboard="job.dueDate | camDate">{{job.dueDate | camDate}}</span>
+            <span ng-if="!job.dueDate" class="null-value">null</span>
         </td>
         <td>
             <span cam-widget-clipboard="job.createTime | camDate">{{job.createTime | camDate}}</span>
