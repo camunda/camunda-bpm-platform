@@ -23,7 +23,6 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
         var processInstance = $scope.processInstance;
 
         $scope.pages = {size: 50, total: 0, current: 1};
-        $scope.options = {useJobCreationDate: true};
         $scope.bpmnElements = [];
 
         var sorting = $scope.sorting = loadLocal({ sortBy: 'jobId', sortOrder: 'desc' });
@@ -144,7 +143,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             else {
               Notifications.addMessage({
                 status: $translate.instant('PLUGIN_JOBS_RECALCULATE_SUCCESS'),
-                message: $translate.instant('PLUGIN_JOBS_RSET_DUEDATE_SUCCESS_MESSAGE'),
+                message: $translate.instant('PLUGIN_JOBS_SET_DUEDATE_SUCCESS_MESSAGE'),
                 exclusive: true
               });
               updateJob(job);
@@ -166,7 +165,6 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           $modal.open({
             controller: ['$scope', '$filter',
               function($scope, $filter) {
-                $scope.recalculationType = 'specific';
 
                 var dateFilter = $filter('date'),
                     dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
@@ -184,6 +182,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                     recalculateDate(job, true);
                     break;
                   }
+                  $scope.status = 'DONE';
                 };
 
                 $scope.isValid = function() {
