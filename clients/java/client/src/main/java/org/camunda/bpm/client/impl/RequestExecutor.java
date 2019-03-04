@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2018-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import java.io.InputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
@@ -129,6 +131,24 @@ public class RequestExecutor {
         }
 
         return response;
+      }
+
+      @Override
+      public T handleResponse(HttpResponse response) throws HttpResponseException, IOException {
+        final StatusLine statusLine = response.getStatusLine();
+        final HttpEntity entity = response.getEntity();
+        if (statusLine.getStatusCode() >= 300) {
+          InputStream inputStream = null;
+          try {
+            inputStream = entity.getContent();
+            String error = IoUtil.inputStreamAsString(inputStream);
+            throw new HttpResponseException(statusLine.getStatusCode(), error);
+          } finally {
+            EntityUtils.consume(entity);
+            IoUtil.closeSilently(inputStream);
+          }
+        }
+        return entity == null ? null : handleEntity(entity);
       }
     };
   }

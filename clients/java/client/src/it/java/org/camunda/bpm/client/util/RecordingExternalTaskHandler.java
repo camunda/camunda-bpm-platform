@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2018-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 
 public class RecordingExternalTaskHandler implements ExternalTaskHandler {
 
+  protected boolean failed = false;
+  protected Exception exception;
   protected List<ExternalTask> handledTasks = Collections.synchronizedList(new ArrayList<>());
   protected int nextTaskHandler = 0;
   protected final ExternalTaskHandler[] taskHandlers;
@@ -46,6 +48,9 @@ public class RecordingExternalTaskHandler implements ExternalTaskHandler {
 
     try {
       handler.execute(task, externalTaskService);
+    } catch (Exception ex) {
+      failed = true;
+      exception = ex;
     } finally {
       handledTasks.add(task);
     }
@@ -59,8 +64,18 @@ public class RecordingExternalTaskHandler implements ExternalTaskHandler {
     return handledTasks.size();
   }
 
+  public boolean isFailed(){
+    return failed;
+  }
+
+  public Exception getException() {
+    return exception;
+  }
+
   public void clear() {
     handledTasks.clear();
+    failed = false;
+    exception = null;
   }
 
 }

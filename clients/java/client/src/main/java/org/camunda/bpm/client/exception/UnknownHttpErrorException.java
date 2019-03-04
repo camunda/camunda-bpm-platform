@@ -16,26 +16,15 @@
 package org.camunda.bpm.client.exception;
 
 /**
- * <p>Exception is thrown if the corresponding process instance could not be resumed</p>
+ * <p>Exception is thrown in cases not related to the process engine operation.</p>
  *
- * @author Tassilo Weidner
+ * @author Nikola Koevski
  */
-public class NotResumedException extends ExternalTaskClientException {
+public class UnknownHttpErrorException extends ExternalTaskClientException {
 
   private static final long serialVersionUID = 1L;
 
-  private String processEngineError;
-
-  public NotResumedException(String message) {
+  public UnknownHttpErrorException(String message) {
     super(message);
-  }
-
-  public NotResumedException(String message, String processEngineError) {
-    super(message);
-    this.processEngineError = processEngineError;
-  }
-
-  public String getProcessEngineError() {
-    return processEngineError;
   }
 }

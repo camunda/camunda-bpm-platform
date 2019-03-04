@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2018-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,9 @@
  */
 package org.camunda.bpm.client.client;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
-import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
-import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
-import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.rule.ClientRule;
@@ -42,11 +28,29 @@ import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
+import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
+import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
 
 /**
  * @author Tassilo Weidner
@@ -597,4 +601,36 @@ public class ClientIT {
     }
   }
 
+  @Test
+  public void shouldFailWithCorrectError() throws FileNotFoundException {
+    BpmnModelInstance bpmnModelInstance = Bpmn.readModelFromStream(new FileInputStream("src/it/resources/failing-output-mapping-model.bpmn"));
+    String processDefinitionKey = engineRule.deploy(bpmnModelInstance).get(0).getId();
+
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(processDefinitionKey);
+
+      client = ExternalTaskClient.create()
+        .baseUrl(BASE_URL)
+        .defaultSerializationFormat("application/x-java-serialized-object")
+        .build();
+
+      RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((t, s) -> s.complete(t));
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(handler)
+        .open();
+
+      // when
+      clientRule.waitForFetchAndLockUntil(() -> handler.isFailed());
+
+      // then
+      assertThat(handler.getException().getMessage()).containsIgnoringCase("ScriptEvaluationException");
+    } finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2018-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
+import org.camunda.bpm.client.exception.UnknownHttpErrorException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.bpm.client.spi.DataFormatConfigurator;
@@ -117,8 +118,14 @@ public class ExternalTaskClientLogger extends BaseLogger {
           return new NotFoundException(exceptionMessage(
             "008", "Exception while {}: The task could not be found", actionName));
         case 500:
+          String processEngineError = e.getCause().getMessage();
+          String exceptionReason = (processEngineError != null && !processEngineError.isEmpty())? "Reason: " + processEngineError : "";
           return new NotResumedException(exceptionMessage(
-            "009", "Exception while {}: The corresponding process instance could not be resumed", actionName));
+            "009", "Exception while {}: The corresponding process instance could not be resumed.{}", actionName, exceptionReason), processEngineError);
+        default:
+          int statusCode = ((HttpResponseException) causedException).getStatusCode();
+          return new UnknownHttpErrorException(exceptionMessage(
+            "031", "Exception while performing an HTTP Request. The request failed with status code: {}.", statusCode));
       }
     }
 
