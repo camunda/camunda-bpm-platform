@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -26,8 +27,12 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 
 public class ResourceTypeUtil {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   private static final Map<Integer, Class<? extends Enum<? extends Permission>>> PERMISSION_ENUMS = new HashMap<>();
 
@@ -67,17 +72,23 @@ public class ResourceTypeUtil {
     return ((Permission[]) clazz.getEnumConstants());
   }
 
-  public static Permission getPermissionForNameByResourceType(String name, int resourceType) {
-    if (resourceType == Resources.BATCH.resourceType()) {
-      return BatchPermissions.forName(name);
-    } else if (resourceType == Resources.PROCESS_DEFINITION.resourceType()) {
-      return ProcessDefinitionPermissions.forName(name);
-    } else if (resourceType == Resources.PROCESS_INSTANCE.resourceType()) {
-      return ProcessInstancePermissions.forName(name);
-    } else if (resourceType == Resources.TASK.resourceType()) {
-      return TaskPermissions.forName(name);
-    } else {
-      return Permissions.forName(name);
+  public static Permission getPermissionByNameAndResourceType(String permissionName, int resourceType) {
+    for (Permission permission : getPermissionsByResourceType(resourceType)) {
+      if (permission.getName().equals(permissionName)) {
+        return permission;
+      }
     }
+    throw new BadUserRequestException(
+        String.format("The permission '%s' is not valid for '%s' resource type.", permissionName, getResource(resourceType))
+        );
+  }
+
+  public static Resource getResource(int resourceType) {
+    for (Resource resource : Resources.values()) {
+      if (resource.resourceType() == resourceType) {
+        return resource;
+      }
+    }
+    return null;
   }
 }

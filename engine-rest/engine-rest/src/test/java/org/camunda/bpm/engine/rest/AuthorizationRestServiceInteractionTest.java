@@ -36,13 +36,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -50,6 +55,7 @@ import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -262,6 +268,35 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource);
     verify(identityServiceMock, times(1)).getCurrentAuthentication();
 
+  }
+
+  @Test
+  public void testIsUserAuthorizedNotValidPermission() {
+
+    List<String> exampleGroups = new ArrayList<String>();
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+    String resourceName = BATCH.resourceName();
+    int resourceType = BATCH.resourceType();
+    ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
+
+    // ACCESS permission is not valid for BATCH
+
+    given()
+        .queryParam("permissionName", Permissions.ACCESS.name())
+        .queryParam("resourceName", resourceName)
+        .queryParam("resourceType", resourceType)
+    .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+        .body("message", equalTo("The permission 'ACCESS' is not valid for 'BATCH' resource type."))
+    .when()
+        .get(AUTH_CHECK_PATH);
+
+    verify(authorizationServiceMock, times(0)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, Permissions.ACCESS, resource);
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
   }
 
   @Test
@@ -481,6 +516,37 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
   }
 
   @Test
+  public void testCreateAuthorizationNotValidPermission() {
+    Authorization authorization = MockProvider.createMockGrantAuthorization();
+    when(authorizationServiceMock.createNewAuthorization(Authorization.AUTH_TYPE_GRANT)).thenReturn(authorization);
+
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+
+    jsonBody.put("type", Authorization.AUTH_TYPE_GRANT);
+    jsonBody.put("permissions", Arrays.asList(Permissions.READ_INSTANCE.name()));
+    jsonBody.put("userId", MockProvider.EXAMPLE_USER_ID + ","+MockProvider.EXAMPLE_USER_ID2);
+    jsonBody.put("groupId", MockProvider.EXAMPLE_GROUP_ID+","+MockProvider.EXAMPLE_GROUP_ID2);
+    jsonBody.put("resourceType", Resources.TASK.resourceType());
+    jsonBody.put("resourceId", MockProvider.EXAMPLE_RESOURCE_ID);
+
+    // READ_INSTANCE permission is not valid for TASK
+
+    given()
+        .body(jsonBody)
+        .contentType(ContentType.JSON)
+    .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+        .body("message", equalTo("The permission 'READ_INSTANCE' is not valid for 'TASK' resource type."))
+    .when()
+        .post(AUTH_CREATE_PATH);
+
+    verify(authorizationServiceMock, times(1)).createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    verify(authorizationServiceMock, never()).saveAuthorization(authorization);
+  }
+
+  @Test
   public void testSaveAuthorizationThrowsAuthorizationException() {
     String message = "expected authorization exception";
     when(authorizationServiceMock.saveAuthorization(any(Authorization.class))).thenThrow(new AuthorizationException(message));
@@ -645,6 +711,38 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("message", equalTo(message))
     .when()
         .put(AUTH_RESOURCE_PATH);
+  }
+
+  @Test
+  public void testUpdateAuthorizationNotValidPermission() {
+    Authorization authorization = MockProvider.createMockGlobalAuthorization();
+    AuthorizationQuery authorizationQuery = mock(AuthorizationQuery.class);
+    when(authorizationServiceMock.createAuthorizationQuery()).thenReturn(authorizationQuery);
+    when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
+    when(authorizationQuery.singleResult()).thenReturn(authorization);
+
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+
+    jsonBody.put("permissions", Arrays.asList(Permissions.TASK_WORK.name()));
+    jsonBody.put("userId", MockProvider.EXAMPLE_USER_ID + ","+MockProvider.EXAMPLE_USER_ID2);
+    jsonBody.put("groupId", MockProvider.EXAMPLE_GROUP_ID+","+MockProvider.EXAMPLE_GROUP_ID2);
+    jsonBody.put("resourceType", Resources.PROCESS_INSTANCE.resourceType());
+    jsonBody.put("resourceId", MockProvider.EXAMPLE_RESOURCE_ID);
+
+    // READ_INSTANCE permission is not valid for TASK
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_AUTHORIZATION_ID)
+        .body(jsonBody).contentType(ContentType.JSON)
+    .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+        .body("message", equalTo("The permission 'TASK_WORK' is not valid for 'PROCESS_INSTANCE' resource type."))
+    .when()
+        .put(AUTH_RESOURCE_PATH);
+
+    verify(authorizationServiceMock, never()).saveAuthorization(authorization);
   }
 
   @Test

@@ -75,7 +75,7 @@ public class PermissionConverter {
 
   public static Permission getPermissionForName(String name, int resourceType) {
     // TODO: make this configurable via SPI
-    return ResourceTypeUtil.getPermissionForNameByResourceType(name, resourceType);
+    return ResourceTypeUtil.getPermissionByNameAndResourceType(name, resourceType);
   }
 
 }

@@ -85,8 +85,4 @@ public enum ProcessInstancePermissions implements Permission {
     return RESOURCES;
   }
 
-  public static Permission forName(String name) {
-    Permission permission = valueOf(name);
-    return permission;
-  }
 }
