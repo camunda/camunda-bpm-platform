@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1530,6 +1530,21 @@ public class TaskRestServiceInteractionTest extends
     expectedVariables.put("aThirdValue", Boolean.TRUE);
 
     verify(taskServiceMock).complete(eq(EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
+  }
+  
+  @Test
+  public void testCompleteWithVariablesInReturn() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("withVariablesInReturn", Boolean.TRUE);
+    
+    given().pathParam("id", EXAMPLE_TASK_ID)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().post(COMPLETE_TASK_URL);
+
+  verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
   }
 
   @Test
