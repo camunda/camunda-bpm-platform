@@ -205,7 +205,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
               });              
             }
             else {
-              updateJob(job);
+              job.suspended = !job.suspended;
               Notifications.addMessage({
                 status: $translate.instant('PLUGIN_JOBS_SUCCESS'),
                 message: $translate.instant('PLUGIN_JOBS_SUSPEND_SUCCESS'),
