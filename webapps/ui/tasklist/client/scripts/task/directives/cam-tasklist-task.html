@@ -34,7 +34,6 @@
           <h4 class="case-definition"
               ng-if="task.caseDefinitionId">
             {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
-            <span ng-if="task._embedded.processDefinition[0].versionTag">(v. {{ task._embedded.processDefinition[0].versionTag }})</span>
           </h4>
           <a class="instance-link"  ng-if="instanceLink"
             ng-href="{{instanceLink}}" class="ng-binding" href="{{instanceLink}}">
