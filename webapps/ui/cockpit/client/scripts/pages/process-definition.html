@@ -65,9 +65,9 @@
 
         <dt>{{ 'PROCESS_DEFINITION_DEFINITION_NAME' | translate }}</dt>
         <dd class="definition-name"
-            ng-if="processDefinition.name && processDefinition.name !== processDefinition.key">{{ processDefinition.name }}</dd>
+            ng-if="processDefinition.name">{{ processDefinition.name }}</dd>
         <dd class="definition-name"
-            ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">{{ 'PROCESS_DEFINITION_NULL' | translate }}</span></dd>
+            ng-if="!processDefinition.name"><span class="null-value">{{ 'PROCESS_DEFINITION_NULL' | translate }}</span></dd>
 
         <dt cam-widget-clipboard="processDefinition.historyTimeToLive"
             cam-hoverable-title="history-time-to-live">
