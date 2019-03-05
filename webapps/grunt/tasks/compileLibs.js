@@ -12,12 +12,15 @@ module.exports = function(grunt, isCeEdition) {
       libDir = '..';
 
       libs.push('../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/vendor/superagent');
+      libs.push('../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/vendor/fast-xml-parser');
       libs.push(superagentE2ePath);
     } else {
       libDir = 'node_modules';
     }
 
-    libs = libs.concat(['node_modules/camunda-bpm-sdk-js/vendor/superagent',
+    libs = libs.concat([
+      'node_modules/camunda-bpm-sdk-js/vendor/fast-xml-parser',
+      'node_modules/camunda-bpm-sdk-js/vendor/superagent',
       libDir + '/camunda-commons-ui/bpmn-js',
       libDir + '/camunda-commons-ui/dmn-js',
       libDir + '/camunda-commons-ui/cmmn-js'
