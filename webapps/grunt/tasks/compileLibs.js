@@ -11,6 +11,7 @@ module.exports = function(grunt, isCeEdition) {
     if (!isCeEdition) {
       libDir = '..';
 
+      libs.push('../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/vendor/fast-xml-parser');
       libs.push('../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/vendor/superagent');
       libs.push('../camunda-bpm-sdk-js/vendor/fast-xml-parser');
       libs.push(superagentE2ePath);
