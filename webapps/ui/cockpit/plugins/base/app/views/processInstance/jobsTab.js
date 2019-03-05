@@ -156,6 +156,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             if(res) {
               //use cached activityName to avoid unnecessary requests
               res.activityName = job.activityName;
+              res.activityId = job.activityId;
               $scope.jobs[$scope.jobs.indexOf(job)] = res;
             } 
           });
