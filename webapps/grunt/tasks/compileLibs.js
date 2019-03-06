@@ -30,15 +30,16 @@ module.exports = function(grunt, isCeEdition) {
     let done = this.async();
 
     let cmd = null;
-    /*if (process.platform === 'win32') {
-      cmd = cmd.replace(/\//g, '\\');
-    }*/
 
     let builds = libs.map(lib => {
       if (superagentE2ePath === lib) {
         cmd = 'npm run buildE2e';
       } else {
         cmd = 'npm run build';
+      }
+
+      if (process.platform === 'win32') {
+        cmd = cmd.replace(/\//g, '\\');
       }
 
       let libPath = path.join(__dirname, `../../${lib}/`);
