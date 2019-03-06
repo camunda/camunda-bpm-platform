@@ -145,7 +145,7 @@ public class CustomHistoryLevelUserOperationLogTest {
     runtimeService.deleteProcessInstance(process.getId(), "a delete reason");
 
     // then
-    assertEquals(3, query().entityType(PROCESS_INSTANCE).count());
+    assertEquals(4, query().entityType(PROCESS_INSTANCE).count());
 
     UserOperationLogEntry deleteEntry = query()
         .entityType(PROCESS_INSTANCE)
