@@ -23,9 +23,10 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-
 
 /**
  * @author Joram Barrez
@@ -54,12 +55,16 @@ public class CompleteTaskCmd implements Command<Map<String, Object>>, Serializab
     if (variables != null) {
       task.setExecutionVariables(variables);
     }
-    
-    Map<String, Object> taskVariables = task.getVariablesTyped(false);
+
+    ExecutionEntity execution = task.getExecution();
+    ExecutionVariableSnapshotObserver variablesListener = null;
+    if (execution != null) {
+      variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
+    }
 
     completeTask(task);
 
-    return taskVariables.isEmpty() ? null : taskVariables;
+    return variablesListener == null ? task.getVariablesTyped(false) : variablesListener.getVariables();
   }
 
   protected void completeTask(TaskEntity task) {

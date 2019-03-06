@@ -772,42 +772,82 @@ public class TaskServiceTest {
     assertEquals("myValue", variables.get("myParam"));
   }
   
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.testCompleteTaskWithVariablesInReturn.bpmn20.xml" })
   @Test
   public void testCompleteTaskWithVariablesInReturn() {
     String processVarName = "processVar";
     String processVarValue = "processVarValue";
 
     String taskVarName = "taskVar";
-    String taskVarValue1 = "taskVarValue1";
-    String taskVarValue2 = "taskVarValue2";
+    String taskVarValue = "taskVarValue";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(processVarName, processVarValue);
+
+    runtimeService.startProcessInstanceByKey("TaskServiceTest.testCompleteTaskWithVariablesInReturn", variables);
+
+    Task firstUserTask = taskService.createTaskQuery().taskName("First User Task").singleResult();
+    taskService.setVariable(firstUserTask.getId(), "x", 1);
+
+    Map<String, Object> additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put(taskVarName, taskVarValue);
+
+    // After completion of firstUserTask a script Task sets 'x' = 5
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+    assertEquals(3, vars.size());
+    assertEquals(5, vars.get("x"));
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(taskVarValue, vars.get(taskVarName));
+
+    additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put("x", 7);
+    Task secondUserTask = taskService.createTaskQuery().taskName("Second User Task").singleResult();
+    vars = taskService.completeWithVariablesInReturn(secondUserTask.getId(), additionalVariables);
+    assertEquals(3, vars.size());
+    assertEquals(7, vars.get("x"));
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(taskVarValue, vars.get(taskVarName));
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturnParallel() {
+    String processVarName = "processVar";
+    String processVarValue = "processVarValue";
+
+    String task1VarName = "taskVar1";
+    String task2VarName = "taskVar2";
+    String task1VarValue = "taskVarValue1";
+    String task2VarValue = "taskVarValue2";
 
     String additionalVar = "additionalVar";
     String additionalVarValue = "additionalVarValue";
 
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(processVarName, processVarValue);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoParallelTasksProcess", variables);
+    runtimeService.startProcessInstanceByKey("twoParallelTasksProcess", variables);
 
     Task firstTask = taskService.createTaskQuery().taskName("First Task").singleResult();
-    taskService.setVariableLocal(firstTask.getId(), taskVarName, taskVarValue1);
+    taskService.setVariable(firstTask.getId(), task1VarName, task1VarValue);
     Task secondTask = taskService.createTaskQuery().taskName("Second Task").singleResult();
-    taskService.setVariableLocal(secondTask.getId(), taskVarName, taskVarValue2);
+    taskService.setVariable(secondTask.getId(), task2VarName, task2VarValue);
 
     Map<String, Object> vars = taskService.completeWithVariablesInReturn(firstTask.getId(), null);
 
-    assertEquals(2, vars.size());
-    assertTrue(vars.containsValue(processVarValue));
-    assertTrue(vars.containsValue(taskVarValue1));
+    assertEquals(3, vars.size());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(task1VarValue, vars.get(task1VarName));
+    assertEquals(task2VarValue, vars.get(task2VarName));
 
     Map<String, Object> additionalVariables = new HashMap<String, Object>();
     additionalVariables.put(additionalVar, additionalVarValue);
 
     vars = taskService.completeWithVariablesInReturn(secondTask.getId(), additionalVariables);
-    assertEquals(3, vars.size());
-    assertTrue(vars.containsValue(processVarValue));
-    assertTrue(vars.containsValue(taskVarValue2));
-    assertTrue(vars.containsValue(additionalVarValue));
+    assertEquals(4, vars.size());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(task1VarValue, vars.get(task1VarName));
+    assertEquals(task2VarValue, vars.get(task2VarName));
+    assertEquals(additionalVarValue, vars.get(additionalVar));
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,25 +31,29 @@ public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
 
   protected ExecutionEntity execution;
 
+  protected boolean localVariables = true;
+
   public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity) {
+    this(executionEntity, true);
+  }
+
+  public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity, boolean localVariables) {
     this.execution = executionEntity;
     this.execution.addExecutionObserver(this);
+    this.localVariables = localVariables;
   }
 
   @Override
   public void onClear(ExecutionEntity execution) {
-    if (variableSnapshot == null)
-    {
-      variableSnapshot = execution.getVariablesLocalTyped(false);
+    if (variableSnapshot == null) {
+      variableSnapshot = this.localVariables ? execution.getVariablesLocalTyped(false) : execution.getVariablesTyped(false);
     }
   }
 
   public VariableMap getVariables() {
-    if (variableSnapshot == null)
-    {
-      return execution.getVariablesLocalTyped(false);
-    }
-    else {
+    if (variableSnapshot == null) {
+      return this.localVariables ? execution.getVariablesLocalTyped(false) : execution.getVariablesTyped(false);
+    } else {
       return variableSnapshot;
     }
   }

@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -68,7 +70,11 @@ public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializ
       task.setVariables(properties);
     }
 
-    Map<String, Object> taskVariables = task.getVariablesTyped(false);
+    ExecutionEntity execution = task.getExecution();
+    ExecutionVariableSnapshotObserver variablesListener = null;
+    if(execution != null) {
+      variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
+    }
 
     // complete or resolve the task
     if (DelegationState.PENDING.equals(task.getDelegationState())) {
@@ -79,6 +85,6 @@ public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializ
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     }
 
-    return taskVariables.isEmpty() ? null : taskVariables;
+    return variablesListener == null ? task.getVariablesTyped(false) : variablesListener.getVariables();
   }
 }
