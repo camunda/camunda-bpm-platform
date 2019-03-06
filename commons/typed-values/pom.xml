@@ -68,11 +68,11 @@
               <ignored>
                 <difference>
                   <differenceType>8001</differenceType>
-                  <className>com/sun/activation/**/*</className>
+                  <className>camundajar/com/sun/activation/**/*</className>
                 </difference>
                 <difference>
                   <differenceType>8001</differenceType>
-                  <className>javax/activation/**/*</className>
+                  <className>camundajar/javax/activation/**/*</className>
                 </difference>
               </ignored>
             </configuration>
