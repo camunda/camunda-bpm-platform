@@ -79,6 +79,10 @@ CamPaginationSearchIntegrationController.prototype.hasSearchQueryStringChanged =
 CamPaginationSearchIntegrationController.prototype.onPageChange = function(newValue, oldValue) {
   // Used for checking if current page change is due to $locationChangeSuccess event
   // If so this change was already passed to updateCallback, so it can be ignored
+
+  //Reset current page and hope that everything works out in the end
+  this.search('page', null);
+
   var searchCurrentPage = this.getCurrentPageFromSearch();
 
   if (newValue == oldValue || newValue === searchCurrentPage) {
