@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQuery> {
 
   private static final String SORT_BY_INCIDENT_ID = "incidentId";
+  private static final String SORT_BY_INCIDENT_MESSAGE = "incidentMessage";
   private static final String SORT_BY_CREATE_TIME = "createTime";
   private static final String SORT_BY_END_TIME = "endTime";
   private static final String SORT_BY_INCIDENT_TYPE = "incidentType";
@@ -52,8 +53,9 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_MESSAGE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CREATE_TIME);
     VALID_SORT_BY_VALUES.add(SORT_BY_END_TIME);
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_TYPE);
@@ -228,6 +230,8 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected void applySortBy(HistoricIncidentQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_INCIDENT_ID)) {
       query.orderByIncidentId();
+    } else if (sortBy.equals(SORT_BY_INCIDENT_MESSAGE)) {
+      query.orderByIncidentMessage();
     } else if (sortBy.equals(SORT_BY_CREATE_TIME)) {
       query.orderByCreateTime();
     } else if (sortBy.equals(SORT_BY_END_TIME)) {
