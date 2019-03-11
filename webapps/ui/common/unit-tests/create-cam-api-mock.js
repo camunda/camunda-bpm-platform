@@ -16,7 +16,7 @@ function createCamApiMock(resourceMethods) {
   var fakeResource = resourceMethods.reduce(function(fakeResource, method) {
     fakeResource[method] = noop;
 
-    sinon.stub(fakeResource, method, function() {
+    sinon.stub(fakeResource, method).callsFake(function() {
       var args = Array.prototype.slice.call(arguments);
       var callback = args[args.length - 1];
 
