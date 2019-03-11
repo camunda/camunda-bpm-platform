@@ -135,7 +135,7 @@ module.exports = function() {
               key = compact([applicationContextPath, key.substring(APP_KEY.length)])
                 .join('/')
                 // prevents multiple "/" in the URI
-                .replace(/\/([\/]+)/, '/');
+                .replace(/\/([/]+)/, '/');
               setAsynchronousFormKey(key);
             } else {
               API.notifyFormInitializationFailed({

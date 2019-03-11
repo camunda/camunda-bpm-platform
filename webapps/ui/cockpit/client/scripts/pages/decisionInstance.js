@@ -46,9 +46,9 @@ var Controller = [
     if(hasHistoryPlugin) {
       // if we have no history plugin, then just go to the runtime view
       $scope.processInstanceLink =
-          '#/process-instance/' + $scope.decisionInstance.processInstanceId + '/history' +
-          '?activityInstanceIds=' + $scope.decisionInstance.activityInstanceId +
-          '&activityIds=' + $scope.decisionInstance.activityId;
+        '#/process-instance/' + $scope.decisionInstance.processInstanceId + '/history' +
+        '?activityInstanceIds=' + $scope.decisionInstance.activityInstanceId +
+        '&activityIds=' + $scope.decisionInstance.activityId;
     } else {
       // if we have the history plugin, go to the history view and select the activity, that executed the decision
       $scope.processInstanceLink = '#/process-instance/' + $scope.decisionInstance.processInstanceId;
@@ -240,44 +240,44 @@ var RouteConfig = [
     });
 
     $routeProvider
-    .when('/decision-instance/:id/history', {
-      template: template,
+      .when('/decision-instance/:id/history', {
+        template: template,
 
-      controller: Controller,
-      authentication: 'required',
-      resolve: {
-        decisionInstance: [ 'ResourceResolver', 'camAPI', '$q',
-        function(ResourceResolver, camAPI, $q) {
-          return ResourceResolver.getByRouteParam('id', {
-            name: 'decision instance',
-            resolve: function(id) {
-              var deferred = $q.defer();
+        controller: Controller,
+        authentication: 'required',
+        resolve: {
+          decisionInstance: [ 'ResourceResolver', 'camAPI', '$q',
+            function(ResourceResolver, camAPI, $q) {
+              return ResourceResolver.getByRouteParam('id', {
+                name: 'decision instance',
+                resolve: function(id) {
+                  var deferred = $q.defer();
 
-              var historyService = camAPI.resource('history');
+                  var historyService = camAPI.resource('history');
 
-              historyService.decisionInstance({
-                decisionInstanceId: id,
-                includeInputs: true,
-                includeOutputs: true,
-                disableBinaryFetching: true,
-                disableCustomObjectDeserialization: true
-              }, function(err, data) {
-                if(!err && data.length) {
-                  deferred.resolve(data[0]);
-                } else {
-                  deferred.reject(err || {
-                    status: 404
+                  historyService.decisionInstance({
+                    decisionInstanceId: id,
+                    includeInputs: true,
+                    includeOutputs: true,
+                    disableBinaryFetching: true,
+                    disableCustomObjectDeserialization: true
+                  }, function(err, data) {
+                    if(!err && data.length) {
+                      deferred.resolve(data[0]);
+                    } else {
+                      deferred.reject(err || {
+                        status: 404
+                      });
+                    }
                   });
+
+                  return deferred.promise;
                 }
               });
-
-              return deferred.promise;
-            }
-          });
-        }]
-      },
-      reloadOnSearch: false
-    });
+            }]
+        },
+        reloadOnSearch: false
+      });
   }];
 
 var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
@@ -290,8 +290,7 @@ var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
 }];
 
 ngModule
-    .config(RouteConfig)
-    .config(ViewConfig)
-  ;
+  .config(RouteConfig)
+  .config(ViewConfig);
 
 module.exports = ngModule;

@@ -65,7 +65,7 @@ module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI',
 
     authorization[authorization.identityType === 'Group' ? 'groupId' : 'userId'] = authorization.identityId;
 
-      // create the update query
+    // create the update query
     var query = {
       permissions: authorization.permissions,
       resourceType: authorization.resourceType,

@@ -53,7 +53,7 @@ module.exports = ['$window', '$q', '$rootScope', '$cookies', function($window, $
     req.open('post', url, true);
 
     var sBoundary = '---------------------------' + Date.now().toString(16);
-    req.setRequestHeader('Content-Type', 'multipart\/form-data; boundary=' + sBoundary);
+    req.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + sBoundary);
 
     var token = $cookies.get('XSRF-TOKEN');
     if (token) {
