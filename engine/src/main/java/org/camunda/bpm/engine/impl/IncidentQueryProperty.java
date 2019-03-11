@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.query.QueryProperty;
 public interface IncidentQueryProperty {
 
   public static final QueryProperty INCIDENT_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty INCIDENT_MESSAGE = new QueryPropertyImpl("INCIDENT_MSG_");
   public static final QueryProperty INCIDENT_TIMESTAMP = new QueryPropertyImpl("INCIDENT_TIMESTAMP_");
   public static final QueryProperty INCIDENT_TYPE = new QueryPropertyImpl("INCIDENT_TYPE_");
   public static final QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");

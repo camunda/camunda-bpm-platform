@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.query.QueryProperty;
 public interface HistoricIncidentQueryProperty {
 
   public static final QueryProperty INCIDENT_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty INCIDENT_MESSAGE = new QueryPropertyImpl("INCIDENT_MSG_");
   public static final QueryProperty INCIDENT_CREATE_TIME = new QueryPropertyImpl("CREATE_TIME_");
   public static final QueryProperty INCIDENT_END_TIME = new QueryPropertyImpl("END_TIME_");
   public static final QueryProperty INCIDENT_TYPE = new QueryPropertyImpl("INCIDENT_TYPE_");
