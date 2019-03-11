@@ -24,7 +24,6 @@
 				<![CDATA[
 				sleep(1000)
 				execution.setVariable('x', 5)
-				println "x: " + execution.getVariable('x')
 				]]>
 			</script>
 		</scriptTask>

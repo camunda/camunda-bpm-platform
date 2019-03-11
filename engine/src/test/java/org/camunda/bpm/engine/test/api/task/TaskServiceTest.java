@@ -788,6 +788,8 @@ public class TaskServiceTest {
 
     Task firstUserTask = taskService.createTaskQuery().taskName("First User Task").singleResult();
     taskService.setVariable(firstUserTask.getId(), "x", 1);
+    // local variables should not be returned
+    taskService.setVariableLocal(firstUserTask.getId(), "localVar", "localVarValue");
 
     Map<String, Object> additionalVariables = new HashMap<String, Object>();
     additionalVariables.put(taskVarName, taskVarValue);
@@ -802,6 +804,7 @@ public class TaskServiceTest {
     additionalVariables = new HashMap<String, Object>();
     additionalVariables.put("x", 7);
     Task secondUserTask = taskService.createTaskQuery().taskName("Second User Task").singleResult();
+
     vars = taskService.completeWithVariablesInReturn(secondUserTask.getId(), additionalVariables);
     assertEquals(3, vars.size());
     assertEquals(7, vars.get("x"));
