@@ -56,7 +56,8 @@ public interface TaskResource {
   @POST
   @Path("/submit-form")
   @Consumes(MediaType.APPLICATION_JSON)
-  void submit(CompleteTaskDto dto);
+  @Produces(MediaType.APPLICATION_JSON)
+  Response submit(CompleteTaskDto dto);
 
   @GET
   @Path("/rendered-form")
