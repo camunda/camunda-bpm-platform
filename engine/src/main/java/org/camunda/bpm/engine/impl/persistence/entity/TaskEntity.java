@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1269,29 +1269,40 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public String getEventName() {
     return eventName;
   }
+
   public void setEventName(String eventName) {
     this.eventName = eventName;
   }
+
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
+
   public ExecutionEntity getProcessInstance() {
-    return processInstance;
+    if (this.processInstance == null && this.processInstanceId != null) {
+      this.processInstance = Context.getCommandContext().getExecutionManager().findExecutionById(this.processInstanceId);
+    }
+    return this.processInstance;
   }
+
   public void setProcessInstance(ExecutionEntity processInstance) {
     this.processInstance = processInstance;
   }
+
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
+
   @Override
   public String getOwner() {
     return owner;
   }
+
   @Override
   public DelegationState getDelegationState() {
     return delegationState;
   }
+
   @Override
   public void setDelegationState(DelegationState delegationState) {
     propertyChanged(DELEGATION, this.delegationState, delegationState);

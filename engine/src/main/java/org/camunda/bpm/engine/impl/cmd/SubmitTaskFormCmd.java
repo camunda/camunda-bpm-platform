@@ -70,7 +70,7 @@ public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializ
       task.setVariables(properties);
     }
 
-    ExecutionEntity execution = task.getExecution();
+    ExecutionEntity execution = task.getProcessInstance();
     ExecutionVariableSnapshotObserver variablesListener = null;
     if(execution != null) {
       variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
