@@ -37,7 +37,7 @@
    * @return {string}               - A URL string to be redirected to
    */
   utils.replaceLastPathFragment = function(replacement, currentPath, currentSearch, keepSearchParams) {
-    var redirectUrl = currentPath.replace(/[^\/]*$/, replacement);
+    var redirectUrl = currentPath.replace(/[^/]*$/, replacement);
 
     return utils.redirectTo(redirectUrl, currentSearch, keepSearchParams);
   };

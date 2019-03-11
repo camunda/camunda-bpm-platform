@@ -257,7 +257,7 @@ function sanitizeValue(value, operator, search) {
   // Regex for '\_' and '\%' epxressions
   var specialWildCardCharExp = /(\\%)|(\\_)/g;
   // Regex for '_' and '%' special characters
-  var wildCardExp = /(\%)|(\_)/;
+  var wildCardExp = /(%)|(_)/;
   if(operator.toLowerCase() === 'like' && !wildCardExp.test(value.replace(specialWildCardCharExp, ''))) {
     return '%'+value+'%';
   } else if(search.allowDates && simpleDateExp.test(value)) {

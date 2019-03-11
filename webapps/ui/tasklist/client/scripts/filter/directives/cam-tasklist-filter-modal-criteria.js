@@ -7,7 +7,7 @@
 
   // yyyy-MM-dd'T'HH:mm:ss
   var dateRegex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
-  var expressionsRegex = /^[\s]*(\#|\$)\{/;
+  var expressionsRegex = /^[\s]*([#$]){/;
   var numberRegex = /^-?[\d]+$/;
 
   function isValid(regex, error, exprSupport) {

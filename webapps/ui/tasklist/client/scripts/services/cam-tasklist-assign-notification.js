@@ -1,5 +1,5 @@
-  'use strict';
-  module.exports = ['camAPI', 'Notifications', '$translate',
+'use strict';
+module.exports = ['camAPI', 'Notifications', '$translate',
   function(camAPI,   Notifications,   $translate) {
     var Task = camAPI.resource('task');
     /**

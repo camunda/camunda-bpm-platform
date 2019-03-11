@@ -213,44 +213,44 @@ var RouteConfig = [
   ) {
 
     $routeProvider
-    .when('/decision-definition/:id', {
-      redirectTo: function(params, currentPath, currentSearch) {
-        var redirectUrl = currentPath + '/history';
+      .when('/decision-definition/:id', {
+        redirectTo: function(params, currentPath, currentSearch) {
+          var redirectUrl = currentPath + '/history';
 
-        return routeUtil.redirectTo(redirectUrl, currentSearch, true);
-      }
-    })
-    .when('/decision-definition/:id/history', {
-      template: template,
+          return routeUtil.redirectTo(redirectUrl, currentSearch, true);
+        }
+      })
+      .when('/decision-definition/:id/history', {
+        template: template,
 
-      controller: Controller,
-      authentication: 'required',
-      resolve: {
-        decisionDefinition: [ 'ResourceResolver', 'camAPI', '$q',
-        function(ResourceResolver, camAPI, $q) {
-          return ResourceResolver.getByRouteParam('id', {
-            name: 'decision definition',
-            resolve: function(id) {
+        controller: Controller,
+        authentication: 'required',
+        resolve: {
+          decisionDefinition: [ 'ResourceResolver', 'camAPI', '$q',
+            function(ResourceResolver, camAPI, $q) {
+              return ResourceResolver.getByRouteParam('id', {
+                name: 'decision definition',
+                resolve: function(id) {
 
-              var deferred = $q.defer();
+                  var deferred = $q.defer();
 
-              var decisionDefinitionService = camAPI.resource('decision-definition');
+                  var decisionDefinitionService = camAPI.resource('decision-definition');
 
-              decisionDefinitionService.get(id, function(err, data) {
-                if(!err) {
-                  deferred.resolve(data);
-                } else {
-                  deferred.reject(err);
+                  decisionDefinitionService.get(id, function(err, data) {
+                    if(!err) {
+                      deferred.resolve(data);
+                    } else {
+                      deferred.reject(err);
+                    }
+                  });
+
+                  return deferred.promise;
                 }
               });
-
-              return deferred.promise;
-            }
-          });
-        }]
-      },
-      reloadOnSearch: false
-    });
+            }]
+        },
+        reloadOnSearch: false
+      });
   }];
 
 var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
@@ -263,8 +263,7 @@ var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
 }];
 
 ngModule
-    .config(RouteConfig)
-    .config(ViewConfig)
-  ;
+  .config(RouteConfig)
+  .config(ViewConfig);
 
 module.exports = ngModule;

@@ -49,7 +49,7 @@ function isQueryVariable(key) {
   return varExp.test(key);
 }
 
-var expressionsExp = /^[\s]*(\#|\$)\{/;
+var expressionsExp = /^[\s]*([#$]){/;
 function isExpression(value) {
   return expressionsExp.test(value);
 }

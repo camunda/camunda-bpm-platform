@@ -6,73 +6,73 @@ var now = (new Date()).getTime();
 
 module.exports = function(ngModule, appRoot, appName) {
   ngModule.factory('localeLoader', ['$q', '$http', 'Notifications', 'configuration',
-      function($q, $http, Notifications, configuration) {
-        return function(options) {
+    function($q, $http, Notifications, configuration) {
+      return function(options) {
 
-          if (!options || (!angular.isString(options.prefix) || !angular.isString(options.suffix))) {
-            throw new Error('Couldn\'t load static files, no prefix or suffix specified!');
+        if (!options || (!angular.isString(options.prefix) || !angular.isString(options.suffix))) {
+          throw new Error('Couldn\'t load static files, no prefix or suffix specified!');
+        }
+
+        var deferred = $q.defer();
+        var cacheKey = options.prefix+'_locales_data_'+options.key;
+        var cachedLocalesData = configuration.get(cacheKey);
+
+        if(cachedLocalesData) {
+          cachedLocalesData = JSON.parse((cachedLocalesData));
+          if(typeof options.callback === 'function') {
+            options.callback(null, cachedLocalesData, options.key);
           }
+          deferred.resolve(cachedLocalesData.labels);
+        }
 
-          var deferred = $q.defer();
-          var cacheKey = options.prefix+'_locales_data_'+options.key;
-          var cachedLocalesData = configuration.get(cacheKey);
+        $http(angular.extend({
+          url: [
+            options.prefix,
+            options.key,
+            options.suffix
+          ].join(''),
+          method: 'GET',
+          params: { '_' : now }
+        }, options.$http))
+          .then(function(response) {
+            configuration.set(cacheKey, JSON.stringify(response.data));
+            if (!cachedLocalesData) {
 
-          if(cachedLocalesData) {
-            cachedLocalesData = JSON.parse((cachedLocalesData));
-            if(typeof options.callback === 'function') {
-              options.callback(null, cachedLocalesData, options.key);
+              if(typeof options.callback === 'function') {
+                options.callback(null, response.data, options.key);
+              }
+
+              deferred.resolve(response.data.labels);
             }
-            deferred.resolve(cachedLocalesData.labels);
-          }
-
-          $http(angular.extend({
-            url: [
-              options.prefix,
-              options.key,
-              options.suffix
-            ].join(''),
-            method: 'GET',
-            params: { '_' : now }
-          }, options.$http))
-            .then(function(response) {
-              configuration.set(cacheKey, JSON.stringify(response.data));
-              if (!cachedLocalesData) {
-
-                if(typeof options.callback === 'function') {
-                  options.callback(null, response.data, options.key);
-                }
-
-                deferred.resolve(response.data.labels);
-              }
-            })
-            .catch(function(response) {
-              // error notification
-              Notifications.addError({
-                status: 'Error in localization configuration',
-                message: '"' + options.key + '" is declared as available locale, but no such locale file exists.'
-              });
-
-              if (!cachedLocalesData) {
-
-                if(typeof options.callback === 'function') {
-                  options.callback(response.data, null, options.key);
-                }
-
-                deferred.reject(options.key);
-              }
+          })
+          .catch(function(response) {
+            // error notification
+            Notifications.addError({
+              status: 'Error in localization configuration',
+              message: '"' + options.key + '" is declared as available locale, but no such locale file exists.'
             });
 
-          return deferred.promise;
-        };
-      }]);
+            if (!cachedLocalesData) {
+
+              if(typeof options.callback === 'function') {
+                options.callback(response.data, null, options.key);
+              }
+
+              deferred.reject(options.key);
+            }
+          });
+
+        return deferred.promise;
+      };
+    }]);
 
   ngModule.config([
     '$translateProvider',
     'configurationProvider',
     function(
       $translateProvider,
-       configurationProvider
-      ) {
+      configurationProvider
+    ) {
       var avail = configurationProvider.getAvailableLocales();
       var fallback = configurationProvider.getFallbackLocale();
 
@@ -93,11 +93,11 @@ module.exports = function(ngModule, appRoot, appName) {
       $translateProvider.determinePreferredLanguage(function() {
         var nav = window.navigator;
         var browserLang = ((angular.isArray(nav.languages) ? nav.languages[0] :
-                              nav.language ||
-                              nav.browserLanguage ||
-                              nav.systemLanguage ||
-                              nav.userLanguage
-                            ) || '').split('-');
+            nav.language ||
+            nav.browserLanguage ||
+            nav.systemLanguage ||
+            nav.userLanguage
+        ) || '').split('-');
         var idx = avail.indexOf(browserLang[0].toLowerCase());
         if (idx > -1) {
           return avail[idx];
