@@ -46,15 +46,19 @@ public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
   @Override
   public void onClear(ExecutionEntity execution) {
     if (variableSnapshot == null) {
-      variableSnapshot = this.localVariables ? execution.getVariablesLocalTyped(false) : execution.getVariablesTyped(false);
+      variableSnapshot = getVariables(this.localVariables);
     }
   }
 
   public VariableMap getVariables() {
     if (variableSnapshot == null) {
-      return this.localVariables ? execution.getVariablesLocalTyped(false) : execution.getVariablesTyped(false);
+      return getVariables(this.localVariables);
     } else {
       return variableSnapshot;
     }
+  }
+  
+  private VariableMap getVariables(final boolean localVariables) {
+    return this.localVariables ? execution.getVariablesLocalTyped(false) : execution.getVariablesTyped(false);
   }
 }
