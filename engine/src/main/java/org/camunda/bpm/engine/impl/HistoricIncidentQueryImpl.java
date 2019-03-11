@@ -158,6 +158,13 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  @Override
+  public HistoricIncidentQuery orderByIncidentMessage() {
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_MESSAGE);
+    return this;
+  }
+
+
   public HistoricIncidentQuery orderByCreateTime() {
     orderBy(HistoricIncidentQueryProperty.INCIDENT_CREATE_TIME);
     return this;

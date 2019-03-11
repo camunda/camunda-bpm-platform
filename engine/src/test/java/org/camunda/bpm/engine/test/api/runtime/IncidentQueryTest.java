@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -24,7 +25,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -38,6 +41,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.hamcrest.CoreMatchers;
@@ -84,10 +88,12 @@ public class IncidentQueryTest {
   public void startProcessInstances() throws Exception {
     testHelper.deploy(FAILING_SERVICE_TASK_MODEL);
 
-    processInstanceIds = new ArrayList<String>();
+    processInstanceIds = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
+      Map<String, Object> variables = Collections.<String, Object>singletonMap("message", "exception" + i);
+
       processInstanceIds.add(engineRule.getRuntimeService()
-        .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId()
+        .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "", variables).getId()
       );
     }
 
@@ -129,12 +135,12 @@ public class IncidentQueryTest {
 
   @Test
   public void testQueryByIncidentMessage() {
-    IncidentQuery query = runtimeService.createIncidentQuery().incidentMessage("Expected_exception.");
-    assertEquals(4, query.count());
+    IncidentQuery query = runtimeService.createIncidentQuery().incidentMessage("exception0");
+    assertEquals(1, query.count());
 
     List<Incident> incidents = query.list();
     assertFalse(incidents.isEmpty());
-    assertEquals(4, incidents.size());
+    assertEquals(1, incidents.size());
   }
 
   @Test
@@ -494,5 +500,21 @@ public class IncidentQueryTest {
     assertEquals(4, runtimeService.createIncidentQuery().orderByRootCauseIncidentId().desc().list().size());
     assertEquals(4, runtimeService.createIncidentQuery().orderByConfiguration().desc().list().size());
 
+  }
+
+  @Test
+  public void testQuerySortingByIncidentMessage()
+  {
+    // given
+
+    // when
+    List<Incident> ascending = runtimeService.createIncidentQuery().orderByIncidentMessage().asc().list();
+    List<Incident> descending = runtimeService.createIncidentQuery().orderByIncidentMessage().desc().list();
+
+    // then
+    assertThat(ascending).extracting("incidentMessage")
+      .containsExactly("exception0", "exception1", "exception2", "exception3");
+    assertThat(descending).extracting("incidentMessage")
+      .containsExactly("exception3", "exception2", "exception1", "exception0");
   }
 }

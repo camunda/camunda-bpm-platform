@@ -170,6 +170,11 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return orderBy(IncidentQueryProperty.TENANT_ID);
   }
 
+  @Override
+  public IncidentQuery orderByIncidentMessage() {
+    return orderBy(IncidentQueryProperty.INCIDENT_MESSAGE);
+  }
+
   //results ////////////////////////////////////////////////////
 
   @Override

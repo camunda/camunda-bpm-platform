@@ -64,6 +64,9 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   /** Order by incidentTimestamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
   IncidentQuery orderByIncidentTimestamp();
 
+  /** Order by incident message (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByIncidentMessage();
+
   /** Order by incidentType (needs to be followed by {@link #asc()} or {@link #desc()}). */
   IncidentQuery orderByIncidentType();
 

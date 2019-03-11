@@ -71,6 +71,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByIncidentId();
 
+  /** Order by message (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricIncidentQuery orderByIncidentMessage();
+
   /** Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByCreateTime();
 

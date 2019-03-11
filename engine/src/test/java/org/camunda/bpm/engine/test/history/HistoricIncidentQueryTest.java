@@ -15,9 +15,14 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -25,6 +30,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -550,13 +556,34 @@ public class HistoricIncidentQueryTest {
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByIncidentState().desc().list().size());
   }
 
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  public void testQuerySortingByIncidentMessage()
+  {
+    // given
+    startProcessInstances(PROCESS_DEFINITION_KEY, 4);
+
+    // when
+    List<HistoricIncident> ascending = historyService.createHistoricIncidentQuery().orderByIncidentMessage().asc().list();
+    List<HistoricIncident> descending = historyService.createHistoricIncidentQuery().orderByIncidentMessage().desc().list();
+
+    // then
+    assertThat(ascending).extracting("incidentMessage")
+      .containsExactly("exception0", "exception1", "exception2", "exception3");
+    assertThat(descending).extracting("incidentMessage")
+      .containsExactly("exception3", "exception2", "exception1", "exception0");
+  }
+
   protected void startProcessInstance(String key) {
     startProcessInstances(key, 1);
   }
 
   protected void startProcessInstances(String key, int numberOfInstances) {
+
     for (int i = 0; i < numberOfInstances; i++) {
-      runtimeService.startProcessInstanceByKey(key);
+      Map<String, Object> variables = Collections.<String, Object>singletonMap("message", "exception" + i);
+
+      runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "", variables);
     }
 
     testHelper.executeAvailableJobs();
