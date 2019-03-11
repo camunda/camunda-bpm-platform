@@ -155,6 +155,16 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("incidentMessage", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByIncidentMessage();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("incidentMessage", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByIncidentMessage();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("incidentTimestamp", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByIncidentTimestamp();
     inOrder.verify(mockedQuery).asc();

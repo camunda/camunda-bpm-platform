@@ -144,7 +144,7 @@ public class HistoricIncidentQueryTest {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
     HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
-        .incidentMessage(FailingDelegate.EXCEPTION_MESSAGE);
+        .incidentMessage("exception0");
 
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
@@ -583,7 +583,7 @@ public class HistoricIncidentQueryTest {
     for (int i = 0; i < numberOfInstances; i++) {
       Map<String, Object> variables = Collections.<String, Object>singletonMap("message", "exception" + i);
 
-      runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "", variables);
+      runtimeService.startProcessInstanceByKey(key, i + "", variables);
     }
 
     testHelper.executeAvailableJobs();
