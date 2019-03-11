@@ -106,7 +106,7 @@ public class TaskResourceImpl implements TaskResource {
       }
       taskService.complete(taskId, variables);
       return Response.noContent().build();
-      
+
     } catch (RestException e) {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
       throw new InvalidRequestException(e.getStatus(), e, errorMessage);
@@ -124,12 +124,20 @@ public class TaskResourceImpl implements TaskResource {
     }
   }
   
-  public void submit(CompleteTaskDto dto) {
+  public Response submit(CompleteTaskDto dto) {
     FormService formService = engine.getFormService();
 
     try {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
+      if (dto.isWithVariablesInReturn()) {
+        Map<String, Object> taskVariables = formService.submitTaskFormWithVariablesInReturn(taskId, variables);
+        return Response
+            .ok(taskVariables)
+            .type(MediaType.APPLICATION_JSON)
+            .build();
+      }
       formService.submitTaskForm(taskId, variables);
+      return Response.noContent().build();
 
     } catch (RestException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
