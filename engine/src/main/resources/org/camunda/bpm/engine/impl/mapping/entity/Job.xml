@@ -450,6 +450,7 @@
        EXCEPTION_STACK_ID_ = #{exceptionByteArrayId, jdbcType=VARCHAR},
        EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
        DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
+       REPEAT_ = #{repeat, jdbcType=VARCHAR},
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
