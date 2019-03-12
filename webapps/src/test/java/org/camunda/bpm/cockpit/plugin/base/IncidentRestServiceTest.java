@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.cockpit.plugin.base;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -363,6 +363,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     executeAvailableJobs();
 
     // asc
+    verifySorting("incidentMessage", "asc", 3);
     verifySorting("incidentTimestamp", "asc", 3);
     verifySorting("incidentType", "asc", 3);
     verifySorting("activityId", "asc", 3);
@@ -370,6 +371,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     verifySorting("rootCauseIncidentProcessInstanceId", "asc", 3);
 
     // desc
+    verifySorting("incidentMessage", "desc", 3);
     verifySorting("incidentTimestamp", "desc", 3);
     verifySorting("incidentType", "desc", 3);
     verifySorting("activityId", "desc", 3);
@@ -377,12 +379,36 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     verifySorting("rootCauseIncidentProcessInstanceId", "desc", 3);
   }
 
-  protected void verifySorting(String sortBy, String sortOrder, int expectedResult) {
-    IncidentQueryDto queryParameter = new IncidentQueryDto();
-    queryParameter.setSortBy(sortBy);
-    queryParameter.setSortOrder(sortOrder);
+  @Test
+  @Deployment(resources = "processes/simple-user-task-process.bpmn")
+  public void testQuerySortingByIncidentMessage()
+  {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("simpleUserTaskProcess");
+    Incident incident1 = runtimeService.createIncident("foo", instance.getId(), null, "message1");
+    Incident incident2 = runtimeService.createIncident("foo", instance.getId(), null, "message3");
+    Incident incident3 = runtimeService.createIncident("foo", instance.getId(), null, "message2");
 
-    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    // when
+    List<IncidentDto> ascending = queryIncidents("incidentMessage", "asc");
+    List<IncidentDto> descending = queryIncidents("incidentMessage", "desc");
+
+    // then
+    assertThat(ascending).extracting("id").containsExactly(incident1.getId(), incident3.getId(), incident2.getId());
+    assertThat(descending).extracting("id").containsExactly(incident2.getId(), incident3.getId(), incident1.getId());
+  }
+
+  protected List<IncidentDto> queryIncidents(String sorting, String order)
+  {
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+    queryParameter.setSortBy(sorting);
+    queryParameter.setSortOrder(order);
+
+    return resource.queryIncidents(queryParameter, null, null);
+  }
+
+  protected void verifySorting(String sortBy, String sortOrder, int expectedResult) {
+    List<IncidentDto> result = queryIncidents(sortBy, sortOrder);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(expectedResult);
   }
