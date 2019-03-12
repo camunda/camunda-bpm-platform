@@ -692,6 +692,16 @@ public class TaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testSubmitFormWithVariablesInReturn() {
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("withVariablesInReturn", true);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).contentType(POST_JSON_CONTENT_TYPE).body(queryParameters).header("accept", MediaType.APPLICATION_JSON).expect()
+        .statusCode(Status.OK.getStatusCode()).when().post(SUBMIT_FORM_URL);
+
+    verify(formServiceMock).submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null);
+  }
+  @Test
   public void testSubmitFormWithParameters() {
     Map<String, Object> variables = VariablesBuilder.create()
         .variable("aVariable", "aStringValue")
@@ -1506,6 +1516,17 @@ public class TaskRestServiceInteractionTest extends
       .when().post(COMPLETE_TASK_URL);
 
     verify(taskServiceMock).complete(EXAMPLE_TASK_ID, null);
+  }
+  
+  @Test
+  public void testCompleteTaskWithVariablesInReturn() {
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("withVariablesInReturn", true);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).contentType(POST_JSON_CONTENT_TYPE).body(queryParameters).header("accept", MediaType.APPLICATION_JSON).expect()
+        .statusCode(Status.OK.getStatusCode()).when().post(COMPLETE_TASK_URL);
+
+    verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
   }
 
   @Test

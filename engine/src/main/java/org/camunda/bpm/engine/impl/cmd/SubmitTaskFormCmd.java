@@ -85,6 +85,10 @@ public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializ
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     }
 
-    return variablesListener == null ? task.getVariablesTyped(false) : variablesListener.getVariables();
+    if (variablesListener != null) {
+      return variablesListener.getVariables();
+    } else {
+      return task.getCaseDefinitionId() == null ? null : task.getVariablesTyped(false);
+    }
   }
 }

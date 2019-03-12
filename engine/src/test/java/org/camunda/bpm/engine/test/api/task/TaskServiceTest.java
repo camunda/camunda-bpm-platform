@@ -852,6 +852,23 @@ public class TaskServiceTest {
     assertEquals(task2VarValue, vars.get(task2VarName));
     assertEquals(additionalVarValue, vars.get(additionalVar));
   }
+  
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturnCMMN() {
+    String taskVariableName = "taskVar";
+    String taskVariableValue = "taskVal";
+
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
+    caseService.withCaseDefinition(caseDefinitionId).create();
+
+    Task task1 = taskService.createTaskQuery().singleResult();
+    assertNotNull(task1);
+
+    taskService.setVariable(task1.getId(), taskVariableName, taskVariableValue);
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(task1.getId(), null);
+    assertNull(vars);
+  }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   @Test
