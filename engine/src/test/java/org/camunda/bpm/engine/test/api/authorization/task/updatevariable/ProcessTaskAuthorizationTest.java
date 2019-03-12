@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -235,6 +237,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRemoveVariable() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, getVariables());
@@ -258,6 +261,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRemoveVariableLocal() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -283,6 +287,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRemoveVariables() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, getVariables());
@@ -306,6 +311,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRemoveVariablesLocal() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -331,6 +337,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesAdd() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -354,6 +361,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesRemove() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -378,6 +386,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesAddRemove() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -401,6 +410,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesLocalAdd() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -424,6 +434,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesLocalRemove() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -448,6 +459,7 @@ public class ProcessTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesLocalAddRemove() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);

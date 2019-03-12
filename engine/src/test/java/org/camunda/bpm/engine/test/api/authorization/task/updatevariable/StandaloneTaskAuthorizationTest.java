@@ -289,7 +289,7 @@ public class StandaloneTaskAuthorizationTest {
   }
 
   @Test
-//  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRemoveVariablesLocal() {
     // given
     createTask(taskId);
@@ -314,6 +314,7 @@ public class StandaloneTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesAdd() {
     // given
     createTask(taskId);
@@ -336,6 +337,7 @@ public class StandaloneTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesRemove() {
     // given
     createTask(taskId);
@@ -359,6 +361,7 @@ public class StandaloneTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesAddRemove() {
     // given
     createTask(taskId);
@@ -381,6 +384,7 @@ public class StandaloneTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesLocalAdd() {
     // given
     createTask(taskId);
@@ -403,6 +407,7 @@ public class StandaloneTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesLocalRemove() {
     // given
     createTask(taskId);
@@ -426,6 +431,7 @@ public class StandaloneTaskAuthorizationTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUpdateVariablesLocalAddRemove() {
     // given
     createTask(taskId);
