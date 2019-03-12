@@ -64,7 +64,11 @@ public class CompleteTaskCmd implements Command<Map<String, Object>>, Serializab
 
     completeTask(task);
 
-    return variablesListener == null ? task.getVariablesTyped(false) : variablesListener.getVariables();
+    if (variablesListener != null) {
+      return variablesListener.getVariables();
+    } else {
+      return task.getCaseDefinitionId() != null ? null : task.getVariablesTyped(false);
+    }
   }
 
   protected void completeTask(TaskEntity task) {
