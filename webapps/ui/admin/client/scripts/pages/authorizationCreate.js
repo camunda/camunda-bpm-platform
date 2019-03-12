@@ -37,25 +37,56 @@ module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI',
     authorization.permissions = [ 'ALL' ];
   };
 
-  $scope.availablePermissionsFor = function(authorization) {
-    var availablePermissions = [];
-    var resourcePermissions = $scope.getPermissionsForResource();
+  $scope.addNonePermissionsTo = function(authorization) {
+    authorization.permissions = [ 'NONE' ];
+  };
 
-    for (var i = 0; i < resourcePermissions.length; i++) {
-      if(authorization.permissions.indexOf(resourcePermissions[i]) < 0) {
-        availablePermissions.push(resourcePermissions[i]);
-      }
+  $scope.availablePermissionsFor = function() {
+    return $scope.getPermissionsForResource().filter(function(permission) {
+      return permission !== 'ALL' && permission !== 'NONE';
+    });
+  };
+
+  $scope.changePermissionOf = function(perm, authorization) {
+    //var resourcePermissions = $scope.getPermissionsForResource();
+    if(authorization.permissions.includes(perm) || authorization.permissions.includes('ALL')) {
+      $scope.removePermissionFrom(perm, authorization);
+    } 
+    else {
+      $scope.addPermissionTo(perm, authorization);
+    }
+  };
+
+  $scope.removePermissionFrom = function(perm, authorization) {
+
+    // Remove 'ALL' permission when removing permissions
+    if(authorization.permissions.indexOf('ALL')!= -1) {
+      authorization.permissions = $scope.getPermissionsForResource();
     }
 
-    return availablePermissions;
+    authorization.permissions = authorization.permissions.filter(function(permission) {
+      return permission !== perm;
+    });
+
+    // Add 'NONE' permission when removing last permission
+    if(authorization.permissions.length === 0) {
+      authorization.permissions.push('NONE');
+    }
   };
 
   $scope.addPermissionTo = function(perm, authorization) {
-    if(authorization.permissions.indexOf('ALL')!= -1 ||
-         authorization.permissions.indexOf('NONE')!= -1) {
+
+    // Remove 'NONE' permission when adding first permission
+    if(authorization.permissions.indexOf('NONE')!= -1) {
       authorization.permissions = [];
     }
+
     authorization.permissions.push(perm);
+
+    // Add 'ALL' permission when everything is checked
+    if(authorization.permissions.length === $scope.getPermissionsForResource().length) {
+      authorization.permissions = ['ALL'];
+    }
   };
 
   $scope.confirmUpdateAuthorization = function(authorization) {

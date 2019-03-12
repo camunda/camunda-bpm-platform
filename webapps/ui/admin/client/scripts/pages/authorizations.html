@@ -104,16 +104,7 @@
                   {{ formatPermissions(authorization.permissions) }}
                 </div>
 
-                <div ng-if="authorization.permissions != 'ALL'"
-                     class="input-group-btn">
-                  <a ng-click="addAllPermissionsTo(authorization)"
-                     class="btn btn-default">
-                    <span class="glyphicon glyphicon-asterisk"></span>
-                  </a>
-                </div>
-
-                <div ng-if="availablePermissionsFor(authorization).length > 0"
-                     class="input-group-btn dropdown" uib-dropdown>
+                <div class="input-group-btn dropdown" uib-dropdown auto-close="outsideClick">
                   <button type="button"
                           class="btn btn-default dropdown-toggle"
                           uib-dropdown-toggle
@@ -122,9 +113,12 @@
                     <span class="caret"></span>
                   </button>
 
-                  <ul uib-dropdown-menu class="dropdown-menu dropdown-menu-right">
-                    <li ng-repeat="perm in availablePermissionsFor(authorization)">
-                      <a ng-click="addPermissionTo(perm, authorization)">{{perm}}</a>
+                  <ul uib-dropdown-menu class="dropdown-menu dropdown-menu-right" auto-close="outsideClick">
+                    <a ng-show="authorization.permissions != 'ALL'" ng-click="addAllPermissionsTo(authorization)">Select all</a>
+                    <a ng-hide="authorization.permissions != 'ALL'" ng-click="addNonePermissionsTo(authorization)">Deselect all</a>
+                    <li ng-repeat="perm in availablePermissionsFor()">
+                      <input type="checkbox" ng-click="changePermissionOf(perm, authorization)" ng-checked="authorization.permissions.includes(perm) || authorization.permissions.includes('ALL')">
+                      {{perm}}
                     </li>
                   </ul>
                 </div><!-- /input-btn-group -->
