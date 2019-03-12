@@ -16,6 +16,8 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
@@ -127,6 +129,14 @@ public class TimerEntity extends JobEntity {
   @Override
   public String getType() {
     return TYPE;
+  }
+
+  @Override
+  public Object getPersistentState() {
+    Map<String, Object> persistentState = (HashMap) super.getPersistentState();
+    persistentState.put("repeat", repeat);
+
+    return persistentState;
   }
 
   @Override

@@ -15,11 +15,16 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -571,4 +576,65 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     assertEquals(2, managementService.createJobQuery().withRetriesLeft().count());
   }
 
+  @Deployment
+  public void testUpdateTimerRepeat() {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Calendar currentTime = Calendar.getInstance();
+    ClockUtil.setCurrentTime(currentTime.getTime());
+
+    // GIVEN
+    // Start process instance with a non-interrupting boundary timer event
+    // on a user task
+    runtimeService.startProcessInstanceByKey("timerRepeat");
+
+    // there should be a single user task for the process instance
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(1, tasks.size());
+    assertEquals("User Waiting", tasks.get(0).getName());
+
+    // there should be a single timer job (R5/PT1H)
+    TimerEntity timerJob = (TimerEntity) managementService.createJobQuery().singleResult();
+    assertNotNull(timerJob);
+    assertEquals("R5/" + sdf.format(ClockUtil.getCurrentTime()) + "/PT1H", timerJob.getRepeat());
+
+    // WHEN
+    // we update the repeat property of the timer job
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      @Override
+      public Void execute(CommandContext commandContext) {
+
+        TimerEntity timerEntity = (TimerEntity) commandContext.getProcessEngineConfiguration()
+          .getManagementService()
+          .createJobQuery()
+          .singleResult();
+
+        // update repeat property
+        timerEntity.setRepeat("R3/PT3H");
+
+        return null;
+      }
+    });
+
+    // THEN
+    // the timer job should be updated
+    TimerEntity updatedTimerJob = (TimerEntity) managementService.createJobQuery().singleResult();
+    assertEquals("R3/PT3H", updatedTimerJob.getRepeat());
+
+    currentTime.add(Calendar.HOUR, 1);
+    ClockUtil.setCurrentTime(currentTime.getTime());
+    managementService.executeJob(timerJob.getId());
+
+    // and when the timer executes, there should be 2 user tasks waiting
+    tasks = taskService.createTaskQuery().orderByTaskCreateTime().asc().list();
+    assertEquals(2, tasks.size());
+    assertEquals("User Waiting", tasks.get(0).getName());
+    assertEquals("Timer Fired", tasks.get(1).getName());
+
+    // finally, the second timer job should have a DueDate in 3 hours instead of 1 hour
+    // and its repeat property should be the one we updated
+    TimerEntity secondTimerJob = (TimerEntity) managementService.createJobQuery().singleResult();
+    currentTime.add(Calendar.HOUR, 3);
+    assertEquals("R3/PT3H", secondTimerJob.getRepeat());
+    assertEquals(currentTime.getTime(), secondTimerJob.getDuedate());
+  }
 }
