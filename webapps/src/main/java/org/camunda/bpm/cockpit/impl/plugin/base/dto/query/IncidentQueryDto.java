@@ -35,6 +35,7 @@ public class IncidentQueryDto extends AbstractRestQueryParametersDto<IncidentDto
   private static final long serialVersionUID = 1L;
 
   private static final String SORT_BY_INCIDENT_TIMESTAMP = "incidentTimestamp";
+  private static final String SORT_BY_INCIDENT_MESSAGE = "incidentMessage";
   private static final String SORT_BY_INCIDENT_TYPE = "incidentType";
   private static final String SORT_BY_ACTIVITY_ID = "activityId";
   private static final String SORT_BY_CAUSE_INCIDENT_PROCESS_INSTANCE_ID = "causeIncidentProcessInstanceId";
@@ -42,8 +43,9 @@ public class IncidentQueryDto extends AbstractRestQueryParametersDto<IncidentDto
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_TIMESTAMP);
+    VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_MESSAGE);
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ACTIVITY_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_CAUSE_INCIDENT_PROCESS_INSTANCE_ID);
@@ -52,7 +54,8 @@ public class IncidentQueryDto extends AbstractRestQueryParametersDto<IncidentDto
 
   private static final Map<String, String> ORDER_BY_VALUES;
   static {
-    ORDER_BY_VALUES = new HashMap<String, String>();
+    ORDER_BY_VALUES = new HashMap<>();
+    ORDER_BY_VALUES.put(SORT_BY_INCIDENT_MESSAGE, "RES.INCIDENT_MSG_");
     ORDER_BY_VALUES.put(SORT_BY_INCIDENT_TIMESTAMP, "RES.INCIDENT_TIMESTAMP_");
     ORDER_BY_VALUES.put(SORT_BY_INCIDENT_TYPE, "RES.INCIDENT_TYPE_");
     ORDER_BY_VALUES.put(SORT_BY_ACTIVITY_ID, "RES.ACTIVITY_ID_");
