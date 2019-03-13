@@ -191,6 +191,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   protected Boolean withoutCandidateGroups;
   protected Boolean withCandidateUsers;
   protected Boolean withoutCandidateUsers;
+  
+  protected boolean variableNamesIgnoreCase;
+  protected boolean variableValuesIgnoreCase;
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
@@ -643,6 +646,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public void setCaseInstanceVariables(List<VariableQueryParameterDto> caseInstanceVariables) {
     this.caseInstanceVariables = caseInstanceVariables;
   }
+  
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(boolean variableNamesCaseInsensitive) {
+    this.variableNamesIgnoreCase = variableNamesCaseInsensitive;
+  }
+
+  @CamundaQueryParam(value ="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(boolean variableValuesCaseInsensitive) {
+    this.variableValuesIgnoreCase = variableValuesCaseInsensitive;
+  }
 
   @Override
   protected boolean isValidSortByValue(String value) {
@@ -969,6 +982,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public List<TaskQueryDto> getOrQueries() {
     return orQueries;
   }
+  
+  public boolean isVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public boolean isVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
+  }
 
   @Override
   protected void applyFilters(TaskQuery query) {
@@ -1222,6 +1243,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
     }
+    if(variableValuesIgnoreCase) {
+      query.matchVariableValuesIgnoreCase();
+    }
+    if(variableNamesIgnoreCase) {
+      query.matchVariableNamesIgnoreCase();
+    }
 
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
@@ -1243,12 +1270,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.taskVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.taskVariableValueLike(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.LIKE_IGNORE_CASE_OPERATOR_NAME)) {
-          query.taskVariableValueLikeIgnoreCase(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
-            query.taskVariableValueEqualsIgnoreCase(variableName, String.valueOf(variableValue));
-        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
-            query.taskVariableValueNotEqualsIgnoreCase(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid task variable comparator specified: " + op);
         }
@@ -1276,12 +1297,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.processVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.processVariableValueLike(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.LIKE_IGNORE_CASE_OPERATOR_NAME)) {
-          query.processVariableValueLikeIgnoreCase(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
-            query.processVariableValueEqualsIgnoreCase(variableName, String.valueOf(variableValue));
-        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
-            query.processVariableValueNotEqualsIgnoreCase(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
@@ -1309,12 +1324,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.caseInstanceVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.caseInstanceVariableValueLike(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.LIKE_IGNORE_CASE_OPERATOR_NAME)) {
-          query.caseInstanceVariableValueLikeIgnoreCase(variableName, String.valueOf(variableValue));
-        } else if (op.equals(VariableQueryParameterDto.EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
-            query.caseInstanceVariableValueEqualsIgnoreCase(variableName, String.valueOf(variableValue));
-        } else if(op.equals(VariableQueryParameterDto.NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME)) {
-            query.caseInstanceVariableValueNotEqualsIgnoreCase(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid case variable comparator specified: " + op);
         }
@@ -1715,5 +1724,4 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     return parameters;
   }
-
 }

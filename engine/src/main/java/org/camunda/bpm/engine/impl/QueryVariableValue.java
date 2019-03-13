@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,9 @@ public class QueryVariableValue implements Serializable {
   protected boolean local;
 
   protected AbstractQueryVariableValueCondition valueCondition;
+  
+  protected boolean variableNameIgnoreCase;
+  protected boolean variableValueIgnoreCase;
 
   public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local) {
     this.name = name;
@@ -83,5 +86,22 @@ public class QueryVariableValue implements Serializable {
 
   public boolean isLocal() {
     return local;
+  }
+  
+
+  public boolean isVariableNameIgnoreCase() {
+    return variableNameIgnoreCase;
+  }
+
+  public void setVariableNameIgnoreCase(boolean variableNameIgnoreCase) {
+    this.variableNameIgnoreCase = variableNameIgnoreCase;
+  }
+
+  public boolean isVariableValueIgnoreCase() {
+    return variableValueIgnoreCase;
+  }
+
+  public void setVariableValueIgnoreCase(boolean variableValueIgnoreCase) {
+    this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
 }

@@ -25,7 +25,7 @@
   <!-- This snippet is used by all queries that allow filtering by variable values -->
   <sql id="variableValueConditions">
 
-    <if test="queryVariableValue.operatorName.contains('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
+    <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
     (
     <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
       <trim prefix="(" prefixOverrides="and" suffix=")">
@@ -37,7 +37,7 @@
         <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
           and ${varPrefix}TEXT_ is not null and 
 		  <choose>
-		  	<when test="queryVariableValue.operatorName.contains('IGNORE_CASE')">UPPER(${varPrefix}TEXT_)</when>
+		  	<when test="queryVariableValue.variableValueIgnoreCase">UPPER(${varPrefix}TEXT_)</when>
 		  	<otherwise>${varPrefix}TEXT_</otherwise>
 		  </choose>
 		  <choose>
@@ -45,7 +45,7 @@
 		    <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
 		  </choose>
 		  <choose>
-		  	<when test="queryVariableValue.operatorName.contains('IGNORE_CASE')">UPPER(#{valueCondition.textValue})</when>
+		  	<when test="queryVariableValue.variableValueIgnoreCase">UPPER(#{valueCondition.textValue})</when>
 		  	<otherwise>#{valueCondition.textValue}</otherwise>
 		  </choose>
 		  ${collationForCaseSensitivity}
@@ -90,8 +90,6 @@
       <when test="queryVariableValue.operatorName.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
       <when test="queryVariableValue.operatorName.equals('LESS_THAN')">&lt;</when>
       <when test="queryVariableValue.operatorName.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
-      <when test="queryVariableValue.operatorName.equals('EQUALS_IGNORE_CASE')">=</when>
-      <when test="queryVariableValue.operatorName.equals('NOT_EQUALS_IGNORE_CASE')">=</when><!-- Note: NOT_EQUALS is handled by negating the condition -->
    </choose>
   </sql>
   

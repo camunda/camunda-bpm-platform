@@ -38,9 +38,6 @@ public class ConditionQueryParameterDto {
   public static final String LESS_THAN_OPERATOR_NAME = "lt";
   public static final String LESS_THAN_OR_EQUALS_OPERATOR_NAME = "lteq";
   public static final String LIKE_OPERATOR_NAME = "like";
-  public static final String LIKE_IGNORE_CASE_OPERATOR_NAME = "likeic";
-  public static final String EQUALS_IGNORE_CASE_OPERATOR_NAME = "eqic";
-  public static final String NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME = "neqic";
 
   protected static final Map<String, QueryOperator> NAME_OPERATOR_MAP = new HashMap<>();
 
@@ -52,9 +49,6 @@ public class ConditionQueryParameterDto {
     NAME_OPERATOR_MAP.put(LESS_THAN_OPERATOR_NAME, QueryOperator.LESS_THAN);
     NAME_OPERATOR_MAP.put(LESS_THAN_OR_EQUALS_OPERATOR_NAME, QueryOperator.LESS_THAN_OR_EQUAL);
     NAME_OPERATOR_MAP.put(LIKE_OPERATOR_NAME, QueryOperator.LIKE);
-    NAME_OPERATOR_MAP.put(LIKE_IGNORE_CASE_OPERATOR_NAME, QueryOperator.LIKE_IGNORE_CASE);
-    NAME_OPERATOR_MAP.put(EQUALS_IGNORE_CASE_OPERATOR_NAME, QueryOperator.EQUALS_IGNORE_CASE);
-    NAME_OPERATOR_MAP.put(NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME, QueryOperator.NOT_EQUALS_IGNORE_CASE);
   };
 
   protected static final Map<QueryOperator, String> OPERATOR_NAME_MAP = new HashMap<>();
@@ -67,9 +61,6 @@ public class ConditionQueryParameterDto {
     OPERATOR_NAME_MAP.put(QueryOperator.LESS_THAN, LESS_THAN_OPERATOR_NAME);
     OPERATOR_NAME_MAP.put(QueryOperator.LESS_THAN_OR_EQUAL, LESS_THAN_OR_EQUALS_OPERATOR_NAME);
     OPERATOR_NAME_MAP.put(QueryOperator.LIKE, LIKE_OPERATOR_NAME);
-    OPERATOR_NAME_MAP.put(QueryOperator.LIKE_IGNORE_CASE, LIKE_IGNORE_CASE_OPERATOR_NAME);
-    OPERATOR_NAME_MAP.put(QueryOperator.EQUALS_IGNORE_CASE, EQUALS_IGNORE_CASE_OPERATOR_NAME);
-    OPERATOR_NAME_MAP.put(QueryOperator.NOT_EQUALS_IGNORE_CASE, NOT_EQUALS_IGNORE_CASE_OPERATOR_NAME);
   };
 
   protected String operator;
