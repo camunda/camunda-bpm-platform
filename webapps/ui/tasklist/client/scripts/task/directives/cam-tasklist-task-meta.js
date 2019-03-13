@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 var fs = require('fs');
 
@@ -35,7 +52,7 @@ module.exports = [
         $scope.successHandler() || function() {};
         var errorHandler = $scope.errorHandler() || function() {};
 
-      /**
+        /**
        * observe task changes
        */
         taskMetaData.observe('task', function(task) {
@@ -52,7 +69,7 @@ module.exports = [
         });
 
 
-      /**
+        /**
        * observe task changes
        */
         taskMetaData.observe('isAssignee', function(isAssignee) {
@@ -68,7 +85,7 @@ module.exports = [
           $scope.groupNames = groupNames;
         });
 
-      /**
+        /**
        * reload data after the task has been updated
        */
         function reload() {
@@ -79,8 +96,8 @@ module.exports = [
         // - we see changes made by other users faster
           taskMetaData.changed('task');
 
-        // list of tasks must be reloaded as well:
-        // changed properties on this task may cause the list to change
+          // list of tasks must be reloaded as well:
+          // changed properties on this task may cause the list to change
           taskMetaData.changed('taskList');
         }
 
@@ -173,7 +190,7 @@ module.exports = [
         $scope.startEditingDueDate = notifyOnStartEditing('due');
         $scope.cancelEditingDueDate = notifyOnCancelEditing('due');
 
-      // initially set each control to false
+        // initially set each control to false
         $scope.editingState = {
           followUp: false,
           due: false,
@@ -338,9 +355,9 @@ module.exports = [
           $modal.open({
           // creates a child scope of a provided scope
             scope: $scope,
-          //TODO: extract filter edit modal class to super style sheet
+            //TODO: extract filter edit modal class to super style sheet
             windowClass: 'filter-edit-modal',
-          // size: 'md',
+            // size: 'md',
             template: editGroupsFormTemplate,
             controller: 'camGroupEditModalCtrl',
             resolve: {
@@ -359,9 +376,9 @@ module.exports = [
               taskMetaData.set('taskId', { taskId: $scope.task.id });
               taskMetaData.changed('taskList');
 
-            // okay, here is where it gets ugly: since the groups have changed, a listener to the event we just fired
-            // will update the task. that means that the complete html of the task is going to be replaced at some point in the future
-            // after this replacement, we have to set the focus to the groups trigger again
+              // okay, here is where it gets ugly: since the groups have changed, a listener to the event we just fired
+              // will update the task. that means that the complete html of the task is going to be replaced at some point in the future
+              // after this replacement, we have to set the focus to the groups trigger again
               doAfterGroupsLoaded.push(function() {
                 $timeout(function() {
                   document.querySelector('.meta .groups a').focus();

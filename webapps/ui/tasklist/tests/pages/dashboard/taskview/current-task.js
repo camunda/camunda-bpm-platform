@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var Page = require('./../dashboard-view');
@@ -34,12 +51,12 @@ module.exports = Page.extend({
   },
 
   commentInputField: function(inputValue) {
-      var inputField = this.commentModalFormElement().element(by.model('comment.message'));
+    var inputField = this.commentModalFormElement().element(by.model('comment.message'));
 
-      if (arguments.length !== 0)
-        inputField.sendKeys(inputValue);
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
 
-      return inputField;
+    return inputField;
   },
 
   commentSaveButton: function() {
@@ -109,14 +126,14 @@ module.exports = Page.extend({
     this.waitForElementToBeVisible(datePickerField);
 
     if (newTime) {
-      var timeValue = newTime.split(':')
+      var timeValue = newTime.split(':');
       var timePickerElement = datePickerField.element(by.css('.timepicker'));
 
       timePickerElement.element(by.model('hours')).clear().sendKeys(timeValue[0]);
       timePickerElement.element(by.model('minutes')).clear().sendKeys(timeValue[1]);
 
       // ToDo: implement date editing
-    };
+    }
 
     datePickerButton.element(by.css('[ng-click*="applyChange($event)"]')).click();
     this.waitForElementToBeNotPresent(datePickerField);
@@ -137,7 +154,7 @@ module.exports = Page.extend({
   },
 
   followUpDateTooltip: function() {
-    var tooltipTriggerer = this.followUpDateElement().element(by.css('[am-time-ago="task.followUp"]'))
+    var tooltipTriggerer = this.followUpDateElement().element(by.css('[am-time-ago="task.followUp"]'));
     browser.actions().mouseMove(tooltipTriggerer).perform();
 
     var tooltipWidget = element(by.css('body > [tooltip-popup]'));
@@ -160,7 +177,7 @@ module.exports = Page.extend({
   },
 
   dueDateTooltip: function() {
-    var tooltipTriggerer = this.dueDateElement().element(by.css('[am-time-ago="task.due"]'))
+    var tooltipTriggerer = this.dueDateElement().element(by.css('[am-time-ago="task.due"]'));
     browser.actions().mouseMove(tooltipTriggerer).perform();
 
     var tooltipWidget = element(by.css('body > [tooltip-popup]'));

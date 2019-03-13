@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 function injectParams(url, params) {
@@ -122,38 +139,38 @@ Page.prototype.findElementIndexInRepeater = function(repeaterName, elementSelect
 
 
 
-Page.prototype.headerWidget = function () {
+Page.prototype.headerWidget = function() {
   return element(by.css('[cam-widget-header]'));
 };
 
-Page.prototype.hamburgerButton = function () {
+Page.prototype.hamburgerButton = function() {
   return this.headerWidget().element(by.css('.navbar-toggle'));
 };
 
 
-Page.prototype.accountDropdown = function () {
+Page.prototype.accountDropdown = function() {
   return this.headerWidget().element(by.css('.account.dropdown'));
 };
 
-Page.prototype.accountDropdownButton = function () {
+Page.prototype.accountDropdownButton = function() {
   return this.accountDropdown().element(by.css('.dropdown-toggle'));
 };
 
 
-Page.prototype.engineSelectDropdown = function () {
+Page.prototype.engineSelectDropdown = function() {
   return this.headerWidget().element(by.css('.engine-select.dropdown'));
 };
 
-Page.prototype.engineSelectDropdownButton = function () {
+Page.prototype.engineSelectDropdownButton = function() {
   return this.engineSelectDropdown().element(by.css('.dropdown-toggle'));
 };
 
 
-Page.prototype.appSwitchDropdown = function () {
+Page.prototype.appSwitchDropdown = function() {
   return this.headerWidget().element(by.css('.app-switch.dropdown'));
 };
 
-Page.prototype.appSwitchDropdownButton = function () {
+Page.prototype.appSwitchDropdownButton = function() {
   return this.appSwitchDropdown().element(by.css('.dropdown-toggle'));
 };
 

@@ -6,13 +6,17 @@
     "quotes": [ 2, "single" ],
     "semi": [ 2, "always" ],
     "no-console": 1,
-    "no-self-assign": 0
+    "no-self-assign": 0,
+    "no-useless-escape": "off"
   },
   "env": {
     "node": true,
     "browser": true
   },
-  "extends": "eslint:recommended",
+  "extends": [
+    "eslint:recommended",
+    "plugin:camunda-licensed/apache"
+  ],
   "parserOptions": {
     "sourceType": "module"
   },

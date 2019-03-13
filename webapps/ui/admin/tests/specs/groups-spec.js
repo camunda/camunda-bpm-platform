@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var testHelper = require('../../../common/tests/test-helper');
@@ -51,16 +68,16 @@ describe('Admin Groups Spec', function() {
     it('should create new group with slash', function() {
 
       // given
-        groupsPage.newGroup.navigateTo();
+      groupsPage.newGroup.navigateTo();
 
       // when
-        groupsPage.newGroup.createNewGroup('/göäüp_name', '/üöäüöäü/', 'testgroup/üäö');
+      groupsPage.newGroup.createNewGroup('/göäüp_name', '/üöäüöäü/', 'testgroup/üäö');
 
       // then
-        expect(groupsPage.groupList().count()).to.eventually.eql(6);
-        expect(groupsPage.groupId(0).getText()).to.eventually.eql('/göäüp_name');
-        expect(groupsPage.groupName(0).getText()).to.eventually.eql('/üöäüöäü/');
-        expect(groupsPage.groupType(0).getText()).to.eventually.eql('testgroup/üäö');
+      expect(groupsPage.groupList().count()).to.eventually.eql(6);
+      expect(groupsPage.groupId(0).getText()).to.eventually.eql('/göäüp_name');
+      expect(groupsPage.groupName(0).getText()).to.eventually.eql('/üöäüöäü/');
+      expect(groupsPage.groupType(0).getText()).to.eventually.eql('testgroup/üäö');
     });
 
 
@@ -79,16 +96,16 @@ describe('Admin Groups Spec', function() {
     it('should create new group with backslash', function() {
 
       // given
-        groupsPage.newGroup.navigateTo();
+      groupsPage.newGroup.navigateTo();
 
       // when
-        groupsPage.newGroup.createNewGroup('\\göäüp_name', '\\üöäüöäü\\', 'testgroup\\üäö');
+      groupsPage.newGroup.createNewGroup('\\göäüp_name', '\\üöäüöäü\\', 'testgroup\\üäö');
 
       // then
-        expect(groupsPage.groupList().count()).to.eventually.eql(7);
-        expect(groupsPage.groupId(2).getText()).to.eventually.eql('\\göäüp_name');
-        expect(groupsPage.groupName(2).getText()).to.eventually.eql('\\üöäüöäü\\');
-        expect(groupsPage.groupType(2).getText()).to.eventually.eql('testgroup\\üäö');
+      expect(groupsPage.groupList().count()).to.eventually.eql(7);
+      expect(groupsPage.groupId(2).getText()).to.eventually.eql('\\göäüp_name');
+      expect(groupsPage.groupName(2).getText()).to.eventually.eql('\\üöäüöäü\\');
+      expect(groupsPage.groupType(2).getText()).to.eventually.eql('testgroup\\üäö');
     });
 
 
@@ -217,7 +234,7 @@ describe('Admin Groups Spec', function() {
     });
   });
 
-  describe('Pagination', function () {
+  describe('Pagination', function() {
 
     describe('list of groups', function() {
 
@@ -229,7 +246,7 @@ describe('Admin Groups Spec', function() {
         });
       });
 
-      it('displays a pager', function () {
+      it('displays a pager', function() {
 
         // then
         expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
@@ -248,7 +265,7 @@ describe('Admin Groups Spec', function() {
         });
       });
 
-      it('displays a pager', function () {
+      it('displays a pager', function() {
 
         // when
         groupsPage.selectGroupByNameLink(0);

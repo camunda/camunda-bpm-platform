@@ -1,10 +1,27 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var Page = require('./dashboard-view');
 
 module.exports = Page.extend({
 
-  createTaskDialog: function () {
+  createTaskDialog: function() {
     return element(by.css('.modal .modal-content'));
   },
 
@@ -37,11 +54,11 @@ module.exports = Page.extend({
   },
 
   taskNameField: function() {
-      return this.createTaskDialog().element(by.css('input[name="taskName"]'));
+    return this.createTaskDialog().element(by.css('input[name="taskName"]'));
   },
 
   taskAssigneeField: function() {
-      return this.createTaskDialog().element(by.css('input[name="taskAssignee"]'));
+    return this.createTaskDialog().element(by.css('input[name="taskAssignee"]'));
   },
 
   taskTenantIdField: function() {
@@ -49,20 +66,20 @@ module.exports = Page.extend({
   },
 
   taskNameInput: function(inputValue) {
-      var inputField = this.taskNameField();
+    var inputField = this.taskNameField();
 
-      if (arguments.length !== 0)
-        inputField.sendKeys(inputValue);
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
 
-      return inputField;
+    return inputField;
   },
 
   taskAssigneeInput: function(inputValue) {
-      var inputField = this.taskAssigneeField();
+    var inputField = this.taskAssigneeField();
 
-      if (arguments.length !== 0)
-        inputField.sendKeys(inputValue);
+    if (arguments.length !== 0)
+      inputField.sendKeys(inputValue);
 
-      return inputField;
+    return inputField;
   }
 });

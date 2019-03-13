@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* jshint ignore:start */
 'use strict';
 
@@ -200,23 +217,23 @@ describe('Cockpit Decision Definition Spec', function() {
 
     describe('decision definition with tenant id', function() {
 
-        before(function() {
-          // second decision definition is deployed for tenant with id 'tenant1'
-          decisionsPage.deployedDecisionsList.selectDecision(1);
-        });
-
-        it('should display definition tenant id', function() {
-
-          expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
-        });
-
-        it('should display definition version for tenant only', function() {
-
-          expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
-          expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
-        });
-
+      before(function() {
+        // second decision definition is deployed for tenant with id 'tenant1'
+        decisionsPage.deployedDecisionsList.selectDecision(1);
       });
+
+      it('should display definition tenant id', function() {
+
+        expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
+      });
+
+      it('should display definition version for tenant only', function() {
+
+        expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+        expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+      });
+
+    });
 
     describe('decision definition without tenant id', function() {
 

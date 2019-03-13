@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var testHelper = require('../../../common/tests/test-helper');
@@ -104,16 +121,16 @@ describe('Cockpit Variable Spec', function() {
         // then
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
         instancePage.variablesTab.findElementIndexInRepeater('(v, info) in variables', by.binding('variable.name'), 'myNullVar')
-        .then(function(idx) {
+          .then(function(idx) {
 
-          var variable = instancePage.variablesTab.variableAt(idx);
+            var variable = instancePage.variablesTab.variableAt(idx);
 
-          expect(variable.name().getText()).to.eventually.eql('myNullVar');
-          expect(variable.type().getText()).to.eventually.eql('Null');
-          expect(variable.value().getText()).to.eventually.eql('');
+            expect(variable.name().getText()).to.eventually.eql('myNullVar');
+            expect(variable.type().getText()).to.eventually.eql('Null');
+            expect(variable.value().getText()).to.eventually.eql('');
 
-          expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
-        });
+            expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
+          });
       });
     });
 
@@ -133,16 +150,16 @@ describe('Cockpit Variable Spec', function() {
         // then
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
         instancePage.variablesTab.findElementIndexInRepeater('(v, info) in variables', by.binding('variable.name'), 'myObjectVar')
-        .then(function(idx) {
+          .then(function(idx) {
 
-          var variable = instancePage.variablesTab.variableAt(idx);
+            var variable = instancePage.variablesTab.variableAt(idx);
 
-          expect(variable.name().getText()).to.eventually.eql('myObjectVar');
-          expect(variable.type().getText()).to.eventually.eql('Object');
-          expect(variable.value().getText()).to.eventually.eql('java.util.ArrayList');
+            expect(variable.name().getText()).to.eventually.eql('myObjectVar');
+            expect(variable.type().getText()).to.eventually.eql('Object');
+            expect(variable.value().getText()).to.eventually.eql('java.util.ArrayList');
 
-          expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
-        });
+            expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
+          });
       });
     });
 
@@ -188,11 +205,11 @@ describe('Cockpit Variable Spec', function() {
 
     describe('validate add variables modal view', function() {
       // ensure the modal dialog to be closed
-      after(function (done) {
+      after(function(done) {
         var btn = instancePage.addVariable.okButton();
-        btn.isPresent().then(function () {
-          btn.click().then(function () {done();});
-        }, function () {done();});
+        btn.isPresent().then(function() {
+          btn.click().then(function() {done();});
+        }, function() {done();});
       });
 
 
@@ -339,17 +356,17 @@ describe('Cockpit Variable Spec', function() {
     });
 
 
-    describe('variables table widget', function () {
+    describe('variables table widget', function() {
       var variable;
 
-      before(function () {
+      before(function() {
         // NEVER select a variable by index as you get no guarantee on  a consistent order
         // select variable by name instead
         variable = instancePage.variablesTab.variableByName('myString');
       });
 
 
-      it('shows the information about the variables by default', function () {
+      it('shows the information about the variables by default', function() {
         expect(variable.name().getText()).to.eventually.eql('myString');
 
         expect(variable.value().getText()).to.eventually.eql('abc dfg');
@@ -360,20 +377,20 @@ describe('Cockpit Variable Spec', function() {
       });
 
 
-      it('provides actions', function () {
+      it('provides actions', function() {
         expect(variable.editButton().isDisplayed()).to.eventually.eql(true);
 
         expect(variable.deleteButton().isDisplayed()).to.eventually.eql(true);
       });
 
 
-      describe('edit mode', function () {
-        before(function () {
+      describe('edit mode', function() {
+        before(function() {
           variable.enterEditMode();
         });
 
 
-        it('shows the relevant fields', function () {
+        it('shows the relevant fields', function() {
           expect(variable.typeSelectElement().isDisplayed()).to.eventually.eql(true);
 
           expect(variable.valueInput().isDisplayed()).to.eventually.eql(true);
@@ -382,36 +399,36 @@ describe('Cockpit Variable Spec', function() {
         });
 
 
-        describe('unchanged', function () {
-          it('does not allow to save', function () {
+        describe('unchanged', function() {
+          it('does not allow to save', function() {
             expect(variable.saveButton().getAttribute('disabled')).to.eventually.eql('true');
           });
         });
 
 
-        describe('changed', function () {
-          before(function () {
+        describe('changed', function() {
+          before(function() {
             variable.valueInput().clear().sendKeys('pipapo');
           });
 
 
-          it('enables the save button', function () {
+          it('enables the save button', function() {
             expect(variable.saveButton().getAttribute('disabled')).to.eventually.eql(null);
           });
 
 
-          describe('save action', function () {
-            before(function () {
+          describe('save action', function() {
+            before(function() {
               variable.saveButton().click();
             });
 
 
-            it('saves the variable', function () {
+            it('saves the variable', function() {
               expect(variable.value().getText()).to.eventually.eql('pipapo');
             });
 
 
-            it('exits the edit mode', function () {
+            it('exits the edit mode', function() {
               expect(variable.typeSelectElement().isPresent()).to.eventually.eql(false);
 
               expect(variable.valueInput().isPresent()).to.eventually.eql(false);
@@ -427,15 +444,15 @@ describe('Cockpit Variable Spec', function() {
       });
 
 
-      describe('deletion', function () {
-        before(function () {
+      describe('deletion', function() {
+        before(function() {
           instancePage.addVariable.addVariable('toBeDeleted', 'String', 'whatever');
 
           variable = instancePage.variablesTab.variableByName('toBeDeleted');
         });
 
 
-        it('is possible in read mode', function () {
+        it('is possible in read mode', function() {
           expect(variable.name().getText()).to.eventually.eql('toBeDeleted');
 
           expect(variable.deleteButton().isDisplayed()).to.eventually.eql(true);
