@@ -31,7 +31,7 @@ var Directive = [
       // ordered available columns
       var availableColumns = [
         { class: 'state',      request: 'incidentState',     sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_STATE')},
-        { class: 'message',    request: '',                  sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')},
+        { class: 'message',    request: 'incidentMessage',   sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')},
         { class: 'process-instance', request: 'processInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE_PROCESS_INSTANCE')},
         { class: 'create-time',request: 'createTime',        sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CREATE_TIME')},
         { class: 'end-time',   request: 'endTime',           sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_END_TIME')},
