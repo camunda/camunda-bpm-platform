@@ -798,6 +798,23 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     count = taskService.createTaskQuery().taskDefinitionKey("unexistingKey").taskDefinitionKeyIn("taskKey1").count();
     assertEquals(0l, count.longValue());
   }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableNameEqualsIgnoreCase() throws Exception {
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    taskService.setVariableLocal(task.getId(), variableName, variableValue);
+    
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().taskVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
+  }
 
   @Deployment
   public void testTaskVariableValueEquals() throws Exception {
@@ -846,9 +863,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals("integerVar", 999).count());
     assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals("stringVar", "999").count());
     assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals("booleanVar", false).count());
-
   }
-  
+
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
   public void testTaskVariableValueEqualsIgnoreCase() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -861,23 +877,26 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     // query for existing variable should return one result
     assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValue).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueEqualsIgnoreCase(variableName, variableValue.toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName, variableValue.toLowerCase()).count());
     
     // query for non existing variable should return zero results
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueEqualsIgnoreCase("nonExistentVariable", variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
     
     // query for existing variable with different value should return zero results
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName, "nonExistentValue").count());
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueEqualsIgnoreCase(variableName, "nonExistentValue".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName, "nonExistentValue".toLowerCase()).count());
     
     // query for case-insensitive variable value should only return a result when case-insensitive search is used
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValue.toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueEqualsIgnoreCase(variableName, variableValue.toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName, variableValue.toLowerCase()).count());
     
     // query for case-insensitive variable with not equals operator should only return a result when case-sensitive search is used
     assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueNotEqualsIgnoreCase(variableName, variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValue.toLowerCase()).matchVariableValuesIgnoreCase().count());
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
@@ -921,17 +940,17 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     taskService.setVariablesLocal(task.getId(), variables);
     
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("stringVar", "stringVal%".toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("stringVar", "%ngValue".toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("stringVar", "%ngVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngValue".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngVal%".toLowerCase()).count());
 
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("stringVar", "stringVar%".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("stringVar", "%ngVar".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("stringVar", "%ngVar%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "stringVar%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngVar".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngVar%".toLowerCase()).count());
 
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("stringVar", "stringVal".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().taskVariableValueLikeIgnoreCase("nonExistingVar", "stringVal%".toLowerCase()).count());
-    
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "stringVal".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("nonExistingVar", "stringVal%".toLowerCase()).count());
+
     // test with null value
     try {
       taskService.createTaskQuery().taskVariableValueLike("stringVar", null).count();
@@ -1129,23 +1148,23 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     
     // query for existing variable should return one result
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals(variableName, variableValue).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueEqualsIgnoreCase(variableName, variableValue.toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals(variableName, variableValue.toLowerCase()).count());
     
     // query for non existing variable should return zero results
     assertEquals(0, taskService.createTaskQuery().processVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().processVariableValueEqualsIgnoreCase("nonExistentVariable", variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
     
     // query for existing variable with different value should return zero results
     assertEquals(0, taskService.createTaskQuery().processVariableValueEquals(variableName, "nonExistentValue").count());
-    assertEquals(0, taskService.createTaskQuery().processVariableValueEqualsIgnoreCase(variableName, "nonExistentValue".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals(variableName, "nonExistentValue".toLowerCase()).count());
     
     // query for case-insensitive variable value should only return a result when case-insensitive search is used
     assertEquals(0, taskService.createTaskQuery().processVariableValueEquals(variableName, variableValue.toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueEqualsIgnoreCase(variableName, variableValue.toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals(variableName, variableValue.toLowerCase()).count());
     
     // query for case-insensitive variable with not equals operator should only return a result when case-sensitive search is used
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().processVariableValueNotEqualsIgnoreCase(variableName, variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
@@ -1181,20 +1200,20 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     assertEquals(0, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", "stringVal%".toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", "%ngValue".toLowerCase()).count());
-    assertEquals(1, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", "%ngVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngValue".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngVal%".toLowerCase()).count());
     
-    assertEquals(0, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", "stringVar%".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", "%ngVar".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", "%ngVar%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "stringVar%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngVar".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngVar%".toLowerCase()).count());
     
-    assertEquals(0, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", "stringVal".toLowerCase()).count());
-    assertEquals(0, taskService.createTaskQuery().processVariableValueLikeIgnoreCase("nonExistingVar", "stringVal%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "stringVal".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("nonExistingVar", "stringVal%".toLowerCase()).count());
     
     // test with null value
     try {
-      taskService.createTaskQuery().processVariableValueLikeIgnoreCase("stringVar", null).count();
+      taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", null).count();
       fail("expected exception");
     } catch (final ProcessEngineException e) {/*OK*/}
   }
@@ -2361,21 +2380,21 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     TaskQuery query;
     
     // query for case-insensitive variable value should only return a result when case-insensitive search is used
-    query = taskService.createTaskQuery().caseInstanceVariableValueEqualsIgnoreCase(variableName, variableValue.toLowerCase());
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals(variableName, variableValue.toLowerCase());
     verifyQueryResults(query, 1);
     query = taskService.createTaskQuery().caseInstanceVariableValueEquals(variableName, variableValue.toLowerCase());
     verifyQueryResults(query, 0);
     
     // query for non existing variable should return zero results
-    query = taskService.createTaskQuery().caseInstanceVariableValueEqualsIgnoreCase("nonExistingVariable", variableValue.toLowerCase());
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals("nonExistingVariable", variableValue.toLowerCase());
     verifyQueryResults(query, 0);
     
     // query for existing variable with different value should return zero results
-    query = taskService.createTaskQuery().caseInstanceVariableValueEqualsIgnoreCase(variableName, "nonExistentValue".toLowerCase());
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals(variableName, "nonExistentValue".toLowerCase());
     verifyQueryResults(query, 0);
     
     // query for case-insensitive variable with not equals operator should only return a result when case-sensitive search is used
-    query = taskService.createTaskQuery().caseInstanceVariableValueNotEqualsIgnoreCase(variableName, variableValue.toLowerCase());
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotEquals(variableName, variableValue.toLowerCase());
     verifyQueryResults(query, 0);
     query = taskService.createTaskQuery().caseInstanceVariableValueNotEquals(variableName, variableValue.toLowerCase());
     verifyQueryResults(query, 1);
@@ -3702,9 +3721,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     
     verifyQueryResults(query, 0);
     
-    query = taskService.createTaskQuery();
-    
-    query.caseInstanceVariableValueLikeIgnoreCase("aStringVariable", "aString%".toLowerCase());
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueLike("aStringVariable", "aString%".toLowerCase());
     
     verifyQueryResults(query, 1);
   }

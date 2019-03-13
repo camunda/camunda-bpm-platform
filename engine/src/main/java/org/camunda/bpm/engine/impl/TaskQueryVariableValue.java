@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,18 @@ public class TaskQueryVariableValue extends QueryVariableValue {
    * </ul>
    */
   public TaskQueryVariableValue(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
+    this(name, value, operator, isTaskVariable, isProcessInstanceVariable, false, false);
+  }
+  
+  public TaskQueryVariableValue(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable, boolean variableNameIgnoreCase, boolean variableValueIgnoreCase) {
     super(name, value, operator, isTaskVariable);
     this.isProcessInstanceVariable = isProcessInstanceVariable;
+    this.variableNameIgnoreCase = variableNameIgnoreCase;
+    this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
+  
 
   public boolean isProcessInstanceVariable() {
     return isProcessInstanceVariable;
   }
-
 }
