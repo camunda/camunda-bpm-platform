@@ -635,6 +635,6 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     TimerEntity secondTimerJob = (TimerEntity) managementService.createJobQuery().singleResult();
     currentTime.add(Calendar.HOUR, 3);
     assertEquals("R3/PT3H", secondTimerJob.getRepeat());
-    assertEquals(currentTime.getTime(), secondTimerJob.getDuedate());
+    assertEquals(sdf.format(currentTime.getTime()), sdf.format(secondTimerJob.getDuedate()));
   }
 }
