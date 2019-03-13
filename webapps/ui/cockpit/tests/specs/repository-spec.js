@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var testHelper = require('../../../common/tests/test-helper');
@@ -21,7 +38,7 @@ describe('Repository Spec', function() {
     });
 
     // handled by dashboard
-    xit('shows an active link in the header', function () {
+    xit('shows an active link in the header', function() {
       expect(repositoryPage.navbarItem(1).getText()).to.eventually.eql('Deployments');
       expect(repositoryPage.navbarItem(1).getAttribute('class')).to.eventually.contain('active');
     });
@@ -355,7 +372,7 @@ describe('Repository Spec', function() {
 
   });
 
-  describe('resource details view', function () {
+  describe('resource details view', function() {
 
     before(function() {
       return testHelper(setupFile.setup1, function() {
@@ -622,8 +639,8 @@ describe('Repository Spec', function() {
       // when
       // prevent tooltip to intercept click
       browser.actions().
-          mouseDown(element(by.css('body'))).
-          perform();
+        mouseDown(element(by.css('body'))).
+        perform();
       deploymentsPage.changeType(0, 'without Tenant ID');
 
       // then

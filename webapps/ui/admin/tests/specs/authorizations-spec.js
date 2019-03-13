@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var testHelper = require('../../../common/tests/test-helper');
@@ -57,7 +74,7 @@ describe('Admin Authorizations Spec', function() {
       return testHelper(setupFile.setup1, function() {
         // given
         authorizationsPage.navigateToWebapp('Admin');
-      })
+      });
     });
 
     it('should not show authorization navbar item for normal user', function() {
@@ -65,7 +82,7 @@ describe('Admin Authorizations Spec', function() {
       authorizationsPage.authentication.userLogin('ringo', 'cam123');
 
       // then
-      expect(authorizationsPage.checkNavbarItem('Authorizations').isPresent()).to.eventually.be.false
+      expect(authorizationsPage.checkNavbarItem('Authorizations').isPresent()).to.eventually.be.false;
     });
   });
 
@@ -734,93 +751,93 @@ describe('Admin Authorizations Spec', function() {
 
   describe('Tenant Authorizations', function() {
 
-      before(function() {
-        return testHelper(setupFile.setup1, function() {
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
 
-          authorizationsPage.navigateToWebapp('Admin');
-          authorizationsPage.authentication.userLogin('admin', 'admin');
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
 
-          authorizationsPage.selectNavbarItem('Authorizations');
-        });
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+    it('should navigate to tenant page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Tenant');
+
+      // then
+      authorizationsPage.tenant.isActive();
+      expect(authorizationsPage.tenant.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.tenant.boxHeader()).to.eventually.eql('Tenant Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'UPDATE',
+          'CREATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
       });
 
-      it('should navigate to tenant page', function() {
-
-        // when
-        authorizationsPage.selectAuthorizationNavbarItem('Tenant');
-
-        // then
-        authorizationsPage.tenant.isActive();
-        expect(authorizationsPage.tenant.createNewButton().isEnabled()).to.eventually.eql(true);
-        expect(authorizationsPage.tenant.boxHeader()).to.eventually.eql('Tenant Authorizations');
-      });
-
-
-      it('should validate authorization attributes', function() {
-
-        authorizationsPage.createNewButton().click().then(function() {
-
-          checkCreateNewState();
-
-          checkAuthorizationTypes();
-
-          var permissionsList = [
-            'READ',
-            'UPDATE',
-            'CREATE',
-            'DELETE'
-          ];
-          checkPermissionTypes(permissionsList);
-
-          abortCreatingNewAuthorization();
-        });
-
-      });
+    });
 
   });
 
   describe('Tenant Membership Authorizations', function() {
 
-      before(function() {
-        return testHelper(setupFile.setup1, function() {
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
 
-          authorizationsPage.navigateToWebapp('Admin');
-          authorizationsPage.authentication.userLogin('admin', 'admin');
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
 
-          authorizationsPage.selectNavbarItem('Authorizations');
-        });
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+    it('should navigate to tenant membership page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Tenant Membership');
+
+      // then
+      authorizationsPage.tenantMembership.isActive();
+      expect(authorizationsPage.tenantMembership.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.tenantMembership.boxHeader()).to.eventually.eql('Tenant Membership Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'CREATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
       });
 
-      it('should navigate to tenant membership page', function() {
-
-        // when
-        authorizationsPage.selectAuthorizationNavbarItem('Tenant Membership');
-
-        // then
-        authorizationsPage.tenantMembership.isActive();
-        expect(authorizationsPage.tenantMembership.createNewButton().isEnabled()).to.eventually.eql(true);
-        expect(authorizationsPage.tenantMembership.boxHeader()).to.eventually.eql('Tenant Membership Authorizations');
-      });
-
-
-      it('should validate authorization attributes', function() {
-
-        authorizationsPage.createNewButton().click().then(function() {
-
-          checkCreateNewState();
-
-          checkAuthorizationTypes();
-
-          var permissionsList = [
-            'CREATE',
-            'DELETE'
-          ];
-          checkPermissionTypes(permissionsList);
-
-          abortCreatingNewAuthorization();
-        });
-
-      });
+    });
 
   });
 

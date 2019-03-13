@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* jshint ignore:start */
 'use strict';
 
@@ -163,29 +180,29 @@ describe('Cockpit Process Definition Spec', function() {
 
     describe('process definition with tenant id', function() {
 
-        before(function() {
-          // process definitions with tenants are sorted below the ones without
-          processesPage.deployedProcessesList.selectProcess(1);
-        });
-
-        it('should display definition tenant id', function() {
-          // then
-          expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
-        });
-
-        it('should display definition version for tenant only', function() {
-          // then
-          expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
-          expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
-        });
-
-        it('should display running instances for tenant only', function() {
-          // then
-          expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
-          expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
-        });
-
+      before(function() {
+        // process definitions with tenants are sorted below the ones without
+        processesPage.deployedProcessesList.selectProcess(1);
       });
+
+      it('should display definition tenant id', function() {
+        // then
+        expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
+      });
+
+      it('should display definition version for tenant only', function() {
+        // then
+        expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+        expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+      });
+
+      it('should display running instances for tenant only', function() {
+        // then
+        expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
+        expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
+      });
+
+    });
 
     describe('process definition without tenant id', function() {
 
@@ -197,9 +214,9 @@ describe('Cockpit Process Definition Spec', function() {
       });
 
       it('should not display definition tenant id', function() {
-          // then
-          expect(definitionPage.information.tenantId()).to.eventually.contain('null');
-        });
+        // then
+        expect(definitionPage.information.tenantId()).to.eventually.contain('null');
+      });
 
       it('should display definition version for non-tenant only', function() {
         // then

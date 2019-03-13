@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 var fs = require('fs');
 
@@ -29,7 +46,7 @@ module.exports = function() {
     scope: {
       tasklistForm : '=',
 
-        /*
+      /*
          * current options are:
          * - hideCompleteButton: to hide the complete button inside the form directive
          * - disableCompleteButton: to disable or enable the complete button inside
@@ -40,21 +57,21 @@ module.exports = function() {
          */
       options: '=',
 
-        /*
+      /*
          * contains parameter like taskId, processDefinitionId, processDefinitionKey etc.
          */
       params: '=',
 
-        /* will be used to make a callback when the form will be completed */
+      /* will be used to make a callback when the form will be completed */
       onFormCompletionCallback: '&',
 
-        /*
+      /*
          * will be used to register a completion handler, when the completion
          * will be trigger from the outside of a form
          */
       onFormCompletion: '&',
 
-        /*
+      /*
          * is a callback which will called when the validation state of the
          * form changes (pass the flag '$invalid').
          */

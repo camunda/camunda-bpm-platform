@@ -1,31 +1,48 @@
-  'use strict';
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  module.exports = function() {
-    return {
-      link: function(scope, element) {
+'use strict';
 
-        var processData = scope.processData;
-        var selectedActivityInstanceQuery = element.attr('cam-select-activity-instance');
+module.exports = function() {
+  return {
+    link: function(scope, element) {
 
-        if (!processData) {
-          throw new Error('No processData defined in scope');
-        }
+      var processData = scope.processData;
+      var selectedActivityInstanceQuery = element.attr('cam-select-activity-instance');
 
-        if (!selectedActivityInstanceQuery) {
-          throw new Error('No activity instance id query given in @cam-select-activity');
-        }
+      if (!processData) {
+        throw new Error('No processData defined in scope');
+      }
 
-        element.on('click', function(event) {
+      if (!selectedActivityInstanceQuery) {
+        throw new Error('No activity instance id query given in @cam-select-activity');
+      }
 
-          event.preventDefault();
+      element.on('click', function(event) {
 
-          scope.$apply(function() {
-            // refresh view with selected activity instance id
-            processData.set('filter', {
-              activityInstanceIds: [scope.$eval(selectedActivityInstanceQuery)]
-            });
+        event.preventDefault();
+
+        scope.$apply(function() {
+          // refresh view with selected activity instance id
+          processData.set('filter', {
+            activityInstanceIds: [scope.$eval(selectedActivityInstanceQuery)]
           });
         });
-      }
-    };
+      });
+    }
   };
+};

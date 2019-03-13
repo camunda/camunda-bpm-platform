@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /* jshint ignore:start */
 'use strict';
 
@@ -158,7 +175,7 @@ describe.skip('Cockpit Process Instance Spec', function() {
       });
 
 
-      it('initially contains two groups', function () {
+      it('initially contains two groups', function() {
         expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(2);
       });
 
@@ -196,9 +213,9 @@ describe.skip('Cockpit Process Instance Spec', function() {
 
       before(function() {
         var el = element(by.css('[ng-click="close($event)"]'));
-        el.isPresent().then(function (yepNope) {
+        el.isPresent().then(function(yepNope) {
           if (!yepNope) { return; }
-          el.isDisplayed().then(function (yepNope) {
+          el.isDisplayed().then(function(yepNope) {
             if (!yepNope) { return; }
             el.click();
           });
@@ -216,7 +233,7 @@ describe.skip('Cockpit Process Instance Spec', function() {
       });
 
 
-      it('initially contains no users', function () {
+      it('initially contains no users', function() {
         expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(0);
       });
 
@@ -434,7 +451,7 @@ describe.skip('Cockpit Process Instance Spec', function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.goToSection('Processes');
-        processesPage.deployedProcessesList.selectProcessByName("Failed external task");
+        processesPage.deployedProcessesList.selectProcessByName('Failed external task');
         element(by.css('.ctn-content-bottom .instance-id [ng-transclude] a')).click();
         instancePage.incidentsTab.selectTab();
       });
@@ -447,8 +464,8 @@ describe.skip('Cockpit Process Instance Spec', function() {
   });
 
 
-  describe('Bulk job retry', function () {
-    before(function () {
+  describe('Bulk job retry', function() {
+    before(function() {
       return testHelper(setupFile.setup3, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -469,12 +486,12 @@ describe.skip('Cockpit Process Instance Spec', function() {
     }
 
 
-    describe('when only 1 job failed', function () {
-      before(function () {
+    describe('when only 1 job failed', function() {
+      before(function() {
         goToInstanceJobRetryModal('mi-incident');
       });
 
-      it('pre-selects the job', function () {
+      it('pre-selects the job', function() {
         expect(element(by.css('.modal-body')).isDisplayed()).to.eventually.eql(true);
         expect(getCheckedCheckboxes().count()).to.eventually.eql(2);
       });
@@ -482,12 +499,12 @@ describe.skip('Cockpit Process Instance Spec', function() {
 
 
 
-    describe('when 4 jobs failed', function () {
-      before(function () {
+    describe('when 4 jobs failed', function() {
+      before(function() {
         goToInstanceJobRetryModal('4 Failing Service Tasks');
       });
 
-      it('pre-selects the jobs', function () {
+      it('pre-selects the jobs', function() {
         expect(element(by.css('.modal-body')).isDisplayed()).to.eventually.eql(true);
         expect(getCheckedCheckboxes().count()).to.eventually.eql(5);
       });
@@ -495,12 +512,12 @@ describe.skip('Cockpit Process Instance Spec', function() {
 
 
 
-    describe('when 7 job failed', function () {
-      before(function () {
+    describe('when 7 job failed', function() {
+      before(function() {
         goToInstanceJobRetryModal('7 Failing Service Tasks');
       });
 
-      it('does not pre-select the jobs', function () {
+      it('does not pre-select the jobs', function() {
         expect(element(by.css('.modal-body')).isDisplayed()).to.eventually.eql(true);
         expect(getCheckedCheckboxes().count()).to.eventually.eql(0);
       });

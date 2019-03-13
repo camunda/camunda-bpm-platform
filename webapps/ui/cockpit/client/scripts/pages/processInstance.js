@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var fs = require('fs');
@@ -23,8 +40,8 @@ var Controller = [
   'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
   'integrateActivityInstanceFilter', 'isModuleAvailable', '$translate',
   function($scope, $filter, $rootScope, $location, search, ProcessDefinitionResource, ProcessInstanceResource,
-      IncidentResource, Views, Data, Transform, processInstance,   dataDepend, page, breadcrumbTrails,
-      integrateActivityInstanceFilter, isModuleAvailable, $translate) {
+    IncidentResource, Views, Data, Transform, processInstance,   dataDepend, page, breadcrumbTrails,
+    integrateActivityInstanceFilter, isModuleAvailable, $translate) {
 
     $scope.hasMigrationPlugin = isModuleAvailable('cockpit.plugin.migration');
     $scope.processInstance = processInstance;
@@ -301,13 +318,13 @@ var Controller = [
       ProcessInstanceResource.query({
         subProcessInstance: processInstance.id
       })
-      .$promise.then(function(response) {
+        .$promise.then(function(response) {
 
         // var superInstance = response.data[0];
-        var superInstance = response[0];
+          var superInstance = response[0];
 
-        done(null, superInstance);
-      }).catch(angular.noop);
+          done(null, superInstance);
+        }).catch(angular.noop);
     }
 
     $rootScope.showBreadcrumbs = true;
@@ -534,10 +551,10 @@ var Controller = [
 
     // INITIALIZE PLUGINS
     var instancePlugins = (
-        Views.getProviders({ component: 'cockpit.processInstance.runtime.tab' })).concat(
-        Views.getProviders({ component: 'cockpit.processInstance.runtime.action' })).concat(
-        Views.getProviders({ component: 'cockpit.processInstance.view' })).concat(
-        Views.getProviders({ component: 'cockpit.processInstance.diagram.overlay' }));
+      Views.getProviders({ component: 'cockpit.processInstance.runtime.tab' })).concat(
+      Views.getProviders({ component: 'cockpit.processInstance.runtime.action' })).concat(
+      Views.getProviders({ component: 'cockpit.processInstance.view' })).concat(
+      Views.getProviders({ component: 'cockpit.processInstance.diagram.overlay' }));
 
     var initData = {
       processInstance : processInstance,
@@ -556,54 +573,54 @@ var Controller = [
   }];
 
 ngModule
-    .controller('ProcessInstanceFilterController', [
-      '$scope', '$translate',
-      function($scope, $translate) {
-        var processData = $scope.processData.newChild($scope),
-            filterData;
+  .controller('ProcessInstanceFilterController', [
+    '$scope', '$translate',
+    function($scope, $translate) {
+      var processData = $scope.processData.newChild($scope),
+          filterData;
 
-        processData.provide('filterData', [ 'filter', function(filter) {
+      processData.provide('filterData', [ 'filter', function(filter) {
 
-          if (!filterData || filterData.filter != filter) {
-            var activityIds = filter.activityIds || [],
-                activityInstanceIds = filter.activityInstanceIds || [];
+        if (!filterData || filterData.filter != filter) {
+          var activityIds = filter.activityIds || [],
+              activityInstanceIds = filter.activityInstanceIds || [];
 
-            return {
-              filter: filter,
-              activityCount: activityIds.length || 0,
-              activityInstanceCount: activityInstanceIds.length || 0
-            };
-          } else {
-            return filterData;
-          }
-        }]);
-
-        processData.observe([ 'filterData' ], function(_filterData) {
-          $scope.filterData = filterData = _filterData;
-        });
-
-        $scope.clearSelection = function() {
-        // update cached filter
-          filterData = {
-            activityCount: 0,
-            activityInstanceCount: 0,
-            filter: {}
-          };
-
-          processData.set('filter', filterData.filter);
-        };
-
-        $scope.getDataWhen = function() {
           return {
-            'null' : $translate.instant('PAGES_PROCESS_INSTANCES_NOTHING'),
-            '0': $translate.instant('PAGES_PROCESS_INSTANCES_NOTHING'),
-            'one': $translate.instant('PAGES_PROCESS_INSTANCES_ONE_SELECT'),
-            'other': $translate.instant('PAGES_PROCESS_INSTANCES_OTHER_SELECT')
+            filter: filter,
+            activityCount: activityIds.length || 0,
+            activityInstanceCount: activityInstanceIds.length || 0
           };
+        } else {
+          return filterData;
+        }
+      }]);
+
+      processData.observe([ 'filterData' ], function(_filterData) {
+        $scope.filterData = filterData = _filterData;
+      });
+
+      $scope.clearSelection = function() {
+        // update cached filter
+        filterData = {
+          activityCount: 0,
+          activityInstanceCount: 0,
+          filter: {}
         };
 
-        $scope.sidebarTab = 'info';
-      }]);
+        processData.set('filter', filterData.filter);
+      };
+
+      $scope.getDataWhen = function() {
+        return {
+          'null' : $translate.instant('PAGES_PROCESS_INSTANCES_NOTHING'),
+          '0': $translate.instant('PAGES_PROCESS_INSTANCES_NOTHING'),
+          'one': $translate.instant('PAGES_PROCESS_INSTANCES_ONE_SELECT'),
+          'other': $translate.instant('PAGES_PROCESS_INSTANCES_OTHER_SELECT')
+        };
+      };
+
+      $scope.sidebarTab = 'info';
+    }]);
 
 var RouteConfig = [
   '$routeProvider',
@@ -634,58 +651,58 @@ var RouteConfig = [
                 var id = $route.current.params['id'];
 
                 $http.get(Uri.appUri('engine://engine/:engine/history/process-instance/') + id)
-                .then (function(result) {
+                  .then (function(result) {
 
-                  var path;
-                  var search;
+                    var path;
+                    var search;
 
-                  var status = $translate.instant('PROCESS_INSTANCE_STATUS_UNABLE_DISPLAY_RUNNING_INSTANCE');
-                  var message = $translate.instant('PROCESS_INSTANCE_MESSAGE_2', { id: id });
+                    var status = $translate.instant('PROCESS_INSTANCE_STATUS_UNABLE_DISPLAY_RUNNING_INSTANCE');
+                    var message = $translate.instant('PROCESS_INSTANCE_MESSAGE_2', { id: id });
 
-                  var historyProvider = Views.getProvider({
-                    id: 'history',
-                    component: 'cockpit.processInstance.view'
-                  });
+                    var historyProvider = Views.getProvider({
+                      id: 'history',
+                      component: 'cockpit.processInstance.view'
+                    });
 
-                  if (historyProvider) {
+                    if (historyProvider) {
                     // keep search params
-                    search = $location.search();
-                    path = '/process-instance/' + id + '/history';
+                      search = $location.search();
+                      path = '/process-instance/' + id + '/history';
 
-                    message = message + $translate.instant('PROCESS_INSTANCE_MESSAGE_3');
-                  }
-                  else {
-                    path = '/process-definition/' + result.data.processDefinitionId;
+                      message = message + $translate.instant('PROCESS_INSTANCE_MESSAGE_3');
+                    }
+                    else {
+                      path = '/process-definition/' + result.data.processDefinitionId;
 
-                    message = message + $translate.instant('PROCESS_INSTANCE_MESSAGE_4');
-                  }
+                      message = message + $translate.instant('PROCESS_INSTANCE_MESSAGE_4');
+                    }
 
-                  $location.path(path);
-                  $location.search(search || {});
-                  $location.replace();
+                    $location.path(path);
+                    $location.search(search || {});
+                    $location.replace();
 
-                  Notifications.addMessage({
-                    status: status,
-                    message: message,
-                    http: true,
-                    exclusive: [ 'http' ],
-                    duration: 5000
+                    Notifications.addMessage({
+                      status: status,
+                      message: message,
+                      http: true,
+                      exclusive: [ 'http' ],
+                      duration: 5000
+                    });
+
+                  })
+                  .catch (function() {
+
+                    $location.path('/dashboard');
+                    $location.search({});
+                    $location.replace();
+
+                    Notifications.addError({
+                      status: $translate.instant('PROCESS_INSTANCE_STATUS_FAILED_RUNNING_PROCESS'),
+                      message: $translate.instant('PROCESS_INSTANCE_MESSAGE_5', { id: id }),
+                      http: true,
+                      exclusive: [ 'http' ]
+                    });
                   });
-
-                })
-                .catch (function() {
-
-                  $location.path('/dashboard');
-                  $location.search({});
-                  $location.replace();
-
-                  Notifications.addError({
-                    status: $translate.instant('PROCESS_INSTANCE_STATUS_FAILED_RUNNING_PROCESS'),
-                    message: $translate.instant('PROCESS_INSTANCE_MESSAGE_5', { id: id }),
-                    http: true,
-                    exclusive: [ 'http' ]
-                  });
-                });
               }
             });
           }]
@@ -704,8 +721,8 @@ var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
 }];
 
 ngModule
-    .config(RouteConfig)
-    .config(ViewConfig)
-  ;
+  .config(RouteConfig)
+  .config(ViewConfig)
+;
 
 module.exports = ngModule;

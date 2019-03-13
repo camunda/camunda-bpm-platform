@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var $ = require('jquery');
@@ -23,10 +40,10 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
       var container = $(element);
       var containerId = attrs.ctnCollapsableParent;
 
-        // the element being collapsed
+      // the element being collapsed
       var collapsableElement = $('[ctn-collapsable]', container).eq(0);
 
-        // the direction into which to collapse
+      // the direction into which to collapse
       var direction = collapsableElement.attr('ctn-collapsable') || 'left';
       var vertical = direction === 'left' || direction === 'right';
 
@@ -46,42 +63,42 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
       var previouslyCollapsed = localConf.get('ctnCollapsableParent:collapsed:'+ containerId, 'no');
       var previouslyMaximized = localConf.get('ctnCollapsableParent:maximized:'+ containerId, 'no');
 
-        // the main element that compensates the collapsing
+      // the main element that compensates the collapsing
       var compensateElement = collapsableElement[direction === 'left' || direction === 'top' ? 'next' : 'prev']();
 
-        // a resize handle
+      // a resize handle
       var resizeHandle = $('<div class="resize-handle"></div>')
-                              .appendTo(container);
+        .appendTo(container);
 
-        /////// init show / hide handles ////////
+      /////// init show / hide handles ////////
 
       var showHandle =
           compensateElement
             .children('.show-collapsable')
-              .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-menu-' + (vertical ? 'right' : 'down') + '"></i>');
+            .addClass('expand-collapse')
+            .append('<i class="glyphicon glyphicon-menu-' + (vertical ? 'right' : 'down') + '"></i>');
 
       var hideHandle =
           collapsableElement
             .children('.hide-collapsable')
-              .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-menu-' + (vertical ? 'left' : 'up') + '"></i>');
+            .addClass('expand-collapse')
+            .append('<i class="glyphicon glyphicon-menu-' + (vertical ? 'left' : 'up') + '"></i>');
 
       var maximizeHandle =
           collapsableElement
             .children('.maximize-collapsable')
-              .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-resize-full"></i>');
+            .addClass('expand-collapse')
+            .append('<i class="glyphicon glyphicon-resize-full"></i>');
 
       var maximizeDirection = maximizeHandle.attr('maximize-parent-direction');
 
       var restoreHandle =
           collapsableElement
             .children('.restore-collapsable')
-              .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-resize-small"></i>');
+            .addClass('expand-collapse')
+            .append('<i class="glyphicon glyphicon-resize-small"></i>');
 
-        /**
+      /**
          * Toggle show / hide handles
          */
       function setCollapsed(collapsed, maximized) {
@@ -114,7 +131,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
         var resizeHandleAttachAttr = vertical ? 'left' : 'top';
         var changeAxis = vertical ? 'x' : 'y';
 
-          /**
+        /**
            * Create a { direction: i } object
            */
         function createOffset(i) {
@@ -124,7 +141,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           return style;
         }
 
-          /**
+        /**
            * Create a { changeAttr: i } object
            */
         function createSize(i) {
@@ -135,7 +152,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
         }
 
         resizeHandle
-            .addClass(vertical ? 'vertical' : 'horizontal');
+          .addClass(vertical ? 'vertical' : 'horizontal');
 
         var originalCollapsableSize = collapsableElement[changeAttr]();
 
@@ -168,39 +185,39 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
 
           if (direction === 'left' || direction === 'top') {
             resizeHandle
-                .css(resizeHandleAttachAttr, collapsableSize);
+              .css(resizeHandleAttachAttr, collapsableSize);
           } else {
             resizeHandle
-                .css(resizeHandleAttachAttr, collapsablePosition[resizeHandleAttachAttr]);
+              .css(resizeHandleAttachAttr, collapsablePosition[resizeHandleAttachAttr]);
           }
         }
 
         $(resizeHandle)
-            .draggable({ axis: changeAxis, containment: 'parent'})
-            .on('drag', function() {
-              var pos = getPos();
-              var collapsed = isCollapsed();
+          .draggable({ axis: changeAxis, containment: 'parent'})
+          .on('drag', function() {
+            var pos = getPos();
+            var collapsed = isCollapsed();
 
-              // update collapsed state on drag
-              setCollapsed(collapsed, isCurrentlyMaximized());
+            // update collapsed state on drag
+            setCollapsed(collapsed, isCurrentlyMaximized());
 
-              collapsableElement.css(changeAttr, pos);
-              compensateElement.css(direction, pos);
+            collapsableElement.css(changeAttr, pos);
+            compensateElement.css(direction, pos);
 
-              localConf.set('ctnCollapsableParent:size:'+ containerId, pos);
-            })
-            .on('dragstop', function() {
-              updateResizeHandlePosition();
+            localConf.set('ctnCollapsableParent:size:'+ containerId, pos);
+          })
+          .on('dragstop', function() {
+            updateResizeHandlePosition();
 
-              var collapsed = isCollapsed();
+            var collapsed = isCollapsed();
 
-              updateCollapsedClass(collapsed);
+            updateCollapsedClass(collapsed);
 
-              $rootScope.$broadcast('resize', {
-                direction: direction,
-                collapsed: collapsed
-              });
+            $rootScope.$broadcast('resize', {
+              direction: direction,
+              collapsed: collapsed
             });
+          });
 
         hideHandle.click(function() {
           var targetSize = isCurrentlyMaximized() ? minWidth || originalCollapsableSize : 0;

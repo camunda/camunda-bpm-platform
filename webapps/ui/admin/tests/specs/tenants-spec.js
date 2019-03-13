@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var testHelper = require('../../../common/tests/test-helper');
@@ -58,9 +75,9 @@ describe('Admin Tenants Spec', function() {
       tenantsPage.newTenant.createNewTenant('/töäünöäünt_name', '/töäünöäünt/');
 
       // then
-        expect(tenantsPage.tenantList().count()).to.eventually.eql(4);
-        expect(tenantsPage.tenantId(0).getText()).to.eventually.eql('/töäünöäünt_name');
-        expect(tenantsPage.tenantName(0).getText()).to.eventually.eql('/töäünöäünt/');
+      expect(tenantsPage.tenantList().count()).to.eventually.eql(4);
+      expect(tenantsPage.tenantId(0).getText()).to.eventually.eql('/töäünöäünt_name');
+      expect(tenantsPage.tenantName(0).getText()).to.eventually.eql('/töäünöäünt/');
     });
 
 
@@ -79,15 +96,15 @@ describe('Admin Tenants Spec', function() {
     it('should create new tenant with backslash', function() {
 
       // given
-        tenantsPage.newTenant.navigateTo();
+      tenantsPage.newTenant.navigateTo();
 
       // when
       tenantsPage.newTenant.createNewTenant('\\töäünöäünt_name', '\\töäünöäünt\\');
 
       // then
-        expect(tenantsPage.tenantList().count()).to.eventually.eql(5);
-        expect(tenantsPage.tenantId(2).getText()).to.eventually.eql('\\töäünöäünt_name');
-        expect(tenantsPage.tenantName(2).getText()).to.eventually.eql('\\töäünöäünt\\');
+      expect(tenantsPage.tenantList().count()).to.eventually.eql(5);
+      expect(tenantsPage.tenantId(2).getText()).to.eventually.eql('\\töäünöäünt_name');
+      expect(tenantsPage.tenantName(2).getText()).to.eventually.eql('\\töäünöäünt\\');
     });
 
 
@@ -153,7 +170,7 @@ describe('Admin Tenants Spec', function() {
 
   });
 
-  describe('Pagination', function () {
+  describe('Pagination', function() {
 
     describe('list of tenants in add tenants to user modal', function() {
       before(function() {
@@ -165,7 +182,7 @@ describe('Admin Tenants Spec', function() {
         });
       });
       
-      it('displays a pager', function () {
+      it('displays a pager', function() {
         // given
         usersPage.selectUserByEditLink(0);
         usersPage.editUserProfile.selectUserNavbarItem('Tenants');
@@ -189,7 +206,7 @@ describe('Admin Tenants Spec', function() {
         });
       });
 
-      it('displays a pager', function () {
+      it('displays a pager', function() {
 
         // given
         groupsPage.selectGroupByEditLink(0);
@@ -214,7 +231,7 @@ describe('Admin Tenants Spec', function() {
         });
       });
 
-      it('displays a pager', function () {
+      it('displays a pager', function() {
 
         // then
         expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
@@ -233,7 +250,7 @@ describe('Admin Tenants Spec', function() {
         });
       });
 
-      it('displays a pager', function () {
+      it('displays a pager', function() {
 
         // when
         tenantsPage.selectTenantByNameLink(0);
@@ -256,7 +273,7 @@ describe('Admin Tenants Spec', function() {
         });
       });
 
-      it('displays a pager', function () {
+      it('displays a pager', function() {
 
         // when
         tenantsPage.selectTenantByNameLink(0);

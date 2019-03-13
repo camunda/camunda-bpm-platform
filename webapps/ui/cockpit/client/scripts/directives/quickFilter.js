@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
   Defines a widget to filter activity instances in the activity tree
 
@@ -27,7 +44,7 @@ var $ = require('jquery');
 
 module.exports = function() {
 
-    /**
+  /**
       determine if an element has to be schown
      */
   function showElement(states, searched, $el) {
@@ -39,10 +56,10 @@ module.exports = function() {
           !!states.running ||
           !!states.completed) {
       if (
-          (!states.canceled  && $el.hasClass('state-canceled'))  ||
+        (!states.canceled  && $el.hasClass('state-canceled'))  ||
           (!states.running   && $el.hasClass('state-running'))   ||
           (!states.completed && $el.hasClass('state-completed'))
-        ) {
+      ) {
         return false;
       }
     }
@@ -85,8 +102,8 @@ module.exports = function() {
 
       var $holder = $(scope.holderSelector);
 
-        // activate (or not) a input (name or state)
-        // if the relevant attribute is present (might be empty)
+      // activate (or not) a input (name or state)
+      // if the relevant attribute is present (might be empty)
       scope.showNameFilter = typeof attrs.nameFilter !== 'undefined';
       scope.showStateFilter = typeof attrs.stateFilter !== 'undefined';
 

@@ -1,3 +1,20 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 
 var Base = require('./../../base');
@@ -20,15 +37,15 @@ module.exports = Base.extend({
 
   notificationStatus: function(idx) {
     return this.notificationList().get(idx)
-     .element(by.css('.status')).getText();
+      .element(by.css('.status')).getText();
   },
 
   notificationMessage: function(idx) {
     return this.notificationList().get(idx)
-     .element(by.css('.message')).getText();
+      .element(by.css('.message')).getText();
   },
 
-  selectPanelByKey: function (key) {
+  selectPanelByKey: function(key) {
     var selecta = 'accordion [is-open="accordion.' + key + '"]';
     var btnSelecta = selecta + ' [ng-click="toggleOpen()"]';
     var theElement = element(by.css('.panel-collapse.in'));
@@ -172,7 +189,7 @@ module.exports = Base.extend({
 
   permissionIdInput: function(inputValue) {
     var inputField = this.newPermissionPageElement()
-                      .element(by.model('newPermission.id'));
+      .element(by.model('newPermission.id'));
 
     if (arguments.length === 1)
       inputField.sendKeys(inputValue);
@@ -243,7 +260,7 @@ module.exports = Base.extend({
     return inputField;
   },
 
-  includeAssignedTasksCheckbox: function () {
+  includeAssignedTasksCheckbox: function() {
     return this.criteriaPageElement().element(by.css('[ng-model="filter.includeAssignedTasks"]'));
   },
   
@@ -300,7 +317,7 @@ module.exports = Base.extend({
 
   variableNameInput: function(idx, inputValue) {
     var inputField = this.variableList().get(idx)
-                      .element(by.model('variable.name'));
+      .element(by.model('variable.name'));
 
     if (arguments.length === 2)
       inputField.sendKeys(inputValue);
@@ -310,7 +327,7 @@ module.exports = Base.extend({
 
   variableLabelInput: function(idx, inputValue) {
     var inputField = this.variableList().get(idx)
-                      .element(by.model('variable.label'));
+      .element(by.model('variable.label'));
 
     if (arguments.length === 2)
       inputField.sendKeys(inputValue);
