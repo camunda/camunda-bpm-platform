@@ -117,7 +117,7 @@
     <profile>
       <id>check-api-compatibility</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <jdk>(,)</jdk>
       </activation>
       <build>
         <plugins>
