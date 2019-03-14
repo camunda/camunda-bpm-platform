@@ -591,6 +591,7 @@
                   NAME_= #{queryVariableValue.name}
                 </otherwise>
               </choose>
+              ${collationForCaseSensitivity}
 
               <choose>
                 <when test="queryVariableValue.local">
