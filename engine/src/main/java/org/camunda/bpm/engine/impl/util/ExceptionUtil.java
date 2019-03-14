@@ -80,6 +80,7 @@ public class ExceptionUtil {
     for (SQLException ex: sqlExceptionList) {
       if (ex.getMessage().contains("too long")
         || ex.getMessage().contains("too large")
+        || ex.getMessage().contains("TOO LARGE")
         || ex.getMessage().contains("ORA-01461")
         || ex.getMessage().contains("ORA-01401")
         || ex.getMessage().contains("data would be truncated")
@@ -145,6 +146,8 @@ public class ExceptionUtil {
           || ("23506".equals(exception.getSQLState()) && exception.getErrorCode() == 23506))
         // DB2
         || (exception.getMessage().toLowerCase().contains("sqlstate=23503") && exception.getMessage().toLowerCase().contains("sqlcode=-530"))
+        // DB2 zOS
+        || ("23503".equals(exception.getSQLState()) && exception.getErrorCode() == -530)
         ) {
 
         return true;

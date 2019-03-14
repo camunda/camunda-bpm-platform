@@ -96,7 +96,7 @@
   
   <update id="updateExecutionSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_EXECUTION set
-      REV_ = REV_ + 1,
+      REV_ = 1 + REV_ ,
       SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
       <if test="parameter.processInstanceId != null">

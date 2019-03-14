@@ -41,7 +41,7 @@
     values
     (
       #{id, jdbcType=VARCHAR},
-      1,
+      (1),
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{sentryId, jdbcType=VARCHAR},
