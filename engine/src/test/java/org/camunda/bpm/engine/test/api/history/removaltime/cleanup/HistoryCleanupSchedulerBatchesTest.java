@@ -107,7 +107,7 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY).getId();
 
     for (int i = 0; i < 5; i++) {
-      String processInstanceId = runtimeService.createProcessInstanceQuery().list().get(0).getId();
+      String processInstanceId = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list().get(0).getId();
       runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
       ClockUtil.setCurrentTime(END_DATE);
@@ -149,7 +149,7 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY).getId();
 
     for (int i = 0; i < 5; i++) {
-      String processInstanceId = runtimeService.createProcessInstanceQuery().list().get(0).getId();
+        String processInstanceId = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list().get(0).getId();
       runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
       ClockUtil.setCurrentTime(END_DATE);
