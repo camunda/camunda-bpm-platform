@@ -47,6 +47,7 @@ public class HistoryCleanupSchedulerIncidentsTest  extends AbstractHistoryCleanu
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      saveCurrentHistoryLevelAndUpdateTo(configuration, customHistoryLevel.getId());
       return configure(configuration, HistoryEventTypes.INCIDENT_CREATE);
     }
   };

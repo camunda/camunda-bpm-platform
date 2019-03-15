@@ -46,6 +46,7 @@ public class HistoryCleanupSchedulerAttachmentsTest extends AbstractHistoryClean
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      saveCurrentHistoryLevelAndUpdateTo(configuration, customHistoryLevel.getId());
       return configure(configuration);
     }
   };

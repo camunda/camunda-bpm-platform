@@ -48,6 +48,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      saveCurrentHistoryLevelAndUpdateTo(configuration, customHistoryLevel.getId());
       return configure(configuration, HistoryEventTypes.DMN_DECISION_EVALUATE);
     }
   };

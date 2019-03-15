@@ -30,14 +30,17 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.junit.After;
 import org.junit.AfterClass;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
@@ -60,6 +63,12 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
   protected ManagementService managementService;
 
   protected final Date END_DATE = new Date(1363608000000L);
+  
+  protected String oldHistoryLevel = "";
+  protected String jdbcUrl = "";
+  protected String jdbcUser =  "";
+  protected String jdbcPwd =  "";
+  protected String jdbcPrefix = "";
 
   public void initEngineConfiguration(ProcessEngineConfigurationImpl engineConfiguration) {
     engineConfiguration
@@ -76,8 +85,59 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
     engineConfiguration.initHistoryCleanup();
   }
 
+  protected void saveCurrentHistoryLevelAndUpdateTo(ProcessEngineConfigurationImpl tmpEngineConf, int newHistoryLevel) {
+    String oldValue = null; 
+    try {
+      jdbcUrl = tmpEngineConf.getJdbcUrl();
+      jdbcUser =  tmpEngineConf.getJdbcUsername();
+      jdbcPwd =  tmpEngineConf.getJdbcPassword();
+      jdbcPrefix = tmpEngineConf.getDatabaseTablePrefix();
+
+      Connection con = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPwd);
+      Statement stat = con.createStatement();
+
+      ResultSet rs= stat.executeQuery("SELECT VALUE_ FROM " + jdbcPrefix + "ACT_GE_PROPERTY WHERE NAME_ = 'historyLevel' ");
+      if (rs.next()) {
+        oldValue = rs.getString(1);
+      }
+      rs.close();
+      stat.close();
+
+      stat = con.createStatement();
+      if (oldValue == null) {
+        stat.execute("INSERT INTO " + jdbcPrefix + "ACT_GE_PROPERTY (NAME_, VALUE_, REV_) VALUES ('historyLevel', '" + newHistoryLevel + "', 1)"  );
+      } else {
+        stat.execute("UPDATE " + jdbcPrefix + "ACT_GE_PROPERTY SET VALUE_ = '" + newHistoryLevel + "' WHERE NAME_ = 'historyLevel' ");
+      }
+      stat.close();
+      con.close();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    oldHistoryLevel=  oldValue;
+  }
+
+  private void setHistoryLevelBackToOriginal(String newHistoryLevel) {
+    System.out.println("HistoryLevel set back to " + newHistoryLevel);
+    try {
+      Connection con = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPwd);
+      Statement stat = con.createStatement();
+      if (newHistoryLevel != null)
+        stat.execute("UPDATE " + jdbcPrefix + "ACT_GE_PROPERTY SET VALUE_ = '" + newHistoryLevel + "' WHERE NAME_ = 'historyLevel' ");
+      else {
+        stat.execute("DELETE FROM " + jdbcPrefix + "ACT_GE_PROPERTY WHERE NAME_ = 'historyLevel' ");
+      }
+      stat.close();
+      con.close();
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
   @After
   public void tearDown() {
+    setHistoryLevelBackToOriginal(oldHistoryLevel);
     clearMeterLog();
 
     for (String jobId : jobIds) {
@@ -167,10 +227,8 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
   }
 
   public ProcessEngineConfiguration configure(ProcessEngineConfigurationImpl configuration, HistoryEventTypes... historyEventTypes) {
-    configuration.setJdbcUrl("jdbc:h2:mem:" + thisClass.getSimpleName());
     configuration.setCustomHistoryLevels(setCustomHistoryLevel(historyEventTypes));
     configuration.setHistory(customHistoryLevel.getName());
-    configuration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_CREATE_DROP);
     return configuration;
   }
 

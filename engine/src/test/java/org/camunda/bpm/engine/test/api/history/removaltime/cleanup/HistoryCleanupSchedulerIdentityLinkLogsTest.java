@@ -47,6 +47,7 @@ public class HistoryCleanupSchedulerIdentityLinkLogsTest extends AbstractHistory
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      saveCurrentHistoryLevelAndUpdateTo(configuration, customHistoryLevel.getId());
       return configure(configuration, HistoryEventTypes.TASK_INSTANCE_CREATE, HistoryEventTypes.IDENTITY_LINK_ADD);
     }
   };

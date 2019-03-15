@@ -47,6 +47,7 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      saveCurrentHistoryLevelAndUpdateTo(configuration, customHistoryLevel.getId());
       return configure(configuration, HistoryEventTypes.JOB_FAIL);
     }
   };
