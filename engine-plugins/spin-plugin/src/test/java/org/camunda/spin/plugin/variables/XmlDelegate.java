@@ -30,7 +30,7 @@ import static org.junit.Assert.assertThat;
 public class XmlDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) {
-    execution.setVariable("xmlVariable", Variables.untypedValue(xmlValue("<xml />")));
+    execution.setVariable("xmlVariable", Variables.untypedValue(xmlValue("<xml />"),true));
 
     // when
     TypedValue typedValue = execution.getVariableTyped("xmlVariable");
