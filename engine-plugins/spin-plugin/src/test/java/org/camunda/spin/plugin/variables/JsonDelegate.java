@@ -30,7 +30,7 @@ import static org.junit.Assert.assertThat;
 public class JsonDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) {
-    execution.setVariable("jsonVariable", Variables.untypedValue(jsonValue("{}")));
+    execution.setVariable("jsonVariable", Variables.untypedValue(jsonValue("{}"),true));
 
     // when
     TypedValue typedValue = execution.getVariableTyped("jsonVariable");
