@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean withoutTenantId;
   private List<String> activityIds;
   private Boolean rootProcessInstances;
+  private Boolean isProcessDefinitionWithoutTenantId;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -286,6 +287,15 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.rootProcessInstances = rootProcessInstances;
   }
 
+  public Boolean isProcessDefinitionWithoutTenantId() {
+    return isProcessDefinitionWithoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionWithoutTenantId", converter = BooleanConverter.class)
+  public void setProcessDefinitionWithoutTenantId(Boolean isProcessDefinitionWithoutTenantId) {
+    this.isProcessDefinitionWithoutTenantId = isProcessDefinitionWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -361,6 +371,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (TRUE.equals(rootProcessInstances)) {
       query.rootProcessInstances();
+    }
+    if (TRUE.equals(isProcessDefinitionWithoutTenantId)) {
+      query.processDefinitionWithoutTenantId();
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
