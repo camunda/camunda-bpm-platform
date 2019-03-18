@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -912,4 +912,35 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     verify(mockedQuery).rootProcessInstances();
   }
+
+  @Test
+  public void testQueryProcessDefinitionWithoutTenantId() {
+    given()
+      .queryParam("processDefinitionWithoutTenantId", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionWithoutTenantId();
+  }
+
+  @Test
+  public void testQueryProcessDefinitionWithoutTenantIdAsPost() {
+    Map<String, Object> params = new HashMap<>();
+    params.put("processDefinitionWithoutTenantId", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionWithoutTenantId();
+  }
+
 }

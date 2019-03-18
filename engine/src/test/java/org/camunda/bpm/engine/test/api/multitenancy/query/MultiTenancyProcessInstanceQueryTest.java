@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.test.api.multitenancy.StaticTenantIdTestProvider;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -166,6 +167,40 @@ public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngine
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
     assertThat(query.count(), is(3L));
+  }
+
+  public void testQueryByProcessDefinitionWithoutTenantId() {
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+      .processDefinitionWithoutTenantId();
+
+    // then
+    assertThat(query.count(), is(1L));
+    assertThat(query.withoutTenantId().count(), is(1L));
+  }
+
+  public void testQueryByProcessDefinitionWithoutTenantId_VaryingProcessInstanceTenantId() {
+    // given
+    StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(null);
+    processEngineConfiguration.setTenantIdProvider(tenantIdProvider);
+
+    tenantIdProvider.setTenantIdProvider("anotherTenantId");
+
+    runtimeService.createProcessInstanceByKey("testProcess")
+      .processDefinitionWithoutTenantId()
+      .execute();
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+      .processDefinitionWithoutTenantId();
+
+    // then
+    assertThat(query.count(), is(2L));
+    assertThat(query.withoutTenantId().count(), is(1L));
+    assertThat(query.tenantIdIn("anotherTenantId").count(), is(1L));
+
+    // cleanup
+    processEngineConfiguration.setTenantIdProvider(null);
   }
 
 }

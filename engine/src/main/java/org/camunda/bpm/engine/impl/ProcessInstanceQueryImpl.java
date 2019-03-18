@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean isProcessDefinitionWithoutTenantId = false;
 
   public ProcessInstanceQueryImpl() {
   }
@@ -237,6 +238,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery processDefinitionWithoutTenantId() {
+    isProcessDefinitionWithoutTenantId = true;
+    return this;
+  }
+
   //results /////////////////////////////////////////////////////////////////
 
   @Override
@@ -342,4 +348,9 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public boolean isRootProcessInstances() {
     return isRootProcessInstances;
   }
+
+  public boolean isProcessDefinitionWithoutTenantId() {
+    return isProcessDefinitionWithoutTenantId;
+  }
+
 }
