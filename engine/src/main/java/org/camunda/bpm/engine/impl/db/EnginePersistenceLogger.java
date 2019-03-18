@@ -724,4 +724,13 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         ));
   }
 
+
+  public BadUserRequestException disabledPermissionException(String permission) {
+    return new BadUserRequestException(exceptionMessage(
+        "088",
+        "The '{}' permission is disabled, please check your process engine configuration.",
+        permission
+        ));
+  }
+
 }

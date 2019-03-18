@@ -411,7 +411,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
 
   public void testIsUserAuthorizedWithValidResourceImpl() {
     // given
-    ResourceImpl resource = new ResourceImpl("authorization", 0);
+    ResourceImpl resource = new ResourceImpl("application", 0);
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     String userId = "userId";
     authorization.setUserId(userId);

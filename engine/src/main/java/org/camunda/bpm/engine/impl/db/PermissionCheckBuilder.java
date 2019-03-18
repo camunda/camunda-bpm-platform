@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
  * @author Thorben Lindhauer
@@ -52,21 +54,25 @@ public class PermissionCheckBuilder {
   }
 
   public PermissionCheckBuilder atomicCheck(Resource resource, String queryParam, Permission permission) {
-    PermissionCheck permCheck = new PermissionCheck();
-    permCheck.setResource(resource);
-    permCheck.setResourceIdQueryParam(queryParam);
-    permCheck.setPermission(permission);
-    this.atomicChecks.add(permCheck);
+    if (!isPermissionDisabled(permission)) {
+      PermissionCheck permCheck = new PermissionCheck();
+      permCheck.setResource(resource);
+      permCheck.setResourceIdQueryParam(queryParam);
+      permCheck.setPermission(permission);
+      this.atomicChecks.add(permCheck);
+    }
 
     return this;
   }
 
   public PermissionCheckBuilder atomicCheckForResourceId(Resource resource, String resourceId, Permission permission) {
-    PermissionCheck permCheck = new PermissionCheck();
-    permCheck.setResource(resource);
-    permCheck.setResourceId(resourceId);
-    permCheck.setPermission(permission);
-    this.atomicChecks.add(permCheck);
+    if (!isPermissionDisabled(permission)) {
+      PermissionCheck permCheck = new PermissionCheck();
+      permCheck.setResource(resource);
+      permCheck.setResourceId(resourceId);
+      permCheck.setPermission(permission);
+      this.atomicChecks.add(permCheck);
+    }
 
     return this;
   }
@@ -98,5 +104,10 @@ public class PermissionCheckBuilder {
     if (!atomicChecks.isEmpty() && !compositeChecks.isEmpty()) {
       throw new ProcessEngineException("Mixed authorization checks of atomic and composite permissions are not supported");
     }
+  }
+
+  public boolean isPermissionDisabled(Permission permission) {
+    AuthorizationManager authorizationManager = Context.getCommandContext().getAuthorizationManager();
+    return authorizationManager.isPermissionDisabled(permission);
   }
 }
