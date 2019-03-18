@@ -166,7 +166,7 @@ var Controller = [
       if(definition.tenantId) {
         queryParams.tenantIdIn = [ definition.tenantId ];
       } else {
-        queryParams.withoutTenantId = true;
+        queryParams.processDefinitionWithoutTenantId = true;
       }
 
       return ProcessInstanceResource.count(queryParams).$promise;
