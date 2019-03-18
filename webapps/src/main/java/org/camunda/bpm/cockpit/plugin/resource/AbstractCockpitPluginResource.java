@@ -16,6 +16,7 @@
 package org.camunda.bpm.cockpit.plugin.resource;
 
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
@@ -140,11 +141,23 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
    * Add a new {@link PermissionCheck} with the given values.
    */
   protected void addPermissionCheck(QueryParameters<?>  query, Resource resource, String queryParam, Permission permission) {
-    PermissionCheck permCheck = new PermissionCheck();
-    permCheck.setResource(resource);
-    permCheck.setResourceIdQueryParam(queryParam);
-    permCheck.setPermission(permission);
-    query.getAuthCheck().addAtomicPermissionCheck(permCheck);
+    if(!isPermissionDisabled(permission)){
+      PermissionCheck permCheck = new PermissionCheck();
+      permCheck.setResource(resource);
+      permCheck.setResourceIdQueryParam(queryParam);
+      permCheck.setPermission(permission);
+      query.getAuthCheck().addAtomicPermissionCheck(permCheck);
+    }
+  }
+
+  protected boolean isPermissionDisabled(Permission permission) {
+    Set<Permission> disabledPermissions = getProcessEngine().getProcessEngineConfiguration().getDisabledPermissions();
+    for (Permission disabledPerm : disabledPermissions) {
+      if (!disabledPerm.getName().equals(permission.getName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }
