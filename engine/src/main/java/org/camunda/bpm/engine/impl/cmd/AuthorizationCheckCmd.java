@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
@@ -31,6 +33,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
  *
  */
 public class AuthorizationCheckCmd implements Command<Boolean> {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected String userId;
   protected List<String> groupIds;
@@ -48,7 +52,10 @@ public class AuthorizationCheckCmd implements Command<Boolean> {
   }
 
   public Boolean execute(CommandContext commandContext) {
-    final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();    
+    final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    if (authorizationManager.isPermissionDisabled(permission)) {
+      throw LOG.disabledPermissionException(permission.getName());
+    }
     return authorizationManager.isAuthorized(userId, groupIds, permission, resource, resourceId);
   }
 

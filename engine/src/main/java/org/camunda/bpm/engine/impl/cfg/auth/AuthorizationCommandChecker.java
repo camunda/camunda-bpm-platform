@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
-import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
@@ -211,23 +210,16 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
     // necessary permissions:
     // - DELETE on PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = new PermissionCheck();
-    firstCheck.setPermission(DELETE);
-    firstCheck.setResource(PROCESS_INSTANCE);
-    firstCheck.setResourceId(execution.getProcessInstanceId());
-
     // ... OR ...
-
     // - DELETE_INSTANCE on PROCESS_DEFINITION
 
-    PermissionCheck secondCheck = new PermissionCheck();
-    secondCheck.setPermission(DELETE_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
+    CompositePermissionCheck deleteInstancePermission = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), DELETE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), DELETE_INSTANCE)
+        .build();
 
-    getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
+    getAuthorizationManager().checkAuthorization(deleteInstancePermission);
   }
 
   @Override
@@ -370,22 +362,15 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
     // necessary permissions:
     // - READ on PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = getAuthorizationManager().newPermissionCheck();
-    firstCheck.setPermission(READ);
-    firstCheck.setResource(PROCESS_INSTANCE);
-    firstCheck.setResourceId(job.getProcessInstanceId());
-
     // ... OR ...
-
     // - READ_INSTANCE on PROCESS_DEFINITION
-    PermissionCheck secondCheck = getAuthorizationManager().newPermissionCheck();
-    secondCheck.setPermission(READ_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(job.getProcessDefinitionKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
+    CompositePermissionCheck readJobPermission = new PermissionCheckBuilder()
+        .disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), READ)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(), READ_INSTANCE)
+        .build();
 
-    getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
+    getAuthorizationManager().checkAuthorization(readJobPermission);
   }
 
   @Override

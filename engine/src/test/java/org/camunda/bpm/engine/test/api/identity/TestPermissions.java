@@ -25,7 +25,8 @@ public enum TestPermissions implements Permission {
   UPDATE("UPDATE", 4),
   CREATE("CREATE", 4),
   DELETE("DELETE", 16),
-  ACCESS("ACCESS", 32);
+  ACCESS("ACCESS", 32),
+  RANDOM("RANDOM", 64);
 
   private TestPermissions(String name, int value) {
     this.name = name;

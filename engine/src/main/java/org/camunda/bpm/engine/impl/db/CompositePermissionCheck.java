@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@ package org.camunda.bpm.engine.impl.db;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
  * @author Thorben Lindhauer
@@ -39,7 +43,9 @@ public class CompositePermissionCheck {
   }
 
   public void addAtomicCheck(PermissionCheck permissionCheck) {
-    this.atomicChecks.add(permissionCheck);
+    if (!isPermissionDisabled(permissionCheck)) {
+      this.atomicChecks.add(permissionCheck);
+    }
   }
 
   public void setAtomicChecks(List<PermissionCheck> atomicChecks) {
@@ -85,5 +91,11 @@ public class CompositePermissionCheck {
 
     return allChecks;
 
+  }
+
+  protected boolean isPermissionDisabled(PermissionCheck permissionCheck) {
+    AuthorizationManager authorizationManager = Context.getCommandContext().getAuthorizationManager();
+    Permission permission = permissionCheck.getPermission();
+    return authorizationManager.isPermissionDisabled(permission);
   }
 }

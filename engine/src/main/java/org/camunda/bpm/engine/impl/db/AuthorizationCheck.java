@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,13 +59,6 @@ public class AuthorizationCheck implements Serializable {
   public AuthorizationCheck() {
   }
 
-  public AuthorizationCheck(String authUserId, List<String> authGroupIds, List<PermissionCheck> permissionChecks, boolean isRevokeAuthorizationCheckEnabled) {
-    this.authUserId = authUserId;
-    this.authGroupIds = authGroupIds;
-    this.permissionChecks.setAtomicChecks(permissionChecks);
-    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;    
-  }
-  
   public AuthorizationCheck(String authUserId, List<String> authGroupIds, CompositePermissionCheck permissionCheck, boolean isRevokeAuthorizationCheckEnabled) {
     this.authUserId = authUserId;
     this.authGroupIds = authGroupIds;

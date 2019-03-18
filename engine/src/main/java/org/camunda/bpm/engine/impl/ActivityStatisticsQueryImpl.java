@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,8 +108,8 @@ public class ActivityStatisticsQueryImpl extends
     this.processInstancePermissionChecks = processInstancePermissionChecks;
   }
 
-  public void addProcessInstancePermissionCheck(PermissionCheck permissionCheck) {
-    processInstancePermissionChecks.add(permissionCheck);
+  public void addProcessInstancePermissionCheck(List<PermissionCheck> permissionChecks) {
+    processInstancePermissionChecks.addAll(permissionChecks);
   }
 
   public List<PermissionCheck> getJobPermissionChecks() {
@@ -120,8 +120,8 @@ public class ActivityStatisticsQueryImpl extends
     this.jobPermissionChecks = jobPermissionChecks;
   }
 
-  public void addJobPermissionCheck(PermissionCheck permissionCheck) {
-    jobPermissionChecks.add(permissionCheck);
+  public void addJobPermissionCheck(List<PermissionCheck> permissionChecks) {
+    jobPermissionChecks.addAll(permissionChecks);
   }
 
   public List<PermissionCheck> getIncidentPermissionChecks() {
@@ -132,7 +132,7 @@ public class ActivityStatisticsQueryImpl extends
     this.incidentPermissionChecks = incidentPermissionChecks;
   }
 
-  public void addIncidentPermissionCheck(PermissionCheck permissionCheck) {
-    incidentPermissionChecks.add(permissionCheck);
+  public void addIncidentPermissionCheck(List<PermissionCheck> permissionChecks) {
+    incidentPermissionChecks.addAll(permissionChecks);
   }
 }
