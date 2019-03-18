@@ -16,6 +16,7 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -372,7 +373,7 @@ public abstract class ProcessEngineConfiguration {
    * Specifies which permissions will not be taken into account in
    * authorizations checks if authorization is enabled.
    */
-  protected Set<Permission> disabledPermissions;
+  protected Set<Permission> disabledPermissions = new HashSet<>();
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {

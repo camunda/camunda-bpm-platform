@@ -31,17 +31,21 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
@@ -50,6 +54,7 @@ import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -58,6 +63,7 @@ import org.camunda.bpm.engine.test.api.identity.TestPermissions;
 import org.camunda.bpm.engine.test.api.identity.TestResource;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -86,6 +92,7 @@ public class DisabledPermissionsAuthorizationTest {
   AuthorizationService authorizationService;
   RuntimeService runtimeService;
   ManagementService managementService;
+  TaskService taskService;
 
   @Before
   public void setUp() {
@@ -95,6 +102,7 @@ public class DisabledPermissionsAuthorizationTest {
     authorizationService = engineRule.getAuthorizationService();
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
+    taskService = engineRule.getTaskService();
   }
 
   @After
@@ -148,6 +156,52 @@ public class DisabledPermissionsAuthorizationTest {
   // specific scenarios //////////////////////////////////////
 
   @Test
+  public void testGetVariableIgnoreTaskRead() {
+    // given
+    Set<Permission> permissions = new HashSet<>();
+    permissions.add(TaskPermissions.READ);
+    processEngineConfiguration.setDisabledPermissions(permissions);
+    String taskId = "taskId";
+    Task task = taskService.newTask(taskId);
+    taskService.saveTask(task);
+
+    taskService.setVariables(taskId, Variables.createVariables().putValue("foo", "bar"));
+    authRule.enableAuthorization(USER_ID);
+
+    // when
+    Object variable = taskService.getVariable(taskId, "foo");
+
+    // then
+    assertEquals("bar", variable);
+    authRule.disableAuthorization();
+    taskService.deleteTask(taskId, true);
+  }
+
+  @Test
+  @Ignore
+  public void testQueryTaskIgnoreTaskRead() {
+    // given
+    Set<Permission> permissions = new HashSet<>();
+    permissions.add(TaskPermissions.READ);
+    permissions.add(ProcessDefinitionPermissions.READ_TASK);
+    processEngineConfiguration.setDisabledPermissions(permissions);
+    String taskId = "taskId";
+    Task task = taskService.newTask(taskId);
+    taskService.saveTask(task);
+
+    taskService.setVariables(taskId, Variables.createVariables().putValue("foo", "bar"));
+    authRule.enableAuthorization(USER_ID);
+
+    // when
+    Task returnedTask = taskService.createTaskQuery().singleResult();
+
+    // then
+    assertNotNull(returnedTask);
+    authRule.disableAuthorization();
+    taskService.deleteTask(taskId, true);
+  }
+
+  @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testDeleteHistoricProcessInstanceIgnoreDeleteHistory() {
@@ -166,13 +220,13 @@ public class DisabledPermissionsAuthorizationTest {
   }
 
   @Test
+  @Ignore
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testQueryDeploymentIgnoreRead() {
     // given
     Set<Permission> permissions = new HashSet<>();
     permissions.add(READ);
     engineRule.getProcessEngineConfiguration().setDisabledPermissions(permissions);
-    authRule.createGrantAuthorization(Resources.DEPLOYMENT, "*", USER_ID, READ);
 
     // when
     authRule.enableAuthorization(USER_ID);
@@ -212,10 +266,6 @@ public class DisabledPermissionsAuthorizationTest {
     Set<Permission> permissions = new HashSet<>();
     permissions.add(READ_INSTANCE);
     processEngineConfiguration.setDisabledPermissions(permissions);
-    String processDefinitionKey = "process";
-    startProcessAndExecuteJob(processDefinitionKey);
-    startProcessAndExecuteJob(processDefinitionKey);
-    startProcessAndExecuteJob(processDefinitionKey);
 
     authRule.enableAuthorization(USER_ID);
 
