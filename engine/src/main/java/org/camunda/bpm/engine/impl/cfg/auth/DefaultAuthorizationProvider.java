@@ -187,7 +187,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
       // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
       // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-      authorization = updateAuthorization(authorization, newAssignee, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecifiReadVariablePermission());
+      authorization = updateAuthorization(authorization, newAssignee, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
 
       // return always created or updated authorization
       return new AuthorizationEntity[]{ authorization };
@@ -212,7 +212,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
       // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
       // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-      authorization = updateAuthorization(authorization, newOwner, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecifiReadVariablePermission());
+      authorization = updateAuthorization(authorization, newOwner, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
 
       // return always created or updated authorization
       return new AuthorizationEntity[]{ authorization };
@@ -237,7 +237,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
     // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
     // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-    authorization = updateAuthorization(authorization, userId, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecifiReadVariablePermission());
+    authorization = updateAuthorization(authorization, userId, null, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
 
     // return always created or updated authorization
     return new AuthorizationEntity[]{ authorization };
@@ -259,7 +259,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     // (1) fetched authorization == null -> create a new authorization (with READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled)
     // (2) fetched authorization != null -> add READ, (UPDATE/TASK_WORK) permission, and READ_VARIABLE if enabled
     // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
-    authorization = updateAuthorization(authorization, null, groupId, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecifiReadVariablePermission());
+    authorization = updateAuthorization(authorization, null, groupId, TASK, taskId, READ, getDefaultUserPermissionForTask(), getSpecificReadVariablePermission());
 
     // return always created or updated authorization
     return new AuthorizationEntity[]{ authorization };
@@ -349,7 +349,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       .getDefaultUserPermissionForTask();
   }
 
-  protected Permission getSpecifiReadVariablePermission() {
+  protected Permission getSpecificReadVariablePermission() {
     return Context
       .getProcessEngineConfiguration()
       .isEnforceSpecificVariablePermission() ? TaskPermissions.READ_VARIABLE : null;
