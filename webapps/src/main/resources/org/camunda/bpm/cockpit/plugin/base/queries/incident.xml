@@ -67,14 +67,14 @@
           on
             RES.ROOT_CAUSE_INCIDENT_ID_ = ROOT_CAUSE.ID_
 
-          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+          <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
           inner join
               ${prefix}ACT_RE_PROCDEF PROCDEF
           on
               RES.PROC_DEF_ID_ = PROCDEF.ID_
           </if>
 
-          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+          <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
             AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, PROCDEF.KEY_, '*'))
           </if>
