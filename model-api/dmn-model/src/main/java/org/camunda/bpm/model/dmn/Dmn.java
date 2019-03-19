@@ -18,6 +18,7 @@ package org.camunda.bpm.model.dmn;
 
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_ALTERNATIVE_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN12_NS;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -218,6 +219,7 @@ public class Dmn {
   protected Dmn() {
     dmnModelBuilder = ModelBuilder.createInstance("DMN Model");
     dmnModelBuilder.alternativeNamespace(DMN11_ALTERNATIVE_NS, DMN11_NS);
+    dmnModelBuilder.alternativeNamespace(DMN12_NS, DMN11_NS);
     doRegisterTypes(dmnModelBuilder);
     dmnModel = dmnModelBuilder.build();
   }

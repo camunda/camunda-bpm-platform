@@ -20,6 +20,7 @@ public final class DmnModelConstants {
 
   /** The DMN 1.1 namespace */
   public static final String DMN11_NS = "http://www.omg.org/spec/DMN/20151101/dmn.xsd";
+  public static final String DMN12_NS = "http://www.omg.org/spec/DMN/20180521/MODEL/";
   
   /**
    * The DMN 1.1 namespace URL release with Camunda 7.4.0
@@ -28,6 +29,7 @@ public final class DmnModelConstants {
 
   /** The location of the DMN 1.1 XML schema. */
   public static final String DMN_11_SCHEMA_LOCATION = "DMN11.xsd";
+  public static final String DMN_12_SCHEMA_LOCATION = "DMN12.xsd";
 
   /**
    * The location of the DMN 1.1 XML schema released with Camunda 7.4.0
@@ -36,6 +38,7 @@ public final class DmnModelConstants {
 
   /** The FEEL namespace */
   public static final String FEEL_NS = "http://www.omg.org/spec/FEEL/20140401";
+  public static final String FEEL12_NS = "http://www.omg.org/spec/DMN/20180521/FEEL/";
 
   /** Camunda namespace */
   public static final String CAMUNDA_NS = "http://camunda.org/schema/1.0/dmn";
