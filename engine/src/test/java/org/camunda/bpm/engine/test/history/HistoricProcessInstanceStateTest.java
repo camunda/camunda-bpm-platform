@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.TerminateEventDefinition;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,6 +39,7 @@ import java.util.List;
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -254,6 +256,33 @@ public class HistoricProcessInstanceStateTest {
     assertEquals(1, processEngineRule.getHistoryService().createHistoricProcessInstanceQuery().completed().count());
     assertThat(entity2.getState(), is(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED));
     assertEquals(1, processEngineRule.getHistoryService().createHistoricProcessInstanceQuery().internallyTerminated().count());
+  }
+
+  @Test
+  @Ignore("CAM-9934")
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/CAM-9934.bpmn"})
+  public void test() {
+    // given
+    processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
+
+    String jobId = processEngineRule.getManagementService()
+      .createJobQuery()
+      .timers()
+      .executable()
+      .singleResult()
+      .getId();
+
+    // when
+    processEngineRule.getManagementService()
+      .executeJob(jobId);
+
+    HistoricProcessInstance historicProcessInstance = processEngineRule.getHistoryService()
+      .createHistoricProcessInstanceQuery()
+      .singleResult();
+
+    // then
+    assertThat(historicProcessInstance.getState(), is(HistoricProcessInstance.STATE_ACTIVE));
+    assertThat(historicProcessInstance.getEndTime(), nullValue());
   }
 
   private HistoricProcessInstance getHistoricProcessInstanceWithAssertion(ProcessDefinition processDefinition) {
