@@ -181,7 +181,8 @@ public interface FormService {
    * Completes a task with the user data that was entered as properties in a task form.
    *
    * @param taskId
-   * @param properties
+   * @param properties 
+   * @return a map of process variables
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}

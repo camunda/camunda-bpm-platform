@@ -811,6 +811,23 @@ public class TaskServiceTest {
     assertEquals(processVarValue, vars.get(processVarName));
     assertEquals(taskVarValue, vars.get(taskVarName));
   }
+  
+  @Test
+  public void testCompleteStandaloneTaskWithVariablesInReturn() {
+    String taskVarName = "taskVar";
+    String taskVarValue = "taskVarValue";
+
+    String taskId = "myTask";
+    Task standaloneTask = taskService.newTask(taskId);
+    taskService.saveTask(standaloneTask);
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(taskVarName, taskVarValue);
+    
+    Map<String, Object> returnedVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+    // expect empty Map for standalone tasks
+    assertEquals(0, returnedVariables.size());
+  }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml" })
   @Test
