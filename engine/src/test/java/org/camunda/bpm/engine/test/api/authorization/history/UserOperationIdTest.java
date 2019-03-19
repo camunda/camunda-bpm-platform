@@ -207,9 +207,7 @@ public class UserOperationIdTest {
         .processInstanceId(pi.getId())
         .list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
-    for (HistoricDetail historicDetail : historicDetails) {
-        System.out.println(historicDetail.getUserOperationId());
-    }
+
     assertFalse(userOperationLogEntries.isEmpty());
     assertFalse(historicDetails.isEmpty());
     verifySameOperationId(userOperationLogEntries, historicDetails);
@@ -233,9 +231,7 @@ public class UserOperationIdTest {
         .processInstanceId(pi.getId())
         .list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
-    for (HistoricDetail historicDetail : historicDetails) {
-        System.out.println(historicDetail.getUserOperationId());
-    }
+
     assertFalse(userOperationLogEntries.isEmpty());
     assertFalse(historicDetails.isEmpty());
     verifySameOperationId(userOperationLogEntries, historicDetails);
