@@ -307,7 +307,7 @@
           left join ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
           on EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
 
-          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+          <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
             left join ${prefix}ACT_RU_EXECUTION PROC_EXECUTION
             on PROC_EXECUTION.ID_ = RES.PROC_INST_ID_
 

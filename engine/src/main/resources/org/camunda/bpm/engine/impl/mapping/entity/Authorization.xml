@@ -536,7 +536,7 @@
 
   <!-- reusable authorization check for queries. -->
   <sql id="queryAuthorizationCheck">    
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <choose>
           <when test="authCheck.revokeAuthorizationCheckEnabled">
             <bind name="permissionChecks" value="authCheck.permissionChecks" />
@@ -562,7 +562,7 @@
   
   <!-- reusable single authorization check for queries. -->
   <sql id="querySingleAuthorizationCheck">
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
 
         <bind name="authUserId" value="authCheck.authUserId" />
         <bind name="authGroupIds" value="authCheck.authGroupIds" />
@@ -588,7 +588,7 @@
   
   
   <sql id="authCheckJoin">
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">      
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">      
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />      
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, '*'))      
     </if>    
@@ -741,7 +741,7 @@
   </sql>
 
   <sql id="contextualAuthorizationCheck">
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       <choose>
         <when test="authCheck.revokeAuthorizationCheckEnabled">    
           <bind name="authUserId" value="authCheck.authUserId" />

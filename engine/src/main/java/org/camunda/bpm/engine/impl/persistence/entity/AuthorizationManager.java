@@ -799,6 +799,9 @@ public class AuthorizationManager extends AbstractManager {
           .atomicCheck(PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE)
           .build();
 
+      // the following is need in order to evaluate whether to perform authCheck or not
+      query.getAuthCheck().setPermissionChecks(processInstancePermissionCheck);
+      // the actual check
       query.addProcessInstancePermissionCheck(processInstancePermissionCheck.getAllPermissionChecks());
 
       if (query.isFailedJobsToInclude()) {
@@ -808,6 +811,9 @@ public class AuthorizationManager extends AbstractManager {
             .atomicCheck(PROCESS_DEFINITION, "JOB.PROCESS_DEF_KEY_", READ_INSTANCE)
             .build();
 
+        // the following is need in order to evaluate whether to perform authCheck or not
+        query.getAuthCheck().setPermissionChecks(jobPermissionCheck);
+        // the actual check
         query.addJobPermissionCheck(jobPermissionCheck.getAllPermissionChecks());
       }
 
@@ -818,6 +824,9 @@ public class AuthorizationManager extends AbstractManager {
             .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
             .build();
 
+        // the following is need in order to evaluate whether to perform authCheck or not
+        query.getAuthCheck().setPermissionChecks(incidentPermissionCheck);
+        // the actual check
         query.addIncidentPermissionCheck(incidentPermissionCheck.getAllPermissionChecks());
 
       }

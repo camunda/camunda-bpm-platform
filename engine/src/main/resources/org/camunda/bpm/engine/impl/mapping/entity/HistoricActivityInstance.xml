@@ -203,7 +203,7 @@
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select
-    <if test="authCheck.isAuthorizationCheckEnabled">
+    <if test="authCheck.shouldPerformAuthorizatioCheck">
     ${distinct}
     </if>
     RES.*
@@ -215,7 +215,7 @@
 
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
     select count(
-    <if test="authCheck.isAuthorizationCheckEnabled">
+    <if test="authCheck.shouldPerformAuthorizatioCheck">
     distinct
     </if>
     RES.ID_)
@@ -225,7 +225,7 @@
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
     FROM ${prefix}ACT_HI_ACTINST RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
@@ -283,7 +283,7 @@
         </foreach>
       </if>
 
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
       </if>
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck"/>

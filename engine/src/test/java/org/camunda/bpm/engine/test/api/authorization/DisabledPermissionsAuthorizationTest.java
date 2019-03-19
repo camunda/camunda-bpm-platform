@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
@@ -109,7 +110,7 @@ public class DisabledPermissionsAuthorizationTest {
   public void tearDown() {
     authRule.disableAuthorization();
     authRule.deleteUsersAndGroups();
-    engineRule.getProcessEngineConfiguration().setDisabledPermissions(null);
+    processEngineConfiguration.setDisabledPermissions(null);
   }
 
   @Test
@@ -178,7 +179,6 @@ public class DisabledPermissionsAuthorizationTest {
   }
 
   @Test
-  @Ignore
   public void testQueryTaskIgnoreTaskRead() {
     // given
     Set<Permission> permissions = new HashSet<>();
@@ -189,7 +189,6 @@ public class DisabledPermissionsAuthorizationTest {
     Task task = taskService.newTask(taskId);
     taskService.saveTask(task);
 
-    taskService.setVariables(taskId, Variables.createVariables().putValue("foo", "bar"));
     authRule.enableAuthorization(USER_ID);
 
     // when
@@ -220,7 +219,6 @@ public class DisabledPermissionsAuthorizationTest {
   }
 
   @Test
-  @Ignore
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testQueryDeploymentIgnoreRead() {
     // given
@@ -260,12 +258,14 @@ public class DisabledPermissionsAuthorizationTest {
   }
 
   @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/authorization/timerBoundaryEventProcess.bpmn20.xml")
   public void testDeploymentStatisticsIgnoreReadInstance() {
     // given
     Set<Permission> permissions = new HashSet<>();
     permissions.add(READ_INSTANCE);
     processEngineConfiguration.setDisabledPermissions(permissions);
+
+    runtimeService.startProcessInstanceByKey("timerBoundaryProcess");
 
     authRule.enableAuthorization(USER_ID);
 
@@ -276,13 +276,36 @@ public class DisabledPermissionsAuthorizationTest {
     List<DeploymentStatistics> statistics = query.list();
 
     for (DeploymentStatistics deploymentStatistics : statistics) {
-      assertEquals("Instances", 0, deploymentStatistics.getInstances());
+      assertEquals("Instances", 1, deploymentStatistics.getInstances());
       assertEquals("Failed Jobs", 0, deploymentStatistics.getFailedJobs());
 
       List<IncidentStatistics> incidentStatistics = deploymentStatistics.getIncidentStatistics();
       assertTrue("Incidents supposed to be empty", incidentStatistics.isEmpty());
     }
 
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/authorization/timerBoundaryEventProcess.bpmn20.xml")
+  public void testActivityStatisticsIgnoreRead() {
+    // given
+    Set<Permission> permissions = new HashSet<>();
+    permissions.add(READ);
+    permissions.add(READ_INSTANCE);
+    processEngineConfiguration.setDisabledPermissions(permissions);
+    String processDefinitionId = runtimeService.startProcessInstanceByKey("timerBoundaryProcess").getProcessDefinitionId();
+
+    authRule.enableAuthorization(USER_ID);
+
+    // when
+    ActivityStatistics statistics = managementService.createActivityStatisticsQuery(processDefinitionId).singleResult();
+
+    // then
+    assertNotNull(statistics);
+    assertEquals("task", statistics.getId());
+    assertEquals(1, statistics.getInstances());
+    assertEquals(0, statistics.getFailedJobs());
+    assertTrue(statistics.getIncidentStatistics().isEmpty());
   }
 
   @Test
