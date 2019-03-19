@@ -26,7 +26,6 @@ var variableInstancesTabSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/
 var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.html', 'utf8');
 var inspectTemplate = require('../../../../../client/scripts/components/variables/variable-inspect-dialog');
 var uploadTemplate = require('../../../../../client/scripts/components/variables/variable-upload-dialog');
-var variableDeletionTemplate = fs.readFileSync(__dirname + '/variable-deletion-dialog.html', 'utf8');
 
 
 module.exports = function(ngModule) {
@@ -125,35 +124,6 @@ module.exports = function(ngModule) {
       };
 
       $scope.deleteVariable = function(info) {
-        // Open Modal to make sure the user wants to delete
-        var promise = $q.defer();
-
-        $modal.open({
-          controller: ['$scope',
-            function($scope) {
-              $scope.body = $translate.instant('PLUGIN_VARIABLE_DELETE_DIALOGUE', {'name': info.variable.name});
-              $scope.submit = function() {
-                $scope.$close();
-                deleteVariable(info)
-                  .then(function(res) {
-                    promise.resolve(res);
-                  }, function() {
-                    promise.reject();
-                  });
-              };
-
-              $scope.dismiss = function() {
-                $scope.$close();
-                promise.reject();
-              };
-            }],
-          template: variableDeletionTemplate
-        }).result.catch(angular.noop);
-
-        return promise.promise;
-      };
-
-      var deleteVariable = function(info) {
         var promise = $q.defer();
 
         var callback = function(error) {
