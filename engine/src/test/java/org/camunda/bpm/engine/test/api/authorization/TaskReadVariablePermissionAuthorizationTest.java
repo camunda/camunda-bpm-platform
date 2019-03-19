@@ -323,10 +323,6 @@ public class TaskReadVariablePermissionAuthorizationTest {
     authRule.enableAuthorization(userId);
   }
 
-  protected void setReadInstanceVariableAsDefaultReadVariablePermission() {
-    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
-  }
-
   protected void verifyUserAuthorization(String userId) {
     authRule.disableAuthorization();
     Authorization userAuthorization = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
