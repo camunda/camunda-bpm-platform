@@ -65,8 +65,7 @@ module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI',
   };
 
   $scope.changePermissionOf = function(perm, authorization) {
-    //var resourcePermissions = $scope.getPermissionsForResource();
-    if(authorization.permissions.includes(perm) || authorization.permissions.includes('ALL')) {
+    if(authorization.permissions.indexOf(perm) > -1 || authorization.permissions.indexOf('ALL') > -1) {
       $scope.removePermissionFrom(perm, authorization);
     } 
     else {
