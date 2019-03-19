@@ -1517,17 +1517,6 @@ public class TaskRestServiceInteractionTest extends
 
     verify(taskServiceMock).complete(EXAMPLE_TASK_ID, null);
   }
-  
-  @Test
-  public void testCompleteTaskWithVariablesInReturn() {
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
-    queryParameters.put("withVariablesInReturn", true);
-
-    given().pathParam("id", EXAMPLE_TASK_ID).contentType(POST_JSON_CONTENT_TYPE).body(queryParameters).header("accept", MediaType.APPLICATION_JSON).expect()
-        .statusCode(Status.OK.getStatusCode()).when().post(COMPLETE_TASK_URL);
-
-    verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
-  }
 
   @Test
   public void testCompleteWithParameters() {
@@ -1555,16 +1544,26 @@ public class TaskRestServiceInteractionTest extends
   }
   
   @Test
-  public void testCompleteWithVariablesInReturn() {
+  public void testCompleteTaskWithVariablesInReturn() {
+    String mockVar = "mockVar";
+    String mockVarVal = "mockVarVal";
+    Map<String, Object> mockMap = new HashMap<String, Object>();
+    mockMap.put(mockVar, mockVarVal);
+    when(taskServiceMock.completeWithVariablesInReturn(EXAMPLE_TASK_ID, null)).thenReturn(mockMap);
+    
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("withVariablesInReturn", Boolean.TRUE);
     
-    given().pathParam("id", EXAMPLE_TASK_ID)
-    .header("accept", MediaType.APPLICATION_JSON)
-    .contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when().post(COMPLETE_TASK_URL);
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body(mockVar, equalTo(mockVarVal))
+    .when()
+      .post(COMPLETE_TASK_URL);
 
   verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
   }
