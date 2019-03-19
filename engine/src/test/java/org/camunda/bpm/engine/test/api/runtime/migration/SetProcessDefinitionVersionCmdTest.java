@@ -698,7 +698,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
             .processInstanceId(processInstance.getId())
             .list();
 
-        assertEquals(1, userOperations.size());
+        assertEquals(2, userOperations.size());
 
         UserOperationLogEntry userOperationLogEntry = userOperations.get(0);
         assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, userOperationLogEntry.getOperationType());

@@ -105,16 +105,17 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     createLogEntries();
 
     // expect: all entries can be fetched
-    assertEquals(17, query().count());
+    assertEquals(18, query().count());
 
     // entity type
     assertEquals(11, query().entityType(EntityTypes.TASK).count());
     assertEquals(4, query().entityType(EntityTypes.IDENTITY_LINK).count());
     assertEquals(2, query().entityType(EntityTypes.ATTACHMENT).count());
+    assertEquals(1, query().entityType(EntityTypes.PROCESS_INSTANCE).count());
     assertEquals(0, query().entityType("unknown entity type").count());
 
     // operation type
-    assertEquals(1, query().operationType(OPERATION_TYPE_CREATE).count());
+    assertEquals(2, query().operationType(OPERATION_TYPE_CREATE).count());
     assertEquals(1, query().operationType(OPERATION_TYPE_SET_PRIORITY).count());
     assertEquals(4, query().operationType(OPERATION_TYPE_UPDATE).count());
     assertEquals(1, query().operationType(OPERATION_TYPE_ADD_USER_LINK).count());
@@ -125,8 +126,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(1, query().operationType(OPERATION_TYPE_DELETE_ATTACHMENT).count());
 
     // process and execution reference
-    assertEquals(11, query().processDefinitionId(process.getProcessDefinitionId()).count());
-    assertEquals(11, query().processInstanceId(process.getId()).count());
+    assertEquals(12, query().processDefinitionId(process.getProcessDefinitionId()).count());
+    assertEquals(12, query().processInstanceId(process.getId()).count());
     assertEquals(11, query().executionId(execution.getId()).count());
 
     // task reference
@@ -148,13 +149,13 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     // ascending order results by time
     List<UserOperationLogEntry> ascLog = query().orderByTimestamp().asc().list();
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
       assertTrue(yesterday.getTime()<=ascLog.get(i).getTimestamp().getTime());
     }
-    for (int i = 4; i < 12; i++) {
+    for (int i = 5; i < 13; i++) {
       assertTrue(today.getTime()<=ascLog.get(i).getTimestamp().getTime());
     }
-    for (int i = 12; i < 16; i++) {
+    for (int i = 13; i < 18; i++) {
       assertTrue(tomorrow.getTime()<=ascLog.get(i).getTimestamp().getTime());
     }
 
@@ -166,14 +167,14 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     for (int i = 4; i < 11; i++) {
       assertTrue(today.getTime()<=descLog.get(i).getTimestamp().getTime());
     }
-    for (int i = 11; i < 15; i++) {
+    for (int i = 11; i < 18; i++) {
       assertTrue(yesterday.getTime()<=descLog.get(i).getTimestamp().getTime());
     }
 
     // filter by time, created yesterday
-    assertEquals(4, query().beforeTimestamp(today).count());
+    assertEquals(5, query().beforeTimestamp(today).count());
     // filter by time, created today and before
-    assertEquals(12, query().beforeTimestamp(tomorrow).count());
+    assertEquals(13, query().beforeTimestamp(tomorrow).count());
     // filter by time, created today and later
     assertEquals(13, query().afterTimestamp(yesterday).count());
     // filter by time, created tomorrow
@@ -186,7 +187,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     createLogEntries();
 
     // expect: all entries can be fetched
-    assertEquals(17, query().count());
+    assertEquals(18, query().count());
 
     // entity type
     assertEquals(11, query().entityType(ENTITY_TYPE_TASK).count());
@@ -207,7 +208,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.deleteProcessInstance(process.getId(), "a delete reason");
 
     // then
-    assertEquals(3, query().entityType(PROCESS_INSTANCE).count());
+    assertEquals(4, query().entityType(PROCESS_INSTANCE).count());
 
     UserOperationLogEntry deleteEntry = query()
         .entityType(PROCESS_INSTANCE)
@@ -263,7 +264,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.activateProcessInstanceByProcessDefinitionId(process.getProcessDefinitionId());
 
     // then
-    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+    assertEquals(3, query().entityType(PROCESS_INSTANCE).count());
 
     UserOperationLogEntry suspendEntry = query()
         .entityType(PROCESS_INSTANCE)
@@ -308,7 +309,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.activateProcessInstanceByProcessDefinitionKey("oneTaskProcess");
 
     // then
-    assertEquals(2, query().entityType(PROCESS_INSTANCE).count());
+    assertEquals(3, query().entityType(PROCESS_INSTANCE).count());
 
     UserOperationLogEntry suspendEntry = query()
         .entityType(PROCESS_INSTANCE)

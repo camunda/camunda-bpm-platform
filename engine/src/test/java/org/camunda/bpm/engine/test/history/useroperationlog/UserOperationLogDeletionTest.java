@@ -119,13 +119,13 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     UserOperationLogQuery query = historyService
         .createUserOperationLogQuery()
         .processInstanceId(processInstanceId);
-    assertEquals(3, query.count());
+    assertEquals(4, query.count());
 
     // when
     historyService.deleteHistoricProcessInstance(processInstanceId);
 
     // then
-    assertEquals(3, query.count());
+    assertEquals(4, query.count());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -174,13 +174,13 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     UserOperationLogQuery query = historyService
         .createUserOperationLogQuery()
         .processInstanceId(processInstanceId);
-    assertEquals(1, query.count());
+    assertEquals(2, query.count());
 
     // when
     repositoryService.deleteProcessDefinition(processDefinitionId, true);
 
     // then new log is created and old stays
-    assertEquals(1, query.count());
+    assertEquals(2, query.count());
   }
 
   public void testDeleteProcessDefinitionsByKey() {
