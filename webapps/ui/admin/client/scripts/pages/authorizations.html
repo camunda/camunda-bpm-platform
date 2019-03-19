@@ -114,11 +114,21 @@
                   </button>
 
                   <ul uib-dropdown-menu class="dropdown-menu dropdown-menu-right" auto-close="outsideClick">
-                    <a ng-show="authorization.permissions != 'ALL'" ng-click="addAllPermissionsTo(authorization)">Select all</a>
-                    <a ng-hide="authorization.permissions != 'ALL'" ng-click="addNonePermissionsTo(authorization)">Deselect all</a>
+                    <button type="button" 
+                      ng-show="authorization.permissions != 'ALL'" 
+                      ng-click="addAllPermissionsTo(authorization)">
+                      Select all
+                    </button>
+                    <button type="button" 
+                      ng-hide="authorization.permissions != 'ALL'" 
+                      ng-click="addNonePermissionsTo(authorization)">
+                      Deselect all
+                  </button>
                     <li ng-repeat="perm in availablePermissionsFor()">
-                      <input type="checkbox" ng-click="changePermissionOf(perm, authorization)" ng-checked="authorization.permissions.includes(perm) || authorization.permissions.includes('ALL')">
-                      {{perm}}
+                      <label>
+                        <input type="checkbox" ng-click="changePermissionOf(perm, authorization)" ng-checked="authorization.permissions.indexOf(perm) > -1 || authorization.permissions.indexOf('ALL') > -1">
+                        {{perm}}
+                      </label>
                     </li>
                   </ul>
                 </div><!-- /input-btn-group -->

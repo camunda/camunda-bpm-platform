@@ -134,7 +134,13 @@ module.exports = [ '$routeProvider', function($routeProvider) {
               }
               result += permissionsList[i];
             }
-            return result;
+
+            if(result === '') {
+              return 'NONE';
+            }
+            else {
+              return result;
+            }
           }
         };
 
