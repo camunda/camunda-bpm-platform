@@ -225,7 +225,7 @@
 
     from ${prefix}ACT_HI_DECINST RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.DEC_DEF_KEY_, '*'))
     </if>
@@ -333,7 +333,7 @@
         </foreach>
       </if>
 
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         and (
           (RES.DEC_DEF_KEY_ is not null
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
@@ -427,7 +427,7 @@
         (
           SELECT DISTINCT RES.*
           FROM ${prefix}ACT_RE_DECISION_DEF RES
-          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+          <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
             AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
           </if>

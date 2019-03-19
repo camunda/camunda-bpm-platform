@@ -158,7 +158,7 @@
   <sql id="selectJobDefinitionByQueryCriteriaSql">
     from ${prefix}ACT_RU_JOBDEF RES
     
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_           
       <if test="!authCheck.revokeAuthorizationCheckEnabled">    

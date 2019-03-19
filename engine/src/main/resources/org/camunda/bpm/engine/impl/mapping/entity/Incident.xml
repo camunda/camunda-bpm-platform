@@ -125,7 +125,7 @@
   <sql id="selectIncidentByQueryCriteriaSql">
     from ${prefix}ACT_RU_INCIDENT RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
@@ -177,7 +177,7 @@
         </foreach>
       </if>
 
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         AND
           ( CASE
 

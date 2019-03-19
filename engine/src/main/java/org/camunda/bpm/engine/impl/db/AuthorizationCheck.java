@@ -32,11 +32,16 @@ public class AuthorizationCheck implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * If true authorization check is performed. This switch is
+   * If true authorization check is enabled. for This switch is
    * useful when implementing a query which may perform an authorization check
    * only under certain circumstances.
    */
   protected boolean isAuthorizationCheckEnabled = false;
+
+  /**
+   * If true authorization check is performed.
+   */
+  protected boolean shouldPerformAuthorizatioCheck = false;
   
   /**
    * Indicates if the revoke authorization checks are enabled or not.
@@ -72,13 +77,29 @@ public class AuthorizationCheck implements Serializable {
     return isAuthorizationCheckEnabled;
   }
 
-  /** is used by myBatis */
   public boolean getIsAuthorizationCheckEnabled() {
     return isAuthorizationCheckEnabled;
   }
 
   public void setAuthorizationCheckEnabled(boolean isAuthorizationCheckPerformed) {
     this.isAuthorizationCheckEnabled = isAuthorizationCheckPerformed;
+  }
+
+  public boolean shouldPerformAuthorizatioCheck() {
+    return shouldPerformAuthorizatioCheck;
+  }
+
+  /** is used by myBatis */
+  public boolean getShouldPerformAuthorizatioCheck() {
+    return isAuthorizationCheckEnabled && !isPermissionChecksEmpty();
+  }
+
+  public void setShouldPerformAuthorizatioCheck(boolean shouldPerformAuthorizatioCheck) {
+    this.shouldPerformAuthorizatioCheck = shouldPerformAuthorizatioCheck;
+  }
+
+  protected boolean isPermissionChecksEmpty() {
+    return permissionChecks.getAtomicChecks().isEmpty() && permissionChecks.getCompositeChecks().isEmpty();
   }
 
   public String getAuthUserId() {
