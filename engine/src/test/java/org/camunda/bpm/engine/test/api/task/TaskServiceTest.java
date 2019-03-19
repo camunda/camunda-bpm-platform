@@ -827,6 +827,8 @@ public class TaskServiceTest {
     Map<String, Object> returnedVariables = taskService.completeWithVariablesInReturn(taskId, variables);
     // expect empty Map for standalone tasks
     assertEquals(0, returnedVariables.size());
+
+    taskService.deleteTask(taskId, true);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml" })
