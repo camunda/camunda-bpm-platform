@@ -1,7 +1,24 @@
-.cam-table {
+form[name="createAuthForm"] > .cam-table {
+  .dropdown-menu {
+    top:auto;
+  }
+
   td {
+    padding: 5px;
+    vertical-align: top;
+
+    &.identity-id,
+    &.resource-id {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    &.user.group {
+      min-width: 140px;
+    }
+
     &.authorization-type {
-      min-width: 120px;
+      min-width: 80px;
       max-width: 160px;
       width: 120px;
       select {
@@ -10,7 +27,7 @@
     }
 
     &.identity-id {
-      width: 180px;
+      min-width: 170px;
     }
 
     &.user {
@@ -18,15 +35,16 @@
     }
 
     &.resource-id {
+      width: 160px;
       min-width: 320px;
       max-width: 350px;
-      width: 320px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     &.permissions {
       .form-control-static {
+        padding: 0;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -48,18 +66,7 @@
     &.action {
       width: 120px;
       text-align: center;
-    }
-  }
-}
-
-table.cam-table > tbody > tr.editing {
-  > td {
-    vertical-align: top;
-
-    &.identity-id,
-    &.resource-id {
-      padding-left: 0;
-      padding-right: 0;
+      vertical-align: top;
     }
   }
 }
