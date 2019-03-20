@@ -81,6 +81,7 @@
     "sinon": "7.2.7",
     "source-map": "0.7.3",
     "watchify": "3.11.1",
-    "xunit-file": "1.0.0"
+    "xunit-file": "1.0.0",
+    "fsevents": "1.2.7"
   }
 }
