@@ -36,7 +36,10 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     managementService.setJobPriority(job.getId(), 42);
 
     // then an op log entry is written
-    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLogEntry = historyService
+            .createUserOperationLogQuery()
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY)
+            .singleResult();
     assertNotNull(userOperationLogEntry);
 
     assertEquals(EntityTypes.JOB, userOperationLogEntry.getEntityType());
