@@ -898,6 +898,23 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // query should treat all variables case-insensitively, even when flag is set after variable
     assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValue.toLowerCase()).matchVariableValuesIgnoreCase().count());
   }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableValueNameEqualsIgnoreCase() throws Exception {
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    taskService.setVariableLocal(task.getId(), variableName, variableValue);
+
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName.toLowerCase(), variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
+  }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
   public void testTaskVariableValueLike() throws Exception {
@@ -1135,6 +1152,23 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .processVariableValueEquals("longVar", 928374L)
         .taskVariableValueEquals("longVar", 928374L)
         .count());
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableNameEqualsIgnoreCase() throws Exception {
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(variableName, variableValue);
+    
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().processVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().processVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
   }
   
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
@@ -2365,6 +2399,23 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testCaseInstanceVariableNameEqualsIgnoreCase() throws Exception {
+    String caseDefinitionId = getCaseDefinitionId();
+
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+
+    caseService.withCaseDefinition(caseDefinitionId).setVariable(variableName, variableValue).create();
+
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    assertEquals(0, taskService.createTaskQuery().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
+  }
+  
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByStringCaseInstanceVariableValueEqualsIgnoreCase() {
     String caseDefinitionId = getCaseDefinitionId();
