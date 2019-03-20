@@ -66,7 +66,8 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
 
   protected void handleInvocationInContext(final DelegateInvocation invocation) throws Exception {
     CommandContext commandContext = Context.getCommandContext();
-    boolean oldValue = commandContext.isAuthorizationCheckEnabled();
+    boolean wasAuthorizationCheckEnabled = commandContext.isAuthorizationCheckEnabled();
+    boolean wasUserOperationLogEnabled = commandContext.isUserOperationLogEnabled();
     BaseDelegateExecution contextExecution = invocation.getContextExecution();
 
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
@@ -96,11 +97,13 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
         }
       }
       finally {
-        commandContext.enableUserOperationLog();
+        if (wasUserOperationLogEnabled) {
+          commandContext.enableUserOperationLog();
+        }
       }
     }
     finally {
-      if (oldValue) {
+      if (wasAuthorizationCheckEnabled) {
         commandContext.enableAuthorizationCheck();
       }
     }
