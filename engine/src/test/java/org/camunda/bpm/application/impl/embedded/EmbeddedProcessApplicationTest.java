@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,29 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
     processApplication.undeploy();
 
+  }
+
+  public void testDeployAppWithCustomDefaultEngine() {
+
+    // Test if it's possible to set a custom default engine name.
+    // This might happen when the "default" ProcessEngine is not available,
+    // but a ProcessApplication doesn't define a ProcessEngine to deploy to.
+    String processApplicationName = "test-app";
+    String customEngineName = "customDefaultEngine";
+    TestApplicationWithCustomDefaultEngine processApplication = new TestApplicationWithCustomDefaultEngine();
+
+    processApplication.deploy();
+
+    String deployedToProcessEngineName = runtimeContainerDelegate.getProcessApplicationService()
+      .getProcessApplicationInfo(processApplicationName)
+      .getDeploymentInfo()
+      .get(0)
+      .getProcessEngineName();
+
+    assertEquals(customEngineName, processApplication.getDefaultDeployToEngineName());
+    assertEquals(customEngineName, deployedToProcessEngineName);
+
+    processApplication.undeploy();
   }
 
   public void testDeployAppReusingExistingEngine() {
