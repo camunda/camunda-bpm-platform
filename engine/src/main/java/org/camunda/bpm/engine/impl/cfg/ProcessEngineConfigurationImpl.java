@@ -306,6 +306,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.pwpolicy.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.runtime.ConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultConditionHandler;
@@ -341,6 +342,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
@@ -604,6 +606,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected SaltGenerator saltGenerator;
 
+  protected boolean disablePasswordPolicy;
+  protected PasswordPolicy passwordPolicy;
+
   protected Set<String> registeredDeployments;
 
   protected ResourceAuthorizationProvider resourceAuthorizationProvider;
@@ -843,6 +848,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initHistoryCleanup();
     initAdminUser();
     initAdminGroups();
+    initPasswordPolicy();
     invokePostInit();
   }
 
@@ -2313,9 +2319,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if(passwordManager == null) {
       passwordManager = new PasswordManager(passwordEncryptor, customPasswordChecker);
     }
-
   }
 
+  protected void initPasswordPolicy() {
+    if(passwordPolicy == null && !disablePasswordPolicy) {
+      passwordPolicy = new DefaultPasswordPolicyImpl();
+    }
+  }
 
   protected void initDeploymentRegistration() {
     if (registeredDeployments == null) {
@@ -2365,7 +2375,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       adminGroups.add(Groups.CAMUNDA_ADMIN);
     }
   }
-
+  
   // getters and setters //////////////////////////////////////////////////////
 
   @Override
@@ -3382,6 +3392,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setPasswordManager(PasswordManager passwordManager) {
     this.passwordManager = passwordManager;
+  }
+
+  public PasswordPolicy getPasswordPolicy() {
+    return passwordPolicy;
+  }
+
+  public void setPasswordPolicy(PasswordPolicy passwordPolicy) {
+    this.passwordPolicy = passwordPolicy;
+  }
+
+  public boolean isDisablePasswordPolicy() {
+    return disablePasswordPolicy;
+  }
+
+  public void setDisablePasswordPolicy(boolean disablePasswordPolicy) {
+    this.disablePasswordPolicy = disablePasswordPolicy;
   }
 
   public Set<String> getRegisteredDeployments() {

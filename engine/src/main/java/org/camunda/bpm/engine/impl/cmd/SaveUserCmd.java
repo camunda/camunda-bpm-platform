@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,16 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResourceId;
+
 import java.io.Serializable;
+
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResourceId;
+import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
 
 /**
  * @author Joram Barrez
@@ -31,15 +33,26 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
   
   private static final long serialVersionUID = 1L;
   protected UserEntity user;
+  private boolean skipPasswordPolicy;
   
   public SaveUserCmd(User user) {
+    this(user, false);
+  }
+  
+  public SaveUserCmd(User user, boolean skipPasswordPolicy) {
     this.user = (UserEntity) user;
+    this.skipPasswordPolicy = skipPasswordPolicy;
   }
   
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("user", user);
     ensureWhitelistedResourceId(commandContext, "User", user.getId());
-
+    
+    if(!skipPasswordPolicy && !commandContext.getProcessEngineConfiguration().isDisablePasswordPolicy()) {
+      PasswordPolicy policy = commandContext.getProcessEngineConfiguration().getPasswordPolicy();
+      user.checkPasswordAgainstPolicy(policy);
+    }
+    
     commandContext
       .getWritableIdentityProvider()
       .saveUser(user);

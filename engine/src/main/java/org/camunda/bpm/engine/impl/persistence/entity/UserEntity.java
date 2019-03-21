@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.pwpolicy.PasswordPolicyChecker;
+import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
 import static org.camunda.bpm.engine.impl.util.EncryptionUtil.saltPassword;
@@ -158,6 +160,11 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
       .getSaltGenerator()
       .generateSalt();
   }
+  
+
+  public void checkPasswordAgainstPolicy(PasswordPolicy policy) {
+    PasswordPolicyChecker.checkPassword(policy, newPassword);
+  }
 
   public String toString() {
     return this.getClass().getSimpleName()
@@ -172,5 +179,4 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
            + ", attempts=" + attempts
            + "]";
   }
-
 }
