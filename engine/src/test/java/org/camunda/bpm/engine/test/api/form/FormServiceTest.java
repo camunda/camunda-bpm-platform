@@ -979,7 +979,7 @@ public class FormServiceTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.testCompleteTaskWithVariablesInReturn.bpmn20.xml" })
   @Test
-  public void testCompleteTaskWithVariablesInReturn() {
+  public void testSubmitTaskFormWithVariablesInReturn() {
     String processVarName = "processVar";
     String processVarValue = "processVarValue";
 
@@ -998,10 +998,12 @@ public class FormServiceTest {
     additionalVariables.put(taskVarName, taskVarValue);
 
     // After completion of firstUserTask a script Task sets 'x' = 5
-    Map<String, Object> vars = formService.submitTaskFormWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+    VariableMap vars = formService.submitTaskFormWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
     assertEquals(3, vars.size());
     assertEquals(5, vars.get("x"));
+    assertEquals(ValueType.INTEGER, vars.getValueTyped("x").getType());
     assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(ValueType.STRING, vars.getValueTyped(processVarName).getType());
     assertEquals(taskVarValue, vars.get(taskVarName));
 
     additionalVariables = new HashMap<String, Object>();

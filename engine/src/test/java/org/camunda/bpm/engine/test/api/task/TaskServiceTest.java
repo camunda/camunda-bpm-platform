@@ -66,6 +66,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -795,11 +796,14 @@ public class TaskServiceTest {
     additionalVariables.put(taskVarName, taskVarValue);
 
     // After completion of firstUserTask a script Task sets 'x' = 5
-    Map<String, Object> vars = taskService.completeWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+    VariableMap vars = taskService.completeWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+
     assertEquals(3, vars.size());
     assertEquals(5, vars.get("x"));
+    assertEquals(ValueType.INTEGER, vars.getValueTyped("x").getType());
     assertEquals(processVarValue, vars.get(processVarName));
     assertEquals(taskVarValue, vars.get(taskVarName));
+    assertEquals(ValueType.STRING, vars.getValueTyped(taskVarName).getType());
 
     additionalVariables = new HashMap<String, Object>();
     additionalVariables.put("x", 7);

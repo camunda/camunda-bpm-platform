@@ -39,7 +39,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializable {
+public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -51,7 +51,7 @@ public class SubmitTaskFormCmd implements Command<Map<String, Object>>, Serializ
     this.properties = Variables.fromMap(properties);
   }
 
-  public Map<String, Object> execute(CommandContext commandContext) {
+  public VariableMap execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
     TaskManager taskManager = commandContext.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);

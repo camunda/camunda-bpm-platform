@@ -188,7 +188,7 @@ public interface FormService {
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
    *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  Map<String, Object> submitTaskFormWithVariablesInReturn(String taskId, Map<String, Object> properties);
+  VariableMap submitTaskFormWithVariablesInReturn(String taskId, Map<String, Object> properties);
 
   /**
    * Retrieves a list of all variables for rendering a start from. The method takes into account
