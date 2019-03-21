@@ -114,16 +114,25 @@
                   </button>
 
                   <ul uib-dropdown-menu class="dropdown-menu dropdown-menu-right" auto-close="outsideClick">
-                    <button type="button" 
-                      ng-show="authorization.permissions != 'ALL'" 
-                      ng-click="addAllPermissionsTo(authorization)">
-                      Select all
-                    </button>
-                    <button type="button" 
-                      ng-hide="authorization.permissions != 'ALL'" 
-                      ng-click="addNonePermissionsTo(authorization)">
-                      Deselect all
-                  </button>
+                    <div class="selection"
+                         ng-if="availablePermissionsFor().length > 1">
+                      <span ng-show="authorization.permissions != 'ALL'"
+                            ng-click="addAllPermissionsTo(authorization)">
+                        <button
+                          class="btn btn-primary btn-xs"
+                          type="button">
+                          <span class="glyphicon glyphicon-unchecked"></span>
+                        </button> Select all
+                      </span>
+                      <span ng-hide="authorization.permissions != 'ALL'"
+                            ng-click="addNonePermissionsTo(authorization)">
+                        <button
+                          class="btn btn-primary btn-xs"
+                          type="button">
+                          <span class="glyphicon glyphicon-check"></span>
+                        </button> Unselect all
+                      </span>
+                    </div>
                     <li ng-repeat="perm in availablePermissionsFor()">
                       <label>
                         <input type="checkbox" ng-click="changePermissionOf(perm, authorization)" ng-checked="authorization.permissions.indexOf(perm) > -1 || authorization.permissions.indexOf('ALL') > -1">
