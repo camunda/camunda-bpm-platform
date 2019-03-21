@@ -176,7 +176,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     commandExecutor.execute(new CompleteTaskCmd(taskId, variables));
   }
 
-  public Map<String, Object> completeWithVariablesInReturn(String taskId, Map<String, Object> variables) {
+  public VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables) {
     return commandExecutor.execute(new CompleteTaskCmd(taskId, variables));
   }
 

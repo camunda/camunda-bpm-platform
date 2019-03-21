@@ -27,11 +27,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Joram Barrez
  */
-public class CompleteTaskCmd implements Command<Map<String, Object>>, Serializable {
+public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -43,7 +44,7 @@ public class CompleteTaskCmd implements Command<Map<String, Object>>, Serializab
     this.variables = variables;
   }
 
-  public Map<String, Object> execute(CommandContext commandContext) {
+  public VariableMap execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
     TaskManager taskManager = commandContext.getTaskManager();

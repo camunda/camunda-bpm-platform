@@ -98,14 +98,15 @@ public class TaskResourceImpl implements TaskResource {
     try {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       if (dto.isWithVariablesInReturn()) {
-        Map<String, Object> taskVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+        VariableMap taskVariables = taskService.completeWithVariablesInReturn(taskId, variables);
         return Response
             .ok(taskVariables)
             .type(MediaType.APPLICATION_JSON)
             .build();
+      } else {
+        taskService.complete(taskId, variables);
+        return Response.noContent().build();
       }
-      taskService.complete(taskId, variables);
-      return Response.noContent().build();
 
     } catch (RestException e) {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
@@ -130,14 +131,15 @@ public class TaskResourceImpl implements TaskResource {
     try {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       if (dto.isWithVariablesInReturn()) {
-        Map<String, Object> taskVariables = formService.submitTaskFormWithVariablesInReturn(taskId, variables);
+        VariableMap taskVariables = formService.submitTaskFormWithVariablesInReturn(taskId, variables);
         return Response
             .ok(taskVariables)
             .type(MediaType.APPLICATION_JSON)
             .build();
+      } else {
+        formService.submitTaskForm(taskId, variables);
+        return Response.noContent().build();
       }
-      formService.submitTaskForm(taskId, variables);
-      return Response.noContent().build();
 
     } catch (RestException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());

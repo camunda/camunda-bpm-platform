@@ -312,7 +312,7 @@ public interface TaskService {
    *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
    *          (if the task is part of a running process instance).
    */
-  Map<String, Object> completeWithVariablesInReturn(String taskId, Map<String, Object> variables);
+  VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables);
 
   /**
    * Changes the assignee of the given task to the given userId.

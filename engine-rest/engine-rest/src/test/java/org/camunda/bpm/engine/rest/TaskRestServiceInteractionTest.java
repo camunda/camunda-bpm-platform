@@ -129,6 +129,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
@@ -693,14 +694,27 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testSubmitFormWithVariablesInReturn() {
+    String mockVar = "mockVar";
+    String mockVarVal = "mockVarVal";
+    VariableMap mockMap = Variables.putValue(mockVar, mockVarVal);
+    when(formServiceMock.submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null)).thenReturn(mockMap);
+
     Map<String, Object> queryParameters = new HashMap<String, Object>();
     queryParameters.put("withVariablesInReturn", true);
 
-    given().pathParam("id", EXAMPLE_TASK_ID).contentType(POST_JSON_CONTENT_TYPE).body(queryParameters).header("accept", MediaType.APPLICATION_JSON).expect()
-        .statusCode(Status.OK.getStatusCode()).when().post(SUBMIT_FORM_URL);
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(queryParameters)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body(mockVar, equalTo(mockVarVal))
+    .when().post(SUBMIT_FORM_URL);
 
     verify(formServiceMock).submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null);
   }
+
   @Test
   public void testSubmitFormWithParameters() {
     Map<String, Object> variables = VariablesBuilder.create()
@@ -1542,13 +1556,12 @@ public class TaskRestServiceInteractionTest extends
 
     verify(taskServiceMock).complete(eq(EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
   }
-  
+
   @Test
   public void testCompleteTaskWithVariablesInReturn() {
     String mockVar = "mockVar";
     String mockVarVal = "mockVarVal";
-    Map<String, Object> mockMap = new HashMap<String, Object>();
-    mockMap.put(mockVar, mockVarVal);
+    VariableMap mockMap = Variables.putValue(mockVar, mockVarVal);
     when(taskServiceMock.completeWithVariablesInReturn(EXAMPLE_TASK_ID, null)).thenReturn(mockMap);
     
     Map<String, Object> json = new HashMap<String, Object>();
@@ -1565,7 +1578,7 @@ public class TaskRestServiceInteractionTest extends
     .when()
       .post(COMPLETE_TASK_URL);
 
-  verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
+    verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
   }
 
   @Test
