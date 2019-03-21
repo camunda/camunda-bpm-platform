@@ -27,6 +27,9 @@
     <property name="loginDelayFactor" value="2" />
     <property name="loginDelayMaxTime" value="30" />
     <property name="loginDelayBase" value="1" />
+    
+    <!-- turn off passowrd policy for tests -->
+    <property name="disablePasswordPolicy" value="true"/>
   </bean>
 
 </beans>
