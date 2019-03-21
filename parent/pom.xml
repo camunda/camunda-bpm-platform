@@ -95,7 +95,6 @@
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>${version.gson}</version>
-        <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>cglib</groupId>
