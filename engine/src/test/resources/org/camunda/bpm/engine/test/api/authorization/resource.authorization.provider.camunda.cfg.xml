@@ -31,6 +31,9 @@
     <!-- resource authorization provider -->
     <property name="resourceAuthorizationProvider" ref="myResourceAuthorizationProvider" />
 
+    <!-- turn off passowrd policy for tests -->
+    <property name="disablePasswordPolicy" value="true"/>
+
   </bean>
 
   <bean id="myResourceAuthorizationProvider" class="org.camunda.bpm.engine.test.api.authorization.MyResourceAuthorizationProvider" />

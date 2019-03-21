@@ -39,6 +39,9 @@
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
+    <!-- turn off passowrd policy for tests -->
+    <property name="disablePasswordPolicy" value="true"/>
+
   </bean>
 
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->
