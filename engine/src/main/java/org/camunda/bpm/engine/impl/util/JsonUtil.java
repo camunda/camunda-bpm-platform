@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.LazilyParsedNumber;
-import com.google.gson.reflect.TypeToken;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
@@ -47,8 +46,6 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 public final class JsonUtil {
 
   private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
-
-  protected static final Type MAP_TYPE_TOKEN = new TypeToken<Map<String, Object>>() {}.getType();
 
   protected static Gson gsonMapper = createGsonMapper();
 
@@ -277,7 +274,7 @@ public final class JsonUtil {
     }
   }
 
-  public static List<String> asList(JsonElement jsonObject) {
+  public static List<String> asStringList(JsonElement jsonObject) {
     JsonArray jsonArray = null;
 
     if (jsonObject != null) {
@@ -341,40 +338,94 @@ public final class JsonUtil {
     return list;
   }
 
-  public static Map<String, Object> asMap(JsonObject jsonObject) {
-    if (jsonObject != null) {
-      Map<String, Object> map = null;
+  public static List<Object> asList(JsonElement jsonElement) {
+    if (jsonElement == null) {
+      return Collections.emptyList();
+    }
 
-      try {
-        map = getGsonMapper().fromJson(jsonObject, MAP_TYPE_TOKEN);
+    JsonArray jsonArray = null;
 
-      } catch (JsonParseException | ClassCastException e) {
-        LOG.logJsonException(e);
-      }
+    try {
+      jsonArray = jsonElement.getAsJsonArray();
 
-      if (map != null) {
+    } catch (IllegalStateException | ClassCastException e) {
+      LOG.logJsonException(e);
+    }
 
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-          Object value = entry.getValue();
+    if (jsonArray == null) {
+      return Collections.emptyList();
+    }
 
-          if (value != null && value instanceof JsonPrimitive) {
+    List<Object> list = new ArrayList<>();
+    for (JsonElement entry : jsonArray) {
 
-            Object rawObject = asPrimitiveObject((JsonPrimitive) value);
-            if (rawObject != null) {
-              map.put(entry.getKey(), rawObject);
-            }
-          }
+      if (entry.isJsonPrimitive()) {
+
+        Object rawObject = asPrimitiveObject((JsonPrimitive) entry);
+        if (rawObject != null) {
+          list.add(rawObject);
         }
 
-        return map;
+      } else if (entry.isJsonNull()) {
+        list.add(null);
 
-      } else {
-        return Collections.emptyMap();
+      } else if (entry.isJsonObject()) {
+        list.add(asMap(entry));
+
+      } else if (entry.isJsonArray()) {
+        list.add(asList(entry));
 
       }
-    } else {
+    }
+
+    return list;
+  }
+
+  public static Map<String, Object> asMap(JsonElement jsonElement) {
+    if (jsonElement == null) {
       return Collections.emptyMap();
     }
+
+    JsonObject jsonObject = null;
+
+    try {
+      jsonObject = jsonElement.getAsJsonObject();
+
+    } catch (IllegalStateException | ClassCastException e) {
+      LOG.logJsonException(e);
+    }
+
+    if (jsonObject == null) {
+      return Collections.emptyMap();
+
+    }
+
+    Map<String, Object> map = new HashMap<>();
+    for (Map.Entry<String, JsonElement> jsonEntry : jsonObject.entrySet()) {
+
+      String key = jsonEntry.getKey();
+      JsonElement value = jsonEntry.getValue();
+
+      if (value.isJsonPrimitive()) {
+
+        Object rawObject = asPrimitiveObject((JsonPrimitive) value);
+        if (rawObject != null) {
+          map.put(key, rawObject);
+        }
+
+      } else if (value.isJsonNull()) {
+        map.put(key, null);
+
+      } else if (value.isJsonObject()) {
+        map.put(key, asMap(value));
+
+      } else if (value.isJsonArray()) {
+        map.put(key, asList(value));
+
+      }
+    }
+
+    return map;
   }
 
   public static String asString(Map<String, Object> properties) {
@@ -466,21 +517,23 @@ public final class JsonUtil {
     Object rawObject = null;
 
     if (jsonValue.isNumber()) {
-      LazilyParsedNumber numberValue = null;
+      Object numberValue = null;
 
       try {
-        numberValue = (LazilyParsedNumber) jsonValue.getAsNumber();
+        numberValue = jsonValue.getAsNumber();
 
-      } catch (ClassCastException | NumberFormatException e) {
+      } catch (NumberFormatException e) {
         LOG.logJsonException(e);
       }
 
-      if (numberValue != null) {
-
+      if (numberValue != null && numberValue instanceof LazilyParsedNumber) {
         String numberString = numberValue.toString();
         if (numberString != null) {
           rawObject = parseNumber(numberString);
         }
+
+      } else {
+        rawObject = numberValue;
 
       }
     } else { // string, boolean
