@@ -213,7 +213,7 @@ public class PurgeDatabaseTest {
       assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
       assertEquals(7, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_JOB_LOG"));
       assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
-      assertEquals(3, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_OP_LOG"));
+      assertEquals(5, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_OP_LOG"));
     }
 
   }

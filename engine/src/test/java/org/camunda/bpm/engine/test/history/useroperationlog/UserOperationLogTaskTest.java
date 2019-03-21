@@ -30,6 +30,7 @@ import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PRIORITY
 
 import java.util.Date;
 import java.util.HashMap;
+import org.camunda.bpm.engine.EntityTypes;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -55,9 +56,10 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   public void testCreateAndCompleteTask() {
     startTestProcess();
 
-    // expect: no entry for the task creation by process engine
+    // expect: one entry for process instance creation,
+    //         no entry for the task creation by process engine
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    assertEquals(0, query.count());
+    assertEquals(1, query.count());
 
     completeTestProcess();
 
@@ -298,7 +300,8 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
 
     // then
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    assertEquals(3, query.count());
+    assertEquals(4, query.count());
+    assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
     assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND).count());
     assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_RESOLVE).count());
     assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).count());
@@ -311,13 +314,19 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
 
     // an op log instance is created
     taskService.resolveTask(task.getId());
-    UserOperationLogEntry opLogEntry = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry opLogEntry = historyService
+            .createUserOperationLogQuery()
+            .entityType(EntityTypes.TASK)
+            .singleResult();
 
     // when the op log instance is deleted
     historyService.deleteUserOperationLogEntry(opLogEntry.getId());
 
     // then it should be removed from the database
-    assertEquals(0, historyService.createUserOperationLogQuery().count());
+    assertEquals(0, historyService
+            .createUserOperationLogQuery()
+            .entityType(EntityTypes.TASK)
+            .count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
@@ -348,8 +357,8 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     // when a non-existing id is used
     historyService.deleteUserOperationLogEntry("a non existing id");
 
-    // then no op log entry should have been deleted
-    assertEquals(1, historyService.createUserOperationLogQuery().count());
+    // then no op log entry should have been deleted (process instance creation+ resolve task)
+    assertEquals(2, historyService.createUserOperationLogQuery().count());
   }
 
   @Deployment
@@ -366,7 +375,10 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "taskListenerCalled"));
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "serviceTaskCalled"));
 
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+    // Filter only task entities, as the process start is also recorded
+    UserOperationLogQuery query = historyService
+            .createUserOperationLogQuery()
+            .entityType(EntityTypes.TASK);
 
     assertEquals(1, query.count());
 

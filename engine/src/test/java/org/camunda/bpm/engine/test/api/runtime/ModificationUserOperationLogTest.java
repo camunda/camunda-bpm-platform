@@ -102,7 +102,10 @@ public class ModificationUserOperationLogTest {
     rule.getIdentityService().clearAuthentication();
 
     // then
-    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService()
+            .createUserOperationLogQuery()
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE)
+            .list();
     Assert.assertEquals(2, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);

@@ -16,6 +16,8 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Collections;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -25,6 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 
 /**
@@ -60,6 +63,14 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
     final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
 
     processInstance.start(instantiationBuilder.getVariables());
+
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        processInstance.getId(),
+        processInstance.getProcessDefinitionId(),
+        processInstance.getProcessDefinition().getKey(),
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+
     return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());
   }
 

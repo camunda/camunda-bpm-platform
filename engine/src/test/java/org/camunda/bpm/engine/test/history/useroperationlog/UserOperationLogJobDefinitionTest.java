@@ -133,20 +133,25 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     // when I set an overriding priority with cascade=true
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42, true);
 
-    // then there are two op log entries
-    assertEquals(2, historyService.createUserOperationLogQuery().count());
+    // then there are three op log entries
+    assertEquals(3, historyService.createUserOperationLogQuery().count());
 
-    // (1): One for the job definition priority
+    // (1): One for the process instance start
+    UserOperationLogEntry processInstanceStartOpLogEntry = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.PROCESS_INSTANCE).singleResult();
+    assertNotNull(processInstanceStartOpLogEntry);
+
+    // (2): One for the job definition priority
     UserOperationLogEntry jobDefOpLogEntry = historyService.createUserOperationLogQuery()
         .entityType(EntityTypes.JOB_DEFINITION).singleResult();
     assertNotNull(jobDefOpLogEntry);
 
-    // (2): and another one for the job priorities
+    // (3): and another one for the job priorities
     UserOperationLogEntry jobOpLogEntry = historyService.createUserOperationLogQuery()
         .entityType(EntityTypes.JOB).singleResult();
     assertNotNull(jobOpLogEntry);
 
-    assertEquals("both entries should be part of the same operation",
+    assertEquals("the two job related entries should be part of the same operation",
         jobDefOpLogEntry.getOperationId(), jobOpLogEntry.getOperationId());
 
     assertEquals(EntityTypes.JOB, jobOpLogEntry.getEntityType());
