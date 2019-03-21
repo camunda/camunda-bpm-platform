@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.qa.upgrade.gson.ProcessInstanceModificationScenario;
+import org.camunda.bpm.qa.upgrade.gson.TaskFilterPropertiesScenario;
 import org.camunda.bpm.qa.upgrade.gson.TaskFilterScenario;
 import org.camunda.bpm.qa.upgrade.gson.TaskFilterVariablesScenario;
 import org.camunda.bpm.qa.upgrade.gson.TimerChangeJobDefinitionScenario;
@@ -73,6 +74,7 @@ public class TestFixture {
     runner.setupScenarios(MigrationBatchScenario.class);
     runner.setupScenarios(TaskFilterScenario.class);
     runner.setupScenarios(TaskFilterVariablesScenario.class);
+    runner.setupScenarios(TaskFilterPropertiesScenario.class);
     runner.setupScenarios(DeploymentDeployTimeScenario.class);
     runner.setupScenarios(JobTimestampsScenario.class);
     runner.setupScenarios(IncidentTimestampScenario.class);
