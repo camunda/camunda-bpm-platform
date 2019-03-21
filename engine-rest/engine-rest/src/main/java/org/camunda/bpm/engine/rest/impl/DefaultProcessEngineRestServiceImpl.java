@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.MetricsRestService;
 import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.ModificationRestService;
+import org.camunda.bpm.engine.rest.PasswordPolicyRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.SignalRestService;
@@ -209,6 +210,11 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
   @Path(VersionRestService.PATH)
   public VersionRestService getVersionRestService() {
     return super.getVersionRestService(null);
+  }
+
+  @Path(PasswordPolicyRestService.PATH)
+  public PasswordPolicyRestService getPasswordPolicyRestService() {
+    return super.getPasswordPolicyRestService(null);
   }
 
   @Override
