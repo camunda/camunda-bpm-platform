@@ -157,28 +157,43 @@ module.exports = [
     /**
       * Provide the list of tasks
       */
-    tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
-      var deferred = $q.defer();
 
-      if(!taskListQuery || taskListQuery.id === null) {
-        // no filter selected
-        deferred.resolve({
-          count: 0,
-          _embedded : {}
-        });
+    // Handeling of long-running requests
+    // store state of last Request
+    var lastRequestIsPending = false;
+    var lastRequest;
+
+    tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
+      if(!lastRequestIsPending) {
+        var deferred = $q.defer();
+        lastRequest = deferred;
+        lastRequestIsPending = true;
+
+        if(!taskListQuery || taskListQuery.id === null) {
+          // no filter selected
+          lastRequestIsPending = false;
+          deferred.resolve({
+            count: 0,
+            _embedded : {}
+          });
+        }
+        else {
+          // filter selected
+          Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
+            lastRequestIsPending = false;
+            if(err) {
+              deferred.reject(err);
+            }
+            else {
+              deferred.resolve(res);
+            }
+          });
+        }
+        return deferred.promise;
       }
       else {
-        // filter selected
-        Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
-          if(err) {
-            deferred.reject(err);
-          }
-          else {
-            deferred.resolve(res);
-          }
-        });
+        return lastRequest.promise;
       }
-      return deferred.promise;
     }]);
 
     /**
@@ -227,6 +242,7 @@ module.exports = [
      */
     $scope.$on('refresh', function() {
       if (!currentFilter || !currentFilter.properties.refresh) return;
+
       tasklistData.changed('taskList');
     });
 
