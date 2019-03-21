@@ -42,12 +42,16 @@ package org.camunda.bpm.engine.authorization;
  * </pre>
  * 
  * <h2>Defining a custom Permission</h2>
- * The {@link Permissions} class contains the values of the  built-in
- * permissions. In order to define a custom permission, you must provide 
+ * The XxxPermissions classes contains the values of the  built-in
+ * permissions (i.e. {@link Permissions}, {@link ProcessDefinitionPermissions},
+ * {@link ProcessInstancePermissions}, {@link TaskPermissions},
+ * all can be found in {@link org.camunda.bpm.engine.authorization authorization} package).
+ * In order to define a custom permission, you must provide
  * an implementation of this interface such that the {@link #getValue()} 
  * method returns an integer which is a power of two and not yet used by the
- * built-in {@link Permissions} and not reserved (values <=2^14 are reserved). 
- * Valid example: 2^15=32768.</p>
+ * built-in {@link Permissions}. You must implement also {@link #getTypes()} and
+ * make sure that the permission values are not already reserved for the desired
+ * {@link Resource}.</p>
  * 
  * 
  * @author Daniel Meyer
