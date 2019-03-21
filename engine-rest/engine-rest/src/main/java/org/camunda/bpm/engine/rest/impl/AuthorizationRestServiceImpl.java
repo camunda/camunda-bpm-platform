@@ -80,7 +80,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
 
     // create new authorization dto implementing both Permission and Resource
     ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
-    Permission permission = PermissionConverter.getPermissionForName(permissionName, resourceType);
+    Permission permission = PermissionConverter.getPermissionProvider().getPermissionForName(permissionName, resourceType);
 
     boolean isUserAuthorized = false;
     if(resourceId == null || Authorization.ANY.equals(resourceId)) {

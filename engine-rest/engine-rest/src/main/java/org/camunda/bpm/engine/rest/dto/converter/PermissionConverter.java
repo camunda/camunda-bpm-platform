@@ -15,13 +15,18 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.spi.PermissionProvider;
 
 /**
  * <p>Converts between the String-Array based representation of permissions in the REST API
@@ -37,7 +42,7 @@ public class PermissionConverter {
     final Permission[] permissions = new Permission[names.length];
     
     for (int i = 0; i < names.length; i++) {
-      permissions[i] = getPermissionForName(names[i], resourceType);
+      permissions[i] = getPermissionProvider().getPermissionForName(names[i], resourceType);
     }
         
     return permissions;    
@@ -73,9 +78,16 @@ public class PermissionConverter {
 
   // permission provider SPI /////////////////////////////////////
 
-  public static Permission getPermissionForName(String name, int resourceType) {
-    // TODO: make this configurable via SPI
-    return ResourceTypeUtil.getPermissionByNameAndResourceType(name, resourceType);
+  public static PermissionProvider getPermissionProvider() {
+    ServiceLoader<PermissionProvider> serviceLoader = ServiceLoader.load(PermissionProvider.class);
+    Iterator<PermissionProvider> iterator = serviceLoader.iterator();
+
+    if (iterator.hasNext()) {
+      PermissionProvider provider = iterator.next();
+      return provider;
+    } else {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the " + PermissionProvider.class + " - SPI");
+    }
   }
 
 }
