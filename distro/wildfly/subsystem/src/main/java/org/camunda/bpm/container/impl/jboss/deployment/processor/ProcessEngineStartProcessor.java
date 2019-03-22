@@ -44,8 +44,8 @@ import org.jboss.msc.service.ServiceTarget;
  */
 public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
   
-  // this can happen early in the phase
-  public static final int PRIORITY = 0x0001; 
+  // this can happen at the beginning of the phase
+  public static final int PRIORITY = 0x0000; 
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     
