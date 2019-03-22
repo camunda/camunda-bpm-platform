@@ -15,6 +15,14 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.ParseException;
+import java.util.*;
+
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -48,24 +56,6 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * @author Joram Barrez
@@ -494,6 +484,35 @@ public class JobQueryTest {
     query = managementService.createJobQuery()
         .duedateHigherThan(new Date(timerThreeFireTime.getTime() + ONE_SECOND))
         .duedateLowerThan(testStartTime);
+    verifyQueryResults(query, 0);
+  }
+
+  @Test
+  public void testQueryByCreateTimeCombinations() {
+    JobQuery query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne);
+    List<Job> jobs = query.list();
+    assertEquals(1, jobs.size());
+    Date jobCreateTime = jobs.get(0).getCreateTime();
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdAfter(new Date(jobCreateTime.getTime() - 1));
+    verifyQueryResults(query, 1);
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdAfter(jobCreateTime);
+    verifyQueryResults(query, 0);
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdBefore(jobCreateTime);
+    verifyQueryResults(query, 1);
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdBefore(new Date(jobCreateTime.getTime() - 1));
     verifyQueryResults(query, 0);
   }
 

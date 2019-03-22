@@ -94,6 +94,12 @@ public interface JobQuery extends Query<JobQuery, Job> {
   @Deprecated
   JobQuery duedateHigherThenOrEquals(Date date);
 
+  /** Only select jobs created before the given date. */
+  JobQuery createdBefore(Date date);
+
+  /** Only select jobs created after the given date. */
+  JobQuery createdAfter(Date date);
+
   /**
    * Only select jobs with a priority that is higher than or equal to the given priority.
    *

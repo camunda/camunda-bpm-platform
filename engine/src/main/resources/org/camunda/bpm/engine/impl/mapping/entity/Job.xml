@@ -321,6 +321,12 @@
       <if test="duedateLowerThanOrEqual != null">
         and RES.DUEDATE_ &lt;= #{duedateLowerThanOrEqual}
       </if>
+      <if test="createdAfter != null">
+        and RES.CREATE_TIME_ > #{createdAfter}
+      </if>
+      <if test="createdBefore != null">
+        and RES.CREATE_TIME_ &lt;= #{createdBefore}
+      </if>
       <if test="priorityHigherThanOrEqual != null">
         and RES.PRIORITY_ &gt;= #{priorityHigherThanOrEqual}
       </if>
