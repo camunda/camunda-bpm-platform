@@ -76,7 +76,7 @@ import org.jboss.vfs.VirtualFile;
  */
 public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProcessor {
 
-  public static final int PRIORITY = 0x0000; // this can happen at the beginning of the phase
+  public static final int PRIORITY = 0x0001; // this can happen early in the phase
 
   @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -160,11 +160,13 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
     ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
       .addDependency(phaseContext.getPhaseServiceName())
-      .addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector())
       .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStartService.getPlatformPluginsInjector())
       .addDependencies(deploymentServiceNames)
       .setInitialMode(Mode.ACTIVE);
 
+    if (phaseContext.getServiceRegistry().getService(ServiceNames.forDefaultProcessEngine()) != null) {
+      serviceBuilder.addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector());
+    }
     if(paViewServiceName != null) {
       serviceBuilder.addDependency(paViewServiceName, ComponentView.class, paStartService.getPaComponentViewInjector());
     } else {

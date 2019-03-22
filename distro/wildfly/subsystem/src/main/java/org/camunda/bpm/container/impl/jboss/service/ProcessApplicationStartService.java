@@ -260,9 +260,9 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
         Class<?> parameterClass = (Class<?>)parameterType;
 
-        // support injection of the default process engine
+        // support injection of the default process engine, if present
         if(ProcessEngine.class.isAssignableFrom(parameterClass)) {
-          parameters.add(defaultProcessEngineInjector.getValue());
+          parameters.add(defaultProcessEngineInjector.getOptionalValue());
           injectionResolved = true;
         }
 
