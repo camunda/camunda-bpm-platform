@@ -499,6 +499,35 @@ public class JobQueryTest {
   }
 
   @Test
+  public void testQueryByCreateTimeCombinations() {
+    JobQuery query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne);
+    List<Job> jobs = query.list();
+    assertEquals(1, jobs.size());
+    Date jobCreateTime = jobs.get(0).getCreateTime();
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdAfter(new Date(jobCreateTime.getTime() - 1));
+    verifyQueryResults(query, 1);
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdAfter(jobCreateTime);
+    verifyQueryResults(query, 0);
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdBefore(jobCreateTime);
+    verifyQueryResults(query, 1);
+
+    query = managementService.createJobQuery()
+            .processInstanceId(processInstanceIdOne)
+            .createdBefore(new Date(jobCreateTime.getTime() - 1));
+    verifyQueryResults(query, 0);
+  }
+
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   public void testQueryByException() {
     JobQuery query = managementService.createJobQuery().withException();

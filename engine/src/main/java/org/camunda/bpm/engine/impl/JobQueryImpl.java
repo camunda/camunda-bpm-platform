@@ -56,6 +56,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected Date duedateLowerThan;
   protected Date duedateHigherThanOrEqual;
   protected Date duedateLowerThanOrEqual;
+  protected Date createdBefore;
+  protected Date createdAfter;
   protected Long priorityHigherThanOrEqual;
   protected Long priorityLowerThanOrEqual;
   protected boolean withException;
@@ -174,8 +176,21 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
 
+  @Override
+  public JobQuery createdBefore(Date date) {
+    ensureNotNull("Provided date", date);
+    this.createdBefore = date;
+    return this;
+  }
 
-  public JobQuery priorityHigherThanOrEquals(long priority) {
+  @Override
+  public JobQuery createdAfter(Date date) {
+    ensureNotNull("Provided date", date);
+    this.createdAfter = date;
+    return this;
+  }
+
+    public JobQuery priorityHigherThanOrEquals(long priority) {
     this.priorityHigherThanOrEqual = priority;
     return this;
   }
@@ -215,7 +230,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
       || CompareUtil.areNotInAscendingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual)
-      || hasExcludingDueDateParameters();
+      || hasExcludingDueDateParameters()
+      || CompareUtil.areNotInAscendingOrder(createdBefore, createdAfter);
   }
 
   private boolean hasExcludingDueDateParameters() {

@@ -90,6 +90,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected Boolean includeJobsWithoutTenantId;
 
   protected List<ConditionQueryParameterDto> dueDates;
+  protected List<ConditionQueryParameterDto> createTimes;
 
   public JobQueryDto() {}
 
@@ -162,6 +163,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     this.dueDates = dueDates;
   }
 
+  @CamundaQueryParam(value = "createTimes", converter = ConditionListConverter.class)
+  public void setCreateTimes(List<ConditionQueryParameterDto> createTimes) {
+    this.createTimes = createTimes;
+  }
+
   @CamundaQueryParam(value="noRetriesLeft", converter = BooleanConverter.class)
   public void setNoRetriesLeft(Boolean noRetriesLeft) {
     this.noRetriesLeft = noRetriesLeft;
@@ -217,8 +223,43 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     return engine.getManagementService().createJobQuery();
   }
 
+  private abstract class ApplyDates {
+    void run(List<ConditionQueryParameterDto> dates) {
+      DateConverter dateConverter = new DateConverter();
+      dateConverter.setObjectMapper(objectMapper);
+
+      for (ConditionQueryParameterDto conditionQueryParam : dates) {
+        String op = conditionQueryParam.getOperator();
+        Date date;
+
+        try {
+          date = dateConverter.convertQueryParameterToType((String) conditionQueryParam.getValue());
+        } catch (RestException e) {
+          throw new InvalidRequestException(e.getStatus(), e, "Invalid " + fieldName() + " format: " + e.getMessage());
+        }
+
+        if (op.equals(ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
+          setGreaterThan(date);
+        } else if (op.equals(ConditionQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
+          setLowerThan(date);
+        } else {
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid " + fieldName() + " comparator specified: " + op);
+        }
+      }
+    }
+
+    /**
+     * @return a descriptive name of the target field, used in error-messages
+     */
+    abstract String fieldName();
+
+    abstract void setGreaterThan(Date date);
+
+    abstract void setLowerThan(Date date);
+  }
+  
   @Override
-  protected void applyFilters(JobQuery query) {
+  protected void applyFilters(final JobQuery query) {
     if (activityId != null){
       query.activityId(activityId);
     }
@@ -298,27 +339,41 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     }
 
     if (dueDates != null) {
-      DateConverter dateConverter = new DateConverter();
-      dateConverter.setObjectMapper(objectMapper);
-
-      for (ConditionQueryParameterDto conditionQueryParam : dueDates) {
-        String op = conditionQueryParam.getOperator();
-        Date dueDate = null;
-
-        try {
-          dueDate = dateConverter.convertQueryParameterToType((String) conditionQueryParam.getValue());
-        } catch (RestException e) {
-          throw new InvalidRequestException(e.getStatus(), e, "Invalid due date format: " + e.getMessage());
+      new ApplyDates() {
+        @Override
+        void setGreaterThan(Date date) {
+          query.duedateHigherThan(date);
         }
 
-        if (op.equals(ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
-          query.duedateHigherThan(dueDate);
-        } else if (op.equals(ConditionQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
-          query.duedateLowerThan(dueDate);
-        } else {
-          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid due date comparator specified: " + op);
+        @Override
+        void setLowerThan(Date date) {
+          query.duedateLowerThan(date);
         }
-      }
+
+        @Override
+        String fieldName() {
+          return "due date";
+        }
+      }.run(dueDates);
+    }
+
+    if (createTimes != null) {
+      new ApplyDates() {
+        @Override
+        void setGreaterThan(Date date) {
+          query.createdAfter(date);
+        }
+
+        @Override
+        void setLowerThan(Date date) {
+          query.createdBefore(date);
+        }
+
+        @Override
+        String fieldName() {
+          return "create time";
+        }
+      }.run(createTimes);
     }
 
     if (tenantIds != null && !tenantIds.isEmpty()) {
