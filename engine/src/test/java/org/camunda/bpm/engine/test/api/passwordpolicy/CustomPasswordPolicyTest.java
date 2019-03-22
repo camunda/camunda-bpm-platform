@@ -15,25 +15,52 @@
  */
 package org.camunda.bpm.engine.test.api.passwordpolicy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.pwpolicy.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.pwpolicy.PasswordPolicyException;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Miklas Boskamp
  */
-public class CustomPasswordPolicyTest extends ResourceProcessEngineTestCase {
+public class CustomPasswordPolicyTest {
 
-  public CustomPasswordPolicyTest() {
-    super("org/camunda/bpm/engine/test/api/passwordpolicy/passwordpolicy.custom.camunda.cfg.xml");
+  @Rule
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
+  private IdentityService identityService;
+
+  @Before
+  public void init() {
+    identityService = engineRule.getIdentityService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    processEngineConfiguration.setPasswordPolicy(new CustomPasswordPolicyImpl());
+    processEngineConfiguration.setDisablePasswordPolicy(false);
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() {
+    // reset configuration
+    processEngineConfiguration.setPasswordPolicy(new DefaultPasswordPolicyImpl());
+    processEngineConfiguration.setDisablePasswordPolicy(true);
+    // reset database
     identityService.deleteUser("user");
   }
 
+  @Test
   public void testCustomPasswordPolicy() {
     PasswordPolicy policy = processEngineConfiguration.getPasswordPolicy();
     assertTrue(policy.getClass().isAssignableFrom(CustomPasswordPolicyImpl.class));
