@@ -34,7 +34,7 @@ public interface UserResource {
   @Produces(MediaType.APPLICATION_JSON)
   public void deleteUser();
 
-  @GET
+  @POST
   @Path("/unlock")
   public void unlockUser();
 
