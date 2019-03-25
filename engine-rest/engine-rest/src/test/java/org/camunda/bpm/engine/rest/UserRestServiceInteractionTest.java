@@ -763,7 +763,7 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .get(USER_UNLOCK);
+      .post(USER_UNLOCK);
 
     verify(identityServiceMock).unlockUser(MockProvider.EXAMPLE_USER_ID);
   }
@@ -775,7 +775,7 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .get(USER_UNLOCK);
+      .post(USER_UNLOCK);
   }
 
   @Test
@@ -791,7 +791,7 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
     .when()
-      .get(USER_UNLOCK);
+      .post(USER_UNLOCK);
   }
 
   protected void verifyNoAuthorizationCheckPerformed() {
