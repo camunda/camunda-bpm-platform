@@ -31,7 +31,7 @@
     <!-- resource authorization provider -->
     <property name="resourceAuthorizationProvider" ref="myResourceAuthorizationProvider" />
 
-    <!-- turn off passowrd policy for tests -->
+    <!-- turn off password policy for tests -->
     <property name="disablePasswordPolicy" value="true"/>
 
   </bean>
