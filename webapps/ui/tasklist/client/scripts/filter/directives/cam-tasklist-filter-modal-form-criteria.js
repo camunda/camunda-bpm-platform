@@ -75,6 +75,11 @@ module.exports = [function() {
         }
       };
 
+      $scope.switchVariableCases = function() {
+        var options = ['none', 'names', 'values', 'all'];
+        $scope.filter.variableCaseHandling = options[(options.indexOf( $scope.filter.variableCaseHandling) + 1) % options.length];
+      };
+
       var emptyCriterion = {
         key: '',
         value: ''
@@ -163,7 +168,7 @@ module.exports = [function() {
         control.$setValidity('number', true);
         control.$setValidity('date', true);
         control.$setValidity('dateValue', true);
-        
+
         if (booleanCriterion[queryParam.key]) {
           queryParam.value = true;
         }

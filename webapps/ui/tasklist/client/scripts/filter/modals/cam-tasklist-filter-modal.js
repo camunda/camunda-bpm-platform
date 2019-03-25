@@ -127,6 +127,9 @@ module.exports = [
     // initialize filter match type
     $scope.filter.matchType =              $scope.filter.matchType;
 
+    // initialize variable case sensetivity handling
+    $scope.filter.variableCaseHandling =   $scope.filter.variableCaseHandling || 'all';
+
     // initialize filter properties
     $scope.filter.properties =             $scope.filter.properties || {};
 
@@ -310,6 +313,14 @@ module.exports = [
 
       if ($scope.filter.includeAssignedTasks) {
         _queryObj.includeAssignedTasks = true;
+      }
+
+      if ($scope.filter.variableCaseHandling === 'values' || $scope.filter.variableCaseHandling === 'all') {
+        _queryObj.variableValuesIgnoreCase = true;
+      }
+
+      if ($scope.filter.variableCaseHandling === 'names' || $scope.filter.variableCaseHandling === 'all') {
+        _queryObj.variableNamesIgnoreCase = true;
       }
 
       if ($scope.filter.matchType === 'any') {
