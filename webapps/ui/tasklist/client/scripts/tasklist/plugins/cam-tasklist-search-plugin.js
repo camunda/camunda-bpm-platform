@@ -102,6 +102,7 @@ var Controller = [
     $scope.searches = [];
     $scope.translations = {};
     $scope.matchAny = $location.search()['searchOrQuery'] || false;
+    $scope.variableCaseHandling = $location.search()['variableCaseHandling'] || 'all';
 
     angular.forEach(searchConfig.tooltips, function(value, key) {
       $scope.translations[key] = $translate.instant(value);
@@ -124,7 +125,7 @@ var Controller = [
     });
 
     var searchData = $scope.tasklistData.newChild($scope);
-    $scope.$watch('[searches, matchAny]', function() {
+    $scope.$watch('[searches, matchAny, variableCaseHandling]', function() {
       var baseQuery = {};
       var tempQuery;
 
@@ -139,6 +140,13 @@ var Controller = [
         baseQuery.taskVariables = [];
         baseQuery.caseInstanceVariables = [];
         tempQuery = baseQuery;
+      }
+
+      if($scope.variableCaseHandling === 'names' || $scope.variableCaseHandling === 'all') {
+        tempQuery.variableNamesIgnoreCase = true;
+      }
+      if($scope.variableCaseHandling === 'values' || $scope.variableCaseHandling === 'all') {
+        tempQuery.variableValuesIgnoreCase = true;
       }
 
       angular.forEach($scope.searches, function(search) {
