@@ -16,6 +16,7 @@
 package org.camunda.bpm.engine.impl.test;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 
 /**
@@ -39,9 +40,10 @@ public abstract class ResourceProcessEngineTestCase extends AbstractProcessEngin
 
   @Override
   protected void initializeProcessEngine() {
-    processEngine = ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource(engineConfigurationResource)
-            .buildProcessEngine();
+    ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+        .createProcessEngineConfigurationFromResource(engineConfigurationResource);
+    processEngineConfig.setDisablePasswordPolicy(true);
+    processEngine = processEngineConfig.buildProcessEngine();
   }
 
 }
