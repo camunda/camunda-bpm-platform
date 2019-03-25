@@ -34,5 +34,8 @@
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
+    <!-- turn off password policy for tests -->
+    <property name="disablePasswordPolicy" value="true"/>
+
   </bean>
 </beans>

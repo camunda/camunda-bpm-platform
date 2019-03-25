@@ -32,6 +32,9 @@
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
     <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+	
+	<!-- turn off password policy for tests -->
+    <property name="disablePasswordPolicy" value="true"/>
 
   </bean>
 </beans>
