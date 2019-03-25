@@ -42,6 +42,7 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
   public ProcessEngine bootstrapEngine(String configurationResource) {
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource(configurationResource);
+    processEngineConfiguration.setDisablePasswordPolicy(true);
     configureEngine(processEngineConfiguration);
     return processEngineConfiguration.buildProcessEngine();
   }
