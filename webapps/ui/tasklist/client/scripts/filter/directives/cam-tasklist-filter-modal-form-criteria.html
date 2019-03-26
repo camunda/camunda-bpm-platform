@@ -148,19 +148,5 @@
       </button>
       <span ng-disabled="query.length < 2">{{ 'MATCH_TYPE' | translate }}</span>
     </div>
-    <div ng-if="query.length > 0"
-         class="col-xs-10 col-xs-offset-2">
-      <div >
-        {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_ATTRIBUTE' | translate}}
-          <label>
-            <input type="checkbox" ng-model="filter.variableNamesIgnoreCase" >
-            {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_NAME' | translate}}
-          </label>
-          <label>
-            <input type="checkbox" ng-model="filter.variableValuesIgnoreCase">
-            {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_VALUE' | translate}}
-          </label>.
-      </div>
-    </div>
   </div>
 </div>
