@@ -16,8 +16,6 @@
 package org.camunda.bpm.cockpit.plugin.resource;
 
 import java.util.List;
-import java.util.Set;
-
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryParameters;
@@ -151,9 +149,9 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   }
 
   protected boolean isPermissionDisabled(Permission permission) {
-    Set<Permission> disabledPermissions = getProcessEngine().getProcessEngineConfiguration().getDisabledPermissions();
-    for (Permission disabledPerm : disabledPermissions) {
-      if (!disabledPerm.getName().equals(permission.getName())) {
+    List<String> disabledPermissions = getProcessEngine().getProcessEngineConfiguration().getDisabledPermissions();
+    for (String disabledPerm : disabledPermissions) {
+      if (!disabledPerm.equals(permission.getName())) {
         return true;
       }
     }
