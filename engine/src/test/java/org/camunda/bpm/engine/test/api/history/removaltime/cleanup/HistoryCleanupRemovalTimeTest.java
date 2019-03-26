@@ -144,6 +144,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     engineConfiguration.setBatchOperationHistoryTimeToLive(null);
     engineConfiguration.setBatchOperationsForHistoryCleanup(null);
+    
+    engineConfiguration.setHistoryTimeToLive(null);
 
     engineConfiguration.initHistoryCleanup();
 
@@ -207,6 +209,12 @@ public class HistoryCleanupRemovalTimeTest {
       .callActivity()
         .calledElement(PROCESS_KEY)
     .endEvent().done();
+  
+  protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .startEvent()
+        .callActivity()
+          .calledElement(PROCESS_KEY)
+      .endEvent().done();
 
   protected final String CALLING_PROCESS_CALLS_DMN_KEY = "callingProcessCallsDmn";
   protected final BpmnModelInstance CALLING_PROCESS_CALLS_DMN = Bpmn.createExecutableProcess(CALLING_PROCESS_CALLS_DMN_KEY)
@@ -410,6 +418,80 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldCleanupProcessInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.complete(taskId);
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // assume
+    assertThat(historicProcessInstances.size(), is(1));
+
+    Date removalTime = addDays(END_DATE, 5);
+    ClockUtil.setCurrentTime(removalTime);
+
+    // when
+    runHistoryCleanup();
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // then
+    assertThat(historicProcessInstances.size(), is(0));
+  }
+  
+  @Test
+  public void shouldNotCleanupProcessInstanceWithoutTTL() {
+    // given
+    testRule.deploy(CALLING_PROCESS_WO_TTL);
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.complete(taskId);
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // assume
+    assertThat(historicProcessInstances.size(), is(1));
+
+    Date removalTime = addDays(END_DATE, 5);
+    ClockUtil.setCurrentTime(removalTime);
+
+    // when
+    runHistoryCleanup();
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // then
+    assertThat(historicProcessInstances.size(), is(1));
+  }
+  
+  @Test
+  public void shouldCleanupProcessInstanceWithoutTTLWithConfigDefault() {
+    // given
+    engineConfiguration.setHistoryTimeToLive("5");
+    
+    testRule.deploy(CALLING_PROCESS_WO_TTL);
 
     testRule.deploy(PROCESS);
 

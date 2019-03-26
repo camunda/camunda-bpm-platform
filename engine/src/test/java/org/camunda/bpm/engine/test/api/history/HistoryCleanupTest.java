@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.management.MetricsQuery;
@@ -1116,6 +1117,14 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchSize(500);
     processEngineConfiguration.initHistoryCleanup();
     assertEquals(processEngineConfiguration.getHistoryCleanupBatchSize(), 500);
+    
+    processEngineConfiguration.setHistoryTimeToLive("5");
+    processEngineConfiguration.initHistoryCleanup();
+    assertEquals(5, ParseUtil.parseHistoryTimeToLive(processEngineConfiguration.getHistoryTimeToLive()).intValue());
+    
+    processEngineConfiguration.setHistoryTimeToLive("P6D");
+    processEngineConfiguration.initHistoryCleanup();
+    assertEquals(6, ParseUtil.parseHistoryTimeToLive(processEngineConfiguration.getHistoryTimeToLive()).intValue());
   }
 
   @Test
@@ -1214,7 +1223,37 @@ public class HistoryCleanupTest {
 
     processEngineConfiguration.initHistoryCleanup();
   }
+  
+  @Test
+  public void testConfigurationFailureMalformedHistoryTimeToLive() {
+    processEngineConfiguration.setHistoryTimeToLive("PP5555DDDD");
 
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyTimeToLive");
+
+    processEngineConfiguration.initHistoryCleanup();
+  }
+  
+  @Test
+  public void testConfigurationFailureInvalidHistoryTimeToLive() {
+    processEngineConfiguration.setHistoryTimeToLive("invalidValue");
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyTimeToLive");
+
+    processEngineConfiguration.initHistoryCleanup();
+  }
+  
+  @Test
+  public void testConfigurationFailureNegativeHistoryTimeToLive() {
+    processEngineConfiguration.setHistoryTimeToLive("-6");
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyTimeToLive");
+
+    processEngineConfiguration.initHistoryCleanup();
+  }
+  
   private Date getNextRunWithinBatchWindow(Date currentTime) {
     return processEngineConfiguration.getBatchWindowManager().getNextBatchWindow(currentTime, processEngineConfiguration).getStart();
   }
