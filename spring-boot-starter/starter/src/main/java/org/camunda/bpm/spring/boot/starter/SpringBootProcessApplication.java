@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
-import static java.util.Collections.EMPTY_SET;
 import static org.camunda.bpm.application.ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH;
 import static org.camunda.bpm.spring.boot.starter.util.GetProcessApplicationNameFromAnnotation.processApplicationNameFromAnnotation;
 import static org.camunda.bpm.spring.boot.starter.util.SpringBootProcessEngineLogger.LOG;
@@ -83,6 +82,9 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
     processApplicationNameFromAnnotation(applicationContext)
       .apply(springApplicationName)
       .ifPresent(this::setBeanName);
+
+    String processEngineName = processEngine.getName();
+    setDefaultDeployToEngineName(processEngineName);
 
     RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(processEngine);
 
