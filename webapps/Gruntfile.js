@@ -190,8 +190,8 @@ module.exports = function(grunt) {
 
   require('./grunt/tasks/compileLibs')(grunt, true);
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
-  require('camunda-commons-ui/grunt/tasks/persistify')(grunt);
-  require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt);
+  require('camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname);
+  require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt, __dirname);
 
   grunt.loadNpmTasks('grunt-karma');
 
