@@ -51,7 +51,8 @@ var Controller = ['$scope', 'page', 'UserResource', 'Notifications', '$location'
   // data model for credentials
   $scope.credentials = {
     password : '',
-    password2 : ''
+    password2 : '',
+    valid: true
   };
 
   $scope.createUser = function() {

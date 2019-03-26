@@ -47,7 +47,8 @@ module.exports = ['camAPI', 'Notifications', '$translate', function(camAPI, Noti
       $scope.password = {
         current: null,
         new: null,
-        confirmation: null
+        confirmation: null,
+        valid: true
       };
 
       var groupResource = camAPI.resource('group');

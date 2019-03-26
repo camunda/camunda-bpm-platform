@@ -61,7 +61,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         $scope.credentials = {
           authenticatedUserPassword: '',
           password : '',
-          password2 : ''
+          password2 : '',
+          valid: true
         };
 
         // list of the user's groups
@@ -76,6 +77,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         $scope.canSubmit = function(form, modelObject) {
           return form.$valid &&
             !form.$pristine &&
+            $scope.credentials.valid &&
             // TODO: investigate "==" or "==="
             (modelObject == null || !angular.equals($scope[modelObject], $scope[modelObject+'Copy']));
         };

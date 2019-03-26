@@ -166,12 +166,9 @@
                  for="inputPassword">{{ 'USERS_NEW_PASSWORD' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
-            <input id="inputPassword"
-                   name="inputPassword"
-                   class="form-control"
-                   type="password"
-                   ng-model="credentials.password"
-                   required />
+            <div cam-widget-password
+              cam-widget-password-password="credentials.password"
+              cam-widget-password-valid="credentials.valid"></div>
 
             <p class="text-danger"
                ng-show="updateCredentialsForm.inputPassword.$error.password">
