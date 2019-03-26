@@ -75,10 +75,6 @@ module.exports = [function() {
         }
       };
 
-      $scope.switchVariableCases = function() {
-        var options = ['none', 'names', 'values', 'all'];
-        $scope.filter.variableCaseHandling = options[(options.indexOf( $scope.filter.variableCaseHandling) + 1) % options.length];
-      };
 
       var emptyCriterion = {
         key: '',
