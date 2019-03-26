@@ -48,9 +48,10 @@ package org.camunda.bpm.engine.authorization;
  * all can be found in {@link org.camunda.bpm.engine.authorization authorization} package).
  * In order to define a custom permission, you must provide
  * an implementation of this interface such that the {@link #getValue()} 
- * method returns an integer which is a power of two and not yet used by the
- * built-in {@link Permissions}. You must implement also {@link #getTypes()} and
- * make sure that the permission values are not already reserved for the desired
+ * method returns an integer which is a power of two and not yet used by any of the
+ * built-in Permissions. Keep the Permission's names unique as well.
+ * You must implement also {@link #getTypes()} and make sure that
+ * the permission values are not already reserved for the desired
  * {@link Resource}.</p>
  * 
  * 

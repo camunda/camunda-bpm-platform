@@ -402,10 +402,10 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isPermissionDisabled(Permission permission) {
-    Set<Permission> disabledPermissions = getCommandContext().getProcessEngineConfiguration().getDisabledPermissions();
+    List<String> disabledPermissions = getCommandContext().getProcessEngineConfiguration().getDisabledPermissions();
     if (disabledPermissions != null) {
-      for (Permission disabledPermission : disabledPermissions) {
-        if (permission.getName().equals(disabledPermission.getName())) {
+      for (String disabledPermission : disabledPermissions) {
+        if (permission.getName().equals(disabledPermission)) {
           return true;
         }
       }

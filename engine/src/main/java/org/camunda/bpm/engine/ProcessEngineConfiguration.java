@@ -16,13 +16,11 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.Collections;
+import java.util.List;
 import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
@@ -370,10 +368,10 @@ public abstract class ProcessEngineConfiguration {
   protected boolean enforceSpecificVariablePermission = false;
 
   /**
-   * Specifies which permissions will not be taken into account in
+   * Specifies which permissions will not be taken into account in the
    * authorizations checks if authorization is enabled.
    */
-  protected Set<Permission> disabledPermissions = new HashSet<>();
+  protected List<String> disabledPermissions = Collections.emptyList();
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -939,11 +937,11 @@ public abstract class ProcessEngineConfiguration {
     this.enforceSpecificVariablePermission = ensureSpecificVariablePermission;
   }
 
-  public Set<Permission> getDisabledPermissions() {
+  public List<String> getDisabledPermissions() {
     return disabledPermissions;
   }
 
-  public void setDisabledPermissions(Set<Permission> disabledPermissions) {
+  public void setDisabledPermissions(List<String> disabledPermissions) {
     this.disabledPermissions = disabledPermissions;
   }
 
