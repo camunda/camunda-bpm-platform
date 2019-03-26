@@ -32,12 +32,9 @@
                  for="inputPassword">{{ 'USERS_PASSWORD' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
-            <input id="inputPassword"
-                name="inputPassword"
-                class="form-control"
-                type="password"
-                ng-model="credentials.password"
-                required />
+              <div cam-widget-password
+                   cam-widget-password-password="credentials.password"
+                   cam-widget-password-valid="credentials.valid"></div>
 
             <span class="help-inline"
                   ng-show="createUserForm.inputPassword.$error.password">
@@ -137,7 +134,7 @@
 
             <button type="submit"
                     class="btn btn-primary"
-                    ng-disabled="!createUserForm.$valid"
+                    ng-disabled="!createUserForm.$valid || !credentials.valid"
                     ng-click="createUser()">{{ 'USERS_CREATE_NEW_USER' | translate }}</button>
           </div>
         </div>
