@@ -20,6 +20,9 @@
     <!-- enabled authorization -->
     <property name="authorizationEnabled" value="true" />
 
+    <!-- disable password policy -->
+    <property name="disablePasswordPolicy" value="true"/>
+
     <!-- mail server configurations -->
     <property name="mailServerPort" value="${mail.server.port}" />
     <property name="history" value="full" />

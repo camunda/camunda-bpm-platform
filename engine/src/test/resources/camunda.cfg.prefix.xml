@@ -33,6 +33,9 @@
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
+    <!-- disable password policy -->
+    <property name="disablePasswordPolicy" value="true"/>
+
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="databaseTablePrefix" value="SCHEMA1." />
