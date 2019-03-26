@@ -45,6 +45,7 @@ public class StandaloneInMemoryTestConfiguration extends StandaloneInMemProcessE
     databaseSchemaUpdate = DB_SCHEMA_UPDATE_DROP_CREATE;
     isDbMetricsReporterActivate = false;
     historyLevel = HistoryLevel.HISTORY_LEVEL_FULL;
+    disablePasswordPolicy = true;
 
     getProcessEnginePlugins().addAll(plugins);
   }
