@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2015-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  */
 package org.camunda.bpm.spring.boot.starter.configuration.impl;
 
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaProcessEngineConfiguration;
+import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -53,6 +55,15 @@ public class DefaultProcessEngineConfiguration extends AbstractCamundaConfigurat
   private void setProcessEngineName(SpringProcessEngineConfiguration configuration) {
     String processEngineName = StringUtils.trimAllWhitespace(camundaBpmProperties.getProcessEngineName());
     if (!StringUtils.isEmpty(processEngineName) && !processEngineName.contains("-")) {
+
+      if (camundaBpmProperties.getGenerateUniqueProcessEngineName()) {
+        if (!processEngineName.equals(ProcessEngines.NAME_DEFAULT)) {
+          throw new RuntimeException(String.format("A unique processEngineName cannot be generated "
+            + "if a custom processEngineName is already set: %s", processEngineName));
+        }
+        processEngineName = CamundaBpmProperties.getUniqueName(camundaBpmProperties.UNIQUE_ENGINE_NAME_PREFIX);
+      }
+
       configuration.setProcessEngineName(processEngineName);
     } else {
       logger.warn("Ignoring invalid processEngineName='{}' - must not be null, blank or contain hyphen", camundaBpmProperties.getProcessEngineName());

@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.spring.application.SpringProcessApplication;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaDeploymentConfiguration;
 import org.camunda.bpm.spring.boot.starter.event.PostDeployEvent;
 import org.camunda.bpm.spring.boot.starter.event.PreUndeployEvent;
+import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -72,6 +73,9 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
   protected String contextPath = "/";
 
   @Autowired
+  protected CamundaBpmProperties camundaBpmProperties;
+
+  @Autowired
   protected ProcessEngine processEngine;
 
   @Autowired
@@ -82,6 +86,10 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
     processApplicationNameFromAnnotation(applicationContext)
       .apply(springApplicationName)
       .ifPresent(this::setBeanName);
+
+    if (camundaBpmProperties.getGenerateUniqueProcessApplicationName()) {
+      setBeanName(CamundaBpmProperties.getUniqueName(camundaBpmProperties.UNIQUE_APPLICATION_NAME_PREFIX));
+    }
 
     String processEngineName = processEngine.getName();
     setDefaultDeployToEngineName(processEngineName);

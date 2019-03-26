@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.property;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.spring.boot.starter.configuration.id.IdGeneratorConfiguration;
@@ -33,6 +34,8 @@ import static org.springframework.core.io.support.ResourcePatternResolver.CLASSP
 public class CamundaBpmProperties {
 
   public static final String PREFIX = "camunda.bpm";
+  public static final String UNIQUE_ENGINE_NAME_PREFIX = "processEngine";
+  public static final String UNIQUE_APPLICATION_NAME_PREFIX = "processApplication";
 
   public static final String[] DEFAULT_BPMN_RESOURCE_SUFFIXES = new String[]{"bpmn20.xml", "bpmn" };
   public static final String[] DEFAULT_CMMN_RESOURCE_SUFFIXES = new String[]{"cmmn11.xml", "cmmn10.xml", "cmmn" };
@@ -56,10 +59,18 @@ public class CamundaBpmProperties {
     return new StringJoiner(", ", clazz.getSimpleName() + "[", "]");
   }
 
+  public static String getUniqueName(String name) {
+    return name + RandomStringUtils.randomAlphanumeric(10);
+  }
+
   /**
    * name of the process engine
    */
   private String processEngineName = ProcessEngines.NAME_DEFAULT;
+
+  private Boolean generateUniqueProcessEngineName = false;
+
+  private Boolean generateUniqueProcessApplicationName = false;
 
   private String idGenerator = IdGeneratorConfiguration.STRONG;
 
@@ -329,11 +340,29 @@ public class CamundaBpmProperties {
     this.enabled = enabled;
   }
 
+  public Boolean getGenerateUniqueProcessEngineName() {
+    return generateUniqueProcessEngineName;
+  }
+
+  public void setGenerateUniqueProcessEngineName(Boolean generateUniqueProcessEngineName) {
+    this.generateUniqueProcessEngineName = generateUniqueProcessEngineName;
+  }
+
+  public Boolean getGenerateUniqueProcessApplicationName() {
+    return generateUniqueProcessApplicationName;
+  }
+
+  public void setGenerateUniqueProcessApplicationName(Boolean generateUniqueProcessApplicationName) {
+    this.generateUniqueProcessApplicationName = generateUniqueProcessApplicationName;
+  }
+
   @Override
   public String toString() {
     return joinOn(this.getClass())
       .add("enabled=" + enabled)
       .add("processEngineName=" + processEngineName)
+      .add("generateUniqueProcessEngineName=" + generateUniqueProcessEngineName)
+      .add("generateUniqueProcessApplicationName=" + generateUniqueProcessApplicationName)
       .add("historyLevel=" + historyLevel)
       .add("historyLevelDefault=" + historyLevelDefault)
       .add("autoDeploymentEnabled=" + autoDeploymentEnabled)
