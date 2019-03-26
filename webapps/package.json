@@ -81,6 +81,7 @@
     "source-map": "0.7.3",
     "xunit-file": "1.0.0",
     "watchify": "3.11.1",
-    "persistify": "2.0.1"
+    "persistify": "2.0.1",
+    "mkdirp": "0.5.1"
   }
 }
