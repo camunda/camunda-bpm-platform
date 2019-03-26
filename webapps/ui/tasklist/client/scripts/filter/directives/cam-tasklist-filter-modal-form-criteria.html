@@ -150,13 +150,17 @@
     </div>
     <div ng-if="query.length > 0"
          class="col-xs-10 col-xs-offset-2">
-        <button ng-click="switchVariableCases()" class="btn btn-default btn-xs" type="button">
-          <span ng-if="filter.variableCaseHandling === 'none'">{{ 'CAM_WIDGET_SEARCH_VARIABLE_CASE_NONE' | translate }}</span>
-          <span ng-if="filter.variableCaseHandling === 'all'">{{ 'CAM_WIDGET_SEARCH_VARIABLE_CASE_ALL' | translate }}</span>
-          <span ng-if="filter.variableCaseHandling === 'values'">{{ 'CAM_WIDGET_SEARCH_VARIABLE_CASE_VALUES' | translate }}</span>
-          <span ng-if="filter.variableCaseHandling === 'names'">{{ 'CAM_WIDGET_SEARCH_VARIABLE_CASE_NAMES' | translate }}</span>
-        </button>
-        <span> {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_ATTRIBUTE' | translate}}</span>
+      <div >
+        {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_ATTRIBUTE' | translate}}
+          <label>
+            <input type="checkbox" ng-model="filter.variableNamesIgnoreCase" >
+            {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_NAME' | translate}}
+          </label>
+          <label>
+            <input type="checkbox" ng-model="filter.variableValuesIgnoreCase">
+            {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_VALUE' | translate}}
+          </label>.
       </div>
+    </div>
   </div>
 </div>
