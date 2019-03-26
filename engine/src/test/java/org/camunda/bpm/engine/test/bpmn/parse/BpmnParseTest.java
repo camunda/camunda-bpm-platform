@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -842,6 +842,63 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
 
     Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
     assertNull(timeToLive);
+  }
+  
+  public void testParseProcessDefinitionWithoutTtlWithConfigDefault() {
+    processEngineConfiguration.setHistoryTimeToLive("6");
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionWithoutTtl");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+      assertNotNull(processDefinitions);
+      assertEquals(1, processDefinitions.size());
+  
+      Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
+      assertNotNull(timeToLive);
+      assertEquals(6, timeToLive.intValue());
+    } finally {
+      processEngineConfiguration.setHistoryTimeToLive(null);
+      repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
+    }
+  }
+  
+  public void testParseProcessDefinitionWithoutTtlWithMalformedConfigDefault() {
+    processEngineConfiguration.setHistoryTimeToLive("PP555DDD");
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionWithoutTtl");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+    } finally {
+      processEngineConfiguration.setHistoryTimeToLive(null);
+    }
+  }
+  
+  public void testParseProcessDefinitionWithoutTtlWithInvalidConfigDefault() {
+    processEngineConfiguration.setHistoryTimeToLive("invalidValue");
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionWithoutTtl");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+    } finally {
+      processEngineConfiguration.setHistoryTimeToLive(null);
+    }
+  }
+  
+  public void testParseProcessDefinitionWithoutTtlWithNegativeConfigDefault() {
+    processEngineConfiguration.setHistoryTimeToLive("-6");
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionWithoutTtl");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+    } finally {
+      processEngineConfiguration.setHistoryTimeToLive(null);
+    }
   }
 
   public void testParseProcessDefinitionInvalidTtl() {

@@ -750,6 +750,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected int historyCleanupDegreeOfParallelism = 1;
 
+  protected String historyTimeToLive;
+  
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
@@ -904,6 +906,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       throw LOG.invalidPropertyValue("historyCleanupBatchThreshold", String.valueOf(historyCleanupBatchThreshold),
           "History cleanup batch threshold cannot be negative.");
     }
+    
+    initHistoryTimeToLive();
 
     initBatchOperationsHistoryTimeToLive();
   }
@@ -953,6 +957,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     if (sundayHistoryCleanupBatchWindowStartTime != null || sundayHistoryCleanupBatchWindowEndTime != null) {
       historyCleanupBatchWindows.put(Calendar.SUNDAY, new BatchWindowConfiguration(sundayHistoryCleanupBatchWindowStartTime, sundayHistoryCleanupBatchWindowEndTime));
+    }
+  }
+  
+  protected void initHistoryTimeToLive() {
+    try {
+      ParseUtil.parseHistoryTimeToLive(historyTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("historyTimeToLive", historyTimeToLive, e);
     }
   }
 
@@ -4154,6 +4166,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
+  }
+  
+  public String getHistoryTimeToLive() {
+    return historyTimeToLive;
+  }
+  
+  public void setHistoryTimeToLive(String historyTimeToLive) {
+    this.historyTimeToLive = historyTimeToLive;
   }
 
   public String getBatchOperationHistoryTimeToLive() {
