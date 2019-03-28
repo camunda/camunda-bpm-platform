@@ -65,7 +65,8 @@
       CURRENT_STATE_ = #{state, jdbcType=INTEGER},
       PREV_STATE_ = #{previous, jdbcType=INTEGER},
       SUPER_CASE_EXEC_ = #{superCaseExecutionId, jdbcType=VARCHAR},
-      SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR}
+      SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR},
+      CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>

@@ -89,7 +89,8 @@
       LONG_ = #{longValue, jdbcType=BIGINT},
       TEXT_ = #{textValue, jdbcType=VARCHAR},
       TEXT2_ = #{textValue2, jdbcType=VARCHAR},
-      STATE_ = #{state, jdbcType=VARCHAR}
+      STATE_ = #{state, jdbcType=VARCHAR},
+      CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
