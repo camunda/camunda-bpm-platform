@@ -40,7 +40,7 @@ public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrat
     try {
       InitialContext.doLookup(TestConstants.PROCESS_APPLICATION_SERVICE_JNDI_NAME);
     } catch (NamingException e) {
-      Assert.fail("Failed to lookup ProcessApplicationService");
+      Assert.fail("Failed to lookup ProcessApplicationService '" + TestConstants.PROCESS_APPLICATION_SERVICE_JNDI_NAME + "'. Reason: " + e);
     }
   }
 
@@ -49,7 +49,7 @@ public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrat
     try {
       InitialContext.doLookup(TestConstants.PROCESS_ENGINE_SERVICE_JNDI_NAME);
     } catch (NamingException e) {
-      Assert.fail("Failed to lookup ProcessEngineService");
+      Assert.fail("Failed to lookup ProcessEngineService '" + TestConstants.PROCESS_ENGINE_SERVICE_JNDI_NAME + "'. Reason: " + e);
     }
   }
 
