@@ -30,6 +30,8 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrationTest {
 
+  protected TestConstants testConstants = new TestConstants();
+
   @Deployment
   public static WebArchive app1() {
     return initWebArchiveDeployment();
@@ -38,7 +40,7 @@ public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrat
   @Test
   public void testProcessApplicationServiceBinding() {
     try {
-      InitialContext.doLookup(TestConstants.PROCESS_APPLICATION_SERVICE_JNDI_NAME);
+      InitialContext.doLookup(testConstants.getProcessApplicationService());
     } catch (NamingException e) {
       Assert.fail("Failed to lookup ProcessApplicationService '" + TestConstants.PROCESS_APPLICATION_SERVICE_JNDI_NAME + "'. Reason: " + e);
     }
@@ -47,7 +49,7 @@ public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrat
   @Test
   public void testProcessEngineServiceBinding() {
     try {
-      InitialContext.doLookup(TestConstants.PROCESS_ENGINE_SERVICE_JNDI_NAME);
+      InitialContext.doLookup(testConstants.getEngineService());
     } catch (NamingException e) {
       Assert.fail("Failed to lookup ProcessEngineService '" + TestConstants.PROCESS_ENGINE_SERVICE_JNDI_NAME + "'. Reason: " + e);
     }
