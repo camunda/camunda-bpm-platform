@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.MetricsRestService;
 import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.ModificationRestService;
+import org.camunda.bpm.engine.rest.PasswordPolicyRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.SignalRestService;
@@ -251,6 +252,11 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + VersionRestService.PATH)
   public VersionRestService getVersionRestService(@PathParam("name") String engineName) {
     return super.getVersionRestService(engineName);
+  }
+
+  @Path("/{name}" + PasswordPolicyRestService.PATH)
+  public PasswordPolicyRestService getPasswordPolicyRestService(@PathParam("name") String engineName) {
+    return super.getPasswordPolicyRestService(engineName);
   }
 
   @GET
