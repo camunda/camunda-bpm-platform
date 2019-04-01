@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,8 @@ public interface AuthorizationRestService {
       @QueryParam("permissionName") String permissionName,
       @QueryParam("resourceName") String resourceName,
       @QueryParam("resourceType") Integer resourceType,
-      @QueryParam("resourceId") String resourceId);
+      @QueryParam("resourceId") String resourceId,
+      @QueryParam("userId") String userId);
 
   @Path("/{id}")
   AuthorizationResource getAuthorization(@PathParam("id") String id);

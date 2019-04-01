@@ -56,11 +56,14 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.spi.PermissionProvider;
 import org.camunda.bpm.engine.rest.util.ResourceUtil;
@@ -269,6 +272,99 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, permission, resource);
     verify(identityServiceMock, times(1)).getCurrentAuthentication();
 
+  }
+
+  @Test
+  public void testIsUserAuthorizedWithUserIdTrue() {
+
+    List<String> currentUserGroups = new ArrayList<String>();
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, currentUserGroups);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+
+    List<String> userToCheckGroups = setupGroupQueryMock();
+
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = getPermissionProvider().getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, currentUserGroups, Permissions.READ, Resources.AUTHORIZATION)).thenReturn(true);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID2, userToCheckGroups, permission, resource)).thenReturn(true);
+
+    given()
+        .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
+        .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
+        .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
+        .queryParam("userId", MockProvider.EXAMPLE_USER_ID2)
+    .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
+        .body("permissionName", equalTo(MockProvider.EXAMPLE_PERMISSION_NAME))
+        .body("resourceName", equalTo(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME))
+        .body("resourceId", equalTo(null))
+        .body("authorized", equalTo(true))
+    .when().get(AUTH_CHECK_PATH);
+
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, currentUserGroups, Permissions.READ, Resources.AUTHORIZATION);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID2, userToCheckGroups, permission, resource);
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+  }
+
+  @Test
+  public void testIsUserAuthorizedWithUserIdFalse() {
+
+    List<String> currentUserGroups = new ArrayList<String>();
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, currentUserGroups);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+
+    List<String> userToCheckGroups = setupGroupQueryMock();
+
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = getPermissionProvider().getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, currentUserGroups, Permissions.READ, Resources.AUTHORIZATION)).thenReturn(true);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID2, userToCheckGroups, permission, resource)).thenReturn(false);
+
+    given()
+        .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
+        .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
+        .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
+        .queryParam("userId", MockProvider.EXAMPLE_USER_ID2)
+    .then().expect()
+        .statusCode(Status.OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
+        .body("permissionName", equalTo(MockProvider.EXAMPLE_PERMISSION_NAME))
+        .body("resourceName", equalTo(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME))
+        .body("resourceId", equalTo(null))
+        .body("authorized", equalTo(false))
+    .when().get(AUTH_CHECK_PATH);
+
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, currentUserGroups, Permissions.READ, Resources.AUTHORIZATION);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID2, userToCheckGroups, permission, resource);
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
+  }
+
+  @Test
+  public void testIsUserAuthorizedWithUserIdNoReadPermission() {
+
+    List<String> currentUserGroups = new ArrayList<String>();
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, currentUserGroups);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+
+    List<String> userToCheckGroups = setupGroupQueryMock();
+
+    ResourceUtil resource = new ResourceUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    Permission permission = getPermissionProvider().getPermissionForName(MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, currentUserGroups, Permissions.READ, Resources.AUTHORIZATION)).thenReturn(false);
+
+    given()
+        .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
+        .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
+        .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
+        .queryParam("userId", MockProvider.EXAMPLE_USER_ID2)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("You must have READ permission for Authorization resource."))
+    .when().get(AUTH_CHECK_PATH);
+
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, currentUserGroups, Permissions.READ, Resources.AUTHORIZATION);
+    verify(authorizationServiceMock, never()).isUserAuthorized(MockProvider.EXAMPLE_USER_ID2, userToCheckGroups, permission, resource);
+    verify(identityServiceMock, times(1)).getCurrentAuthentication();
   }
 
   @Test
@@ -1004,5 +1100,18 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
   protected PermissionProvider getPermissionProvider() {
     return PermissionConverter.getPermissionProvider();
+  }
+
+  protected List<String> setupGroupQueryMock() {
+    GroupQuery mockGroupQuery = mock(GroupQuery.class);
+    List<Group> groupMocks = MockProvider.createMockGroups();
+    when(identityServiceMock.createGroupQuery()).thenReturn(mockGroupQuery);
+    when(mockGroupQuery.groupMember(anyString())).thenReturn(mockGroupQuery);
+    when(mockGroupQuery.list()).thenReturn(groupMocks);
+    List<String> groupIds = new ArrayList<String>();
+    for (Group group : groupMocks) {
+      groupIds.add(group.getId());
+    }
+    return groupIds;
   }
 }
