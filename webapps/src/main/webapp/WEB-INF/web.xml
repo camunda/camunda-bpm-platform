@@ -84,6 +84,18 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
+  <!-- HTTP Header Security Filter -->
+  <filter>
+    <filter-name>HttpHeaderSecurity</filter-name>
+    <filter-class>org.camunda.bpm.webapp.impl.security.filter.headersec.HttpHeaderSecurityFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>HttpHeaderSecurity</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+
   <!-- engines filter -->
   <filter>
     <filter-name>Engines Filter</filter-name>
