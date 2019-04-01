@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-let { promisify } = require('util');
-let exec = promisify(require('child_process').exec);
+let { execSync } = require('child_process');
 let path = require('path');
 let superagentE2ePath = '../camunda-bpm-sdk-js/vendor/superagent';
 
@@ -60,7 +59,13 @@ module.exports = function(grunt, isCeEdition) {
       }
 
       let libPath = path.join(__dirname, `../../${lib}/`);
-      return exec(cmd, { maxBuffer: 1024 * 500, cwd: libPath });
+      try {
+        console.log(`\t${libPath}: ${cmd}`);
+        execSync(cmd, { maxBuffer: 1024 * 500, cwd: libPath });
+      }
+      catch (error) {
+        console.error(error);
+      }
     });
 
     Promise.all(builds)
