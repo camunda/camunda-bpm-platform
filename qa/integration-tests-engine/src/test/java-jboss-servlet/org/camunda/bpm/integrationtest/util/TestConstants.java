@@ -31,4 +31,13 @@ public final static String APP_NAME = "";
   public static String getAppName() {
     return APP_NAME;
   }
+
+  public String getEngineService() {
+    return PROCESS_ENGINE_SERVICE_JNDI_NAME;
+  }
+
+  public String getProcessApplicationService() {
+    return PROCESS_APPLICATION_SERVICE_JNDI_NAME;
+  }
+
 }
