@@ -17,11 +17,15 @@ package org.camunda.bpm.engine.rest.impl;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -41,6 +45,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
@@ -57,7 +62,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     super(engineName,AUTHORIZATION, ANY, objectMapper);
   }
 
-  public AuthorizationCheckResultDto isUserAuthorized(String permissionName, String resourceName, Integer resourceType, String resourceId) {
+  public AuthorizationCheckResultDto isUserAuthorized(String permissionName, String resourceName, Integer resourceType, String resourceId, String userId) {
 
     // validate request:
     if(permissionName == null) {
@@ -78,17 +83,32 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
 
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
-    // create new authorization dto implementing both Permission and Resource
     ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
     Permission permission = PermissionConverter.getPermissionProvider().getPermissionForName(permissionName, resourceType);
+    String currentUserId = currentAuthentication.getUserId();
 
     boolean isUserAuthorized = false;
-    if(resourceId == null || Authorization.ANY.equals(resourceId)) {
-      isUserAuthorized = authorizationService.isUserAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource);
 
+    String userIdToCheck;
+    List<String> groupIdsToCheck = new ArrayList<>();
+
+    if(userId != null && !userId.equals(currentUserId)) {
+      boolean isCurrentUserAuthorized = authorizationService.isUserAuthorized(currentUserId, currentAuthentication.getGroupIds(), Permissions.READ, Resources.AUTHORIZATION);
+      if (isCurrentUserAuthorized) {
+        throw new InvalidRequestException(Status.FORBIDDEN, "You must have READ permission for Authorization resource.");
+      }
+      userIdToCheck = userId;
+      groupIdsToCheck = getUserGroups(userId);
     } else {
-      isUserAuthorized = authorizationService.isUserAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
+      // userId == null || userId.equals(currentUserId)
+      userIdToCheck = currentUserId;
+      groupIdsToCheck = currentAuthentication.getGroupIds();
+    }
 
+    if(resourceId == null || Authorization.ANY.equals(resourceId)) {
+      isUserAuthorized = authorizationService.isUserAuthorized(userIdToCheck, groupIdsToCheck, permission, resource);
+    } else {
+      isUserAuthorized = authorizationService.isUserAuthorized(userIdToCheck, groupIdsToCheck, permission, resource, resourceId);
     }
 
     return new AuthorizationCheckResultDto(isUserAuthorized, permissionName, resource, resourceId);
@@ -179,6 +199,15 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
 
   protected IdentityService getIdentityService() {
     return getProcessEngine().getIdentityService();
+  }
+
+  protected List<String> getUserGroups(String userId) {
+    List<String> groupIds= new ArrayList<>();
+    List<Group> userGroups = getIdentityService().createGroupQuery().groupMember(userId).list();
+    for (Group group : userGroups) {
+      groupIds.add(group.getId());
+    }
+    return groupIds;
   }
 
 }
