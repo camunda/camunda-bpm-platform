@@ -30,17 +30,15 @@ public class DeleteProcessInstancesCmd extends AbstractDeleteProcessInstanceCmd 
   private static final long serialVersionUID = 1L;
   protected List<String> processInstanceIds;
 
-  public DeleteProcessInstancesCmd(List<String> processInstanceIds,
-                                   String deleteReason,
-                                   boolean skipCustomListeners,
-                                   boolean externallyTerminated,
-                                   boolean skipSubprocesses) {
+  public DeleteProcessInstancesCmd(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
+      boolean skipSubprocesses, boolean failIfNotExists) {
 
     this.processInstanceIds = processInstanceIds;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.externallyTerminated = externallyTerminated;
     this.skipSubprocesses = skipSubprocesses;
+    this.failIfNotExists = failIfNotExists;
   }
 
   public Void execute(CommandContext commandContext) {

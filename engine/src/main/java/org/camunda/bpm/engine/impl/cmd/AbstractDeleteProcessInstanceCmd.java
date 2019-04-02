@@ -51,6 +51,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   protected String deleteReason;
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
+  protected boolean failIfNotExists = true;
 
   protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
@@ -71,6 +72,10 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     // fetch process instance
     ExecutionManager executionManager = commandContext.getExecutionManager();
     final ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
+
+    if(!failIfNotExists && execution == null) {
+      return;
+    }
 
     ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
 
