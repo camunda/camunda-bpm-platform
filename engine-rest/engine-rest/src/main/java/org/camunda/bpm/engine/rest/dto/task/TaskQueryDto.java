@@ -192,8 +192,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   protected Boolean withCandidateUsers;
   protected Boolean withoutCandidateUsers;
   
-  protected boolean variableNamesIgnoreCase;
-  protected boolean variableValuesIgnoreCase;
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
@@ -648,12 +648,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
   
   @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
-  public void setVariableNamesIgnoreCase(boolean variableNamesCaseInsensitive) {
+  public void setVariableNamesIgnoreCase(Boolean variableNamesCaseInsensitive) {
     this.variableNamesIgnoreCase = variableNamesCaseInsensitive;
   }
 
   @CamundaQueryParam(value ="variableValuesIgnoreCase", converter = BooleanConverter.class)
-  public void setVariableValuesIgnoreCase(boolean variableValuesCaseInsensitive) {
+  public void setVariableValuesIgnoreCase(Boolean variableValuesCaseInsensitive) {
     this.variableValuesIgnoreCase = variableValuesCaseInsensitive;
   }
 
@@ -983,11 +983,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return orQueries;
   }
   
-  public boolean isVariableNamesIgnoreCase() {
+  public Boolean isVariableNamesIgnoreCase() {
     return variableNamesIgnoreCase;
   }
 
-  public boolean isVariableValuesIgnoreCase() {
+  public Boolean isVariableValuesIgnoreCase() {
     return variableValuesIgnoreCase;
   }
 
@@ -1243,10 +1243,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
     }
-    if(variableValuesIgnoreCase) {
+    if(variableValuesIgnoreCase != null && variableValuesIgnoreCase) {
       query.matchVariableValuesIgnoreCase();
     }
-    if(variableNamesIgnoreCase) {
+    if(variableNamesIgnoreCase != null && variableNamesIgnoreCase) {
       query.matchVariableNamesIgnoreCase();
     }
 
@@ -1484,6 +1484,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.dueBefore = taskQuery.getDueBefore();
     dto.dueDate = taskQuery.getDueDate();
     dto.followUpAfter = taskQuery.getFollowUpAfter();
+    
+    dto.variableNamesIgnoreCase = taskQuery.isVariableNamesIgnoreCase();
+    dto.variableValuesIgnoreCase = taskQuery.isVariableValuesIgnoreCase();
 
     if (taskQuery.isFollowUpNullAccepted()) {
       dto.followUpBeforeOrNotExistent = taskQuery.getFollowUpBefore();
