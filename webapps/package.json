@@ -19,11 +19,6 @@
     "commonsUiDir": "node_modules/camunda-commons-ui",
     "enTranslationDir": "node_modules/camunda-webapp-translations"
   },
-  "browserify": {
-    "transform": [
-      "brfs"
-    ]
-  },
   "scripts": {
     "dependencies": "license-checker --production --json --relativeLicensePath"
   },
