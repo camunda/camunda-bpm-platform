@@ -137,7 +137,11 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
   }
 
   public void deleteHistoricProcessInstances(List<String> processInstanceIds) {
-    commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(processInstanceIds));
+    commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(processInstanceIds, true));
+  }
+
+  public void deleteHistoricProcessInstancesIfExists(List<String> processInstanceIds) {
+    commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(processInstanceIds, false));
   }
 
   public void deleteHistoricProcessInstancesBulk(List<String> processInstanceIds){

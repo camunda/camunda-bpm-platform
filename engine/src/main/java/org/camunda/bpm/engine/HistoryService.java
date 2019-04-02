@@ -168,6 +168,16 @@ public interface HistoryService {
   void deleteHistoricProcessInstances(List<String> processInstanceIds);
 
   /**
+   * Deletes historic process instances. All historic activities, historic task and
+   * historic details (variable updates, form properties) are deleted as well. Does not
+   * fail if a process instance was not found.
+   * 
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricProcessInstancesIfExists(List<String> processInstanceIds);
+
+  /**
    * Deletes historic process instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
    * of given process instance ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
    *
