@@ -94,7 +94,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
 
     if(userId != null && !userId.equals(currentUserId)) {
       boolean isCurrentUserAuthorized = authorizationService.isUserAuthorized(currentUserId, currentAuthentication.getGroupIds(), Permissions.READ, Resources.AUTHORIZATION);
-      if (isCurrentUserAuthorized) {
+      if (!isCurrentUserAuthorized) {
         throw new InvalidRequestException(Status.FORBIDDEN, "You must have READ permission for Authorization resource.");
       }
       userIdToCheck = userId;
