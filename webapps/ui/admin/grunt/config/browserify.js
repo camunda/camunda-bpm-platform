@@ -25,6 +25,7 @@ module.exports = function(config, browserifyConfig) {
         debug: true
       },
       watch: true,
+      transform: [ 'brfs' ],
       postBundleCB: function(err, src, next) {
 
         var buildMode = config.grunt.config('buildMode');
@@ -52,7 +53,7 @@ module.exports = function(config, browserifyConfig) {
   browserifyConfig.admin_plugins = {
     options: {
       watch: true,
-      transform: [
+      transform: [ 'brfs',
         [ 'exposify',
           {
             expose: {
