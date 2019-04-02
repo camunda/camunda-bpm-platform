@@ -30,13 +30,15 @@ module.exports = [
         CANCEL_FAILED = 'cancellationFailed';
 
     var SKIP_CUSTOM_LISTENERS = configuration.getSkipCustomListeners();
+    var SKIP_IO_MAPPINGS = $scope.SKIP_IO_MAPPINGS = configuration.getSkipIoMappings();
+
     $scope.processInstance = processInstance;
 
     var cancelProcessInstanceData = processData.newChild($scope);
 
     $scope.options = {
       skipCustomListeners: SKIP_CUSTOM_LISTENERS.default,
-      skipIoMappings: true
+      skipIoMappings: SKIP_IO_MAPPINGS.default
     };
 
     $scope.hideSkipCustomListeners = SKIP_CUSTOM_LISTENERS.hidden;
