@@ -36,6 +36,10 @@ var defaultConfig = {
     'default': true,
     'hidden': false
   },
+  'skipIoMappings': {
+    'default': true,
+    'hidden': false
+  },
   'runtimeActivityInstanceMetrics': {
     'display': true
   },
@@ -100,6 +104,10 @@ module.exports = function(config, app) {
 
     this.getSkipCustomListeners = function() {
       return angular.extend({}, defaultConfig.skipCustomListeners, config.skipCustomListeners);
+    };
+
+    this.getSkipIoMappings = function() {
+      return angular.extend({}, defaultConfig.skipIoMappings, config.skipIoMappings);
     };
 
     this.getRuntimeActivityInstanceMetrics = function() {

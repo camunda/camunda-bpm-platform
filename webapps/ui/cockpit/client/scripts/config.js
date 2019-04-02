@@ -48,6 +48,10 @@ window.camCockpitConf = {
   //   default: true,
   //   hidden: false
   // },
+  // skipIoMappings: {
+  //   default: true,
+  //   hidden: false
+  // },
   // 'batchOperation' : {
   //   // select mode of query for process instances or decision instances
   //   // possible values: filter, search

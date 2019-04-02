@@ -44,11 +44,12 @@ module.exports = [
     var deleteDeploymentData = deploymentData.newChild($scope);
 
     var SKIP_CUSTOM_LISTENERS = configuration.getSkipCustomListeners();
+    var SKIP_IO_MAPPINGS = $scope.SKIP_IO_MAPPINGS = configuration.getSkipIoMappings();
 
     var options = $scope.options = {
       cascade: false,
       skipCustomListeners: SKIP_CUSTOM_LISTENERS.default,
-      skipIoMappings: true
+      skipIoMappings: SKIP_IO_MAPPINGS.default
     };
 
     $scope.hideSkipCustomListeners = SKIP_CUSTOM_LISTENERS.hidden;
