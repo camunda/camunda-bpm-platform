@@ -104,8 +104,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected boolean initializeFormKeys = false;
   protected boolean taskNameCaseInsensitive = false;
   
-  protected boolean variableNamesIgnoreCase = false;
-  protected boolean variableValuesIgnoreCase = false;
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
 
   protected String parentTaskId;
   protected boolean isTenantIdSet = false;
@@ -1055,8 +1055,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       }
     }
 
-    boolean shouldMatchVariableValueCaseInsensitive = variableValuesIgnoreCase && value != null && String.class.isAssignableFrom(value.getClass());
-    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable, variableNamesIgnoreCase, shouldMatchVariableValueCaseInsensitive));
+    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable, Boolean.TRUE.equals(variableNamesIgnoreCase), shouldMatchVariableValuesIgnoreCase));
   }
 
   protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
@@ -1590,6 +1590,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public boolean getIsTenantIdSet() {
     return isTenantIdSet;
+  }
+
+  public Boolean isVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public Boolean isVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
   }
 
   public List<TaskQueryImpl> getQueries() {
