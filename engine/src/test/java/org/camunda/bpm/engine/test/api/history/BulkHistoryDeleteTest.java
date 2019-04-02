@@ -412,6 +412,20 @@ public class BulkHistoryDeleteTest {
 
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
+  public void testCleanupFakeHistoryDecisionData() {
+    //given
+    List<String> ids = Arrays.asList("aFake");
+
+    //when
+    historyService.deleteHistoricDecisionInstancesBulk(ids);
+
+    //then expect no exception
+    assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+  }
+
   void assertDataDeleted(final List<String> inputIds, final List<String> inputByteArrayIds, final List<String> outputIds,
     final List<String> outputByteArrayIds) {
     engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
