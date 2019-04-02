@@ -76,7 +76,7 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
     try {
       commandContext.getProcessEngineConfiguration()
           .getRuntimeService()
-          .deleteProcessInstances(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());
+          .deleteProcessInstancesIfExists(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());
     } finally {
       commandContext.enableUserOperationLog();
       commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);

@@ -98,7 +98,6 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -507,9 +506,9 @@ public class RuntimeServiceTest {
   }
 
   @Test
-  public void testDeleteProcessInstanceUnexistingId() {
+  public void testDeleteProcessInstanceWithFake() {
     try {
-      runtimeService.deleteProcessInstance("enexistingInstanceId", null);
+      runtimeService.deleteProcessInstance("aFake", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       testRule.assertTextPresent("No process instance found for id", ae.getMessage());
@@ -517,6 +516,29 @@ public class RuntimeServiceTest {
     }
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesWithFake() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    
+    try {
+      runtimeService.deleteProcessInstances(Arrays.asList(instance.getId(), "aFake"), "test", false, false, false);
+      fail("ProcessEngineException expected");
+    }catch (ProcessEngineException e) {
+      //expected
+      assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesIfExistsWithFake() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    runtimeService.deleteProcessInstancesIfExists(Arrays.asList(instance.getId(), "aFake"), "test", false, false, false);
+    //dont't expect exception, existing instances are deleted
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+  }
 
   @Test
   public void testDeleteProcessInstanceNullId() {
