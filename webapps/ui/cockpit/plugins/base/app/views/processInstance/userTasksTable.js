@@ -90,6 +90,9 @@ module.exports = function(ngModule) {
 
       var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
 
+      // reset search page
+      search('page', pages.current);
+
       var filter = null;
       var executionIdToInstanceMap = null;
 
