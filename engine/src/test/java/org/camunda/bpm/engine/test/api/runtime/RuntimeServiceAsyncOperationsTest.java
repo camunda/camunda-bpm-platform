@@ -184,13 +184,10 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     executeSeedJob(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
-    // then
-    assertEquals(1, exceptions.size());
+    // then expect no failure because of missing id
+    assertEquals(0, exceptions.size());
 
-    Exception e = exceptions.get(0);
-    assertTrue(e.getMessage().startsWith("No process instance found for id 'unknown'"));
-
-    assertThat(managementService.createJobQuery().withException().list().size(), is(1));
+    assertThat(managementService.createJobQuery().withException().list().size(), is(0));
 
     processIds.remove("unknown");
     assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
