@@ -48,7 +48,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.mockFilter;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockVariableInstance;
 import static org.camunda.bpm.engine.rest.helper.TaskQueryMatcher.hasName;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;

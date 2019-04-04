@@ -17,7 +17,7 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
