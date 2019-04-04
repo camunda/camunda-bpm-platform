@@ -155,6 +155,16 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstance(String processInstanceId);
+  
+  /**
+   * Deletes historic process instance. All historic activities, historic task and
+   * historic details (variable updates, form properties) are deleted as well.
+   * Does not fail if a process instance was not found.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricProcessInstanceIfExists(String processInstanceId);
 
   /**
    * Deletes historic process instances. All historic activities, historic task and
@@ -266,6 +276,20 @@ public interface HistoryService {
    *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason);
+  
+  /**
+   * Deletes historic process instances asynchronously based on query and a list of process instances. Query result and
+   * list of ids will be merged.
+   * All historic activities, historic task and historic details (variable updates, form properties) are deleted as well.
+   * Does not fail if a process instance was not found.
+   *
+   * @throws BadUserRequestException
+   *          when no process instances is found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteHistoricProcessInstancesAsyncIfExists(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason);
 
   /**
    * Deletes a user operation log entry. Does not cascade to any related entities.

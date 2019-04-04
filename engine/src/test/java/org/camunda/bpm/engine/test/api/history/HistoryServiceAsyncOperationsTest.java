@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   }
 
   @Test
-  public void testDeleteHistoryProcessInstancesAsyncWithNonExistingID() throws Exception {
+  public void testDeleteHistoryProcessInstancesAsyncWithFake() throws Exception {
     //given
     ArrayList<String> processInstanceIds = new ArrayList<String>();
     processInstanceIds.add(historicProcessInstances.get(0));
@@ -133,6 +133,22 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertHistoricBatchExists(testRule);
   }
 
+  @Test
+  public void testDeleteHistoryProcessInstancesAsyncIfExistsWithFake() throws Exception {
+    //given
+    ArrayList<String> processInstanceIds = new ArrayList<String>();
+    processInstanceIds.add(historicProcessInstances.get(0));
+    processInstanceIds.add("aFakeId");
+    
+    //when
+    Batch batch = historyService.deleteHistoricProcessInstancesAsyncIfExists(processInstanceIds, null, TEST_REASON);
+    executeSeedJob(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+    
+    //then
+    assertThat(exceptions.size(), is(0));
+    assertHistoricBatchExists(testRule);
+  }
 
   @Test
   public void testDeleteHistoryProcessInstancesAsyncWithQueryAndList() throws Exception {
