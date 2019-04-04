@@ -27,19 +27,22 @@ import java.util.List;
  */
 public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<BatchConfiguration> {
 
+
   public static final DeleteHistoricProcessInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteHistoricProcessInstanceBatchConfigurationJsonConverter();
 
   public static final String HISTORIC_PROCESS_INSTANCE_IDS = "historicProcessInstanceIds";
+  public static final String FAIL_IF_NOT_EXISTS = "failIfNotExists";
 
   public JsonObject toJsonObject(BatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, HISTORIC_PROCESS_INSTANCE_IDS, configuration.getIds());
+    JsonUtil.addField(json, FAIL_IF_NOT_EXISTS, configuration.isFailIfNotExists());
     return json;
   }
 
   public BatchConfiguration toObject(JsonObject json) {
-    BatchConfiguration configuration = new BatchConfiguration(readProcessInstanceIds(json));
+    BatchConfiguration configuration = new BatchConfiguration(readProcessInstanceIds(json), JsonUtil.getBoolean(json, FAIL_IF_NOT_EXISTS));
     return configuration;
   }
 

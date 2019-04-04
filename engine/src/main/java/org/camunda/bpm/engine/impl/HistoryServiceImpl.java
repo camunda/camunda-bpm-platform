@@ -136,6 +136,10 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     deleteHistoricProcessInstances(Arrays.asList(processInstanceId));
   }
 
+  public void deleteHistoricProcessInstanceIfExists(String processInstanceId) {
+    deleteHistoricProcessInstancesIfExists(Arrays.asList(processInstanceId));
+  }
+
   public void deleteHistoricProcessInstances(List<String> processInstanceIds) {
     commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(processInstanceIds, true));
   }
@@ -180,7 +184,11 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
   }
 
   public Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason){
-    return commandExecutor.execute(new DeleteHistoricProcessInstancesBatchCmd(processInstanceIds, query, deleteReason));
+    return commandExecutor.execute(new DeleteHistoricProcessInstancesBatchCmd(processInstanceIds, query, deleteReason, true));
+  }
+
+  public Batch deleteHistoricProcessInstancesAsyncIfExists(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason){
+    return commandExecutor.execute(new DeleteHistoricProcessInstancesBatchCmd(processInstanceIds, query, deleteReason, false));
   }
 
   public void deleteUserOperationLogEntry(String entryId) {

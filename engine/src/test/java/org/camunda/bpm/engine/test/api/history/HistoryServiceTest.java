@@ -602,13 +602,18 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testDeleteProcessInstanceUnexistingId() {
+  public void testDeleteProcessInstanceWithFake() {
     try {
-      historyService.deleteHistoricProcessInstance("unexistingInstanceId");
+      historyService.deleteHistoricProcessInstance("aFake");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("No historic process instance found with id", ae.getMessage());
     }
+  }
+
+  public void testDeleteProcessInstanceIfExistsWithFake() {
+      historyService.deleteHistoricProcessInstanceIfExists("aFake");
+      //don't expect exception
   }
 
   public void testDeleteProcessInstanceNullId() {
@@ -651,6 +656,14 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
 
     //then expect no instance is deleted
     assertEquals(2, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Deployment(resources = {
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstancesIfExistsWithFake() {
+    //given
+    List<String> ids = prepareHistoricProcesses();
+    ids.add("aFake");
 
     //when
     historyService.deleteHistoricProcessInstancesIfExists(ids);

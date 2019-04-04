@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.batch.deletion;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
@@ -52,7 +53,7 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHa
 
   @Override
   protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration, List<String> processIdsForJob) {
-    return new BatchConfiguration(processIdsForJob);
+    return new BatchConfiguration(processIdsForJob, configuration.isFailIfNotExists());
   }
 
   @Override
@@ -67,9 +68,12 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHa
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
-      commandContext.getProcessEngineConfiguration()
-          .getHistoryService()
-          .deleteHistoricProcessInstancesIfExists(batchConfiguration.getIds());
+      HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
+      if(batchConfiguration.isFailIfNotExists()) {
+        historyService.deleteHistoricProcessInstances(batchConfiguration.getIds());
+      }else {
+        historyService.deleteHistoricProcessInstancesIfExists(batchConfiguration.getIds());
+      }
     } finally {
       commandContext.enableUserOperationLog();
       commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
