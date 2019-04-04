@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2014-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.MapAssert.entry;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.junit.Test;
@@ -82,9 +81,8 @@ public class RequestFilterTest {
     // then
     assertThat(matchResult)
         .isNotNull()
-        .includes(
-          entry("foo", "foo"),
-          entry("bar", "bar"));
+        .containsEntry("foo", "foo")
+        .containsEntry("bar", "bar");
   }
 
   @Test
@@ -99,8 +97,7 @@ public class RequestFilterTest {
     // then
     assertThat(matchResult)
         .isNotNull()
-        .includes(
-          entry("bar", "bar/asdf/asd"));
+        .containsEntry("bar", "bar/asdf/asd");
   }
 
   private RequestFilter newMatcher(String uri, String ... methods) {
