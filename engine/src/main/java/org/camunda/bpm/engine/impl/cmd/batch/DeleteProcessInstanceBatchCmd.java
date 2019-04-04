@@ -45,14 +45,16 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
   protected ProcessInstanceQuery processInstanceQuery;
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
+  protected boolean failIfNotExists;
 
-  public DeleteProcessInstanceBatchCmd(List<String> processInstances, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
+  public DeleteProcessInstanceBatchCmd(List<String> processInstances, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses, boolean failIfNotExists) {
     super();
     this.processInstanceIds = processInstances;
     this.processInstanceQuery = processInstanceQuery;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.skipSubprocesses = skipSubprocesses;
+    this.failIfNotExists = failIfNotExists;
   }
 
   protected List<String> collectProcessInstanceIds() {
@@ -101,7 +103,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new DeleteProcessInstanceBatchConfiguration(processInstanceIds, deleteReason, skipCustomListeners, skipSubprocesses);
+    return new DeleteProcessInstanceBatchConfiguration(processInstanceIds, deleteReason, skipCustomListeners, skipSubprocesses, failIfNotExists);
   }
 
   protected BatchJobHandler<DeleteProcessInstanceBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {

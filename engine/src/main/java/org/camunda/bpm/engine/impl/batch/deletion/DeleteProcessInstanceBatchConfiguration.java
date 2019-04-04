@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,18 +34,19 @@ public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration 
   protected boolean skipSubprocesses;
 
   public DeleteProcessInstanceBatchConfiguration(List<String> ids, boolean skipCustomListeners, boolean skipSubprocesses) {
-    this(ids, null, skipCustomListeners, skipSubprocesses);
+    this(ids, null, skipCustomListeners, skipSubprocesses, true);
   }
 
   public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners) {
-    this(ids, deleteReason, skipCustomListeners, true);
+    this(ids, deleteReason, skipCustomListeners, true, true);
   }
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses, boolean failIfNotExists) {
     super(ids);
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.skipSubprocesses = skipSubprocesses;
+    this.failIfNotExists = failIfNotExists;
   }
 
   public String getDeleteReason() {

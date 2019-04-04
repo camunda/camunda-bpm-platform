@@ -173,10 +173,10 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
-  public void testDeleteProcessInstancesAsyncWithNonExistingId() throws Exception {
+  public void testDeleteProcessInstancesAsyncWithFake() throws Exception {
     // given
     List<String> processIds = startTestProcesses(2);
-    processIds.add("unknown");
+    processIds.add("aFake");
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
@@ -184,12 +184,37 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     executeSeedJob(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
+    // then
+    assertEquals(1, exceptions.size());
+
+    assertThat(managementService.createJobQuery().withException().list().size(), is(1));
+
+    processIds.remove("aFake");
+    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
+    assertHistoricBatchExists(testRule);
+    assertProcessInstancesAreDeleted();
+  }
+
+  @Deployment(resources = {
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesAsyncIfExistsWithFake() throws Exception {
+    // given
+    List<String> processIds = startTestProcesses(2);
+    processIds.add("aFake");
+    
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsyncIfExists(processIds, null, TESTING_INSTANCE_DELETE, false, false);
+    
+    executeSeedJob(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+    
     // then expect no failure because of missing id
     assertEquals(0, exceptions.size());
-
+    
     assertThat(managementService.createJobQuery().withException().list().size(), is(0));
-
-    processIds.remove("unknown");
+    
+    processIds.remove("aFake");
     assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
     assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();

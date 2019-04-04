@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.batch.deletion;
 
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
@@ -59,7 +60,7 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
 
   @Override
   protected DeleteProcessInstanceBatchConfiguration createJobConfiguration(DeleteProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
-    return new DeleteProcessInstanceBatchConfiguration(processIdsForJob, configuration.getDeleteReason(), configuration.isSkipCustomListeners(), configuration.isSkipSubprocesses());
+    return new DeleteProcessInstanceBatchConfiguration(processIdsForJob, configuration.getDeleteReason(), configuration.isSkipCustomListeners(), configuration.isSkipSubprocesses(), configuration.isFailIfNotExists());
   }
 
   @Override
@@ -74,9 +75,12 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
-      commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
-          .deleteProcessInstancesIfExists(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());
+      RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
+      if(batchConfiguration.isFailIfNotExists()) {
+        runtimeService.deleteProcessInstances(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());        
+      } else {
+        runtimeService.deleteProcessInstancesIfExists(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());                
+      }
     } finally {
       commandContext.enableUserOperationLog();
       commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
