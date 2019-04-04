@@ -516,6 +516,12 @@ public class RuntimeServiceTest {
     }
   }
 
+  @Test
+  public void testDeleteProcessInstanceIfExistsWithFake() {
+      runtimeService.deleteProcessInstanceIfExists("aFake", null, false, false, false, false);
+      //don't expect exception
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesWithFake() {

@@ -33,6 +33,7 @@ public class DeleteProcessInstanceBatchConfigurationJsonConverter extends JsonOb
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
   public static final String SKIP_CUSTOM_LISTENERS = "skipCustomListeners";
   public static final String SKIP_SUBPROCESSES = "skipSubprocesses";
+  public static final String FAIL_IF_NOT_EXISTS = "failIfNotExists";
 
   public JsonObject toJsonObject(DeleteProcessInstanceBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
@@ -41,12 +42,13 @@ public class DeleteProcessInstanceBatchConfigurationJsonConverter extends JsonOb
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
     JsonUtil.addField(json, SKIP_CUSTOM_LISTENERS, configuration.isSkipCustomListeners());
     JsonUtil.addField(json, SKIP_SUBPROCESSES, configuration.isSkipSubprocesses());
+    JsonUtil.addField(json, FAIL_IF_NOT_EXISTS, configuration.isFailIfNotExists());
     return json;
   }
 
   public DeleteProcessInstanceBatchConfiguration toObject(JsonObject json) {
     DeleteProcessInstanceBatchConfiguration configuration =
-      new DeleteProcessInstanceBatchConfiguration(readProcessInstanceIds(json), JsonUtil.getBoolean(json, SKIP_CUSTOM_LISTENERS), JsonUtil.getBoolean(json, SKIP_SUBPROCESSES));
+      new DeleteProcessInstanceBatchConfiguration(readProcessInstanceIds(json), null, JsonUtil.getBoolean(json, SKIP_CUSTOM_LISTENERS), JsonUtil.getBoolean(json, SKIP_SUBPROCESSES), JsonUtil.getBoolean(json, FAIL_IF_NOT_EXISTS));
 
     String deleteReason = JsonUtil.getString(json, DELETE_REASON);
     if (deleteReason != null && !deleteReason.isEmpty()) {

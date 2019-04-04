@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,15 @@ import java.util.List;
 public class BatchConfiguration {
 
   protected List<String> ids;
+  protected boolean failIfNotExists;
 
   public BatchConfiguration(List<String> ids) {
+    this(ids, true);
+  }
+
+  public BatchConfiguration(List<String> ids, boolean failIfNotExists) {
     this.ids = ids;
+    this.failIfNotExists = failIfNotExists;
   }
 
   public List<String> getIds() {
@@ -32,6 +38,14 @@ public class BatchConfiguration {
 
   public void setIds(List<String> ids) {
     this.ids = ids;
+  }
+
+  public boolean isFailIfNotExists() {
+    return failIfNotExists;
+  }
+
+  public void setFailIfNotExists(boolean failIfNotExists) {
+    this.failIfNotExists = failIfNotExists;
   }
 
 }
