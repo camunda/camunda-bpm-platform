@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
@@ -68,6 +67,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   
   protected static final String DELETE_REASON = "deleteReason";
   protected static final String TEST_DELETE_REASON = "test";
+  protected static final String FAIL_IF_NOT_EXISTS = "failIfNotExists";
   protected static final String HISTORIC_PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/process-instance";
   protected static final String HISTORIC_SINGLE_PROCESS_INSTANCE_URL = HISTORIC_PROCESS_INSTANCE_URL + "/{id}";
   protected static final String DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL = HISTORIC_PROCESS_INSTANCE_URL + "/delete";
@@ -168,6 +168,15 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   }
 
   @Test
+  public void testDeleteNonExistingProcessInstanceIfExists() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParam("failIfNotExists", false)
+    .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().delete(HISTORIC_SINGLE_PROCESS_INSTANCE_URL);
+    
+    verify(historyServiceMock).deleteHistoricProcessInstanceIfExists(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  @Test
   public void testDeleteProcessInstanceThrowsAuthorizationException() {
     String message = "expected exception";
     doThrow(new AuthorizationException(message)).when(historyServiceMock).deleteHistoricProcessInstance(anyString());
@@ -207,6 +216,42 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
 
     verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsync(
         eq(ids), eq((HistoricProcessInstanceQuery) null), eq(TEST_DELETE_REASON));
+  }
+  
+  @Test
+  public void testDeleteAsyncIfExists() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    Batch batchEntity = MockProvider.createMockBatch();
+    when(historyServiceMock.deleteHistoricProcessInstancesAsyncIfExists(anyListOf(String.class), any(HistoricProcessInstanceQuery.class), anyString()))
+        .thenReturn(batchEntity);
+    when(historyServiceMock.deleteHistoricProcessInstancesAsync(anyListOf(String.class), any(HistoricProcessInstanceQuery.class), anyString()))
+    .thenReturn(batchEntity);
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("historicProcessInstanceIds", ids);
+    messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
+    messageBodyJson.put(FAIL_IF_NOT_EXISTS, false);
+
+    Response response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsyncIfExists(eq(ids), eq((HistoricProcessInstanceQuery) null), eq(TEST_DELETE_REASON));
+
+    messageBodyJson.put(FAIL_IF_NOT_EXISTS, true);
+    response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsync(eq(ids), eq((HistoricProcessInstanceQuery) null), eq(TEST_DELETE_REASON));
   }
 
   @Test

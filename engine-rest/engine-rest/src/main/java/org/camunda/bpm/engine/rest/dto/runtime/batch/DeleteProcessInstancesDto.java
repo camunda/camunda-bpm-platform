@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ public class DeleteProcessInstancesDto {
   protected boolean skipCustomListeners;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected boolean skipSubprocesses;
+  private Boolean failIfNotExists;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -75,8 +76,16 @@ public class DeleteProcessInstancesDto {
     return skipSubprocesses;
   }
 
-  public void setSkipSubprocesses(boolean skipSubprocesses) {
+  public void setSkipSubprocesses(Boolean skipSubprocesses) {
     this.skipSubprocesses = skipSubprocesses;
+  }
+
+  public boolean isFailIfNotExists() {
+    return this.failIfNotExists == null || this.failIfNotExists;
+  }
+
+  public void setFailIfNotExists(Boolean failIfNotExists) {
+    this.failIfNotExists = failIfNotExists;
   }
 
 }

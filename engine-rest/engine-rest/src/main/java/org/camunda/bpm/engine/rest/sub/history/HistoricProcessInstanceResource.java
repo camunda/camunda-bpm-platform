@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package org.camunda.bpm.engine.rest.sub.history;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 public interface HistoricProcessInstanceResource {
@@ -27,8 +29,8 @@ public interface HistoricProcessInstanceResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   HistoricProcessInstanceDto getHistoricProcessInstance();
-  
+
   @DELETE
-  void deleteHistoricProcessInstance();
+  void deleteHistoricProcessInstance(@QueryParam("failIfNotExists") @DefaultValue("true") Boolean failIfNotExists);
 
 }
