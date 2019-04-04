@@ -157,10 +157,12 @@ import java.util.List;
     }
 
     try {
-      Batch batch = historyService.deleteHistoricProcessInstancesAsync(
-          dto.getHistoricProcessInstanceIds(),
-          historicProcessInstanceQuery,
-          dto.getDeleteReason());
+      Batch batch;
+      if(dto.isFailIfNotExists()) {
+        batch = historyService.deleteHistoricProcessInstancesAsync(dto.getHistoricProcessInstanceIds(), historicProcessInstanceQuery, dto.getDeleteReason());
+      } else {
+        batch = historyService.deleteHistoricProcessInstancesAsyncIfExists(dto.getHistoricProcessInstanceIds(), historicProcessInstanceQuery, dto.getDeleteReason());
+      }
       return BatchDto.fromBatch(batch);
 
     } catch (BadUserRequestException e) {

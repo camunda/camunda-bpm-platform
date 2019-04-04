@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,10 +63,14 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
   }
 
   @Override
-  public void deleteProcessInstance(boolean skipCustomListeners, boolean skipIoMappings, boolean skipSubprocesses) {
+  public void deleteProcessInstance(boolean skipCustomListeners, boolean skipIoMappings, boolean skipSubprocesses, boolean failIfNotExists) {
     RuntimeService runtimeService = engine.getRuntimeService();
     try {
-      runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);
+      if(failIfNotExists) {
+        runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);        
+      } else {
+        runtimeService.deleteProcessInstanceIfExists(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);        
+      }
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {
