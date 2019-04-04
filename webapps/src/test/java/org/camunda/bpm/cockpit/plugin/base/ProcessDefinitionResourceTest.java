@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2014-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.camunda.bpm.cockpit.plugin.base;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.EQUALS_OPERATOR_NAME;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LIKE_OPERATOR_NAME;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.NOT_EQUALS_OPERATOR_NAME;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2014-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
