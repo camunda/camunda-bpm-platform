@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="test-process" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Camunda Modeler" exporterVersion="2.2.4" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <process id="ProcessEngineTests-completeExternalTask" name="Test Process" isExecutable="true">
+    <serviceTask id="ExternalTask_1" camunda:type="external" camunda:topic="External_1">
+      <incoming>SequenceFlow_0dziarg</incoming>
+      <outgoing>SequenceFlow_013elpr</outgoing>
+    </serviceTask>
+    <startEvent id="StartEvent_1">
+      <outgoing>SequenceFlow_0dziarg</outgoing>
+    </startEvent>
+    <sequenceFlow id="SequenceFlow_0dziarg" sourceRef="StartEvent_1" targetRef="ExternalTask_1" />
+    <endEvent id="EndEvent_1">
+      <incoming>SequenceFlow_013elpr</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_013elpr" sourceRef="ExternalTask_1" targetRef="EndEvent_1" />
+  </process>
+  <bpmndi:BPMNDiagram id="sid-830c5f5e-90b8-4b10-84fa-0fe5d466f2d0">
+    <bpmndi:BPMNPlane id="sid-c40130ce-08e6-4f67-ae3d-774a7f6a3ead" bpmnElement="ProcessEngineTests-completeExternalTask">
+      <bpmndi:BPMNShape id="ServiceTask_15bsvcl_di" bpmnElement="ExternalTask_1">
+        <omgdc:Bounds x="184" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0w7pk2k_di" bpmnElement="StartEvent_1">
+        <omgdc:Bounds x="102" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dziarg_di" bpmnElement="SequenceFlow_0dziarg">
+        <omgdi:waypoint x="138" y="125" />
+        <omgdi:waypoint x="184" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0oklxmf_di" bpmnElement="EndEvent_1">
+        <omgdc:Bounds x="331" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_013elpr_di" bpmnElement="SequenceFlow_013elpr">
+        <omgdi:waypoint x="284" y="125" />
+        <omgdi:waypoint x="331" y="125" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

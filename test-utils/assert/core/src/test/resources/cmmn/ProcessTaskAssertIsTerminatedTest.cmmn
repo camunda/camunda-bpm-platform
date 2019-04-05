@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns="http://www.trisotech.com/cmmn/definitions/ProcessTaskAssertIsTerminatedTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:rss="http://purl.org/rss/2.0/" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" id="Def_ProcessTaskAssertIsTerminatedTest" name="ProcessTaskAssertIsTerminated Test" targetNamespace="http://www.trisotech.com/cmmn/definitions/ProcessTaskAssertIsTerminatedTest" exporter="Camunda Modeler" exporterVersion="1.4.0" author="">
+  <cmmn:case id="Case_ProcessTaskAssertIsTerminatedTest" name="ProcessTaskAssertIsTerminated Test">
+    <cmmn:casePlanModel id="CPM_ProcessTaskAssertIsTerminatedTest" name="ProcessTaskAssertIsTerminated Test" autoComplete="false">
+      <cmmn:planItem id="PI_TaskA" definitionRef="PID_PI_TaskA" />
+      <cmmn:planItem id="PI_TaskB" definitionRef="PID_PI_TaskB">
+        <cmmn:itemControl id="PlanItemControl_1gpe3z3">
+          <cmmn:manualActivationRule id="ManualActivationRule_0rsbm9y">
+            <cmmn:condition id="Expression_0do67pl">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:itemControl>
+        <cmmn:exitCriterion id="N65560_exit1" sentryRef="On_PI_HT_A_Complete" />
+      </cmmn:planItem>
+      <cmmn:sentry id="On_PI_HT_A_Complete">
+        <cmmn:planItemOnPart id="_2c44a60a-f150-4214-a569-842e2a6ed70c" sourceRef="PI_TaskA">        <cmmn:standardEvent>complete</cmmn:standardEvent>
+</cmmn:planItemOnPart>
+      </cmmn:sentry>
+      <cmmn:processTask id="PID_PI_TaskA" name="A" processRef="ProcessTaskAssert-calledProcess">
+        <cmmn:defaultControl />
+      </cmmn:processTask>
+      <cmmn:processTask id="PID_PI_TaskB" name="B" processRef="ProcessTaskAssert-calledProcess" />
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram sharedStyle="afe4fd12-829c-4715-839b-676b3ebfc987" id="PCPM_ProcessTaskAssertIsTerminatedTest" name="ProcessTaskAssertIsTerminated Test">
+      <cmmndi:Size xsi:type="dc:Dimension" width="642" height="500" />
+      <cmmndi:CMMNShape id="_63636d21-9beb-4acc-908b-bcb9954c1418" cmmnElementRef="CPM_ProcessTaskAssertIsTerminatedTest">
+        <dc:Bounds x="150" y="150" width="342" height="156" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_41557a9c-037a-4d54-a447-9cf205c16ef7" cmmnElementRef="PI_TaskA">
+        <dc:Bounds x="356" y="190" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_a814f43e-e80f-4b6e-8b77-785e9d802df1" cmmnElementRef="PI_TaskB">
+        <dc:Bounds x="190" y="190" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_2abd8dee-57d1-4b7a-a4c4-0252efadeac7" cmmnElementRef="N65560_exit1">
+        <dc:Bounds x="276" y="214" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="_00258802-7b71-4fcf-b41b-812f8baccc41" cmmnElementRef="_2c44a60a-f150-4214-a569-842e2a6ed70c" targetCMMNElementRef="N65560_exit1" isStandardEventVisible="true">
+        <di:waypoint xsi:type="dc:Point" x="296" y="228" />
+        <di:waypoint xsi:type="dc:Point" x="356" y="228" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+    <cmmndi:CMMNStyle id="afe4fd12-829c-4715-839b-676b3ebfc987" fontFamily="Arial,Helvetica,sans-serif" />
+  </cmmndi:CMMNDI>
+</cmmn:definitions>
