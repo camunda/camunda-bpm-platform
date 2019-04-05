@@ -81,4 +81,4 @@ Starting from version 2.3.0 it was adopted as part of the Camunda BPM Platform.
 
 ## License
 
-* link:./LICENSE[Apache License, Version 2.0]
+* The source files in this repository are made available under the link:./LICENSE[Apache License, Version 2.0].
