@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions author="" exporter="CMMN Modeler" id="Def_CaseTaskAssertIsCompletedTest" name="CaseTaskAssertIsCompleted Test" targetNamespace="http://www.trisotech.com/cmmn/definitions/CaseTaskAssertIsCompletedTest" xmlns="http://www.trisotech.com/cmmn/definitions/CaseTaskAssertIsCompletedTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:rss="http://purl.org/rss/2.0/" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC">
+    <cmmn:case name="CaseTaskAssertIsCompleted Test" id="Case_CaseTaskAssertIsCompletedTest">
+        <cmmn:casePlanModel autoComplete="false" name="CaseTaskAssertIsCompleted Test" id="CPM_CaseTaskAssertIsCompletedTest">
+            <cmmn:planItem definitionRef="PID_PI_TaskA" id="PI_TaskA"/>
+            <cmmn:caseTask caseRef="Case_CaseTaskAssertIsCompletedTest_CaseB" isBlocking="true" name="A" id="PID_PI_TaskA">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="_c814f81f-04ff-4100-bb88-63b1acc5a920">
+                        <cmmn:condition language="juel" id="f3953a0a-12ef-46f5-95ec-a0f60e0f45df">#{false}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:caseTask>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmn:case name="CaseTaskAssertIsCompleted Test CaseB" id="Case_CaseTaskAssertIsCompletedTest_CaseB">
+        <cmmn:casePlanModel autoComplete="false" name="CaseTaskAssertIsCompleted Test CaseB" id="CPM_CaseTaskAssertIsCompletedTest_CaseB">
+            <cmmn:planItem definitionRef="PID_PI_TaskB" id="PI_TaskB"/>
+            <cmmn:humanTask isBlocking="true" name="A" id="PID_PI_TaskB">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="_c814f81f-04ff-4100-bb88-63b1acc5a921">
+                        <cmmn:condition language="juel" id="f3953a0a-12ef-46f5-95ec-a0f60e0f45d1">#{false}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="CaseTaskAssertIsCompleted Test" id="PCPM_CaseTaskAssertIsCompletedTest" sharedStyle="_95924bb0-d0e2-4da3-bc0c-18cf66fdf834">
+            <cmmndi:Size height="500.0" width="550.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_CaseTaskAssertIsCompletedTest" id="_37af37a5-d837-42af-b8c2-4edee6ed6bc6">
+                <dc:Bounds height="156.0" width="250.0" x="150.0" y="150.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskA" id="_df07530f-acbb-4298-9282-f50bdde5654b">
+                <dc:Bounds height="76.0" width="96.0" x="190.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNDiagram name="CaseTaskAssertIsCompleted Test CaseB" id="PCPM_CaseTaskAssertIsCompletedTest_CaseB" sharedStyle="_95924bb0-d0e2-4da3-bc0c-18cf66fdf834">
+            <cmmndi:Size height="500.0" width="550.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_CaseTaskAssertIsCompletedTest_CaseB" id="_1473aa18-267a-4734-87f2-6ce4186ade24">
+                <dc:Bounds height="156.0" width="250.0" x="150.0" y="150.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskB" id="_aaf88e2f-b1c2-4ffc-b600-74a46ee17061">
+                <dc:Bounds height="76.0" width="96.0" x="190.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="_95924bb0-d0e2-4da3-bc0c-18cf66fdf834"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>
+

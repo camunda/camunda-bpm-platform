@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions author="" exporter="CMMN Modeler" id="Def_HumanTaskAssertIsActiveTest" name="HumanTaskAssertIsActive Test" targetNamespace="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsActiveTest" xmlns="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsActiveTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:rss="http://purl.org/rss/2.0/" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC">
+    <cmmn:case name="HumanTaskAssertIsActive Test" id="Case_HumanTaskAssertIsActiveTest">
+        <cmmn:casePlanModel autoComplete="false" name="HumanTaskAssertIsActive Test" id="CPM_HumanTaskAssertIsActiveTest">
+            <cmmn:planItem definitionRef="PID_PI_TaskA" id="PI_TaskA"/>
+            <cmmn:humanTask isBlocking="true" name="A" id="PID_PI_TaskA">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="_c814f81f-04ff-4100-bb88-63b1acc5a920">
+                        <cmmn:condition language="juel" id="f3953a0a-12ef-46f5-95ec-a0f60e0f45df">#{false}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="HumanTaskAssertIsActive Test" id="PCPM_HumanTaskAssertIsActiveTest" sharedStyle="_6935a39c-58ed-46f8-944b-dd8fcf578a6a">
+            <cmmndi:Size height="500.0" width="550.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_HumanTaskAssertIsActiveTest" id="_11dde4cc-5f67-493a-9090-b10bb826db7c">
+                <dc:Bounds height="156.0" width="250.0" x="150.0" y="150.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskA" id="_6ca6974d-1e29-4656-8c88-2e90ac894da8">
+                <dc:Bounds height="76.0" width="96.0" x="190.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="_6935a39c-58ed-46f8-944b-dd8fcf578a6a"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>
+

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns="http://www.trisotech.com/cmmn/definitions/_TaskWithSentryExitCriteriaTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:rss="http://purl.org/rss/2.0/" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" id="Def_TaskWithSentryExitCriteriaTest" name="Task with Sentry Tests and Exit Criteria" targetNamespace="http://www.trisotech.com/cmmn/definitions/_TaskWithSentryExitCriteriaTest" exporter="Camunda Modeler" exporterVersion="1.4.0" author="">
+  <cmmn:case id="Case_TaskWithSentryExitCriteriaTest" name="Task with Sentry Tests and Exit Criteria">
+    <cmmn:casePlanModel id="CPM_TaskWithSentryExitCriteriaTest" name="Task with Sentry Tests" autoComplete="false">
+      <cmmn:planItem id="PI_HT_A" definitionRef="PID_PI_HT_A">
+        <cmmn:itemControl id="PlanItemControl_04sfv9q">
+          <cmmn:manualActivationRule id="ManualActivationRule_0bhlp3b">
+            <cmmn:condition id="Expression_1xj9lql">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:itemControl>
+        <cmmn:exitCriterion id="N65556_exit1" sentryRef="On_PI_HT_B_ManualStart" />
+      </cmmn:planItem>
+      <cmmn:planItem id="PI_HT_B" definitionRef="PID_PI_HT_B">
+        <cmmn:itemControl id="PlanItemControl_0legxx7">
+          <cmmn:manualActivationRule id="ManualActivationRule_1t9b1rn">
+            <cmmn:condition id="Expression_0rmg3hz">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:itemControl>
+      </cmmn:planItem>
+      <cmmn:sentry id="On_PI_HT_B_ManualStart">
+        <cmmn:planItemOnPart id="f314d875-694b-40a1-a96c-d8c37084c0c4" sourceRef="PI_HT_B">        <cmmn:standardEvent>manualStart</cmmn:standardEvent>
+</cmmn:planItemOnPart>
+      </cmmn:sentry>
+      <cmmn:humanTask id="PID_PI_HT_A" name="A" />
+      <cmmn:humanTask id="PID_PI_HT_B" name="B" />
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram sharedStyle="d4da590d-a61b-41d0-8f01-c62696eca972" id="PCPM_TaskWithSentryExitCriteriaTest" name="Task with Sentry Tests">
+      <cmmndi:Size xsi:type="dc:Dimension" width="642" height="500" />
+      <cmmndi:CMMNShape id="_f3ef863d-2098-4cb7-aa06-3068a4be1177" cmmnElementRef="CPM_TaskWithSentryExitCriteriaTest">
+        <dc:Bounds x="150" y="150" width="342" height="156" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_d9e77d80-719a-4f69-a43d-514d50206cf1" cmmnElementRef="PI_HT_A">
+        <dc:Bounds x="190" y="190" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_e423c7d5-81f7-4317-98f7-0d40ebe4037d" cmmnElementRef="PI_HT_B">
+        <dc:Bounds x="356" y="190" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_4255c1ed-934b-413a-9b8c-57ae37be0391" cmmnElementRef="N65556_exit1">
+        <dc:Bounds x="276" y="214" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="_47fda588-082f-44f9-b7db-37a68a1a5f07" cmmnElementRef="f314d875-694b-40a1-a96c-d8c37084c0c4" targetCMMNElementRef="N65556_exit1" isStandardEventVisible="true">
+        <di:waypoint xsi:type="dc:Point" x="296" y="228" />
+        <di:waypoint xsi:type="dc:Point" x="356" y="228" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+    <cmmndi:CMMNStyle id="d4da590d-a61b-41d0-8f01-c62696eca972" fontFamily="Arial,Helvetica,sans-serif" />
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

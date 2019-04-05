@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions author="" exporter="CMMN Modeler" id="Def_HumanTaskAssertIsTerminatedTest" name="HumanTaskAssertIsTerminated Test" targetNamespace="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsTerminatedTest" xmlns="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsTerminatedTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:rss="http://purl.org/rss/2.0/" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC">
+    <cmmn:case name="HumanTaskAssertIsTerminated Test" id="Case_HumanTaskAssertIsTerminatedTest">
+        <cmmn:casePlanModel autoComplete="false" name="HumanTaskAssertIsTerminated Test" id="CPM_HumanTaskAssertIsTerminatedTest">
+            <cmmn:planItem definitionRef="PID_PI_TaskA" id="PI_TaskA"/>
+            <cmmn:planItem definitionRef="PID_PI_TaskB" id="PI_TaskB">
+                <cmmn:exitCriterion sentryRef="On_PI_HT_A_Complete" id="N65560_exit1"/>
+            </cmmn:planItem>
+            <cmmn:sentry id="On_PI_HT_A_Complete">
+                <cmmn:planItemOnPart sourceRef="PI_TaskA" id="d0430edf-ca7b-421a-80a7-e0d064ba882d">
+                    <cmmn:standardEvent>complete</cmmn:standardEvent>
+                </cmmn:planItemOnPart>
+            </cmmn:sentry>
+            <cmmn:humanTask isBlocking="true" name="A" id="PID_PI_TaskA">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="_c814f81f-04ff-4100-bb88-63b1acc5a920">
+                        <cmmn:condition language="juel" id="f3953a0a-12ef-46f5-95ec-a0f60e0f45df">#{false}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+            <cmmn:humanTask isBlocking="true" name="B" id="PID_PI_TaskB"/>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="HumanTaskAssertIsTerminated Test" id="PCPM_HumanTaskAssertIsTerminatedTest" sharedStyle="bcf3910a-b4cc-4fb5-9811-3727cc1c19b2">
+            <cmmndi:Size height="500.0" width="642.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_HumanTaskAssertIsTerminatedTest" id="_a24d93a9-937d-467c-be7c-c3e019cbc671">
+                <dc:Bounds height="156.0" width="342.0" x="150.0" y="150.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskA" id="_9ec25bab-e39f-41d0-8044-79b27bfb47aa">
+                <dc:Bounds height="76.0" width="96.0" x="356.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskB" id="_eeee5399-cd66-4a59-a1d5-ca1b685ac1cb">
+                <dc:Bounds height="76.0" width="96.0" x="190.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="N65560_exit1" id="_7bf2115d-c0c0-4427-89d6-af25cb139537">
+                <dc:Bounds height="28.0" width="20.0" x="276.0" y="214.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge cmmnElementRef="d0430edf-ca7b-421a-80a7-e0d064ba882d" isStandardEventVisible="true" targetCMMNElementRef="N65560_exit1" id="_eb4cd508-9d16-43c0-9e56-00572f4ed364">
+                <di:waypoint x="296.0" y="228.0"/>
+                <di:waypoint x="356.0" y="228.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="bcf3910a-b4cc-4fb5-9811-3727cc1c19b2"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>
+

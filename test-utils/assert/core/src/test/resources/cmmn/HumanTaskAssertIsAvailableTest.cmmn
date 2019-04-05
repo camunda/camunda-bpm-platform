@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions author="" exporter="CMMN Modeler" id="Def_HumanTaskAssertIsAvailableTest" name="HumanTaskAssertIsAvailable Test" targetNamespace="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsAvailableTest" xmlns="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsAvailableTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:rss="http://purl.org/rss/2.0/" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC">
+    <cmmn:case name="HumanTaskAssertIsAvailable Test" id="Case_HumanTaskAssertIsAvailableTest">
+        <cmmn:casePlanModel autoComplete="false" name="HumanTaskAssertIsAvailable Test" id="CPM_HumanTaskAssertIsAvailableTest">
+            <cmmn:planItem definitionRef="PID_PI_TaskA" id="PI_TaskA"/>
+            <cmmn:planItem definitionRef="PID_PI_TaskB" id="PI_TaskB">
+                <cmmn:entryCriterion sentryRef="On_PI_HT_A_Complete" id="N65560_entry1"/>
+            </cmmn:planItem>
+            <cmmn:sentry id="On_PI_HT_A_Complete">
+                <cmmn:planItemOnPart sourceRef="PI_TaskA" id="_094a5483-0f68-4393-9508-4faab3626276">
+                    <cmmn:standardEvent>complete</cmmn:standardEvent>
+                </cmmn:planItemOnPart>
+            </cmmn:sentry>
+            <cmmn:humanTask isBlocking="true" name="A" id="PID_PI_TaskA">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="_c814f81f-04ff-4100-bb88-63b1acc5a920">
+                        <cmmn:condition language="juel" id="f3953a0a-12ef-46f5-95ec-a0f60e0f45df">#{false}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+            <cmmn:humanTask isBlocking="true" name="B" id="PID_PI_TaskB"/>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="HumanTaskAssertIsAvailable Test" id="PCPM_HumanTaskAssertIsAvailableTest" sharedStyle="_989d7ae2-0d33-4ad7-9b63-2b2292c926ef">
+            <cmmndi:Size height="500.0" width="642.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_HumanTaskAssertIsAvailableTest" id="_3514150e-7bbe-4b15-981f-4d1dc585b9fc">
+                <dc:Bounds height="156.0" width="342.0" x="150.0" y="150.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskA" id="_92fbc328-f8b3-452b-9406-8bd02a600a9f">
+                <dc:Bounds height="76.0" width="96.0" x="190.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskB" id="_aa5da780-ce0f-4bfc-9114-bbe17805e3b2">
+                <dc:Bounds height="76.0" width="96.0" x="356.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="N65560_entry1" id="_308def56-dc74-4e29-9c62-9d9828267ba3">
+                <dc:Bounds height="28.0" width="20.0" x="346.0" y="214.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge cmmnElementRef="_094a5483-0f68-4393-9508-4faab3626276" isStandardEventVisible="true" targetCMMNElementRef="N65560_entry1" id="_6ecd36e0-046f-4811-9f13-d53afe97037a">
+                <di:waypoint x="286.0" y="228.0"/>
+                <di:waypoint x="346.0" y="228.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="_989d7ae2-0d33-4ad7-9b63-2b2292c926ef"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>
+

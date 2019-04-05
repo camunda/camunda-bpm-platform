@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions author="" exporter="CMMN Modeler" id="Def_TaskWithSentryTests" name="Task with Sentry Tests" targetNamespace="http://www.trisotech.com/cmmn/definitions/_TaskWithSentryTests" xmlns="http://www.trisotech.com/cmmn/definitions/_TaskWithSentryTests" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:rss="http://purl.org/rss/2.0/" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC">
+    <cmmn:case name="Task with Sentry Tests" id="Case_TaskWithSentryTests">
+        <cmmn:casePlanModel autoComplete="false" name="Task with Sentry Tests" id="CPM_TaskWithSentryTests">
+            <cmmn:planItem definitionRef="PID_PI_HT_A" id="PI_HT_A"/>
+            <cmmn:planItem definitionRef="PID_PI_HT_B" id="PI_HT_B">
+                <cmmn:entryCriterion sentryRef="On_PI_HT_A_Complete" id="N65560_entry1"/>
+            </cmmn:planItem>
+            <cmmn:sentry id="On_PI_HT_A_Complete">
+                <cmmn:planItemOnPart sourceRef="PI_HT_A" id="_40ff4dd3-f136-419d-834d-97c4bc1430e2">
+                    <cmmn:standardEvent>complete</cmmn:standardEvent>
+                </cmmn:planItemOnPart>
+            </cmmn:sentry>
+            <cmmn:humanTask isBlocking="true" name="A" id="PID_PI_HT_A">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="MAR_HT_A">
+                        <cmmn:condition language="juel" id="Cond_MAR_HT_A">
+              #{false}
+            </cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+            <cmmn:humanTask isBlocking="true" name="B" id="PID_PI_HT_B">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="MAR_HT_B">
+                        <cmmn:condition language="juel" id="Cond_MAR_HT_B">
+              #{false}
+            </cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="Task with Sentry Tests" id="PCPM_TaskWithSentryTests" sharedStyle="_406b1053-c1a2-494b-aeaa-2f6a881e3cce">
+            <cmmndi:Size height="500.0" width="642.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_TaskWithSentryTests" id="_cacbf32a-62b7-4a1a-9200-2295e8d5fbdf">
+                <dc:Bounds height="156.0" width="342.0" x="150.0" y="150.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_HT_A" id="_b82c4ee7-1bb1-4d87-b4ed-c435d6507c53">
+                <dc:Bounds height="76.0" width="96.0" x="190.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_HT_B" id="_1865c3bf-adac-48f9-8c55-1e92ca2a0472">
+                <dc:Bounds height="76.0" width="96.0" x="356.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="N65560_entry1" id="_ca9fd642-42ad-44b1-9969-981e34c3efd2">
+                <dc:Bounds height="28.0" width="20.0" x="346.0" y="214.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge cmmnElementRef="_40ff4dd3-f136-419d-834d-97c4bc1430e2" isStandardEventVisible="true" targetCMMNElementRef="N65560_entry1" id="_0a5485bd-a9da-4c08-a0b8-9e573e535643">
+                <di:waypoint x="286.0" y="228.0"/>
+                <di:waypoint x="346.0" y="228.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="_406b1053-c1a2-494b-aeaa-2f6a881e3cce"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>
+

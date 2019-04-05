@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns="http://www.trisotech.com/cmmn/definitions/StageTests" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:rss="http://purl.org/rss/2.0/" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" id="Def_StageTests" name="Stage Tests" targetNamespace="http://www.trisotech.com/cmmn/definitions/StageTests" exporter="Camunda Modeler" exporterVersion="2.2.4" author="">
+  <cmmn:case id="Case_StageTests" name="Stage Tests">
+    <cmmn:casePlanModel id="CPM_StageTests" name="Stage Tests" autoComplete="false">
+      <cmmn:planItem id="PI_S_S" definitionRef="PID_PI_S_S">
+        <cmmn:itemControl id="PlanItemControl_0u1k7js">
+          <cmmn:manualActivationRule id="ManualActivationRule_1fecwzc">
+            <cmmn:condition id="Expression_161fejs">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:itemControl>
+      </cmmn:planItem>
+      <cmmn:stage id="PID_PI_S_S" name="S" autoComplete="false">
+        <cmmn:planItem id="PI_HT_A" definitionRef="PID_PI_HT_A">
+          <cmmn:itemControl id="PlanItemControl_0k5w9tq">
+            <cmmn:manualActivationRule id="ManualActivationRule_0yqw2ln">
+              <cmmn:condition id="Expression_1278cdx">${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:itemControl>
+        </cmmn:planItem>
+        <cmmn:planItem id="PI_CT_B" name="B" definitionRef="PID_PI_CT_B">
+          <cmmn:itemControl id="PlanItemControl_1359k09">
+            <cmmn:manualActivationRule id="ManualActivationRule_1e2il9a">
+              <cmmn:condition id="Expression_007uvjv">${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:itemControl>
+          <cmmn:entryCriterion id="EC_CT_B" sentryRef="Sentry_17qywzs" />
+        </cmmn:planItem>
+        <cmmn:sentry id="Sentry_17qywzs">
+          <cmmn:planItemOnPart id="PlanItemOnPart_0g7ol0a" sourceRef="PI_HT_A">
+            <cmmn:standardEvent>complete</cmmn:standardEvent>
+          </cmmn:planItemOnPart>
+        </cmmn:sentry>
+        <cmmn:humanTask id="PID_PI_HT_A" name="A" />
+        <cmmn:caseTask id="PID_PI_CT_B" name="B" isBlocking="false" caseRef="Case_StageTestsCalled" />
+      </cmmn:stage>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmn:case id="Case_StageTestsCalled" name="Stage Tests Called">
+    <cmmn:casePlanModel id="CPM_StageTestsCalled" name="Stage Tests Called">
+      <cmmn:planItem id="PI_S_S2" name="S2" definitionRef="PID_PI_S_S2" />
+      <cmmn:stage id="PID_PI_S_S2" name="S2">
+        <cmmn:planItem id="PI_S_S3" definitionRef="PID_PI_S_S3" />
+        <cmmn:stage id="PID_PI_S_S3" name="S3">
+          <cmmn:planItem id="PI_PT_C" name="C" definitionRef="PID_PI_PT_C">
+            <cmmn:itemControl id="PlanItemControl_0iilmnq">
+              <cmmn:manualActivationRule id="ManualActivationRule_1lf9fpy">
+                <cmmn:condition id="Expression_1o37oeg">${true}</cmmn:condition>
+              </cmmn:manualActivationRule>
+            </cmmn:itemControl>
+          </cmmn:planItem>
+          <cmmn:processTask id="PID_PI_PT_C" name="C" processRef="ProcessTaskAssert-calledProcess" />
+        </cmmn:stage>
+      </cmmn:stage>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram sharedStyle="c8e4a14d-22df-4a40-ad4a-7b0152c640ae" id="PCPM_StageTests" name="Stage Tests">
+      <cmmndi:Size width="596" height="576" />
+      <cmmndi:CMMNShape id="_22a5e301-5866-40e2-9978-6d25cccc2ea7" cmmnElementRef="CPM_StageTests">
+        <dc:Bounds x="175" y="157" width="375" height="160" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_421692d5-8162-4a8a-a941-441ac83a3ab6" cmmnElementRef="PI_S_S" isCollapsed="false">
+        <dc:Bounds x="195" y="177" width="335" height="120" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_ad068218-30c4-46cc-a281-e025b1e5bb91" cmmnElementRef="PI_HT_A">
+        <dc:Bounds x="215" y="199" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0etteya_di" cmmnElementRef="PI_CT_B">
+        <dc:Bounds x="410" y="197" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CasePlanModel_0nlfr4w_di" cmmnElementRef="CPM_StageTestsCalled">
+        <dc:Bounds x="581" y="137" width="351" height="200" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_01ftbp0_di" cmmnElementRef="PI_S_S2">
+        <dc:Bounds x="664" y="153" width="180" height="160" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_0076bw0_di" cmmnElementRef="EC_CT_B">
+        <dc:Bounds x="400" y="223" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="PlanItemOnPart_0g7ol0a_di" cmmnElementRef="PlanItemOnPart_0g7ol0a" targetCMMNElementRef="EC_CT_B" isStandardEventVisible="true">
+        <di:waypoint x="311" y="237" />
+        <di:waypoint x="336" y="237" />
+        <di:waypoint x="336" y="237" />
+        <di:waypoint x="400" y="237" />
+        <cmmndi:CMMNLabel>
+          <dc:Bounds x="315" y="217" width="51" height="12" />
+        </cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNShape id="PlanItem_18fj8wm_di" cmmnElementRef="PI_PT_C">
+        <dc:Bounds x="704" y="193" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1c6tkhi_di" cmmnElementRef="PI_S_S3">
+        <dc:Bounds x="684" y="173" width="140" height="120" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+    <cmmndi:CMMNStyle id="c8e4a14d-22df-4a40-ad4a-7b0152c640ae" fontFamily="Arial,Helvetica,sans-serif" />
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

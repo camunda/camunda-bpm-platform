@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions exporter="Camunda Modeler" id="Test" name="CaseTaskAssertIsDisabledTest" targetNamespace="http://bpmn.io/schema/cmmn" xmlns="http://bpmn.io/schema/cmmn" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:rss="http://purl.org/rss/2.0/" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC">
+    <cmmn:case name="CaseTaskAssertIsDisabled Test" id="Case_CaseTaskAssertIsDisabledTest">
+        <cmmn:casePlanModel autoComplete="false" name="CaseTaskAssertIsDisabled Test" id="CPM_CaseTaskAssertIsDisabledTest">
+            <cmmn:planItem definitionRef="PID_PI_TaskA" id="PI_TaskA"/>
+            <cmmn:caseTask caseRef="Case_CaseTaskAssertIsDisabledTest_CaseB" isBlocking="true" name="A" id="PID_PI_TaskA">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="ManualActivationRule_0noww12">
+                        <cmmn:condition id="Expression_0twwiui">${true}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:caseTask>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmn:case name="CaseTaskAssertIsDisabled Test CaseB" id="Case_CaseTaskAssertIsDisabledTest_CaseB">
+        <cmmn:casePlanModel autoComplete="false" name="CaseTaskAssertIsDisabled Test CaseB&#10;&#10;" id="CPM_CaseTaskAssertIsDisabledTest_CaseB">
+            <cmmn:planItem definitionRef="PID_PI_TaskB" id="PI_TaskB"/>
+            <cmmn:humanTask isBlocking="true" name="A" id="PID_PI_TaskB">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="ManualActivationRule_1xissx7">
+                        <cmmn:condition id="Expression_10rydqt">${true}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="Page 0" id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2" sharedStyle="_4d4d2f54-bd40-4dba-b0f3-701a71dc1088">
+            <cmmndi:Size height="500.0" width="500.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_CaseTaskAssertIsDisabledTest" id="DI_CasePlanModel_1">
+                <dc:Bounds height="389.0" width="534.0" x="114.0" y="63.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskA" id="PlanItem_1b4kl2o_di">
+                <dc:Bounds height="80.0" width="100.0" x="150.0" y="96.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="CPM_CaseTaskAssertIsDisabledTest_CaseB" id="CasePlanModel_0row8py_di">
+                <dc:Bounds height="250.0" width="400.0" x="715.0" y="92.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskB" id="PlanItem_1uwrc15_di">
+                <dc:Bounds height="80.0" width="100.0" x="776.0" y="175.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="_4d4d2f54-bd40-4dba-b0f3-701a71dc1088"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>
+

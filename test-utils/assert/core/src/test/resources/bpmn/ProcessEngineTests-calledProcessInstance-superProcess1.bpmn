@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="test-process" exporter="camunda modeler" exporterVersion="2.6.0" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <process id="ProcessEngineTests-calledProcessInstance-superProcess1" name="Test Process" isExecutable="true">
+    <startEvent id="StartEvent_1">
+      <outgoing>SequenceFlow_2</outgoing>
+    </startEvent>
+    <callActivity id="CallActivity_1" calledElement="ProcessEngineTests-calledProcessInstance-subProcess1">
+      <incoming>SequenceFlow_2</incoming>
+      <outgoing>SequenceFlow_3</outgoing>
+    </callActivity>
+    <callActivity id="CallActivity_2" calledElement="ProcessEngineTests-calledProcessInstance-subProcess2">
+      <incoming>SequenceFlow_3</incoming>
+      <outgoing>SequenceFlow_4</outgoing>
+    </callActivity>
+    <endEvent id="EndEvent_1">
+      <incoming>SequenceFlow_4</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_2" name="" sourceRef="StartEvent_1" targetRef="CallActivity_1"/>
+    <sequenceFlow id="SequenceFlow_3" name="" sourceRef="CallActivity_1" targetRef="CallActivity_2"/>
+    <sequenceFlow id="SequenceFlow_4" name="" sourceRef="CallActivity_2" targetRef="EndEvent_1"/>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-830c5f5e-90b8-4b10-84fa-0fe5d466f2d0">
+    <bpmndi:BPMNPlane id="sid-c40130ce-08e6-4f67-ae3d-774a7f6a3ead" bpmnElement="ProcessEngineTests-calledProcessInstance-superProcess1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <omgdc:Bounds height="28.0" width="28.0" x="106.0" y="111.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">
+        <omgdc:Bounds height="28.0" width="28.0" x="444.0" y="111.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="458.0" y="144.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_CallActivity_2" bpmnElement="CallActivity_1">
+        <omgdc:Bounds height="80.0" width="100.0" x="168.0" y="85.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_CallActivity_3" bpmnElement="CallActivity_2">
+        <omgdc:Bounds height="80.0" width="100.0" x="312.0" y="85.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_CallActivity_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="134.0" y="125.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="168.0" y="125.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_CallActivity_2" targetElement="_BPMNShape_CallActivity_3">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="268.0" y="125.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="312.0" y="125.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="_BPMNShape_CallActivity_3" targetElement="_BPMNShape_EndEvent_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="412.0" y="125.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="444.0" y="125.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
