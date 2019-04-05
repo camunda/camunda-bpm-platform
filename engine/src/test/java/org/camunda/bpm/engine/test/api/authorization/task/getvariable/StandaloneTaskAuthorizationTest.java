@@ -22,10 +22,8 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -102,7 +100,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       assertEquals(VARIABLE_VALUE, variable);
-      deleteAuthorizations();
     }
   }
 
@@ -125,7 +122,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       assertEquals(VARIABLE_VALUE, variable);
-      deleteAuthorizations();
     }
   }
 
@@ -149,7 +145,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     if (authRule.assertScenario(scenario)) {
       assertNotNull(typedValue);
       assertEquals(VARIABLE_VALUE, typedValue.getValue());
-      deleteAuthorizations();
     }
   }
 
@@ -173,7 +168,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     if (authRule.assertScenario(scenario)) {
       assertNotNull(typedValue);
       assertEquals(VARIABLE_VALUE, typedValue.getValue());
-      deleteAuthorizations();
     }
   }
 
@@ -196,8 +190,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
@@ -220,8 +212,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
@@ -243,8 +233,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
@@ -266,8 +254,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
@@ -290,8 +276,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
@@ -314,8 +298,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
@@ -337,8 +319,6 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
@@ -360,21 +340,12 @@ public abstract class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyGetVariables(variables);
-
-      deleteAuthorizations();
     }
   }
 
   protected void createTask(final String taskId) {
     Task task = taskService.newTask(taskId);
     taskService.saveTask(task);
-  }
-
-  protected void deleteAuthorizations() {
-    AuthorizationService authorizationService = engineRule.getAuthorizationService();
-    for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
-      authorizationService.deleteAuthorization(authorization.getId());
-    }
   }
 
   protected VariableMap getVariables() {

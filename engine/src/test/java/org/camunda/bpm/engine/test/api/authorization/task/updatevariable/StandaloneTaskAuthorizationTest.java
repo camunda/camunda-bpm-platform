@@ -15,8 +15,8 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.task.updatevariable;
 
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.UPDATE_VARIABLE;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
@@ -26,12 +26,11 @@ import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.Collection;
-import org.camunda.bpm.engine.AuthorizationService;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -142,8 +141,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifySetVariables();
-
-      deleteAuthorizations();
     }
   }
 
@@ -164,8 +161,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifySetVariables();
-
-      deleteAuthorizations();
     }
   }
 
@@ -186,8 +181,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifySetVariables();
-
-      deleteAuthorizations();
     }
   }
 
@@ -208,8 +201,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifySetVariables();
-
-      deleteAuthorizations();
     }
   }
 
@@ -233,8 +224,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -258,8 +247,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -283,8 +270,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -308,8 +293,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -331,8 +314,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifySetVariables();
-
-      deleteAuthorizations();
     }
   }
 
@@ -355,8 +336,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -378,8 +357,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -401,8 +378,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifySetVariables();
-
-      deleteAuthorizations();
     }
   }
 
@@ -425,8 +400,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -448,8 +421,6 @@ public class StandaloneTaskAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       verifyRemoveVariable();
-
-      deleteAuthorizations();
     }
   }
 
@@ -473,13 +444,6 @@ public class StandaloneTaskAuthorizationTest {
   protected void createTask(final String taskId) {
     Task task = taskService.newTask(taskId);
     taskService.saveTask(task);
-  }
-
-  protected void deleteAuthorizations() {
-    AuthorizationService authorizationService = engineRule.getAuthorizationService();
-    for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
-      authorizationService.deleteAuthorization(authorization.getId());
-    }
   }
 
   protected VariableMap getVariables() {
