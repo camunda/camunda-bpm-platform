@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsDisabledTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:rss="http://purl.org/rss/2.0/" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" id="Def_HumanTaskAssertIsDisabledTest" name="HumanTaskAssertisDisabled Test" targetNamespace="http://www.trisotech.com/cmmn/definitions/HumanTaskAssertIsDisabledTest" exporter="Camunda Modeler" exporterVersion="1.4.0" author="">
+  <cmmn:case id="Case_HumanTaskAssertIsDisabledTest" name="HumanTaskAssertisDisabled Test">
+    <cmmn:casePlanModel id="CPM_HumanTaskAssertIsDisabledTest" name="HumanTaskAssertisDisabled Test" autoComplete="false">
+      <cmmn:planItem id="PI_TaskA" definitionRef="PID_PI_TaskA">
+        <cmmn:itemControl id="PlanItemControl_0f5byxe">
+          <cmmn:manualActivationRule id="ManualActivationRule_1afc7p1">
+            <cmmn:condition id="Expression_18hoqny">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:itemControl>
+      </cmmn:planItem>
+      <cmmn:humanTask id="PID_PI_TaskA" name="A" />
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram sharedStyle="_32d90c96-6336-4f03-946c-afd3a438b4bb" id="PCPM_HumanTaskAssertIsDisabledTest" name="HumanTaskAssertisDisabled Test">
+      <cmmndi:Size xsi:type="dc:Dimension" width="550" height="500" />
+      <cmmndi:CMMNShape id="_90ce5a8f-dbe6-467d-90e4-d9389b205cce" cmmnElementRef="CPM_HumanTaskAssertIsDisabledTest">
+        <dc:Bounds x="150" y="150" width="250" height="156" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_1000d092-dbdf-4bcf-a54d-33ea61048698" cmmnElementRef="PI_TaskA">
+        <dc:Bounds x="190" y="190" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+    <cmmndi:CMMNStyle id="_32d90c96-6336-4f03-946c-afd3a438b4bb" fontFamily="Arial,Helvetica,sans-serif" />
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="test-process" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Camunda Modeler" exporterVersion="2.2.4" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <process id="ProcessInstanceAssert-externalTask" name="Test Process" isExecutable="true">
+    <sequenceFlow id="SequenceFlow_2" name="" sourceRef="ExternalTask_1" targetRef="ParallelGateway_1" />
+    <sequenceFlow id="SequenceFlow_3" name="" sourceRef="ParallelGateway_1" targetRef="ExternalTask_2" />
+    <sequenceFlow id="SequenceFlow_4" name="" sourceRef="ParallelGateway_1" targetRef="ExternalTask_3" />
+    <sequenceFlow id="SequenceFlow_9" name="" sourceRef="ExternalTask_2" targetRef="ExclusiveGateway_1" />
+    <sequenceFlow id="SequenceFlow_10" name="" sourceRef="ExternalTask_3" targetRef="ExclusiveGateway_1" />
+    <sequenceFlow id="SequenceFlow_11" name="" sourceRef="ExclusiveGateway_1" targetRef="ExternalTask_4" />
+    <sequenceFlow id="SequenceFlow_8" name="" sourceRef="ExternalTask_4" targetRef="EndEvent_1" />
+    <serviceTask id="ExternalTask_1" camunda:type="external" camunda:topic="External_1">
+      <incoming>SequenceFlow_0dziarg</incoming>
+      <outgoing>SequenceFlow_2</outgoing>
+    </serviceTask>
+    <serviceTask id="ExternalTask_2" camunda:type="external" camunda:topic="External_2">
+      <incoming>SequenceFlow_3</incoming>
+      <outgoing>SequenceFlow_9</outgoing>
+    </serviceTask>
+    <serviceTask id="ExternalTask_3" camunda:type="external" camunda:topic="External_3">
+      <incoming>SequenceFlow_4</incoming>
+      <outgoing>SequenceFlow_10</outgoing>
+    </serviceTask>
+    <serviceTask id="ExternalTask_4" camunda:type="external" camunda:topic="External_4">
+      <incoming>SequenceFlow_11</incoming>
+      <outgoing>SequenceFlow_8</outgoing>
+    </serviceTask>
+    <parallelGateway id="ExclusiveGateway_1">
+      <incoming>SequenceFlow_9</incoming>
+      <incoming>SequenceFlow_10</incoming>
+      <outgoing>SequenceFlow_11</outgoing>
+    </parallelGateway>
+    <parallelGateway id="ParallelGateway_1">
+      <incoming>SequenceFlow_2</incoming>
+      <outgoing>SequenceFlow_3</outgoing>
+      <outgoing>SequenceFlow_4</outgoing>
+    </parallelGateway>
+    <startEvent id="StartEvent_1">
+      <outgoing>SequenceFlow_0dziarg</outgoing>
+    </startEvent>
+    <sequenceFlow id="SequenceFlow_0dziarg" sourceRef="StartEvent_1" targetRef="ExternalTask_1" />
+    <endEvent id="EndEvent_1">
+      <incoming>SequenceFlow_8</incoming>
+    </endEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-830c5f5e-90b8-4b10-84fa-0fe5d466f2d0">
+    <bpmndi:BPMNPlane id="sid-c40130ce-08e6-4f67-ae3d-774a7f6a3ead" bpmnElement="ProcessInstanceAssert-externalTask">
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="ServiceTask_15bsvcl_di" targetElement="ParallelGateway_0ho8qu6_di">
+        <omgdi:waypoint x="284" y="125" />
+        <omgdi:waypoint x="329" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="ParallelGateway_0ho8qu6_di" targetElement="ServiceTask_0bsuzvd_di">
+        <omgdi:waypoint x="354" y="100" />
+        <omgdi:waypoint x="354" y="66" />
+        <omgdi:waypoint x="420" y="66" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="351" y="80" width="6" height="6" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="ParallelGateway_0ho8qu6_di" targetElement="ServiceTask_1buqi6n_di">
+        <omgdi:waypoint x="354" y="150" />
+        <omgdi:waypoint x="354" y="184" />
+        <omgdi:waypoint x="420" y="184" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="387" y="184" width="6" height="6" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_8" bpmnElement="SequenceFlow_8" sourceElement="ServiceTask_0et1m7c_di" targetElement="EndEvent_0oklxmf_di">
+        <omgdi:waypoint x="751" y="127" />
+        <omgdi:waypoint x="785" y="127" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="762" y="126" width="6" height="6" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_9" bpmnElement="SequenceFlow_9" sourceElement="ServiceTask_0bsuzvd_di" targetElement="ParallelGateway_03pq956_di">
+        <omgdi:waypoint x="520" y="66" />
+        <omgdi:waypoint x="585" y="66" />
+        <omgdi:waypoint x="585" y="102" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="570" y="66" width="6" height="6" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_10" bpmnElement="SequenceFlow_10" sourceElement="ServiceTask_1buqi6n_di" targetElement="ParallelGateway_03pq956_di">
+        <omgdi:waypoint x="520" y="184" />
+        <omgdi:waypoint x="585" y="184" />
+        <omgdi:waypoint x="585" y="152" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="568" y="184" width="6" height="6" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_11" bpmnElement="SequenceFlow_11" sourceElement="ParallelGateway_03pq956_di" targetElement="ServiceTask_0et1m7c_di">
+        <omgdi:waypoint x="610" y="127" />
+        <omgdi:waypoint x="651" y="127" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="623" y="126" width="6" height="6" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_15bsvcl_di" bpmnElement="ExternalTask_1">
+        <omgdc:Bounds x="184" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0bsuzvd_di" bpmnElement="ExternalTask_2">
+        <omgdc:Bounds x="420" y="26" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1buqi6n_di" bpmnElement="ExternalTask_3">
+        <omgdc:Bounds x="420" y="144" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0et1m7c_di" bpmnElement="ExternalTask_4">
+        <omgdc:Bounds x="651" y="87" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_03pq956_di" bpmnElement="ExclusiveGateway_1">
+        <omgdc:Bounds x="560" y="102" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_0ho8qu6_di" bpmnElement="ParallelGateway_1">
+        <omgdc:Bounds x="329" y="100" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0w7pk2k_di" bpmnElement="StartEvent_1">
+        <omgdc:Bounds x="102" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dziarg_di" bpmnElement="SequenceFlow_0dziarg">
+        <omgdi:waypoint x="138" y="125" />
+        <omgdi:waypoint x="184" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0oklxmf_di" bpmnElement="EndEvent_1">
+        <omgdc:Bounds x="785" y="109" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

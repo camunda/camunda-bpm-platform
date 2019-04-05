@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions author="" exporter="CMMN Modeler" id="_4062973c-a12e-4992-8631-18f0b1f7311b" name="Drawing 1" targetNamespace="http://www.trisotech.com/cmmn/definitions/_4062973c-a12e-4992-8631-18f0b1f7311b" xmlns="http://www.trisotech.com/cmmn/definitions/_4062973c-a12e-4992-8631-18f0b1f7311b" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:rss="http://purl.org/rss/2.0/" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC">
+    <cmmn:case id="MilestoneAssertIsCompletedTest">
+        <cmmn:casePlanModel autoComplete="true" id="_b70a29d0-52f0-4f65-a1d1-47130791b832">
+            <cmmn:planItem definitionRef="PID_PI_TaskA" id="PI_TaskA"/>
+            <cmmn:planItem definitionRef="PID_Milestone" id="Milestone">
+                <cmmn:entryCriterion sentryRef="_cf6057cb-b409-4363-a177-92df6bbee2b7" id="N65557_entry1"/>
+            </cmmn:planItem>
+            <cmmn:sentry id="_cf6057cb-b409-4363-a177-92df6bbee2b7">
+                <cmmn:planItemOnPart sourceRef="PI_TaskA" id="_db4acf8d-40c1-4e1f-b9c9-ad3510e605f8">
+                    <cmmn:standardEvent>complete</cmmn:standardEvent>
+                </cmmn:planItemOnPart>
+            </cmmn:sentry>
+            <cmmn:humanTask isBlocking="true" id="PID_PI_TaskA">
+                <cmmn:defaultControl>
+                    <cmmn:requiredRule id="_7a98952a-a040-49a8-b479-1df83da3309e">
+                        <cmmn:condition id="bbe1c437-0e31-4941-b556-d9380905b775">
+              ${true}
+            </cmmn:condition>
+                    </cmmn:requiredRule>
+                    <cmmn:manualActivationRule id="e0b48876-fe8d-442f-8bf1-467db41846fe">
+                        <cmmn:condition id="d5d8fcd6-1356-4685-9ef2-a477eaa98fb2">
+              ${false}
+            </cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+            <cmmn:milestone id="PID_Milestone"/>
+        </cmmn:casePlanModel>
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="Page 1" id="P_b70a29d0-52f0-4f65-a1d1-47130791b832" sharedStyle="_7ccf3219-99c5-473f-a741-8a4f902567a7">
+            <cmmndi:Size height="500.0" width="661.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="_b70a29d0-52f0-4f65-a1d1-47130791b832" id="_9bd2df9b-7601-407f-bd8c-6217d3739348">
+                <dc:Bounds height="156.0" width="361.0" x="150.0" y="150.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="PI_TaskA" id="_02e22e60-bbf5-4e05-9053-6a1ba4c115fb">
+                <dc:Bounds height="76.0" width="96.0" x="190.0" y="190.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="Milestone" id="_ac4f6949-01cd-4380-b206-4fee0134c54e">
+                <dc:Bounds height="39.0" width="115.0" x="356.0" y="209.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="N65557_entry1" id="_3b41b25c-aaf5-4028-b0d7-d9f9635f8844">
+                <dc:Bounds height="28.0" width="20.0" x="403.5" y="195.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge cmmnElementRef="_db4acf8d-40c1-4e1f-b9c9-ad3510e605f8" isStandardEventVisible="true" targetCMMNElementRef="N65557_entry1" id="_5a5fdc27-889e-4e33-9e33-5079543a43a2">
+                <di:waypoint x="286.0" y="228.0"/>
+                <di:waypoint x="351.75" y="228.0"/>
+                <di:waypoint x="351.75" y="176.0"/>
+                <di:waypoint x="413.5" y="176.0"/>
+                <di:waypoint x="413.5" y="195.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="_7ccf3219-99c5-473f-a741-8a4f902567a7"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>
+
