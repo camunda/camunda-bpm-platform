@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+@SuppressWarnings("ALL")
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { SimpleConfiguration.class })
 public class SimpleContextTest {

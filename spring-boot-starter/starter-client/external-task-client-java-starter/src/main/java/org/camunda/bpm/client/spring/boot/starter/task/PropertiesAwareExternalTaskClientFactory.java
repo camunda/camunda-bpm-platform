@@ -1,23 +1,24 @@
 package org.camunda.bpm.client.spring.boot.starter.task;
 
-import java.util.Optional;
-
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.camunda.bpm.client.spring.ExternalTaskClientFactory;
 import org.camunda.bpm.client.spring.boot.starter.CamundaBpmClientProperties;
 import org.camunda.bpm.client.spring.boot.starter.CamundaBpmClientProperties.BasicAuthProperties;
 import org.camunda.bpm.client.spring.boot.starter.CamundaBpmClientProperties.Client;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class PropertiesAwareExternalTaskClientFactory extends ExternalTaskClientFactory {
 
-  @Autowired
-  private CamundaBpmClientProperties camundaBpmClientProperties;
+  @NonNull
+  private final CamundaBpmClientProperties camundaBpmClientProperties;
 
   @Override
   public void afterPropertiesSet() throws Exception {
     camundaBpmClientProperties.getBaseUrl(getId()).ifPresent(this::setBaseUrl);
-    applyClientProperties(camundaBpmClientProperties.getClient(getId()));
+    camundaBpmClientProperties.getClient(getId()).ifPresent(this::applyClientProperties);
     addBasicAuthInterceptor();
     super.afterPropertiesSet();
   }
@@ -27,30 +28,30 @@ public class PropertiesAwareExternalTaskClientFactory extends ExternalTaskClient
         .ifPresent(basicAuth -> getClientRequestInterceptors().add(new BasicAuthProvider(basicAuth.getUsername(), basicAuth.getPassword())));
   }
 
-  protected void applyClientProperties(Optional<Client> client) {
-    client.ifPresent(c -> {
-      if (c.getMaxTasks() != null) {
-        setMaxTasks(c.getMaxTasks());
+  protected void applyClientProperties(Client client) {
+    if (client != null) {
+      if (client.getMaxTasks() != null) {
+        setMaxTasks(client.getMaxTasks());
       }
-      if (c.getWorkerId() != null) {
-        setWorkerId(c.getWorkerId());
+      if (client.getWorkerId() != null) {
+        setWorkerId(client.getWorkerId());
       }
-      if (c.getAsyncResponseTimeout() != null) {
-        setAsyncResponseTimeout(c.getAsyncResponseTimeout());
+      if (client.getAsyncResponseTimeout() != null) {
+        setAsyncResponseTimeout(client.getAsyncResponseTimeout());
       }
-      if (c.getAutoFetchingEnabled() != null) {
-        setAutoFetchingEnabled(c.getAutoFetchingEnabled());
+      if (client.getAutoFetchingEnabled() != null) {
+        setAutoFetchingEnabled(client.getAutoFetchingEnabled());
       }
-      if (c.getLockDuration() != null) {
-        setLockDuration(c.getLockDuration());
+      if (client.getLockDuration() != null) {
+        setLockDuration(client.getLockDuration());
       }
-      if (c.getDateFormat() != null) {
-        setDateFormat(c.getDateFormat());
+      if (client.getDateFormat() != null) {
+        setDateFormat(client.getDateFormat());
       }
-      if (c.getDefaultSerializationFormat() != null) {
-        setDefaultSerializationFormat(c.getDefaultSerializationFormat());
+      if (client.getDefaultSerializationFormat() != null) {
+        setDefaultSerializationFormat(client.getDefaultSerializationFormat());
       }
-    });
+    }
   }
 
 }

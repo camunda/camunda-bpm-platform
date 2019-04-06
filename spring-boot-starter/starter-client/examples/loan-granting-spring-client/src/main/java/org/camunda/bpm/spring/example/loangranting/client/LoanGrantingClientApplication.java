@@ -15,7 +15,7 @@ import org.springframework.core.io.Resource;
 public class LoanGrantingClientApplication {
 
   public static void main(String[] args) {
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(LoanGrantingClientApplication.class);
+    new AnnotationConfigApplicationContext(LoanGrantingClientApplication.class);
   }
 
   @Bean

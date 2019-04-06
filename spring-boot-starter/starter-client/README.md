@@ -11,16 +11,19 @@ Support for `@EnableTaskSubscription` and `@TaskSubscription`.
 ### Spring
 
 ```xml
-<dependency>
-  <groupId>org.camunda.bpm.spring.boot</groupId>
-  <artifactId>external-task-client-java-spring</artifactId>
-  <version>${project.version}</version>
-</dependency>
-<dependency>
-  <groupId>org.springframework</groupId>
-  <artifactId>spring-context</artifactId>
-  <version>${spring.version}</version>
-</dependency>
+<dependencies>
+  ...
+  <dependency>
+    <groupId>org.camunda.bpm.spring.boot</groupId>
+    <artifactId>external-task-client-java-spring</artifactId>
+    <version>${project.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+    <version>${spring.version}</version>
+  </dependency>
+</dependencies>
 ```
 
 ```java
@@ -43,15 +46,18 @@ public class SimpleConfiguration {
 ### Spring Boot
 
 ```xml
-<dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-starter</artifactId>
-</dependency>
-<dependency>
-  <groupId>org.camunda.bpm.spring.boot</groupId>
-  <artifactId>external-task-client-java-starter</artifactId>
-  <version>${project.version}</version>
-</dependency>
+<dependencies>
+  ...
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>org.camunda.bpm.spring.boot</groupId>
+    <artifactId>external-task-client-java-starter</artifactId>
+    <version>${project.version}</version>
+  </dependency>
+</dependencies>
 ```
 
 ```java

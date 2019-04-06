@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+@SuppressWarnings("ALL")
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { ExtendedConfiguration.class })
 public class ExtendedContextTest {

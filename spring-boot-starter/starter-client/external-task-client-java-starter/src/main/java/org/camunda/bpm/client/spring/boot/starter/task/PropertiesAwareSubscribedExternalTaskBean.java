@@ -5,14 +5,17 @@ import java.util.function.Predicate;
 import org.camunda.bpm.client.spring.SubscribedExternalTaskBean;
 import org.camunda.bpm.client.spring.SubscriptionInformation;
 import org.camunda.bpm.client.spring.boot.starter.CamundaBpmClientProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationEvent;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class PropertiesAwareSubscribedExternalTaskBean extends SubscribedExternalTaskBean {
 
-  @Autowired
-  private CamundaBpmClientProperties camundaBpmClientProperties;
+  @NonNull
+  private final CamundaBpmClientProperties camundaBpmClientProperties;
 
   @Override
   public void afterPropertiesSet() throws Exception {

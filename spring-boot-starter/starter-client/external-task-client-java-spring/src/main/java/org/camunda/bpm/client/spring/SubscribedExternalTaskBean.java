@@ -24,7 +24,7 @@ import lombok.Setter;
 
 public class SubscribedExternalTaskBean implements SubscribedExternalTask, InitializingBean, ApplicationContextAware {
 
-  private Map<ExternalTaskClient, Subscription> subscriptions = new HashMap<>();
+  private final Map<ExternalTaskClient, Subscription> subscriptions = new HashMap<>();
   @Getter
   @Setter
   private ExternalTaskHandler externalTaskHandler;
@@ -35,9 +35,7 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    ExternalTaskClientHelper.findMatchingClients(applicationContext, this).forEach(client -> {
-      register(client);
-    });
+    ExternalTaskClientHelper.findMatchingClients(applicationContext, this).forEach(this::register);
   }
 
   @EventListener
@@ -65,7 +63,7 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
 
   @Override
   public Collection<Subscription> getSubscriptions() {
-    return subscriptions.values().stream().filter(s -> s != null).collect(Collectors.toList());
+    return subscriptions.values().stream().filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   @Override
@@ -73,9 +71,7 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
     if (!isSubscribed(externalTaskClient)) {
       Subscription subscription = Subscription.build(this, externalTaskClient);
       subscription.subscribe();
-      if (subscriptions.containsKey(externalTaskClient)) {
-        subscriptions.remove(externalTaskClient);
-      }
+      subscriptions.remove(externalTaskClient);
       subscriptions.put(externalTaskClient, subscription);
     }
     return this;
@@ -98,7 +94,7 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
 
   @Override
   public void close() {
-    subscriptions.values().stream().filter(s -> s != null).forEach(Subscription::close);
+    subscriptions.values().stream().filter(Objects::nonNull).forEach(Subscription::close);
   }
 
   @Override
@@ -200,7 +196,7 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
             .businessKey(subscriptionInformation.getBusinessKey()).handler(externalTaskHandler);
         List<String> variableNames = subscriptionInformation.getVariableNames();
         if (variableNames != null) {
-          topicSubscriptionBuilder.variables(variableNames.toArray(new String[variableNames.size()]));
+          topicSubscriptionBuilder.variables(variableNames.toArray(new String[0]));
         }
       }
     }

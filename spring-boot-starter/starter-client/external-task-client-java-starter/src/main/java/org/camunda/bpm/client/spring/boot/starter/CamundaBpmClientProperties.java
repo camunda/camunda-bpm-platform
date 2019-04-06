@@ -29,7 +29,7 @@ public class CamundaBpmClientProperties implements InitializingBean {
   protected Map<String, Client> clients = new HashMap<>();
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     clients.put("",
         new Client(baseUrl, basicAuth, maxTasks, workerId, asyncResponseTimeout, autoFetchingEnabled, lockDuration, dateFormat, defaultSerializationFormat));
   }

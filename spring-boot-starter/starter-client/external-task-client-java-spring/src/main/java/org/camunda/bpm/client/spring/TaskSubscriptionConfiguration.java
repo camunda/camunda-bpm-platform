@@ -32,7 +32,7 @@ public class TaskSubscriptionConfiguration implements ImportSelector {
       imports.add(ClientRegistrar.class.getName());
     }
 
-    return imports.toArray(new String[imports.size()]);
+    return imports.toArray(new String[0]);
   }
 
   @Role(BeanDefinition.ROLE_INFRASTRUCTURE)

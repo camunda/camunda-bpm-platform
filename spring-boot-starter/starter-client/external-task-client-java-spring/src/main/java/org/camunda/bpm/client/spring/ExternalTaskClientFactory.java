@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient>, InitializingBean {
 
   @Getter
@@ -56,7 +57,7 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
   private ExternalTaskClient externalTaskClient;
 
   @Override
-  public ExternalTaskClient getObject() throws Exception {
+  public ExternalTaskClient getObject() {
     if (externalTaskClient == null) {
       ExternalTaskClientBuilder taskClientBuilder = ExternalTaskClient.create().baseUrl(baseUrl).workerId(workerId);
       addClientRequestInterceptors(taskClientBuilder);
@@ -67,7 +68,7 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
       if (asyncResponseTimeout != null) {
         taskClientBuilder.asyncResponseTimeout(asyncResponseTimeout);
       }
-      if (autoFetchingEnabled != null && autoFetchingEnabled == false) {
+      if (autoFetchingEnabled != null && !autoFetchingEnabled) {
         taskClientBuilder.disableAutoFetching();
       }
       if (lockDuration != null) {
