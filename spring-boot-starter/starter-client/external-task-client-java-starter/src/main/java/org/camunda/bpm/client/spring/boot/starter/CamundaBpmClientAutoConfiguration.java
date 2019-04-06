@@ -14,22 +14,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Role;
 
-@EnableConfigurationProperties({ CamundaBpmClientProperties.class })
-@EnableTaskSubscription
-@Import({ PropertiesAwareClientRegistrar.class })
+@EnableConfigurationProperties({CamundaBpmClientProperties.class})
+@EnableTaskSubscription(defaultExternalTaskRegistration = false)
+@Import({PropertiesAwareClientRegistrar.class})
 @Configuration
 public class CamundaBpmClientAutoConfiguration {
 
-  @Bean
-  @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-  public static BeanDefinitionRegistryPostProcessor externalTaskBeanDefinitionRegistryPostProcessor() {
-    return new ExternalTaskBeanDefinitionRegistryPostProcessor(PropertiesAwareSubscribedExternalTaskBean.class);
-  }
-
-  static class PropertiesAwareClientRegistrar extends ClientRegistrar {
-    public PropertiesAwareClientRegistrar() {
-      super(PropertiesAwareExternalTaskClientFactory.class);
+    @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+    public static BeanDefinitionRegistryPostProcessor externalTaskBeanDefinitionRegistryPostProcessor() {
+        return new ExternalTaskBeanDefinitionRegistryPostProcessor(PropertiesAwareSubscribedExternalTaskBean.class);
     }
 
-  }
+    static class PropertiesAwareClientRegistrar extends ClientRegistrar {
+        public PropertiesAwareClientRegistrar() {
+            super(PropertiesAwareExternalTaskClientFactory.class);
+        }
+
+    }
 }

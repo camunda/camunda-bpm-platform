@@ -2,7 +2,7 @@ camunda:
   bpm:
     client:
       base-url: http://localhost:8080/rest
-      
+
 logging:
   level:
     org.camunda.bpm.client: info

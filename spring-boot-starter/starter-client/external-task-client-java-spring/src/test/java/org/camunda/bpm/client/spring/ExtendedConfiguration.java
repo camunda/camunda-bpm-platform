@@ -11,58 +11,58 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-@ComponentScan(basePackageClasses = { ExtendedTestClassSubscription.class })
+@ComponentScan(basePackageClasses = {ExtendedTestClassSubscription.class})
 public class ExtendedConfiguration {
 
-  @Bean
-  @Primary
-  public ClientRequestInterceptor clientRequestInterceptor() {
-    return new ClientRequestInterceptor() {
-
-      @Override
-      public void intercept(ClientRequestContext requestContext) {
-        //
-      }
-    };
-  }
-
-  @Configuration
-  @EnableTaskSubscription(baseUrl = "http://localhost:8080/rest", id = "First")
-  static class FirstConfig {
-
-    @TaskSubscription(topicName = "methodSubscription", externalTaskClientIds = "externalTaskClientFirst")
     @Bean
-    public ExternalTaskHandler methodSubscription() {
-      return (externalTask, externalTaskService) -> {
+    @Primary
+    public ClientRequestInterceptor clientRequestInterceptor() {
+        return new ClientRequestInterceptor() {
 
-        // interact with the external task
-
-      };
+            @Override
+            public void intercept(ClientRequestContext requestContext) {
+                //
+            }
+        };
     }
-  }
 
-  @Configuration
-  @EnableTaskSubscription(baseUrl = "http://localhost:8090/rest", id = SecondConfig.CLIENT_ID)
-  static class SecondConfig {
+    @Configuration
+    @EnableTaskSubscription(baseUrl = "http://localhost:8080/rest", id = "First")
+    static class FirstConfig {
 
-    static final String CLIENT_ID = "Second";
+        @TaskSubscription(topicName = "methodSubscription", externalTaskClientIds = "externalTaskClientFirst")
+        @Bean
+        public ExternalTaskHandler methodSubscription() {
+            return (externalTask, externalTaskService) -> {
 
-    @Bean
-    public ClientIdAcceptingClientRequestInterceptor clientIdAcceptingClientRequestInterceptor() {
+                // interact with the external task
 
-      return new ClientIdAcceptingClientRequestInterceptor() {
-
-        @Override
-        public void intercept(ClientRequestContext requestContext) {
-          //
+            };
         }
-
-        @Override
-        public boolean accepts(String id) {
-          return CLIENT_ID.equals(id);
-        }
-      };
     }
-  }
+
+    @Configuration
+    @EnableTaskSubscription(baseUrl = "http://localhost:8090/rest", id = SecondConfig.CLIENT_ID)
+    static class SecondConfig {
+
+        static final String CLIENT_ID = "Second";
+
+        @Bean
+        public ClientIdAcceptingClientRequestInterceptor clientIdAcceptingClientRequestInterceptor() {
+
+            return new ClientIdAcceptingClientRequestInterceptor() {
+
+                @Override
+                public void intercept(ClientRequestContext requestContext) {
+                    //
+                }
+
+                @Override
+                public boolean accepts(String id) {
+                    return CLIENT_ID.equals(id);
+                }
+            };
+        }
+    }
 
 }
