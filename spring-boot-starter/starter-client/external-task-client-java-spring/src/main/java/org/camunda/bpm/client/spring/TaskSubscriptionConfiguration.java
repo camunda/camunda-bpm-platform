@@ -24,7 +24,7 @@ public class TaskSubscriptionConfiguration implements ImportSelector {
     AnnotationAttributes enableTaskSubscription = ClientRegistrar.getEnableTaskSubscription(importingClassMetadata);
     List<String> imports = new ArrayList<>();
 
-    if (ClientRegistrar.isDefaultExternalTaskRegistration(enableTaskSubscription)) {
+    if (!ClientRegistrar.getDisableDefaultExternalTaskRegistration(importingClassMetadata).isPresent()) {
       imports.add(PostProcessorConfig.class.getName());
     }
 

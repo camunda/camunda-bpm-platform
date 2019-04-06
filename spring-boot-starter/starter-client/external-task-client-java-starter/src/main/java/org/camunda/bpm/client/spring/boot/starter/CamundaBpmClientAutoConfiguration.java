@@ -1,5 +1,6 @@
 package org.camunda.bpm.client.spring.boot.starter;
 
+import org.camunda.bpm.client.spring.DisableDefaultExternalTaskRegistration;
 import org.camunda.bpm.client.spring.EnableTaskSubscription;
 import org.camunda.bpm.client.spring.boot.starter.CamundaBpmClientAutoConfiguration.PropertiesAwareClientRegistrar;
 import org.camunda.bpm.client.spring.boot.starter.task.PropertiesAwareExternalTaskClientFactory;
@@ -15,7 +16,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Role;
 
 @EnableConfigurationProperties({ CamundaBpmClientProperties.class })
-@EnableTaskSubscription(defaultExternalTaskRegistration = false)
+@EnableTaskSubscription
+@DisableDefaultExternalTaskRegistration
 @Import({ PropertiesAwareClientRegistrar.class })
 @Configuration
 public class CamundaBpmClientAutoConfiguration {

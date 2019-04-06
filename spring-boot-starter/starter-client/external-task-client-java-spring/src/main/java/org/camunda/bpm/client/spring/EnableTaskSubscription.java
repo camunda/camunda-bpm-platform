@@ -31,5 +31,4 @@ public @interface EnableTaskSubscription {
 
   String defaultSerializationFormat() default NULL_VALUE_STRING;
 
-  boolean defaultExternalTaskRegistration() default true;
 }

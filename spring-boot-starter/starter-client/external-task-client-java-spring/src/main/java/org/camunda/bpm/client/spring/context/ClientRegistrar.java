@@ -1,5 +1,8 @@
 package org.camunda.bpm.client.spring.context;
 
+import java.util.Optional;
+
+import org.camunda.bpm.client.spring.DisableDefaultExternalTaskRegistration;
 import org.camunda.bpm.client.spring.EnableTaskSubscription;
 import org.camunda.bpm.client.spring.ExternalTaskClientFactory;
 import org.camunda.bpm.client.spring.helper.AnnotationNullValueHelper;
@@ -103,11 +106,12 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
     return AnnotationNullValueHelper.respectNullValue(annotationAttributes.getString("workerId"));
   }
 
-  public static boolean isDefaultExternalTaskRegistration(AnnotationAttributes annotationAttributes) {
-    return annotationAttributes.getBoolean("defaultExternalTaskRegistration");
-  }
-
   public static AnnotationAttributes getEnableTaskSubscription(AnnotationMetadata annotationMetadata) {
     return AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(EnableTaskSubscription.class.getName(), false));
+  }
+
+  public static Optional<AnnotationAttributes> getDisableDefaultExternalTaskRegistration(AnnotationMetadata annotationMetadata) {
+    return Optional
+        .ofNullable(AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(DisableDefaultExternalTaskRegistration.class.getName(), false)));
   }
 }
