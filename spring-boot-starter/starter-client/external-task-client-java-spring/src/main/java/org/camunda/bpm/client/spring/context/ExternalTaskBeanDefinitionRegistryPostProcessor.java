@@ -58,8 +58,12 @@ public class ExternalTaskBeanDefinitionRegistryPostProcessor implements BeanDefi
 
   protected BeanDefinitionBuilder getBeanDefinitionBuilderForExternalTaskBean(ListableBeanFactory listableBeanFactory,
       ExternalTaskSubscriptionDefinition definition) {
-    return BeanDefinitionBuilder.genericBeanDefinition(subscribedExternalTaskBeanClass).addPropertyReference("externalTaskHandler", definition.getBeanName())
-        .addPropertyValue("subscriptionInformation", definition.getSubscriptionInformation()).setDestroyMethodName("close");
+    // @formatter:off
+    return BeanDefinitionBuilder.genericBeanDefinition(subscribedExternalTaskBeanClass)
+                                .addPropertyReference("externalTaskHandler", definition.getBeanName())
+                                .addPropertyValue("subscriptionInformation", definition.getSubscriptionInformation())
+                                .setDestroyMethodName("close");
+    // @formatter:on
   }
 
   protected Optional<ExternalTaskSubscriptionDefinition> getSchedulingDefinition(String beanName, BeanDefinition beanDefinition) {
