@@ -14,17 +14,16 @@ import org.springframework.core.io.Resource;
 @EnableTaskSubscription(baseUrl = "${client.baseUrl}")
 public class LoanGrantingClientApplication {
 
-    public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-                LoanGrantingClientApplication.class);
-    }
+  public static void main(String[] args) {
+    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(LoanGrantingClientApplication.class);
+  }
 
-    @Bean
-    static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
-        Resource location = new ClassPathResource("client.properties");
-        configurer.setLocation(location);
-        return configurer;
-    }
+  @Bean
+  static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+    PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+    Resource location = new ClassPathResource("client.properties");
+    configurer.setLocation(location);
+    return configurer;
+  }
 
 }

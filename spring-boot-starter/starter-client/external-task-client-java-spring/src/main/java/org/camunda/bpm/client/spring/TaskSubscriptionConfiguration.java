@@ -1,5 +1,8 @@
 package org.camunda.bpm.client.spring;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.client.spring.context.ClientRegistrar;
 import org.camunda.bpm.client.spring.context.ExternalTaskBeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -12,38 +15,35 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Configuration
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class TaskSubscriptionConfiguration implements ImportSelector {
 
-    @Override
-    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        AnnotationAttributes enableTaskSubscription = ClientRegistrar.getEnableTaskSubscription(importingClassMetadata);
-        List<String> imports = new ArrayList<>();
+  @Override
+  public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+    AnnotationAttributes enableTaskSubscription = ClientRegistrar.getEnableTaskSubscription(importingClassMetadata);
+    List<String> imports = new ArrayList<>();
 
-        if (ClientRegistrar.isDefaultExternalTaskRegistration(enableTaskSubscription)) {
-            imports.add(PostProcessorConfig.class.getName());
-        }
-
-        if (!StringUtils.isEmpty(ClientRegistrar.getBaseUrl(enableTaskSubscription))) {
-            imports.add(ClientRegistrar.class.getName());
-        }
-
-        return imports.toArray(new String[imports.size()]);
+    if (ClientRegistrar.isDefaultExternalTaskRegistration(enableTaskSubscription)) {
+      imports.add(PostProcessorConfig.class.getName());
     }
 
+    if (!StringUtils.isEmpty(ClientRegistrar.getBaseUrl(enableTaskSubscription))) {
+      imports.add(ClientRegistrar.class.getName());
+    }
+
+    return imports.toArray(new String[imports.size()]);
+  }
+
+  @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+  static class PostProcessorConfig {
+
+    @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    static class PostProcessorConfig {
-
-        @Bean
-        @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-        public static BeanDefinitionRegistryPostProcessor externalTaskBeanDefinitionRegistryPostProcessor() {
-            return new ExternalTaskBeanDefinitionRegistryPostProcessor();
-        }
-
+    public static BeanDefinitionRegistryPostProcessor externalTaskBeanDefinitionRegistryPostProcessor() {
+      return new ExternalTaskBeanDefinitionRegistryPostProcessor();
     }
+
+  }
 
 }

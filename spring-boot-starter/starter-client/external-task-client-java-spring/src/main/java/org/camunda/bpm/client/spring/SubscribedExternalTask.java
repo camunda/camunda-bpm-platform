@@ -1,35 +1,35 @@
 package org.camunda.bpm.client.spring;
 
+import java.util.Collection;
+
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.spring.SubscribedExternalTaskBean.Subscription;
 import org.camunda.bpm.client.topic.TopicSubscription;
 
-import java.util.Collection;
-
 public interface SubscribedExternalTask extends TopicSubscription {
 
-    SubscribedExternalTask subscribe(ExternalTaskClient externalTaskClient);
+  SubscribedExternalTask subscribe(ExternalTaskClient externalTaskClient);
 
-    boolean isSubscribed(ExternalTaskClient externalTaskClient);
+  boolean isSubscribed(ExternalTaskClient externalTaskClient);
 
-    SubscribedExternalTask open(ExternalTaskClient externalTaskClient);
+  SubscribedExternalTask open(ExternalTaskClient externalTaskClient);
 
-    boolean isAutoSubscribe();
+  boolean isAutoSubscribe();
 
-    boolean isAutoOpen();
+  boolean isAutoOpen();
 
-    boolean isOpen(ExternalTaskClient externalTaskClient);
+  boolean isOpen(ExternalTaskClient externalTaskClient);
 
-    void start();
+  void start();
 
-    void start(ExternalTaskClient externalTaskClients);
+  void start(ExternalTaskClient externalTaskClients);
 
-    void register(ExternalTaskClient externalTaskClient);
+  void register(ExternalTaskClient externalTaskClient);
 
-    boolean isRegistered(ExternalTaskClient externalTaskClient);
+  boolean isRegistered(ExternalTaskClient externalTaskClient);
 
-    Collection<Subscription> getSubscriptions();
+  Collection<Subscription> getSubscriptions();
 
-    SubscriptionInformation getSubscriptionInformation();
+  SubscriptionInformation getSubscriptionInformation();
 
 }

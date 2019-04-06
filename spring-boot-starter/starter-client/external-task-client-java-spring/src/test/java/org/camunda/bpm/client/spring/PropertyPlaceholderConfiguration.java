@@ -10,25 +10,25 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 @Configuration
-@ComponentScan(basePackageClasses = {TestClassSubscription.class})
+@ComponentScan(basePackageClasses = { TestClassSubscription.class })
 @EnableTaskSubscription(baseUrl = "${client.baseUrl}")
 public class PropertyPlaceholderConfiguration {
 
-    @Bean
-    static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
-        Resource location = new ClassPathResource("client.properties");
-        configurer.setLocation(location);
-        return configurer;
-    }
+  @Bean
+  static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+    PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+    Resource location = new ClassPathResource("client.properties");
+    configurer.setLocation(location);
+    return configurer;
+  }
 
-    @TaskSubscription(topicName = "methodSubscription")
-    @Bean
-    public ExternalTaskHandler methodSubscription() {
-        return (externalTask, externalTaskService) -> {
+  @TaskSubscription(topicName = "methodSubscription")
+  @Bean
+  public ExternalTaskHandler methodSubscription() {
+    return (externalTask, externalTaskService) -> {
 
-            // interact with the external task
+      // interact with the external task
 
-        };
-    }
+    };
+  }
 }

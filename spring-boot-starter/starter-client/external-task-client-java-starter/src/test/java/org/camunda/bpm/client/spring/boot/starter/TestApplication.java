@@ -8,14 +8,14 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class TestApplication {
 
-    @TaskSubscription(topicName = "methodSubscription", autoOpen = false)
-    @Bean
-    public ExternalTaskHandler methodSubscription() {
-        return (externalTask, externalTaskService) -> {
+  @TaskSubscription(topicName = "methodSubscription", autoOpen = false)
+  @Bean
+  public ExternalTaskHandler methodSubscription() {
+    return (externalTask, externalTaskService) -> {
 
-            // interact with the external task
+      // interact with the external task
 
-        };
-    }
+    };
+  }
 
 }

@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExtendedTestClassSubscription implements ExternalTaskHandler {
 
-    @Override
-    public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
-        // TODO Auto-generated method stub
+  @Override
+  public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    // TODO Auto-generated method stub
 
-    }
+  }
 
 }
