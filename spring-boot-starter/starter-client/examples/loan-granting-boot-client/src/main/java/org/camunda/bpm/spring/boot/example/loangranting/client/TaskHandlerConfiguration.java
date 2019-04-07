@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.client.spring.TaskSubscription;
+import org.camunda.bpm.client.spring.boot.starter.CamundaBpmClientProperties;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
@@ -16,6 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @Slf4j
 public class TaskHandlerConfiguration {
+
+  private final String workerId;
+
+  public TaskHandlerConfiguration(CamundaBpmClientProperties properties) {
+    workerId = properties.getWorkerId();
+  }
 
   @TaskSubscription(topicName = "creditScoreChecker")
   @Bean
@@ -33,7 +40,7 @@ public class TaskHandlerConfiguration {
       // complete the external task
       externalTaskService.complete(externalTask, Variables.putValueTyped("creditScores", creditScoresObject));
 
-      log.info("The External Task {} has been checked!", externalTask.getId());
+      log.info("{}: The External Task {} has been checked!", workerId, externalTask.getId());
     };
   }
 
@@ -44,7 +51,7 @@ public class TaskHandlerConfiguration {
       int score = externalTask.getVariable("score");
       externalTaskService.complete(externalTask);
 
-      log.info("The External Task {} has been granted with score {}!", externalTask.getId(), score);
+      log.info("{}: The External Task {} has been granted with score {}!", workerId, externalTask.getId(), score);
     };
   }
 
@@ -55,7 +62,7 @@ public class TaskHandlerConfiguration {
       int score = externalTask.getVariable("score");
       externalTaskService.complete(externalTask);
 
-      log.info("The External Task {} has been rejected with score {}!", externalTask.getId(), score);
+      log.info("{}: The External Task {} has been rejected with score {}!", workerId, externalTask.getId(), score);
     };
   }
 }

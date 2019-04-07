@@ -2,8 +2,8 @@ camunda:
   bpm:
     client:
       base-url: http://localhost:8080/rest
+      worker-id: spring-boot-client
 
 logging:
   level:
     org.camunda.bpm.client: info
-      
