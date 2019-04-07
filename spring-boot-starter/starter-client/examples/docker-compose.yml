@@ -1,0 +1,12 @@
+version: '3'
+services:
+  webapp:
+    image: camunda/loan-granting-webapp
+    ports:
+      - "8080:8080"
+  client:
+    image: camunda/loan-granting-boot-client
+    depends_on:
+      - webapp
+    environment:
+      camunda.bpm.client.base-url: http://webapp:8080/rest
