@@ -46,6 +46,10 @@ public class EverLivingJobEntity extends JobEntity {
 
   @Override
   public void init(CommandContext commandContext) {
+    init(commandContext, false);
+  }
+
+  public void init(CommandContext commandContext, boolean shouldResetLock) {
     // clean additional data related to this job
     JobHandler jobHandler = getJobHandler();
     if (jobHandler != null) {
@@ -62,9 +66,12 @@ public class EverLivingJobEntity extends JobEntity {
       this.exceptionByteArrayId = null;
       this.exceptionMessage = null;
     }
+
     //clean the lock information
-    setLockOwner(null);
-    setLockExpirationTime(null);
+    if (shouldResetLock) {
+      setLockOwner(null);
+      setLockExpirationTime(null);
+    }
 
     if (exceptionByteArrayIdToDelete != null) {
       ByteArrayEntity byteArray = commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, exceptionByteArrayIdToDelete);
