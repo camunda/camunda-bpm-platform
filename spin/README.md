@@ -73,6 +73,6 @@ Element e = XML( xmlSource ).childElement("customer").unwrap();
 
 Check [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines about how to contribute.
 
-## What license is used by Spin?
+# License:
 
-camunda Spin is licensed under the Apache 2.0 License.
+The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).

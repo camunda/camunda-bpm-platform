@@ -3,6 +3,12 @@
 We would love you to contribute to this project. You can do so in various ways. The following 
 documentation should help you to get started and explain the main concepts of the project architecture.
 
+## License headers
+
+Every source file needs to contain a license header, please follow the instructions [here](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md#license-headers).
+
+It should be noted that Java source files from a contribution, that do not contain a valid license header, will not be merged with the codebase.
+
 ## Writing Docs
 
 All docs are written in Markdown and are located in the [docs.camunda.org](https://github.com/camunda/docs.camunda.org)
