@@ -187,6 +187,7 @@ import org.camunda.bpm.engine.impl.history.producer.DefaultDmnHistoryEventProduc
 import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListener;
+import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
@@ -306,7 +307,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
-import org.camunda.bpm.engine.impl.pwpolicy.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.runtime.ConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultConditionHandler;
@@ -342,7 +342,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
@@ -605,9 +604,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected PasswordManager passwordManager;
 
   protected SaltGenerator saltGenerator;
-
-  protected boolean disablePasswordPolicy;
-  protected PasswordPolicy passwordPolicy;
 
   protected Set<String> registeredDeployments;
 
@@ -3404,22 +3400,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setPasswordManager(PasswordManager passwordManager) {
     this.passwordManager = passwordManager;
-  }
-
-  public PasswordPolicy getPasswordPolicy() {
-    return passwordPolicy;
-  }
-
-  public void setPasswordPolicy(PasswordPolicy passwordPolicy) {
-    this.passwordPolicy = passwordPolicy;
-  }
-
-  public boolean isDisablePasswordPolicy() {
-    return disablePasswordPolicy;
-  }
-
-  public void setDisablePasswordPolicy(boolean disablePasswordPolicy) {
-    this.disablePasswordPolicy = disablePasswordPolicy;
   }
 
   public Set<String> getRegisteredDeployments() {

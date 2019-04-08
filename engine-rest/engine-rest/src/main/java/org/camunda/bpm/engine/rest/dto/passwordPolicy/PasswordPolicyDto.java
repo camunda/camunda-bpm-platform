@@ -18,13 +18,13 @@ package org.camunda.bpm.engine.rest.dto.passwordPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
  */
 public class PasswordPolicyDto {
-  private List<PasswordPolicyRuleDto> rules = new ArrayList<PasswordPolicyRuleDto>();
+  protected List<PasswordPolicyRuleDto> rules = new ArrayList<PasswordPolicyRuleDto>();
 
   // transformers
 

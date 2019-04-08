@@ -1,5 +1,5 @@
 /*
- * Copyright © 2013-2018 camunda services GmbH and various authors (info@camunda.com)
+ * Copyright © 2013-2019 camunda services GmbH and various authors (info@camunda.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -30,6 +32,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 
 
 /**
@@ -301,6 +304,21 @@ public interface IdentityService {
    * and password are nullsafe.
    */
   boolean checkPassword(String userId, String password);
+
+  /**
+   * Check a given password against a given {@link PasswordPolicy}. If the
+   * password does not match a policy {@link PasswordPolicyRule rules} a
+   * {@link PasswordPolicyException} is thrown. If the password passes all
+   * {@link PasswordPolicyRule rules} the method returns <code>true</code>.
+   * 
+   * @param policy
+   *          the {@link PasswordPolicy} against which the password is tested
+   * @param password
+   *          the password that should be tested
+   * @return <code>true</code> if the password is policy-compliant (if not an
+   *         exception is thrown)
+   */
+  boolean checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
 
   /**
    * Passes the authenticated user id for this thread.

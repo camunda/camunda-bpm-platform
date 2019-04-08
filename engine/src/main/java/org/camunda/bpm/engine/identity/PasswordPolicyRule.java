@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.pwpolicy;
+package org.camunda.bpm.engine.identity;
 
 import java.util.Map;
 
@@ -27,20 +27,19 @@ import java.util.Map;
 public interface PasswordPolicyRule {
 
   /**
-   * String that can be used by a front end to display a description of this
-   * rule. The actual description text must be managed by the front end.
+   * Placeholder string that can be used to display a description of this rule.
+   * The actual description text must be managed on the calling side.
    * 
    * @return the placeholder for the description text.
    */
-  public String getPlaceholder();
+  String getPlaceholder();
 
   /**
-   * Additional parameter that can be used by the front end to display a
-   * meaningful description.
+   * Additional parameter that can be used to display a meaningful description.
    * 
    * @return a map of parameter
    */
-  public Map<String, String> getParameter();
+  Map<String, String> getParameters();
 
   /**
    * Checks the given password against this rule.
@@ -51,5 +50,5 @@ public interface PasswordPolicyRule {
    *         <code>false</code> if the given password is not compliant with this
    *         rule.
    */
-  public boolean execute(String password);
+  boolean execute(String password);
 }

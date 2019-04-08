@@ -20,11 +20,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.pwpolicy.PasswordPolicyChecker;
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
 import static org.camunda.bpm.engine.impl.util.EncryptionUtil.saltPassword;
@@ -163,7 +162,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   
 
   public void checkPasswordAgainstPolicy(PasswordPolicy policy) {
-    PasswordPolicyChecker.checkPassword(policy, newPassword);
+    Context.getProcessEngineConfiguration().getIdentityService().checkPasswordAgainstPolicy(policy, newPassword);
   }
 
   public String toString() {

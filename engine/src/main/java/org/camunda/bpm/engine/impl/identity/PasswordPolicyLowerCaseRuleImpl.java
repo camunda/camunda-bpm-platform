@@ -13,40 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.pwpolicy;
+package org.camunda.bpm.engine.impl.identity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
  */
-public class PasswordPolicyLengthRuleImpl implements PasswordPolicyRule {
+public class PasswordPolicyLowerCaseRuleImpl implements PasswordPolicyRule {
 
-  public static final String placeholder = "LENGTH";
+  public static final String PLACEHOLDER = "LOWERCASE";
   
-  private int minLength;
-
-  public PasswordPolicyLengthRuleImpl(int minLength) {
-    this.minLength = minLength;
+  protected int minLowerCase;
+  
+  public PasswordPolicyLowerCaseRuleImpl(int minLowerCase) {
+    this.minLowerCase = minLowerCase;
   }
-
+  
   @Override
   public String getPlaceholder() {
-    return PasswordPolicyLengthRuleImpl.placeholder;
+    return PasswordPolicyLowerCaseRuleImpl.PLACEHOLDER;
   }
 
   @Override
-  public Map<String, String> getParameter() {
+  public Map<String, String> getParameters() {
     Map<String, String> parameter = new HashMap<String, String>();
-    parameter.put("minLength", "" + this.minLength);
+    parameter.put("minLowerCase", "" + this.minLowerCase);
     return parameter;
   }
 
   @Override
   public boolean execute(String password) {
-    return password.length() >= this.minLength;
+    int lowerCaseCount = 0;
+    for (Character c : password.toCharArray()) {
+      if(Character.isLowerCase(c)) {
+        lowerCaseCount++;
+      }
+      if(lowerCaseCount >= this.minLowerCase) {
+        return true;
+      }
+    }
+    return false;
   }
 }

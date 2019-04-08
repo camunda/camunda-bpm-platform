@@ -18,10 +18,9 @@ package org.camunda.bpm.engine.rest.impl;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.pwpolicy.PasswordPolicyChecker;
-import org.camunda.bpm.engine.impl.pwpolicy.PasswordPolicyException;
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.rest.PasswordPolicyRestService;
 import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
 import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordPolicyDto;
@@ -45,9 +44,9 @@ public class PasswordPolicyRestServiceImpl extends AbstractRestProcessEngineAwar
 
   @Override
   public Response checkPassword(PasswordDto password) {
-    PasswordPolicy policy = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getPasswordPolicy();
+    PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
     try {
-      PasswordPolicyChecker.checkPassword(policy, password.getPassword());
+      processEngine.getIdentityService().checkPasswordAgainstPolicy(policy, password.getPassword());
       return Response.status(Status.NO_CONTENT).build();
     } catch (PasswordPolicyException e) {
       return Response.status(Status.BAD_REQUEST.getStatusCode()).entity(PasswordPolicyDto.fromPasswordPolicyRules(e.getPolicyRules())).build();

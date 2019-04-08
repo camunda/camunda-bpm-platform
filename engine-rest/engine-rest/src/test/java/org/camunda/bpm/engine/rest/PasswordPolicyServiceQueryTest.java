@@ -19,15 +19,16 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.pwpolicy.DefaultPasswordPolicyImpl;
+import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -38,17 +39,20 @@ import org.junit.Test;
  */
 public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
-  private static final String QUERY_URL = TEST_RESOURCE_ROOT_PATH + PasswordPolicyRestService.PATH;
+  protected static final String QUERY_URL = TEST_RESOURCE_ROOT_PATH + PasswordPolicyRestService.PATH;
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
+  private PasswordPolicy passwordPolicy;
+  
   @Before
   public void setUpRuntimeData() {
-    ProcessEngineConfigurationImpl mockedConfig = mock(ProcessEngineConfigurationImpl.class);
+    passwordPolicy = new DefaultPasswordPolicyImpl();
 
+    ProcessEngineConfigurationImpl mockedConfig = mock(ProcessEngineConfigurationImpl.class);
     when(processEngine.getProcessEngineConfiguration()).thenReturn(mockedConfig);
-    when(mockedConfig.getPasswordPolicy()).thenReturn(new DefaultPasswordPolicyImpl());
+    when(mockedConfig.getPasswordPolicy()).thenReturn(passwordPolicy);
   }
 
   @Test
@@ -74,9 +78,11 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
     .when()
       .get(QUERY_URL);
   }
-  
+
   @Test
   public void testCheckBadPasswordAgainstDefaultPolicy() {
+    when(processEngine.getIdentityService()).thenReturn(new IdentityServiceImpl());
+
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("password", "password");
     

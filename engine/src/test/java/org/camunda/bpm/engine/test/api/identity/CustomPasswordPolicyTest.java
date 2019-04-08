@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.passwordpolicy;
+package org.camunda.bpm.engine.test.api.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.pwpolicy.DefaultPasswordPolicyImpl;
-import org.camunda.bpm.engine.impl.pwpolicy.PasswordPolicyException;
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
+import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Miklas Boskamp
@@ -39,6 +39,8 @@ public class CustomPasswordPolicyTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   private ProcessEngineConfigurationImpl processEngineConfiguration;
   private IdentityService identityService;
@@ -47,7 +49,7 @@ public class CustomPasswordPolicyTest {
   public void init() {
     identityService = engineRule.getIdentityService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-    processEngineConfiguration.setPasswordPolicy(new CustomPasswordPolicyImpl());
+    processEngineConfiguration.setPasswordPolicy(new DefaultPasswordPolicyImpl());
     processEngineConfiguration.setDisablePasswordPolicy(false);
   }
 
@@ -61,35 +63,33 @@ public class CustomPasswordPolicyTest {
   }
 
   @Test
-  public void testCustomPasswordPolicy() {
+  public void testPasswordPolicyConfiguration() {
     PasswordPolicy policy = processEngineConfiguration.getPasswordPolicy();
-    assertTrue(policy.getClass().isAssignableFrom(CustomPasswordPolicyImpl.class));
-    assertEquals(2, policy.getRules().size());
+    assertThat(policy.getClass().isAssignableFrom(DefaultPasswordPolicyImpl.class), is(true));
+    assertThat(policy.getRules().size(), is(5));
+  }
 
+  @Test
+  public void testCustomPasswordPolicyWithNoPassword() {
+    thrown.expect(PasswordPolicyException.class);
     User user = identityService.newUser("user");
-
-    // check password blacklist rule is invoked
-    for (String password : CustomPasswordPolicyImpl.passwordBlacklist) {
-      try {
-        user.setPassword(password);
-        identityService.saveUser(user);
-        fail();
-      } catch (PasswordPolicyException e) {
-        assertEquals(policy.getRules(), e.getPolicyRules());
-      }
-    }
-
-    // check consecutive digit rule is invoked
-    try {
-      user.setPassword("password42");
-      identityService.saveUser(user);
-      fail();
-    } catch (PasswordPolicyException e) {
-      assertEquals(policy.getRules(), e.getPolicyRules());
-    }
-
-    // check user is saved when password is policy compliant
-    user.setPassword("this should work");
     identityService.saveUser(user);
+    thrown.expectMessage("Password does not match policy");
+  }
+  
+  @Test
+  public void testCustomPasswordPolicyWithCompliantPassword() {
+    User user = identityService.newUser("user");
+    user.setPassword("this-is-1-STRONG-password");
+    identityService.saveUser(user);
+  }
+
+  @Test
+  public void testCustomPasswordPolicyWithNonCompliantPassword() {
+    thrown.expect(PasswordPolicyException.class);
+    User user = identityService.newUser("user");
+    user.setPassword("weakpassword");
+    identityService.saveUser(user);
+    thrown.expectMessage("Password does not match policy");
   }
 }
