@@ -572,9 +572,9 @@
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes combine.children="append">
+              <!--<excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
-              </excludes>
+              </excludes>-->
             </configuration>
           </plugin>
         </plugins>
