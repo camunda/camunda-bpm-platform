@@ -50,7 +50,7 @@ public class PasswordPolicySpecialCharacterRuleImpl implements PasswordPolicyRul
   public boolean execute(String password) {
     int specialCount = 0;
     for (Character c : password.toCharArray()) {
-      if (specialCharacters.indexOf(c) != -1) {
+      if (SPECIALCHARACTERS.indexOf(c) != -1) {
         specialCount++;
       }
       if (specialCount >= this.minSpecial) {
