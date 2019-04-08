@@ -13,49 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.pwpolicy;
+package org.camunda.bpm.engine.impl.identity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
  */
-public class PasswordPolicyUpperCaseRuleImpl implements PasswordPolicyRule {
+public class PasswordPolicyLengthRuleImpl implements PasswordPolicyRule {
 
-  public static final String placeholder = "UPPERCASE";
+  public static final String PLACEHOLDER = "LENGTH";
   
-  private int minUpperCase;
+  protected int minLength;
 
-  public PasswordPolicyUpperCaseRuleImpl(int minUpperCase) {
-    this.minUpperCase = minUpperCase;
+  public PasswordPolicyLengthRuleImpl(int minLength) {
+    this.minLength = minLength;
   }
 
   @Override
   public String getPlaceholder() {
-    return PasswordPolicyUpperCaseRuleImpl.placeholder;
+    return PasswordPolicyLengthRuleImpl.PLACEHOLDER;
   }
 
   @Override
-  public Map<String, String> getParameter() {
+  public Map<String, String> getParameters() {
     Map<String, String> parameter = new HashMap<String, String>();
-    parameter.put("minUpperCase", "" + this.minUpperCase);
+    parameter.put("minLength", "" + this.minLength);
     return parameter;
   }
 
   @Override
   public boolean execute(String password) {
-    int lowerCaseCount = 0;
-    for (Character c : password.toCharArray()) {
-      if (Character.isUpperCase(c)) {
-        lowerCaseCount++;
-      }
-      if (lowerCaseCount >= this.minUpperCase) {
-        return true;
-      }
-    }
-    return false;
+    return password.length() >= this.minLength;
   }
 }

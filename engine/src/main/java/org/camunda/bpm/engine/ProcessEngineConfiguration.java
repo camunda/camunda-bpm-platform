@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
@@ -258,6 +259,12 @@ public abstract class ProcessEngineConfiguration {
   protected ClassLoader classLoader;
 
   protected boolean createIncidentOnFailedJobEnabled = true;
+
+  /**
+   * configuration of password policy
+   */
+  protected boolean disablePasswordPolicy;
+  protected PasswordPolicy passwordPolicy;
 
   /**
    * switch for controlling whether the process engine performs authorization checks.
@@ -945,4 +952,21 @@ public abstract class ProcessEngineConfiguration {
     this.disabledPermissions = disabledPermissions;
   }
 
+  public boolean isDisablePasswordPolicy() {
+    return disablePasswordPolicy;
+  }
+
+  public ProcessEngineConfiguration setDisablePasswordPolicy(boolean disablePasswordPolicy) {
+    this.disablePasswordPolicy = disablePasswordPolicy;
+    return this;
+  }
+
+  public PasswordPolicy getPasswordPolicy() {
+    return passwordPolicy;
+  }
+
+  public ProcessEngineConfiguration setPasswordPolicy(PasswordPolicy passwordPolicy) {
+    this.passwordPolicy = passwordPolicy;
+    return this;
+  }
 }

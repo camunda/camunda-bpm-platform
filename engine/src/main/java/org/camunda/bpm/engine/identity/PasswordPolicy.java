@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.pwpolicy;
+package org.camunda.bpm.engine.identity;
 
 import java.util.List;
 
@@ -25,5 +25,9 @@ import java.util.List;
  */
 public interface PasswordPolicy {
 
-  public List<PasswordPolicyRule> getRules();
+  /**
+   * A list of rules that must be matched by user passwords.
+   * @return the list
+   */
+  List<PasswordPolicyRule> getRules();
 }

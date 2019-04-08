@@ -13,46 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.pwpolicy;
+package org.camunda.bpm.engine.impl.identity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
  */
-public class PasswordPolicyDigitRuleImpl implements PasswordPolicyRule {
+public class PasswordPolicyUpperCaseRuleImpl implements PasswordPolicyRule {
 
-  public static final String placeholder = "DIGIT";
+  public static final String PLACEHOLDER = "UPPERCASE";
   
-  private int minDigit;
+  protected int minUpperCase;
 
-  public PasswordPolicyDigitRuleImpl(int minDigit) {
-    this.minDigit = minDigit;
+  public PasswordPolicyUpperCaseRuleImpl(int minUpperCase) {
+    this.minUpperCase = minUpperCase;
   }
 
   @Override
   public String getPlaceholder() {
-    return PasswordPolicyDigitRuleImpl.placeholder;
+    return PasswordPolicyUpperCaseRuleImpl.PLACEHOLDER;
   }
 
   @Override
-  public Map<String, String> getParameter() {
+  public Map<String, String> getParameters() {
     Map<String, String> parameter = new HashMap<String, String>();
-    parameter.put("minDigit", "" + this.minDigit);
+    parameter.put("minUpperCase", "" + this.minUpperCase);
     return parameter;
   }
 
   @Override
   public boolean execute(String password) {
-    int digitCount = 0;
+    int upperCaseCount = 0;
     for (Character c : password.toCharArray()) {
-      if (Character.isDigit(c)) {
-        digitCount++;
+      if (Character.isUpperCase(c)) {
+        upperCaseCount++;
       }
-      if (digitCount >= this.minDigit) {
+      if (upperCaseCount >= this.minUpperCase) {
         return true;
       }
     }

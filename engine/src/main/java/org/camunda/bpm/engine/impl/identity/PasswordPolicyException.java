@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.pwpolicy;
+package org.camunda.bpm.engine.impl.identity;
 
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 /**
  * @author Miklas Boskamp
  */
 public class PasswordPolicyException extends ProcessEngineException {
-  private static final long serialVersionUID = 1L;
+  protected static final long serialVersionUID = 1L;
 
-  private List<PasswordPolicyRule> policyRules;
+  protected List<PasswordPolicyRule> policyRules;
 
   public PasswordPolicyException(List<PasswordPolicyRule> policyrules) {
     super("Password does not match policy");

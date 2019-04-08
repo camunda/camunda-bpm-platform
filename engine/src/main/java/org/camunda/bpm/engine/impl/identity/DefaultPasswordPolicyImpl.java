@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.pwpolicy;
+package org.camunda.bpm.engine.impl.identity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicy;
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
@@ -34,7 +34,7 @@ public class DefaultPasswordPolicyImpl implements PasswordPolicy {
   public static final int MIN_DIGIT = 1;
   public static final int MIN_SPECIAL = 1;
 
-  private final List<PasswordPolicyRule> rules = new ArrayList<PasswordPolicyRule>();
+  protected final List<PasswordPolicyRule> rules = new ArrayList<PasswordPolicyRule>();
 
   public DefaultPasswordPolicyImpl() {
     rules.add(new PasswordPolicyLengthRuleImpl(MIN_LENGTH));

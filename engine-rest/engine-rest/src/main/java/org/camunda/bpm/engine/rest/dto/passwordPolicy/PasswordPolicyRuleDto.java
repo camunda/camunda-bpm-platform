@@ -17,21 +17,21 @@ package org.camunda.bpm.engine.rest.dto.passwordPolicy;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.pwpolicy.PasswordPolicyRule;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
  */
 public class PasswordPolicyRuleDto {
-  private String placeholder;
-  private Map<String, String> parameter;
+  protected String placeholder;
+  protected Map<String, String> parameter;
 
   // transformers
 
   public static PasswordPolicyRuleDto fromRule(PasswordPolicyRule rule) {
     PasswordPolicyRuleDto dto = new PasswordPolicyRuleDto();
     dto.setPlaceholder(rule.getPlaceholder());
-    dto.setParameter(rule.getParameter());
+    dto.setParameter(rule.getParameters());
     return dto;
   }
 

@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -61,6 +63,7 @@ import org.camunda.bpm.engine.impl.cmd.SetUserPictureCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockUserCmd;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -161,6 +164,20 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
   public boolean checkPassword(String userId, String password) {
     return commandExecutor.execute(new CheckPassword(userId, password));
+  }
+  
+  public boolean checkPasswordAgainstPolicy(PasswordPolicy policy, String password) {
+    if (policy != null) {
+      if (password == null) {
+        throw new PasswordPolicyException(policy.getRules());
+      }
+      for (PasswordPolicyRule rule : policy.getRules()) {
+        if (!rule.execute(password)) {
+          throw new PasswordPolicyException(policy.getRules());
+        }
+      }
+    }
+    return true;
   }
 
   public void unlockUser(String userId) {
