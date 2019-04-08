@@ -27,6 +27,10 @@ process engine and standalone usage via API. Please see the [official documentat
 camunda Connect is licensed under the Apache 2.0 License. Check [CONTRIBUTING.md][]
 for guidelines about how to contribute.
 
+# License:
+
+The source files in this repository are made available under the <a href="LICENSE">Apache License, Version 2.0</a>.
+
 
 
 [CONTRIBUTING.md]: https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md
