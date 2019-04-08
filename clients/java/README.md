@@ -46,4 +46,4 @@ If you want to use a JDK higher than 1.8, please add the following dependency to
 ```
 
 ## License
-Unless otherwise specified this project is licensed under [Apache License Version 2.0](./LICENSE).
+The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
