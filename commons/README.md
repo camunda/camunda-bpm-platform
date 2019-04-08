@@ -46,9 +46,9 @@ Now you can reference individual commons projects:
 
 Java JRE 1.6+ is required.
 
-### Under which License is this project distributed?
+## License:
 
-Apache License 2.0.
+The source files in this repository are made available under the <a href="LICENSE">Apache License, Version 2.0</a>.
 
 [logging]: logging/
 [utils]: utils/
