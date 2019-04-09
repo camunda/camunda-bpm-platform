@@ -15,6 +15,9 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -24,7 +27,6 @@ import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.rest.PasswordPolicyRestService;
 import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
 import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordPolicyDto;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -45,11 +47,16 @@ public class PasswordPolicyRestServiceImpl extends AbstractRestProcessEngineAwar
   @Override
   public Response checkPassword(PasswordDto password) {
     PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
+    Map<String, Object> parameters = new HashMap<String, Object>();
     try {
       processEngine.getIdentityService().checkPasswordAgainstPolicy(policy, password.getPassword());
-      return Response.status(Status.NO_CONTENT).build();
+      parameters.put("valid", true);
+      return Response.status(Status.OK).entity(parameters).build();
     } catch (PasswordPolicyException e) {
-      return Response.status(Status.BAD_REQUEST.getStatusCode()).entity(PasswordPolicyDto.fromPasswordPolicyRules(e.getPolicyRules())).build();
+      PasswordPolicyDto policyDto = PasswordPolicyDto.fromPasswordPolicyRules(e.getPolicyRules());
+      parameters.put("policy", policyDto);
+      parameters.put("valid", false);
+      return Response.status(Status.OK.getStatusCode()).entity(parameters).build();
     }
   }
 }

@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 public class PasswordPolicySpecialCharacterRuleImpl implements PasswordPolicyRule {
 
   public static final String SPECIALCHARACTERS = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-  public static final String PLACEHOLDER = "SPECIAL";
+  public static final String PLACEHOLDER = DefaultPasswordPolicyImpl.PLACEHOLDER_PREFIX + "SPECIAL";
 
   protected int minSpecial;
 

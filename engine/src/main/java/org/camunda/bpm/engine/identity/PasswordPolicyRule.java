@@ -37,7 +37,7 @@ public interface PasswordPolicyRule {
   /**
    * Additional parameter that can be used to display a meaningful description.
    * 
-   * @return a map of parameter
+   * @return a map of parameters
    */
   Map<String, String> getParameters();
 
