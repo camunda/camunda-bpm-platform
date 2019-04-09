@@ -30,6 +30,11 @@ function CamPaginationSearchIntegrationController($scope, $rootScope, searchWidg
   this.lastSearchQueryString = null;
   this.locationChange = true;
 
+  // reset Page when changing Tabs
+  $scope.$on('$destroy', function() {
+    search('page', null);
+  });
+
   exposeScopeProperties($scope, this, [
     'config',
     'arrayTypes',
@@ -95,12 +100,9 @@ CamPaginationSearchIntegrationController.prototype.hasSearchQueryStringChanged =
 
 CamPaginationSearchIntegrationController.prototype.onPageChange = function(newValue, oldValue) {
   // Used for checking if current page change is due to $locationChangeSuccess event
-  // If so this change was already passed to updateCallback, so it can be ignored  
+  // If so this change was already passed to updateCallback, so it can be ignored
 
   var searchCurrentPage = this.getCurrentPageFromSearch();
-
-  //Reset current page and hope that everything works out in the end
-  this.search('page', null);
 
   if (newValue == oldValue || newValue === searchCurrentPage) {
     return;
