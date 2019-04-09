@@ -7,12 +7,11 @@ The camunda BPMN model API is a simple, lightweight Java library for parsing, cr
 camunda BPMN model can be used standalone, independenly of camunda BPM platform / process engine.
 ====
 
-* Web Site: http://www.camunda.org/
+* Web Site: https://camunda.com/
 * User Guide: link:http://docs.camunda.org/latest/guides/user-guide/#bpmn-model-api[http://docs.camunda.org]
 * Examples: link:https://github.com/camunda/camunda-bpm-examples/tree/master/bpmn-model-api[https://github.com/camunda/camunda-bpm-examples]
 * Issue Tracker: https://app.camunda.com/jira/
-* Contribution Guidelines: http://www.camunda.org/community/contribute.html
-* License: Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
+* Contribution Guidelines: https://camunda.com/learn/community/#contribute
 
 == Features
 
@@ -31,7 +30,7 @@ BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("processId")
   .done();
 ----
 
-For more complex examples see the link:http://docs.camunda.org/latest/guides/user-guide/#bpmn-model-api-fluent-builder-api[docs],
+For more complex examples see the link:https://docs.camunda.org/manual/latest/user-guide/model-api/bpmn-model-api/fluent-builder-api/[docs],
 the tests in link:src/test/java/org/camunda/bpm/model/bpmn/builder/ProcessBuilderTest.java[ProcessBuilderTest.java] or this
 link:https://github.com/camunda/camunda-bpm-examples/tree/master/bpmn-model-api/generate-process-fluent-api[example].
 
@@ -109,18 +108,17 @@ Bpmn.writeModelToFile(file, modelInstance);
 
 === What is BPMN 2.0?
 
-Read the http://camunda.org/bpmn/tutorial.html[BPMN 2.0 Tutorial on camunda.org].
+Read the https://camunda.com/bpmn/[BPMN 2.0 Tutorial on camunda.com].
 
 === Which Java (JRE) Version is required?
 
 Java JRE 1.6+ is required. We test camunda BPMN model API on Oracle and IBM JVMs.
-
-=== Under which License is camunda BPMN model API distributed?
-
-Apache License 2.0.
 
 === Does this API support all BPMN 2.0 Elements?
 
 No, but support is already quite extensive. See
 link:src/main/java/org/camunda/bpm/model/bpmn/instance[org.camunda.bpm.model.bpmn.instance]
 for a list of currently supported elements.
+
+== License:
+The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
