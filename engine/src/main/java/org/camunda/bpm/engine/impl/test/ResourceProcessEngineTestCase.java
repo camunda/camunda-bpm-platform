@@ -43,7 +43,6 @@ public abstract class ResourceProcessEngineTestCase extends AbstractProcessEngin
   protected void initializeProcessEngine() {
     ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
         .createProcessEngineConfigurationFromResource(engineConfigurationResource);
-    processEngineConfig.setDisablePasswordPolicy(true);
     processEngine = processEngineConfig.buildProcessEngine();
   }
 
