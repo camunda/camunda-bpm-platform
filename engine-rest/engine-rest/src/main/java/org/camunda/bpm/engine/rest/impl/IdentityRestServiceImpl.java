@@ -16,25 +16,33 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
+import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordPolicyDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware implements IdentityRestService {
 
@@ -83,4 +91,33 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     }
   }
 
+  @Override
+  public Response getPasswordPolicy() {
+    PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
+    if(policy != null) {
+      return Response.status(Status.OK.getStatusCode()).entity(PasswordPolicyDto.fromPasswordPolicyRules(policy.getRules())).build();
+    } else {
+      return Response.status(Status.NOT_FOUND.getStatusCode()).build();
+    }
+  }
+
+  @Override
+  public Response checkPassword(PasswordDto password) {
+    PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    if (policy != null) {
+      try {
+        processEngine.getIdentityService().checkPasswordAgainstPolicy(policy, password.getPassword());
+        parameters.put("valid", true);
+        return Response.status(Status.OK).entity(parameters).build();
+      } catch (PasswordPolicyException e) {
+        PasswordPolicyDto policyDto = PasswordPolicyDto.fromPasswordPolicyRules(e.getPolicyRules());
+        parameters.put("policy", policyDto);
+        parameters.put("valid", false);
+      }
+    }else {
+      parameters.put("policy", "No password policy is configured.");
+    }
+    return Response.status(Status.OK.getStatusCode()).entity(parameters).build();
+  }
 }
