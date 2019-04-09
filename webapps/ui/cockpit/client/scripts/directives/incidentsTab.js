@@ -44,7 +44,6 @@ var Directive = [
       ];
 
       scope.onSortChange = updateView;
-      scope.historicJobMap = [];
 
       // filter table column based on the view level (definition | instance | history | runtime)
       var classesToInclude = ['activity', 'cause instance-id uuid', 'cause-root instance-id uuid', 'type', 'action'];
@@ -169,14 +168,6 @@ var Directive = [
               var bpmnElement = bpmnElements[activityId];
               incident.activityName = (bpmnElement && (bpmnElement.name || bpmnElement.id)) || activityId;
               incident.linkable = bpmnElements[activityId] && activityIdToInstancesMap[activityId] && activityIdToInstancesMap[activityId].length > 0;
-
-              // Fetch Historic Job Logs related to this one
-              if(scope.incidentsContext === 'history') {
-                $http.post(Uri.appUri('engine://engine/:engine/history/job-log'), {jobId: incident.rootCauseIncidentConfiguration, failureLog: true})
-                  .then(function(res) {
-                    scope.historicJobMap[incident.rootCauseIncidentConfiguration] = res.data;
-                  });
-              }
             });
 
             scope.incidents = data;
@@ -193,15 +184,7 @@ var Directive = [
       };
 
       scope.getJobStacktraceUrl = function(incident) {
-        if(scope.incidentsContext === 'history') {
-          if(scope.historicJobMap && scope.historicJobMap[incident.rootCauseIncidentConfiguration])
-            return Uri.appUri('engine://engine/:engine/history/job-log/' + scope.historicJobMap[incident.rootCauseIncidentConfiguration][0].id + '/stacktrace');
-          else
-            return '#';
-        }
-        else {
-          return Uri.appUri('engine://engine/:engine/job/' + incident.rootCauseIncidentConfiguration + '/stacktrace');
-        }
+        return Uri.appUri('engine://engine/:engine/job/' + incident.rootCauseIncidentConfiguration + '/stacktrace');
       };
 
       scope.incidentHasActions = function(incident) {
