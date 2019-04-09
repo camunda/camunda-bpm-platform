@@ -30,7 +30,7 @@
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm.extension.spring.boot</groupId>
-      <artifactId>camunda-external-task-client-springboot-starter</artifactId>
+      <artifactId>camunda-external-task-client-spring-boot-starter</artifactId>
       <version>${project.version}</version>
     </dependency>
 
