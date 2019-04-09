@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
  */
 public class PasswordPolicyLowerCaseRuleImpl implements PasswordPolicyRule {
 
-  public static final String PLACEHOLDER = "LOWERCASE";
+  public static final String PLACEHOLDER = DefaultPasswordPolicyImpl.PLACEHOLDER_PREFIX + "LOWERCASE";
   
   protected int minLowerCase;
   

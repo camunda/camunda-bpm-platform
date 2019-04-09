@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
  */
 public class PasswordPolicyDigitRuleImpl implements PasswordPolicyRule {
 
-  public static final String PLACEHOLDER = "DIGIT";
+  public static final String PLACEHOLDER = DefaultPasswordPolicyImpl.PLACEHOLDER_PREFIX + "DIGIT";
   
   protected int minDigit;
 
@@ -44,7 +44,7 @@ public class PasswordPolicyDigitRuleImpl implements PasswordPolicyRule {
     parameter.put("minDigit", "" + this.minDigit);
     return parameter;
   }
-
+  
   @Override
   public boolean execute(String password) {
     int digitCount = 0;

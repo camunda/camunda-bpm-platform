@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
  */
 public class PasswordPolicyUpperCaseRuleImpl implements PasswordPolicyRule {
 
-  public static final String PLACEHOLDER = "UPPERCASE";
+  public static final String PLACEHOLDER = DefaultPasswordPolicyImpl.PLACEHOLDER_PREFIX + "UPPERCASE";
   
   protected int minUpperCase;
 

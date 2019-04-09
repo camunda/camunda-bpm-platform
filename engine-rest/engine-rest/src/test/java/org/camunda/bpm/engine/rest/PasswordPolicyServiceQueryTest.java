@@ -61,19 +61,19 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
-        .body("rules[0].placeholder", equalTo("LENGTH"))
+        .body("rules[0].placeholder", equalTo("PASSWORD_POLICY_LENGTH"))
         .body("rules[0].parameter.minLength", equalTo("10"))
 
-        .body("rules[1].placeholder", equalTo("LOWERCASE"))
+        .body("rules[1].placeholder", equalTo("PASSWORD_POLICY_LOWERCASE"))
         .body("rules[1].parameter.minLowerCase", equalTo("1"))
 
-        .body("rules[2].placeholder", equalTo("UPPERCASE"))
+        .body("rules[2].placeholder", equalTo("PASSWORD_POLICY_UPPERCASE"))
         .body("rules[2].parameter.minUpperCase", equalTo("1"))
 
-        .body("rules[3].placeholder", equalTo("DIGIT"))
+        .body("rules[3].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
         .body("rules[3].parameter.minDigit", equalTo("1"))
 
-        .body("rules[4].placeholder", equalTo("SPECIAL"))
+        .body("rules[4].placeholder", equalTo("PASSWORD_POLICY_SPECIAL"))
         .body("rules[4].parameter.minSpecial", equalTo("1"))
     .when()
       .get(QUERY_URL);
@@ -85,33 +85,35 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("password", "password");
-    
+
     given()
       .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
     .then()
       .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .statusCode(Status.OK.getStatusCode())
 
-        .body("rules[0].placeholder", equalTo("LENGTH"))
-        .body("rules[0].parameter.minLength", equalTo("10"))
+        .body("policy.rules[0].placeholder", equalTo("PASSWORD_POLICY_LENGTH"))
+        .body("policy.rules[0].parameter.minLength", equalTo("10"))
 
-        .body("rules[1].placeholder", equalTo("LOWERCASE"))
-        .body("rules[1].parameter.minLowerCase", equalTo("1"))
+        .body("policy.rules[1].placeholder", equalTo("PASSWORD_POLICY_LOWERCASE"))
+        .body("policy.rules[1].parameter.minLowerCase", equalTo("1"))
 
-        .body("rules[2].placeholder", equalTo("UPPERCASE"))
-        .body("rules[2].parameter.minUpperCase", equalTo("1"))
+        .body("policy.rules[2].placeholder", equalTo("PASSWORD_POLICY_UPPERCASE"))
+        .body("policy.rules[2].parameter.minUpperCase", equalTo("1"))
 
-        .body("rules[3].placeholder", equalTo("DIGIT"))
-        .body("rules[3].parameter.minDigit", equalTo("1"))
+        .body("policy.rules[3].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
+        .body("policy.rules[3].parameter.minDigit", equalTo("1"))
 
-        .body("rules[4].placeholder", equalTo("SPECIAL"))
-        .body("rules[4].parameter.minSpecial", equalTo("1"))
+        .body("policy.rules[4].placeholder", equalTo("PASSWORD_POLICY_SPECIAL"))
+        .body("policy.rules[4].parameter.minSpecial", equalTo("1"))
+
+        .body("valid", equalTo(false))
     .when()
       .post(QUERY_URL);
   }
-  
+
   @Test
   public void testCheckGoodPasswordAgainstDefaultPolicy() {
     Map<String, Object> json = new HashMap<String, Object>();
@@ -123,7 +125,9 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
     .body(json)
   .then()
     .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
+      .statusCode(Status.OK.getStatusCode())
+
+      .body("valid", equalTo(true))
   .when()
     .post(QUERY_URL);
   }
