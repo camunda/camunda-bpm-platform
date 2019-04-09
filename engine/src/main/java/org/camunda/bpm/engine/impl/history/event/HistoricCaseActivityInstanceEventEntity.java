@@ -38,9 +38,6 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   /** the id of the case activity */
   protected String caseActivityId;
 
-  /** the id of the case definition **/
-  protected String caseDefinitionId;
-
   /** the name of the case activity */
   protected String caseActivityName;
 
