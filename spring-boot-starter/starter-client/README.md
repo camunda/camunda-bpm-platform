@@ -31,7 +31,7 @@ You need this dependency in order to get started
 # External Task Subscription
 
   ```java
-  @ExternalTask("invoiceCreator")
+  @ExternalTaskSubscription("invoiceCreator")
   @Component
   public class InvoiceCreator implents ExternalTaskHandler {
       void execute(ExternalTask externalTask, ExternalTaskService externalTaskService);
