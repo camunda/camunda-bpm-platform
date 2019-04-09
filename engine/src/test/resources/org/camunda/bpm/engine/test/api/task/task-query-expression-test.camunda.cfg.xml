@@ -27,9 +27,6 @@
     
     <!-- enable expressions in adhoc queries -->
     <property name="enableExpressionsInAdhocQueries" value="true" />
-    
-    <!-- turn off password policy for tests -->
-    <property name="disablePasswordPolicy" value="true"/>
   </bean>
 
 </beans>

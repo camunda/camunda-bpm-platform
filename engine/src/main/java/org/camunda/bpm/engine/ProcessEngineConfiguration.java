@@ -264,7 +264,7 @@ public abstract class ProcessEngineConfiguration {
   /**
    * configuration of password policy
    */
-  protected boolean disablePasswordPolicy;
+  protected boolean disablePasswordPolicy = true;
   protected PasswordPolicy passwordPolicy;
 
   /**

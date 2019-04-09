@@ -25,9 +25,6 @@
 
     <property name="cmmnEnabled" value="false" />
 
-    <!-- turn off password policy for tests -->
-    <property name="disablePasswordPolicy" value="true"/>
-
   </bean>
 
 </beans>

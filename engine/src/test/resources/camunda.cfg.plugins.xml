@@ -33,9 +33,6 @@
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
-        <!-- turn off password policy for tests -->
-    <property name="disablePasswordPolicy" value="true"/>
-
     <property name="processEnginePlugins">
       <list>
         <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin" />
