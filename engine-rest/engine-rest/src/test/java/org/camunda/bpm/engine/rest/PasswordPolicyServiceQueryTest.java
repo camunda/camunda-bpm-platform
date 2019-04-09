@@ -89,7 +89,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
     given()
     .then()
       .expect()
-        .statusCode(Status.OK.getStatusCode())
+        .statusCode(Status.NOT_FOUND.getStatusCode())
         .body("policy", equalTo("No password policy is configured."))
     .when()
       .get(QUERY_URL);
