@@ -43,7 +43,6 @@ import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.MetricsRestService;
 import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.ModificationRestService;
-import org.camunda.bpm.engine.rest.PasswordPolicyRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.SignalRestService;
@@ -287,13 +286,6 @@ public abstract class AbstractProcessEngineRestServiceImpl {
   public VersionRestService getVersionRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     VersionRestService subResource = new VersionRestService(engineName, getObjectMapper());
-    subResource.setRelativeRootResourceUri(rootResourcePath);
-    return subResource;
-  }
-  
-  public PasswordPolicyRestService getPasswordPolicyRestService(String engineName) {
-    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
-    PasswordPolicyRestServiceImpl subResource = new PasswordPolicyRestServiceImpl(engineName, getObjectMapper());
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }

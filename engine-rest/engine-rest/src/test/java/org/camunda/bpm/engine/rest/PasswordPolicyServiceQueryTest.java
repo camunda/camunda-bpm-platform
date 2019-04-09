@@ -40,18 +40,20 @@ import org.junit.Test;
  */
 public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
-  protected static final String QUERY_URL = TEST_RESOURCE_ROOT_PATH + PasswordPolicyRestService.PATH;
+  protected static final String QUERY_URL = TEST_RESOURCE_ROOT_PATH + IdentityRestService.PATH + "/password-policy";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
   private PasswordPolicy passwordPolicy;
+
+  private ProcessEngineConfigurationImpl mockedConfig;
   
   @Before
   public void setUpRuntimeData() {
     passwordPolicy = new DefaultPasswordPolicyImpl();
 
-    ProcessEngineConfigurationImpl mockedConfig = mock(ProcessEngineConfigurationImpl.class);
+    mockedConfig = mock(ProcessEngineConfigurationImpl.class);
     when(processEngine.getProcessEngineConfiguration()).thenReturn(mockedConfig);
     when(mockedConfig.getPasswordPolicy()).thenReturn(passwordPolicy);
   }
@@ -76,6 +78,19 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
         .body("rules[4].placeholder", equalTo("PASSWORD_POLICY_SPECIAL"))
         .body("rules[4].parameter.minSpecial", equalTo("1"))
+    .when()
+      .get(QUERY_URL);
+  }
+  
+
+  @Test
+  public void testGetPolicyNoPolicyConfigured() {
+    when(mockedConfig.getPasswordPolicy()).thenReturn(null);
+    given()
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("policy", equalTo("No password policy is configured."))
     .when()
       .get(QUERY_URL);
   }

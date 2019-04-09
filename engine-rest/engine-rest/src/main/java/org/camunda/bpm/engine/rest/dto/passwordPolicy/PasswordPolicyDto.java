@@ -30,12 +30,11 @@ public class PasswordPolicyDto {
   // transformers
 
   public static PasswordPolicyDto fromPasswordPolicyRules(List<PasswordPolicyRule> rules) {
-    PasswordPolicyDto poilicy = new PasswordPolicyDto();
-
+    PasswordPolicyDto policy = new PasswordPolicyDto();
     for (PasswordPolicyRule rule : rules) {
-      poilicy.rules.add(PasswordPolicyRuleDto.fromRule(rule));
+      policy.rules.add(PasswordPolicyRuleDto.fromRule(rule));
     }
-    return poilicy;
+    return policy;
   }
 
   // getters / setters

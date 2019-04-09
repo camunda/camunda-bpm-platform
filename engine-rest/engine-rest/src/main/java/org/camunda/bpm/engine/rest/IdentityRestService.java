@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
-import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 
@@ -46,4 +46,14 @@ public interface IdentityRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   AuthenticationResult verifyUser(BasicUserCredentialsDto credentialsDto);
 
+  @GET
+  @Path("/password-policy")
+  @Produces(MediaType.APPLICATION_JSON)
+  Response getPasswordPolicy();
+
+  @POST
+  @Path("/password-policy")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  Response checkPassword(PasswordDto password);
 }
