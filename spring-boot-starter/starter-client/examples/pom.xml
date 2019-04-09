@@ -3,18 +3,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.camunda.bpm.spring.boot</groupId>
-    <artifactId>external-task-client-java-spring-root</artifactId>
+    <groupId>org.camunda.bpm.extension.spring.boot</groupId>
+    <artifactId>camunda-external-task-client-spring-root</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>external-task-client-java-spring-examples</artifactId>
+  <artifactId>loan-granting-examples</artifactId>
   <packaging>pom</packaging>
 
   <modules>
     <module>loan-granting-webapp</module>
-    <module>loan-granting-boot-client</module>
-    <module>loan-granting-spring-client</module>
+    <module>loan-granting-spring-boot</module>
+    <module>loan-granting-spring</module>
   </modules>
 
 </project>

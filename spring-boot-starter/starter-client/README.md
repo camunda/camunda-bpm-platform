@@ -1,80 +1,55 @@
 [![Build Status](https://travis-ci.org/osteinhauer/camunda-external-task-client-java-spring.svg?branch=master)](https://travis-ci.org/osteinhauer/camunda-external-task-client-java-spring)
 
-# Spring and Spring Boot Support for camunda-external-task-client-java
+# Camunda External Task Client as Spring Boot Starter
 
-See https://github.com/camunda/camunda-external-task-client-java
+This project provides a Spring Boot starter that allows you to implement an external task worker for Camunda. It uses the Camunda REST API to fetch, lock and complete external services tasks. It is based on the [Camunda External Task Client](https://github.com/camunda/camunda-external-task-client-java)
 
-Support for `@EnableTaskSubscription` and `@TaskSubscription`. 
+# UNDER DEVELOPMENT
 
-## Example Usage
+This project is not yet there and still need to be worked on.
 
-### Spring
+There is an implementation here: https://github.com/osteinhauer/camunda-external-task-client-java-spring. Currently undecided if this will be based on that code or not.
 
-```xml
-<dependencies>
-  ...
-  <dependency>
-    <groupId>org.camunda.bpm.spring.boot</groupId>
-    <artifactId>external-task-client-java-spring</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-context</artifactId>
-    <version>${spring.version}</version>
-  </dependency>
-</dependencies>
-```
+# Dependency
 
-```java
-@Configuration
-@EnableTaskSubscription(baseUrl = "http://localhost:8080/rest")
-public class SimpleConfiguration {
-
-  @TaskSubscription(topicName = "creditScoreChecker")
-  @Bean
-  public ExternalTaskHandler creditScoreCheckerHandler() {
-    return (externalTask, externalTaskService) -> {
-
-      // interact with the external task
-
-    };
-  }
-}
-```
-
-### Spring Boot
+You need this dependency in order to get started
 
 ```xml
 <dependencies>
   ...
   <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter</artifactId>
+    <groupId>org.camunda.bpm.extension.spring.boot</groupId>
+    <artifactId>camunda-external-task-client-spring-boot-starter</artifactId>
+    <version>...</version>
   </dependency>
-  <dependency>
-    <groupId>org.camunda.bpm.spring.boot</groupId>
-    <artifactId>external-task-client-java-starter</artifactId>
-    <version>${project.version}</version>
-  </dependency>
+  ...
 </dependencies>
 ```
 
+
+
+# External Task Subscription
+
+  ```java
+  @ExternalTask("invoiceCreator")
+  @Component
+  public class InvoiceCreator implents ExternalTaskHandler {
+      void execute(ExternalTask externalTask, ExternalTaskService externalTaskService);
+  }
+  ```
+
+# Configuration
+
+In order to enable the external task subscriptions you have to do use the `EnableExternalTaskSubscriptions` annotation. You can configure the Camunda endpoint and other properties there.
+
 ```java
 @Configuration
+@EnableExternalTaskSubscriptions(baseUrl = "http://localhost:8080/rest")
 public class SimpleConfiguration {
-
-  @TaskSubscription(topicName = "creditScoreChecker")
-  @Bean
-  public ExternalTaskHandler creditScoreCheckerHandler() {
-    return (externalTask, externalTaskService) -> {
-
-      // interact with the external task
-
-    };
-  }
 }
 ```
+
+You can also use other ways to configure it via normal Spring possibilities:
 
 ```yaml
 camunda:
@@ -85,3 +60,37 @@ camunda:
 
 
 Check tests and examples for usage.
+
+
+# Use Spring (not Spring Boot)
+
+You can also use the basic Spriung integration without the Spring Boot Starter:
+
+```xml
+<dependencies>
+  ...
+  <dependency>
+    <groupId>org.camunda.bpm.extension.spring</groupId>
+    <artifactId>camunda-external-task-client-spring</artifactId>
+    <version>...</version>
+  </dependency>
+  ...
+</dependencies>
+```
+
+
+# Todo / Future features
+
+- Connection resilience / retrying in case the engine is not available (also during startup of the client)
+
+- Multiple ExternalTask subsctiptions on one handler?
+
+  ```java  
+  @ExternalTask("invoiceCreator")
+  @ExternalTask(topicName = "invoiceCreator", lockDuration = 1000)
+  @ExternalTask(topicName = "offerCreator", lockDuration = 2000)
+  @Component
+  public class InvoiceCreator implents ExternalTaskHandler {
+      void execute(ExternalTask externalTask, ExternalTaskService externalTaskService);
+  }
+  ```
