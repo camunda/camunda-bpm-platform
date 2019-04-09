@@ -7,7 +7,6 @@ Lightweight Execution Engine for DMN (Decision Model and Notation) written in Ja
   <a href="http://camunda.org/">Home</a> |
   <a href="http://camunda.org/community/forum.html">Forum</a> |
   <a href="https://app.camunda.com/jira/browse/CAM">Issues</a> |
-  <a href="LICENSE">License</a>
 </p>
 
 The Decision Engine can be used seamlessly in combination with BPMN and CMMN or standalone.
@@ -112,3 +111,5 @@ public class App {
 }
 ```
 
+## License
+The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
