@@ -31,9 +31,6 @@
 
     <property name="jdbcBatchProcessing" value="false"/>
 
-    <!-- disable password policy -->
-    <property name="disablePasswordPolicy" value="true"/>
-
   </bean>
 
 </beans>
