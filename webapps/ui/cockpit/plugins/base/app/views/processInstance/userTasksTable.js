@@ -88,6 +88,11 @@ module.exports = function(ngModule) {
 
       var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
 
+      // reset Page when changing Tabs
+      $scope.$on('$destroy', function() {
+        search('page', null);
+      });
+
       var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
 
       var filter = null;
