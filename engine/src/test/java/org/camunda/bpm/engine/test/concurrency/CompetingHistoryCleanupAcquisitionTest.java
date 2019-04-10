@@ -20,9 +20,13 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.test.jobexecutor.ControllableJobExecutor;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
+
+import java.sql.Connection;
 
 /**
  * @author Tassilo Weidner
@@ -42,9 +46,23 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
   }
 
   protected void tearDown() throws Exception {
+    if (jobExecutor.isActive()) {
+      jobExecutor.shutdown();
+    }
+
     clearDatabase();
 
     super.tearDown();
+  }
+
+  protected void runTest() throws Throwable {
+    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if (!DbSqlSessionFactory.H2.equals(databaseType) && !DbSqlSessionFactory.MARIADB.equals(databaseType) &&
+      (transactionIsolationLevel == null || transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
+      super.runTest();
+    }
   }
 
   public void testCompetingHistoryCleanupAcquisition() {
