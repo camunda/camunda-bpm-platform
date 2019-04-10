@@ -20,11 +20,15 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
+import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquireJobsCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ControllableCommand;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.engine.test.concurrency.ControllableThread;
@@ -42,7 +46,10 @@ public class ControllableJobExecutor extends JobExecutor {
   protected ThreadControl executionThreadControl;
 
   protected boolean syncOnShutdown = true;
-  boolean syncAsSuspendEnabled;
+  protected boolean syncAsSuspendEnabled;
+
+  protected boolean shouldThrowOle;
+  protected boolean oleThrown;
 
   public ControllableJobExecutor() {
     acquireJobsRunnable = new RecordingAcquireJobsRunnable(this);
@@ -135,6 +142,10 @@ public class ControllableJobExecutor extends JobExecutor {
 
     public AcquiredJobs execute(CommandContext commandContext) {
 
+      if (shouldThrowOle) {
+        rethrowOptimisticLockingException(commandContext);
+      }
+
       monitor.sync(); // wait till makeContinue() is called from test thread
 
       AcquiredJobs acquiredJobs = new AcquireJobsCmd(ControllableJobExecutor.this, numJobsToAcquire).execute(commandContext);
@@ -144,6 +155,32 @@ public class ControllableJobExecutor extends JobExecutor {
       return acquiredJobs;
     }
 
+    protected void rethrowOptimisticLockingException(CommandContext commandContext) {
+      commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
+
+        public Class<? extends DbEntity> getEntityType() {
+          return JobEntity.class;
+        }
+
+        public void failedOperation(DbOperation operation) {
+          oleThrown = true;
+        }
+
+      });
+    }
+
+  }
+
+  public void indicateOptimisticLockingException() {
+    shouldThrowOle = true;
+  }
+
+  public boolean isOleThrown() {
+    return oleThrown;
+  }
+
+  public void resetOleThrown() {
+    oleThrown = false;
   }
 
 }
