@@ -146,4 +146,25 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
   .when()
     .post(QUERY_URL);
   }
+
+  @Test
+  public void testCheckBadPasswordAgainstNoPolicy() {
+    when(mockedConfig.getPasswordPolicy()).thenReturn(null);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("password", "password");
+    
+    given()
+    .header("accept", MediaType.APPLICATION_JSON)
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+  .then()
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+
+      .body("policy", equalTo("No password policy is configured."))
+      .body("valid", equalTo(true))
+  .when()
+    .post(QUERY_URL);
+  }
 }

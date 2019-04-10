@@ -322,6 +322,15 @@ public interface IdentityService {
   boolean checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
 
   /**
+   * Returns the {@link PasswordPolicy} that is currently configured in the
+   * engine.
+   * 
+   * @return the current {@link PasswordPolicy} or <code>null</code> if no
+   *         policy is set or the configured policy is disabled.
+   */
+  PasswordPolicy getPasswordPolicy();
+
+  /**
    * Passes the authenticated user id for this thread.
    * All service method (from any service) invocations done by the same
    * thread will have access to this authenticatedUserId. Should be followed by

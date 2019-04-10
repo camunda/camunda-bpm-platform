@@ -117,6 +117,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
       }
     }else {
       parameters.put("policy", "No password policy is configured.");
+      parameters.put("valid", true);
     }
     return Response.status(Status.OK.getStatusCode()).entity(parameters).build();
   }

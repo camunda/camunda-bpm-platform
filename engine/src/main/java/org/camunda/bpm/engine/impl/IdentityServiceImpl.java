@@ -62,6 +62,7 @@ import org.camunda.bpm.engine.impl.cmd.SaveUserCmd;
 import org.camunda.bpm.engine.impl.cmd.SetUserInfoCmd;
 import org.camunda.bpm.engine.impl.cmd.SetUserPictureCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockUserCmd;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
@@ -168,17 +169,23 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
   
   public boolean checkPasswordAgainstPolicy(PasswordPolicy policy, String password) {
-    if (policy != null) {
-      if (password == null) {
+    EnsureUtil.ensureNotNull("policy", policy);
+    EnsureUtil.ensureNotNull("password", password);
+
+    for (PasswordPolicyRule rule : policy.getRules()) {
+      if (!rule.execute(password)) {
         throw new PasswordPolicyException(policy.getRules());
-      }
-      for (PasswordPolicyRule rule : policy.getRules()) {
-        if (!rule.execute(password)) {
-          throw new PasswordPolicyException(policy.getRules());
-        }
       }
     }
     return true;
+  }
+
+  public PasswordPolicy getPasswordPolicy() {
+    PasswordPolicy policy = Context.getProcessEngineConfiguration().getPasswordPolicy();
+    if (policy != null && !Context.getProcessEngineConfiguration().isDisablePasswordPolicy()) {
+      return policy;
+    }
+    return null;
   }
 
   public void unlockUser(String userId) {

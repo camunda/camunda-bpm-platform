@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -72,10 +73,10 @@ public class CustomPasswordPolicyTest {
 
   @Test
   public void testCustomPasswordPolicyWithNoPassword() {
-    thrown.expect(PasswordPolicyException.class);
+    thrown.expect(ProcessEngineException.class);
     User user = identityService.newUser("user");
     identityService.saveUser(user);
-    thrown.expectMessage("Password does not match policy");
+    thrown.expectMessage("password is null");
   }
   
   @Test
