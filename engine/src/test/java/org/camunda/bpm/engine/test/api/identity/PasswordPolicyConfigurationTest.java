@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -70,6 +71,7 @@ public class PasswordPolicyConfigurationTest {
     processEngineConfiguration.setPasswordPolicy(passwordPolicyDefaultSetting).setDisablePasswordPolicy(passwordPolicyDisabledDefaultSetting);
   }
 
+  @Ignore
   @Test
   public void testInitialConfiguration() {
     // given initial configuration
