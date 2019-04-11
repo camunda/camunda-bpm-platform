@@ -254,5 +254,10 @@ public class UserOperationLogContextEntryBuilder {
     entry.setBatchId(batchId);
     return this;
   }
+  
+  public UserOperationLogContextEntryBuilder category(String category) {
+    entry.setCategory(category);
+    return this;
+  }
 
 }

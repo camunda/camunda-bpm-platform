@@ -54,6 +54,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals(null, userOperationLogEntry.getOrgValue());
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
@@ -83,6 +85,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
 
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
         userOperationLogEntry.getOperationType());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertEquals("overridingPriority", userOperationLogEntry.getProperty());
     assertEquals("43", userOperationLogEntry.getNewValue());
@@ -118,6 +122,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals("42", userOperationLogEntry.getOrgValue());
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
@@ -166,6 +172,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
         jobOpLogEntry.getOrgValue());
 
     assertEquals(USER_ID, jobOpLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, jobOpLogEntry.getCategory());
 
     // these properties should be there to narrow down the bulk update (like a SQL WHERE clasue)
     assertEquals(job.getJobDefinitionId(), jobOpLogEntry.getJobDefinitionId());

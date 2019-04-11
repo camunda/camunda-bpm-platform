@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_TASK_WORKER;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ASSIGN;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_COMPLETE;
@@ -188,6 +189,7 @@ public class GetHistoricOperationLogsForOptimizeTest {
     // then
     assertThat(userOperationsLog.size(), is(1));
     assertThat(userOperationsLog.get(0).getOperationType(), is(OPERATION_TYPE_CLAIM));
+    assertThat(userOperationsLog.get(0).getCategory(), is(CATEGORY_TASK_WORKER));
   }
 
   @Test
@@ -390,6 +392,7 @@ public class GetHistoricOperationLogsForOptimizeTest {
     assertThat(userOperationLogEntry.getProcessDefinitionId(), notNullValue());
     assertThat(userOperationLogEntry.getUserId(), is(userId));
     assertThat(userOperationLogEntry.getTaskId(), is(taskService.createTaskQuery().singleResult().getId()));
+    assertThat(userOperationLogEntry.getCategory(), is(CATEGORY_TASK_WORKER));
   }
 
 }

@@ -44,3 +44,7 @@ ALTER TABLE ACT_HI_JOB_LOG
 
 ALTER TABLE ACT_ID_USER
   MODIFY COLUMN LOCK_EXP_TIME_ datetime(3) NULL;
+
+-- https://app.camunda.com/jira/browse/CAM-9920
+ALTER TABLE ACT_HI_OP_LOG
+  ADD CATEGORY_ varchar(64);

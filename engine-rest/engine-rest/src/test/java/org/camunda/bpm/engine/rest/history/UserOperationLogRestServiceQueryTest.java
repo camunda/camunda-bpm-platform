@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.rest.history;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -135,6 +134,8 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
         .queryParam("operationType", OPERATION_TYPE_CLAIM)
         .queryParam("entityType", EntityTypes.TASK)
         .queryParam("entityTypeIn", EntityTypes.TASK + "," + EntityTypes.VARIABLE)
+        .queryParam("category", UserOperationLogEntry.CATEGORY_TASK_WORKER)
+        .queryParam("categoryIn", UserOperationLogEntry.CATEGORY_TASK_WORKER + "," + UserOperationLogEntry.CATEGORY_OPERATOR)
         .queryParam("property", "owner")
         .then().expect().statusCode(Status.OK.getStatusCode())
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
@@ -156,6 +157,8 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock).operationType(OPERATION_TYPE_CLAIM);
     verify(queryMock).entityType(EntityTypes.TASK);
     verify(queryMock).entityTypeIn(EntityTypes.TASK, EntityTypes.VARIABLE);
+    verify(queryMock).category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
+    verify(queryMock).categoryIn(UserOperationLogEntry.CATEGORY_TASK_WORKER, UserOperationLogEntry.CATEGORY_OPERATOR);
     verify(queryMock).property("owner");
     verify(queryMock).list();
 

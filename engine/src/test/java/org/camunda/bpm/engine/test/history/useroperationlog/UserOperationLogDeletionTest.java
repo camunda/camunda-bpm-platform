@@ -84,7 +84,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
       .withCaseDefinitionByKey("oneTaskCase")
       .create();
 
-    String caseExecutionId = caseService
+    caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
         .singleResult()
@@ -137,7 +137,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
         .create()
         .getId();
 
-    String caseExecutionId = caseService
+    caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
         .singleResult()
@@ -314,7 +314,9 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
       assertTrue(Boolean.valueOf(userOperationLogEntry.getNewValue()));
 
       assertEquals(USER_ID, userOperationLogEntry.getUserId());
-
+      
+      assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, userOperationLogEntry.getCategory());
+      
       assertNull(userOperationLogEntry.getJobDefinitionId());
       assertNull(userOperationLogEntry.getProcessInstanceId());
       assertNull(userOperationLogEntry.getCaseInstanceId());

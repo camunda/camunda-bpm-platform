@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -55,10 +54,12 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   protected String operationType;
   protected String entityType;
   protected String property;
+  protected String category;
   protected Date afterTimestamp;
   protected Date beforeTimestamp;
 
   protected String[] entityTypes;
+  protected String[] categories;
 
   public UserOperationLogQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
@@ -126,6 +127,12 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     }
     if (entityTypes != null) {
       query.entityTypeIn(entityTypes);
+    }
+    if (category != null) {
+      query.category(category);
+    }
+    if (categories != null) {
+      query.categoryIn(categories);
     }
     if (property != null) {
       query.property(property);
@@ -229,7 +236,17 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   public void setEntityTypeIn(String[] entityTypes) {
     this.entityTypes = entityTypes;
   }
+  
+  @CamundaQueryParam("category")
+  public void setcategory(String category) {
+    this.category = category;
+  }
 
+  @CamundaQueryParam(value = "categoryIn", converter = StringArrayConverter.class)
+  public void setCategoryIn(String[] categories) {
+    this.categories = categories;
+  }
+  
   @CamundaQueryParam("property")
   public void setProperty(String property) {
     this.property = property;

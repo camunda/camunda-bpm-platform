@@ -26,13 +26,11 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -135,6 +133,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertEquals(externalTask.getProcessDefinitionKey(), retriesEntry.getProcessDefinitionKey());
     Assert.assertNull(retriesEntry.getOrgValue());
     Assert.assertEquals("5", retriesEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, retriesEntry.getCategory());
   }
 
   @Test
@@ -166,6 +165,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("false", asyncEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);
@@ -176,6 +176,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
     Assert.assertEquals("6", numInstancesEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstancesEntry.getCategory());
 
     UserOperationLogEntry retriesEntry = entries.get("retries");
     Assert.assertNotNull(retriesEntry);
@@ -187,6 +188,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(retriesEntry.getOrgValue());
     Assert.assertEquals("5", retriesEntry.getNewValue());
     Assert.assertEquals(asyncEntry.getOperationId(), retriesEntry.getOperationId());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, retriesEntry.getCategory());
   }
 
   @Test
@@ -212,6 +214,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("true", asyncEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);
@@ -222,6 +225,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
     Assert.assertEquals("6", numInstancesEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstancesEntry.getCategory());
 
     UserOperationLogEntry retriesEntry = entries.get("retries");
     Assert.assertNotNull(retriesEntry);
@@ -233,6 +237,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(retriesEntry.getOrgValue());
     Assert.assertEquals("5", retriesEntry.getNewValue());
     Assert.assertEquals(asyncEntry.getOperationId(), retriesEntry.getOperationId());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, retriesEntry.getCategory());
   }
 
   protected Map<String, UserOperationLogEntry> asMap(List<UserOperationLogEntry> logEntries) {

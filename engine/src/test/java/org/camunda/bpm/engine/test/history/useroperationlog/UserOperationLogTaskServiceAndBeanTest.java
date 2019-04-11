@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
@@ -36,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -161,6 +161,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(DELETE, delete.getProperty());
     assertFalse(Boolean.parseBoolean(delete.getOrgValue()));
     assertTrue(Boolean.parseBoolean(delete.getNewValue()));
+    assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, delete.getCategory());
   }
 
   public void testCompositeBeanInteraction() {
@@ -174,10 +175,11 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_CREATE);
     UserOperationLogEntry create = query.singleResult();
     assertNotNull(create);
-    assertEquals(ENTITY_TYPE_TASK, create.getEntityType());
+    assertEquals(EntityTypes.TASK, create.getEntityType());
     assertNull(create.getOrgValue());
     assertNull(create.getNewValue());
     assertNull(create.getProperty());
+    assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, create.getCategory());
 
     task.setAssignee("icke");
     task.setName("to do");
@@ -189,6 +191,8 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     List<UserOperationLogEntry> entries = queryOperationDetails(OPERATION_TYPE_UPDATE).list();
     assertEquals(2, entries.size());
     assertEquals(entries.get(0).getOperationId(), entries.get(1).getOperationId());
+    assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, entries.get(0).getCategory());
+    assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, entries.get(1).getCategory());
   }
 
   public void testMultipleValueChange() {
@@ -203,6 +207,7 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     UserOperationLogEntry update = queryOperationDetails(OPERATION_TYPE_UPDATE).singleResult();
     assertNull(update.getOrgValue());
     assertEquals("to do", update.getNewValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, update.getCategory());
   }
 
   public void testSetDateProperty() {

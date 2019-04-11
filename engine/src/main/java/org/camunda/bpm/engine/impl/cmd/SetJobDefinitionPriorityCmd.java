@@ -100,6 +100,7 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
         .entry(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, EntityTypes.JOB_DEFINITION)
         .inContextOf(jobDefinition)
         .propertyChanges(propertyChange)
+        .category(UserOperationLogEntry.CATEGORY_OPERATOR)
         .create();
 
     opLogContext.addEntry(entry);
@@ -114,6 +115,7 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
         .entry(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, EntityTypes.JOB)
         .inContextOf(jobDefinition)
         .propertyChanges(propertyChange)
+        .category(UserOperationLogEntry.CATEGORY_OPERATOR)
         .create();
 
     opLogContext.addEntry(entry);

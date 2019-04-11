@@ -60,5 +60,6 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
     assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
   }
 }

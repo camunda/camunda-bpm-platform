@@ -229,6 +229,7 @@ create table ACT_HI_OP_LOG (
     NEW_VALUE_ varchar(4000),
     TENANT_ID_ varchar(64),
     REMOVAL_TIME_ timestamp,
+	CATEGORY_ varchar(64),
     primary key (ID_)
 );
 

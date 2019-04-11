@@ -324,6 +324,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobId(contextEntry.getJobId());
     evt.setJobDefinitionId(contextEntry.getJobDefinitionId());
     evt.setBatchId(contextEntry.getBatchId());
+    evt.setCategory(contextEntry.getCategory());
     evt.setTimestamp(ClockUtil.getCurrentTime());
     evt.setRootProcessInstanceId(contextEntry.getRootProcessInstanceId());
 

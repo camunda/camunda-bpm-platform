@@ -48,7 +48,8 @@
         ORG_VALUE_,
         NEW_VALUE_,
         TENANT_ID_,
-        REMOVAL_TIME_
+        REMOVAL_TIME_,
+        CATEGORY_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{deploymentId, jdbcType=VARCHAR},
@@ -73,7 +74,8 @@
         #{orgValue, jdbcType=VARCHAR},
         #{newValue ,jdbcType=VARCHAR},
         #{tenantId ,jdbcType=VARCHAR},
-        #{removalTime, jdbcType=TIMESTAMP}
+        #{removalTime, jdbcType=TIMESTAMP},
+        #{category, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -176,6 +178,7 @@
     <result property="newValue" column="NEW_VALUE_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- OPERATION LOG ENTRY SELECT -->
@@ -271,7 +274,16 @@
       <if test="timestampBefore != null">
         and RES.TIMESTAMP_ &lt; #{timestampBefore}
       </if>
-
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categories != null &amp;&amp; categories.length > 0">
+        and RES.CATEGORY_ in
+        <foreach item="category" collection="categories" open="(" separator="," close=")">
+          #{category}
+        </foreach>
+      </if>
+      
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <!-- may not exist in the context of a process definition -->
         and (

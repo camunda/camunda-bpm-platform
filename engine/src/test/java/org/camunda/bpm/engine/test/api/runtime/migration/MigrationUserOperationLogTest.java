@@ -88,6 +88,7 @@ public class MigrationUserOperationLogTest {
     Assert.assertNull(procDefEntry.getProcessInstanceId());
     Assert.assertEquals(sourceProcessDefinition.getId(), procDefEntry.getOrgValue());
     Assert.assertEquals(targetProcessDefinition.getId(), procDefEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, procDefEntry.getCategory());
 
     UserOperationLogEntry asyncEntry = entries.get("async");
     Assert.assertNotNull(asyncEntry);
@@ -98,6 +99,7 @@ public class MigrationUserOperationLogTest {
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("false", asyncEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     UserOperationLogEntry numInstanceEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstanceEntry);
@@ -108,6 +110,7 @@ public class MigrationUserOperationLogTest {
     Assert.assertNull(numInstanceEntry.getProcessInstanceId());
     Assert.assertNull(numInstanceEntry.getOrgValue());
     Assert.assertEquals("1", numInstanceEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstanceEntry.getCategory());
 
     Assert.assertEquals(procDefEntry.getOperationId(), asyncEntry.getOperationId());
     Assert.assertEquals(asyncEntry.getOperationId(), numInstanceEntry.getOperationId());

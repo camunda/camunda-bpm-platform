@@ -123,6 +123,7 @@ public class RestartProcessInstanceUserOperationLogTest {
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("true", asyncEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);
@@ -133,6 +134,7 @@ public class RestartProcessInstanceUserOperationLogTest {
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
     Assert.assertEquals("2", numInstancesEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstancesEntry.getCategory());
 
     Assert.assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
   }
@@ -169,6 +171,7 @@ public class RestartProcessInstanceUserOperationLogTest {
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("false", asyncEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);
@@ -179,6 +182,7 @@ public class RestartProcessInstanceUserOperationLogTest {
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
     Assert.assertEquals("2", numInstancesEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstancesEntry.getCategory());
 
     Assert.assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
   }

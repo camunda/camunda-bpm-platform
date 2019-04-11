@@ -117,6 +117,9 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
   public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";
 
+  public static String CATEGORY_ADMIN = "Admin";
+  public static String CATEGORY_OPERATOR = "Operator";
+  public static String CATEGORY_TASK_WORKER = "TaskWorker";
 
   /** The unique identifier of this log entry. */
   String getId();
@@ -201,5 +204,8 @@ public interface UserOperationLogEntry {
 
   /** The time the historic user operation log will be removed. */
   Date getRemovalTime();
+  
+  /** The category this entry is associated with */
+  String getCategory();
 
 }

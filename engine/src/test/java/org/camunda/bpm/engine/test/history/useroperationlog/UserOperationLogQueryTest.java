@@ -125,6 +125,10 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(1, query().operationType(OPERATION_TYPE_DELETE_GROUP_LINK).count());
     assertEquals(1, query().operationType(OPERATION_TYPE_ADD_ATTACHMENT).count());
     assertEquals(1, query().operationType(OPERATION_TYPE_DELETE_ATTACHMENT).count());
+    
+    // category
+    assertEquals(17, query().categoryIn(UserOperationLogEntry.CATEGORY_TASK_WORKER).count());
+    assertEquals(1, query().categoryIn(UserOperationLogEntry.CATEGORY_OPERATOR).count());// start process instance
 
     // process and execution reference
     assertEquals(12, query().processDefinitionId(process.getProcessDefinitionId()).count());
@@ -222,12 +226,13 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNotNull(deleteEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", deleteEntry.getProcessDefinitionKey());
     assertEquals(deploymentId, deleteEntry.getDeploymentId());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, deleteEntry.getCategory());
 
-      UserOperationLogEntry suspendEntry = query()
-        .entityType(PROCESS_INSTANCE)
-        .processInstanceId(process.getId())
-        .operationType(OPERATION_TYPE_SUSPEND)
-        .singleResult();
+    UserOperationLogEntry suspendEntry = query()
+      .entityType(PROCESS_INSTANCE)
+      .processInstanceId(process.getId())
+      .operationType(OPERATION_TYPE_SUSPEND)
+      .singleResult();
 
     assertNotNull(suspendEntry);
     assertEquals(process.getId(), suspendEntry.getProcessInstanceId());
@@ -237,6 +242,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", suspendEntry.getProperty());
     assertEquals("suspended", suspendEntry.getNewValue());
     assertNull(suspendEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendEntry.getCategory());
 
     UserOperationLogEntry activateEntry = query()
         .entityType(PROCESS_INSTANCE)
@@ -253,6 +259,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
     assertNull(activateEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateEntry.getCategory());
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -282,6 +289,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", suspendEntry.getProperty());
     assertEquals("suspended", suspendEntry.getNewValue());
     assertNull(suspendEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendEntry.getCategory());
 
     UserOperationLogEntry activateEntry = query()
         .entityType(PROCESS_INSTANCE)
@@ -298,6 +306,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
     assertNull(activateEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateEntry.getCategory());
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -327,6 +336,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", suspendEntry.getProperty());
     assertEquals("suspended", suspendEntry.getNewValue());
     assertNull(suspendEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendEntry.getCategory());
 
     UserOperationLogEntry activateEntry = query()
         .entityType(PROCESS_INSTANCE)
@@ -343,6 +353,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
     assertNull(activateEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateEntry.getCategory());
   }
 
   /**
@@ -375,6 +386,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", suspendDefinitionEntry.getProperty());
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
     assertNull(suspendDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
 
     UserOperationLogEntry activateDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
@@ -390,6 +402,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateDefinitionEntry.getCategory());
 
   }
 
@@ -422,6 +435,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", suspendDefinitionEntry.getProperty());
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
     assertNull(suspendDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendDefinitionEntry.getCategory());
 
     UserOperationLogEntry activateDefinitionEntry = query()
       .entityType(PROCESS_DEFINITION)
@@ -437,6 +451,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateDefinitionEntry.getCategory());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -468,6 +483,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activeJobDefinitionEntry.getProperty());
     assertEquals("active", activeJobDefinitionEntry.getNewValue());
     assertNull(activeJobDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activeJobDefinitionEntry.getCategory());
 
     // active job
     UserOperationLogEntry activateJobIdEntry = query()
@@ -483,6 +499,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateJobIdEntry.getProperty());
     assertEquals("active", activateJobIdEntry.getNewValue());
     assertNull(activateJobIdEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, activateJobIdEntry.getCategory());
 
     // suspended job definition
     UserOperationLogEntry suspendJobDefinitionEntry = query()
@@ -498,6 +515,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", suspendJobDefinitionEntry.getProperty());
     assertEquals("suspended", suspendJobDefinitionEntry.getNewValue());
     assertNull(suspendJobDefinitionEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendJobDefinitionEntry.getCategory());
 
     // suspended job
     UserOperationLogEntry suspendedJobEntry = query()
@@ -513,6 +531,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", suspendedJobEntry.getProperty());
     assertEquals("suspended", suspendedJobEntry.getNewValue());
     assertNull(suspendedJobEntry.getOrgValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, suspendedJobEntry.getCategory());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
@@ -543,6 +562,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(job.getProcessDefinitionKey(), jobRetryEntry.getProcessDefinitionKey());
     assertEquals(job.getProcessDefinitionId(), jobRetryEntry.getProcessDefinitionId());
     assertEquals(deploymentId, jobRetryEntry.getDeploymentId());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, jobRetryEntry.getCategory());
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -571,6 +591,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .entityType(JOB_DEFINITION)
       .operationType(UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION)
       .processDefinitionId(processDefinitionId)
+      .category(UserOperationLogEntry.CATEGORY_OPERATOR)
       .count();
 
     assertEquals(1, jobDefinitionEntryCount.longValue());
@@ -588,6 +609,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .entityType(JOB_DEFINITION)
       .operationType(UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION)
       .processDefinitionId(processDefinitionId)
+      .category(UserOperationLogEntry.CATEGORY_OPERATOR)
       .count();
 
     assertEquals(1, jobDefinitionEntryCount.longValue());
@@ -629,6 +651,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .entityType(PROCESS_DEFINITION)
       .operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
       .processDefinitionKey(key)
+      .category(UserOperationLogEntry.CATEGORY_OPERATOR)
       .count();
 
     assertEquals(1, processDefinitionEntryCount.longValue());
@@ -643,6 +666,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .entityType(PROCESS_DEFINITION)
       .operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION)
       .processDefinitionKey(key)
+      .category(UserOperationLogEntry.CATEGORY_OPERATOR)
       .count();
 
     assertEquals(1, processDefinitionEntryCount.longValue());
@@ -687,6 +711,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNull(logEntry.getProperty());
     assertNull(logEntry.getOrgValue());
     assertNull(logEntry.getNewValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
   }
 
   // ----- ADD VARIABLES -----
@@ -700,7 +725,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.setVariable(process.getId(), "testVariable1", "THIS IS TESTVARIABLE!!!");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE, UserOperationLogEntry.CATEGORY_OPERATOR);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -712,7 +737,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.setVariables(process.getId(), createMapForVariableAddition());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE, UserOperationLogEntry.CATEGORY_OPERATOR);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -726,7 +751,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.setVariable(process.getId(), "testVariable4", "bar");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE, UserOperationLogEntry.CATEGORY_OPERATOR);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -739,7 +764,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     taskService.setVariable(processTaskId, "testVariable1", "THIS IS TESTVARIABLE!!!");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE, UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -752,7 +777,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     taskService.setVariables(processTaskId, createMapForVariableAddition());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE, UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -767,7 +792,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     taskService.setVariable(processTaskId, "testVariable4", "bar");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE, UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   // ----- PATCH VARIABLES -----
@@ -782,7 +807,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .updateVariables(process.getId(), createMapForVariableAddition(), createCollectionForVariableDeletion());
 
     // then
-   verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE);
+   verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE, UserOperationLogEntry.CATEGORY_OPERATOR);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -796,7 +821,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .updateVariablesLocal(processTaskId, createMapForVariableAddition(), createCollectionForVariableDeletion());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE, UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   // ----- REMOVE VARIABLES -----
@@ -810,7 +835,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.removeVariable(process.getId(), "testVariable1");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE, UserOperationLogEntry.CATEGORY_OPERATOR);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -822,7 +847,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.removeVariables(process.getId(), createCollectionForVariableDeletion());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE, UserOperationLogEntry.CATEGORY_OPERATOR);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -836,7 +861,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     runtimeService.removeVariable(process.getId(), "testVariable2");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE, UserOperationLogEntry.CATEGORY_OPERATOR);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -849,7 +874,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     taskService.removeVariable(processTaskId, "testVariable1");
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE, UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -862,7 +887,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     taskService.removeVariables(processTaskId, createCollectionForVariableDeletion());
 
     // then
-    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
+    verifyVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE, UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -877,7 +902,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     taskService.removeVariable(processTaskId, "testVariable4");
 
     // then
-    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
+    verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE, UserOperationLogEntry.CATEGORY_TASK_WORKER);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -906,7 +931,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     verifyQueryResults(query, 0);
 
     try {
-      query.entityTypeIn(null);
+      query.entityTypeIn((String[]) null);
       fail();
     } catch (ProcessEngineException e) {
       // expected
@@ -914,6 +939,73 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     try {
       query.entityTypeIn(EntityTypes.TASK, null, EntityTypes.VARIABLE);
+      fail();
+    } catch (ProcessEngineException e) {
+      // expected
+    }
+  }
+  
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryByCategories() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.setAssignee(processTaskId, "foo");
+    taskService.setVariable(processTaskId, "foo", "bar");
+
+    // then
+    UserOperationLogQuery query = historyService
+      .createUserOperationLogQuery()
+      .categoryIn(UserOperationLogEntry.CATEGORY_TASK_WORKER, UserOperationLogEntry.CATEGORY_OPERATOR);
+
+    verifyQueryResults(query, 3);
+    
+    // and
+    query = historyService
+        .createUserOperationLogQuery()
+        .categoryIn(UserOperationLogEntry.CATEGORY_TASK_WORKER);
+
+    verifyQueryResults(query, 2);
+      
+    // and
+    query = historyService
+      .createUserOperationLogQuery()
+      .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+    verifyQueryResults(query, 1);
+  }
+  
+  public void testQueryByInvalidCategories() {
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .categoryIn("foo");
+
+    verifyQueryResults(query, 0);
+    
+    query = historyService
+        .createUserOperationLogQuery()
+        .category("foo");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.category(null);
+      fail();
+    } catch (ProcessEngineException e) {
+      // expected
+    }
+    
+    try {
+      query.categoryIn((String[]) null);
+      fail();
+    } catch (ProcessEngineException e) {
+      // expected
+    }
+
+    try {
+      query.categoryIn(UserOperationLogEntry.CATEGORY_ADMIN, null, UserOperationLogEntry.CATEGORY_TASK_WORKER);
       fail();
     } catch (ProcessEngineException e) {
       // expected
@@ -1144,7 +1236,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     UserOperationLogQuery query = historyService
       .createUserOperationLogQuery()
-      .caseDefinitionId(caseDefinitionId);
+      .caseDefinitionId(caseDefinitionId)
+      .category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
 
     verifyQueryResults(query, 1);
   }
@@ -1175,7 +1268,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     UserOperationLogQuery query = historyService
       .createUserOperationLogQuery()
-      .caseInstanceId(caseInstanceId);
+      .caseInstanceId(caseInstanceId)
+      .category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
 
     verifyQueryResults(query, 1);
   }
@@ -1211,7 +1305,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     UserOperationLogQuery query = historyService
       .createUserOperationLogQuery()
-      .caseExecutionId(caseExecutionId);
+      .caseExecutionId(caseExecutionId)
+      .category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
 
     verifyQueryResults(query, 1);
   }
@@ -1227,7 +1322,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     // when
     UserOperationLogQuery query = historyService
         .createUserOperationLogQuery()
-        .deploymentId(deploymentId);
+        .deploymentId(deploymentId)
+        .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
     // then
     verifyQueryResults(query, 1);
@@ -1286,7 +1382,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     return variables;
   }
 
-  private void verifyVariableOperationAsserts(int countAssertValue, String operationType) {
+  private void verifyVariableOperationAsserts(int countAssertValue, String operationType, String category) {
     UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
     assertEquals(countAssertValue, logQuery.count());
 
@@ -1297,12 +1393,14 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
         assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
         assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
         assertEquals(deploymentId, logEntry.getDeploymentId());
+        assertEquals(category, logEntry.getCategory());
       }
     } else {
       UserOperationLogEntry logEntry = logQuery.singleResult();
       assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
       assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
       assertEquals(deploymentId, logEntry.getDeploymentId());
+      assertEquals(category, logEntry.getCategory());
     }
   }
   
@@ -1318,6 +1416,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
         assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
         assertEquals(deploymentId, logEntry.getDeploymentId());
         assertNull(logEntry.getTaskId());
+        assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
       }
     } else {
       UserOperationLogEntry logEntry = logQuery.singleResult();
@@ -1325,6 +1424,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
       assertEquals(deploymentId, logEntry.getDeploymentId());
       assertNull(logEntry.getTaskId());
+      assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
     }
   }
   
@@ -1334,6 +1434,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     UserOperationLogEntry logEntry = logQuery.singleResult();
     assertEquals(property, logEntry.getProperty());
     assertEquals(newValue, logEntry.getNewValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
   }
   
   private void verfiySingleCaseVariableOperationAsserts(CaseInstance caseInstance) {
@@ -1346,6 +1447,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(caseInstance.getCaseInstanceId(), logEntry.getCaseInstanceId());
     assertEquals(deploymentId, logEntry.getDeploymentId());
     assertNull(logEntry.getTaskId());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logEntry.getCategory());
   }
 
   private UserOperationLogQuery query() {

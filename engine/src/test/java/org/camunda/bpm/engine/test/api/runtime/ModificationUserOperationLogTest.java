@@ -121,6 +121,7 @@ public class ModificationUserOperationLogTest {
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("true", asyncEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);
@@ -131,6 +132,7 @@ public class ModificationUserOperationLogTest {
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
     Assert.assertEquals("10", numInstancesEntry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstancesEntry.getCategory());
 
     Assert.assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
   }

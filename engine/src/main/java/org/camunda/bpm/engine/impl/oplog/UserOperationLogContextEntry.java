@@ -43,6 +43,7 @@ public class UserOperationLogContextEntry {
   protected String jobDefinitionId;
   protected String jobId;
   protected String batchId;
+  protected String category;
   protected String rootProcessInstanceId;
 
   public UserOperationLogContextEntry(String operationType, String entityType) {
@@ -168,6 +169,14 @@ public class UserOperationLogContextEntry {
 
   public void setBatchId(String batchId) {
     this.batchId = batchId;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   public String getRootProcessInstanceId() {

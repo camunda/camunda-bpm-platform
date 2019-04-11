@@ -95,6 +95,7 @@ public class UpdateSuspendStateUserOperationLogTest {
     assertNull(asyncEntry.getProcessInstanceId());
     assertNull(asyncEntry.getOrgValue());
     assertEquals("true", asyncEntry.getNewValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     assertNotNull(numInstancesEntry);
@@ -105,6 +106,7 @@ public class UpdateSuspendStateUserOperationLogTest {
     assertNull(numInstancesEntry.getProcessDefinitionId());
     assertNull(numInstancesEntry.getOrgValue());
     assertEquals("2", numInstancesEntry.getNewValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, asyncEntry.getCategory());
 
     assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
   }

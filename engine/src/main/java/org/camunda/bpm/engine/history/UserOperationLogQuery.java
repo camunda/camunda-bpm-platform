@@ -107,6 +107,28 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
 
   /** Query entries that changed a property. */
   UserOperationLogQuery property(String property);
+  
+  /**
+   * Query for operations of the given category only. This allows you to restrict the
+   * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
+   * All Admin Operations ...)
+   *
+   * @see UserOperationLogEntry#CATEGORY_ADMIN
+   * @see UserOperationLogEntry#CATEGORY_OPERATOR
+   * @see UserOperationLogEntry#CATEGORY_TASK_WORKER
+   */
+  UserOperationLogQuery category(String category);
+  
+  /**
+   * Query for operations of given categories only. This allows you to restrict the
+   * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
+   * All Admin Operations ...)
+   *
+   * @see UserOperationLogEntry#CATEGORY_ADMIN
+   * @see UserOperationLogEntry#CATEGORY_OPERATOR
+   * @see UserOperationLogEntry#CATEGORY_TASK_WORKER
+   */
+  UserOperationLogQuery categoryIn(String... categories);
 
   /** Query entries after the time stamp. */
   UserOperationLogQuery afterTimestamp(Date after);
