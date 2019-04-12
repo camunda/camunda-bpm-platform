@@ -104,7 +104,7 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
     propertyChanges.add(new PropertyChange("async", null, async));
     propertyChanges.add(new PropertyChange("retries", null, retries));
 
-    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES, null, null, null,
-        propertyChanges);
+    commandContext.getOperationLogManager().logExternalTaskOperation(
+        UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES, null, propertyChanges);
   }
 }

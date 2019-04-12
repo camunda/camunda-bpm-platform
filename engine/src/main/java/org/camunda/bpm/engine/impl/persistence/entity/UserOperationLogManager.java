@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -177,9 +178,15 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
-
+  
   public void logJobOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
       String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
+    logJobOperation(operation, jobId, jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey, 
+        Collections.singletonList(propertyChange));
+  }
+
+  public void logJobOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
+      String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
@@ -189,7 +196,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
             .jobDefinitionId(jobDefinitionId)
             .processDefinitionId(processDefinitionId)
             .processDefinitionKey(processDefinitionKey)
-            .propertyChanges(propertyChange)
+            .propertyChanges(propertyChanges)
             .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if(jobId != null) {
@@ -387,6 +394,34 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   
       context.addEntry(entryBuilder.create());
   
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logExternalTaskOperation(String operation, ExternalTaskEntity externalTask, List<PropertyChange> propertyChanges) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.EXTERNAL_TASK)
+            .propertyChanges(propertyChanges)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      if (externalTask != null) {
+        ExecutionEntity instance = null;
+        ProcessDefinitionEntity definition = null;
+        if (externalTask.getProcessInstanceId() != null) {
+          instance = getProcessInstanceManager().findExecutionById(externalTask.getProcessInstanceId());
+        } else if (externalTask.getProcessDefinitionId() != null) {
+          definition = getProcessDefinitionManager().findLatestProcessDefinitionById(externalTask.getProcessDefinitionId());
+        }
+        entryBuilder.processInstanceId(externalTask.getProcessInstanceId())
+          .processDefinitionId(externalTask.getProcessDefinitionId())
+          .processDefinitionKey(externalTask.getProcessDefinitionKey())
+          .inContextOf(externalTask, instance, definition);
+      }
+
+      context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
     }
   }

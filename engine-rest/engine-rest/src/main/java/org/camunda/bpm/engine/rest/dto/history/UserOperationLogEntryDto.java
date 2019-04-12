@@ -43,6 +43,7 @@ public class UserOperationLogEntryDto {
   protected String userId;
   protected Date timestamp;
   protected String operationId;
+  protected String externalTaskId;
   protected String operationType;
   protected String entityType;
   protected String property;
@@ -71,6 +72,7 @@ public class UserOperationLogEntryDto {
     dto.userId = entry.getUserId();
     dto.timestamp = entry.getTimestamp();
     dto.operationId = entry.getOperationId();
+    dto.externalTaskId = entry.getExternalTaskId();
     dto.operationType = entry.getOperationType();
     dto.entityType = entry.getEntityType();
     dto.property = entry.getProperty();
@@ -153,6 +155,10 @@ public class UserOperationLogEntryDto {
 
   public String getOperationId() {
     return operationId;
+  }
+  
+  public String getExternalTaskId() {
+    return externalTaskId;
   }
 
   public String getOperationType() {

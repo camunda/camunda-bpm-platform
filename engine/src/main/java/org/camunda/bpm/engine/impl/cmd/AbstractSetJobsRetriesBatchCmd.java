@@ -79,7 +79,9 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
     propertyChanges.add(new PropertyChange("retries", null, retries));
 
     commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES,
+        .logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES,
+            null,
+            null,
             null,
             null,
             null,

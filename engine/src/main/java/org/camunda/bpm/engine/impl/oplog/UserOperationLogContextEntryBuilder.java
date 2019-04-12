@@ -25,6 +25,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -103,13 +104,12 @@ public class UserOperationLogContextEntryBuilder {
     }
     entry.setPropertyChanges(propertyChanges);
 
-    ResourceDefinitionEntity definition = task.getProcessDefinition();
+    ProcessDefinitionEntity definition = task.getProcessDefinition();
     if (definition != null) {
       entry.setProcessDefinitionKey(definition.getKey());
       entry.setDeploymentId(definition.getDeploymentId());
     } else if (task.getCaseDefinitionId() != null) {
-      definition = task.getCaseDefinition();
-      entry.setDeploymentId(definition.getDeploymentId());
+      entry.setDeploymentId(task.getCaseDefinition().getDeploymentId());
     }
 
     entry.setProcessDefinitionId(task.getProcessDefinitionId());
@@ -142,7 +142,7 @@ public class UserOperationLogContextEntryBuilder {
     entry.setExecutionId(processInstance.getId());
     entry.setCaseInstanceId(processInstance.getCaseInstanceId());
 
-    ResourceDefinitionEntity definition = processInstance.getProcessDefinition();
+    ProcessDefinitionEntity definition = processInstance.getProcessDefinition();
     if (definition != null) {
       entry.setProcessDefinitionKey(definition.getKey());
       entry.setDeploymentId(definition.getDeploymentId());
@@ -201,6 +201,16 @@ public class UserOperationLogContextEntryBuilder {
       entry.setDeploymentId(definition.getDeploymentId());
     }
     
+    return this;
+  }
+  
+  public UserOperationLogContextEntryBuilder inContextOf(ExternalTaskEntity task, ExecutionEntity execution, ProcessDefinitionEntity definition) {
+    if (execution != null) {
+      inContextOf(execution);
+    } else if (definition != null) {
+      inContextOf(definition);
+    }
+    entry.setExternalTaskId(task.getId());
     return this;
   }
 

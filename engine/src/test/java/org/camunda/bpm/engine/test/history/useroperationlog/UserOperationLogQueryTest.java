@@ -54,6 +54,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
@@ -82,6 +83,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml";
   protected static final String ONE_TASK_CASE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
+  protected static final String ONE_EXTERNAL_TASK_PROCESS = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml";
 
   private ProcessInstance process;
   private Task userTask;
@@ -1307,6 +1309,26 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       .createUserOperationLogQuery()
       .caseExecutionId(caseExecutionId)
       .category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
+
+    verifyQueryResults(query, 1);
+  }
+  
+  @Deployment(resources={ONE_EXTERNAL_TASK_PROCESS})
+  public void testQueryByExternalTaskId() {
+    // given:
+    // an active process instance
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+    assertNotNull(task);
+
+    // when
+    externalTaskService.setRetries(task.getId(), 5);
+
+    // then
+    UserOperationLogQuery query = historyService
+      .createUserOperationLogQuery()
+      .externalTaskId(task.getId());
 
     verifyQueryResults(query, 1);
   }

@@ -178,6 +178,9 @@ public interface UserOperationLogEntry {
    * created with a common operationId. This allows grouping multiple entries which are part of a composite operation.
    */
   String getOperationId();
+  
+  /** External task reference. */
+  String getExternalTaskId();
 
   /**
    * Type of this operation, like create, assign, claim and so on.

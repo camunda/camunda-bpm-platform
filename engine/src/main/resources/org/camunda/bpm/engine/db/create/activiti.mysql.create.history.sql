@@ -230,6 +230,7 @@ create table ACT_HI_OP_LOG (
     TENANT_ID_ varchar(64),
     REMOVAL_TIME_ datetime,
 	CATEGORY_ varchar(64),
+	EXTERNAL_TASK_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

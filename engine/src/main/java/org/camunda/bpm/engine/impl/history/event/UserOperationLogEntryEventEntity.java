@@ -42,6 +42,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   protected String tenantId;
   protected String batchId;
   protected String category;
+  protected String externalTaskId;
 
   public String getOperationId() {
     return operationId;
@@ -170,6 +171,14 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
+  
+  public String getExternalTaskId() {
+    return externalTaskId;
+  }
+  
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
+  }
 
   @Override
   public String toString() {
@@ -193,6 +202,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
         + ", processDefinitionId=" + processDefinitionId
         + ", rootProcessInstanceId=" + rootProcessInstanceId
         + ", processInstanceId=" + processInstanceId
+        + ", externalTaskId=" + externalTaskId
         + ", tenantId=" + tenantId
         + ", entityType=" + entityType
         + ", category=" + category

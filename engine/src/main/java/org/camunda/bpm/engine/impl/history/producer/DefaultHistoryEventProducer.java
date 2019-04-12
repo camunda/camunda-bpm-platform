@@ -327,6 +327,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setCategory(contextEntry.getCategory());
     evt.setTimestamp(ClockUtil.getCurrentTime());
     evt.setRootProcessInstanceId(contextEntry.getRootProcessInstanceId());
+    evt.setExternalTaskId(contextEntry.getExternalTaskId());
 
     if (isHistoryRemovalTimeStrategyStart()) {
       provideRemovalTime(evt);

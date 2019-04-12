@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -126,8 +127,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
 
     UserOperationLogEntry retriesEntry = entries.get("retries");
     Assert.assertNotNull(retriesEntry);
-    Assert.assertEquals("ProcessInstance", retriesEntry.getEntityType());
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, retriesEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", retriesEntry.getOperationType());
+    Assert.assertEquals(externalTask.getId(), retriesEntry.getExternalTaskId());
     Assert.assertEquals(externalTask.getProcessInstanceId(), retriesEntry.getProcessInstanceId());
     Assert.assertEquals(externalTask.getProcessDefinitionId(), retriesEntry.getProcessDefinitionId());
     Assert.assertEquals(externalTask.getProcessDefinitionKey(), retriesEntry.getProcessDefinitionKey());
@@ -158,8 +160,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
 
     UserOperationLogEntry asyncEntry = entries.get("async");
     Assert.assertNotNull(asyncEntry);
-    Assert.assertEquals("ProcessInstance", asyncEntry.getEntityType());
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, asyncEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", asyncEntry.getOperationType());
+    Assert.assertNull(asyncEntry.getExternalTaskId());
     Assert.assertNull(asyncEntry.getProcessDefinitionId());
     Assert.assertNull(asyncEntry.getProcessDefinitionKey());
     Assert.assertNull(asyncEntry.getProcessInstanceId());
@@ -169,8 +172,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);
-    Assert.assertEquals("ProcessInstance", numInstancesEntry.getEntityType());
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, numInstancesEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", numInstancesEntry.getOperationType());
+    Assert.assertNull(numInstancesEntry.getExternalTaskId());
     Assert.assertNull(numInstancesEntry.getProcessDefinitionId());
     Assert.assertNull(numInstancesEntry.getProcessDefinitionKey());
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
@@ -180,8 +184,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
 
     UserOperationLogEntry retriesEntry = entries.get("retries");
     Assert.assertNotNull(retriesEntry);
-    Assert.assertEquals("ProcessInstance", retriesEntry.getEntityType());
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, retriesEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", retriesEntry.getOperationType());
+    Assert.assertNull(retriesEntry.getExternalTaskId());
     Assert.assertNull(retriesEntry.getProcessDefinitionId());
     Assert.assertNull(retriesEntry.getProcessDefinitionKey());
     Assert.assertNull(retriesEntry.getProcessInstanceId());
@@ -207,8 +212,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
 
     UserOperationLogEntry asyncEntry = entries.get("async");
     Assert.assertNotNull(asyncEntry);
-    Assert.assertEquals("ProcessInstance", asyncEntry.getEntityType());
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, asyncEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", asyncEntry.getOperationType());
+    Assert.assertNull(asyncEntry.getExternalTaskId());
     Assert.assertNull(asyncEntry.getProcessDefinitionId());
     Assert.assertNull(asyncEntry.getProcessDefinitionKey());
     Assert.assertNull(asyncEntry.getProcessInstanceId());
@@ -218,8 +224,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);
-    Assert.assertEquals("ProcessInstance", numInstancesEntry.getEntityType());
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, numInstancesEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", numInstancesEntry.getOperationType());
+    Assert.assertNull(numInstancesEntry.getExternalTaskId());
     Assert.assertNull(numInstancesEntry.getProcessDefinitionId());
     Assert.assertNull(numInstancesEntry.getProcessDefinitionKey());
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
@@ -229,8 +236,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
 
     UserOperationLogEntry retriesEntry = entries.get("retries");
     Assert.assertNotNull(retriesEntry);
-    Assert.assertEquals("ProcessInstance", retriesEntry.getEntityType());
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, retriesEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", retriesEntry.getOperationType());
+    Assert.assertNull(retriesEntry.getExternalTaskId());
     Assert.assertNull(retriesEntry.getProcessDefinitionId());
     Assert.assertNull(retriesEntry.getProcessDefinitionKey());
     Assert.assertNull(retriesEntry.getProcessInstanceId());

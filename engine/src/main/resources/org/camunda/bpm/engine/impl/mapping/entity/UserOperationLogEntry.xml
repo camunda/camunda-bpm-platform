@@ -49,7 +49,8 @@
         NEW_VALUE_,
         TENANT_ID_,
         REMOVAL_TIME_,
-        CATEGORY_
+        CATEGORY_,
+        EXTERNAL_TASK_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{deploymentId, jdbcType=VARCHAR},
@@ -75,7 +76,8 @@
         #{newValue ,jdbcType=VARCHAR},
         #{tenantId ,jdbcType=VARCHAR},
         #{removalTime, jdbcType=TIMESTAMP},
-        #{category, jdbcType=VARCHAR}
+        #{category, jdbcType=VARCHAR},
+        #{externalTaskId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -179,6 +181,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
+    <result property="externalTaskId" column="EXTERNAL_TASK_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- OPERATION LOG ENTRY SELECT -->
@@ -252,6 +255,9 @@
       </if>
       <if test="operationId != null">
         and RES.OPERATION_ID_ = #{operationId}
+      </if>
+      <if test="externalTaskId != null">
+        and RES.EXTERNAL_TASK_ID_ = #{externalTaskId}
       </if>
       <if test="operationType != null">
         and RES.OPERATION_TYPE_ = #{operationType}

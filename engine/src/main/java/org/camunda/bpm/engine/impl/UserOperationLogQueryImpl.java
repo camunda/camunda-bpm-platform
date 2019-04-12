@@ -47,6 +47,7 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected String batchId;
   protected String userId;
   protected String operationId;
+  protected String externalTaskId;
   protected String operationType;
   protected String property;
   protected String entityType;
@@ -146,6 +147,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   public UserOperationLogQuery operationId(String operationId) {
     ensureNotNull("operationId", operationId);
     this.operationId = operationId;
+    return this;
+  }
+  
+  public UserOperationLogQuery externalTaskId(String externalTaskId) {
+    ensureNotNull("externalTaskId", externalTaskId);
+    this.externalTaskId = externalTaskId;
     return this;
   }
 

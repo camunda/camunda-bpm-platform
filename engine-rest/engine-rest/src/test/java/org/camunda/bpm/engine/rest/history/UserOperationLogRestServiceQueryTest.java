@@ -103,8 +103,10 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock, never()).batchId(anyString());
     verify(queryMock, never()).userId(anyString());
     verify(queryMock, never()).operationId(anyString());
+    verify(queryMock, never()).externalTaskId(anyString());
     verify(queryMock, never()).operationType(anyString());
     verify(queryMock, never()).entityType(anyString());
+    verify(queryMock, never()).category(anyString());
     verify(queryMock, never()).property(anyString());
     verify(queryMock, never()).afterTimestamp(any(Date.class));
     verify(queryMock, never()).beforeTimestamp(any(Date.class));
@@ -131,6 +133,7 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
         .queryParam("batchId", MockProvider.EXAMPLE_BATCH_ID)
         .queryParam("userId", "icke")
         .queryParam("operationId", "5")
+        .queryParam("externalTaskId", "1")
         .queryParam("operationType", OPERATION_TYPE_CLAIM)
         .queryParam("entityType", EntityTypes.TASK)
         .queryParam("entityTypeIn", EntityTypes.TASK + "," + EntityTypes.VARIABLE)
@@ -154,6 +157,7 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock).batchId(MockProvider.EXAMPLE_BATCH_ID);
     verify(queryMock).userId("icke");
     verify(queryMock).operationId("5");
+    verify(queryMock).externalTaskId("1");
     verify(queryMock).operationType(OPERATION_TYPE_CLAIM);
     verify(queryMock).entityType(EntityTypes.TASK);
     verify(queryMock).entityTypeIn(EntityTypes.TASK, EntityTypes.VARIABLE);

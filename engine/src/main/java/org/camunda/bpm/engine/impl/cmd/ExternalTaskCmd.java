@@ -18,11 +18,15 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -55,10 +59,29 @@ public abstract class ExternalTaskCmd implements Command<Void> {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
     }
-
+    
+    writeUserOperationLog(commandContext, externalTask, getUserOperationLogOperationType(), 
+        getUserOperationLogPropertyChanges(externalTask));
+    
     execute(externalTask);
 
     return null;
+  }
+  
+  protected void writeUserOperationLog(CommandContext commandContext, ExternalTaskEntity externalTask, String operationType, List<PropertyChange> propertyChanges) {
+    if (operationType != null) {
+      commandContext.getOperationLogManager().logExternalTaskOperation(operationType, externalTask,
+          propertyChanges == null || propertyChanges.isEmpty() ? 
+              Collections.singletonList(PropertyChange.EMPTY_CHANGE) : propertyChanges);
+    }
+  }
+  
+  protected String getUserOperationLogOperationType() {
+    return null;
+  }
+  
+  protected List<PropertyChange> getUserOperationLogPropertyChanges(ExternalTaskEntity externalTask) {
+    return Collections.emptyList();
   }
 
   /**

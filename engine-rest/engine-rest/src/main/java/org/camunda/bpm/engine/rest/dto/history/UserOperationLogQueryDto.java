@@ -51,6 +51,7 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   protected String batchId;
   protected String userId;
   protected String operationId;
+  protected String externalTaskId;
   protected String operationType;
   protected String entityType;
   protected String property;
@@ -118,6 +119,9 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     }
     if (operationId != null) {
       query.operationId(operationId);
+    }
+    if (externalTaskId != null) {
+      query.externalTaskId(externalTaskId);
     }
     if (operationType != null) {
       query.operationType(operationType);
@@ -220,6 +224,11 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   @CamundaQueryParam("operationId")
   public void setOperationId(String operationId) {
     this.operationId = operationId;
+  }
+  
+  @CamundaQueryParam("externalTaskId")
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
   }
 
   @CamundaQueryParam("operationType")

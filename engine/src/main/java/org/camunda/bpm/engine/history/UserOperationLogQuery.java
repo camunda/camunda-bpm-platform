@@ -104,6 +104,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    * which will be logged as separate {@link UserOperationLogEntry OperationLogEntries} with the same 'operationId'
    * */
   UserOperationLogQuery operationId(String operationId);
+  
+  /** Query entries which are existing for the external task. */
+  UserOperationLogQuery externalTaskId(String externalTaskId);
 
   /** Query entries that changed a property. */
   UserOperationLogQuery property(String property);

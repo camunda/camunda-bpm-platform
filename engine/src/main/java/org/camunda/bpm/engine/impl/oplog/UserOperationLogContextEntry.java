@@ -45,6 +45,7 @@ public class UserOperationLogContextEntry {
   protected String batchId;
   protected String category;
   protected String rootProcessInstanceId;
+  protected String externalTaskId;
 
   public UserOperationLogContextEntry(String operationType, String entityType) {
     this.operationType = operationType;
@@ -185,6 +186,14 @@ public class UserOperationLogContextEntry {
 
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+  
+  public String getExternalTaskId() {
+    return externalTaskId;
+  }
+  
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
   }
 
 }
