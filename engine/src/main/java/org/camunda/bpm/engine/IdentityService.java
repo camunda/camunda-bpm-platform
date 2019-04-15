@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
@@ -33,8 +34,6 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
-
 
 /**
  * Service to manage {@link User}s and {@link Group}s.
@@ -319,7 +318,7 @@ public interface IdentityService {
    * @return <code>true</code> if the password is policy-compliant (if not an
    *         exception is thrown)
    */
-  boolean checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
+  CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
 
   /**
    * Returns the {@link PasswordPolicy} that is currently configured in the

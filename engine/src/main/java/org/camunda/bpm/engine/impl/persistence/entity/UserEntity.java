@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -162,8 +163,9 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   }
   
 
-  public void checkPasswordAgainstPolicy(PasswordPolicy policy) {
-    Context.getProcessEngineConfiguration().getIdentityService().checkPasswordAgainstPolicy(policy, newPassword);
+  public boolean checkPasswordAgainstPolicy(PasswordPolicy policy) {
+    CheckPasswordAgainstPolicyResult result = Context.getProcessEngineConfiguration().getIdentityService().checkPasswordAgainstPolicy(policy, newPassword);
+    return result.getViolatedRules().size() > 0 ? false : true;
   }
 
   public String toString() {

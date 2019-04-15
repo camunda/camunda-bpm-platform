@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
-import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -84,14 +83,16 @@ public class CustomPasswordPolicyTest {
     User user = identityService.newUser("user");
     user.setPassword("this-is-1-STRONG-password");
     identityService.saveUser(user);
+    assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(1L));
   }
 
   @Test
   public void testCustomPasswordPolicyWithNonCompliantPassword() {
-    thrown.expect(PasswordPolicyException.class);
+    thrown.expect(ProcessEngineException.class);
     User user = identityService.newUser("user");
     user.setPassword("weakpassword");
     identityService.saveUser(user);
     thrown.expectMessage("Password does not match policy");
+    assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(0L));
   }
 }

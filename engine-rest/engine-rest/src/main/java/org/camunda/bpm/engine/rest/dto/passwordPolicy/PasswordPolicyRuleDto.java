@@ -26,14 +26,14 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 public class PasswordPolicyRuleDto {
   protected String placeholder;
   protected Map<String, String> parameter;
+  protected Boolean valid = true;
 
   // transformers
 
-  public static PasswordPolicyRuleDto fromRule(PasswordPolicyRule rule) {
-    PasswordPolicyRuleDto dto = new PasswordPolicyRuleDto();
-    dto.setPlaceholder(rule.getPlaceholder());
-    dto.setParameter(rule.getParameters());
-    return dto;
+  public PasswordPolicyRuleDto(PasswordPolicyRule rule, Boolean valid) {
+    this.placeholder = rule.getPlaceholder();
+    this.parameter = rule.getParameters();
+    this.valid = valid;
   }
 
   // getters / setters
@@ -52,6 +52,14 @@ public class PasswordPolicyRuleDto {
 
   public void setParameter(Map<String, String> parameter) {
     this.parameter = parameter;
+  }
+
+  public Boolean isValid() {
+    return valid;
+  }
+
+  public void setValid(Boolean valid) {
+    this.valid = valid;
   }
 
 }

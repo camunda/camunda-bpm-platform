@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.rest.dto.passwordPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
@@ -29,10 +31,21 @@ public class PasswordPolicyDto {
 
   // transformers
 
-  public static PasswordPolicyDto fromPasswordPolicyRules(List<PasswordPolicyRule> rules) {
+  public static PasswordPolicyDto fromPasswordPolicy(PasswordPolicy policy) {
+    PasswordPolicyDto policyDto = new PasswordPolicyDto();
+    for (PasswordPolicyRule rule : policy.getRules()) {
+      policyDto.rules.add(new PasswordPolicyRuleDto(rule, null));
+    }
+    return policyDto;
+  }
+  
+  public static PasswordPolicyDto fromPasswordPolicyResult(CheckPasswordAgainstPolicyResult result) {
     PasswordPolicyDto policy = new PasswordPolicyDto();
-    for (PasswordPolicyRule rule : rules) {
-      policy.rules.add(PasswordPolicyRuleDto.fromRule(rule));
+    for (PasswordPolicyRule rule : result.getFulfilledRules()) {
+      policy.rules.add(new PasswordPolicyRuleDto(rule, true));
+    }
+    for (PasswordPolicyRule rule : result.getViolatedRules()) {
+      policy.rules.add(new PasswordPolicyRuleDto(rule, false));
     }
     return policy;
   }

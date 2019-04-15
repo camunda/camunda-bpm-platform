@@ -27,11 +27,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
@@ -66,7 +66,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
     for (Group group : userGroups) {
       List<User> groupUsers = identityService.createUserQuery().memberOfGroup(group.getId()).list();
-      for (User user: groupUsers) {
+      for (User user : groupUsers) {
         if (!user.getId().equals(userId)) {
           allGroupUsers.add(new UserDto(user.getId(), user.getFirstName(), user.getLastName()));
         }
@@ -83,7 +83,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
       throw new InvalidRequestException(Status.BAD_REQUEST, "Username and password are required");
     }
     IdentityService identityService = getProcessEngine().getIdentityService();
-    boolean valid = identityService.checkPassword(credentialsDto.getUsername(),credentialsDto.getPassword());
+    boolean valid = identityService.checkPassword(credentialsDto.getUsername(), credentialsDto.getPassword());
     if (valid) {
       return AuthenticationResult.successful(credentialsDto.getUsername());
     } else {
@@ -94,8 +94,8 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
   @Override
   public Response getPasswordPolicy() {
     PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
-    if(policy != null) {
-      return Response.status(Status.OK.getStatusCode()).entity(PasswordPolicyDto.fromPasswordPolicyRules(policy.getRules())).build();
+    if (policy != null) {
+      return Response.status(Status.OK.getStatusCode()).entity(PasswordPolicyDto.fromPasswordPolicy(policy)).build();
     } else {
       return Response.status(Status.NOT_FOUND.getStatusCode()).build();
     }
@@ -106,16 +106,13 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
     Map<String, Object> parameters = new HashMap<String, Object>();
     if (policy != null) {
-      try {
-        processEngine.getIdentityService().checkPasswordAgainstPolicy(policy, password.getPassword());
-        parameters.put("valid", true);
-        return Response.status(Status.OK).entity(parameters).build();
-      } catch (PasswordPolicyException e) {
-        PasswordPolicyDto policyDto = PasswordPolicyDto.fromPasswordPolicyRules(e.getPolicyRules());
+      CheckPasswordAgainstPolicyResult result = processEngine.getIdentityService().checkPasswordAgainstPolicy(policy, password.getPassword());
+      parameters.put("valid", result.isValid());
+      if (!result.isValid()) {
+        PasswordPolicyDto policyDto = PasswordPolicyDto.fromPasswordPolicyResult(result);
         parameters.put("policy", policyDto);
-        parameters.put("valid", false);
       }
-    }else {
+    } else {
       parameters.put("policy", "No password policy is configured.");
       parameters.put("valid", true);
     }

@@ -14,25 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.identity;
+package org.camunda.bpm.engine.identity;
 
 import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.identity.PasswordPolicyRule;
+
 /**
+ * Data structure that represents a result of a password check against a
+ * {@link PasswordPolicy}.
+ * 
  * @author Miklas Boskamp
+ *
  */
-public class PasswordPolicyException extends ProcessEngineException {
-  protected static final long serialVersionUID = 1L;
+public interface CheckPasswordAgainstPolicyResult {
 
-  protected List<PasswordPolicyRule> policyRules;
+  /**
+   * Indicator of the overall result of the check.
+   * 
+   * @return <code>true</code> if all rules passed, <code>false</code> if at
+   *         least one rule was violated.
+   */
+  public boolean isValid();
 
-  public PasswordPolicyException(List<PasswordPolicyRule> policyrules) {
-    super("Password does not match policy");
-    this.policyRules = policyrules;
-  }
+  /**
+   * List of all rules that were violated during the check.
+   * 
+   * @return all violated rules.
+   */
+  public List<PasswordPolicyRule> getViolatedRules();
 
-  public List<PasswordPolicyRule> getPolicyRules() {
-    return policyRules;
-  }
+  /**
+   * List of all rules that were fulfilled during the check.
+   * 
+   * @return all fulfilled rules.
+   */
+  public List<PasswordPolicyRule> getFulfilledRules();
 }
