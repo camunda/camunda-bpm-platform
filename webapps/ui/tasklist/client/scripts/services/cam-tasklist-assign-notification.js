@@ -43,7 +43,7 @@ module.exports = ['camAPI', 'Notifications', '$translate',
         if(data._embedded.task.length > 0) {
           var msg = '';
           for(var task, i = 0; (task = data._embedded.task[i]); i++) {
-            msg += '<a ng-href="#/?forceDisplayTask=true&task='+ task.id +'" ng-click="removeNotification(notification)">'+ escapeHtml(task.name); +'</a>, ';
+            msg += '<a ng-href="#/?forceDisplayTask=true&task='+ task.id +'" ng-click="removeNotification(notification)">'+ escapeHtml(task.name) +'</a>, ';
           }
           $translate(params.processInstanceId ? 'ASSIGN_NOTE_PROCESS' : 'ASSIGN_NOTE_CASE').then(function(translated) {
             Notifications.addMessage({
