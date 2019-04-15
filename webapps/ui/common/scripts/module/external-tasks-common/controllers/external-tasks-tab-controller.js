@@ -20,14 +20,19 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  '$scope', 'exposeScopeProperties',
+  '$scope', 'exposeScopeProperties', 'search',
   ExternalTasksTabController
 ];
 
 module.exports.ExternalTasksTabController = ExternalTasksTabController;
 
-function ExternalTasksTabController($scope, exposeScopeProperties) {
+function ExternalTasksTabController($scope, exposeScopeProperties, search) {
   exposeScopeProperties($scope, this, ['onLoad']);
+
+  // reset Page when changing Tabs
+  $scope.$on('$destroy', function() {
+    search('page', null);
+  });
 
   var processData = $scope.processData.newChild($scope);
 
