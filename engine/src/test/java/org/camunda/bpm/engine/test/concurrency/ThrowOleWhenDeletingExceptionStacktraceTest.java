@@ -32,25 +32,31 @@ public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest
 
   protected AtomicReference<JobEntity> job = new AtomicReference<>();
 
+  protected void runTest() {
+    // ignored
+  }
+
   protected void tearDown() throws Exception {
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        JobEntity jobEntity = job.get();
+    if (job.get() != null) {
+      processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+          JobEntity jobEntity = job.get();
 
-        jobEntity.setRevision(2);
+          jobEntity.setRevision(2);
 
-        commandContext.getJobManager().deleteJob(jobEntity);
-        commandContext.getByteArrayManager().deleteByteArrayById(jobEntity.getExceptionByteArrayId());
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobEntity.getId());
+          commandContext.getJobManager().deleteJob(jobEntity);
+          commandContext.getByteArrayManager().deleteByteArrayById(jobEntity.getExceptionByteArrayId());
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobEntity.getId());
 
-        return null;
-      }
-    });
+          return null;
+        }
+      });
+    }
 
     super.tearDown();
   }
 
-  public void FAILING_testThrowOleWhenDeletingExceptionStacktraceTest() {
+  public void testThrowOleWhenDeletingExceptionStacktraceTest() {
     // given
     processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new Command<Void>() {
