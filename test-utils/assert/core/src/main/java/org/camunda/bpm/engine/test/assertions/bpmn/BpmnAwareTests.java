@@ -199,6 +199,16 @@ public class BpmnAwareTests extends AbstractAssertions {
   }
 
   /**
+   * Helper method to easily access DecisionService
+   *
+   * @return DecisionService of process engine bound to this testing thread
+   * @see org.camunda.bpm.engine.DecisionService
+   */
+  public static DecisionService decisionService() {
+    return processEngine().getDecisionService();
+  }
+
+  /**
    * Helper method to easily create a new TaskQuery
    *
    * @return  new TaskQuery for process engine bound to this testing thread
