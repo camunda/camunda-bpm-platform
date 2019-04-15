@@ -17,13 +17,16 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 
 /**
@@ -53,6 +56,10 @@ public class SetJobDuedateCmd implements Command<Void>, Serializable {
       for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
         checker.checkUpdateJob(job);
       }
+      
+      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE, jobId, 
+          job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
+          Collections.singletonList(new PropertyChange("duedate", job.getDuedate(), newDuedate)));
 
       job.setDuedate(newDuedate);
     } else {

@@ -17,11 +17,14 @@
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -301,5 +304,68 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
     
     managementService.deleteBatch(batch.getId(), true);
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  public void testSetJobDueDate() {
+    // given a job
+    runtimeService.startProcessInstanceByKey("asyncTaskProcess");
+    Job job = managementService.createJobQuery().singleResult();
+
+    // and set the job due date
+    Date newDate = new Date(ClockUtil.getCurrentTime().getTime() + 2 * 1000);
+    managementService.setJobDuedate(job.getId(), newDate);
+
+    // then one op log entry is written
+    UserOperationLogQuery query = historyService
+            .createUserOperationLogQuery()
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE);
+    assertEquals(1, query.count());
+
+    // assert details
+    UserOperationLogEntry entry = query.singleResult();
+    assertEquals(job.getId(), entry.getJobId());
+    assertEquals(job.getDeploymentId(), entry.getDeploymentId());
+    assertEquals(job.getJobDefinitionId(), entry.getJobDefinitionId());
+    assertEquals("duedate", entry.getProperty());
+    assertNull(entry.getOrgValue());
+    assertEquals(newDate, new Date(Long.valueOf(entry.getNewValue())));
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/TimerRecalculationTest.testFinishedJob.bpmn20.xml"})
+  public void testRecalculateJobDueDate() {
+    // given a job
+    HashMap<String, Object> variables1 = new HashMap<String, Object>();
+    Date duedate = ClockUtil.getCurrentTime();
+    variables1.put("dueDate", duedate);
+
+    runtimeService.startProcessInstanceByKey("intermediateTimerEventExample", variables1);
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when I recalculate the job due date
+    managementService.recalculateJobDuedate(job.getId(), false);
+
+    // then one op log entry is written
+    UserOperationLogQuery query = historyService
+            .createUserOperationLogQuery()
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_RECALC_DUEDATE);
+    assertEquals(2, query.count());
+
+    // assert details
+    UserOperationLogEntry entry = query.property("duedate").singleResult();
+    assertEquals(job.getId(), entry.getJobId());
+    assertEquals(job.getDeploymentId(), entry.getDeploymentId());
+    assertEquals(job.getJobDefinitionId(), entry.getJobDefinitionId());
+    assertEquals("duedate", entry.getProperty());
+    assertEquals(duedate, new Date(Long.valueOf(entry.getOrgValue())));
+    assertEquals(duedate, new Date(Long.valueOf(entry.getNewValue())));
+    
+    entry = query.property("creationDateBased").singleResult();
+    assertEquals(job.getId(), entry.getJobId());
+    assertEquals(job.getDeploymentId(), entry.getDeploymentId());
+    assertEquals(job.getJobDefinitionId(), entry.getJobDefinitionId());
+    assertEquals("creationDateBased", entry.getProperty());
+    assertNull(entry.getOrgValue());
+    assertFalse(Boolean.valueOf(entry.getNewValue()));
   }
 }

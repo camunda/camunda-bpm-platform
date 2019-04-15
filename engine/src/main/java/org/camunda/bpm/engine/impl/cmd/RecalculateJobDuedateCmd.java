@@ -20,11 +20,14 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -39,6 +42,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandl
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
@@ -73,6 +77,7 @@ public class RecalculateJobDuedateCmd implements Command<Void>, Serializable {
     // prepare recalculation
     final TimerDeclarationImpl timerDeclaration = findTimerDeclaration(commandContext, job);
     final TimerEntity timer = (TimerEntity) job;
+    Date oldDuedate = job.getDuedate();
     Runnable runnable = new Runnable() {
       @Override
       public void run() {
@@ -86,6 +91,14 @@ public class RecalculateJobDuedateCmd implements Command<Void>, Serializable {
         .getDeploymentCache()
         .findDeployedProcessDefinitionById(job.getProcessDefinitionId());
     ProcessApplicationContextUtil.doContextSwitch(runnable, contextDefinition);
+    
+    // log operation
+    List<PropertyChange> propertyChanges = new ArrayList<>();
+    propertyChanges.add(new PropertyChange("duedate", oldDuedate, job.getDuedate()));
+    propertyChanges.add(new PropertyChange("creationDateBased", null, creationDateBased));
+    commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_RECALC_DUEDATE, jobId, 
+        job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
+        propertyChanges);
     
     return null;
   }
