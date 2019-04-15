@@ -115,11 +115,6 @@
 
         <div class="col-xs-4"
              ng-switch="variable.type">
-          <input ng-switch-when=""
-                 readonly
-                 type="text"
-                 class="form-control"
-                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
 
 
           <input ng-switch-when="Boolean"
@@ -136,6 +131,7 @@
                  type="{{ variableTypes[variable.type] }}"
                  required
                  ng-model="variable.value"
+                 ng-readonly="!variable.type"
                  name="value"
                  cam-variable-name="{{ variable.name }}"
                  cam-variable-type="{{ variable.type }}"
