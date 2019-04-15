@@ -296,6 +296,8 @@ module.exports = [
               element.focus();
             }
           });
+
+          scope.openDropdownNew = false;
         };
 
         /**
