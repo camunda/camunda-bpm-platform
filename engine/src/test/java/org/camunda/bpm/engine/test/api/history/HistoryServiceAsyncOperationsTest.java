@@ -135,23 +135,6 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   }
 
   @Test
-  public void testDeleteHistoryProcessInstancesAsyncIfExistsWithFake() throws Exception {
-    //given
-    ArrayList<String> processInstanceIds = new ArrayList<String>();
-    processInstanceIds.add(historicProcessInstances.get(0));
-    processInstanceIds.add("aFakeId");
-    
-    //when
-    Batch batch = historyService.deleteHistoricProcessInstancesAsyncIfExists(processInstanceIds, null, TEST_REASON);
-    executeSeedJob(batch);
-    List<Exception> exceptions = executeBatchJobs(batch);
-    
-    //then
-    assertThat(exceptions.size(), is(0));
-    assertHistoricBatchExists(testRule);
-  }
-
-  @Test
   public void testDeleteHistoryProcessInstancesAsyncWithQueryAndList() throws Exception {
     //given
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()

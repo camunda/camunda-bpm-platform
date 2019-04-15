@@ -159,11 +159,7 @@ import java.util.List;
 
     try {
       Batch batch;
-      if(dto.isFailIfNotExists()) {
-        batch = historyService.deleteHistoricProcessInstancesAsync(dto.getHistoricProcessInstanceIds(), historicProcessInstanceQuery, dto.getDeleteReason());
-      } else {
-        batch = historyService.deleteHistoricProcessInstancesAsyncIfExists(dto.getHistoricProcessInstanceIds(), historicProcessInstanceQuery, dto.getDeleteReason());
-      }
+      batch = historyService.deleteHistoricProcessInstancesAsync(dto.getHistoricProcessInstanceIds(), historicProcessInstanceQuery, dto.getDeleteReason());
       return BatchDto.fromBatch(batch);
 
     } catch (BadUserRequestException e) {

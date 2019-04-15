@@ -152,15 +152,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     Batch batch = null;
 
     try {
-
-      if(dto.isFailIfNotExists()) {
-        batch = runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(), processInstanceQuery, dto.getDeleteReason(),
-            dto.isSkipCustomListeners(), dto.isSkipSubprocesses());
-      } else {
-        batch = runtimeService.deleteProcessInstancesAsyncIfExists(dto.getProcessInstanceIds(), processInstanceQuery, dto.getDeleteReason(),
-            dto.isSkipCustomListeners(), dto.isSkipSubprocesses());
-      }
-
+      batch = runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(), processInstanceQuery, dto.getDeleteReason(), dto.isSkipCustomListeners(),
+          dto.isSkipSubprocesses());
       return BatchDto.fromBatch(batch);
     }
     catch (BadUserRequestException e) {

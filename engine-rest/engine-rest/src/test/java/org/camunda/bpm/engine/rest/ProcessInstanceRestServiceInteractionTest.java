@@ -292,35 +292,6 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
-  public void testDeleteAsyncIfExists() {
-    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    when(runtimeServiceMock.deleteProcessInstancesAsyncIfExists(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
-
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
-    messageBodyJson.put("processInstanceIds", ids);
-    messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
-    messageBodyJson.put(FAIL_IF_NOT_EXISTS, false);
-
-    given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
-
-    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsyncIfExists(ids, null, TEST_DELETE_REASON, false, false);
-
-    messageBodyJson.put(FAIL_IF_NOT_EXISTS, true);
-    given()
-    .contentType(ContentType.JSON).body(messageBodyJson)
-    .then().expect()
-    .statusCode(Status.OK.getStatusCode())
-    .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
-
-    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(ids, null, TEST_DELETE_REASON, false, false);
-  }
-
-  @Test
   public void testDeleteAsyncWithQuery() {
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);

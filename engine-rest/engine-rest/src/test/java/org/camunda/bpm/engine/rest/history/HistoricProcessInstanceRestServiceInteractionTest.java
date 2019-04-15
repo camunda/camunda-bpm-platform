@@ -218,42 +218,6 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
     verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsync(
         eq(ids), eq((HistoricProcessInstanceQuery) null), eq(TEST_DELETE_REASON));
   }
-  
-  @Test
-  public void testDeleteAsyncIfExists() {
-    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(historyServiceMock.deleteHistoricProcessInstancesAsyncIfExists(anyListOf(String.class), any(HistoricProcessInstanceQuery.class), anyString()))
-        .thenReturn(batchEntity);
-    when(historyServiceMock.deleteHistoricProcessInstancesAsync(anyListOf(String.class), any(HistoricProcessInstanceQuery.class), anyString()))
-    .thenReturn(batchEntity);
-    
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
-    messageBodyJson.put("historicProcessInstanceIds", ids);
-    messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
-    messageBodyJson.put(FAIL_IF_NOT_EXISTS, false);
-
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
-
-    verifyBatchJson(response.asString());
-
-    verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsyncIfExists(eq(ids), eq((HistoricProcessInstanceQuery) null), eq(TEST_DELETE_REASON));
-
-    messageBodyJson.put(FAIL_IF_NOT_EXISTS, true);
-    response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
-
-    verifyBatchJson(response.asString());
-
-    verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsync(eq(ids), eq((HistoricProcessInstanceQuery) null), eq(TEST_DELETE_REASON));
-  }
 
   @Test
   public void testDeleteAsyncWithQuery() {

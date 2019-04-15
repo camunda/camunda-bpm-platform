@@ -44,15 +44,13 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
   protected final String deleteReason;
   protected List<String> historicProcessInstanceIds;
   protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
-  protected boolean failIfNotExists;
 
   public DeleteHistoricProcessInstancesBatchCmd(List<String> historicProcessInstanceIds, HistoricProcessInstanceQuery historicProcessInstanceQuery,
-      String deleteReason, boolean failIfNotExists) {
+      String deleteReason) {
     super();
     this.historicProcessInstanceIds = historicProcessInstanceIds;
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     this.deleteReason = deleteReason;
-    this.failIfNotExists = failIfNotExists;
   }
 
   protected List<String> collectHistoricProcessInstanceIds() {
@@ -125,7 +123,7 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
 
   @Override
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new BatchConfiguration(processInstanceIds, failIfNotExists);
+    return new BatchConfiguration(processInstanceIds, true);
   }
 
   @Override

@@ -655,28 +655,6 @@ public interface RuntimeService {
    * Delete an existing runtime process instances asynchronously using Batch operation.
    *
    * Deletion propagates upward as far as necessary.
-   * 
-   * Does not fail if a process instance was not found.
-   *
-   * @param processInstanceIds id's of process instances to delete, cannot be null if processInstanceQuery is null.
-   * @param processInstanceQuery query that will be used to fetch affected process instances.
-   *                             Cannot be null if processInstanceIds are null.
-   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
-   * @param skipCustomListeners skips custom execution listeners when removing instances
-   * @param skipSubprocesses skips subprocesses when removing instances
-   *
-   * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} or
-   *          {@link BatchPermissions#CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
-   */
-  Batch deleteProcessInstancesAsyncIfExists(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses);
-
-  /**
-   * Delete an existing runtime process instances asynchronously using Batch operation.
-   *
-   * Deletion propagates upward as far as necessary.
    *
    * @param processInstanceQuery query that will be used to fetch affected process instances.
    *                             Cannot be null.

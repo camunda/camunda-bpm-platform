@@ -31,7 +31,6 @@ public class DeleteProcessInstancesDto {
   protected boolean skipCustomListeners;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected boolean skipSubprocesses;
-  private Boolean failIfNotExists;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -79,14 +78,6 @@ public class DeleteProcessInstancesDto {
 
   public void setSkipSubprocesses(Boolean skipSubprocesses) {
     this.skipSubprocesses = skipSubprocesses;
-  }
-
-  public boolean isFailIfNotExists() {
-    return this.failIfNotExists == null || this.failIfNotExists;
-  }
-
-  public void setFailIfNotExists(Boolean failIfNotExists) {
-    this.failIfNotExists = failIfNotExists;
   }
 
 }
