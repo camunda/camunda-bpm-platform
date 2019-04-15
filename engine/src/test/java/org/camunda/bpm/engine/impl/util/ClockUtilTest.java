@@ -27,6 +27,7 @@ import org.junit.Test;
 public class ClockUtilTest {
 
   private static final long ONE_SECOND = 1000L;
+  private static final long TWO_SECONDS = 2000L;
   private static final long FIVE_SECONDS = 5000L;
   private static final long TWO_DAYS = 172800000L;
 
@@ -51,21 +52,25 @@ public class ClockUtilTest {
   }
 
   @Test
-  public void offsetShouldTravelInTime() {
+  public void offsetShouldTravelInTime() throws InterruptedException {
     long duration = TWO_DAYS;
     Date target = new Date(new Date().getTime() + duration);
 
     ClockUtil.offset(duration);
+    
+    Thread.sleep(1100L);
 
-    assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
+    assertThat(ClockUtil.now()).isCloseTo(target, TWO_SECONDS);
   }
 
   @Test
-  public void setCurrentTimeShouldFreezeTime() {
+  public void setCurrentTimeShouldFreezeTime() throws InterruptedException {
     long duration = TWO_DAYS;
     Date target = new Date(new Date().getTime() + duration);
 
     ClockUtil.setCurrentTime(target);
+    
+    Thread.sleep(1100L);
 
     assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);
   }

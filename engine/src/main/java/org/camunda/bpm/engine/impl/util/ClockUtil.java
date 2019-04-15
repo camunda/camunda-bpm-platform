@@ -26,6 +26,13 @@ import java.util.Date;
  */
 public class ClockUtil {
 
+  /**
+   * Freezes the clock to a specified Date that will be returned by
+   * {@link #now()} and {@link #getCurrentTime()}
+   * 
+   * @param currentTime
+   *          the Date to freeze the clock at
+   */
   public static void setCurrentTime(Date currentTime) {
     DateTimeUtils.setCurrentMillisFixed(currentTime.getTime());
   }
@@ -42,6 +49,14 @@ public class ClockUtil {
     return new Date(DateTimeUtils.currentTimeMillis());
   }
 
+  /**
+   * Moves the clock by the given offset and keeps it running from that point
+   * on.
+   * 
+   * @param offsetInMillis
+   *          the offset to move the clock by
+   * @return the new 'now'
+   */
   public static Date offset(Long offsetInMillis) {
     DateTimeUtils.setCurrentMillisOffset(offsetInMillis);
     return new Date(DateTimeUtils.currentTimeMillis());
