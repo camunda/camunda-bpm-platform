@@ -57,7 +57,7 @@ public class CustomPasswordPolicyTest {
   @After
   public void tearDown() {
     // reset configuration
-    processEngineConfiguration.setPasswordPolicy(new DefaultPasswordPolicyImpl());
+    processEngineConfiguration.setPasswordPolicy(null);
     processEngineConfiguration.setDisablePasswordPolicy(true);
     // reset database
     identityService.deleteUser("user");

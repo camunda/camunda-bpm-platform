@@ -21,7 +21,6 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.hamcrest.core.IsNull.nullValue;
 
-import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -29,7 +28,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -37,7 +35,7 @@ import org.junit.rules.RuleChain;
 
 public class PasswordPolicyConfigurationTest {
 
-  protected static ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
@@ -48,30 +46,17 @@ public class PasswordPolicyConfigurationTest {
 
   protected static ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  static PasswordPolicy passwordPolicyDefaultSetting;
-  static Boolean passwordPolicyDisabledDefaultSetting;
-
   @Before
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-
-    if (passwordPolicyDisabledDefaultSetting == null) {
-      // save initial configuration
-      passwordPolicyDefaultSetting = processEngineConfiguration.getPasswordPolicy();
-      passwordPolicyDisabledDefaultSetting = processEngineConfiguration.isDisablePasswordPolicy();
-    } else {
-      // restore initial configuration
-      processEngineConfiguration.setPasswordPolicy(passwordPolicyDefaultSetting);
-      processEngineConfiguration.setDisablePasswordPolicy(passwordPolicyDisabledDefaultSetting);
-    }
+    processEngineConfiguration.setPasswordPolicy(null).setDisablePasswordPolicy(true);
   }
 
   @AfterClass
   public static void tearDown() {
-    processEngineConfiguration.setPasswordPolicy(passwordPolicyDefaultSetting).setDisablePasswordPolicy(passwordPolicyDisabledDefaultSetting);
+    processEngineConfiguration.setPasswordPolicy(null).setDisablePasswordPolicy(true);
   }
 
-  @Ignore
   @Test
   public void testInitialConfiguration() {
     // given initial configuration
@@ -87,6 +72,7 @@ public class PasswordPolicyConfigurationTest {
   @Test
   public void testAutoConfigurationDefaultPasswordPolicy() {
     // given
+    
     processEngineConfiguration.setDisablePasswordPolicy(false);
 
     // when
