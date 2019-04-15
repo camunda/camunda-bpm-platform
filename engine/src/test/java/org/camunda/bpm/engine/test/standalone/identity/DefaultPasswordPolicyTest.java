@@ -16,22 +16,22 @@
  */
 package org.camunda.bpm.engine.test.standalone.identity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
-import java.util.Arrays;
-import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyDigitRuleImpl;
-import org.camunda.bpm.engine.impl.identity.PasswordPolicyException;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyLengthRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyLowerCaseRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicySpecialCharacterRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyUpperCaseRuleImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,53 +43,78 @@ public class DefaultPasswordPolicyTest {
   @Rule
   public ProcessEngineRule rule = new ProcessEngineRule();
 
-  @Test
-  public void testDefaultPasswordPolicy() {
-    IdentityService identityService = rule.getIdentityService();
+  static IdentityService identityService;
 
-    // enforces a minimum length of 10 characters, at least one upper and one
-    // lower case, one digit and one special character
-    DefaultPasswordPolicyImpl policy = new DefaultPasswordPolicyImpl();
+  // enforces a minimum length of 10 characters, at least one upper, one
+  // lower case, one digit and one special character
+  static PasswordPolicy policy = new DefaultPasswordPolicyImpl();
 
-    // should all fail
-    List<String> nonCompliantPasswords = Arrays.asList("password", "Password", "LongPassword", "LongPassw0rd");
-    for (String pw : nonCompliantPasswords) {
-      try {
-        identityService.checkPasswordAgainstPolicy(policy, pw);
-        fail("exception expected");
-      } catch (PasswordPolicyException e) {
-        checkPolicyRules(e.getPolicyRules());
-      }
-    }
-
-    // should pass
-    assertThat(identityService.checkPasswordAgainstPolicy(policy, "LongPas$w0rd"));
+  @Before
+  public void init() {
+    identityService = rule.getIdentityService();
   }
 
-  private void checkPolicyRules(List<PasswordPolicyRule> rules) {
-    assertThat(rules.size()).isEqualTo(5);
+  @Test
+  public void testGoodPassword() {
+    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$w0rd");
+    assertThat(result.getViolatedRules().size(), is(0));
+    assertThat(result.getFulfilledRules().size(), is(5));
+    assertThat(result.isValid(), is(true));
+  }
 
-    for (PasswordPolicyRule rule : rules) {
-      if (PasswordPolicyLengthRuleImpl.class.isAssignableFrom(rule.getClass())) {
-        assertThat(rule.getPlaceholder()).isEqualTo(PasswordPolicyLengthRuleImpl.PLACEHOLDER);
-        assertThat(((PasswordPolicyLengthRuleImpl) rule).getParameters().get("minLength")).isEqualTo("10");
+  @Test
+  public void testPasswordWithoutLowerCase() {
+    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LONGPAS$W0RD");
+    checkThatPasswordWasInvalid(result);
 
-      } else if (PasswordPolicyLowerCaseRuleImpl.class.isAssignableFrom(rule.getClass())) {
-        assertThat(rule.getPlaceholder()).isEqualTo(PasswordPolicyLowerCaseRuleImpl.PLACEHOLDER);
-        assertThat(((PasswordPolicyLowerCaseRuleImpl) rule).getParameters().get("minLowerCase")).isEqualTo("1");
+    PasswordPolicyRule rule = result.getViolatedRules().get(0);
+    assertThat(rule.getPlaceholder(), is(PasswordPolicyLowerCaseRuleImpl.PLACEHOLDER));
+    assertThat(rule, instanceOf(PasswordPolicyLowerCaseRuleImpl.class));
+  }
 
-      } else if (PasswordPolicyUpperCaseRuleImpl.class.isAssignableFrom(rule.getClass())) {
-        assertThat(rule.getPlaceholder()).isEqualTo(PasswordPolicyUpperCaseRuleImpl.PLACEHOLDER);
-        assertThat(((PasswordPolicyUpperCaseRuleImpl) rule).getParameters().get("minUpperCase")).isEqualTo("1");
+  @Test
+  public void testPasswordWithoutUpperCase() {
+    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "longpas$w0rd");
+    checkThatPasswordWasInvalid(result);
 
-      } else if (PasswordPolicyDigitRuleImpl.class.isAssignableFrom(rule.getClass())) {
-        assertThat(rule.getPlaceholder()).isEqualTo(PasswordPolicyDigitRuleImpl.PLACEHOLDER);
-        assertThat(((PasswordPolicyDigitRuleImpl) rule).getParameters().get("minDigit")).isEqualTo("1");
+    PasswordPolicyRule rule = result.getViolatedRules().get(0);
+    assertThat(rule.getPlaceholder(), is(PasswordPolicyUpperCaseRuleImpl.PLACEHOLDER));
+    assertThat(rule, instanceOf(PasswordPolicyUpperCaseRuleImpl.class));
+  }
 
-      } else if (PasswordPolicySpecialCharacterRuleImpl.class.isAssignableFrom(rule.getClass())) {
-        assertThat(rule.getPlaceholder()).isEqualTo(PasswordPolicySpecialCharacterRuleImpl.PLACEHOLDER);
-        assertThat(((PasswordPolicySpecialCharacterRuleImpl) rule).getParameters().get("minSpecial")).isEqualTo("1");
-      }
-    }
+  @Test
+  public void testPasswordWithoutSpecialChar() {
+    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPassw0rd");
+    checkThatPasswordWasInvalid(result);
+
+    PasswordPolicyRule rule = result.getViolatedRules().get(0);
+    assertThat(rule.getPlaceholder(), is(PasswordPolicySpecialCharacterRuleImpl.PLACEHOLDER));
+    assertThat(rule, instanceOf(PasswordPolicySpecialCharacterRuleImpl.class));
+  }
+
+  @Test
+  public void testPasswordWithoutDigit() {
+    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$word");
+    checkThatPasswordWasInvalid(result);
+
+    PasswordPolicyRule rule = result.getViolatedRules().get(0);
+    assertThat(rule.getPlaceholder(), is(PasswordPolicyDigitRuleImpl.PLACEHOLDER));
+    assertThat(rule, instanceOf(PasswordPolicyDigitRuleImpl.class));
+  }
+
+  @Test
+  public void testShortPassword() {
+    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "Pas$w0rd");
+    checkThatPasswordWasInvalid(result);
+
+    PasswordPolicyRule rule = result.getViolatedRules().get(0);
+    assertThat(rule.getPlaceholder(), is(PasswordPolicyLengthRuleImpl.PLACEHOLDER));
+    assertThat(rule, instanceOf(PasswordPolicyLengthRuleImpl.class));
+  }
+
+  private void checkThatPasswordWasInvalid(CheckPasswordAgainstPolicyResult result) {
+    assertThat(result.getViolatedRules().size(), is(1));
+    assertThat(result.getFulfilledRules().size(), is(4));
+    assertThat(result.isValid(), is(false));
   }
 }
