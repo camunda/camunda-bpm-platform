@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.history;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.EntityTypes;
+
+import java.util.Date;
 
 
 /**
@@ -103,6 +103,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION = "SuspendProcessDefinition";
   public static String OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION = "ActivateProcessDefinition";
 
+  public static String OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB = "CreateHistoryCleanupJobs";
   public static String OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE = "UpdateHistoryTimeToLive";
 
   public static String OPERATION_TYPE_MODIFY_PROCESS_INSTANCE = "ModifyProcessInstance";

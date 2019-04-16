@@ -16,12 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.oplog;
 
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -33,6 +27,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
 
 public class UserOperationLogContextEntryBuilder {
 
@@ -262,6 +262,11 @@ public class UserOperationLogContextEntryBuilder {
 
   public UserOperationLogContextEntryBuilder batchId(String batchId) {
     entry.setBatchId(batchId);
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder taskId(String taskId) {
+    entry.setTaskId(taskId);
     return this;
   }
   

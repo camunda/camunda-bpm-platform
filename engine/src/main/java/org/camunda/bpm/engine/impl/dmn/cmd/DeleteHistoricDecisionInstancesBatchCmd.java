@@ -16,13 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
@@ -38,14 +31,21 @@ import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+
 public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatchCmd<Batch> {
 
-  protected List<String> historicProcessInstanceIds;
+  protected List<String> historicDecisionInstanceIds;
   protected HistoricDecisionInstanceQuery historicDecisionInstanceQuery;
   protected String deleteReason;
 
   public DeleteHistoricDecisionInstancesBatchCmd(List<String> historicDecisionInstanceIds, HistoricDecisionInstanceQuery historicDecisionInstanceQuery, String deleteReason) {
-    this.historicProcessInstanceIds = historicDecisionInstanceIds;
+    this.historicDecisionInstanceIds = historicDecisionInstanceIds;
     this.historicDecisionInstanceQuery = historicDecisionInstanceQuery;
     this.deleteReason = deleteReason;
   }
@@ -70,7 +70,7 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
   }
 
   public List<String> getHistoricDecisionInstanceIds() {
-    return historicProcessInstanceIds;
+    return historicDecisionInstanceIds;
   }
 
   @Override

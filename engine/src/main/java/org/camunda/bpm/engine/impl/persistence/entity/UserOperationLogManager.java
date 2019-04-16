@@ -16,14 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
@@ -43,6 +35,14 @@ import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -109,7 +109,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
-  
+
   public void logUserOperation(IdentityOperationResult operationResult, String userId) {
     logUserOperation(getOperationType(operationResult), userId);
   }
@@ -126,11 +126,11 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
-  
+
   public void logGroupOperation(IdentityOperationResult operationResult, String groupId) {
     logGroupOperation(getOperationType(operationResult), groupId);
   }
-  
+
   public void logGroupOperation(String operation, String groupId) {
     if (operation != null && isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
@@ -143,11 +143,11 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
-  
+
   public void logTenantOperation(IdentityOperationResult operationResult, String tenantId) {
     logTenantOperation(getOperationType(operationResult), tenantId);
   }
-  
+
   public void logTenantOperation(String operation, String tenantId) {
     if (operation != null && isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
@@ -160,15 +160,15 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
-  
+
   public void logMembershipOperation(IdentityOperationResult operationResult, String userId, String groupId, String tenantId) {
     logMembershipOperation(getOperationType(operationResult), userId, groupId, tenantId);
   }
-  
+
   public void logMembershipOperation(String operation, String userId, String groupId, String tenantId) {
     if (operation != null && isUserOperationLogEnabled()) {
       String entityType = tenantId == null ? EntityTypes.GROUP_MEMBERSHIP : EntityTypes.TENANT_MEMBERSHIP;
-      
+
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, entityType)
@@ -197,6 +197,20 @@ public class UserOperationLogManager extends AbstractHistoricManager {
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TASK)
             .category(UserOperationLogEntry.CATEGORY_TASK_WORKER)
             .inContextOf(task, propertyChanges);
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logTaskOperations(String operation, String taskId, List<PropertyChange> propertyChanges, String operationCategory) {
+    if (isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TASK)
+          .propertyChanges(propertyChanges)
+          .taskId(taskId)
+          .category(operationCategory);
 
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
@@ -558,7 +572,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   protected boolean isUserOperationLogEnabledOnCommandContext() {
     return Context.getCommandContext().isUserOperationLogEnabled();
   }
-  
+
   protected String getOperationType(IdentityOperationResult operationResult) {
     switch (operationResult.getOperation()) {
     case IdentityOperationResult.OPERATION_CREATE:

@@ -18,10 +18,12 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,9 +31,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 
 
 /**
@@ -92,7 +94,23 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
     if(existingIds.size() > 0) {
       commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(existingIds);
     }
+    writeUserOperationLog(commandContext, existingIds.size());
 
     return null;
+  }
+
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
+
+    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
+    propertyChanges.add(new PropertyChange("async", null, false));
+    propertyChanges.add(new PropertyChange("type", null, "history"));
+
+    commandContext.getOperationLogManager()
+      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+        null,
+        null,
+        null,
+        propertyChanges);
   }
 }

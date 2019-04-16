@@ -16,14 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -46,10 +50,25 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
       checker.checkDeleteHistoricTaskInstance(task);
     }
 
+    writeUserOperationLog(commandContext);
+
     commandContext
       .getHistoricTaskInstanceManager()
       .deleteHistoricTaskInstanceById(taskId);
+
     return null;
   }
 
+  protected void writeUserOperationLog(CommandContext commandContext) {
+    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, 1));
+    propertyChanges.add(new PropertyChange("async", null, false));
+    propertyChanges.add(new PropertyChange("type", null, "history"));
+
+    commandContext.getOperationLogManager()
+      .logTaskOperations(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+        taskId,
+        propertyChanges,
+        UserOperationLogEntry.CATEGORY_OPERATOR);
+  }
 }

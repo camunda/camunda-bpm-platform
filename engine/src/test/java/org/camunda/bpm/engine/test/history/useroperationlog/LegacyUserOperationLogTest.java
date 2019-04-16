@@ -216,7 +216,7 @@ public class LegacyUserOperationLogTest {
     managementService.executeJob(migrationJob.getId());
 
     // then
-    assertEquals(6, userOperationLogQuery().count());
+    assertEquals(7, userOperationLogQuery().count());
     assertEquals(2, userOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
         .entityType(EntityTypes.DEPLOYMENT)

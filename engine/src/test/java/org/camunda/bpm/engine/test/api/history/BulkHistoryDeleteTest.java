@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -36,6 +37,7 @@ import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
@@ -57,6 +59,7 @@ import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,6 +71,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -92,6 +97,9 @@ public class BulkHistoryDeleteTest {
   private FormService formService;
   private ExternalTaskService externalTaskService;
   private CaseService caseService;
+  private IdentityService identityService;
+
+  public static final String USER_ID = "demo";
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -104,6 +112,14 @@ public class BulkHistoryDeleteTest {
     formService = engineRule.getFormService();
     externalTaskService = engineRule.getExternalTaskService();
     caseService = engineRule.getCaseService();
+
+    identityService = engineRule.getIdentityService();
+    identityService.setAuthenticatedUserId(USER_ID);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    identityService.clearAuthentication();
   }
 
   @Test
@@ -411,6 +427,17 @@ public class BulkHistoryDeleteTest {
     //check that decision inputs and outputs were removed
     assertDataDeleted(inputIds, inputByteArrayIds, outputIds, outputByteArrayIds);
 
+
+    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
+      .operationType(OPERATION_TYPE_DELETE)
+      .property("nrOfInstances")
+      .list();
+
+    assertEquals(1, userOperationLogEntries.size());
+
+    UserOperationLogEntry entry = userOperationLogEntries.get(0);
+    assertEquals(String.valueOf(historicDecisionInstances.size()), entry.getNewValue());
+    assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
   @Test

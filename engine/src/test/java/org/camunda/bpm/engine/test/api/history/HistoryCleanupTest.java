@@ -16,19 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TimeZone;
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -39,6 +30,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.BatchWindowConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
@@ -77,8 +69,21 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TimeZone;
+
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -101,6 +106,7 @@ public class HistoryCleanupTest {
   protected static final String DECISION = "decision";
   protected static final String ONE_TASK_CASE = "case";
   private static final int NUMBER_OF_THREADS = 3;
+  private static final String USER_ID = "demo";
 
   private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -131,6 +137,7 @@ public class HistoryCleanupTest {
   private ManagementService managementService;
   private CaseService caseService;
   private RepositoryService repositoryService;
+  private IdentityService identityService;
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Rule
@@ -143,12 +150,15 @@ public class HistoryCleanupTest {
     managementService = engineRule.getManagementService();
     caseService = engineRule.getCaseService();
     repositoryService = engineRule.getRepositoryService();
+    identityService = engineRule.getIdentityService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/dmn/Example.dmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithHistoryTimeToLive.cmmn");
     defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
     defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
     defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
+
+    identityService.setAuthenticatedUserId(USER_ID);
   }
 
   @After
@@ -202,6 +212,7 @@ public class HistoryCleanupTest {
 
     clearMetrics();
 
+    identityService.clearAuthentication();
   }
 
   protected void clearMetrics() {
@@ -223,6 +234,17 @@ public class HistoryCleanupTest {
 
     //then
     assertResult(0);
+
+
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+      .createUserOperationLogQuery()
+      .operationType(OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB)
+      .list();
+
+    assertEquals(1, userOperationLogEntries.size());
+
+    UserOperationLogEntry entry = userOperationLogEntries.get(0);
+    assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
   @Test

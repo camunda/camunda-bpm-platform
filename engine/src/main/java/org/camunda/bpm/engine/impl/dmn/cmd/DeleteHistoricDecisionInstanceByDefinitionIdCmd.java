@@ -16,12 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Deletes historic decision instances with the given id of the decision definition.
@@ -50,6 +56,9 @@ public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<
       checker.checkDeleteHistoricDecisionInstance(decisionDefinition.getKey());
     }
 
+    long numInstances = getDecisionInstanceCount(commandContext);
+    writeUserOperationLog(commandContext, numInstances);
+
     commandContext
       .getHistoricDecisionInstanceManager()
       .deleteHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinitionId);
@@ -57,4 +66,21 @@ public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<
     return null;
   }
 
+  protected void writeUserOperationLog(CommandContext commandContext, long numInstances) {
+    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
+    propertyChanges.add(new PropertyChange("async", null, false));
+    propertyChanges.add(new PropertyChange("type", null, "history"));
+
+    commandContext.getOperationLogManager()
+      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, propertyChanges);
+  }
+
+  protected long getDecisionInstanceCount(CommandContext commandContext) {
+    HistoricDecisionInstanceQueryImpl historicDecisionInstanceQuery = new HistoricDecisionInstanceQueryImpl();
+    historicDecisionInstanceQuery.decisionDefinitionId(decisionDefinitionId);
+
+    return commandContext.getHistoricDecisionInstanceManager()
+      .findHistoricDecisionInstanceCountByQueryCriteria(historicDecisionInstanceQuery);
+  }
 }

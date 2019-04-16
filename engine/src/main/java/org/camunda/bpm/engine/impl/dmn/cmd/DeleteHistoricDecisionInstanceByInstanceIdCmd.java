@@ -16,11 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
-import java.util.Arrays;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -46,6 +51,7 @@ public class DeleteHistoricDecisionInstanceByInstanceIdCmd implements Command<Ob
         .findHistoricDecisionInstance(historicDecisionInstanceId);
     ensureNotNull("No historic decision instance found with id: " + historicDecisionInstanceId,
         "historicDecisionInstance", historicDecisionInstance);
+    writeUserOperationLog(commandContext);
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricDecisionInstance(historicDecisionInstance);
@@ -58,4 +64,12 @@ public class DeleteHistoricDecisionInstanceByInstanceIdCmd implements Command<Ob
     return null;
   }
 
+  protected void writeUserOperationLog(CommandContext commandContext) {
+    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, 1));
+    propertyChanges.add(new PropertyChange("async", null, false));
+    propertyChanges.add(new PropertyChange("type", null, "history"));
+
+    commandContext.getOperationLogManager().logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, propertyChanges);
+  }
 }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -24,13 +25,21 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
 
 /**
  * @author Roman Smirnov
  *
  */
 public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
+
+  public static final String DECISION_SINGLE_OUTPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
+  public static final String DECISION_DEFINITION_KEY = "testDecision";
 
   protected static final String PROCESS_PATH = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String PROCESS_KEY = "oneTaskProcess";
@@ -53,7 +62,15 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricTaskInstance(taskId);
 
     // then
-    assertEquals(2, query.count());
+    assertEquals(5, query.count());
+
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
+      .operationType(OPERATION_TYPE_DELETE)
+      .property("type")
+      .taskId(taskId)
+      .singleResult();
+    assertEquals("history", entry.getNewValue());
+    assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
   public void testDeleteStandaloneTaskKeepUserOperationLog() {
@@ -74,7 +91,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricTaskInstance(taskId);
 
     // then
-    assertEquals(3, query.count());
+    assertEquals(6, query.count());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -103,7 +120,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricTaskInstance(taskId);
 
     // then
-    assertEquals(2, query.count());
+    assertEquals(5, query.count());
   }
 
   @Deployment(resources = PROCESS_PATH)
@@ -127,6 +144,15 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
 
     // then
     assertEquals(4, query.count());
+
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
+      .operationType(OPERATION_TYPE_DELETE)
+      .property("type")
+      .singleResult();
+
+    assertNotNull(entry);
+    assertEquals("history", entry.getNewValue());
+    assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -285,6 +311,50 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
 
     // then
     assertEquals(1, query.count());
+  }
+
+  @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  public void testDeleteDecisionInstanceByDecisionDefinition() {
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("input1", "test");
+    decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, variables);
+
+    String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).singleResult().getId();
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
+
+    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
+      .operationType(OPERATION_TYPE_DELETE)
+      .property("nrOfInstances")
+      .list();
+
+    assertEquals(1, userOperationLogEntries.size());
+
+    UserOperationLogEntry entry = userOperationLogEntries.get(0);
+    assertEquals("1", entry.getNewValue());
+    assertEquals(CATEGORY_OPERATOR, entry.getCategory());
+  }
+
+  @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  public void testDeleteDecisionInstanceById() {
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("input1", "test");
+    decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, variables);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+    historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+
+    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
+      .operationType(OPERATION_TYPE_DELETE)
+      .property("nrOfInstances")
+      .list();
+
+    assertEquals(1, userOperationLogEntries.size());
+
+    UserOperationLogEntry entry = userOperationLogEntries.get(0);
+    assertEquals("1", entry.getNewValue());
+    assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
   public void assertUserOperationLogs() {
