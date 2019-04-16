@@ -16,12 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResourceId;
+
 import java.io.Serializable;
+
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -40,9 +43,11 @@ public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> imple
     ensureNotNull("group", group);
     ensureWhitelistedResourceId(commandContext, "Group", group.getId());
 
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .saveGroup(group);
+
+    commandContext.getOperationLogManager().logGroupOperation(operationResult, group.getId());
 
     return null;
   }

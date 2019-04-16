@@ -61,4 +61,17 @@
     where TENANT_ID_ = #{parameter}
   </delete>
   
+  <!-- SELECT -->
+  <select id="selectTenantMembershipCount" parameterType="map" resultType="long">
+    select count(TENANT_ID_)
+    from ${prefix}ACT_ID_TENANT_MEMBER
+    where TENANT_ID_ = #{tenantId}
+    <if test="groupId != null">
+      and GROUP_ID_ = #{groupId} 
+    </if>
+    <if test="userId != null">
+      and USER_ID_ = #{userId} 
+    </if>
+  </select>
+  
 </mapper>

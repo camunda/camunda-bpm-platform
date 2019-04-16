@@ -16,11 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -44,9 +46,11 @@ public class DeleteUserCmd extends AbstractWritableIdentityServiceCmd<Void> impl
     commandContext.getIdentityInfoManager()
       .deleteUserInfoByUserId(userId);
 
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .deleteUser(userId);
+
+    commandContext.getOperationLogManager().logUserOperation(operationResult, userId);
 
     return null;
   }

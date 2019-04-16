@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -30,16 +31,18 @@ public class DeleteTenantCmd extends AbstractWritableIdentityServiceCmd<Void>  i
   protected final String tenantId;
 
   public DeleteTenantCmd(String tenantId) {
-    ensureNotNull("groupId", tenantId);
+    ensureNotNull("tenantId", tenantId);
 
     this.tenantId = tenantId;
   }
 
   @Override
   protected Void executeCmd(CommandContext commandContext) {
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .deleteTenant(tenantId);
+
+    commandContext.getOperationLogManager().logTenantOperation(operationResult, tenantId);
 
     return null;
   }

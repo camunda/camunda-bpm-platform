@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -40,9 +41,11 @@ public class DeleteTenantGroupMembershipCmd extends AbstractWritableIdentityServ
     ensureNotNull("tenantId", tenantId);
     ensureNotNull("groupId", groupId);
 
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .deleteTenantGroupMembership(tenantId, groupId);
+
+    commandContext.getOperationLogManager().logMembershipOperation(operationResult, null, groupId, tenantId);
 
     return null;
   }

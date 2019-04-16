@@ -93,6 +93,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_DELETE_GROUP_LINK = "DeleteGroupLink";
   public static String OPERATION_TYPE_SET_DUEDATE = "SetDueDate";
   public static String OPERATION_TYPE_RECALC_DUEDATE = "RecalculateDueDate";
+  public static String OPERATION_TYPE_UNLOCK = "Unlock";
 
   public static String OPERATION_TYPE_ADD_ATTACHMENT = "AddAttachment";
   public static String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";

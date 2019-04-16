@@ -16,11 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -41,9 +43,13 @@ public class CreateMembershipCmd extends AbstractWritableIdentityServiceCmd<Void
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("userId", userId);
     ensureNotNull("groupId", groupId);
-    commandContext
+
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .createMembership(userId, groupId);
+
+    commandContext.getOperationLogManager().logMembershipOperation(operationResult, userId, groupId, null);
+
     return null;
   }
 }

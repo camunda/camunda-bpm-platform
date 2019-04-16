@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -36,6 +37,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
@@ -104,6 +106,86 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   public void logUserOperations(UserOperationLogContext context) {
     if (isUserOperationLogEnabled()) {
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logUserOperation(IdentityOperationResult operationResult, String userId) {
+    logUserOperation(getOperationType(operationResult), userId);
+  }
+
+  public void logUserOperation(String operation, String userId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.USER)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN)
+            .propertyChanges(new PropertyChange("userId", null, userId));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logGroupOperation(IdentityOperationResult operationResult, String groupId) {
+    logGroupOperation(getOperationType(operationResult), groupId);
+  }
+  
+  public void logGroupOperation(String operation, String groupId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.GROUP)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN)
+            .propertyChanges(new PropertyChange("groupId", null, groupId));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logTenantOperation(IdentityOperationResult operationResult, String tenantId) {
+    logTenantOperation(getOperationType(operationResult), tenantId);
+  }
+  
+  public void logTenantOperation(String operation, String tenantId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TENANT)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN)
+            .propertyChanges(new PropertyChange("tenantId", null, tenantId));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logMembershipOperation(IdentityOperationResult operationResult, String userId, String groupId, String tenantId) {
+    logMembershipOperation(getOperationType(operationResult), userId, groupId, tenantId);
+  }
+  
+  public void logMembershipOperation(String operation, String userId, String groupId, String tenantId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      String entityType = tenantId == null ? EntityTypes.GROUP_MEMBERSHIP : EntityTypes.TENANT_MEMBERSHIP;
+      
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, entityType)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN);
+      List<PropertyChange> propertyChanges = new ArrayList<>();
+      if (userId != null) {
+        propertyChanges.add(new PropertyChange("userId", null, userId));
+      }
+      if (groupId != null) {
+        propertyChanges.add(new PropertyChange("groupId", null, groupId));
+      }
+      if (tenantId != null) {
+        propertyChanges.add(new PropertyChange("tenantId", null, tenantId));
+      }
+      entryBuilder.propertyChanges(propertyChanges);
+
+      context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
     }
   }
@@ -475,6 +557,21 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   protected boolean isUserOperationLogEnabledOnCommandContext() {
     return Context.getCommandContext().isUserOperationLogEnabled();
+  }
+  
+  protected String getOperationType(IdentityOperationResult operationResult) {
+    switch (operationResult.getOperation()) {
+    case IdentityOperationResult.OPERATION_CREATE:
+      return UserOperationLogEntry.OPERATION_TYPE_CREATE;
+    case IdentityOperationResult.OPERATION_UPDATE:
+      return UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+    case IdentityOperationResult.OPERATION_DELETE:
+      return UserOperationLogEntry.OPERATION_TYPE_DELETE;
+    case IdentityOperationResult.OPERATION_UNLOCK:
+      return UserOperationLogEntry.OPERATION_TYPE_UNLOCK;
+    default:
+      return null;
+    }
   }
 
 }

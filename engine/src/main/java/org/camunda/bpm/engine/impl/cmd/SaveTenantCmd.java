@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResou
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -39,9 +40,11 @@ public class SaveTenantCmd extends AbstractWritableIdentityServiceCmd<Void> impl
     ensureNotNull("tenant", tenant);
     ensureWhitelistedResourceId(commandContext, "Tenant", tenant.getId());
 
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .saveTenant(tenant);
+
+    commandContext.getOperationLogManager().logTenantOperation(operationResult, tenant.getId());
 
     return null;
   }

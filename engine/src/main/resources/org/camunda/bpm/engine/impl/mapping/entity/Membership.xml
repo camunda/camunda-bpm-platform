@@ -33,6 +33,14 @@
   
   <!-- MEMBERSHIP UPDATE -->
   
+  <!-- MEMBERSHIP SELECT -->
+  <select id="selectMembershipCount" parameterType="map" resultType="long">
+    select count(USER_ID_)
+    from ${prefix}ACT_ID_MEMBERSHIP
+    where USER_ID_ = #{userId}
+      and GROUP_ID_ = #{groupId} 
+  </select>
+  
   <!-- MEMBERSHIP DELETE -->
 
   <delete id="deleteMembershipsByUserId" parameterType="string">

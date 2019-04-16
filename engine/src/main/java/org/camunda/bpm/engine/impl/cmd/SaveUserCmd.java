@@ -24,6 +24,7 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
@@ -57,9 +58,11 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
       }
     }
     
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .saveUser(user);
+
+    commandContext.getOperationLogManager().logUserOperation(operationResult, user.getId());
 
     return null;
   }

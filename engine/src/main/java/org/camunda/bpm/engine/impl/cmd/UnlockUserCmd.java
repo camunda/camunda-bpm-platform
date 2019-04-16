@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -41,7 +42,9 @@ public class UnlockUserCmd implements Command<Object>, Serializable {
   public Object execute(CommandContext commandContext) {
     commandContext.getAuthorizationManager().checkCamundaAdmin();
 
-    commandContext.getWritableIdentityProvider().unlockUser(userId);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider().unlockUser(userId);
+
+    commandContext.getOperationLogManager().logUserOperation(operationResult, userId);
     return null;
   }
 

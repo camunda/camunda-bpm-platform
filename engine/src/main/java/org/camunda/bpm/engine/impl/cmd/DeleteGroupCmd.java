@@ -16,11 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -37,9 +39,12 @@ public class DeleteGroupCmd extends AbstractWritableIdentityServiceCmd<Void>  im
   
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("groupId", groupId);
-    commandContext
+    
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .deleteGroup(groupId);
+    
+    commandContext.getOperationLogManager().logGroupOperation(operationResult, groupId);
 
     return null;
   }

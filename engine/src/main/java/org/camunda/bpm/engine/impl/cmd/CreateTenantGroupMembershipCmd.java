@@ -20,6 +20,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -40,9 +42,11 @@ public class CreateTenantGroupMembershipCmd extends AbstractWritableIdentityServ
     ensureNotNull("tenantId", tenantId);
     ensureNotNull("groupId", groupId);
 
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .createTenantGroupMembership(tenantId, groupId);
+    
+    commandContext.getOperationLogManager().logMembershipOperation(operationResult, null, groupId, tenantId);
 
     return null;
   }
