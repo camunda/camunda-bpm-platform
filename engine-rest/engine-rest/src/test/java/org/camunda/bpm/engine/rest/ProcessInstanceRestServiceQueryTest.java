@@ -944,4 +944,33 @@ public class ProcessInstanceRestServiceQueryTest extends
     verify(mockedQuery).processDefinitionWithoutTenantId();
   }
 
+  @Test
+  public void testQueryProcessInstanceHasIncident() {
+    given()
+      .queryParam("hasIncident", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).hasIncident();
+  }
+  
+  @Test
+  public void testQueryProcessInstanceHasIncidentAsPost() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("hasIncident", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).hasIncident();
+  }
 }

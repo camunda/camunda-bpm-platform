@@ -58,6 +58,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processIn
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByBusinessKey;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -1253,6 +1254,22 @@ public class ProcessInstanceQueryTest {
   @Test
   public void testNativeQueryPaging() {
     assertEquals(5, runtimeService.createNativeProcessInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ProcessInstance.class)).listPage(0, 5).size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testQueryHasIncident() {
+    ProcessInstance instanceWithIncident = runtimeService.startProcessInstanceByKey("failingProcess");
+    ProcessInstance instanceWithoutIncident = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    testHelper.executeAvailableJobs();
+
+    List<Incident> incidentList = runtimeService.createIncidentQuery().list();
+    assertEquals(1, incidentList.size());
+
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().hasIncident().singleResult();
+    assertThat(instance.getId(), is(instanceWithIncident.getId()));
   }
 
   @Test

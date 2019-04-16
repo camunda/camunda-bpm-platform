@@ -70,6 +70,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean active;
   private Boolean suspended;
   private Set<String> processInstanceIds;
+  private Boolean hasIncident;
   private String incidentId;
   private String incidentType;
   private String incidentMessage;
@@ -216,6 +217,15 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.variables = variables;
   }
 
+  public Boolean isHasIncident() {
+    return hasIncident;
+  }
+
+  @CamundaQueryParam(value = "hasIncident", converter = BooleanConverter.class)
+  public void setHasIncident(Boolean hasIncident) {
+    this.hasIncident = hasIncident;
+  }
+
   public String getIncidentId() {
     return incidentId;
   }
@@ -324,6 +334,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (businessKeyLike != null) {
       query.processInstanceBusinessKeyLike(businessKeyLike);
+    }
+    if(TRUE.equals(hasIncident)) {
+      query.hasIncident();
     }
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
