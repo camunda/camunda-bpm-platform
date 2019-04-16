@@ -64,8 +64,11 @@ import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -558,4 +561,23 @@ public interface HistoryService {
    * @since 7.7
    */
   String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId);
+
+  /**
+   * Set a removal time asynchronously to historic process instances and
+   * all associated historic entities using a fluent builder.
+   *
+   * Historic process instances can be specified by passing a query to
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#byQuery(HistoricProcessInstanceQuery)}.
+   *
+   * An absolute or no removal time can be specified via
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#removalTime(Date)}.
+   * Pass {@code null} to set no removal time.
+   *
+   * To create the batch and complete the configuration chain, call
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#executeAsync()}.
+   *
+   * @since 7.11
+   */
+  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder setRemovalTimeToHistoricProcessInstancesAsync();
+
 }

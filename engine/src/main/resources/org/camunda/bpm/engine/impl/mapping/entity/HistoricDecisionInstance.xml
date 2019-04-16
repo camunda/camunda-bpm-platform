@@ -91,6 +91,13 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricDecisionInstancesByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_DECINST
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- delete -->
 
   <delete id="deleteHistoricDecisionInstance" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity">

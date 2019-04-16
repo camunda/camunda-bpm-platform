@@ -53,6 +53,16 @@ public class AttachmentManager extends AbstractHistoricManager {
       .updatePreserveOrder(AttachmentEntity.class, "updateAttachmentsByRootProcessInstanceId", parameters);
   }
 
+  public void addRemovalTimeToAttachmentsByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(AttachmentEntity.class, "updateAttachmentsByProcessInstanceId", parameters);
+
+  }
+
   @SuppressWarnings("unchecked")
   public void deleteAttachmentsByTaskId(String taskId) {
     checkHistoryEnabled();

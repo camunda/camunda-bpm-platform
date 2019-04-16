@@ -66,6 +66,15 @@ public class HistoricExternalTaskLogManager extends AbstractManager {
       .updatePreserveOrder(HistoricExternalTaskLogEntity.class, "updateExternalTaskLogByRootProcessInstanceId", parameters);
   }
 
+  public void addRemovalTimeToExternalTaskLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricExternalTaskLogEntity.class, "updateExternalTaskLogByProcessInstanceId", parameters);
+  }
+
   // delete ///////////////////////////////////////////////////////////////////
 
   public void deleteHistoricExternalTaskLogsByProcessInstanceIds(List<String> processInstanceIds) {

@@ -100,8 +100,15 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateUserOperationLogByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_OP_LOG
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- OPERATION LOG ENTRY DELETE -->
-  
+
   <delete id="deleteUserOperationLogEntryById">
     delete from ${prefix}ACT_HI_OP_LOG where ID_ = #{id}
   </delete>

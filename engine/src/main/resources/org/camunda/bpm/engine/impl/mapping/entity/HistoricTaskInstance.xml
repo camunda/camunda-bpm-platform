@@ -115,6 +115,13 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricTaskInstancesByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_TASKINST
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- HISTORIC TASK INSTANCE SELECT -->
 
   <select id="selectHistoricTaskInstanceEvent" parameterType="java.lang.String" resultMap="historicTaskInstanceResultMap">

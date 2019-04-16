@@ -58,6 +58,15 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
       .updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class, "updateIdentityLinkLogByRootProcessInstanceId", parameters);
   }
 
+  public void addRemovalTimeToIdentityLinkLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class, "updateIdentityLinkLogByProcessInstanceId", parameters);
+  }
+
   public void deleteHistoricIdentityLinksLogByProcessDefinitionId(String processDefId) {
     if (isHistoryEventProduced()) {
       getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByProcessDefinitionId", processDefId);

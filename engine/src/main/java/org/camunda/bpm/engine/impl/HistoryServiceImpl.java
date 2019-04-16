@@ -68,6 +68,8 @@ import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByDefin
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByInstanceIdCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBulkCmd;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -320,5 +322,9 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
   @Override
   public String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId) {
     return commandExecutor.execute(new GetHistoricExternalTaskLogErrorDetailsCmd(historicExternalTaskLogId));
+  }
+
+  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder setRemovalTimeToHistoricProcessInstancesAsync() {
+    return new SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl(commandExecutor);
   }
 }

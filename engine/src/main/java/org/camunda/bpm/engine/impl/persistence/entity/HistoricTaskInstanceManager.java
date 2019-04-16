@@ -190,6 +190,15 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
       .updatePreserveOrder(HistoricTaskInstanceEventEntity.class, "updateHistoricTaskInstancesByRootProcessInstanceId", parameters);
   }
 
+  public void addRemovalTimeToTaskInstancesByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricTaskInstanceEventEntity.class, "updateHistoricTaskInstancesByProcessInstanceId", parameters);
+  }
+
   public void markTaskInstanceEnded(String taskId, final String deleteReason) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 

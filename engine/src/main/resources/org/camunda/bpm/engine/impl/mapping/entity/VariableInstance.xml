@@ -485,6 +485,49 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateByteArraysByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
+        <!-- variables -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_VARINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      ) or ID_ IN (
+        <!-- decision inputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_IN I
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON I.DEC_INST_ID_ = D.ID_
+        WHERE D.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      ) or ID_ IN (
+        <!-- decision outputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_OUT O
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON O.DEC_INST_ID_ = D.ID_
+        WHERE D.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      ) or ID_ IN (
+        <!-- job log -->
+        SELECT JOB_EXCEPTION_STACK_ID_
+        FROM ${prefix}ACT_HI_JOB_LOG
+        WHERE PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      ) or ID_ IN (
+        <!-- external task log -->
+        SELECT ERROR_DETAILS_ID_
+        FROM ${prefix}ACT_HI_EXT_TASK_LOG
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      ) or ID_ IN (
+        <!-- attachment -->
+        SELECT CONTENT_ID_
+        FROM ${prefix}ACT_HI_ATTACHMENT A
+        LEFT JOIN ${prefix}ACT_HI_TASKINST T ON A.TASK_ID_ = T.ID_
+        WHERE A.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+          OR T.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
   <!-- BYTE ARRAY DELETE -->
 
   <select id="selectBytesOfByteArray" parameterType="string" resultType="hashmap">

@@ -136,6 +136,13 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricDetailsByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_DETAIL
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- HISTORIC DETAILS DELETE -->
 
   <delete id="deleteHistoricDetailVariableInstanceUpdate">

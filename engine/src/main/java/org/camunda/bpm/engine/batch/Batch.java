@@ -44,6 +44,7 @@ public interface Batch {
   String TYPE_HISTORIC_DECISION_INSTANCE_DELETION = "historic-decision-instance-deletion";
   String TYPE_SET_JOB_RETRIES = "set-job-retries";
   String TYPE_SET_EXTERNAL_TASK_RETRIES = "set-external-task-retries";
+  String TYPE_PROCESS_SET_REMOVAL_TIME = "process-set-removal-time";
 
   /**
    * @return the id of the batch

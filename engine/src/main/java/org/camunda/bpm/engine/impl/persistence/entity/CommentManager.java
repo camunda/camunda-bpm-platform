@@ -116,6 +116,15 @@ public class CommentManager extends AbstractHistoricManager {
       .updatePreserveOrder(CommentEntity.class, "updateCommentsByRootProcessInstanceId", parameters);
   }
 
+  public void addRemovalTimeToCommentsByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(CommentEntity.class, "updateCommentsByProcessInstanceId", parameters);
+  }
+
   public DbOperation deleteCommentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
