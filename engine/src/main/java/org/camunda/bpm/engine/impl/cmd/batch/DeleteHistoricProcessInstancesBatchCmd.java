@@ -123,7 +123,7 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
 
   @Override
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new BatchConfiguration(processInstanceIds, true);
+    return new BatchConfiguration(processInstanceIds, false);
   }
 
   @Override
