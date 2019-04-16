@@ -34,7 +34,7 @@ public class HistoryCleanupBatchTest extends ResourceProcessEngineTestCase {
     assertEquals("P5D", batchOperationHistoryTimeToLive);
 
     Map<String, String> map = processEngineConfiguration.getBatchOperationsForHistoryCleanup();
-    assertEquals(10, map.size());
+    assertEquals(11, map.size());
     assertEquals("P10D", map.get("instance-migration"));
     assertEquals("P7D", map.get("instance-modification"));
     assertEquals("P5D", map.get("instance-restart"));
