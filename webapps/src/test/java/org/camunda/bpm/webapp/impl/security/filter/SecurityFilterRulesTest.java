@@ -67,6 +67,13 @@ public class SecurityFilterRulesTest {
     assertThat(FILTER_RULES).hasSize(1);
   }
 
+
+  @Test
+  public void shouldPassPasswordPolicy() {
+    assertThat(isAuthorized("GET", "/api/engine/engine/default/identity/password-policy")).isTrue();
+    assertThat(isAuthorized("POST", "/api/engine/engine/default/identity/password-policy")).isTrue();
+  }
+
   @Test
   public void shouldPassStaticPluginResources_GET() throws Exception {
     assertThat(isAuthorized("GET", "/api/cockpit/plugin/some-plugin/static/foo.html")).isTrue();
