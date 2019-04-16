@@ -130,7 +130,7 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     List<Exception> exceptions = executeBatchJobs(batch);
 
     //then
-    assertThat(exceptions.size(), is(1));
+    assertThat(exceptions.size(), is(0));
     assertHistoricBatchExists(testRule);
   }
 

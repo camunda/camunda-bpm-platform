@@ -186,9 +186,9 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertEquals(1, exceptions.size());
+    assertEquals(0, exceptions.size());
 
-    assertThat(managementService.createJobQuery().withException().list().size(), is(1));
+    assertThat(managementService.createJobQuery().withException().list().size(), is(0));
 
     processIds.remove("aFake");
     assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
