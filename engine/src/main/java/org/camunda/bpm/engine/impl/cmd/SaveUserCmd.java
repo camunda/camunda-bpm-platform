@@ -22,7 +22,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResou
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -52,8 +51,7 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
     ensureWhitelistedResourceId(commandContext, "User", user.getId());
     
     if(!skipPasswordPolicy && !commandContext.getProcessEngineConfiguration().isDisablePasswordPolicy()) {
-      PasswordPolicy policy = commandContext.getProcessEngineConfiguration().getPasswordPolicy();
-      if(!user.checkPasswordAgainstPolicy(policy)) {
+      if(!user.checkPasswordAgainstPolicy()) {
         throw new ProcessEngineException("Password does not match policy");
       }
     }
