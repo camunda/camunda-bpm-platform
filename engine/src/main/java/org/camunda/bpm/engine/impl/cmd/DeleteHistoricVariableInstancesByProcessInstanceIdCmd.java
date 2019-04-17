@@ -16,12 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-import java.util.Arrays;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -32,6 +26,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+
+import java.io.Serializable;
+import java.util.Arrays;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tobias Metzke
@@ -67,7 +67,7 @@ public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Co
     } catch (NullValueException nve) {
       // definition has been deleted already
     }
-    commandContext.getOperationLogManager().logHistoricVariableOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY, instance, definition, PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logHistoricVariableOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, instance, definition, PropertyChange.EMPTY_CHANGE);
     
     return null;
   }

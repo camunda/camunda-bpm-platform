@@ -105,6 +105,7 @@ public interface UserOperationLogEntry {
 
   public static String OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB = "CreateHistoryCleanupJobs";
   public static String OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE = "UpdateHistoryTimeToLive";
+  public static String OPERATION_TYPE_DELETE_HISTORY = "DeleteHistory";
 
   public static String OPERATION_TYPE_MODIFY_PROCESS_INSTANCE = "ModifyProcessInstance";
   public static String OPERATION_TYPE_RESTART_PROCESS_INSTANCE  = "RestartProcessInstance";
@@ -116,7 +117,6 @@ public interface UserOperationLogEntry {
 
   public static String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
   public static String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
-  public static String OPERATION_TYPE_DELETE_VARIABLE_HISTORY = "DeleteVariableHistory";
 
   public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
   public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";

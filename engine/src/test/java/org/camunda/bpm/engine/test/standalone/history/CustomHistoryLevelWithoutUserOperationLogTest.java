@@ -305,7 +305,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Test
@@ -321,7 +321,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Test
@@ -338,7 +338,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
 
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Test
@@ -354,7 +354,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
     
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     
     taskService.deleteTask(task.getId(), true);
   }
@@ -374,7 +374,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Test
@@ -391,7 +391,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
 
   @Test
@@ -412,7 +412,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Test
@@ -431,7 +431,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   // --------------- CMMN --------------------

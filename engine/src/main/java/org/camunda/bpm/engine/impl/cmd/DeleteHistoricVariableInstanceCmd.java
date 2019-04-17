@@ -16,11 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -31,6 +26,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+
+import java.io.Serializable;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tobias Metzke
@@ -76,7 +76,7 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
       // definition has been deleted already
     }
     commandContext.getOperationLogManager().logHistoricVariableOperation(
-        UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY, variable, definition, new PropertyChange("name", null, variable.getName()));
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, variable, definition, new PropertyChange("name", null, variable.getName()));
     
     return null;
   }

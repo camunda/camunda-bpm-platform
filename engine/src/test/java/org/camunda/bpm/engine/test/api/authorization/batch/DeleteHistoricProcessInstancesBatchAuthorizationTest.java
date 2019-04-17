@@ -52,7 +52,7 @@ import static org.junit.Assert.assertThat;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends AbstractBatchAuthorizationTest {
 
-  protected static final long BATCH_OPERATIONS = 4;
+  protected static final long BATCH_OPERATIONS = 3;
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
 

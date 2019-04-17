@@ -46,7 +46,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.junit.Assert.assertEquals;
@@ -139,7 +139,7 @@ public class DeleteHistoricBatchAuthorizationTest {
 
       List<UserOperationLogEntry> userOperationLogEntries = engineRule.getHistoryService()
         .createUserOperationLogQuery()
-        .operationType(OPERATION_TYPE_DELETE)
+        .operationType(OPERATION_TYPE_DELETE_HISTORY)
         .list();
 
       assertEquals(1, userOperationLogEntries.size());

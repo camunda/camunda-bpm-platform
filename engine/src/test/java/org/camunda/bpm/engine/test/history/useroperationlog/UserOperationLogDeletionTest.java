@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY;
 
 /**
  * @author Roman Smirnov
@@ -62,14 +62,13 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricTaskInstance(taskId);
 
     // then
-    assertEquals(5, query.count());
+    assertEquals(4, query.count());
 
     UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
-      .operationType(OPERATION_TYPE_DELETE)
-      .property("type")
+      .operationType(OPERATION_TYPE_DELETE_HISTORY)
       .taskId(taskId)
+      .property("nrOfInstances")
       .singleResult();
-    assertEquals("history", entry.getNewValue());
     assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
@@ -91,7 +90,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricTaskInstance(taskId);
 
     // then
-    assertEquals(6, query.count());
+    assertEquals(5, query.count());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -120,7 +119,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricTaskInstance(taskId);
 
     // then
-    assertEquals(5, query.count());
+    assertEquals(4, query.count());
   }
 
   @Deployment(resources = PROCESS_PATH)
@@ -146,12 +145,11 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertEquals(4, query.count());
 
     UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
-      .operationType(OPERATION_TYPE_DELETE)
-      .property("type")
+      .operationType(OPERATION_TYPE_DELETE_HISTORY)
+      .property("nrOfInstances")
       .singleResult();
 
     assertNotNull(entry);
-    assertEquals("history", entry.getNewValue());
     assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
@@ -324,7 +322,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
 
     List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-      .operationType(OPERATION_TYPE_DELETE)
+      .operationType(OPERATION_TYPE_DELETE_HISTORY)
       .property("nrOfInstances")
       .list();
 
@@ -346,7 +344,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
 
     List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-      .operationType(OPERATION_TYPE_DELETE)
+      .operationType(OPERATION_TYPE_DELETE_HISTORY)
       .property("nrOfInstances")
       .list();
 

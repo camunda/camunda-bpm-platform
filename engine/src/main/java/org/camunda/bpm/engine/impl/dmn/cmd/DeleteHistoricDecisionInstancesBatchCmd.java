@@ -98,11 +98,10 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, true));
-    propertyChanges.add(new PropertyChange("type", null, "history"));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
     commandContext.getOperationLogManager()
-      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, propertyChanges);
+      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {

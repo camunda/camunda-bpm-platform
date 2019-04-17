@@ -60,13 +60,12 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
   }
 
   protected void writeUserOperationLog(CommandContext commandContext) {
-    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, 1));
     propertyChanges.add(new PropertyChange("async", null, false));
-    propertyChanges.add(new PropertyChange("type", null, "history"));
 
     commandContext.getOperationLogManager()
-      .logTaskOperations(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+      .logTaskOperations(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
         taskId,
         propertyChanges,
         UserOperationLogEntry.CATEGORY_OPERATOR);

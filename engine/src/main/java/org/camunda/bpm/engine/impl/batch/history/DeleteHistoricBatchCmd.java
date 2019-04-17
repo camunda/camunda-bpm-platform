@@ -55,7 +55,7 @@ public class DeleteHistoricBatchCmd implements Command<Object> {
 
   protected void writeUserOperationLog(CommandContext commandContext) {
     commandContext.getOperationLogManager()
-      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, batchId, new PropertyChange("deleteReason", null, null));
+      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, batchId, new PropertyChange("deleteReason", null, null));
   }
 
 }

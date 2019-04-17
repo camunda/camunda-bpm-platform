@@ -16,6 +16,37 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.impl.TaskServiceImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Attachment;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static org.camunda.bpm.engine.EntityTypes.JOB;
 import static org.camunda.bpm.engine.EntityTypes.JOB_DEFINITION;
 import static org.camunda.bpm.engine.EntityTypes.PROCESS_DEFINITION;
@@ -44,37 +75,6 @@ import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYP
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_UPDATE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.ASSIGNEE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.camunda.bpm.engine.EntityTypes;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.history.UserOperationLogQuery;
-import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.TaskServiceImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Attachment;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Danny Gräf
@@ -1028,8 +1028,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
-    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1044,8 +1044,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
-    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1061,8 +1061,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
-    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1078,8 +1078,8 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstanceId);
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
-    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -1096,7 +1096,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     // then
     verfiySingleCaseVariableOperationAsserts(caseInstance);
-    verifySingleVariableOperationPropertyChange("name", "myVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "myVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -1113,7 +1113,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
 
     verfiySingleCaseVariableOperationAsserts(caseInstance);
-    verifySingleVariableOperationPropertyChange("name", "myVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "myVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
@@ -1128,14 +1128,14 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
     
     // then
-    String operationType = UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY;
+    String operationType = UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY;
     UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
     assertEquals(1, logQuery.count());
 
     UserOperationLogEntry logEntry = logQuery.singleResult();
     assertEquals(task.getId(), logEntry.getTaskId());
     assertEquals(deploymentId, logEntry.getDeploymentId());
-    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifySingleVariableOperationPropertyChange("name", "testVariable", UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
     
     taskService.deleteTask(task.getId(), true);
   }
@@ -1154,7 +1154,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1170,7 +1170,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(1, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1190,7 +1190,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyHistoricVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -1208,7 +1208,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     historyService.deleteHistoricVariableInstancesByProcessInstanceId(process.getId());
 
     // then
-    verifyHistoricVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY);
+    verifyHistoricVariableOperationAsserts(2, UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
   
   // --------------- CMMN --------------------
@@ -1460,7 +1460,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
   }
   
   private void verfiySingleCaseVariableOperationAsserts(CaseInstance caseInstance) {
-    String operationType = UserOperationLogEntry.OPERATION_TYPE_DELETE_VARIABLE_HISTORY;
+    String operationType = UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY;
     UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
     assertEquals(1, logQuery.count());
 

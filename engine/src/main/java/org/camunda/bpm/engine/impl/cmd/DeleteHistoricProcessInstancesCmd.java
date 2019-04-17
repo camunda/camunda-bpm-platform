@@ -101,13 +101,12 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
 
   protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
 
-    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, false));
-    propertyChanges.add(new PropertyChange("type", null, "history"));
 
     commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
         null,
         null,
         null,

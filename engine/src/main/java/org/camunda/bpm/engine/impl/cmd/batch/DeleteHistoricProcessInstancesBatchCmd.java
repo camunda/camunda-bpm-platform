@@ -106,15 +106,12 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
                                        boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-        null,
-        numInstances));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
-    propertyChanges.add(new PropertyChange("type", null, "history"));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
     commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
             null,
             null,
             null,
