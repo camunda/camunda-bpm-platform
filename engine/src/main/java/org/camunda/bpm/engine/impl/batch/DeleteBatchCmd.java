@@ -19,9 +19,11 @@ package org.camunda.bpm.engine.impl.batch;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * @author Thorben Lindhauer
@@ -45,7 +47,7 @@ public class DeleteBatchCmd implements Command<Void> {
     ensureNotNull(BadUserRequestException.class, "Batch for id '" + batchId + "' cannot be found", "batch", batchEntity);
 
     checkAccess(commandContext, batchEntity);
-
+    writeUserOperationLog(commandContext);
     batchEntity.delete(cascadeToHistory);
 
     return null;
@@ -57,4 +59,10 @@ public class DeleteBatchCmd implements Command<Void> {
     }
   }
 
+  protected void writeUserOperationLog(CommandContext commandContext) {
+    commandContext.getOperationLogManager()
+      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+        batchId,
+        new PropertyChange("cascadeToHistory", null, cascadeToHistory));
+  }
 }

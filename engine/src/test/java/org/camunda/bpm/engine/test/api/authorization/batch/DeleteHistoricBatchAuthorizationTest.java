@@ -50,6 +50,7 @@ import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYP
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Thorben Lindhauer
@@ -136,7 +137,6 @@ public class DeleteHistoricBatchAuthorizationTest {
     if (authRule.assertScenario(scenario)) {
       assertEquals(0, engineRule.getHistoryService().createHistoricBatchQuery().count());
 
-
       List<UserOperationLogEntry> userOperationLogEntries = engineRule.getHistoryService()
         .createUserOperationLogQuery()
         .operationType(OPERATION_TYPE_DELETE_HISTORY)
@@ -145,6 +145,7 @@ public class DeleteHistoricBatchAuthorizationTest {
       assertEquals(1, userOperationLogEntries.size());
 
       UserOperationLogEntry entry = userOperationLogEntries.get(0);
+      assertNull(entry.getProperty());
       assertEquals(CATEGORY_OPERATOR, entry.getCategory());
     }
   }

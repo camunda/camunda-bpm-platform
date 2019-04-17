@@ -16,15 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -45,6 +40,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Thorben Lindhauer
@@ -138,6 +143,18 @@ public class DeleteBatchAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       Assert.assertEquals(0, engineRule.getManagementService().createBatchQuery().count());
+
+      List<UserOperationLogEntry> userOperationLogEntries = engineRule.getHistoryService()
+        .createUserOperationLogQuery()
+        .operationType(OPERATION_TYPE_DELETE)
+        .list();
+
+      assertEquals(1, userOperationLogEntries.size());
+
+      UserOperationLogEntry entry = userOperationLogEntries.get(0);
+      assertEquals("cascadeToHistory", entry.getProperty());
+      assertEquals("false", entry.getNewValue());
+      assertEquals(CATEGORY_OPERATOR, entry.getCategory());
     }
   }
 
@@ -168,6 +185,18 @@ public class DeleteBatchAuthorizationTest {
     if (authRule.assertScenario(scenario)) {
       Assert.assertEquals(0, engineRule.getManagementService().createBatchQuery().count());
       Assert.assertEquals(0, engineRule.getHistoryService().createHistoricBatchQuery().count());
+
+      List<UserOperationLogEntry> userOperationLogEntries = engineRule.getHistoryService()
+        .createUserOperationLogQuery()
+        .operationType(OPERATION_TYPE_DELETE)
+        .list();
+
+      assertEquals(1, userOperationLogEntries.size());
+
+      UserOperationLogEntry entry = userOperationLogEntries.get(0);
+      assertEquals("cascadeToHistory", entry.getProperty());
+      assertEquals("true", entry.getNewValue());
+      assertEquals(CATEGORY_OPERATOR, entry.getCategory());
     }
   }
 }
