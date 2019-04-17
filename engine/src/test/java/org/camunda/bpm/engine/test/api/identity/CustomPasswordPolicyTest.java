@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -98,7 +97,6 @@ public class CustomPasswordPolicyTest {
     assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(0L));
   }
 
-  @Ignore("CAM-10182")
   @Test
   public void shouldGetPasswordPolicy() {
     // given
@@ -109,5 +107,4 @@ public class CustomPasswordPolicyTest {
     // when
     assertThat(passwordPolicy, notNullValue());
   }
-
 }

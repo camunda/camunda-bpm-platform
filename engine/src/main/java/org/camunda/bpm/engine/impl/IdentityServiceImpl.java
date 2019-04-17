@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.cmd.CheckPassword;
+import org.camunda.bpm.engine.impl.cmd.GetPasswordPolicyCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateMembershipCmd;
@@ -64,7 +65,6 @@ import org.camunda.bpm.engine.impl.cmd.SaveUserCmd;
 import org.camunda.bpm.engine.impl.cmd.SetUserInfoCmd;
 import org.camunda.bpm.engine.impl.cmd.SetUserPictureCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockUserCmd;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.CheckPasswordAgainstPolicyResultImpl;
@@ -188,11 +188,7 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public PasswordPolicy getPasswordPolicy() {
-    if (!Context.getProcessEngineConfiguration().isDisablePasswordPolicy()) {
-      return Context.getProcessEngineConfiguration().getPasswordPolicy();
-    } else {
-      return null;
-    }
+    return commandExecutor.execute(new GetPasswordPolicyCmd());
   }
 
   public void unlockUser(String userId) {
