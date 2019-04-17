@@ -17,10 +17,8 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
@@ -34,6 +32,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.passwordPolicy.CheckPasswordPolicyResultDto;
 import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
 import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordPolicyDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupDto;
@@ -96,26 +95,18 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
     if (policy != null) {
       return Response.status(Status.OK.getStatusCode()).entity(PasswordPolicyDto.fromPasswordPolicy(policy)).build();
-    } else {
-      return Response.status(Status.NOT_FOUND.getStatusCode()).build();
     }
+    return Response.status(Status.NOT_FOUND.getStatusCode()).build();
   }
 
   @Override
   public Response checkPassword(PasswordDto password) {
     PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
-    Map<String, Object> parameters = new HashMap<String, Object>();
     if (policy != null) {
       CheckPasswordAgainstPolicyResult result = processEngine.getIdentityService().checkPasswordAgainstPolicy(policy, password.getPassword());
-      parameters.put("valid", result.isValid());
-      if (!result.isValid()) {
-        PasswordPolicyDto policyDto = PasswordPolicyDto.fromPasswordPolicyResult(result);
-        parameters.put("policy", policyDto);
-      }
-    } else {
-      parameters.put("policy", "No password policy is configured.");
-      parameters.put("valid", true);
+      CheckPasswordPolicyResultDto dto = CheckPasswordPolicyResultDto.fromPasswordPolicyResult(result);
+      return Response.status(Status.OK.getStatusCode()).entity(dto).build();
     }
-    return Response.status(Status.OK.getStatusCode()).entity(parameters).build();
+    return Response.status(Status.NOT_FOUND.getStatusCode()).build();
   }
 }

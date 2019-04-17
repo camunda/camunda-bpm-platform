@@ -110,25 +110,25 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.OK.getStatusCode())
 
-        .body("policy.rules[0].placeholder", equalTo("PASSWORD_POLICY_LOWERCASE"))
-        .body("policy.rules[0].parameter.minLowerCase", equalTo("1"))
-        .body("policy.rules[0].valid", equalTo(true))
+        .body("rules[0].placeholder", equalTo("PASSWORD_POLICY_LOWERCASE"))
+        .body("rules[0].parameter.minLowerCase", equalTo("1"))
+        .body("rules[0].valid", equalTo(true))
 
-        .body("policy.rules[1].placeholder", equalTo("PASSWORD_POLICY_LENGTH"))
-        .body("policy.rules[1].parameter.minLength", equalTo("10"))
-        .body("policy.rules[1].valid", equalTo(false))
+        .body("rules[1].placeholder", equalTo("PASSWORD_POLICY_LENGTH"))
+        .body("rules[1].parameter.minLength", equalTo("10"))
+        .body("rules[1].valid", equalTo(false))
 
-        .body("policy.rules[2].placeholder", equalTo("PASSWORD_POLICY_UPPERCASE"))
-        .body("policy.rules[2].parameter.minUpperCase", equalTo("1"))
-        .body("policy.rules[2].valid", equalTo(false))
+        .body("rules[2].placeholder", equalTo("PASSWORD_POLICY_UPPERCASE"))
+        .body("rules[2].parameter.minUpperCase", equalTo("1"))
+        .body("rules[2].valid", equalTo(false))
 
-        .body("policy.rules[3].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
-        .body("policy.rules[3].parameter.minDigit", equalTo("1"))
-        .body("policy.rules[3].valid", equalTo(false))
+        .body("rules[3].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
+        .body("rules[3].parameter.minDigit", equalTo("1"))
+        .body("rules[3].valid", equalTo(false))
 
-        .body("policy.rules[4].placeholder", equalTo("PASSWORD_POLICY_SPECIAL"))
-        .body("policy.rules[4].parameter.minSpecial", equalTo("1"))
-        .body("policy.rules[4].valid", equalTo(false))
+        .body("rules[4].placeholder", equalTo("PASSWORD_POLICY_SPECIAL"))
+        .body("rules[4].parameter.minSpecial", equalTo("1"))
+        .body("rules[4].valid", equalTo(false))
 
         .body("valid", equalTo(false))
     .when()
@@ -166,10 +166,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
     .body(json)
   .then()
     .expect()
-      .statusCode(Status.OK.getStatusCode())
-
-      .body("policy", equalTo("No password policy is configured."))
-      .body("valid", equalTo(true))
+      .statusCode(Status.NOT_FOUND.getStatusCode())
   .when()
     .post(QUERY_URL);
   }

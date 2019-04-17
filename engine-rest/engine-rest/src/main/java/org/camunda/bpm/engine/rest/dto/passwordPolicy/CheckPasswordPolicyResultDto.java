@@ -16,35 +16,36 @@
  */
 package org.camunda.bpm.engine.rest.dto.passwordPolicy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
+ *
  */
-public class PasswordPolicyDto {
-  protected List<PasswordPolicyRuleDto> rules = new ArrayList<PasswordPolicyRuleDto>();
+public class CheckPasswordPolicyResultDto extends PasswordPolicyDto {
 
-  // transformers
+  protected boolean valid = true;
 
-  public static PasswordPolicyDto fromPasswordPolicy(PasswordPolicy policy) {
-    PasswordPolicyDto policyDto = new PasswordPolicyDto();
-    for (PasswordPolicyRule rule : policy.getRules()) {
-      policyDto.rules.add(new PasswordPolicyRuleDto(rule, null));
+  public static CheckPasswordPolicyResultDto fromPasswordPolicyResult(CheckPasswordAgainstPolicyResult result) {
+    CheckPasswordPolicyResultDto dto = new CheckPasswordPolicyResultDto();
+    for (PasswordPolicyRule rule : result.getFulfilledRules()) {
+      dto.rules.add(new PasswordPolicyRuleDto(rule, true));
     }
-    return policyDto;
+    if(result.getViolatedRules().size() > 0) {
+      dto.valid = false;
+      for (PasswordPolicyRule rule : result.getViolatedRules()) {
+        dto.rules.add(new PasswordPolicyRuleDto(rule, false));
+      }
+    }
+    return dto;
   }
 
-  // getters / setters
-
-  public List<PasswordPolicyRuleDto> getRules() {
-    return rules;
+  public boolean isValid() {
+    return valid;
   }
 
-  public void setRules(List<PasswordPolicyRuleDto> rules) {
-    this.rules = rules;
+  public void setValid(boolean valid) {
+    this.valid = valid;
   }
 }
