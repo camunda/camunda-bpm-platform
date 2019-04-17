@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
@@ -306,20 +306,20 @@ public interface IdentityService {
 
   /**
    * Check a given password against the configured {@link PasswordPolicy}. The result
-   * is returned as {@link CheckPasswordAgainstPolicyResult} which contains all
+   * is returned as {@link PasswordPolicyResult} which contains all
    * passed and violated rules as well as a flag indicating if the password is
    * valid.
    * 
    * @param password
    *          the password that should be tested
-   * @return a {@link CheckPasswordAgainstPolicyResult} containing passed and
+   * @return a {@link PasswordPolicyResult} containing passed and
    *         failed rules
    */
-  CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(String password);
+  PasswordPolicyResult checkPasswordAgainstPolicy(String password);
 
   /**
    * Check a given password against a given {@link PasswordPolicy}. The result
-   * is returned as {@link CheckPasswordAgainstPolicyResult} which contains all
+   * is returned as {@link PasswordPolicyResult} which contains all
    * passed and violated rules as well as a flag indicating if the password is
    * valid.
    * 
@@ -327,10 +327,10 @@ public interface IdentityService {
    *          the {@link PasswordPolicy} against which the password is tested
    * @param password
    *          the password that should be tested
-   * @return a {@link CheckPasswordAgainstPolicyResult} containing passed and
+   * @return a {@link PasswordPolicyResult} containing passed and
    *         failed rules
    */
-  CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
+  PasswordPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
 
   /**
    * Returns the {@link PasswordPolicy} that is currently configured in the

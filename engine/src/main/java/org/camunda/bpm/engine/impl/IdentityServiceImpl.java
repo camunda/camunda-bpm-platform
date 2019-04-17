@@ -23,7 +23,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
@@ -67,7 +67,7 @@ import org.camunda.bpm.engine.impl.cmd.SetUserPictureCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockUserCmd;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.identity.CheckPasswordAgainstPolicyResultImpl;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyResultImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -170,11 +170,11 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
     return commandExecutor.execute(new CheckPassword(userId, password));
   }
 
-  public CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(String password) {
+  public PasswordPolicyResult checkPasswordAgainstPolicy(String password) {
     return checkPasswordAgainstPolicy(getPasswordPolicy(), password);
   }
   
-  public CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password) {
+  public PasswordPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password) {
     EnsureUtil.ensureNotNull("policy", policy);
     EnsureUtil.ensureNotNull("password", password);
 
@@ -188,7 +188,7 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
         violatedRules.add(rule);
       }
     }
-    return new CheckPasswordAgainstPolicyResultImpl(violatedRules, fulfilledRules);
+    return new PasswordPolicyResultImpl(violatedRules, fulfilledRules);
   }
 
   public PasswordPolicy getPasswordPolicy() {

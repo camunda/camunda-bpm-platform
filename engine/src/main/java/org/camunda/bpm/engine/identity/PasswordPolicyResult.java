@@ -19,13 +19,12 @@ package org.camunda.bpm.engine.identity;
 import java.util.List;
 
 /**
- * Data structure that represents a result of a password check against a
- * {@link PasswordPolicy}.
+ * The result of a password which was checked against a {@link PasswordPolicy}.
  * 
  * @author Miklas Boskamp
  *
  */
-public interface CheckPasswordAgainstPolicyResult {
+public interface PasswordPolicyResult {
 
   /**
    * Indicator of the overall result of the check.

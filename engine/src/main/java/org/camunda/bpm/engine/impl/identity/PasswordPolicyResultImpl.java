@@ -18,19 +18,19 @@ package org.camunda.bpm.engine.impl.identity;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
  *
  */
-public class CheckPasswordAgainstPolicyResultImpl implements CheckPasswordAgainstPolicyResult {
+public class PasswordPolicyResultImpl implements PasswordPolicyResult {
 
   protected List<PasswordPolicyRule> violatedRules;
   protected List<PasswordPolicyRule> fulfilledRules;
 
-  public CheckPasswordAgainstPolicyResultImpl(List<PasswordPolicyRule> violatedRules, List<PasswordPolicyRule> fulfilledRules) {
+  public PasswordPolicyResultImpl(List<PasswordPolicyRule> violatedRules, List<PasswordPolicyRule> fulfilledRules) {
     this.violatedRules = violatedRules;
     this.fulfilledRules = fulfilledRules;
   }

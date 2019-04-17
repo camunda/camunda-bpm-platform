@@ -23,7 +23,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
@@ -74,7 +74,7 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testGoodPassword() {
-    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$w0rd");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$w0rd");
     assertThat(result.getViolatedRules().size(), is(0));
     assertThat(result.getFulfilledRules().size(), is(5));
     assertThat(result.isValid(), is(true));
@@ -84,16 +84,16 @@ public class DefaultPasswordPolicyTest {
   public void shouldCheckValidPassword_WithoutPassingPolicy() {
     // given
 
-    // then
-    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy("LongPas$w0rd");
-
     // when
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy("LongPas$w0rd");
+
+    // then
     assertThat(result, notNullValue());
   }
 
   @Test
   public void testPasswordWithoutLowerCase() {
-    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LONGPAS$W0RD");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LONGPAS$W0RD");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -103,7 +103,7 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testPasswordWithoutUpperCase() {
-    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "longpas$w0rd");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "longpas$w0rd");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -113,7 +113,7 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testPasswordWithoutSpecialChar() {
-    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPassw0rd");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPassw0rd");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -123,7 +123,7 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testPasswordWithoutDigit() {
-    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$word");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$word");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -133,7 +133,7 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testShortPassword() {
-    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "Pas$w0rd");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "Pas$w0rd");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -176,7 +176,7 @@ public class DefaultPasswordPolicyTest {
     assertThat(passwordPolicy, notNullValue());
   }
 
-  private void checkThatPasswordWasInvalid(CheckPasswordAgainstPolicyResult result) {
+  private void checkThatPasswordWasInvalid(PasswordPolicyResult result) {
     assertThat(result.getViolatedRules().size(), is(1));
     assertThat(result.getFulfilledRules().size(), is(4));
     assertThat(result.isValid(), is(false));
