@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.standalone.identity;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.identity.PasswordPolicyLowerCaseRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicySpecialCharacterRuleImpl;
 import org.camunda.bpm.engine.impl.identity.PasswordPolicyUpperCaseRuleImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,6 +59,17 @@ public class DefaultPasswordPolicyTest {
   @Before
   public void init() {
     identityService = rule.getIdentityService();
+
+    rule.getProcessEngineConfiguration()
+      .setPasswordPolicy(new DefaultPasswordPolicyImpl())
+      .setDisablePasswordPolicy(false);
+  }
+
+  @After
+  public void resetProcessEngineConfig() {
+    rule.getProcessEngineConfiguration()
+      .setPasswordPolicy(null)
+      .setDisablePasswordPolicy(true);
   }
 
   @Test
@@ -139,6 +152,17 @@ public class DefaultPasswordPolicyTest {
 
     // when
     identityService.checkPasswordAgainstPolicy(policy, null);
+  }
+
+  @Test
+  public void shouldGetPasswordPolicy() {
+    // given
+
+    // then
+    PasswordPolicy passwordPolicy = identityService.getPasswordPolicy();
+
+    // when
+    assertThat(passwordPolicy, notNullValue());
   }
 
   private void checkThatPasswordWasInvalid(CheckPasswordAgainstPolicyResult result) {

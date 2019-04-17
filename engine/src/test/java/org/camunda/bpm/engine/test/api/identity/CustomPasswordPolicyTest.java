@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.api.identity;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.IdentityService;
@@ -95,16 +94,5 @@ public class CustomPasswordPolicyTest {
     identityService.saveUser(user);
     thrown.expectMessage("Password does not match policy");
     assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(0L));
-  }
-
-  @Test
-  public void shouldGetPasswordPolicy() {
-    // given
-
-    // then
-    PasswordPolicy passwordPolicy = identityService.getPasswordPolicy();
-
-    // when
-    assertThat(passwordPolicy, notNullValue());
   }
 }
