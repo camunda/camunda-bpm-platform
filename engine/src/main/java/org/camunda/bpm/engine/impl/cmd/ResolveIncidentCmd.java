@@ -16,12 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Collections;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
@@ -60,6 +64,9 @@ public class ResolveIncidentCmd implements Command<Void> {
       checker.checkUpdateProcessInstance(execution);
     }
 
+    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_RESOLVE, execution.getProcessInstanceId(), 
+        execution.getProcessDefinitionId(), null, Collections.singletonList(new PropertyChange("incidentId", null, incidentId)));
+    
     execution.resolveIncident(incidentId);
     return null;
   }

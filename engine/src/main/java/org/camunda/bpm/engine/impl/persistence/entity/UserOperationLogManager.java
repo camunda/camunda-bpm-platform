@@ -240,7 +240,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
             .processInstanceId(processInstanceId)
             .processDefinitionId(processDefinitionId)
             .processDefinitionKey(processDefinitionKey)
-            .category(UserOperationLogEntry.CATEGORY_OPERATOR);// TODO: allow differentiation for caller (StartProcessInstanceCmd on TaskWorker, the rest on Operator?)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if(processInstanceId != null) {
         ExecutionEntity instance = getProcessInstanceManager().findExecutionById(processInstanceId);
