@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+
 /**
  * @author Daniel Meyer
  *
@@ -47,6 +49,7 @@ public class DeleteAuthorizationCmd implements Command<Void> {
     ensureNotNull("Authorization for Id '" + authorizationId + "' does not exist", "authorization", authorization);
 
     authorizationManager.delete(authorization);
+    commandContext.getOperationLogManager().logAuthorizationOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, authorization);
 
     return null;
   }

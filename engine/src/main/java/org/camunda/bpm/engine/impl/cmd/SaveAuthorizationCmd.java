@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -49,13 +50,15 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
 
     authorizationManager.validateResourceCompatibility(authorization);
 
+    String operationType = null;
     if(authorization.getId() == null) {
       authorizationManager.insert(authorization);
-      
+      operationType = UserOperationLogEntry.OPERATION_TYPE_CREATE;
     } else {
       authorizationManager.update(authorization);
-      
+      operationType = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
     }
+    commandContext.getOperationLogManager().logAuthorizationOperation(operationType, authorization);
     
     return authorization;
   }

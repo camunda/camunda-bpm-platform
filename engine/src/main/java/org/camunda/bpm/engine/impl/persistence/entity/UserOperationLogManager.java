@@ -16,6 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
@@ -35,14 +43,7 @@ import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -555,6 +556,30 @@ public class UserOperationLogManager extends AbstractHistoricManager {
           .inContextOf(externalTask, instance, definition);
       }
 
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logAuthorizationOperation(String operation, AuthorizationEntity authorization) {
+    if (isUserOperationLogEnabled()) {
+      List<PropertyChange> propertyChanges = new ArrayList<>();
+      propertyChanges.add(new PropertyChange("permissions", null, authorization.getPermissions()));
+      propertyChanges.add(new PropertyChange("type", null, authorization.getAuthorizationType()));
+      propertyChanges.add(new PropertyChange("resource", null, ResourceTypeUtil.getResourceByType(authorization.getResourceType()).resourceName()));
+      propertyChanges.add(new PropertyChange("resourceId", null, authorization.getResourceId()));
+      if (authorization.getUserId() != null) {
+        propertyChanges.add(new PropertyChange("userId", null, authorization.getUserId()));
+      }
+      if (authorization.getGroupId() != null) {
+        propertyChanges.add(new PropertyChange("groupId", null, authorization.getGroupId()));
+      }
+      
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.AUTHORIZATION)
+            .propertyChanges(propertyChanges)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN);
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
     }

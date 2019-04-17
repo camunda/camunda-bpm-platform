@@ -120,7 +120,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -135,7 +135,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -150,8 +150,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -228,7 +228,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -246,7 +246,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
 
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -273,7 +273,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   public void testQuerySuspendProcessDefinitionUserOperationLogWithReadHistoryPermissionOnProcessDefinition() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -287,7 +287,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   public void testQuerySuspendProcessDefinitionUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -319,7 +319,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -335,7 +335,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -353,7 +353,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
 
     disableAuthorization();
     taskService.complete(taskId);
