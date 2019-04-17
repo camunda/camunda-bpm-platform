@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
-import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -306,17 +305,30 @@ public interface IdentityService {
   boolean checkPassword(String userId, String password);
 
   /**
-   * Check a given password against a given {@link PasswordPolicy}. If the
-   * password does not match a policy {@link PasswordPolicyRule rules} a
-   * {@link PasswordPolicyException} is thrown. If the password passes all
-   * {@link PasswordPolicyRule rules} the method returns <code>true</code>.
+   * Check a given password against the configured {@link PasswordPolicy}. The result
+   * is returned as {@link CheckPasswordAgainstPolicyResult} which contains all
+   * passed and violated rules as well as a flag indicating if the password is
+   * valid.
+   * 
+   * @param password
+   *          the password that should be tested
+   * @return a {@link CheckPasswordAgainstPolicyResult} containing passed and
+   *         failed rules
+   */
+  CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(String password);
+
+  /**
+   * Check a given password against a given {@link PasswordPolicy}. The result
+   * is returned as {@link CheckPasswordAgainstPolicyResult} which contains all
+   * passed and violated rules as well as a flag indicating if the password is
+   * valid.
    * 
    * @param policy
    *          the {@link PasswordPolicy} against which the password is tested
    * @param password
    *          the password that should be tested
-   * @return <code>true</code> if the password is policy-compliant (if not an
-   *         exception is thrown)
+   * @return a {@link CheckPasswordAgainstPolicyResult} containing passed and
+   *         failed rules
    */
   CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
 

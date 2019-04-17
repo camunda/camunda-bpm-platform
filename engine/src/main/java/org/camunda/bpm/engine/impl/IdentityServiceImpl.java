@@ -170,6 +170,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
     return commandExecutor.execute(new CheckPassword(userId, password));
   }
 
+  public CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(String password) {
+    return checkPasswordAgainstPolicy(getPasswordPolicy(), password);
+  }
+  
   public CheckPasswordAgainstPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password) {
     EnsureUtil.ensureNotNull("policy", policy);
     EnsureUtil.ensureNotNull("password", password);
