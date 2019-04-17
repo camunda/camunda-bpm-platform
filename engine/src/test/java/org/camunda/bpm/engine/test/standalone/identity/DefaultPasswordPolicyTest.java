@@ -21,6 +21,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Miklas Boskamp
@@ -43,11 +45,14 @@ public class DefaultPasswordPolicyTest {
   @Rule
   public ProcessEngineRule rule = new ProcessEngineRule();
 
-  static IdentityService identityService;
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  protected IdentityService identityService;
 
   // enforces a minimum length of 10 characters, at least one upper, one
   // lower case, one digit and one special character
-  static PasswordPolicy policy = new DefaultPasswordPolicyImpl();
+  protected PasswordPolicy policy = new DefaultPasswordPolicyImpl();
 
   @Before
   public void init() {
@@ -110,6 +115,30 @@ public class DefaultPasswordPolicyTest {
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
     assertThat(rule.getPlaceholder(), is(PasswordPolicyLengthRuleImpl.PLACEHOLDER));
     assertThat(rule, instanceOf(PasswordPolicyLengthRuleImpl.class));
+  }
+
+  @Test
+  public void shouldThrowNullValueException_policyNull() {
+    // given
+
+    // then
+    thrown.expectMessage("policy is null");
+    thrown.expect(NullValueException.class);
+
+    // when
+    identityService.checkPasswordAgainstPolicy(null, "Pas$w0rd");
+  }
+
+  @Test
+  public void shouldThrowNullValueException_passwordNull() {
+    // given
+
+    // then
+    thrown.expectMessage("password is null");
+    thrown.expect(NullValueException.class);
+
+    // when
+    identityService.checkPasswordAgainstPolicy(policy, null);
   }
 
   private void checkThatPasswordWasInvalid(CheckPasswordAgainstPolicyResult result) {

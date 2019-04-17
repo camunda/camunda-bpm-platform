@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class PasswordPolicyConfigurationTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  protected static ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
   public void init() {
@@ -52,8 +52,8 @@ public class PasswordPolicyConfigurationTest {
     processEngineConfiguration.setPasswordPolicy(null).setDisablePasswordPolicy(true);
   }
 
-  @AfterClass
-  public static void tearDown() {
+  @After
+  public void tearDown() {
     processEngineConfiguration.setPasswordPolicy(null).setDisablePasswordPolicy(true);
   }
 

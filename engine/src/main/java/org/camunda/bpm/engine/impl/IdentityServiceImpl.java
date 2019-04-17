@@ -188,11 +188,11 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public PasswordPolicy getPasswordPolicy() {
-    PasswordPolicy policy = Context.getProcessEngineConfiguration().getPasswordPolicy();
-    if (policy != null && !Context.getProcessEngineConfiguration().isDisablePasswordPolicy()) {
-      return policy;
+    if (!Context.getProcessEngineConfiguration().isDisablePasswordPolicy()) {
+      return Context.getProcessEngineConfiguration().getPasswordPolicy();
+    } else {
+      return null;
     }
-    return null;
   }
 
   public void unlockUser(String userId) {
