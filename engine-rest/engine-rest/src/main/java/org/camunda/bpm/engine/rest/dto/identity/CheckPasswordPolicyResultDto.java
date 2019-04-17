@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.identity;
 
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
@@ -27,7 +27,7 @@ public class CheckPasswordPolicyResultDto extends PasswordPolicyDto {
 
   protected boolean valid = true;
 
-  public static CheckPasswordPolicyResultDto fromPasswordPolicyResult(CheckPasswordAgainstPolicyResult result) {
+  public static CheckPasswordPolicyResultDto fromPasswordPolicyResult(PasswordPolicyResult result) {
     CheckPasswordPolicyResultDto dto = new CheckPasswordPolicyResultDto();
     for (PasswordPolicyRule rule : result.getFulfilledRules()) {
       dto.rules.add(new CheckPasswordPolicyRuleDto(rule, true));

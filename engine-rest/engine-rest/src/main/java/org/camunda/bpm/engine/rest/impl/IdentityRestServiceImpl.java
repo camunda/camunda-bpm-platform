@@ -25,10 +25,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
@@ -92,11 +91,13 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response getPasswordPolicy() {
-    PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
+    boolean isEnabled = !processEngine.getProcessEngineConfiguration().isDisablePasswordPolicy();
 
-    if (policy != null) {
+    if (isEnabled) {
+      IdentityService identityService = processEngine.getIdentityService();
+
       return Response.status(Status.OK.getStatusCode())
-        .entity(PasswordPolicyDto.fromPasswordPolicy(policy))
+        .entity(PasswordPolicyDto.fromPasswordPolicy(identityService.getPasswordPolicy()))
         .build();
 
     } else {
@@ -107,11 +108,12 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response checkPassword(PasswordDto password) {
-    PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
+    boolean isEnabled = !processEngine.getProcessEngineConfiguration().isDisablePasswordPolicy();
 
-    if (policy != null) {
-      CheckPasswordAgainstPolicyResult result = processEngine.getIdentityService()
-        .checkPasswordAgainstPolicy(policy, password.getPassword());
+    if (isEnabled) {
+      IdentityService identityService = processEngine.getIdentityService();
+
+      PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(password.getPassword());
 
       return Response.status(Status.OK.getStatusCode())
         .entity(CheckPasswordPolicyResultDto.fromPasswordPolicyResult(result))

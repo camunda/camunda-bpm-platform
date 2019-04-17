@@ -22,19 +22,18 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
-import org.camunda.bpm.engine.impl.IdentityServiceImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
-import org.camunda.bpm.engine.rest.dto.identity.PasswordPolicyRuleDto;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyDigitRuleImpl;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyLengthRuleImpl;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -50,45 +49,47 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  private ProcessEngineConfigurationImpl mockedConfig;
-  
-  @Before
-  public void setUpRuntimeData() {
-    PasswordPolicy passwordPolicy = new DefaultPasswordPolicyImpl();
+  protected ProcessEngineConfiguration processEngineConfigurationMock = mock(ProcessEngineConfiguration.class);
 
-    mockedConfig = mock(ProcessEngineConfigurationImpl.class);
-    when(processEngine.getProcessEngineConfiguration()).thenReturn(mockedConfig);
-    when(mockedConfig.getPasswordPolicy()).thenReturn(passwordPolicy);
+  protected IdentityService identityServiceMock;
+
+  @Before
+  public void setUpMocks() {
+    identityServiceMock = mock(IdentityService.class);
+
+    when(processEngine.getProcessEngineConfiguration())
+      .thenReturn(processEngineConfigurationMock);
+
+    when(processEngine.getIdentityService())
+      .thenReturn(identityServiceMock);
   }
 
   @Test
-  public void testGetPolicy() {
+  public void shouldGetPolicy() {
+    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(false);
+
+    PasswordPolicy passwordPolicyMock = mock(PasswordPolicy.class);
+
+    when(identityServiceMock.getPasswordPolicy())
+      .thenReturn(passwordPolicyMock);
+
+    when(passwordPolicyMock.getRules())
+      .thenReturn(Collections.<PasswordPolicyRule>singletonList(new PasswordPolicyDigitRuleImpl(1)));
+
     given()
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
-        .body("rules[0].placeholder", equalTo("PASSWORD_POLICY_LENGTH"))
-        .body("rules[0].parameter.minLength", equalTo("10"))
-
-        .body("rules[1].placeholder", equalTo("PASSWORD_POLICY_LOWERCASE"))
-        .body("rules[1].parameter.minLowerCase", equalTo("1"))
-
-        .body("rules[2].placeholder", equalTo("PASSWORD_POLICY_UPPERCASE"))
-        .body("rules[2].parameter.minUpperCase", equalTo("1"))
-
-        .body("rules[3].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
-        .body("rules[3].parameter.minDigit", equalTo("1"))
-
-        .body("rules[4].placeholder", equalTo("PASSWORD_POLICY_SPECIAL"))
-        .body("rules[4].parameter.minSpecial", equalTo("1"))
+        .body("rules[0].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
+        .body("rules[0].parameter.minDigit", equalTo("1"))
     .when()
       .get(QUERY_URL);
   }
-  
 
   @Test
-  public void testGetPolicyNoPolicyConfigured() {
-    when(mockedConfig.getPasswordPolicy()).thenReturn(null);
+  public void shouldReturnNotFound_PasswordPolicyDisabled() {
+    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(true);
+
     given()
     .then()
       .expect()
@@ -98,39 +99,35 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testCheckBadPasswordAgainstDefaultPolicy() {
-    when(processEngine.getIdentityService()).thenReturn(new IdentityServiceImpl());
+  public void shouldCheckInvalidPassword() {
+    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(false);
 
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put("password", "password");
+    PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
+
+    when(identityServiceMock.checkPasswordAgainstPolicy(anyString()))
+      .thenReturn(passwordPolicyResultMock);
+
+    when(passwordPolicyResultMock.getFulfilledRules())
+      .thenReturn(Collections.<PasswordPolicyRule>singletonList(new PasswordPolicyDigitRuleImpl(1)));
+
+    when(passwordPolicyResultMock.getViolatedRules())
+      .thenReturn(Collections.<PasswordPolicyRule>singletonList(new PasswordPolicyLengthRuleImpl(1)));
 
     given()
       .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE)
-      .body(json)
+      .body(Collections.singletonMap("password", "password"))
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
 
-        .body("rules[0].placeholder", equalTo("PASSWORD_POLICY_LOWERCASE"))
-        .body("rules[0].parameter.minLowerCase", equalTo("1"))
+        .body("rules[0].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
+        .body("rules[0].parameter.minDigit", equalTo("1"))
         .body("rules[0].valid", equalTo(true))
 
         .body("rules[1].placeholder", equalTo("PASSWORD_POLICY_LENGTH"))
-        .body("rules[1].parameter.minLength", equalTo("10"))
+        .body("rules[1].parameter.minLength", equalTo("1"))
         .body("rules[1].valid", equalTo(false))
-
-        .body("rules[2].placeholder", equalTo("PASSWORD_POLICY_UPPERCASE"))
-        .body("rules[2].parameter.minUpperCase", equalTo("1"))
-        .body("rules[2].valid", equalTo(false))
-
-        .body("rules[3].placeholder", equalTo("PASSWORD_POLICY_DIGIT"))
-        .body("rules[3].parameter.minDigit", equalTo("1"))
-        .body("rules[3].valid", equalTo(false))
-
-        .body("rules[4].placeholder", equalTo("PASSWORD_POLICY_SPECIAL"))
-        .body("rules[4].parameter.minSpecial", equalTo("1"))
-        .body("rules[4].valid", equalTo(false))
 
         .body("valid", equalTo(false))
     .when()
@@ -138,38 +135,45 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testCheckGoodPasswordAgainstDefaultPolicy() {
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put("password", "SuperS4f3Pa$$word");
+  public void shouldCheckValidPassword() {
+    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(false);
+
+    PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
+
+    when(identityServiceMock.checkPasswordAgainstPolicy(anyString()))
+      .thenReturn(passwordPolicyResultMock);
+
+    when(passwordPolicyResultMock.getFulfilledRules())
+      .thenReturn(Collections.<PasswordPolicyRule>singletonList(new PasswordPolicyDigitRuleImpl(1)));
+
+    when(passwordPolicyResultMock.getViolatedRules())
+      .thenReturn(Collections.<PasswordPolicyRule>emptyList());
     
     given()
-    .header("accept", MediaType.APPLICATION_JSON)
-    .contentType(POST_JSON_CONTENT_TYPE)
-    .body(json)
-  .then()
-    .expect()
-      .statusCode(Status.OK.getStatusCode())
-
-      .body("valid", equalTo(true))
-  .when()
-    .post(QUERY_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(Collections.singletonMap("password", "password"))
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("valid", equalTo(true))
+    .when()
+      .post(QUERY_URL);
   }
 
   @Test
-  public void testCheckBadPasswordAgainstNoPolicy() {
-    when(mockedConfig.getPasswordPolicy()).thenReturn(null);
+  public void shouldCheckPasswordAgainstNoPolicy() {
+    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(true);
 
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put("password", "password");
-    
     given()
-    .header("accept", MediaType.APPLICATION_JSON)
-    .contentType(POST_JSON_CONTENT_TYPE)
-    .body(json)
-  .then()
-    .expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode())
-  .when()
-    .post(QUERY_URL);
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(Collections.singletonMap("password", "password"))
+    .then()
+      .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+    .when()
+      .post(QUERY_URL);
   }
+
 }
