@@ -72,7 +72,7 @@
     "mocha-multi": "1.0.1",
     "mocha-proshot": "1.0.1",
     "request": "2.88.0",
-    "sinon": "7.2.7",
+    "sinon": "7.3.1",
     "source-map": "0.7.3",
     "xunit-file": "1.0.0",
     "watchify": "3.11.1",
