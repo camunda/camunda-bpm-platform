@@ -32,9 +32,9 @@ import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
-import org.camunda.bpm.engine.rest.dto.passwordPolicy.CheckPasswordPolicyResultDto;
-import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
-import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordPolicyDto;
+import org.camunda.bpm.engine.rest.dto.identity.CheckPasswordPolicyResultDto;
+import org.camunda.bpm.engine.rest.dto.identity.PasswordDto;
+import org.camunda.bpm.engine.rest.dto.identity.PasswordPolicyDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
@@ -93,20 +93,33 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
   @Override
   public Response getPasswordPolicy() {
     PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
+
     if (policy != null) {
-      return Response.status(Status.OK.getStatusCode()).entity(PasswordPolicyDto.fromPasswordPolicy(policy)).build();
+      return Response.status(Status.OK.getStatusCode())
+        .entity(PasswordPolicyDto.fromPasswordPolicy(policy))
+        .build();
+
+    } else {
+      return Response.status(Status.NOT_FOUND.getStatusCode()).build();
+
     }
-    return Response.status(Status.NOT_FOUND.getStatusCode()).build();
   }
 
   @Override
   public Response checkPassword(PasswordDto password) {
     PasswordPolicy policy = processEngine.getProcessEngineConfiguration().getPasswordPolicy();
+
     if (policy != null) {
-      CheckPasswordAgainstPolicyResult result = processEngine.getIdentityService().checkPasswordAgainstPolicy(policy, password.getPassword());
-      CheckPasswordPolicyResultDto dto = CheckPasswordPolicyResultDto.fromPasswordPolicyResult(result);
-      return Response.status(Status.OK.getStatusCode()).entity(dto).build();
+      CheckPasswordAgainstPolicyResult result = processEngine.getIdentityService()
+        .checkPasswordAgainstPolicy(policy, password.getPassword());
+
+      return Response.status(Status.OK.getStatusCode())
+        .entity(CheckPasswordPolicyResultDto.fromPasswordPolicyResult(result))
+        .build();
+
+    } else {
+      return Response.status(Status.NOT_FOUND.getStatusCode()).build();
+
     }
-    return Response.status(Status.NOT_FOUND.getStatusCode()).build();
   }
 }

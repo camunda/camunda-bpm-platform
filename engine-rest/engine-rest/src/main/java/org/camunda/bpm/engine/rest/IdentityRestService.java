@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
-import org.camunda.bpm.engine.rest.dto.passwordPolicy.PasswordDto;
+import org.camunda.bpm.engine.rest.dto.identity.PasswordDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 

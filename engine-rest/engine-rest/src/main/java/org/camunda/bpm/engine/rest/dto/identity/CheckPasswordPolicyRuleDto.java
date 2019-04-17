@@ -14,31 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.passwordPolicy;
+package org.camunda.bpm.engine.rest.dto.identity;
 
-import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
- * @author Miklas Boskamp
- *
+ * @author Tassilo Weidner
  */
-public class CheckPasswordPolicyResultDto extends PasswordPolicyDto {
+public class CheckPasswordPolicyRuleDto extends PasswordPolicyRuleDto {
 
-  protected boolean valid = true;
+  protected boolean valid;
 
-  public static CheckPasswordPolicyResultDto fromPasswordPolicyResult(CheckPasswordAgainstPolicyResult result) {
-    CheckPasswordPolicyResultDto dto = new CheckPasswordPolicyResultDto();
-    for (PasswordPolicyRule rule : result.getFulfilledRules()) {
-      dto.rules.add(new PasswordPolicyRuleDto(rule, true));
-    }
-    if(result.getViolatedRules().size() > 0) {
-      dto.valid = false;
-      for (PasswordPolicyRule rule : result.getViolatedRules()) {
-        dto.rules.add(new PasswordPolicyRuleDto(rule, false));
-      }
-    }
-    return dto;
+  public CheckPasswordPolicyRuleDto(PasswordPolicyRule rule, boolean valid) {
+    super(rule);
+    this.valid = valid;
   }
 
   public boolean isValid() {
@@ -48,4 +37,5 @@ public class CheckPasswordPolicyResultDto extends PasswordPolicyDto {
   public void setValid(boolean valid) {
     this.valid = valid;
   }
+
 }

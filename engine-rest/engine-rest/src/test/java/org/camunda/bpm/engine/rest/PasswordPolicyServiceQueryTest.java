@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,10 +28,13 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.CheckPasswordAgainstPolicyResult;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
+import org.camunda.bpm.engine.rest.dto.identity.PasswordPolicyRuleDto;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -46,13 +50,11 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  private PasswordPolicy passwordPolicy;
-
   private ProcessEngineConfigurationImpl mockedConfig;
   
   @Before
   public void setUpRuntimeData() {
-    passwordPolicy = new DefaultPasswordPolicyImpl();
+    PasswordPolicy passwordPolicy = new DefaultPasswordPolicyImpl();
 
     mockedConfig = mock(ProcessEngineConfigurationImpl.class);
     when(processEngine.getProcessEngineConfiguration()).thenReturn(mockedConfig);

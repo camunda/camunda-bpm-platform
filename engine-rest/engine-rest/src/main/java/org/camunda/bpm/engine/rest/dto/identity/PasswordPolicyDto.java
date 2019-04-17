@@ -14,52 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.passwordPolicy;
+package org.camunda.bpm.engine.rest.dto.identity;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 
 /**
  * @author Miklas Boskamp
  */
-public class PasswordPolicyRuleDto {
-  protected String placeholder;
-  protected Map<String, String> parameter;
-  protected Boolean valid = true;
+public class PasswordPolicyDto {
+  protected List<PasswordPolicyRuleDto> rules = new ArrayList<PasswordPolicyRuleDto>();
 
   // transformers
 
-  public PasswordPolicyRuleDto(PasswordPolicyRule rule, Boolean valid) {
-    this.placeholder = rule.getPlaceholder();
-    this.parameter = rule.getParameters();
-    this.valid = valid;
+  public static PasswordPolicyDto fromPasswordPolicy(PasswordPolicy policy) {
+    PasswordPolicyDto policyDto = new PasswordPolicyDto();
+    for (PasswordPolicyRule rule : policy.getRules()) {
+      policyDto.rules.add(new PasswordPolicyRuleDto(rule));
+    }
+    return policyDto;
   }
 
   // getters / setters
 
-  public String getPlaceholder() {
-    return placeholder;
+  public List<PasswordPolicyRuleDto> getRules() {
+    return rules;
   }
 
-  public void setPlaceholder(String placeholder) {
-    this.placeholder = placeholder;
+  public void setRules(List<PasswordPolicyRuleDto> rules) {
+    this.rules = rules;
   }
-
-  public Map<String, String> getParameter() {
-    return parameter;
-  }
-
-  public void setParameter(Map<String, String> parameter) {
-    this.parameter = parameter;
-  }
-
-  public Boolean isValid() {
-    return valid;
-  }
-
-  public void setValid(Boolean valid) {
-    this.valid = valid;
-  }
-
 }
