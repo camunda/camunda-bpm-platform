@@ -283,6 +283,35 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
+
+  public void logCaseDefinitionOperation(String operation, String caseDefinitionId, List<PropertyChange> propertyChanges) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.CASE_DEFINITION)
+          .propertyChanges(propertyChanges)
+          .caseDefinitionId(caseDefinitionId)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logDecisionDefinitionOperation(String operation, List<PropertyChange> propertyChanges) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DECISION_DEFINITION)
+          .propertyChanges(propertyChanges)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
   
   public void logJobOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
       String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {

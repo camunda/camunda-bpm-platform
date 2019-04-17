@@ -255,6 +255,11 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
 
+  public UserOperationLogContextEntryBuilder caseDefinitionId(String caseDefinitionId) {
+    entry.setCaseDefinitionId(caseDefinitionId);
+    return this;
+  }
+
   public UserOperationLogContextEntryBuilder deploymentId(String deploymentId) {
     entry.setDeploymentId(deploymentId);
     return this;

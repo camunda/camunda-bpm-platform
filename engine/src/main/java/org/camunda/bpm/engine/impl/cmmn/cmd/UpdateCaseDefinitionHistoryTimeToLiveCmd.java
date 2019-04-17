@@ -16,16 +16,20 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, Serializable {
 
@@ -53,8 +57,21 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
       checker.checkUpdateCaseDefinition(caseDefinitionEntity);
     }
 
+    logUserOperation(commandContext, caseDefinitionEntity);
     caseDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
 
     return null;
+  }
+
+  protected void logUserOperation(CommandContext commandContext, CaseDefinitionEntity caseDefinitionEntity) {
+    List<PropertyChange> propertyChanges = new ArrayList<>();
+    propertyChanges.add(new PropertyChange("historyTimeToLive", caseDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive));
+    propertyChanges.add(new PropertyChange("caseDefinitionKey", null, caseDefinitionEntity.getKey()));
+
+
+    commandContext.getOperationLogManager()
+      .logCaseDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE,
+        caseDefinitionId,
+        propertyChanges);
   }
 }

@@ -16,19 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -38,6 +27,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
@@ -49,7 +39,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
@@ -73,6 +62,18 @@ import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Frederik Heremans
@@ -807,9 +808,11 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
-  public void testDecisionDefinitionUpdateTimeToLive() {
+  public void testDecisionDefinitionUpdateTimeToLiveWithUserOperationLog() {
     //given
+    identityService.setAuthenticatedUserId("userId");
     DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
+    Integer orgTtl = decisionDefinition.getHistoryTimeToLive();
 
     //when
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 6);
@@ -818,6 +821,26 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     decisionDefinition = findOnlyDecisionDefinition();
     assertEquals(6, decisionDefinition.getHistoryTimeToLive().intValue());
 
+    UserOperationLogQuery operationLogQuery = historyService.createUserOperationLogQuery()
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE)
+      .entityType(EntityTypes.DECISION_DEFINITION);
+
+    UserOperationLogEntry ttlEntry = operationLogQuery.property("historyTimeToLive").singleResult();
+    UserOperationLogEntry definitionIdEntry = operationLogQuery.property("decisionDefinitionId").singleResult();
+    UserOperationLogEntry definitionKeyEntry = operationLogQuery.property("decisionDefinitionKey").singleResult();
+
+    assertNotNull(ttlEntry);
+    assertNotNull(definitionIdEntry);
+    assertNotNull(definitionKeyEntry);
+
+    assertEquals(orgTtl.toString(), ttlEntry.getOrgValue());
+    assertEquals("6", ttlEntry.getNewValue());
+    assertEquals(decisionDefinition.getId(), definitionIdEntry.getNewValue());
+    assertEquals(decisionDefinition.getKey(), definitionKeyEntry.getNewValue());
+
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, ttlEntry.getCategory());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, definitionIdEntry.getCategory());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, definitionKeyEntry.getCategory());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
@@ -894,7 +917,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testProcessDefinitionUpdateTimeToLiveUserOperationLog() {
+  public void testProcessDefinitionUpdateHistoryTimeToLiveWithUserOperationLog() {
     //given
     ProcessDefinition processDefinition = findOnlyProcessDefinition();
     Integer timeToLiveOrgValue = processDefinition.getHistoryTimeToLive();
@@ -919,10 +942,11 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testUpdateHistoryTimeToLive() {
+  public void testCaseDefinitionUpdateHistoryTimeToLiveWithUserOperationLog() {
     // given
-    // there exists a deployment containing a case definition with key "oneTaskCase"
+    identityService.setAuthenticatedUserId("userId");
 
+    // there exists a deployment containing a case definition with key "oneTaskCase"
     CaseDefinition caseDefinition = findOnlyCaseDefinition();
 
     // when
@@ -932,6 +956,25 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     caseDefinition = findOnlyCaseDefinition();
 
     assertEquals(6, caseDefinition.getHistoryTimeToLive().intValue());
+
+    UserOperationLogQuery operationLogQuery = historyService.createUserOperationLogQuery()
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE)
+      .entityType(EntityTypes.CASE_DEFINITION)
+      .caseDefinitionId(caseDefinition.getId());
+
+    UserOperationLogEntry ttlEntry = operationLogQuery.property("historyTimeToLive").singleResult();
+    UserOperationLogEntry definitionKeyEntry = operationLogQuery.property("caseDefinitionKey").singleResult();
+
+    assertNotNull(ttlEntry);
+    assertNotNull(definitionKeyEntry);
+
+    // original time-to-live value is null
+    assertNull(ttlEntry.getOrgValue());
+    assertEquals("6", ttlEntry.getNewValue());
+    assertEquals(caseDefinition.getKey(), definitionKeyEntry.getNewValue());
+
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, ttlEntry.getCategory());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, definitionKeyEntry.getCategory());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
