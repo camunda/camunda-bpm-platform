@@ -17,9 +17,11 @@
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -357,8 +359,8 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals(job.getDeploymentId(), entry.getDeploymentId());
     assertEquals(job.getJobDefinitionId(), entry.getJobDefinitionId());
     assertEquals("duedate", entry.getProperty());
-    assertEquals(duedate, new Date(Long.valueOf(entry.getOrgValue())));
-    assertEquals(duedate, new Date(Long.valueOf(entry.getNewValue())));
+    assertTrue(DateUtils.truncatedEquals(duedate, new Date(Long.valueOf(entry.getOrgValue())), Calendar.SECOND));
+    assertTrue(DateUtils.truncatedEquals(duedate, new Date(Long.valueOf(entry.getNewValue())), Calendar.SECOND));
     
     entry = query.property("creationDateBased").singleResult();
     assertEquals(job.getId(), entry.getJobId());
