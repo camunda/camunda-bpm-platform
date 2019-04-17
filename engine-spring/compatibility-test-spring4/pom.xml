@@ -103,5 +103,21 @@
         </configuration>
       </plugin>
     </plugins>
-  </build>  
+  </build>
+  <profiles>
+    <profile>
+      <id>java11</id>
+      <activation>
+        <jdk>[1.11,)</jdk>
+      </activation>
+      <dependencies>
+        <!-- Hibernate requires JAXB which is not present in Java 11+ -->
+        <dependency>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles> 
 </project>
