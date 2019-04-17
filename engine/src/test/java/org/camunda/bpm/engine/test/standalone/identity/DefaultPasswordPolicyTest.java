@@ -81,6 +81,17 @@ public class DefaultPasswordPolicyTest {
   }
 
   @Test
+  public void shouldCheckValidPassword_WithoutPassingPolicy() {
+    // given
+
+    // then
+    CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy("LongPas$w0rd");
+
+    // when
+    assertThat(result, notNullValue());
+  }
+
+  @Test
   public void testPasswordWithoutLowerCase() {
     CheckPasswordAgainstPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LONGPAS$W0RD");
     checkThatPasswordWasInvalid(result);
