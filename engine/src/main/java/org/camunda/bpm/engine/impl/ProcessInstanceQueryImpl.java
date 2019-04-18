@@ -20,13 +20,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -68,6 +72,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
   protected boolean isProcessDefinitionWithoutTenantId = false;
+
+  // or query /////////////////////////////
+  protected List<ProcessInstanceQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
+  protected boolean isOrQueryActive = false;
 
   public ProcessInstanceQueryImpl() {
   }
@@ -168,28 +176,48 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   }
 
   public ProcessInstanceQuery orderByProcessInstanceId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
+    }
+
     orderBy(ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID);
     return this;
   }
 
   public ProcessInstanceQuery orderByProcessDefinitionId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
+    }
+
     orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
         ProcessInstanceQueryProperty.PROCESS_DEFINITION_ID));
     return this;
   }
 
   public ProcessInstanceQuery orderByProcessDefinitionKey() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
+    }
+
     orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
         ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY));
     return this;
   }
 
   public ProcessInstanceQuery orderByTenantId() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByTenantId() within 'or' query");
+    }
+
     orderBy(ProcessInstanceQueryProperty.TENANT_ID);
     return this;
   }
 
   public ProcessInstanceQuery orderByBusinessKey() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set orderByBusinessKey() within 'or' query");
+    }
+
     orderBy(ProcessInstanceQueryProperty.BUSINESS_KEY);
     return this;
   }
@@ -276,9 +304,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   //results /////////////////////////////////////////////////////////////////
 
   @Override
+  protected void checkQueryOk() {
+    ensureVariablesInitialized();
+
+    super.checkQueryOk();
+  }
+
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    ensureVariablesInitialized();
+
     return commandContext
       .getExecutionManager()
       .findProcessInstanceCountByQueryCriteria(this);
@@ -287,7 +322,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   @Override
   public List<ProcessInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    ensureVariablesInitialized();
+
     return commandContext
       .getExecutionManager()
       .findProcessInstancesByQueryCriteria(this, page);
@@ -295,10 +330,26 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public List<String> executeIdsList(CommandContext commandContext) {
     checkQueryOk();
-    ensureVariablesInitialized();
+
     return commandContext
       .getExecutionManager()
       .findProcessInstancesIdsByQueryCriteria(this);
+  }
+
+  @Override
+  protected void ensureVariablesInitialized() {
+    super.ensureVariablesInitialized();
+
+    if (!queries.isEmpty()) {
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
+          .getVariableSerializers();
+
+      for (ProcessInstanceQueryImpl orQuery: queries) {
+        for (QueryVariableValue var : orQuery.queryVariableValues) {
+          var.initialize(variableSerializers);
+        }
+      }
+    }
   }
 
   //getters /////////////////////////////////////////////////////////////////
@@ -309,6 +360,27 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public Set<String> getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public List<ProcessInstanceQueryImpl> getQueries() {
+    return queries;
+  }
+
+  public void addOrQuery(ProcessInstanceQueryImpl orQuery) {
+    orQuery.isOrQueryActive = true;
+    this.queries.add(orQuery);
+  }
+
+  public void setOrQueryActive() {
+    isOrQueryActive = true;
+  }
+
+  public boolean isOrQueryActive() {
+    return isOrQueryActive;
+  }
+
+  public String[] getActivityIds() {
+    return activityIds;
   }
 
   public String getBusinessKey() {
@@ -387,11 +459,41 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return subCaseInstanceId;
   }
 
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
   public boolean isRootProcessInstances() {
     return isRootProcessInstances;
   }
 
   public boolean isProcessDefinitionWithoutTenantId() {
     return isProcessDefinitionWithoutTenantId;
+  }
+
+  public boolean isLeafProcessInstances() {
+    return isLeafProcessInstances;
+  }
+
+  @Override
+  public ProcessInstanceQuery or() {
+    if (this != queries.get(0)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set or() within 'or' query");
+    }
+
+    ProcessInstanceQueryImpl orQuery = new ProcessInstanceQueryImpl();
+    orQuery.isOrQueryActive = true;
+    orQuery.queries = queries;
+    queries.add(orQuery);
+    return orQuery;
+  }
+
+  @Override
+  public ProcessInstanceQuery endOr() {
+    if (!queries.isEmpty() && this != queries.get(queries.size()-1)) {
+      throw new ProcessEngineException("Invalid query usage: cannot set endOr() before or()");
+    }
+
+    return queries.get(0);
   }
 }
