@@ -1,7 +1,6 @@
 package org.camunda.feel.integration
 
 import org.camunda.bpm.engine.variable.context.VariableContext
-import org.camunda.feel.{EvalValue, EvalFailure, ParseFailure}
 import org.camunda.feel.interpreter._
 import org.camunda.feel.spi._
 import org.camunda.bpm.dmn.feel.impl.FeelException
@@ -31,9 +30,8 @@ class CamundaFeelEngine extends org.camunda.bpm.dmn.feel.impl.FeelEngine {
     val context = new RootContext(
       variableProvider = asVariableProvider(ctx, engine.valueMapper))
     engine.evalExpression(expression, context) match {
-      case EvalValue(value) => value.asInstanceOf[T]
-      case EvalFailure(error) => throw new FeelException(error)
-      case ParseFailure(error) => throw new FeelException(error)
+      case Right(value) => value.asInstanceOf[T]
+      case Left(failure) => throw new FeelException(failure.message)
     }
   }
 
@@ -44,9 +42,8 @@ class CamundaFeelEngine extends org.camunda.bpm.dmn.feel.impl.FeelEngine {
       Map(RootContext.inputVariableKey -> inputVariable),
       variableProvider = asVariableProvider(ctx, engine.valueMapper))
     engine.evalUnaryTests(expression, context) match {
-      case EvalValue(value) => value.asInstanceOf[Boolean]
-      case EvalFailure(error) => throw new FeelException(error)
-      case ParseFailure(error) => throw new FeelException(error)
+      case Right(value) => value
+      case Left(failure) => throw new FeelException(failure.message)
     }
   }
 

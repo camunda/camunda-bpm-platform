@@ -1,6 +1,5 @@
 package org.camunda.feel.integration
 
-import org.camunda.feel._
 import org.camunda.feel.interpreter._
 import org.camunda.feel.spi._
 import scala.collection.JavaConverters._
@@ -10,7 +9,7 @@ import org.camunda.spin.xml.SpinXmlNode
 import org.camunda.spin.xml.SpinXmlElement
 import org.camunda.spin.xml.SpinXmlAttribute
 
-class CamundaValueMapper extends CustomValueMapper {
+class CamundaValueMapper extends JavaValueMapper {
 
   override def toVal(x: Any): Val = x match {
     // joda-time
@@ -36,24 +35,6 @@ class CamundaValueMapper extends CustomValueMapper {
     case x: SpinXmlElement => spinXmlToVal(x)
     // else
     case _ => super.toVal(x)
-  }
-
-  override def unpackVal(value: Val): Any = value match {
-    case ValNumber(number) => {
-      if (number.isWhole()) {
-        number.longValue: java.lang.Long
-      } else {
-        number.doubleValue: java.lang.Double
-      }
-    }
-    case ValList(list) => (list map unpackVal).asJava: java.util.List[Any]
-    case ValContext(dc: DefaultContext) =>
-      (dc.variables
-        .map { case (key, value) => key -> unpackVal(toVal(value)) }
-        .toMap)
-        .asJava: java.util.Map[String, Any]
-    // else
-    case _ => super.unpackVal(value)
   }
 
   private def spinJsonToVal(node: SpinJsonNode): Val = node match {
