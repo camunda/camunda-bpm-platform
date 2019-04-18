@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -23,7 +24,7 @@ import org.camunda.bpm.engine.impl.cmd.ActivityInstanceCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstanceCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstantiationCmd;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 
 public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractProcessInstanceModificationCommand> {
 
@@ -39,8 +40,8 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
   public static final String CANCEL_TRANSITION_INSTANCES = "cancelTransitionInstances";
 
   @Override
-  public JSONObject toJsonObject(AbstractProcessInstanceModificationCommand command) {
-    JSONObject json = new JSONObject();
+  public JsonObject toJsonObject(AbstractProcessInstanceModificationCommand command) {
+    JsonObject json = JsonUtil.createObject();
 
     if (command instanceof ActivityAfterInstantiationCmd) {
       JsonUtil.addField(json, START_AFTER, ((ActivityAfterInstantiationCmd) command).getTargetElementId());
@@ -68,29 +69,29 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
   }
 
   @Override
-  public AbstractProcessInstanceModificationCommand toObject(JSONObject json) {
+  public AbstractProcessInstanceModificationCommand toObject(JsonObject json) {
 
     AbstractProcessInstanceModificationCommand cmd = null;
 
     if (json.has(START_BEFORE)) {
-      cmd = new ActivityBeforeInstantiationCmd(json.getString(START_BEFORE));
+      cmd = new ActivityBeforeInstantiationCmd(JsonUtil.getString(json, START_BEFORE));
     }
     else if (json.has(START_AFTER)) {
-      cmd = new ActivityAfterInstantiationCmd(json.getString(START_AFTER));
+      cmd = new ActivityAfterInstantiationCmd(JsonUtil.getString(json, START_AFTER));
     }
     else if (json.has(START_TRANSITION)) {
-      cmd = new TransitionInstantiationCmd(json.getString(START_TRANSITION));
+      cmd = new TransitionInstantiationCmd(JsonUtil.getString(json, START_TRANSITION));
     }
     else if (json.has(CANCEL_ALL)) {
-      cmd = new ActivityCancellationCmd(json.getString(CANCEL_ALL));
-      boolean cancelCurrentActiveActivityInstances = json.getBoolean(CANCEL_CURRENT);
+      cmd = new ActivityCancellationCmd(JsonUtil.getString(json, CANCEL_ALL));
+      boolean cancelCurrentActiveActivityInstances = JsonUtil.getBoolean(json, CANCEL_CURRENT);
       ((ActivityCancellationCmd) cmd).setCancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
     }
     else if (json.has(CANCEL_ACTIVITY_INSTANCES)) {
-      cmd = new ActivityInstanceCancellationCmd(json.getString(PROCESS_INSTANCE), json.getString(CANCEL_ACTIVITY_INSTANCES));
+      cmd = new ActivityInstanceCancellationCmd(JsonUtil.getString(json, PROCESS_INSTANCE), JsonUtil.getString(json, CANCEL_ACTIVITY_INSTANCES));
     }
     else if (json.has(CANCEL_TRANSITION_INSTANCES)) {
-      cmd = new TransitionInstanceCancellationCmd(json.getString(PROCESS_INSTANCE), json.getString(CANCEL_TRANSITION_INSTANCES));
+      cmd = new TransitionInstanceCancellationCmd(JsonUtil.getString(json, PROCESS_INSTANCE), JsonUtil.getString(json, CANCEL_TRANSITION_INSTANCES));
     }
 
     return cmd;

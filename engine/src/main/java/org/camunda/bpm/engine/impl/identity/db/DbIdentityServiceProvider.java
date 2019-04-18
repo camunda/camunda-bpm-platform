@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
@@ -55,25 +57,28 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new UserEntity(userId);
   }
 
-  public User saveUser(User user) {
+  public IdentityOperationResult saveUser(User user) {
     UserEntity userEntity = (UserEntity) user;
 
     // encrypt password
     userEntity.encryptPassword();
 
+    String operation = null;
     if(userEntity.getRevision() == 0) {
+      operation = IdentityOperationResult.OPERATION_CREATE;
       checkAuthorization(Permissions.CREATE, Resources.USER, null);
       getDbEntityManager().insert(userEntity);
       createDefaultAuthorizations(userEntity);
     } else {
+      operation = IdentityOperationResult.OPERATION_UPDATE;
       checkAuthorization(Permissions.UPDATE, Resources.USER, user.getId());
       getDbEntityManager().merge(userEntity);
     }
 
-    return userEntity;
+    return new IdentityOperationResult(userEntity, operation);
   }
 
-  public void deleteUser(final String userId) {
+  public IdentityOperationResult deleteUser(final String userId) {
     checkAuthorization(Permissions.DELETE, Resources.USER, userId);
     UserEntity user = findUserById(userId);
     if(user != null) {
@@ -96,7 +101,9 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       });
 
       getDbEntityManager().delete(user);
+      return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_DELETE);
     }
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
   public boolean checkPassword(String userId, String password) {
@@ -152,17 +159,20 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     getIdentityInfoManager().updateUserLock(user, attempts, lockExpirationTime);
   }
 
-  public void unlockUser(String userId) {
+  public IdentityOperationResult unlockUser(String userId) {
     UserEntity user = findUserById(userId);
     if(user != null) {
-      unlockUser(user);
+      return unlockUser(user);
     }
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
-  protected void unlockUser(UserEntity user) {
+  protected IdentityOperationResult unlockUser(UserEntity user) {
     if (user.getAttempts() > 0 || user.getLockExpirationTime() != null) {
       getIdentityInfoManager().updateUserLock(user, 0, null);
+      return new IdentityOperationResult(user, IdentityOperationResult.OPERATION_UNLOCK);
     }
+    return new IdentityOperationResult(user, IdentityOperationResult.OPERATION_NONE);
   }
 
   // groups ////////////////////////////////////////////////////////
@@ -172,20 +182,23 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new GroupEntity(groupId);
   }
 
-  public GroupEntity saveGroup(Group group) {
+  public IdentityOperationResult saveGroup(Group group) {
     GroupEntity groupEntity = (GroupEntity) group;
+    String operation = null;
     if(groupEntity.getRevision() == 0) {
+      operation = IdentityOperationResult.OPERATION_CREATE;
       checkAuthorization(Permissions.CREATE, Resources.GROUP, null);
       getDbEntityManager().insert(groupEntity);
       createDefaultAuthorizations(group);
     } else {
+      operation = IdentityOperationResult.OPERATION_UPDATE;
       checkAuthorization(Permissions.UPDATE, Resources.GROUP, group.getId());
       getDbEntityManager().merge(groupEntity);
     }
-    return groupEntity;
+    return new IdentityOperationResult(groupEntity, operation);
   }
 
-  public void deleteGroup(final String groupId) {
+  public IdentityOperationResult deleteGroup(final String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.GROUP, groupId);
     GroupEntity group = findGroupById(groupId);
     if(group != null) {
@@ -207,7 +220,9 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
         }
       });
       getDbEntityManager().delete(group);
+      return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_DELETE);
     }
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
   // tenants //////////////////////////////////////////////////////
@@ -217,20 +232,23 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new TenantEntity(tenantId);
   }
 
-  public Tenant saveTenant(Tenant tenant) {
+  public IdentityOperationResult saveTenant(Tenant tenant) {
     TenantEntity tenantEntity = (TenantEntity) tenant;
+    String operation = null;
     if (tenantEntity.getRevision() == 0) {
+      operation = IdentityOperationResult.OPERATION_CREATE;
       checkAuthorization(Permissions.CREATE, Resources.TENANT, null);
       getDbEntityManager().insert(tenantEntity);
       createDefaultAuthorizations(tenant);
     } else {
+      operation = IdentityOperationResult.OPERATION_UPDATE;
       checkAuthorization(Permissions.UPDATE, Resources.TENANT, tenant.getId());
       getDbEntityManager().merge(tenantEntity);
     }
-    return tenantEntity;
+    return new IdentityOperationResult(tenantEntity, operation);
   }
 
-  public void deleteTenant(String tenantId) {
+  public IdentityOperationResult deleteTenant(String tenantId) {
     checkAuthorization(Permissions.DELETE, Resources.TENANT, tenantId);
     TenantEntity tenant = findTenantById(tenantId);
     if (tenant != null) {
@@ -238,12 +256,14 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
       deleteAuthorizations(Resources.TENANT, tenantId);
       getDbEntityManager().delete(tenant);
+      return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_DELETE);
     }
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
   // membership //////////////////////////////////////////////////////
 
-  public void createMembership(String userId, String groupId) {
+  public IdentityOperationResult createMembership(String userId, String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.GROUP_MEMBERSHIP, groupId);
     UserEntity user = findUserById(userId);
     GroupEntity group = findGroupById(groupId);
@@ -252,16 +272,21 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     membership.setGroup(group);
     getDbEntityManager().insert(membership);
     createDefaultMembershipAuthorizations(userId, groupId);
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_CREATE);
   }
 
-  public void deleteMembership(String userId, String groupId) {
+  public IdentityOperationResult deleteMembership(String userId, String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.GROUP_MEMBERSHIP, groupId);
-    deleteAuthorizations(Resources.GROUP_MEMBERSHIP, groupId);
-
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("userId", userId);
-    parameters.put("groupId", groupId);
-    getDbEntityManager().delete(MembershipEntity.class, "deleteMembership", parameters);
+    if (existsMembership(userId, groupId)) {
+      deleteAuthorizations(Resources.GROUP_MEMBERSHIP, groupId);
+  
+      Map<String, Object> parameters = new HashMap<String, Object>();
+      parameters.put("userId", userId);
+      parameters.put("groupId", groupId);
+      getDbEntityManager().delete(MembershipEntity.class, "deleteMembership", parameters);
+      return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_DELETE);
+    }
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
   protected void deleteMembershipsByUserId(String userId) {
@@ -272,7 +297,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     getDbEntityManager().delete(MembershipEntity.class, "deleteMembershipsByGroupId", groupId);
   }
 
-  public void createTenantUserMembership(String tenantId, String userId) {
+  public IdentityOperationResult createTenantUserMembership(String tenantId, String userId) {
     checkAuthorization(Permissions.CREATE, Resources.TENANT_MEMBERSHIP, tenantId);
 
     TenantEntity tenant = findTenantById(tenantId);
@@ -288,9 +313,10 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     getDbEntityManager().insert(membership);
 
     createDefaultTenantMembershipAuthorizations(tenant, user);
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_CREATE);
   }
 
-  public void createTenantGroupMembership(String tenantId, String groupId) {
+  public IdentityOperationResult createTenantGroupMembership(String tenantId, String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.TENANT_MEMBERSHIP, tenantId);
 
     TenantEntity tenant = findTenantById(tenantId);
@@ -306,30 +332,40 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     getDbEntityManager().insert(membership);
 
     createDefaultTenantMembershipAuthorizations(tenant, group);
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_CREATE);
   }
 
-  public void deleteTenantUserMembership(String tenantId, String userId) {
+  public IdentityOperationResult deleteTenantUserMembership(String tenantId, String userId) {
     checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
-    deleteAuthorizations(Resources.TENANT_MEMBERSHIP, userId);
-
-    deleteAuthorizationsForUser(Resources.TENANT, tenantId, userId);
-
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("tenantId", tenantId);
-    parameters.put("userId", userId);
-    getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
+    if (existsTenantMembership(tenantId, userId, null)) {
+      deleteAuthorizations(Resources.TENANT_MEMBERSHIP, userId);
+  
+      deleteAuthorizationsForUser(Resources.TENANT, tenantId, userId);
+  
+      Map<String, Object> parameters = new HashMap<String, Object>();
+      parameters.put("tenantId", tenantId);
+      parameters.put("userId", userId);
+      getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
+      return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_DELETE);
+    }
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
-  public void deleteTenantGroupMembership(String tenantId, String groupId) {
+  public IdentityOperationResult deleteTenantGroupMembership(String tenantId, String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
-    deleteAuthorizations(Resources.TENANT_MEMBERSHIP, groupId);
-
-    deleteAuthorizationsForGroup(Resources.TENANT, tenantId, groupId);
-
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("tenantId", tenantId);
-    parameters.put("groupId", groupId);
-    getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
+    
+    if (existsTenantMembership(tenantId, null, groupId)) {
+      deleteAuthorizations(Resources.TENANT_MEMBERSHIP, groupId);
+  
+      deleteAuthorizationsForGroup(Resources.TENANT, tenantId, groupId);
+  
+      Map<String, Object> parameters = new HashMap<String, Object>();
+      parameters.put("tenantId", tenantId);
+      parameters.put("groupId", groupId);
+      getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
+      return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_DELETE);
+    }
+    return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
   protected void deleteTenantMembershipsOfUser(String userId) {

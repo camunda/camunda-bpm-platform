@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.10.0</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-79</artifactId>
@@ -23,6 +23,26 @@
         <version>7.9.0</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-bpmn-model</artifactId>
+        <version>7.9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-cmmn-model</artifactId>
+        <version>7.9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-dmn-model</artifactId>
+        <version>7.9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-xml-model</artifactId>
+        <version>7.9.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -48,6 +68,7 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
+	  <version>7.9.0</version>
     </dependency>
 
     <dependency>

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -82,6 +83,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<String, String>();
+
   static {
 
     String defaultOrderBy = "order by ${internalOrderBy}";
@@ -118,6 +121,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     databaseSpecificDaysComparator.put(H2, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
+    databaseSpecificCollationForCaseSensitivity.put(H2, "");
+    
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
@@ -127,6 +132,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
+    constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(H2, constants);
 
     // mysql specific
@@ -162,6 +168,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
       databaseSpecificDaysComparator.put(mysqlLikeDatabase, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
 
+      databaseSpecificCollationForCaseSensitivity.put(mysqlLikeDatabase, "");
+
       addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
@@ -186,13 +194,10 @@ public class DbSqlSessionFactory implements SessionFactory {
       addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIncidentsByBatchIds", "deleteHistoricIncidentsByBatchIds_mysql");
 
       // related to CAM-9505
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIncident", "updateIncident_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateTaskSuspensionStateByParameters", "updateTaskSuspensionStateByParameters_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateJobLogByBatchId", "updateJobLogByBatchId_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateJobLogByRootProcessInstanceId", "updateJobLogByRootProcessInstanceId_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByBatchId", "updateHistoricIncidentsByBatchId_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_mysql");
 
       constants = new HashMap<String, String>();
@@ -204,6 +209,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       constants.put("constant.datepart.minute", "MINUTE");
       constants.put("constant.null.startTime", "null START_TIME_");
       constants.put("constant.varchar.cast", "'${key}'");
+      constants.put("constant.null.reporter", "NULL AS REPORTER_");
       dbSpecificConstants.put(mysqlLikeDatabase, constants);
     }
 
@@ -237,9 +243,12 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
 
+    databaseSpecificCollationForCaseSensitivity.put(POSTGRES, "");
+
     addDatabaseSpecificStatement(POSTGRES, "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectByteArray", "selectByteArray_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectByteArrays", "selectByteArrays_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceName", "selectResourceByDeploymentIdAndResourceName_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceNames", "selectResourceByDeploymentIdAndResourceNames_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceId", "selectResourceByDeploymentIdAndResourceId_postgres");
@@ -287,6 +296,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
+    constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR) AS REPORTER_");
     dbSpecificConstants.put(POSTGRES, constants);
 
     // oracle
@@ -318,6 +328,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificIfNull.put(ORACLE, "NVL");
 
     databaseSpecificDaysComparator.put(ORACLE, "${date} <= #{currentTimestamp} - ${days}");
+
+    databaseSpecificCollationForCaseSensitivity.put(ORACLE, "");
 
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
@@ -355,6 +367,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.minute", "'MI'");
     constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
+    constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(ORACLE, constants);
 
     // db2
@@ -386,6 +399,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificIfNull.put(DB2, "NVL");
 
     databaseSpecificDaysComparator.put(DB2, "${date} + ${days} DAYS <= #{currentTimestamp}");
+
+    databaseSpecificCollationForCaseSensitivity.put(DB2, "");
 
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
@@ -427,6 +442,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
     constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
+    constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR(255)) AS REPORTER_");
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
@@ -459,6 +475,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     databaseSpecificDaysComparator.put(MSSQL, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
+    databaseSpecificCollationForCaseSensitivity.put(MSSQL, "COLLATE Latin1_General_CS_AS");
+
     addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
@@ -484,6 +502,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "CAST(NULL AS datetime2) AS START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
+    constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(MSSQL, constants);
   }
 

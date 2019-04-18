@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +18,7 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1282,6 +1284,51 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
     verify(updateRetriesBuilder).setAsync(-5);
     verifyNoMoreInteractions(updateRetriesBuilder);
+  }
+  
+  @Test
+  public void testSetNullRetriesForExternalTasks() {
+    List<String> externalTaskIds = null;
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("retries", null);
+    parameters.put("externalTaskIds", externalTaskIds);
+    
+    // test set retries to null synchronous
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(parameters)
+    .then()
+    .expect()
+    .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+    .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+    
+    verify(updateRetriesBuilder, never()).set(anyInt());
+    
+    // test set retries to null asynchronous
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(parameters)
+    .then()
+    .expect()
+    .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+    .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+    
+    verify(updateRetriesBuilder, never()).setAsync(anyInt());
+    
+    // test set retries to null on single task
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(parameters)
+    .pathParam("id", "anExternalTaskId")
+    .then()
+    .expect()
+    .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+    .put(RETRIES_EXTERNAL_TASK_URL);
+    
+    verify(externalTaskService, never()).setRetries(anyString() ,anyInt());
   }
 
   @Test

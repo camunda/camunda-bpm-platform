@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,11 +17,13 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
-
+import java.util.Collections;
+import java.util.List;
 import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
@@ -207,6 +210,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jobExecutorAcquireByDueDate = false;
   protected boolean jobExecutorAcquireByPriority = false;
 
+  protected boolean ensureJobDueDateNotNull = false;
   protected boolean producePrioritizedJobs = true;
   protected boolean producePrioritizedExternalTasks = true;
 
@@ -256,6 +260,12 @@ public abstract class ProcessEngineConfiguration {
   protected ClassLoader classLoader;
 
   protected boolean createIncidentOnFailedJobEnabled = true;
+
+  /**
+   * configuration of password policy
+   */
+  protected boolean enablePasswordPolicy;
+  protected PasswordPolicy passwordPolicy;
 
   /**
    * switch for controlling whether the process engine performs authorization checks.
@@ -354,6 +364,22 @@ public abstract class ProcessEngineConfiguration {
    * <p>The default value is <code>true</code>.</p>
    */
   protected boolean skipHistoryOptimisticLockingExceptions = true;
+
+  /**
+   * If the value of this flag is set to <code>true</code>,
+   * READ_INSTANCE_VARIABLE,
+   * READ_HISTORY_VARIABLE, or
+   * READ_TASK_VARIABLE on Process Definition resource, and
+   * READ_VARIABLE on Task resource
+   * will be required to fetch variables when the autorizations are enabled.
+   */
+  protected boolean enforceSpecificVariablePermission = false;
+
+  /**
+   * Specifies which permissions will not be taken into account in the
+   * authorizations checks if authorization is enabled.
+   */
+  protected List<String> disabledPermissions = Collections.emptyList();
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -854,6 +880,14 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  public boolean isEnsureJobDueDateNotNull() {
+    return ensureJobDueDateNotNull;
+  }
+
+  public void setEnsureJobDueDateNotNull(boolean ensureJobDueDateNotNull) {
+    this.ensureJobDueDateNotNull = ensureJobDueDateNotNull;
+  }
+
   public boolean isProducePrioritizedJobs() {
     return producePrioritizedJobs;
   }
@@ -903,4 +937,37 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  public boolean isEnforceSpecificVariablePermission() {
+    return enforceSpecificVariablePermission;
+  }
+
+  public void setEnforceSpecificVariablePermission(boolean ensureSpecificVariablePermission) {
+    this.enforceSpecificVariablePermission = ensureSpecificVariablePermission;
+  }
+
+  public List<String> getDisabledPermissions() {
+    return disabledPermissions;
+  }
+
+  public void setDisabledPermissions(List<String> disabledPermissions) {
+    this.disabledPermissions = disabledPermissions;
+  }
+
+  public boolean isEnablePasswordPolicy() {
+    return enablePasswordPolicy;
+  }
+
+  public ProcessEngineConfiguration setEnablePasswordPolicy(boolean enablePasswordPolicy) {
+    this.enablePasswordPolicy = enablePasswordPolicy;
+    return this;
+  }
+
+  public PasswordPolicy getPasswordPolicy() {
+    return passwordPolicy;
+  }
+
+  public ProcessEngineConfiguration setPasswordPolicy(PasswordPolicy passwordPolicy) {
+    this.passwordPolicy = passwordPolicy;
+    return this;
+  }
 }

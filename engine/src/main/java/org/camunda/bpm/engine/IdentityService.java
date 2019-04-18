@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -20,9 +21,11 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -30,7 +33,6 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-
 
 /**
  * Service to manage {@link User}s and {@link Group}s.
@@ -301,6 +303,43 @@ public interface IdentityService {
    * and password are nullsafe.
    */
   boolean checkPassword(String userId, String password);
+
+  /**
+   * Check a given password against the configured {@link PasswordPolicy}. The result
+   * is returned as {@link PasswordPolicyResult} which contains all
+   * passed and violated rules as well as a flag indicating if the password is
+   * valid.
+   * 
+   * @param password
+   *          the password that should be tested
+   * @return a {@link PasswordPolicyResult} containing passed and
+   *         failed rules
+   */
+  PasswordPolicyResult checkPasswordAgainstPolicy(String password);
+
+  /**
+   * Check a given password against a given {@link PasswordPolicy}. The result
+   * is returned as {@link PasswordPolicyResult} which contains all
+   * passed and violated rules as well as a flag indicating if the password is
+   * valid.
+   * 
+   * @param policy
+   *          the {@link PasswordPolicy} against which the password is tested
+   * @param password
+   *          the password that should be tested
+   * @return a {@link PasswordPolicyResult} containing passed and
+   *         failed rules
+   */
+  PasswordPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password);
+
+  /**
+   * Returns the {@link PasswordPolicy} that is currently configured in the
+   * engine.
+   * 
+   * @return the current {@link PasswordPolicy} or <code>null</code> if no
+   *         policy is set or the configured policy is disabled.
+   */
+  PasswordPolicy getPasswordPolicy();
 
   /**
    * Passes the authenticated user id for this thread.

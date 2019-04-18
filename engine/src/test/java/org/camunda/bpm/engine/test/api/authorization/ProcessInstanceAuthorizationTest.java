@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -25,6 +26,11 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.SUSPEND_INSTANCE;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.UPDATE_INSTANCE_VARIABLE;
+import static org.camunda.bpm.engine.authorization.ProcessInstancePermissions.SUSPEND;
+import static org.camunda.bpm.engine.authorization.ProcessInstancePermissions.UPDATE_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
@@ -60,6 +66,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   protected static final String THROW_ALERT_SIGNAL_PROCESS_KEY = "throwAlertSignalProcess";
 
   protected String deploymentId;
+  protected boolean ensureSpecificVariablePermission;
 
   @Override
   public void setUp() throws Exception {
@@ -72,6 +79,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/api/authorization/throwWarningSignalEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/throwAlertSignalEventProcess.bpmn20.xml"
         ).getId();
+    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
     super.setUp();
   }
 
@@ -79,6 +87,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
+    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // process instance query //////////////////////////////////////////////////////////
@@ -1760,6 +1769,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
     }
   }
 
@@ -1805,8 +1816,47 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSuspendProcessInstanceById() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+
+    // when
+    runtimeService.suspendProcessInstanceById(processInstanceId);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+  }
+
+  public void testSuspendProcessInstanceByIdWithSuspendPermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, SUSPEND);
+
+    // when
+    runtimeService.suspendProcessInstanceById(processInstanceId);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+  }
+
+  public void testSuspendProcessInstanceByIdWithSuspendPermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, SUSPEND);
+
+    // when
+    runtimeService.suspendProcessInstanceById(processInstanceId);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+  }
+
+  public void testSuspendProcessInstanceByIdWithSuspendInstancesPermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, SUSPEND_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceById(processInstanceId);
@@ -1838,6 +1888,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
     }
   }
 
@@ -1887,8 +1939,50 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+
+    // when
+    runtimeService.activateProcessInstanceById(processInstanceId);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+  }
+
+  public void testActivateProcessInstanceByIdWithSuspendPermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    suspendProcessInstanceById(processInstanceId);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, SUSPEND);
+
+    // when
+    runtimeService.activateProcessInstanceById(processInstanceId);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+  }
+
+  public void testActivateProcessInstanceByIdWithSuspendPermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    suspendProcessInstanceById(processInstanceId);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, SUSPEND);
+
+    // when
+    runtimeService.activateProcessInstanceById(processInstanceId);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+  }
+
+  public void testActivateProcessInstanceByIdWithSuspendInstancesPermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    suspendProcessInstanceById(processInstanceId);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, SUSPEND_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceById(processInstanceId);
@@ -1913,9 +2007,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       // then
       String message = e.getMessage();
       assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
     }
   }
 
@@ -1936,8 +2034,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
     }
   }
 
@@ -1975,8 +2076,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = instance.getId();
     String processDefinitionId = instance.getProcessDefinitionId();
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -1985,6 +2086,60 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
   }
+
+  public void testSuspendProcessInstanceByProcessDefinitionIdWithSuspendPermissionOnProcessInstance() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    String processDefinitionId = instance.getProcessDefinitionId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, SUSPEND);
+
+    try {
+      // when
+      runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
+      fail("Exception expected: It should not be posssible to suspend a process instance.");
+    } catch (AuthorizationException e) {
+
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
+    }
+  }
+
+  public void testSuspendProcessInstanceByProcessDefinitionIdWithSuspendPermissionOnAnyProcessInstance() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processDefinitionId = instance.getProcessDefinitionId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, SUSPEND);
+
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
+
+    // then
+    instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+  }
+
+  public void testSuspendProcessInstanceByProcessDefinitionIdWithSuspendInstancesPermissionOnProcessDefinition() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processDefinitionId = instance.getProcessDefinitionId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, SUSPEND_INSTANCE);
+
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
+
+    // then
+    instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+  }
+
 
   // activate process instance by process definition id /////////////////////////////
 
@@ -2004,9 +2159,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       // then
       String message = e.getMessage();
       assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
     }
   }
 
@@ -2029,8 +2188,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
     }
   }
 
@@ -2075,8 +2237,69 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = instance.getProcessDefinitionId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+
+    // when
+    runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
+
+    // then
+    instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+  }
+
+  public void testActivateProcessInstanceByProcessDefinitionIdWithSuspendPermissionOnProcessInstance() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    String processDefinitionId = instance.getProcessDefinitionId();
+    suspendProcessInstanceById(processInstanceId);
+
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, SUSPEND);
+
+    try {
+      // when
+      runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
+      fail("Exception expected: It should not be posssible to suspend a process instance.");
+    } catch (AuthorizationException e) {
+
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
+    }
+  }
+
+  public void testActivateProcessInstanceByProcessDefinitionIdWithSuspendPermissionOnAnyProcessInstance() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    String processDefinitionId = instance.getProcessDefinitionId();
+    suspendProcessInstanceById(processInstanceId);
+
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, SUSPEND);
+
+    // when
+    runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
+
+    // then
+    instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+  }
+
+  public void testActivateProcessInstanceByProcessDefinitionIdWithSuspendInstancesPermissionOnProcessDefinition() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    String processDefinitionId = instance.getProcessDefinitionId();
+    suspendProcessInstanceById(processInstanceId);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, SUSPEND_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -2101,10 +2324,14 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       // then
       String message = e.getMessage();
       assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
-    }
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+   }
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithUpdatePermissionOnProcessInstance() {
@@ -2123,8 +2350,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
     }
   }
 
@@ -2170,6 +2400,56 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
   }
 
+  public void testSuspendProcessInstanceByProcessDefinitionKeyWithSuspendPermissionOnProcessInstance() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, SUSPEND);
+
+    try {
+      // when
+      runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
+      fail("Exception expected: It should not be posssible to suspend a process instance.");
+    } catch (AuthorizationException e) {
+
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
+    }
+  }
+
+  public void testSuspendProcessInstanceByProcessDefinitionKeyWithSuspendPermissionOnAnyProcessInstance() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, SUSPEND);
+
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+  }
+
+  public void testSuspendProcessInstanceByProcessDefinitionKeyWithSuspendInstancesPermissionOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, SUSPEND_INSTANCE);
+
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
+
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+  }
+
   // activate process instance by process definition key /////////////////////////////
 
   public void testActivateProcessInstanceByProcessDefinitionKeyWithoutAuthorization() {
@@ -2187,9 +2467,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       // then
       String message = e.getMessage();
       assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
     }
   }
 
@@ -2211,8 +2495,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
     }
   }
 
@@ -2254,8 +2541,66 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = instance.getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+
+    // when
+    runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
+
+    // then
+    instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+  }
+
+  public void testActivateProcessInstanceByProcessDefinitionKeyWithSuspendPermissionOnProcessInstance() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    suspendProcessInstanceById(processInstanceId);
+
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, SUSPEND);
+
+    try {
+      // when
+      runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
+      fail("Exception expected: It should not be posssible to suspend a process instance.");
+    } catch (AuthorizationException e) {
+
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(SUSPEND_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      assertTextPresent(SUSPEND.getName(), message);
+      assertTextPresent(UPDATE.getName(), message);
+    }
+  }
+
+  public void testActivateProcessInstanceByProcessDefinitionKeyWithSuspendPermissionOnAnyProcessInstance() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    suspendProcessInstanceById(processInstanceId);
+
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, SUSPEND);
+
+    // when
+    runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
+
+    // then
+    instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+  }
+
+  public void testActivateProcessInstanceByProcessDefinitionKeyWithSuspendInstancesPermissionOnProcessDefinition() {
+    // given
+    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    String processInstanceId = instance.getId();
+    suspendProcessInstanceById(processInstanceId);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, SUSPEND_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
@@ -2517,6 +2862,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariable(processInstanceId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
   }
 
   public void testGetVariableWithReadPermissionOnProcessInstance() {
@@ -2567,6 +2928,32 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variable);
   }
 
+  public void testGetVariableWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Object variable = runtimeService.getVariable(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
+  public void testGetVariableWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Object variable = runtimeService.getVariable(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
   // RuntimeService#getVariableLocal() ////////////////////////////////////////////
 
   public void testGetVariableLocalWithoutAuthorization() {
@@ -2585,6 +2972,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariableLocal(processInstanceId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -2638,6 +3041,32 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variable);
   }
 
+  public void testGetVariableLocalWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Object variable = runtimeService.getVariableLocal(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
+  public void testGetVariableLocalWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Object variable = runtimeService.getVariableLocal(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertEquals(VARIABLE_VALUE, variable);
+  }
+
   // RuntimeService#getVariableTyped() ////////////////////////////////////////////
 
   public void testGetVariableTypedWithoutAuthorization() {
@@ -2656,6 +3085,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariableTyped(processInstanceId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -2713,6 +3158,34 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, typedValue.getValue());
   }
 
+  public void testGetVariableTypedWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    TypedValue typedValue = runtimeService.getVariableTyped(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
+  public void testGetVariableTypedWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    TypedValue typedValue = runtimeService.getVariableTyped(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
   // RuntimeService#getVariableLocalTyped() ////////////////////////////////////////////
 
   public void testGetVariableLocalTypedWithoutAuthorization() {
@@ -2731,6 +3204,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariableLocalTyped(processInstanceId, VARIABLE_NAME);
+      fail("Exception expected: It should not be to retrieve the variable instance");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -2788,6 +3277,34 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, typedValue.getValue());
   }
 
+  public void testGetVariableLocalTypedWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    TypedValue typedValue = runtimeService.getVariableLocalTyped(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
+  public void testGetVariableLocalTypedWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    TypedValue typedValue = runtimeService.getVariableLocalTyped(processInstanceId, VARIABLE_NAME);
+
+    // then
+    assertNotNull(typedValue);
+    assertEquals(VARIABLE_VALUE, typedValue.getValue());
+  }
+
   // RuntimeService#getVariables() ////////////////////////////////////////////
 
   public void testGetVariablesWithoutAuthorization() {
@@ -2806,6 +3323,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariables(processInstanceId);
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -2875,6 +3408,34 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  // RuntimeService#getVariablesLocal() ////////////////////////////////////////////
+
   // RuntimeService#getVariablesLocal() ////////////////////////////////////////////
 
   public void testGetVariablesLocalWithoutAuthorization() {
@@ -2893,6 +3454,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariablesLocal(processInstanceId);
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -2962,6 +3539,34 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesLocalWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesLocalWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  // RuntimeService#getVariablesTyped() ////////////////////////////////////////////
+
   // RuntimeService#getVariablesTyped() ////////////////////////////////////////////
 
   public void testGetVariablesTypedWithoutAuthorization() {
@@ -2980,6 +3585,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariablesTyped(processInstanceId);
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -3049,6 +3670,34 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesTypedWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesTypedWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  // RuntimeService#getVariablesLocalTyped() ////////////////////////////////////////////
+
   // RuntimeService#getVariablesLocalTyped() ////////////////////////////////////////////
 
   public void testGetVariablesLocalTypedWithoutAuthorization() {
@@ -3067,6 +3716,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariablesLocalTyped(processInstanceId);
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -3136,6 +3801,32 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesLocalTypedWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesLocalTypedWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
   // RuntimeService#getVariables() ////////////////////////////////////////////
 
   public void testGetVariablesByNameWithoutAuthorization() {
@@ -3154,6 +3845,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -3223,6 +3930,32 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesByNameWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesByNameWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyGetVariables(variables);
+  }
+
   // RuntimeService#getVariablesLocal() ////////////////////////////////////////////
 
   public void testGetVariablesLocalByNameWithoutAuthorization() {
@@ -3241,6 +3974,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -3310,6 +4059,32 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesLocalByNameWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesLocalByNameWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyGetVariables(variables);
+  }
+
   // RuntimeService#getVariablesTyped() ////////////////////////////////////////////
 
   public void testGetVariablesTypedByNameWithoutAuthorization() {
@@ -3328,6 +4103,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -3397,6 +4188,32 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesTypedByNameWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesTypedByNameWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
   // RuntimeService#getVariablesLocalTyped() ////////////////////////////////////////////
 
   public void testGetVariablesLocalTypedByNameWithoutAuthorization() {
@@ -3415,6 +4232,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(processInstanceId, message);
       assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
       assertTextPresent(READ_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    // given (2)
+    setReadVariableAsDefaultReadVariablePermission();
+
+    try {
+      // when (2)
+      runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+      fail("Exception expected: It should not be to retrieve the variable instances");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ_INSTANCE_VARIABLE.getName(), message);
       assertTextPresent(PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
@@ -3484,6 +4317,32 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
+  public void testGetVariablesLocalTypedByNameWithReadInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
+  public void testGetVariablesLocalTypedByNameWithReadInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    setReadVariableAsDefaultReadVariablePermission();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
+
+    // when
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+
+    // then
+    verifyGetVariables(variables);
+  }
+
   // RuntimeService#setVariable() ////////////////////////////////////////////
 
   public void testSetVariableWithoutAuthorization() {
@@ -3497,47 +4356,27 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, message);
     }
   }
 
-  public void testSetVariableWithReadPermissionOnProcessInstance() {
+  public void testSetVariableWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.setVariable(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariable(processInstanceId);
   }
 
-  public void testSetVariableWithReadPermissionOnAnyProcessInstance() {
+  public void testSetVariableWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.setVariable(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariable(processInstanceId);
   }
 
-  public void testSetVariableWithReadInstancePermissionOnProcessDefinition() {
+  public void testSetVariableWithUpdateInstanceInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
@@ -3552,19 +4391,44 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testSetVariableWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testSetVariableWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.setVariable(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
+    verifySetVariable(processInstanceId);
+  }
 
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+  public void testSetVariableWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
+
+    verifySetVariable(processInstanceId);
+  }
+
+  public void testSetVariableWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifySetVariable(processInstanceId);
+  }
+
+  public void testSetVariableWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariable(processInstanceId);
+  }
+
+  public void testSetVariableWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariable(processInstanceId);
   }
 
   // RuntimeService#setVariableLocal() ////////////////////////////////////////////
@@ -3579,63 +4443,35 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testSetVariableLocalWithReadPermissionOnProcessInstance() {
+  public void testSetVariableLocalWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.setVariableLocal(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariableLocal(processInstanceId);
   }
 
-  public void testSetVariableLocalWithReadPermissionOnAnyProcessInstance() {
+  public void testSetVariableLocalWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.setVariableLocal(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariableLocal(processInstanceId);
   }
 
-  public void testSetVariableLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testSetVariableLocalWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.setVariableLocal(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariableLocal(processInstanceId);
   }
 
-  public void testSetVariableLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testSetVariableLocalWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
@@ -3648,6 +4484,38 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
     verifyQueryResults(query, 1);
     enableAuthorization();
+  }
+
+  public void testSetVariableLocalWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
+
+    verifySetVariableLocal(processInstanceId);
+  }
+
+  public void testSetVariableLocalWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifySetVariableLocal(processInstanceId);
+  }
+
+  public void testSetVariableLocalWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariableLocal(processInstanceId);
+  }
+
+  public void testSetVariableLocalWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariableLocal(processInstanceId);
   }
 
   // RuntimeService#setVariables() ////////////////////////////////////////////
@@ -3662,75 +4530,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testSetVariablesWithReadPermissionOnProcessInstance() {
+  public void testSetVariablesWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.setVariables(processInstanceId, getVariables());
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariables(processInstanceId);
   }
 
-  public void testSetVariablesWithReadPermissionOnAnyProcessInstance() {
+  public void testSetVariablesWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.setVariables(processInstanceId, getVariables());
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariables(processInstanceId);
   }
 
-  public void testSetVariablesWithReadInstancePermissionOnProcessDefinition() {
+  public void testSetVariablesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.setVariables(processInstanceId, getVariables());
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariables(processInstanceId);
   }
 
-  public void testSetVariablesWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testSetVariablesWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.setVariables(processInstanceId, getVariables());
+    verifySetVariables(processInstanceId);
+  }
 
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+  public void testSetVariablesWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
+
+    verifySetVariables(processInstanceId);
+  }
+
+  public void testSetVariablesWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifySetVariables(processInstanceId);
+  }
+
+  public void testSetVariablesWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariables(processInstanceId);
+  }
+
+  public void testSetVariablesWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariables(processInstanceId);
   }
 
   // RuntimeService#setVariablesLocal() ////////////////////////////////////////////
@@ -3745,75 +4610,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testSetVariablesLocalWithReadPermissionOnProcessInstance() {
+  public void testSetVariablesLocalWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.setVariablesLocal(processInstanceId, getVariables());
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariablesLocal(processInstanceId);
   }
 
-  public void testSetVariablesLocalWithReadPermissionOnAnyProcessInstance() {
+  public void testSetVariablesLocalWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.setVariablesLocal(processInstanceId, getVariables());
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariablesLocal(processInstanceId);
   }
 
-  public void testSetVariablesLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testSetVariablesLocalWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.setVariablesLocal(processInstanceId, getVariables());
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+    verifySetVariablesLocal(processInstanceId);
   }
 
-  public void testSetVariablesLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testSetVariablesLocalWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.setVariablesLocal(processInstanceId, getVariables());
+    verifySetVariablesLocal(processInstanceId);
+  }
 
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+  public void testSetVariablesLocalWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
+
+    verifySetVariablesLocal(processInstanceId);
+  }
+
+  public void testSetVariablesLocalWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifySetVariablesLocal(processInstanceId);
+  }
+
+  public void testSetVariablesLocalWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariablesLocal(processInstanceId);
+  }
+
+  public void testSetVariablesLocalWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifySetVariablesLocal(processInstanceId);
   }
 
   // RuntimeService#removeVariable() ////////////////////////////////////////////
@@ -3828,75 +4690,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testRemoveVariableWithReadPermissionOnProcessInstance() {
+  public void testRemoveVariableWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariable(processInstanceId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariable(processInstanceId);
   }
 
-  public void testRemoveVariableWithReadPermissionOnAnyProcessInstance() {
+  public void testRemoveVariableWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariable(processInstanceId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariable(processInstanceId);
   }
 
-  public void testRemoveVariableWithReadInstancePermissionOnProcessDefinition() {
+  public void testRemoveVariableWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariable(processInstanceId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariable(processInstanceId);
   }
 
-  public void testRemoveVariableWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testRemoveVariableWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariable(processInstanceId, VARIABLE_NAME);
+    verifyRemoveVariable(processInstanceId);
+  }
 
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testRemoveVariableWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariable(processInstanceId);
+  }
+
+  public void testRemoveVariableWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariable(processInstanceId);
+  }
+
+  public void testRemoveVariableWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariable(processInstanceId);
+  }
+
+  public void testRemoveVariableWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariable(processInstanceId);
   }
 
   // RuntimeService#removeVariableLocal() ////////////////////////////////////////////
@@ -3911,75 +4770,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testRemoveVariableLocalWithReadPermissionOnProcessInstance() {
+  public void testRemoveVariableLocalWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariableLocal(processInstanceId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariableLocal(processInstanceId);
   }
 
-  public void testRemoveVariableLocalWithReadPermissionOnAnyProcessInstance() {
+  public void testRemoveVariableLocalWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariableLocal(processInstanceId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariableLocal(processInstanceId);
   }
 
-  public void testRemoveVariableLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testRemoveVariableLocalWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariableLocal(processInstanceId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariableLocal(processInstanceId);
   }
 
-  public void testRemoveVariableLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testRemoveVariableLocalWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariableLocal(processInstanceId, VARIABLE_NAME);
+    verifyRemoveVariableLocal(processInstanceId);
+  }
 
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testRemoveVariableLocalWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariableLocal(processInstanceId);
+  }
+
+  public void testRemoveVariableLocalWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariableLocal(processInstanceId);
+  }
+
+  public void testRemoveVariableLocalWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariableLocal(processInstanceId);
+  }
+
+  public void testRemoveVariableLocalWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariableLocal(processInstanceId);
   }
 
   // RuntimeService#removeVariables() ////////////////////////////////////////////
@@ -3994,75 +4850,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testRemoveVariablesWithReadPermissionOnProcessInstance() {
+  public void testRemoveVariablesWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariables(processInstanceId);
   }
 
-  public void testRemoveVariablesWithReadPermissionOnAnyProcessInstance() {
+  public void testRemoveVariablesWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariables(processInstanceId);
   }
 
-  public void testRemoveVariablesWithReadInstancePermissionOnProcessDefinition() {
+  public void testRemoveVariablesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariables(processInstanceId);
   }
 
-  public void testRemoveVariablesWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testRemoveVariablesWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    verifyRemoveVariables(processInstanceId);
+  }
 
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testRemoveVariablesWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariables(processInstanceId);
+  }
+
+  public void testRemoveVariablesWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariables(processInstanceId);
+  }
+
+  public void testRemoveVariablesWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariables(processInstanceId);
+  }
+
+  public void testRemoveVariablesWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariables(processInstanceId);
   }
 
   // RuntimeService#removeVariablesLocal() ////////////////////////////////////////////
@@ -4077,75 +4930,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testRemoveVariablesLocalWithReadPermissionOnProcessInstance() {
+  public void testRemoveVariablesLocalWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariablesLocal(processInstanceId);
   }
 
-  public void testRemoveVariablesLocalWithReadPermissionOnAnyProcessInstance() {
+  public void testRemoveVariablesLocalWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    // when
-    runtimeService.removeVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariablesLocal(processInstanceId);
   }
 
-  public void testRemoveVariablesLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testRemoveVariablesLocalWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyRemoveVariablesLocal(processInstanceId);
   }
 
-  public void testRemoveVariablesLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testRemoveVariablesLocalWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
-    // when
-    runtimeService.removeVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    verifyRemoveVariablesLocal(processInstanceId);
+  }
 
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testRemoveVariablesLocalWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariablesLocal(processInstanceId);
+  }
+
+  public void testRemoveVariablesLocalWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
+
+    verifyRemoveVariablesLocal(processInstanceId);
+  }
+
+  public void testRemoveVariablesLocalWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariablesLocal(processInstanceId);
+  }
+
+  public void testRemoveVariablesLocalWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyRemoveVariablesLocal(processInstanceId);
   }
 
   // RuntimeServiceImpl#updateVariables() ////////////////////////////////////////////
@@ -4160,14 +5010,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (1)
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
 
     try {
@@ -4176,14 +5019,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (2)
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
 
     try {
@@ -4192,139 +5028,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (3)
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testUpdateVariablesWithReadPermissionOnProcessInstance() {
+  public void testUpdateVariablesWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), null);
-
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
-
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
-
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyUpdateVariables(processInstanceId);
   }
 
-  public void testUpdateVariablesWithReadPermissionOnAnyProcessInstance() {
+  public void testUpdateVariablesWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), null);
-
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
-
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
-
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyUpdateVariables(processInstanceId);
   }
 
-  public void testUpdateVariablesWithReadInstancePermissionOnProcessDefinition() {
+  public void testUpdateVariablesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), null);
-
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
-
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
-
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyUpdateVariables(processInstanceId);
   }
 
-  public void testUpdateVariablesWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testUpdateVariablesWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), null);
+    verifyUpdateVariables(processInstanceId);
+  }
 
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+  public void testUpdateVariablesWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
 
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+    verifyUpdateVariables(processInstanceId);
+  }
 
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testUpdateVariablesWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
 
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    verifyUpdateVariables(processInstanceId);
+  }
 
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testUpdateVariablesWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyUpdateVariables(processInstanceId);
+  }
+
+  public void testUpdateVariablesWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyUpdateVariables(processInstanceId);
   }
 
   // RuntimeServiceImpl#updateVariablesLocal() ////////////////////////////////////////////
@@ -4339,14 +5108,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (1)
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
 
     try {
@@ -4355,14 +5117,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (2)
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
 
     try {
@@ -4371,139 +5126,72 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (3)
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE.getName(), message);
-      assertTextPresent(processInstanceId, message);
-      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+      verifyMessageIsValid(processInstanceId, e.getMessage());
     }
   }
 
-  public void testUpdateVariablesLocalWithReadPermissionOnProcessInstance() {
+  public void testUpdateVariablesLocalWithUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), null);
-
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
-
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
-
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyUpdateVariablesLocal(processInstanceId);
   }
 
-  public void testUpdateVariablesLocalWithReadPermissionOnAnyProcessInstance() {
+  public void testUpdateVariablesLocalWithUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), null);
-
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
-
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
-
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyUpdateVariablesLocal(processInstanceId);
   }
 
-  public void testUpdateVariablesLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testUpdateVariablesLocalWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), null);
-
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
-
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
-
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+    verifyUpdateVariablesLocal(processInstanceId);
   }
 
-  public void testUpdateVariablesLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testUpdateVariablesLocalWithUpdateInstancePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
-    // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), null);
+    verifyUpdateVariablesLocal(processInstanceId);
+  }
 
-    // then (1)
-    disableAuthorization();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
+  public void testUpdateVariablesLocalWithUpdateVariablePermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE_VARIABLE);
 
-    // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+    verifyUpdateVariablesLocal(processInstanceId);
+  }
 
-    // then (2)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testUpdateVariablesLocalWithUpdateVariablePermissionOnAnyProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE_VARIABLE);
 
-    // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    verifyUpdateVariablesLocal(processInstanceId);
+  }
 
-    // then (3)
-    disableAuthorization();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
+  public void testUpdateVariablesLocalWithUpdateInstanceVariablePermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyUpdateVariablesLocal(processInstanceId);
+  }
+
+  public void testUpdateVariablesLocalWithUpdateInstanceVariablePermissionOnAnyProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE_VARIABLE);
+
+    verifyUpdateVariablesLocal(processInstanceId);
   }
 
   // helper /////////////////////////////////////////////////////
@@ -4514,6 +5202,140 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
+  }
+
+  protected void verifyMessageIsValid(String processInstanceId, String message) {
+    assertTextPresent(userId, message);
+    assertTextPresent(UPDATE.getName(), message);
+    assertTextPresent(UPDATE_VARIABLE.getName(), message);
+    assertTextPresent(processInstanceId, message);
+    assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+    assertTextPresent(UPDATE_INSTANCE.getName(), message);
+    assertTextPresent(UPDATE_INSTANCE_VARIABLE.getName(), message);
+    assertTextPresent(PROCESS_KEY, message);
+    assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+  }
+
+  protected void verifyVariableInstanceCountDisabledAuthorization(int count) {
+    disableAuthorization();
+    verifyQueryResults(runtimeService.createVariableInstanceQuery(), count);
+    enableAuthorization();
+  }
+
+  protected void verifySetVariable(String processInstanceId) {
+    // when
+    runtimeService.setVariable(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(1);
+  }
+
+  protected void verifySetVariableLocal(String processInstanceId) {
+    // when
+    runtimeService.setVariableLocal(processInstanceId, VARIABLE_NAME, VARIABLE_VALUE);
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(1);
+  }
+
+  protected void verifySetVariables(String processInstanceId) {
+    // when
+    runtimeService.setVariables(processInstanceId, getVariables());
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(1);
+  }
+
+  protected void verifySetVariablesLocal(String processInstanceId) {
+    // when
+    runtimeService.setVariablesLocal(processInstanceId, getVariables());
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(1);
+  }
+
+  protected void verifyRemoveVariable(String processInstanceId) {
+    // when
+    runtimeService.removeVariable(processInstanceId, VARIABLE_NAME);
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(0);
+  }
+
+  protected void verifyRemoveVariableLocal(String processInstanceId) {
+    // when
+    runtimeService.removeVariableLocal(processInstanceId, VARIABLE_NAME);
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(0);
+  }
+
+  protected void verifyRemoveVariables(String processInstanceId) {
+    // when
+    runtimeService.removeVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(0);
+  }
+
+  protected void verifyRemoveVariablesLocal(String processInstanceId) {
+    // when
+    runtimeService.removeVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+
+    // then
+    verifyVariableInstanceCountDisabledAuthorization(0);
+  }
+
+  protected void verifyUpdateVariables(String processInstanceId) {
+    // when (1)
+    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), null);
+
+    // then (1)
+    verifyVariableInstanceCountDisabledAuthorization(1);
+
+    // when (2)
+    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+
+    // then (2)
+    verifyVariableInstanceCountDisabledAuthorization(0);
+
+    // when (3)
+    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+
+    // then (3)
+    verifyVariableInstanceCountDisabledAuthorization(0);
+  }
+
+  protected void verifyUpdateVariablesLocal(String processInstanceId) {
+    // when (1)
+    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), null);
+
+    // then (1)
+    verifyVariableInstanceCountDisabledAuthorization(1);
+
+    // when (2)
+    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+
+    // then (2)
+    verifyVariableInstanceCountDisabledAuthorization(0);
+  
+    // when (3)
+    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+
+    // then (3)
+    verifyVariableInstanceCountDisabledAuthorization(0);
+  }
+
+  protected void setReadVariableAsDefaultReadVariablePermission() {
+    processEngineConfiguration.setEnforceSpecificVariablePermission(true);
+  }
+
+  protected void verifyGetVariables(Map<String, Object> variables) {
+    assertNotNull(variables);
+    assertFalse(variables.isEmpty());
+    assertEquals(1, variables.size());
+
+    assertEquals(VARIABLE_VALUE, variables.get(VARIABLE_NAME));
   }
 
 }

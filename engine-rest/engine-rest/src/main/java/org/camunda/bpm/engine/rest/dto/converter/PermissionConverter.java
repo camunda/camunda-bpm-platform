@@ -1,12 +1,13 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +16,18 @@
  */
 package org.camunda.bpm.engine.rest.dto.converter;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.spi.PermissionProvider;
 
 /**
  * <p>Converts between the String-Array based representation of permissions in the REST API
@@ -31,17 +38,17 @@ import java.util.List;
  */
 public class PermissionConverter {
 
-  public static Permission[] getPermissionsForNames(String[] names) {
+  public static Permission[] getPermissionsForNames(String[] names, int resourceType) {
     
     final Permission[] permissions = new Permission[names.length];
     
     for (int i = 0; i < names.length; i++) {
-      permissions[i] = getPermissionForName(names[i]);      
+      permissions[i] = getPermissionProvider().getPermissionForName(names[i], resourceType);
     }
         
     return permissions;    
   }
-  
+
   public static String[] getNamesForPermissions(Authorization authorization, Permission[] permissions) {
 
     int type = authorization.getAuthorizationType();
@@ -71,15 +78,17 @@ public class PermissionConverter {
   }
 
   // permission provider SPI /////////////////////////////////////
-  
-  public static Permission[] getAllPermissions() {
-    // TODO: make this configurable via SPI
-    return Permissions.values();
+
+  public static PermissionProvider getPermissionProvider() {
+    ServiceLoader<PermissionProvider> serviceLoader = ServiceLoader.load(PermissionProvider.class);
+    Iterator<PermissionProvider> iterator = serviceLoader.iterator();
+
+    if (iterator.hasNext()) {
+      PermissionProvider provider = iterator.next();
+      return provider;
+    } else {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the " + PermissionProvider.class + " - SPI");
+    }
   }
-  
-  public static Permission getPermissionForName(String name) {
-    // TODO: make this configuratble via SPI       
-    return Permissions.forName(name);
-  }
-  
+
 }

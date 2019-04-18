@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -467,5 +468,55 @@ public class ExecutionListenerTest {
     //then end listener sets variable and triggers conditional event
     //end listener should called only once
     assertEquals(1, RecorderExecutionListener.getRecordedEvents().size());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testMultiInstanceCancelation.bpmn20.xml")
+  public void testMultiInstanceCancelationDoesNotAffectEndListener() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MultiInstanceCancelation");
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(2).getId());
+    
+    // when
+    taskService.complete(tasks.get(3).getId());
+    
+    // then
+    assertProcessEnded(processInstance.getId());
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstance endVariable = historyService.createHistoricVariableInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .variableName("finished")
+          .singleResult();
+      assertNotNull(endVariable);
+      assertNotNull(endVariable.getValue());
+      assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+    }
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testMultiInstanceCancelation.bpmn20.xml")
+  public void testProcessInstanceCancelationNoticedInEndListener() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MultiInstanceCancelation");
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(2).getId());
+    
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), "myReason");
+    
+    // then
+    assertProcessEnded(processInstance.getId());
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstance endVariable = historyService.createHistoricVariableInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .variableName("canceled")
+          .singleResult();
+      assertNotNull(endVariable);
+      assertNotNull(endVariable.getValue());
+      assertTrue(Boolean.valueOf(String.valueOf(endVariable.getValue())));
+    }
   }
 }

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,17 +16,23 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotEquals;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.Deployment;
+import org.joda.time.LocalDateTime;
 
 
 public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
@@ -78,6 +85,73 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(pi1.getProcessInstanceId());
     assertProcessEnded(pi2.getProcessInstanceId());
   }
+  
+  @Deployment
+  public void testExpressionRecalculateCurrentDateBased() throws Exception {
+    // Set the clock fixed
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("duration", "PT1H");
+
+    // After process start, there should be timer created
+    ProcessInstanceWithVariables pi1 = (ProcessInstanceWithVariables) runtimeService.startProcessInstanceByKey("intermediateTimerEventExample", variables);
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi1.getId());
+    assertEquals(1, jobQuery.count());
+    Job job = jobQuery.singleResult();
+    Date firstDate = job.getDuedate();
+
+    // After variable change and recalculation, there should still be one timer only, with a changed due date
+    moveByMinutes(1);
+    Date currentTime = ClockUtil.getCurrentTime();
+    runtimeService.setVariable(pi1.getProcessInstanceId(), "duration", "PT15M");
+    processEngine.getManagementService().recalculateJobDuedate(job.getId(), false);
+    
+    assertEquals(1, jobQuery.count());
+    job = jobQuery.singleResult();
+    assertNotEquals(firstDate, job.getDuedate());
+    assertTrue(firstDate.after(job.getDuedate()));
+    Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusMinutes(15).toDate();
+    assertThat(job.getDuedate()).isCloseTo(expectedDate, 1000l);
+    
+    // After waiting for sixteen minutes the timer should fire
+    ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));
+    waitForJobExecutorToProcessAllJobs(5000L);
+
+    assertEquals(0, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
+    assertProcessEnded(pi1.getProcessInstanceId());
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testExpressionRecalculateCurrentDateBased.bpmn20.xml")
+  public void testExpressionRecalculateCreationDateBased() throws Exception {
+    // Set the clock fixed
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("duration", "PT1H");
+
+    // After process start, there should be timer created
+    ProcessInstanceWithVariables pi1 = (ProcessInstanceWithVariables) runtimeService.startProcessInstanceByKey("intermediateTimerEventExample", variables);
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi1.getId());
+    assertEquals(1, jobQuery.count());
+    Job job = jobQuery.singleResult();
+    Date firstDate = job.getDuedate();
+
+    // After variable change and recalculation, there should still be one timer only, with a changed due date
+    moveByMinutes(65);// move past first due date
+    runtimeService.setVariable(pi1.getProcessInstanceId(), "duration", "PT15M");
+    processEngine.getManagementService().recalculateJobDuedate(job.getId(), true);
+    
+    assertEquals(1, jobQuery.count());
+    job = jobQuery.singleResult();
+    assertNotEquals(firstDate, job.getDuedate());
+    assertTrue(firstDate.after(job.getDuedate()));
+    Date expectedDate = LocalDateTime.fromDateFields(job.getCreateTime()).plusMinutes(15).toDate();
+    assertEquals(expectedDate, job.getDuedate());
+    
+    // After waiting for sixteen minutes the timer should fire
+    ClockUtil.setCurrentTime(new Date(firstDate.getTime() + TimeUnit.MINUTES.toMillis(16L)));
+    waitForJobExecutorToProcessAllJobs(5000L);
+
+    assertEquals(0, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
+    assertProcessEnded(pi1.getProcessInstanceId());
+  }
 
   @Deployment
   public void testTimeCycle() {
@@ -95,6 +169,69 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(taskId);
 
     assertProcessEnded(processInstanceId);
+  }
+  
+  @Deployment
+  public void testRecalculateTimeCycleExpressionCurrentDateBased() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("cycle", "R/PT15M");
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process", variables).getId();
+
+    JobQuery query = managementService.createJobQuery();
+    assertEquals(1, query.count());
+    Job job = query.singleResult();
+    Date oldDuedate = job.getDuedate();
+    String jobId = job.getId();
+
+    // when
+    runtimeService.setVariable(processInstanceId, "cycle", "R/PT10M");
+    managementService.recalculateJobDuedate(jobId, false);
+
+    // then
+    assertEquals(1, query.count());
+    assertTrue(oldDuedate.after(query.singleResult().getDuedate()));
+
+    managementService.executeJob(jobId);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+
+    assertProcessEnded(processInstanceId);
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/IntermediateTimerEventTest.testRecalculateTimeCycleExpressionCurrentDateBased.bpmn20.xml")
+  public void testRecalculateTimeCycleExpressionCreationDateBased() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("cycle", "R/PT15M");
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process", variables).getId();
+
+    JobQuery query = managementService.createJobQuery();
+    assertEquals(1, query.count());
+    Job job = query.singleResult();
+    Date oldDuedate = job.getDuedate();
+    String jobId = job.getId();
+
+    // when
+    runtimeService.setVariable(processInstanceId, "cycle", "R/PT10M");
+    managementService.recalculateJobDuedate(jobId, true);
+
+    // then
+    assertEquals(1, query.count());
+    Date newDuedate = query.singleResult().getDuedate();
+    assertTrue(oldDuedate.after(newDuedate));
+    Date expectedDate = LocalDateTime.fromDateFields(job.getCreateTime()).plusMinutes(10).toDate();
+    assertEquals(expectedDate, newDuedate);
+
+    managementService.executeJob(jobId);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+
+    assertProcessEnded(processInstanceId);
+  }
+  
+  private void moveByMinutes(int minutes) throws Exception {
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + ((minutes * 60 * 1000) + 5000)));
   }
 
 }

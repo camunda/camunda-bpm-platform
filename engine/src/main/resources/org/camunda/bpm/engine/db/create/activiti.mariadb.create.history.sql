@@ -1,8 +1,9 @@
 --
--- Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
---
--- Licensed under the Apache License, Version 2.0 (the "License");
--- you may not use this file except in compliance with the License.
+-- Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+-- under one or more contributor license agreements. See the NOTICE file
+-- distributed with this work for additional information regarding copyright
+-- ownership. Camunda licenses this file to you under the Apache License,
+-- Version 2.0; you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at
 --
 --     http://www.apache.org/licenses/LICENSE-2.0
@@ -228,6 +229,8 @@ create table ACT_HI_OP_LOG (
     NEW_VALUE_ varchar(4000),
     TENANT_ID_ varchar(64),
     REMOVAL_TIME_ datetime(3),
+	CATEGORY_ varchar(64),
+	EXTERNAL_TASK_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -255,9 +258,9 @@ create table ACT_HI_INCIDENT (
 
 create table ACT_HI_JOB_LOG (
     ID_ varchar(64) not null,
-    TIMESTAMP_ timestamp(3) not null,
+    TIMESTAMP_ datetime(3) not null,
     JOB_ID_ varchar(64) not null,
-    JOB_DUEDATE_ timestamp(3) NULL,
+    JOB_DUEDATE_ datetime(3) NULL,
     JOB_RETRIES_ integer,
     JOB_PRIORITY_ bigint NOT NULL DEFAULT 0,
     JOB_EXCEPTION_MSG_ varchar(4000),

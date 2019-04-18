@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.qa.rolling.update.scenarios.DeploymentWhichShouldBeDeletedScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.authorization.AuthorizationScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.callactivity.ProcessWithCallActivityScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.cleanup.HistoryCleanupScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.eventSubProcess.ProcessWithEventSubProcessScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.externalTask.ProcessWithExternalTaskScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.mulltiInstance.ProcessWithMultiInstanceCallActivityScenario;
@@ -30,6 +32,8 @@ import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithParallelGatew
 import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithParallelGatewayScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithUserTaskAndTimerScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithUserTaskScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.timestamp.IncidentTimestampUpdateScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.timestamp.JobTimestampsUpdateScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioRunner;
 
 /**
@@ -71,6 +75,12 @@ public class TestFixture {
     runner.setupScenarios(ProcessWithMultiInstanceCallActivityScenario.class);
     runner.setupScenarios(ProcessWithExternalTaskScenario.class);
     runner.setupScenarios(ProcessWithEventSubProcessScenario.class);
+    runner.setupScenarios(JobTimestampsUpdateScenario.class);
+    runner.setupScenarios(IncidentTimestampUpdateScenario.class);
+
+    if (RollingUpdateConstants.NEW_ENGINE_TAG.equals(currentFixtureTag)) { // create data with new engine
+      runner.setupScenarios(HistoryCleanupScenario.class);
+    }
 
     processEngine.close();
 

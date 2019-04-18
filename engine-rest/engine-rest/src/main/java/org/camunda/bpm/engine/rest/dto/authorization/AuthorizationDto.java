@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,13 +16,13 @@
  */
 package org.camunda.bpm.engine.rest.dto.authorization;
 
-import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
+import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 
 /**
  * @author Daniel Meyer
@@ -45,7 +46,7 @@ public class AuthorizationDto {
     authorizationDto.setId(dbAuthorization.getId());
     authorizationDto.setType(dbAuthorization.getAuthorizationType());
 
-    Permission[] dbPermissions = dbAuthorization.getPermissions(Permissions.values());
+    Permission[] dbPermissions = getPermissions(dbAuthorization);
     authorizationDto.setPermissions(PermissionConverter.getNamesForPermissions(dbAuthorization, dbPermissions));
 
     authorizationDto.setUserId(dbAuthorization.getUserId());
@@ -69,7 +70,7 @@ public class AuthorizationDto {
     }
 
     if(dto.getPermissions() != null) {
-      dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions()));
+      dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions(), dto.getResourceType()));
     }
 
   }
@@ -127,6 +128,13 @@ public class AuthorizationDto {
   }
   public void setResourceId(String resourceId) {
     this.resourceId = resourceId;
+  }
+
+  private static Permission[] getPermissions(Authorization dbAuthorization) {
+    int givenResourceType = dbAuthorization.getResourceType();
+    Permission[] permissionsByResourceType = ResourceTypeUtil.getPermissionsByResourceType(givenResourceType);
+
+    return dbAuthorization.getPermissions(permissionsByResourceType);
   }
 
 }

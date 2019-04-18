@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="Examples">
+
+  <process id="oneTaskProcessMigration_710" name="The One Task Process" isExecutable="true" camunda:historyTimeToLive="5">
+    <documentation>This is a process for testing purposes</documentation>
+
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="userTask1" />
+
+    <userTask id="userTask1" name="userTaskOne">
+      <extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="groovy">throw new RuntimeException()</camunda:script>
+        </camunda:executionListener>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input_08c2ntk">
+            <camunda:script scriptFormat="groovy">throw new RuntimeException()</camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow sourceRef="userTask1" targetRef="conditional" />
+
+    <intermediateCatchEvent id="conditional">
+      <conditionalEventDefinition>
+        <condition xsi:type="tFormalExpression">${true}</condition>
+      </conditionalEventDefinition>
+    </intermediateCatchEvent>
+
+    <sequenceFlow id="flow4" sourceRef="conditional" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

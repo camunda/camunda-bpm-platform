@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -80,6 +81,7 @@ public class ExceptionUtil {
     for (SQLException ex: sqlExceptionList) {
       if (ex.getMessage().contains("too long")
         || ex.getMessage().contains("too large")
+        || ex.getMessage().contains("TOO LARGE")
         || ex.getMessage().contains("ORA-01461")
         || ex.getMessage().contains("ORA-01401")
         || ex.getMessage().contains("data would be truncated")
@@ -145,6 +147,8 @@ public class ExceptionUtil {
           || ("23506".equals(exception.getSQLState()) && exception.getErrorCode() == 23506))
         // DB2
         || (exception.getMessage().toLowerCase().contains("sqlstate=23503") && exception.getMessage().toLowerCase().contains("sqlcode=-530"))
+        // DB2 zOS
+        || ("23503".equals(exception.getSQLState()) && exception.getErrorCode() == -530)
         ) {
 
         return true;

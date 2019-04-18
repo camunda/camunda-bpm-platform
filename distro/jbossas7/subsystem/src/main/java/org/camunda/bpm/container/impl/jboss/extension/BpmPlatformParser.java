@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2011, 2012 camunda services GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -35,8 +36,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.parsing.ParseUtils;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
@@ -113,26 +116,25 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
         throw unexpectedElement(reader);
     }
     
+    ModelNode addProcessEngine = new ModelNode();
     String engineName = null;
-    Boolean isDefault = null;
     
     for (int i = 0; i < reader.getAttributeCount(); i++) {
       String attr = reader.getAttributeLocalName(i);
       if (Attribute.forName(attr).equals(Attribute.NAME)) {
         engineName = String.valueOf(reader.getAttributeValue(i));
       } else if (Attribute.forName(attr).equals(Attribute.DEFAULT)) {
-        isDefault = Boolean.valueOf(reader.getAttributeValue(i));
+        SubsystemAttributeDefinitons.DEFAULT.parseAndSetParameter(reader.getAttributeValue(i), addProcessEngine, reader);;
       } else {
         throw unexpectedAttribute(reader, i);
       }
     }
     
-    if (engineName.equals("null")) {
+    if ("null".equals(engineName)) {
       throw missingRequiredElement(reader, Collections.singleton(Attribute.NAME.getLocalName()));
     }
     
     //Add the 'add' operation for each 'process-engine' child
-    ModelNode addProcessEngine = new ModelNode();
     addProcessEngine.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(
             PathElement.pathElement(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME),
@@ -141,12 +143,8 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
  
     addProcessEngine.get(Attribute.NAME.getLocalName()).set(engineName);
     
-    if(isDefault != null) {
-      addProcessEngine.get(Attribute.DEFAULT.getLocalName()).set(isDefault);
-    }
-    
-    if(discoveredEngineNames.contains(engineName)) {
-      throw new ProcessEngineException("A process engine with name '"+engineName+"' already exists. The process engine name must be unique.");
+    if (discoveredEngineNames.contains(engineName)) {
+      throw new ProcessEngineException("A process engine with name '" + engineName + "' already exists. The process engine name must be unique.");
     } else {
       discoveredEngineNames.add(engineName);
     }
@@ -166,15 +164,15 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
           break;
         }
         case DATASOURCE: {
-          parseElement(Element.DATASOURCE, reader, addProcessEngine, REQUIRED);
+          parseElement(SubsystemAttributeDefinitons.DATASOURCE, reader, addProcessEngine);
           break;
         }
         case HISTORY_LEVEL: {
-          parseElement(Element.HISTORY_LEVEL, reader, addProcessEngine, NOT_REQUIRED);
+          parseElement(SubsystemAttributeDefinitons.HISTORY_LEVEL, reader, addProcessEngine);
           break;
         }
         case CONFIGURATION: {
-          parseElement(Element.CONFIGURATION, reader, addProcessEngine, NOT_REQUIRED);
+          parseElement(SubsystemAttributeDefinitons.CONFIGURATION, reader, addProcessEngine);
           break;
         }
         default: {
@@ -221,7 +219,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
       final Element element = Element.forName(reader.getLocalName());
       switch (element) {
         case PLUGIN_CLASS: {
-          parseElement(Element.PLUGIN_CLASS, reader, plugin, REQUIRED);
+          parseElement(SubsystemAttributeDefinitons.PLUGIN_CLASS, reader, plugin);
           break;
         }
         case PROPERTIES: {
@@ -244,13 +242,11 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
     
     requireNoAttributes(reader);
     
-    ModelNode properties = new ModelNode();
-    
     while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
       final Element element = Element.forName(reader.getLocalName());
       switch (element) {
         case PROPERTY: {
-          parseProperty(reader, list, properties);
+          parseProperty(reader, list, parentAddress);
           break;
         }
         default: {
@@ -258,8 +254,6 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
         }
       }
     }
-    
-    parentAddress.get(Element.PROPERTIES.getLocalName()).set(properties);
   }
 
   private void parseProperty(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
@@ -271,7 +265,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
       throw missingRequired(reader, Collections.singleton(Attribute.NAME));
     }
 
-    parentAddress.get(name).set(value);
+    SubsystemAttributeDefinitons.PROPERTIES.parseAndAddParameterElement(name, value, parentAddress, reader);
   }
 
   private void parseJobExecutor(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
@@ -305,7 +299,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
             break;
           }
           case THREAD_POOL_NAME: {
-            parseElement(Element.THREAD_POOL_NAME, reader, addJobExecutor, REQUIRED);
+            parseElement(SubsystemAttributeDefinitons.THREAD_POOL_NAME, reader, addJobExecutor);
             break;
           }
           default: {
@@ -363,7 +357,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
       }
     }
 
-    if (acquisitionName.equals("null")) {
+    if ("null".equals(acquisitionName)) {
       throw missingRequiredElement(reader, Collections.singleton(Attribute.NAME.getLocalName()));
     }
 
@@ -396,7 +390,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
               break;
             }
             case ACQUISITION_STRATEGY: {
-              parseElement(Element.ACQUISITION_STRATEGY, reader, addJobAcquisition, REQUIRED);
+              parseElement(SubsystemAttributeDefinitons.ACQUISITION_STRATEGY, reader, addJobAcquisition);
               break;
             }
             default: {
@@ -408,23 +402,14 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
       }
     }
   }  
-  private void parseElement(Element element, XMLExtendedStreamReader reader, ModelNode parentAddress, boolean required) throws XMLStreamException {
-    if (!element.equals(Element.forName(reader.getLocalName()))) {
-      throw unexpectedElement(reader);
-    }
-
-    String elementName = reader.getLocalName();
-    String elementValue = rawElementText(reader);
-    if (elementValue == null && required) {
-      throw missingRequiredElement(reader, Collections.singleton(element.getLocalName()));
-    }
-
-    parentAddress.get(elementName).set(elementValue);
+  private void parseElement(AttributeDefinition element, XMLExtendedStreamReader reader, ModelNode parentAddress) throws XMLStreamException {
+    String value = rawElementText(reader);
+    ((SimpleAttributeDefinition) element).parseAndSetParameter(value, parentAddress, reader);
   }
   
   /** {@inheritDoc} */
   @Override
-  public void writeContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+  public void writeContent(XMLExtendedStreamWriter writer, SubsystemMarshallingContext context) throws XMLStreamException {
 
     context.startSubsystemElement(Namespace.CURRENT.getUriString(), false);
     
@@ -436,7 +421,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
     writer.writeEndElement();
   }
   
-  private void writeProcessEnginesContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+  protected void writeProcessEnginesContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
     
     writer.writeStartElement(Element.PROCESS_ENGINES.getLocalName());
 
@@ -448,15 +433,15 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
         // write each child element to xml
         writer.writeStartElement(Element.PROCESS_ENGINE.getLocalName());
         
-        writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
-        ModelNode entry = property.getValue();
-        writeAttribute(Attribute.DEFAULT, writer, entry);
-        writeElement(Element.DATASOURCE, writer, entry);
-        writeElement(Element.HISTORY_LEVEL, writer, entry);
-        writeElement(Element.CONFIGURATION, writer, entry);
-  
-        writeProperties(writer, entry);
-        writePlugins(writer, entry);
+        ModelNode propertyValue = property.getValue();
+        for (AttributeDefinition processEngineAttribute : SubsystemAttributeDefinitons.PROCESS_ENGINE_ATTRIBUTES) {
+          if (processEngineAttribute.equals(SubsystemAttributeDefinitons.NAME) || processEngineAttribute.equals(SubsystemAttributeDefinitons.DEFAULT)) {
+            ((SimpleAttributeDefinition) processEngineAttribute).marshallAsAttribute(propertyValue, writer);
+          } else {
+            processEngineAttribute.marshallAsElement(propertyValue, writer);
+          }
+        }
+
   
         writer.writeEndElement();
       }
@@ -465,24 +450,33 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
     writer.writeEndElement();
   }
   
-  private void writeJobExecutorContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+  protected void writeJobExecutorContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
     ModelNode node = context.getModelNode();
     ModelNode jobExecutorNode = node.get(Element.JOB_EXECUTOR.getLocalName());
     
     if (jobExecutorNode.isDefined()) { 
       writer.writeStartElement(Element.JOB_EXECUTOR.getLocalName());
       
-      Property property = jobExecutorNode.asProperty();
-      writeElement(Element.THREAD_POOL_NAME, writer, property.getValue());
-      
-      writeJobAcquisitionsContent(writer, context, property.getValue());
-      
+      for (Property property : jobExecutorNode.asPropertyList()) {
+        ModelNode propertyValue = property.getValue();
+
+        for (AttributeDefinition jobExecutorAttribute : SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES) {
+          if (jobExecutorAttribute.equals(SubsystemAttributeDefinitons.NAME)) {
+            ((SimpleAttributeDefinition) jobExecutorAttribute).marshallAsAttribute(propertyValue, writer);
+          } else {
+            jobExecutorAttribute.marshallAsElement(propertyValue, writer);
+          }
+        }
+
+        writeJobAcquisitionsContent(writer, context, propertyValue);
+      }
+
       // end job-executor
       writer.writeEndElement();
     }
   }
   
-  private void writeJobAcquisitionsContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context, ModelNode parentNode) throws XMLStreamException {
+  protected void writeJobAcquisitionsContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context, ModelNode parentNode) throws XMLStreamException {
     writer.writeStartElement(Element.JOB_AQUISITIONS.getLocalName());
 
     ModelNode jobAcquisitionConfigurations = parentNode.get(Element.JOB_AQUISITIONS.getLocalName());
@@ -490,14 +484,15 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
       for (Property property : jobAcquisitionConfigurations.asPropertyList()) {
         // write each child element to xml
         writer.writeStartElement(Element.JOB_AQUISITION.getLocalName());
-        
-        writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
-        ModelNode entry = property.getValue();
-  
-        writeElement(Element.ACQUISITION_STRATEGY, writer, entry);
-        
-        writeProperties(writer, entry);
-  
+
+        for (AttributeDefinition jobAcquisitionAttribute : SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES) {
+          if (jobAcquisitionAttribute.equals(SubsystemAttributeDefinitons.NAME)) {
+            ((SimpleAttributeDefinition) jobAcquisitionAttribute).marshallAsAttribute(property.getValue(), writer);
+          } else {
+            jobAcquisitionAttribute.marshallAsElement(property.getValue(), writer);
+          }
+        }
+
         writer.writeEndElement();
       }
     }
@@ -505,67 +500,11 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
     writer.writeEndElement();
   }
 
-  private void writeAttribute(Attribute attribute, final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
-    if (entry.hasDefined(attribute.getLocalName())) {
-      writer.writeAttribute(attribute.getLocalName(), entry.get(attribute.getLocalName()).asString());
-    }
-  }
-
-  private void writeElement(Element element, final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
-    if (entry.hasDefined(element.getLocalName())) {
-      writer.writeStartElement(element.getLocalName());
-      writer.writeCharacters(entry.get(element.getLocalName()).asString());
-      writer.writeEndElement();
-    }
-  }
-  
-  private void writeProperties(final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
-    if (entry.hasDefined(Element.PROPERTIES.getLocalName())) {
-      writer.writeStartElement(Element.PROPERTIES.getLocalName());
-      
-      List<Property> propertyList = entry.get(Element.PROPERTIES.getLocalName()).asPropertyList();
-      if (!propertyList.isEmpty()) {
-        for (Property property : propertyList) {
-          writer.writeStartElement(Element.PROPERTY.getLocalName());
-          writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
-          writer.writeCharacters(property.getValue().asString());
-          writer.writeEndElement();
-        }
-      }
-      
-      writer.writeEndElement();
-    }
-  }
-
-  private void writePlugins(final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
-    if (entry.hasDefined(Element.PLUGINS.getLocalName())) {
-      writer.writeStartElement(Element.PLUGINS.getLocalName());
-
-      List<ModelNode> plugins = entry.get(Element.PLUGINS.getLocalName()).asList();
-      if (!plugins.isEmpty()) {
-        for (ModelNode plugin : plugins) {
-          writePlugin(writer, plugin);
-        }
-      }
-
-      writer.writeEndElement();
-    }
-  }
-
-  public void writePlugin(final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
-    writer.writeStartElement(Element.PLUGIN.getLocalName());
-
-    writeElement(Element.PLUGIN_CLASS, writer, entry);
-
-    writeProperties(writer, entry);
-    writer.writeEndElement();
-  }
-
   /**
-   * FIXME Comment this
+   * Reads and trims the element text and returns it or {@code null}
    *
-   * @param reader
-   * @return the string representing the raw element text
+   * @param reader  source for the element text
+   * @return the string representing the trimmed element text or {@code null} if there is none or it is an empty string
    * @throws XMLStreamException
    */
   public String rawElementText(XMLStreamReader reader) throws XMLStreamException {
@@ -574,16 +513,4 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
     return elementText;
   }
 
-  /**
-   * FIXME Comment this
-   *
-   * @param reader
-   * @param attributeName
-   * @return the string representing raw attribute text
-   */
-  public String rawAttributeText(XMLStreamReader reader, String attributeName) {
-    String attributeString = 
-            reader.getAttributeValue("", attributeName) == null ? null : reader.getAttributeValue("", attributeName).trim();
-    return attributeString;
-  }
 }

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,9 +16,9 @@
  */
 package org.camunda.bpm.engine.history;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.EntityTypes;
+
+import java.util.Date;
 
 
 /**
@@ -90,6 +91,9 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";
   public static String OPERATION_TYPE_ADD_GROUP_LINK = "AddGroupLink";
   public static String OPERATION_TYPE_DELETE_GROUP_LINK = "DeleteGroupLink";
+  public static String OPERATION_TYPE_SET_DUEDATE = "SetDueDate";
+  public static String OPERATION_TYPE_RECALC_DUEDATE = "RecalculateDueDate";
+  public static String OPERATION_TYPE_UNLOCK = "Unlock";
 
   public static String OPERATION_TYPE_ADD_ATTACHMENT = "AddAttachment";
   public static String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";
@@ -99,7 +103,9 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION = "SuspendProcessDefinition";
   public static String OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION = "ActivateProcessDefinition";
 
+  public static String OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB = "CreateHistoryCleanupJobs";
   public static String OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE = "UpdateHistoryTimeToLive";
+  public static String OPERATION_TYPE_DELETE_HISTORY = "DeleteHistory";
 
   public static String OPERATION_TYPE_MODIFY_PROCESS_INSTANCE = "ModifyProcessInstance";
   public static String OPERATION_TYPE_RESTART_PROCESS_INSTANCE  = "RestartProcessInstance";
@@ -115,6 +121,9 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
   public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";
 
+  public static String CATEGORY_ADMIN = "Admin";
+  public static String CATEGORY_OPERATOR = "Operator";
+  public static String CATEGORY_TASK_WORKER = "TaskWorker";
 
   /** The unique identifier of this log entry. */
   String getId();
@@ -173,6 +182,9 @@ public interface UserOperationLogEntry {
    * created with a common operationId. This allows grouping multiple entries which are part of a composite operation.
    */
   String getOperationId();
+  
+  /** External task reference. */
+  String getExternalTaskId();
 
   /**
    * Type of this operation, like create, assign, claim and so on.
@@ -199,5 +211,8 @@ public interface UserOperationLogEntry {
 
   /** The time the historic user operation log will be removed. */
   Date getRemovalTime();
+  
+  /** The category this entry is associated with */
+  String getCategory();
 
 }

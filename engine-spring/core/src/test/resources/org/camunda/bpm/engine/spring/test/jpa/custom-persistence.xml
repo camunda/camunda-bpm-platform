@@ -1,0 +1,18 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+     version="1.0"
+>
+  <persistence-unit name="activiti-jpa-pu">
+    <!-- This class does not exist in Hibernate 5 (which we use in the Spring 4/5 test suite), 
+      the correct provider name for Hibernate 5 is org.hibernate.jpa.HibernatePersistenceProvider.
+      But Hibernate is backwards compatible in this respect, so we don't have to overwrite this file 
+      in the Spring 4/5 test suite -->
+    <provider>org.hibernate.ejb.HibernatePersistence</provider> 
+    <class>org.camunda.bpm.engine.spring.test.jpa.LoanRequest</class>    
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+     <properties>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+    </properties>
+  </persistence-unit>
+</persistence>

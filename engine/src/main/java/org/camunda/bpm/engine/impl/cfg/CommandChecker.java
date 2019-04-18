@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cfg;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -27,7 +29,9 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -68,9 +72,24 @@ public interface CommandChecker {
   void checkUpdateProcessDefinitionById(String processDefinitionId);
 
   /**
+   * Checks if it is allowed to update the suspension state of a process definition.
+   */
+  void checkUpdateProcessDefinitionSuspensionStateById(String processDefinitionId);
+
+  /**
    * Checks if it is allowed to update a process instance of the given process definition id.
    */
   void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId);
+
+  /**
+   *  Checks if it is allowed to update a process instance's retries of the given process definition.
+   */
+  void checkUpdateRetriesProcessInstanceByProcessDefinitionId(String processDefinitionId);
+
+  /**
+   * Checks if it is allowed to update a process instance's suspension state of the given process definition.
+   */
+  void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(String processDefinitionId);
 
   /**
    * Checks if it is allowed to update a decision definition with given id.
@@ -81,6 +100,11 @@ public interface CommandChecker {
    * Checks if it is allowed to update a process definition of the given process definition key.
    */
   void checkUpdateProcessDefinitionByKey(String processDefinitionKey);
+
+  /**
+   * Checks if it is allowed to update the suspension state of a process definition.
+   */
+  void checkUpdateProcessDefinitionSuspensionStateByKey(String processDefinitionKey);
 
   /**
    * Checks if it is allowed to delete a process definition, which corresponds to the given id.
@@ -102,14 +126,29 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
   /**
+   * Checks if it is allowed to update a process instance's suspension state of the given process definition.
+   */
+  void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
    * Checks if it is allowed to update a process instance of the given process instance id.
    */
   void checkUpdateProcessInstanceById(String processInstanceId);
 
   /**
+   * Checks if it is allowed to update a process instance's suspension state.
+   */
+  void checkUpdateProcessInstanceSuspensionStateById(String processInstanceId);
+
+  /**
    * Checks if it is allowed to update a process instance of the given execution.
    */
   void checkUpdateProcessInstance(ExecutionEntity execution);
+
+  /**
+   * Checks if it is allowed to update a process instance's variables of the given execution.
+   */
+  void checkUpdateProcessInstanceVariables(ExecutionEntity execution);
 
   void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition);
 
@@ -128,9 +167,19 @@ public interface CommandChecker {
   void checkUpdateJob(JobEntity job);
 
   /**
+   * Checks if it is allowed to update a job retries.
+   */
+  void checkUpdateRetriesJob(JobEntity job);
+
+  /**
    * Checks if it is allowed to read a process instance of the given execution.
    */
   void checkReadProcessInstance(ExecutionEntity execution);
+
+  /**
+   * Checks if it is allowed to read a process instance's variables of the given execution.
+   */
+  void checkReadProcessInstanceVariable(ExecutionEntity execution);
 
   /**
    * Check if it is allowed to delete a process instance of the given execution.
@@ -143,9 +192,19 @@ public interface CommandChecker {
   void checkReadTask(TaskEntity task);
 
   /**
-   * Check if it is allowed to update a task
+   * Check if it is allowed to read a task's variable.
    */
-  void checkUpdateTask(TaskEntity task);
+  void checkReadTaskVariable(TaskEntity task);
+
+  /**
+   * Check if it is allowed to update a task's variable
+   */
+  void checkUpdateTaskVariable(TaskEntity task);
+
+  /**
+   * Check if it is allowed to create a batch
+   */
+  void checkCreateBatch(Permission permission);
 
   /**
    * Check if it is allowed to delete a batch
@@ -297,5 +356,15 @@ public interface CommandChecker {
    * Checks if it is allowed to read the given historic external task log.
    */
   void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog);
+
+  /**
+   * Checks if it is allowed to delete the given historic variable instance.
+   */
+  void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable);
+
+  /**
+   * Checks if it is allowed to delete the historic variable instances of the given process instance.
+   */
+  void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance);
 
 }

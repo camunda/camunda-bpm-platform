@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -94,6 +95,7 @@ import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
+import org.camunda.bpm.engine.impl.batch.removaltime.ProcessSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
@@ -187,6 +189,7 @@ import org.camunda.bpm.engine.impl.history.producer.DefaultDmnHistoryEventProduc
 import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListener;
+import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
@@ -745,6 +748,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected int historyCleanupDegreeOfParallelism = 1;
 
+  protected String historyTimeToLive;
+  
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
@@ -843,6 +848,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initHistoryCleanup();
     initAdminUser();
     initAdminGroups();
+    initPasswordPolicy();
     invokePostInit();
   }
 
@@ -898,6 +904,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       throw LOG.invalidPropertyValue("historyCleanupBatchThreshold", String.valueOf(historyCleanupBatchThreshold),
           "History cleanup batch threshold cannot be negative.");
     }
+    
+    initHistoryTimeToLive();
 
     initBatchOperationsHistoryTimeToLive();
   }
@@ -947,6 +955,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     if (sundayHistoryCleanupBatchWindowStartTime != null || sundayHistoryCleanupBatchWindowEndTime != null) {
       historyCleanupBatchWindows.put(Calendar.SUNDAY, new BatchWindowConfiguration(sundayHistoryCleanupBatchWindowStartTime, sundayHistoryCleanupBatchWindowEndTime));
+    }
+  }
+  
+  protected void initHistoryTimeToLive() {
+    try {
+      ParseUtil.parseHistoryTimeToLive(historyTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("historyTimeToLive", historyTimeToLive, e);
     }
   }
 
@@ -1092,6 +1108,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       DeleteHistoricDecisionInstancesJobHandler deleteHistoricDecisionInstancesJobHandler = new DeleteHistoricDecisionInstancesJobHandler();
       batchHandlers.put(deleteHistoricDecisionInstancesJobHandler.getType(), deleteHistoricDecisionInstancesJobHandler);
+
+      ProcessSetRemovalTimeJobHandler processSetRemovalTimeJobHandler = new ProcessSetRemovalTimeJobHandler();
+      batchHandlers.put(processSetRemovalTimeJobHandler.getType(), processSetRemovalTimeJobHandler);
     }
 
     if (customBatchJobHandlers != null) {
@@ -1452,6 +1471,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("dbSpecificIfNullFunction", DbSqlSessionFactory.databaseSpecificIfNull.get(databaseType));
 
       properties.put("dayComparator", DbSqlSessionFactory.databaseSpecificDaysComparator.get(databaseType));
+
+      properties.put("collationForCaseSensitivity", DbSqlSessionFactory.databaseSpecificCollationForCaseSensitivity.get(databaseType));
 
       Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
       for (Entry<String, String> entry : constants.entrySet()) {
@@ -2311,9 +2332,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if(passwordManager == null) {
       passwordManager = new PasswordManager(passwordEncryptor, customPasswordChecker);
     }
-
   }
 
+  public void initPasswordPolicy() {
+    if(passwordPolicy == null && enablePasswordPolicy) {
+      passwordPolicy = new DefaultPasswordPolicyImpl();
+    }
+  }
 
   protected void initDeploymentRegistration() {
     if (registeredDeployments == null) {
@@ -2363,7 +2388,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       adminGroups.add(Groups.CAMUNDA_ADMIN);
     }
   }
-
+  
   // getters and setters //////////////////////////////////////////////////////
 
   @Override
@@ -4126,6 +4151,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
+  }
+  
+  public String getHistoryTimeToLive() {
+    return historyTimeToLive;
+  }
+  
+  public void setHistoryTimeToLive(String historyTimeToLive) {
+    this.historyTimeToLive = historyTimeToLive;
   }
 
   public String getBatchOperationHistoryTimeToLive() {

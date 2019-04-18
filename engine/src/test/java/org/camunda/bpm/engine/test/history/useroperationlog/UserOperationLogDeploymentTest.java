@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -68,6 +69,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertFalse(Boolean.valueOf(userOperationLogEntry.getNewValue()));
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertNull(userOperationLogEntry.getJobDefinitionId());
     assertNull(userOperationLogEntry.getProcessInstanceId());
@@ -102,6 +105,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertFalse(Boolean.valueOf(userOperationLogEntry.getNewValue()));
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertNull(userOperationLogEntry.getJobDefinitionId());
     assertNull(userOperationLogEntry.getProcessInstanceId());
@@ -136,6 +141,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDuplicateFilterEnabledProperty.getOperationType());
 
     assertEquals(USER_ID, logDuplicateFilterEnabledProperty.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDuplicateFilterEnabledProperty.getCategory());
 
     assertEquals("duplicateFilterEnabled", logDuplicateFilterEnabledProperty.getProperty());
     assertNull(logDuplicateFilterEnabledProperty.getOrgValue());
@@ -149,6 +156,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(deployment.getId(), logDeployChangedOnlyProperty.getDeploymentId());
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDeployChangedOnlyProperty.getOperationType());
     assertEquals(USER_ID, logDeployChangedOnlyProperty.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDeployChangedOnlyProperty.getCategory());
 
     assertEquals("deployChangedOnly", logDeployChangedOnlyProperty.getProperty());
     assertNull(logDeployChangedOnlyProperty.getOrgValue());
@@ -181,6 +190,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(deployment.getId(), logDuplicateFilterEnabledProperty.getDeploymentId());
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDuplicateFilterEnabledProperty.getOperationType());
     assertEquals(USER_ID, logDuplicateFilterEnabledProperty.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDuplicateFilterEnabledProperty.getCategory());
 
     assertEquals("duplicateFilterEnabled", logDuplicateFilterEnabledProperty.getProperty());
     assertNull(logDuplicateFilterEnabledProperty.getOrgValue());
@@ -194,6 +205,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertEquals(deployment.getId(), logDeployChangedOnlyProperty.getDeploymentId());
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDeployChangedOnlyProperty.getOperationType());
     assertEquals(USER_ID, logDeployChangedOnlyProperty.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDeployChangedOnlyProperty.getCategory());
 
     assertEquals("deployChangedOnly", logDeployChangedOnlyProperty.getProperty());
     assertNull(logDeployChangedOnlyProperty.getOrgValue());
@@ -276,6 +289,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertFalse(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
     assertNull(log.getProcessInstanceId());
@@ -316,6 +331,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertTrue(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
     assertNull(log.getProcessInstanceId());
@@ -413,6 +430,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertFalse(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
     assertNull(log.getProcessInstanceId());
@@ -457,6 +476,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertTrue(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
     assertNull(log.getProcessInstanceId());

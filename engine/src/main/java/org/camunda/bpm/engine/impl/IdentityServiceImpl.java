@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,21 +16,26 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.NativeUserQuery;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.cmd.CheckPassword;
+import org.camunda.bpm.engine.impl.cmd.GetPasswordPolicyCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateMembershipCmd;
@@ -61,6 +67,7 @@ import org.camunda.bpm.engine.impl.cmd.SetUserPictureCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockUserCmd;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.identity.PasswordPolicyResultImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -104,9 +111,12 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public void saveUser(User user) {
-
+    saveUser(user, false);
+  }
+  
+  public void saveUser(User user, boolean skipPasswordPolicy) {
     try {
-      commandExecutor.execute(new SaveUserCmd(user));
+      commandExecutor.execute(new SaveUserCmd(user, skipPasswordPolicy));
     } catch (ProcessEngineException ex) {
       if (ExceptionUtil.checkConstraintViolationException(ex)) {
         throw new BadUserRequestException("The user already exists", ex);
@@ -158,6 +168,31 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
   public boolean checkPassword(String userId, String password) {
     return commandExecutor.execute(new CheckPassword(userId, password));
+  }
+
+  public PasswordPolicyResult checkPasswordAgainstPolicy(String password) {
+    return checkPasswordAgainstPolicy(getPasswordPolicy(), password);
+  }
+  
+  public PasswordPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password) {
+    EnsureUtil.ensureNotNull("policy", policy);
+    EnsureUtil.ensureNotNull("password", password);
+
+    List<PasswordPolicyRule> violatedRules = new ArrayList<PasswordPolicyRule>();
+    List<PasswordPolicyRule> fulfilledRules = new ArrayList<PasswordPolicyRule>();
+
+    for (PasswordPolicyRule rule : policy.getRules()) {
+      if (rule.execute(password)) {
+        fulfilledRules.add(rule);
+      } else {
+        violatedRules.add(rule);
+      }
+    }
+    return new PasswordPolicyResultImpl(violatedRules, fulfilledRules);
+  }
+
+  public PasswordPolicy getPasswordPolicy() {
+    return commandExecutor.execute(new GetPasswordPolicyCmd());
   }
 
   public void unlockUser(String userId) {

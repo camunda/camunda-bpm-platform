@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
@@ -112,6 +111,21 @@
 
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
+
+  <update id="updateHistoricProcessInstanceByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_PROCINST
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <!-- HISTORIC PROCESS INSTANCE REMOVAL TIME SELECT -->
+
+  <select id="selectHistoricProcessInstanceForRemovalTimeBatch" parameterType="java.lang.String"
+          resultMap="historicProcessInstanceResultMap">
+    select START_TIME_, END_TIME_, PROC_DEF_ID_ from ${prefix}ACT_HI_PROCINST
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
 
@@ -248,7 +262,7 @@
     LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
     ON SELF.PROC_DEF_ID_ = DEF.ID_
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
         AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
     </if>
@@ -426,76 +440,76 @@
               )
             </foreach>
 
-            <if test="query.executedActivityAfter != null || query.executedActivityBefore != null">
-              ${queryType} EXISTS (
-                SELECT *
-                FROM ${prefix}ACT_HI_ACTINST
-                <where>
-                  PROC_INST_ID_ = SELF.ID_
-                  <if test="query.executedActivityAfter != null">
-                    AND (START_TIME_ &gt;= #{query.executedActivityAfter} OR END_TIME_ &gt;= #{query.executedActivityAfter})
-                  </if>
-                  <if test="query.executedActivityBefore != null">
-                    AND (START_TIME_ &lt;= #{query.executedActivityBefore} OR END_TIME_ &lt;= #{query.executedActivityBefore})
-                  </if>
-                </where>
-                )
-            </if>
+						<if test="query.executedActivityAfter != null || query.executedActivityBefore != null">
+							${queryType} EXISTS (
+								SELECT *
+								FROM ${prefix}ACT_HI_ACTINST
+								<where>
+									PROC_INST_ID_ = SELF.ID_
+									<if test="query.executedActivityAfter != null">
+										AND (START_TIME_ &gt;= #{query.executedActivityAfter} OR END_TIME_ &gt;= #{query.executedActivityAfter})
+									</if>
+									<if test="query.executedActivityBefore != null">
+										AND (START_TIME_ &lt;= #{query.executedActivityBefore} OR END_TIME_ &lt;= #{query.executedActivityBefore})
+									</if>
+								</where>
+								)
+						</if>
 
             <if test="query.executedActivityIds != null &amp;&amp; query.executedActivityIds.length > 0">
               ${queryType} (HAI.END_TIME_ IS NOT NULL AND HAI.ACT_ID_ IN
-              <foreach item="activityId" index="index" collection="query.executedActivityIds" open="(" separator="," close=")">
-                #{activityId}
-              </foreach>
+							<foreach item="activityId" index="index" collection="query.executedActivityIds" open="(" separator="," close=")">
+								#{activityId}
+							</foreach>
               )
-            </if>
+						</if>
 
             <if test="query.activeActivityIds != null &amp;&amp; query.activeActivityIds.length > 0">
               ${queryType} (HAI.END_TIME_ IS NULL AND HAI.ACT_ID_ IN
               <foreach item="activityId" index="index" collection="query.activeActivityIds" open="(" separator="," close=")">
-                #{activityId}
-              </foreach>
+								#{activityId}
+							</foreach>
               )
-            </if>
+						</if>
 
             <if test="query.executedJobAfter != null || query.executedJobBefore != null">
               ${queryType} EXISTS (
-              SELECT *
-              FROM ${prefix}ACT_HI_JOB_LOG
-              <where>
-                PROCESS_INSTANCE_ID_ = SELF.ID_
+							SELECT *
+							FROM ${prefix}ACT_HI_JOB_LOG
+							<where>
+								PROCESS_INSTANCE_ID_ = SELF.ID_
                 <if test="query.executedJobAfter != null">
                   AND TIMESTAMP_ &gt;= #{query.executedJobAfter}
-                </if>
+								</if>
                 <if test="query.executedJobBefore != null">
                   AND TIMESTAMP_ &lt;= #{query.executedJobBefore}
-                </if>
-              </where>
-              )
-            </if>
+								</if>
+							</where>
+							)
+						</if>
 
             <if test="query.isTenantIdSet">
               <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
                 ${queryType} SELF.TENANT_ID_ in
                 <foreach item="tenantId" index="index" collection="query.tenantIds"
-                         open="(" separator="," close=")">
-                  #{tenantId}
-                </foreach>
-              </if>
+												 open="(" separator="," close=")">
+									#{tenantId}
+								</foreach>
+							</if>
               <if test="query.tenantIds == null">
                 ${queryType} SELF.TENANT_ID_ is null
-              </if>
-            </if>
+							</if>
+						</if>
 
-            <if test="query.authCheck.isAuthorizationCheckEnabled &amp;&amp; query.authCheck.authUserId != null">
+            <if test="query.authCheck.shouldPerformAuthorizatioCheck &amp;&amp; query.authCheck.authUserId != null">
               ${queryType} (
-              (SELF.PROC_DEF_KEY_ is not null
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-              ) or SELF.PROC_DEF_KEY_ is null
-              )
-            </if>
+							(SELF.PROC_DEF_KEY_ is not null
+							<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+							) or SELF.PROC_DEF_KEY_ is null
+							)
+						</if>
 
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
+						<include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
           </trim>
         </trim>
         )
@@ -616,7 +630,7 @@
         (
           SELECT DISTINCT RES.*
           FROM ${prefix}ACT_RE_PROCDEF RES
-          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+          <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
             AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
           </if>
@@ -663,10 +677,6 @@
           GROUP BY PI.PROC_DEF_ID_
           ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
 
-        <if test="isCompact &amp;&amp; !isHistoryCleanupStrategyRemovalTimeBased">
-          WHERE FINISHED_ > 0
-        </if>
-
         GROUP BY RES.ID_,
           RES.KEY_,
           RES.NAME_,
@@ -676,9 +686,14 @@
           F.FINISHED_
 
     ) RES
-    <if test="isCompact &amp;&amp; isHistoryCleanupStrategyRemovalTimeBased">
-      WHERE RES.CLEANABLE_ > 0
-    </if>
+    <choose>
+      <when test="isCompact &amp;&amp; isHistoryCleanupStrategyRemovalTimeBased">
+        WHERE (RES.CLEANABLE_ > 0 OR FINISHED_ > 0)
+      </when>
+      <when test="isCompact &amp;&amp; !isHistoryCleanupStrategyRemovalTimeBased">
+        WHERE FINISHED_ > 0
+      </when>
+    </choose>
 
   </sql>
 

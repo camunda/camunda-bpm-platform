@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,11 +16,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotEquals;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -29,6 +32,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.joda.time.LocalDateTime;
 
 /**
  * @author Joram Barrez
@@ -105,6 +109,144 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
     // which means the process has ended
     assertProcessEnded(pi.getId());
   }
+  
+  @Deployment
+  public void testRecalculateUnchangedExpressionOnTimerCurrentDateBased(){
+    // Set the clock fixed
+    Date startTime = new Date();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("duedate", "PT1H");
+
+    // After process start, there should be a timer created
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnTimer", variables);
+
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
+    List<Job> jobs = jobQuery.list();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    Date oldDate = job.getDuedate();
+    
+    // After recalculation of the timer, the job's duedate should be changed
+    Date currentTime = new Date(startTime.getTime() + TimeUnit.MINUTES.toMillis(5));
+    ClockUtil.setCurrentTime(currentTime);
+    managementService.recalculateJobDuedate(job.getId(), false);
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(job.getId(), jobUpdated.getId());
+    assertNotEquals(oldDate, jobUpdated.getDuedate());
+    assertTrue(oldDate.before(jobUpdated.getDuedate()));
+    Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusHours(1).toDate();
+    assertThat(jobUpdated.getDuedate()).isCloseTo(expectedDate, 1000l);
+
+    // After setting the clock to time '1 hour and 6 min', the second timer should fire
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.MINUTES.toMillis(6L)));
+    waitForJobExecutorToProcessAllJobs(5000L);
+    assertEquals(0L, jobQuery.count());
+
+    // which means the process has ended
+    assertProcessEnded(pi.getId());
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testRecalculateUnchangedExpressionOnTimerCurrentDateBased.bpmn20.xml")
+  public void testRecalculateUnchangedExpressionOnTimerCreationDateBased(){
+    // Set the clock fixed
+    Date startTime = new Date();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("duedate", "PT1H");
+
+    // After process start, there should be a timer created
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnTimer", variables);
+
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
+    List<Job> jobs = jobQuery.list();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    
+    // After recalculation of the timer, the job's duedate should be based on the creation date
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.SECONDS.toMillis(5)));
+    managementService.recalculateJobDuedate(job.getId(), true);
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(job.getId(), jobUpdated.getId());
+    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusHours(1).toDate();
+    assertEquals(expectedDate, jobUpdated.getDuedate());
+
+    // After setting the clock to time '1 hour and 15 seconds', the second timer should fire
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.HOURS.toMillis(1L) + TimeUnit.SECONDS.toMillis(15L)));
+    waitForJobExecutorToProcessAllJobs(5000L);
+    assertEquals(0L, jobQuery.count());
+
+    // which means the process has ended
+    assertProcessEnded(pi.getId());
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testRecalculateUnchangedExpressionOnTimerCurrentDateBased.bpmn20.xml")
+  public void testRecalculateChangedExpressionOnTimerCurrentDateBased(){
+    // Set the clock fixed
+    Date startTime = new Date();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("duedate", "PT1H");
+
+    // After process start, there should be a timer created
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnTimer", variables);
+
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
+    List<Job> jobs = jobQuery.list();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    Date oldDate = job.getDuedate();
+    
+    // After recalculation of the timer, the job's duedate should be changed
+    runtimeService.setVariable(pi.getId(), "duedate", "PT15M");
+    managementService.recalculateJobDuedate(job.getId(), false);
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(job.getId(), jobUpdated.getId());
+    assertNotEquals(oldDate, jobUpdated.getDuedate());
+    assertTrue(oldDate.after(jobUpdated.getDuedate()));
+
+    // After setting the clock to time '16 minutes', the timer should fire
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.MINUTES.toMillis(16L)));
+    waitForJobExecutorToProcessAllJobs(5000L);
+    assertEquals(0L, jobQuery.count());
+
+    // which means the process has ended
+    assertProcessEnded(pi.getId());
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testRecalculateUnchangedExpressionOnTimerCurrentDateBased.bpmn20.xml")
+  public void testRecalculateChangedExpressionOnTimerCreationDateBased(){
+    // Set the clock fixed
+    Date startTime = new Date();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("duedate", "PT1H");
+
+    // After process start, there should be a timer created
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnTimer", variables);
+
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
+    List<Job> jobs = jobQuery.list();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    Date oldDate = job.getDuedate();
+    
+    // After recalculation of the timer, the job's duedate should be the same
+    runtimeService.setVariable(pi.getId(), "duedate", "PT15M");
+    managementService.recalculateJobDuedate(job.getId(), true);
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(job.getId(), jobUpdated.getId());
+    assertNotEquals(oldDate, jobUpdated.getDuedate());
+    assertEquals(LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate(), jobUpdated.getDuedate());
+
+    // After setting the clock to time '16 minutes', the timer should fire
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + TimeUnit.MINUTES.toMillis(16L)));
+    waitForJobExecutorToProcessAllJobs(5000L);
+    assertEquals(0L, jobQuery.count());
+
+    // which means the process has ended
+    assertProcessEnded(pi.getId());
+  }
 
   @Deployment
   public void testTimerInSingleTransactionProcess() {
@@ -116,7 +258,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testRepeatingTimerWithCancelActivity() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("repeatingTimerAndCallActivity");
+    runtimeService.startProcessInstanceByKey("repeatingTimerAndCallActivity");
     assertEquals(1, managementService.createJobQuery().count());
     assertEquals(1, taskService.createTaskQuery().count());
 

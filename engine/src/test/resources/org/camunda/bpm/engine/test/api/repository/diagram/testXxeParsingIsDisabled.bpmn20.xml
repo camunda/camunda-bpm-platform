@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE foo [<!ELEMENT bpmn:incoming ANY >
+  <!ENTITY xxe SYSTEM "./file.txt" >]>
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_19meldu" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.1">
+  <bpmn:process id="Process_1" isExecutable="true">
+    <bpmn:sequenceFlow id="SequenceFlow_0z1a0n2" sourceRef="StartEvent_1" targetRef="Task_1m7g3wy" />
+    <bpmn:endEvent id="EndEvent_0edeh1n">
+      <bpmn:incoming>SequenceFlow_0f75jmi</bpmn:incoming>
+      <bpmn:incoming>&xxe;</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0f75jmi" sourceRef="Task_1m7g3wy" targetRef="EndEvent_0edeh1n" />
+    <bpmn:serviceTask id="Task_1m7g3wy" name="Service Task" camunda:expression="{}">
+      <bpmn:incoming>SequenceFlow_0z1a0n2</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0f75jmi</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0z1a0n2</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_1pb66n0" />
+    </bpmn:startEvent>
+  </bpmn:process>
+  <bpmn:signal id="Signal_1pb66n0" name="test" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNEdge id="SequenceFlow_0z1a0n2_di" bpmnElement="SequenceFlow_0z1a0n2">
+        <di:waypoint x="209" y="120" />
+        <di:waypoint x="259" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0edeh1n_di" bpmnElement="EndEvent_0edeh1n">
+        <dc:Bounds x="409" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0f75jmi_di" bpmnElement="SequenceFlow_0f75jmi">
+        <di:waypoint x="359" y="120" />
+        <di:waypoint x="409" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_07ztwjf_di" bpmnElement="Task_1m7g3wy">
+        <dc:Bounds x="259" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1elizq8_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -23,6 +24,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 
@@ -37,6 +40,7 @@ import org.camunda.bpm.engine.impl.util.SingleConsumerCondition;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
 
@@ -48,18 +52,23 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   private final static Logger LOG = Logger.getLogger(FetchAndLockHandlerImpl.class.getName());
 
-  protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30 * 1000;
+  protected static final String UNIQUE_WORKER_REQUEST_PARAM_NAME = "fetch-and-lock-unique-worker-request";
+
+  protected static final long PENDING_REQUEST_FETCH_INTERVAL = 30L * 1000;
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_REQUEST_TIMEOUT = 1800000; // 30 minutes
 
   protected SingleConsumerCondition condition;
 
-  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
-  protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
+  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<>(200);
+  protected List<FetchAndLockRequest> pendingRequests = new ArrayList<>();
+  protected List<FetchAndLockRequest> newRequests = new ArrayList<>();
 
   protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
 
   protected volatile boolean isRunning = false;
+
+  protected boolean isUniqueWorkerRequest = false;
 
   public FetchAndLockHandlerImpl() {
     this.condition = new SingleConsumerCondition(handlerThread);
@@ -71,7 +80,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       try {
         acquire();
       }
-      catch (Throwable e) {
+      catch (Exception e) {
         // what ever happens, don't leave the loop
       }
     }
@@ -82,7 +91,16 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected void acquire() {
     LOG.log(Level.FINEST, "Acquire start");
 
-    queue.drainTo(pendingRequests);
+    queue.drainTo(newRequests);
+
+    if (!newRequests.isEmpty()) {
+      if (isUniqueWorkerRequest) {
+        removeDuplicates();
+      }
+
+      pendingRequests.addAll(newRequests);
+      newRequests.clear();
+    }
 
     LOG.log(Level.FINEST, "Number of pending requests {0}", pendingRequests.size());
 
@@ -139,6 +157,23 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
     }
   }
 
+  protected void removeDuplicates() {
+    for (FetchAndLockRequest newRequest : newRequests) {
+      // remove any request from pendingRequests with the same worker id
+      Iterator<FetchAndLockRequest> iterator = pendingRequests.iterator();
+      while (iterator.hasNext()) {
+        FetchAndLockRequest pendingRequest = iterator.next();
+        if (pendingRequest.getDto().getWorkerId().equals(newRequest.getDto().getWorkerId())) {
+          AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
+          asyncResponse.cancel();
+
+          iterator.remove();
+        }
+      }
+
+    }
+  }
+
   @Override
   public void start() {
     if (isRunning) {
@@ -160,6 +195,12 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       isRunning = false;
       condition.signal();
     }
+
+    try {
+      handlerThread.join();
+    } catch (InterruptedException e) {
+      LOG.log(Level.WARNING, "Shutting down the handler thread failed: {0}", e);
+    }
   }
 
   protected void suspend(long millis) {
@@ -175,7 +216,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       if (queue.isEmpty() && isRunning) {
         LOG.log(Level.FINEST, "Suspend acquisition for {0}ms", millis);
         condition.await(millis);
-        LOG.log(Level.FINEST, "Acquisition woke up", millis);
+        LOG.log(Level.FINEST, "Acquisition woke up");
       }
     }
     finally {
@@ -210,7 +251,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       List<LockedExternalTaskDto> lockedTasks = executeFetchAndLock(fetchingDto, processEngine);
       result = FetchAndLockResult.successful(lockedTasks);
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       result = FetchAndLockResult.failed(e);
     }
     finally {
@@ -228,21 +269,15 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
     return LockedExternalTaskDto.fromLockedExternalTasks(externalTasks);
   }
 
-  protected void invalidRequest(AsyncResponse asyncResponse, String message) {
-    InvalidRequestException invalidRequestException = new InvalidRequestException(Status.BAD_REQUEST, message);
-    asyncResponse.resume(invalidRequestException);
-  }
-
   protected void errorTooManyRequests(AsyncResponse asyncResponse) {
     String errorMessage = "At the moment the server has to handle too many requests at the same time. Please try again later.";
-    InvalidRequestException invalidRequestException = new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, errorMessage);
-    asyncResponse.resume(invalidRequestException);
+    asyncResponse.resume(new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, errorMessage));
   }
 
   protected void rejectPendingRequests() {
     for (FetchAndLockRequest pendingRequest : pendingRequests) {
       AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
-      invalidRequest(asyncResponse, "Request rejected due to shutdown of application server.");
+      asyncResponse.resume(new RestException(Status.INTERNAL_SERVER_ERROR, "Request rejected due to shutdown of application server."));
     }
   }
 
@@ -261,8 +296,8 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   public void addPendingRequest(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse, ProcessEngine processEngine) {
     Long asyncResponseTimeout = dto.getAsyncResponseTimeout();
     if (asyncResponseTimeout != null && asyncResponseTimeout > MAX_REQUEST_TIMEOUT) {
-      invalidRequest(asyncResponse, "The asynchronous response timeout cannot be set to a value greater than "
-        + MAX_REQUEST_TIMEOUT + " milliseconds");
+      asyncResponse.resume(new InvalidRequestException(Status.BAD_REQUEST, "The asynchronous response timeout cannot be set to a value greater than "
+          + MAX_REQUEST_TIMEOUT + " milliseconds"));
       return;
     }
 
@@ -299,6 +334,26 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       asyncResponse.resume(processEngineException);
 
       LOG.log(Level.FINEST, "Resuming request with error {0}", processEngineException);
+    }
+  }
+
+  public void contextInitialized(ServletContextEvent servletContextEvent) {
+    ServletContext servletContext = null;
+
+    if (servletContextEvent != null) {
+      servletContext = servletContextEvent.getServletContext();
+
+      if (servletContext != null) {
+        parseUniqueWorkerRequestParam(servletContext.getInitParameter(UNIQUE_WORKER_REQUEST_PARAM_NAME));
+      }
+    }
+  }
+
+  protected void parseUniqueWorkerRequestParam(String uniqueWorkerRequestParam) {
+    if (uniqueWorkerRequestParam != null) {
+      isUniqueWorkerRequest = Boolean.valueOf(uniqueWorkerRequestParam);
+    } else {
+      isUniqueWorkerRequest = false; // default configuration
     }
   }
 

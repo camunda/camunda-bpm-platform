@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,6 +17,8 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Collections;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -25,6 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 
 /**
@@ -60,6 +64,14 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
     final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
 
     processInstance.start(instantiationBuilder.getVariables());
+
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        processInstance.getId(),
+        processInstance.getProcessDefinitionId(),
+        processInstance.getProcessDefinition().getKey(),
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+
     return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());
   }
 

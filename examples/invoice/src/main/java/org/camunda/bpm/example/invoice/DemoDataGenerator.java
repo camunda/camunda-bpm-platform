@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -35,7 +36,6 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FilterService;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.task.TaskQuery;
 
@@ -60,7 +61,7 @@ public class DemoDataGenerator {
 
     public void createUsers(ProcessEngine engine) {
 
-      final IdentityService identityService = engine.getIdentityService();
+      final IdentityServiceImpl identityService = (IdentityServiceImpl) engine.getIdentityService();
 
       if(identityService.isReadOnly()) {
         LOGGER.info("Identity service provider is Read Only, not creating any demo users.");
@@ -79,31 +80,28 @@ public class DemoDataGenerator {
       user.setLastName("Demo");
       user.setPassword("demo");
       user.setEmail("demo@camunda.org");
-      identityService.saveUser(user);
+      identityService.saveUser(user, true);
 
       User user2 = identityService.newUser("john");
       user2.setFirstName("John");
       user2.setLastName("Doe");
       user2.setPassword("john");
       user2.setEmail("john@camunda.org");
-
-      identityService.saveUser(user2);
+      identityService.saveUser(user2, true);
 
       User user3 = identityService.newUser("mary");
       user3.setFirstName("Mary");
       user3.setLastName("Anne");
       user3.setPassword("mary");
       user3.setEmail("mary@camunda.org");
-
-      identityService.saveUser(user3);
+      identityService.saveUser(user3, true);
 
       User user4 = identityService.newUser("peter");
       user4.setFirstName("Peter");
       user4.setLastName("Meter");
       user4.setPassword("peter");
       user4.setEmail("peter@camunda.org");
-
-      identityService.saveUser(user4);
+      identityService.saveUser(user4, true);
 
       Group salesGroup = identityService.newGroup("sales");
       salesGroup.setName("Sales");

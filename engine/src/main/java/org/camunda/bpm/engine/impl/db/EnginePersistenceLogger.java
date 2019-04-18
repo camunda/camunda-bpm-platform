@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -674,7 +675,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     do {
       if (exCause instanceof BatchExecutorException) {
         final List<SQLException> relatedSqlExceptions = ExceptionUtil.findRelatedSqlExceptions(exCause);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (SQLException sqlException : relatedSqlExceptions) {
           sb.append(sqlException).append("\n");
         }
@@ -705,6 +706,31 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "085",
         "Found more than one decision definition for key '{}' and versionTag '{}'",
         decisionDefinitionKey, decisionDefinitionVersionTag
+        ));
+  }
+
+  public BadUserRequestException invalidResourceForPermission(String resourceType, String permission) {
+    return new BadUserRequestException(exceptionMessage(
+        "086",
+        "The resource type '{}' is not valid for '{}' permission.",
+        resourceType, permission
+        ));
+  }
+
+  public BadUserRequestException invalidResourceForAuthorization(int resourceType, String permission) {
+    return new BadUserRequestException(exceptionMessage(
+        "087",
+        "The resource type with id:'{}' is not valid for '{}' permission.",
+        resourceType, permission
+        ));
+  }
+
+
+  public BadUserRequestException disabledPermissionException(String permission) {
+    return new BadUserRequestException(exceptionMessage(
+        "088",
+        "The '{}' permission is disabled, please check your process engine configuration.",
+        permission
         ));
   }
 

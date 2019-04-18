@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -30,6 +31,8 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrationTest {
 
+  protected TestConstants testConstants = new TestConstants();
+
   @Deployment
   public static WebArchive app1() {
     return initWebArchiveDeployment();
@@ -38,18 +41,18 @@ public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrat
   @Test
   public void testProcessApplicationServiceBinding() {
     try {
-      InitialContext.doLookup(TestConstants.PROCESS_APPLICATION_SERVICE_JNDI_NAME);
+      InitialContext.doLookup(testConstants.getProcessApplicationService());
     } catch (NamingException e) {
-      Assert.fail("Failed to lookup ProcessApplicationService");
+      Assert.fail("Failed to lookup ProcessApplicationService '" + TestConstants.PROCESS_APPLICATION_SERVICE_JNDI_NAME + "'. Reason: " + e);
     }
   }
 
   @Test
   public void testProcessEngineServiceBinding() {
     try {
-      InitialContext.doLookup(TestConstants.PROCESS_ENGINE_SERVICE_JNDI_NAME);
+      InitialContext.doLookup(testConstants.getEngineService());
     } catch (NamingException e) {
-      Assert.fail("Failed to lookup ProcessEngineService");
+      Assert.fail("Failed to lookup ProcessEngineService '" + TestConstants.PROCESS_ENGINE_SERVICE_JNDI_NAME + "'. Reason: " + e);
     }
   }
 

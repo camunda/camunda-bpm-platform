@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -39,7 +40,7 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -131,12 +132,13 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
   public void setQueryInternal(String query) {
     ensureNotNull(NotValidException.class, "query", query);
     JsonObjectConverter<Object> converter = getConverter();
-    this.query = (AbstractQuery<?, ?>) converter.toObject(new JSONObject(query));
+    this.query = (AbstractQuery<?, ?>) converter.toObject(JsonUtil.asObject(query));
   }
 
   public Map<String, Object> getProperties() {
     if (properties != null) {
-      return JsonUtil.jsonObjectAsMap(new JSONObject(properties));
+      JsonObject json = JsonUtil.asObject(properties);
+      return JsonUtil.asMap(json);
     }
     else {
       return null;
@@ -144,7 +146,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
   }
 
   public String getPropertiesInternal() {
-    return new JSONObject(properties).toString();
+    return JsonUtil.asString(properties);
   }
 
   public Filter setProperties(Map<String, Object> properties) {
@@ -154,8 +156,8 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
 
   public void setPropertiesInternal(String properties) {
     if (properties != null) {
-      JSONObject jsonObject = new JSONObject(properties);
-      this.properties = JsonUtil.jsonObjectAsMap(jsonObject);
+      JsonObject json = JsonUtil.asObject(properties);
+      this.properties = JsonUtil.asMap(json);
     }
     else {
       this.properties = null;

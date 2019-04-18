@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -1608,12 +1609,11 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
 
-    // then
+    // assume
     assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
 
     // when
@@ -1621,8 +1621,127 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
 
     List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery().list();
 
+    // then
     assertThat(jobLogs.get(0).getRemovalTime(), is(addDays(START_DATE, 5)));
     assertThat(jobLogs.get(1).getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldResolveBatchIncident_SeedJob() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
+
+    // assume
+    assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // when
+    managementService.setJobRetries(jobLog.getJobId(), 0);
+
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // then
+    assertThat(historicIncident.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldResolveBatchIncident_BatchJob() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
+
+    // assume
+    assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    runtimeService.deleteProcessInstance(processInstanceId, "aDeleteReason");
+
+    managementService.executeJob(jobLog.getJobId());
+
+    String jobId = managementService.createJobQuery()
+      .jobDefinitionId(batch.getBatchJobDefinitionId())
+      .singleResult()
+      .getId();
+
+    // when
+    managementService.setJobRetries(jobId, 0);
+
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // then
+    assertThat(historicIncident.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldResolveBatchIncident_MonitorJob() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(CALLED_PROCESS);
+    testRule.deploy(CALLING_PROCESS);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
+
+    // assume
+    assertThat(jobLog.getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    managementService.executeJob(jobLog.getJobId());
+
+    String jobId = managementService.createJobQuery()
+      .jobDefinitionId(batch.getBatchJobDefinitionId())
+      .singleResult()
+      .getId();
+    managementService.executeJob(jobId);
+
+    jobId = managementService.createJobQuery()
+      .jobDefinitionId(batch.getMonitorJobDefinitionId())
+      .singleResult()
+      .getId();
+
+    // when
+    managementService.setJobRetries(jobId, 0);
+
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // then
+    assertThat(historicIncident.getRemovalTime(), is(addDays(START_DATE, 5)));
 
     // cleanup
     managementService.deleteBatch(batch.getId(), true);

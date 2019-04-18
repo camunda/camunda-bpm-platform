@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -23,8 +24,11 @@ import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
@@ -807,7 +811,9 @@ public interface ManagementService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link ProcessInstancePermissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link ProcessDefinitionPermissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(String jobId, int retries);
 
@@ -824,7 +830,9 @@ public interface ManagementService {
    * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(List<String> jobIds, int retries);
 
@@ -840,7 +848,8 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(List<String> jobIds, int retries);
 
@@ -856,7 +865,8 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if jobQuery is null
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(JobQuery jobQuery, int retries);
 
@@ -876,7 +886,8 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if neither jobIds, nor jobQuery is provided or result in empty list
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries);
 
@@ -895,7 +906,8 @@ public interface ManagementService {
    * @param retries number of retries.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync (List<String> processInstanceIds, ProcessInstanceQuery query, int retries);
 
@@ -923,7 +935,9 @@ public interface ManagementService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries);
 
@@ -940,6 +954,22 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobDuedate(String jobId, Date newDuedate);
+  
+  /**
+   * Triggers the recalculation for the job with the provided id.
+   * 
+   * @param jobId id of job to recalculate, must neither be null nor empty.
+   * @param creationDateBased
+   *          indicates whether the recalculation should be based on the
+   *          creation date of the job or the current date
+   * 
+   * @throws AuthorizationException
+   *           If the user has no {@link Permissions#UPDATE} permission on
+   *           {@link Resources#PROCESS_INSTANCE} or no
+   *           {@link Permissions#UPDATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
+   */
+  void recalculateJobDuedate(String jobId, boolean creationDateBased);
 
   /**
    * Sets a new priority for the job with the provided id.

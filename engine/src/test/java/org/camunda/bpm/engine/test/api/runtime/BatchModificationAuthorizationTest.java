@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -20,6 +21,7 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 
 import java.util.Collection;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -68,7 +70,22 @@ public class BatchModificationAuthorizationTest {
             ).succeeds(),
         scenario()
             .withAuthorizations(
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ, Permissions.UPDATE)
+            ).succeeds(),
+        scenario()
+            .withAuthorizations(
                 grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
+            ).failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
             ).failsDueToRequired(

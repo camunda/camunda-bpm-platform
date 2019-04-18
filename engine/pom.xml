@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.10.0</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -69,6 +69,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>provided</scope>
@@ -98,6 +103,12 @@
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -178,6 +189,12 @@
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -309,6 +326,41 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <configuration>
+          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+          <createSourcesJar>true</createSourcesJar>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <artifactSet>
+            <excludes>
+              <exclude>org.camunda.bpm.model:*</exclude>
+              <exclude>org.camunda.bpm.dmn:*</exclude>
+              <exclude>org.camunda.commons:*</exclude>
+
+              <exclude>org.springframework:*</exclude>
+              <exclude>org.slf4j:*</exclude>
+              <exclude>org.apache.commons:*</exclude>
+              <exclude>com.sun.mail:*</exclude>
+              <exclude>javax.activation:*</exclude>
+              <exclude>org.mybatis:mybatis:*</exclude>
+              <exclude>commons-logging:*</exclude>
+              <exclude>joda-time:*</exclude>
+            </excludes>
+          </artifactSet>
+          <relocations>
+            <relocation>
+              <pattern>com.google.gson</pattern>
+              <shadedPattern>camundajar.com.google.gson</shadedPattern>
+            </relocation>
+          </relocations>
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+          </transformers>
+          <shadeTestJar>true</shadeTestJar>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>

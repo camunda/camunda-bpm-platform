@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -17,6 +18,7 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
@@ -126,7 +128,35 @@ public class SingleProcessInstanceModificationAsyncAuthorizationTest extends Aut
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
-      assertTrue(e.getMessage().contains("The user with id 'test' does not have 'CREATE' permission on resource 'Batch'."));
+      assertTrue(e.getMessage().contains("The user with id 'test' does not have"));
+      assertTrue(e.getMessage().contains("'CREATE' permission on resource 'Batch'"));
+      assertTrue(e.getMessage().contains("'CREATE_BATCH_MODIFY_PROCESS_INSTANCES' permission on resource 'Batch'"));
+    }
+  }
+
+  @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  public void testModificationRevoke() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, "parallelGateway", userId, CREATE_INSTANCE, READ_INSTANCE, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+    createGrantAuthorization(BATCH, ANY, userId, CREATE);
+    createRevokeAuthorization(BATCH, ANY, userId, CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    try {
+      // when
+      runtimeService
+        .createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .executeAsync();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("The user with id 'test' does not have"));
+      assertTrue(e.getMessage().contains("'CREATE' permission on resource 'Batch'"));
+      assertTrue(e.getMessage().contains("'CREATE_BATCH_MODIFY_PROCESS_INSTANCES' permission on resource 'Batch'"));
     }
   }
 

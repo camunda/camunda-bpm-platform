@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.After;
@@ -36,6 +38,8 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response.Status;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -111,6 +115,11 @@ public class FetchAndLockHandlerTest {
   @After
   public void resetClock() {
     ClockUtil.reset();
+  }
+
+  @After
+  public void resetUniqueWorkerRequestParam() {
+    handler.parseUniqueWorkerRequestParam("false");
   }
 
   @Test
@@ -316,6 +325,48 @@ public class FetchAndLockHandlerTest {
   }
 
   @Test
+  public void shouldCancelPreviousPendingRequestWhenWorkerIdsEqual() {
+    // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+
+    handler.parseUniqueWorkerRequestParam("true");
+
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "aWorkerId"), asyncResponse, processEngine);
+    handler.acquire();
+
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "aWorkerId"), mock(AsyncResponse.class), processEngine);
+
+    // when
+    handler.acquire();
+
+    // then
+    verify(asyncResponse).cancel();
+    assertThat(handler.getPendingRequests().size(), is(1));
+  }
+
+  @Test
+  public void shouldNotCancelPreviousPendingRequestWhenWorkerIdsDiffer() {
+    // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+
+    handler.parseUniqueWorkerRequestParam("true");
+
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "aWorkerId"), asyncResponse, processEngine);
+    handler.acquire();
+
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_REQUEST_TIMEOUT, "anotherWorkerId"), mock(AsyncResponse.class), processEngine);
+
+    // when
+    handler.acquire();
+
+    // then
+    verify(asyncResponse, never()).cancel();
+    assertThat(handler.getPendingRequests().size(), is(2));
+  }
+
+  @Test
   public void shouldResumeAsyncResponseDueToTooManyRequests() {
     // given
 
@@ -359,12 +410,13 @@ public class FetchAndLockHandlerTest {
     handler.rejectPendingRequests();
 
     // then
-    ArgumentCaptor<InvalidRequestException> argumentCaptor = ArgumentCaptor.forClass(InvalidRequestException.class);
+    ArgumentCaptor<RestException> argumentCaptor = ArgumentCaptor.forClass(RestException.class);
     verify(asyncResponse).resume(argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue().getStatus(), is(Status.INTERNAL_SERVER_ERROR));
     assertThat(argumentCaptor.getValue().getMessage(), is("Request rejected due to shutdown of application server."));
   }
 
-  protected FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
+  protected FetchExternalTasksExtendedDto createDto(Long responseTimeout, String workerId) {
     FetchExternalTasksExtendedDto externalTask = new FetchExternalTasksExtendedDto();
 
     FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topic = new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
@@ -372,7 +424,7 @@ public class FetchAndLockHandlerTest {
     topic.setLockDuration(12354L);
 
     externalTask.setMaxTasks(5);
-    externalTask.setWorkerId("aWorkerId");
+    externalTask.setWorkerId(workerId);
     externalTask.setTopics(Collections.singletonList(topic));
 
     if (responseTimeout != null) {
@@ -380,6 +432,10 @@ public class FetchAndLockHandlerTest {
     }
 
     return externalTask;
+  }
+
+  protected FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
+    return createDto(responseTimeout, "aWorkerId");
   }
 
   protected Date addSeconds(Date date, int seconds) {

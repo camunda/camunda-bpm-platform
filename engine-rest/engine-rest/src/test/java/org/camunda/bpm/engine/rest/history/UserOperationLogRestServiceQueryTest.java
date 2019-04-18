@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -18,7 +19,6 @@ package org.camunda.bpm.engine.rest.history;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -103,8 +103,10 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock, never()).batchId(anyString());
     verify(queryMock, never()).userId(anyString());
     verify(queryMock, never()).operationId(anyString());
+    verify(queryMock, never()).externalTaskId(anyString());
     verify(queryMock, never()).operationType(anyString());
     verify(queryMock, never()).entityType(anyString());
+    verify(queryMock, never()).category(anyString());
     verify(queryMock, never()).property(anyString());
     verify(queryMock, never()).afterTimestamp(any(Date.class));
     verify(queryMock, never()).beforeTimestamp(any(Date.class));
@@ -131,9 +133,12 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
         .queryParam("batchId", MockProvider.EXAMPLE_BATCH_ID)
         .queryParam("userId", "icke")
         .queryParam("operationId", "5")
+        .queryParam("externalTaskId", "1")
         .queryParam("operationType", OPERATION_TYPE_CLAIM)
         .queryParam("entityType", EntityTypes.TASK)
         .queryParam("entityTypeIn", EntityTypes.TASK + "," + EntityTypes.VARIABLE)
+        .queryParam("category", UserOperationLogEntry.CATEGORY_TASK_WORKER)
+        .queryParam("categoryIn", UserOperationLogEntry.CATEGORY_TASK_WORKER + "," + UserOperationLogEntry.CATEGORY_OPERATOR)
         .queryParam("property", "owner")
         .then().expect().statusCode(Status.OK.getStatusCode())
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
@@ -152,9 +157,12 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock).batchId(MockProvider.EXAMPLE_BATCH_ID);
     verify(queryMock).userId("icke");
     verify(queryMock).operationId("5");
+    verify(queryMock).externalTaskId("1");
     verify(queryMock).operationType(OPERATION_TYPE_CLAIM);
     verify(queryMock).entityType(EntityTypes.TASK);
     verify(queryMock).entityTypeIn(EntityTypes.TASK, EntityTypes.VARIABLE);
+    verify(queryMock).category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
+    verify(queryMock).categoryIn(UserOperationLogEntry.CATEGORY_TASK_WORKER, UserOperationLogEntry.CATEGORY_OPERATOR);
     verify(queryMock).property("owner");
     verify(queryMock).list();
 

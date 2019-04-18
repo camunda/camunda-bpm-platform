@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,16 +15,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.api.runtime;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
@@ -66,6 +57,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  *
  * @author Anna Pazola
@@ -81,11 +86,13 @@ public class RestartProcessInstanceAsyncTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   protected HistoryService historyService;
   protected ManagementService managementService;
   protected TenantIdProvider defaultTenantIdProvider;
+  protected boolean defaultEnsureJobDueDateSet;
 
   @Before
   public void init() {
@@ -93,13 +100,17 @@ public class RestartProcessInstanceAsyncTest {
     taskService = engineRule.getTaskService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
-    defaultTenantIdProvider = engineRule.getProcessEngineConfiguration().getTenantIdProvider();
+
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    defaultTenantIdProvider = processEngineConfiguration.getTenantIdProvider();
+    defaultEnsureJobDueDateSet = processEngineConfiguration.isEnsureJobDueDateNotNull();
   }
 
   @After
   public void reset() {
     helper.removeAllRunningAndHistoricBatches();
-    engineRule.getProcessEngineConfiguration().setTenantIdProvider(defaultTenantIdProvider);
+    processEngineConfiguration.setTenantIdProvider(defaultTenantIdProvider);
+    processEngineConfiguration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
   }
 
   @After
@@ -496,6 +507,8 @@ public class RestartProcessInstanceAsyncTest {
 
   @Test
   public void testMonitorJobPollingForCompletion() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(false);
+
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process");
@@ -519,6 +532,45 @@ public class RestartProcessInstanceAsyncTest {
     Job monitorJob = helper.getMonitorJob(batch);
     assertNotNull(monitorJob);
     assertNull(monitorJob.getDuedate());
+
+    // when the monitor job is executed
+    helper.executeMonitorJob(batch);
+
+    // then the monitor job has a due date of the default batch poll time
+    monitorJob = helper.getMonitorJob(batch);
+    Date dueDate = helper.addSeconds(createDate, 30);
+    assertEquals(dueDate, monitorJob.getDuedate());
+  }
+
+  @Test
+  public void testMonitorJobPollingForCompletionDueDateSet() {
+    Date testDate = new Date(1457326800000L);
+    ClockUtil.setCurrentTime(testDate);
+    processEngineConfiguration.setEnsureJobDueDateNotNull(true);
+
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process");
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
+
+    // when
+    Batch batch = runtimeService
+      .restartProcessInstances(processDefinition.getId())
+      .startTransition("flow1")
+      .processInstanceIds(processInstance1.getId(), processInstance2.getId())
+      .executeAsync();
+
+    // when the seed job creates the monitor job
+    Date createDate = testDate;
+    helper.executeSeedJob(batch);
+
+    // then the monitor job has the create date as due date set
+    Job monitorJob = helper.getMonitorJob(batch);
+    assertNotNull(monitorJob);
+    assertEquals(testDate, monitorJob.getDuedate());
 
     // when the monitor job is executed
     helper.executeMonitorJob(batch);

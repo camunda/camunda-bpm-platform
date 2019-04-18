@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
@@ -98,7 +97,7 @@
   
   <update id="updateExecutionSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_EXECUTION set
-      REV_ = REV_ + 1,
+      REV_ = 1 + REV_ ,
       SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
       <if test="parameter.processInstanceId != null">
@@ -220,7 +219,7 @@
   <sql id="selectProcessInstanceByQueryCriteriaSql">
 
     from ${prefix}ACT_RU_EXECUTION RES
-    <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
+    <if test="hasIncident || incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
       inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
     </if>
     <if test="activityIds != null &amp;&amp; activityIds.length > 0">
@@ -228,7 +227,7 @@
     </if>
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, P.KEY_, '*'))
     </if>
@@ -322,6 +321,9 @@
       <if test="incidentMessageLike != null">
         and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
       </if>
+      <if test="isProcessDefinitionWithoutTenantId">
+        and P.TENANT_ID_ IS NULL
+      </if>
       <if test="isTenantIdSet">
         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
           and RES.TENANT_ID_ in
@@ -360,7 +362,7 @@
     </if>
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, P.KEY_, '*'))
     </if>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
@@ -204,6 +203,17 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
   </sql>
+
+  <select id="selectHistoricBatchByJobId" parameterType="string" resultMap="historicBatchResultMap">
+    select ID_, REMOVAL_TIME_ from ${prefix}ACT_HI_BATCH
+      where ID_ in (SELECT HB.ID_ from ${prefix}ACT_RU_JOB J
+        inner join ${prefix}ACT_HI_BATCH HB
+        on J.JOB_DEF_ID_ in
+          (HB.SEED_JOB_DEF_ID_,
+           HB.MONITOR_JOB_DEF_ID_,
+           HB.BATCH_JOB_DEF_ID_)
+        where J.ID_ = #{jobId})
+  </select>
 
   <!-- Select ids for async history cleanup -->
 

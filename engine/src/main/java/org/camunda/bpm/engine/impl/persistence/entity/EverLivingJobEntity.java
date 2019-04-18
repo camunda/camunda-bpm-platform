@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -46,6 +47,10 @@ public class EverLivingJobEntity extends JobEntity {
 
   @Override
   public void init(CommandContext commandContext) {
+    init(commandContext, false);
+  }
+
+  public void init(CommandContext commandContext, boolean shouldResetLock) {
     // clean additional data related to this job
     JobHandler jobHandler = getJobHandler();
     if (jobHandler != null) {
@@ -62,9 +67,12 @@ public class EverLivingJobEntity extends JobEntity {
       this.exceptionByteArrayId = null;
       this.exceptionMessage = null;
     }
+
     //clean the lock information
-    setLockOwner(null);
-    setLockExpirationTime(null);
+    if (shouldResetLock) {
+      setLockOwner(null);
+      setLockExpirationTime(null);
+    }
 
     if (exceptionByteArrayIdToDelete != null) {
       ByteArrayEntity byteArray = commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, exceptionByteArrayIdToDelete);

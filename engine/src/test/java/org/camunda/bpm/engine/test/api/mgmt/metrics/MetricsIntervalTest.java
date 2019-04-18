@@ -1,8 +1,9 @@
 /*
- * Copyright 2016 camunda services GmbH.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -23,9 +24,13 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Test;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
+import org.camunda.bpm.engine.management.Metrics;
+
 import static junit.framework.TestCase.assertEquals;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.joda.time.DateTime;
 import org.junit.Assert;
@@ -492,4 +497,72 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     //clean up
     clearMetrics();
   }
+
+  // AGGREGATE BY REPORTER ////////////////////////////////////////////////
+
+  @Test
+  public void testMetricQueryAggregatedByReporterSingleReporter() {
+    // given metric data and result of interval query
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().interval();
+
+    // assume
+    assertTrue(metrics.size() > 0);
+
+    // when
+    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().aggregateByReporter().interval();
+
+    // then
+    assertEquals(metrics.size(), aggregatedMetrics.size());
+    for (MetricIntervalValue metricIntervalValue : aggregatedMetrics) {
+      assertNull(metricIntervalValue.getReporter());
+    }
+  }
+
+  @Test
+  public void testMetricQueryAggregatedByReporterThreeReporters() {
+    // given metric data for default reported
+    // generate data for reporter1
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter1");
+    generateMeterData(3, DEFAULT_INTERVAL_MILLIS);
+
+    // generate data for reporter2
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter2");
+    generateMeterData(3, DEFAULT_INTERVAL_MILLIS);
+
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().interval();
+
+    // when
+    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().aggregateByReporter().interval();
+
+    // then
+    // multiply by 3 because there are three reporters: 'REPORTER_ID' (check the #initMetrics()), reporter1 and reporter2
+    assertEquals(metrics.size(), aggregatedMetrics.size() * 3);
+    for (MetricIntervalValue metricIntervalValue : aggregatedMetrics) {
+      assertNull(metricIntervalValue.getReporter());
+    }
+  }
+
+  @Test
+  public void testMetricQueryAggregatedByReporterLimitAndTwoReporters() {
+    // clean up default recorded metrics
+    clearLocalMetrics();
+    // given
+    // generate data for reporter1
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter1");
+    generateMeterData(10, DEFAULT_INTERVAL_MILLIS);
+
+    // generate data for reporter2
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter2");
+    generateMeterData(10, DEFAULT_INTERVAL_MILLIS);
+
+    int limit = 10;
+    // when
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).limit(limit).interval();
+    List<MetricIntervalValue> aggregatedMetrics = managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).limit(limit).aggregateByReporter().interval();
+
+    // then aggregatedMetrics contains wider time interval
+    assertTrue(metrics.get(limit - 1).getTimestamp().getTime() > aggregatedMetrics.get(limit - 1).getTimestamp().getTime());
+    assertEquals(metrics.size(), aggregatedMetrics.size());
+  }
+
 }

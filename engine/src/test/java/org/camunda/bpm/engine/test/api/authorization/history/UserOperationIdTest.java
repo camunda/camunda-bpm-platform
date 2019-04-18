@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -188,6 +191,51 @@ public class UserOperationIdTest {
     HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
     // no user operation log id is set for this update, as it is not written as part of the user operation
     assertNull(historicDetail.getUserOperationId());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testStartProcessOperationId() {
+    // given
+    identityService.setAuthenticatedUserId("demo");
+
+    // when
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_KEY, getVariables());
+
+    //then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+        .processInstanceId(pi.getId())
+        .list();
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
+
+    assertFalse(userOperationLogEntries.isEmpty());
+    assertFalse(historicDetails.isEmpty());
+    verifySameOperationId(userOperationLogEntries, historicDetails);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testStartProcessAtActivityOperationId() {
+    // given
+    identityService.setAuthenticatedUserId("demo");
+
+    // when
+    ProcessInstance pi = runtimeService.createProcessInstanceByKey(PROCESS_KEY)
+            .startBeforeActivity("theTask")
+            .setVariables(getVariables())
+            .execute();
+
+    //then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+        .processInstanceId(pi.getId())
+        .list();
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
+
+    assertFalse(userOperationLogEntries.isEmpty());
+    assertFalse(historicDetails.isEmpty());
+    verifySameOperationId(userOperationLogEntries, historicDetails);
   }
 
   private void verifySameOperationId(List<UserOperationLogEntry> userOperationLogEntries, List<HistoricDetail> historicDetails) {

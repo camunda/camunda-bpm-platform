@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.10.0</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -129,20 +129,13 @@
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
       <!-- override version -->
-      <version>1.6</version>
+      <version>1.11</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.easytesting</groupId>
-      <artifactId>fest-assert</artifactId>
-      <version>1.4</version>
       <scope>test</scope>
     </dependency>
 
@@ -183,6 +176,12 @@
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-logging-juli</artifactId>
       <version>${version.tomcat}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
 

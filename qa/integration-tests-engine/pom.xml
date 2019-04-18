@@ -7,13 +7,13 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.10.0</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <properties>
     <!-- Needs to be updated after a new WildFly release -->
     <wildfly.container.adapter.groupId>org.wildfly.arquillian</wildfly.container.adapter.groupId>
-    <wildfly.container.adapter.version>2.1.1.Final</wildfly.container.adapter.version>
+    <wildfly.container.adapter.version>2.2.0.Final</wildfly.container.adapter.version>
 
     <redirect.test.output>true</redirect.test.output>
   </properties>
@@ -150,7 +150,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
-      <version>2.9.7</version>
+      <version>2.9.8</version>
     </dependency>
 
 

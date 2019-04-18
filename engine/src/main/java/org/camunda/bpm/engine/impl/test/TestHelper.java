@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -69,9 +70,9 @@ public abstract class TestHelper {
     "ACT_GE_PROPERTY"
   );
 
-  static Map<String, ProcessEngine> processEngines = new HashMap<String, ProcessEngine>();
+  static Map<String, ProcessEngine> processEngines = new HashMap<>();
 
-  public final static List<String> RESOURCE_SUFFIXES = new ArrayList<String>();
+  public final static List<String> RESOURCE_SUFFIXES = new ArrayList<>();
 
   static {
     RESOURCE_SUFFIXES.addAll(Arrays.asList(BpmnDeployer.BPMN_RESOURCE_SUFFIXES));
@@ -177,7 +178,7 @@ public abstract class TestHelper {
   }
 
   private static String createResourceName(Class< ? > type, String name, String suffix) {
-    StringBuffer r = new StringBuffer(type.getName().replace('.', '/'));
+    StringBuilder r = new StringBuilder(type.getName().replace('.', '/'));
     if (name != null) {
       r.append("." + name);
     }

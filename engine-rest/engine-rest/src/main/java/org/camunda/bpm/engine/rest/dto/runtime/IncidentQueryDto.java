@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -36,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
 
   private static final String SORT_BY_INCIDENT_ID = "incidentId";
+  private static final String SORT_BY_INCIDENT_MESSAGE = "incidentMessage";
   private static final String SORT_BY_INCIDENT_TIMESTAMP = "incidentTimestamp";
   private static final String SORT_BY_INCIDENT_TYPE = "incidentType";
   private static final String SORT_BY_EXECUTION_ID = "executionId";
@@ -49,8 +51,9 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_MESSAGE);
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_TIMESTAMP);
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID);
@@ -197,6 +200,8 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
   protected void applySortBy(IncidentQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_INCIDENT_ID)) {
       query.orderByIncidentId();
+    } else if (sortBy.equals(SORT_BY_INCIDENT_MESSAGE)) {
+      query.orderByIncidentMessage();
     } else if (sortBy.equals(SORT_BY_INCIDENT_TIMESTAMP)) {
       query.orderByIncidentTimestamp();
     } else if (sortBy.equals(SORT_BY_INCIDENT_TYPE)) {

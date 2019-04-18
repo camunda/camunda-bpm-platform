@@ -11,7 +11,7 @@ camunda BPM platform is a flexible framework for workflow and process automation
 * User Forum: https://forum.camunda.org/
 * Issue Tracker: https://app.camunda.com/jira
 * Contribution Guidelines: https://camunda.org/contribute/
-* License: Apache License, Version 2.0  https://www.apache.org/licenses/LICENSE-2.0
+* License: The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
 
 Components
 ----------
@@ -82,7 +82,7 @@ Add the following lines to it:
 </activeProfiles>
 ```
 
-Apache Maven 3 and Java JDK 6/7/8 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
+Apache Maven 3 and Java JDK 7/8 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
 
 ```
 mvn clean install

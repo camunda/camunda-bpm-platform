@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -76,7 +77,7 @@ import org.jboss.vfs.VirtualFile;
  */
 public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProcessor {
 
-  public static final int PRIORITY = 0x0000; // this can happen at the beginning of the phase
+  public static final int PRIORITY = 0x0001; // this can happen early in the phase
 
   @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -160,11 +161,13 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
     ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
       .addDependency(phaseContext.getPhaseServiceName())
-      .addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector())
       .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStartService.getPlatformPluginsInjector())
       .addDependencies(deploymentServiceNames)
       .setInitialMode(Mode.ACTIVE);
 
+    if (phaseContext.getServiceRegistry().getService(ServiceNames.forDefaultProcessEngine()) != null) {
+      serviceBuilder.addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector());
+    }
     if(paViewServiceName != null) {
       serviceBuilder.addDependency(paViewServiceName, ComponentView.class, paStartService.getPaComponentViewInjector());
     } else {

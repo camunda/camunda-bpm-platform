@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,23 +15,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.api.runtime;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -53,7 +37,6 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
-import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -65,8 +48,32 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
+@RunWith(Parameterized.class)
 public class ModificationExecutionAsyncTest {
+
+  protected static final Date START_DATE = new Date(1457326800000L);
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
@@ -75,11 +82,28 @@ public class ModificationExecutionAsyncTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
 
+  protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
+
   protected BpmnModelInstance instance;
+
   private int defaultBatchJobsPerSeed;
   private int defaultInvocationsPerBatchJob;
-  protected static final Date START_DATE = new Date(1457326800000L);
+  private boolean defaultEnsureJobDueDateSet;
+
+  @Parameterized.Parameter(0)
+  public boolean ensureJobDueDateSet;
+
+  @Parameterized.Parameter(1)
+  public Date currentTime;
+
+  @Parameterized.Parameters(name = "Job DueDate is set: {0}")
+  public static Collection<Object[]> scenarios() throws ParseException {
+    return Arrays.asList(new Object[][] {
+      { false, null },
+      { true, START_DATE }
+    });
+  }
 
   @Before
   public void initServices() {
@@ -89,6 +113,15 @@ public class ModificationExecutionAsyncTest {
   @Before
   public void setClock() {
     ClockUtil.setCurrentTime(START_DATE);
+  }
+
+  @Before
+  public void storeEngineSettings() {
+    configuration = rule.getProcessEngineConfiguration();
+    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
+    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
+    defaultEnsureJobDueDateSet = configuration.isEnsureJobDueDateNotNull();
+    configuration.setEnsureJobDueDateNotNull(ensureJobDueDateSet);
   }
 
   @Before
@@ -107,18 +140,11 @@ public class ModificationExecutionAsyncTest {
     ClockUtil.reset();
   }
 
-  @Before
-  public void storeEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
-    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
-    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
-  }
-
   @After
   public void restoreEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+    configuration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
   }
 
   @After
@@ -253,7 +279,7 @@ public class ModificationExecutionAsyncTest {
     Job seedJob = helper.getSeedJob(batch);
     assertNotNull(seedJob);
     assertEquals(seedJobDefinition.getId(), seedJob.getJobDefinitionId());
-    assertNull(seedJob.getDuedate());
+    assertEquals(currentTime, seedJob.getDuedate());
     assertNull(seedJob.getDeploymentId());
     assertNull(seedJob.getProcessDefinitionId());
     assertNull(seedJob.getProcessDefinitionKey());
@@ -280,7 +306,7 @@ public class ModificationExecutionAsyncTest {
 
     for (Job modificationJob : modificationJobs) {
       assertEquals(modificationJobDefinition.getId(), modificationJob.getJobDefinitionId());
-      assertNull(modificationJob.getDuedate());
+      assertEquals(currentTime, modificationJob.getDuedate());
       assertNull(modificationJob.getProcessDefinitionId());
       assertNull(modificationJob.getProcessDefinitionKey());
       assertNull(modificationJob.getProcessInstanceId());
@@ -608,13 +634,13 @@ public class ModificationExecutionAsyncTest {
     Batch batch = helper.startAfterAsync("process1", 3, "user1", processDefinition.getId());
 
     // when the seed job creates the monitor job
-    Date createDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
+    Date createDate = START_DATE;
     helper.executeSeedJob(batch);
 
     // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
     assertNotNull(monitorJob);
-    assertNull(monitorJob.getDuedate());
+    assertEquals(currentTime, monitorJob.getDuedate());
 
     // when the monitor job is executed
     helper.executeMonitorJob(batch);

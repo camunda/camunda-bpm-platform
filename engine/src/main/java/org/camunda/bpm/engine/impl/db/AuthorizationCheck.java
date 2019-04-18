@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -32,11 +33,16 @@ public class AuthorizationCheck implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * If true authorization check is performed. This switch is
+   * If true authorization check is enabled. for This switch is
    * useful when implementing a query which may perform an authorization check
    * only under certain circumstances.
    */
   protected boolean isAuthorizationCheckEnabled = false;
+
+  /**
+   * If true authorization check is performed.
+   */
+  protected boolean shouldPerformAuthorizatioCheck = false;
   
   /**
    * Indicates if the revoke authorization checks are enabled or not.
@@ -59,13 +65,6 @@ public class AuthorizationCheck implements Serializable {
   public AuthorizationCheck() {
   }
 
-  public AuthorizationCheck(String authUserId, List<String> authGroupIds, List<PermissionCheck> permissionChecks, boolean isRevokeAuthorizationCheckEnabled) {
-    this.authUserId = authUserId;
-    this.authGroupIds = authGroupIds;
-    this.permissionChecks.setAtomicChecks(permissionChecks);
-    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;    
-  }
-  
   public AuthorizationCheck(String authUserId, List<String> authGroupIds, CompositePermissionCheck permissionCheck, boolean isRevokeAuthorizationCheckEnabled) {
     this.authUserId = authUserId;
     this.authGroupIds = authGroupIds;
@@ -79,13 +78,29 @@ public class AuthorizationCheck implements Serializable {
     return isAuthorizationCheckEnabled;
   }
 
-  /** is used by myBatis */
   public boolean getIsAuthorizationCheckEnabled() {
     return isAuthorizationCheckEnabled;
   }
 
   public void setAuthorizationCheckEnabled(boolean isAuthorizationCheckPerformed) {
     this.isAuthorizationCheckEnabled = isAuthorizationCheckPerformed;
+  }
+
+  public boolean shouldPerformAuthorizatioCheck() {
+    return shouldPerformAuthorizatioCheck;
+  }
+
+  /** is used by myBatis */
+  public boolean getShouldPerformAuthorizatioCheck() {
+    return isAuthorizationCheckEnabled && !isPermissionChecksEmpty();
+  }
+
+  public void setShouldPerformAuthorizatioCheck(boolean shouldPerformAuthorizatioCheck) {
+    this.shouldPerformAuthorizatioCheck = shouldPerformAuthorizatioCheck;
+  }
+
+  protected boolean isPermissionChecksEmpty() {
+    return permissionChecks.getAtomicChecks().isEmpty() && permissionChecks.getCompositeChecks().isEmpty();
   }
 
   public String getAuthUserId() {

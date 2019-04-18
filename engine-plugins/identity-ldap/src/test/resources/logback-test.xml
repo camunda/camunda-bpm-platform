@@ -21,7 +21,7 @@
   <logger name="org.camunda.bpm.engine.impl.pvm" level="debug" />
   <logger name="org.camunda.bpm.identity.impl.ldap" level="debug" />
   
-  <root level="debug">
+  <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
   

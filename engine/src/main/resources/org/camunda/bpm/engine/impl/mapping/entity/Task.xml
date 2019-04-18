@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TaskEntity">
@@ -103,18 +102,8 @@
 
   <update id="updateTaskSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_TASK set
-      REV_ = REV_ + 1,
+      REV_ = 1 + REV_ ,
       SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
-    <where>
-      <include refid="updateTaskSuspensionStateByParametersSql" />
-    </where>
-  </update>
-
-  <update id="updateTaskSuspensionStateByParameters_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    update ${prefix}ACT_RU_TASK set
-      REV_ = REV_ + 1,
-      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER},
-      CREATE_TIME_ = CREATE_TIME_
     <where>
       <include refid="updateTaskSuspensionStateByParametersSql" />
     </where>
@@ -289,7 +278,7 @@
       left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_           
       <if test="!authCheck.revokeAuthorizationCheckEnabled">    
@@ -595,7 +584,15 @@
               from
               ${prefix}ACT_RU_VARIABLE
               WHERE
-              NAME_= #{queryVariableValue.name}
+              <choose>
+                <when test="queryVariableValue.variableNameIgnoreCase">
+                  UPPER(NAME_)= UPPER(#{queryVariableValue.name})
+                </when>
+                <otherwise>
+                  NAME_= #{queryVariableValue.name}
+                </otherwise>
+              </choose>
+              ${collationForCaseSensitivity}
 
               <choose>
                 <when test="queryVariableValue.local">

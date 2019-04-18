@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -26,7 +27,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
@@ -44,10 +44,12 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -146,8 +148,7 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
     assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
 
     if(assertResponseBody) {
-      assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID,
-        new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8")).get("id"));
+      assertThat(EntityUtils.toString(response.getEntity(), "UTF-8"), containsString(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
     }
 
     response.close();
