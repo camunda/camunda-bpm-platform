@@ -40,6 +40,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import javax.ws.rs.core.Response.Status;
@@ -52,6 +53,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DECISION_INSTANCE_ID;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -485,6 +487,36 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
       .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
       .post(SET_REMOVAL_TIME_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
+  }
+
+  @Test
+  public void testOrQuery() {
+    // given
+    HistoricProcessInstanceQueryImpl mockedQuery = mock(HistoricProcessInstanceQueryImpl.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedQuery);
+
+    String payload = "{ \"orQueries\": [{" +
+        "\"processDefinitionKey\": \"aKey\", " +
+        "\"processInstanceBusinessKey\": \"aBusinessKey\"}] }";
+
+    // when
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header(ACCEPT_JSON_HEADER)
+      .body(payload)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_PROCESS_INSTANCE_URL);
+
+    ArgumentCaptor<HistoricProcessInstanceQueryImpl> argument =
+        ArgumentCaptor.forClass(HistoricProcessInstanceQueryImpl.class);
+
+    verify(mockedQuery).addOrQuery(argument.capture());
+
+    // then
+    assertThat(argument.getValue().getProcessDefinitionKey()).isEqualTo("aKey");
+    assertThat(argument.getValue().getBusinessKey()).isEqualTo("aBusinessKey");
   }
 
   protected void verifyBatchJson(String batchJson) {
