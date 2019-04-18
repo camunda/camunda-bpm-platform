@@ -41,6 +41,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -51,6 +52,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -2232,6 +2234,35 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
     verify(mockedQuery).list();
   }
 
+  @Test
+  public void testOrQuery() {
+    // given
+    HistoricTaskInstanceQueryImpl mockedQuery = mock(HistoricTaskInstanceQueryImpl.class);
+    when(processEngine.getHistoryService().createHistoricTaskInstanceQuery()).thenReturn(mockedQuery);
+
+    String payload = "{ \"orQueries\": [{" +
+        "\"processDefinitionKey\": \"aKey\", " +
+        "\"processInstanceBusinessKey\": \"aBusinessKey\"}] }";
+
+    // when
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header(ACCEPT_JSON_HEADER)
+      .body(payload)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    ArgumentCaptor<HistoricTaskInstanceQueryImpl> argument =
+        ArgumentCaptor.forClass(HistoricTaskInstanceQueryImpl.class);
+
+    verify(mockedQuery).addOrQuery(argument.capture());
+
+    // then
+    assertThat(argument.getValue().getProcessDefinitionKey()).isEqualTo("aKey");
+    assertThat(argument.getValue().getProcessInstanceBusinessKey()).isEqualTo("aBusinessKey");
+  }
 
   private List<HistoricTaskInstance> createMockHistoricTaskInstancesTwoTenants() {
     return Arrays.asList(

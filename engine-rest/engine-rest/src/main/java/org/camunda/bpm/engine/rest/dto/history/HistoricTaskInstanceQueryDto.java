@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -151,10 +152,17 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
 
+  private List<HistoricTaskInstanceQueryDto> orQueries;
+
   public HistoricTaskInstanceQueryDto() {}
 
   public HistoricTaskInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("orQueries")
+  public void setOrQueries(List<HistoricTaskInstanceQueryDto> orQueries) {
+    this.orQueries = orQueries;
   }
 
   @CamundaQueryParam("taskId")
@@ -437,8 +445,20 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     return engine.getHistoryService().createHistoricTaskInstanceQuery();
   }
 
+  public List<HistoricTaskInstanceQueryDto> getOrQueries() {
+    return orQueries;
+  }
+
   @Override
   protected void applyFilters(HistoricTaskInstanceQuery query) {
+    if (orQueries != null) {
+      for (HistoricTaskInstanceQueryDto orQueryDto: orQueries) {
+        HistoricTaskInstanceQueryImpl orQuery = new HistoricTaskInstanceQueryImpl();
+        orQuery.setOrQueryActive();
+        orQueryDto.applyFilters(orQuery);
+        ((HistoricTaskInstanceQueryImpl) query).addOrQuery(orQuery);
+      }
+    }
     if (taskId != null) {
       query.taskId(taskId);
     }
