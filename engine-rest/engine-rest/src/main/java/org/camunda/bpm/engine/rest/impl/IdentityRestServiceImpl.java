@@ -91,7 +91,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response getPasswordPolicy() {
-    boolean isEnabled = !processEngine.getProcessEngineConfiguration().isDisablePasswordPolicy();
+    boolean isEnabled = processEngine.getProcessEngineConfiguration().isEnablePasswordPolicy();
 
     if (isEnabled) {
       IdentityService identityService = processEngine.getIdentityService();
@@ -108,7 +108,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response checkPassword(PasswordDto password) {
-    boolean isEnabled = !processEngine.getProcessEngineConfiguration().isDisablePasswordPolicy();
+    boolean isEnabled = processEngine.getProcessEngineConfiguration().isEnablePasswordPolicy();
 
     if (isEnabled) {
       IdentityService identityService = processEngine.getIdentityService();

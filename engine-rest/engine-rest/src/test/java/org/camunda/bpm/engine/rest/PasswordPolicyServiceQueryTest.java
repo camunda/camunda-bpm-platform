@@ -66,7 +66,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldGetPolicy() {
-    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(false);
+    when(processEngineConfigurationMock.isEnablePasswordPolicy()).thenReturn(true);
 
     PasswordPolicy passwordPolicyMock = mock(PasswordPolicy.class);
 
@@ -88,7 +88,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldReturnNotFound_PasswordPolicyDisabled() {
-    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(true);
+    when(processEngineConfigurationMock.isEnablePasswordPolicy()).thenReturn(false);
 
     given()
     .then()
@@ -100,7 +100,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldCheckInvalidPassword() {
-    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(false);
+    when(processEngineConfigurationMock.isEnablePasswordPolicy()).thenReturn(true);
 
     PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
 
@@ -136,7 +136,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldCheckValidPassword() {
-    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(false);
+    when(processEngineConfigurationMock.isEnablePasswordPolicy()).thenReturn(true);
 
     PasswordPolicyResult passwordPolicyResultMock = mock(PasswordPolicyResult.class);
 
@@ -163,7 +163,7 @@ public class PasswordPolicyServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldCheckPasswordAgainstNoPolicy() {
-    when(processEngineConfigurationMock.isDisablePasswordPolicy()).thenReturn(true);
+    when(processEngineConfigurationMock.isEnablePasswordPolicy()).thenReturn(false);
 
     given()
       .header("accept", MediaType.APPLICATION_JSON)
