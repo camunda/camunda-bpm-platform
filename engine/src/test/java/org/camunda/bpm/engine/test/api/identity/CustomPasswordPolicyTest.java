@@ -51,14 +51,14 @@ public class CustomPasswordPolicyTest {
     identityService = engineRule.getIdentityService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     processEngineConfiguration.setPasswordPolicy(new DefaultPasswordPolicyImpl());
-    processEngineConfiguration.setDisablePasswordPolicy(false);
+    processEngineConfiguration.setEnablePasswordPolicy(true);
   }
 
   @After
   public void tearDown() {
     // reset configuration
     processEngineConfiguration.setPasswordPolicy(null);
-    processEngineConfiguration.setDisablePasswordPolicy(true);
+    processEngineConfiguration.setEnablePasswordPolicy(false);
     // reset database
     identityService.deleteUser("user");
   }

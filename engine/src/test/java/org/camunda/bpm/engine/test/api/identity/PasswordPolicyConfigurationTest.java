@@ -49,12 +49,12 @@ public class PasswordPolicyConfigurationTest {
   @Before
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-    processEngineConfiguration.setPasswordPolicy(null).setDisablePasswordPolicy(true);
+    processEngineConfiguration.setPasswordPolicy(null).setEnablePasswordPolicy(false);
   }
 
   @After
   public void tearDown() {
-    processEngineConfiguration.setPasswordPolicy(null).setDisablePasswordPolicy(true);
+    processEngineConfiguration.setPasswordPolicy(null).setEnablePasswordPolicy(false);
   }
 
   @Test
@@ -66,34 +66,34 @@ public class PasswordPolicyConfigurationTest {
 
     // then
     assertThat(processEngineConfiguration.getPasswordPolicy(), nullValue());
-    assertThat(processEngineConfiguration.isDisablePasswordPolicy(), is(true));
+    assertThat(processEngineConfiguration.isEnablePasswordPolicy(), is(false));
   }
 
   @Test
   public void testAutoConfigurationDefaultPasswordPolicy() {
     // given
     
-    processEngineConfiguration.setDisablePasswordPolicy(false);
+    processEngineConfiguration.setEnablePasswordPolicy(true);
 
     // when
     processEngineConfiguration.initPasswordPolicy();
 
     // then
-    assertThat(processEngineConfiguration.isDisablePasswordPolicy(), is(false));
+    assertThat(processEngineConfiguration.isEnablePasswordPolicy(), is(true));
     assertThat(processEngineConfiguration.getPasswordPolicy(), is(instanceOf(DefaultPasswordPolicyImpl.class)));
   }
 
   @Test
   public void testFullPasswordPolicyConfiguration() {
     // given
-    processEngineConfiguration.setDisablePasswordPolicy(false);
+    processEngineConfiguration.setEnablePasswordPolicy(true);
     processEngineConfiguration.setPasswordPolicy(new DefaultPasswordPolicyImpl());
 
     // when
     processEngineConfiguration.initPasswordPolicy();
 
     // then
-    assertThat(processEngineConfiguration.isDisablePasswordPolicy(), is(false));
+    assertThat(processEngineConfiguration.isEnablePasswordPolicy(), is(true));
     assertThat(processEngineConfiguration.getPasswordPolicy(), is(instanceOf(DefaultPasswordPolicyImpl.class)));
   }
 }

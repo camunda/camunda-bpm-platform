@@ -33,7 +33,7 @@ public class GetPasswordPolicyCmd implements Command<PasswordPolicy>, Serializab
   @Override
   public PasswordPolicy execute(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    if (!processEngineConfiguration.isDisablePasswordPolicy()) {
+    if (processEngineConfiguration.isEnablePasswordPolicy()) {
       return processEngineConfiguration.getPasswordPolicy();
     } else {
       return null;

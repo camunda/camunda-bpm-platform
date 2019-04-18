@@ -62,14 +62,14 @@ public class DefaultPasswordPolicyTest {
 
     rule.getProcessEngineConfiguration()
       .setPasswordPolicy(new DefaultPasswordPolicyImpl())
-      .setDisablePasswordPolicy(false);
+      .setEnablePasswordPolicy(true);
   }
 
   @After
   public void resetProcessEngineConfig() {
     rule.getProcessEngineConfiguration()
       .setPasswordPolicy(null)
-      .setDisablePasswordPolicy(true);
+      .setEnablePasswordPolicy(false);
   }
 
   @Test

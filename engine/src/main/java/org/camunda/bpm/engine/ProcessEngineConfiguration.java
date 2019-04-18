@@ -264,7 +264,7 @@ public abstract class ProcessEngineConfiguration {
   /**
    * configuration of password policy
    */
-  protected boolean disablePasswordPolicy = true;
+  protected boolean enablePasswordPolicy;
   protected PasswordPolicy passwordPolicy;
 
   /**
@@ -953,12 +953,12 @@ public abstract class ProcessEngineConfiguration {
     this.disabledPermissions = disabledPermissions;
   }
 
-  public boolean isDisablePasswordPolicy() {
-    return disablePasswordPolicy;
+  public boolean isEnablePasswordPolicy() {
+    return enablePasswordPolicy;
   }
 
-  public ProcessEngineConfiguration setDisablePasswordPolicy(boolean disablePasswordPolicy) {
-    this.disablePasswordPolicy = disablePasswordPolicy;
+  public ProcessEngineConfiguration setEnablePasswordPolicy(boolean enablePasswordPolicy) {
+    this.enablePasswordPolicy = enablePasswordPolicy;
     return this;
   }
 

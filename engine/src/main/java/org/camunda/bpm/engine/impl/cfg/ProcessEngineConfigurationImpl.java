@@ -2335,7 +2335,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void initPasswordPolicy() {
-    if(passwordPolicy == null && !disablePasswordPolicy) {
+    if(passwordPolicy == null && enablePasswordPolicy) {
       passwordPolicy = new DefaultPasswordPolicyImpl();
     }
   }

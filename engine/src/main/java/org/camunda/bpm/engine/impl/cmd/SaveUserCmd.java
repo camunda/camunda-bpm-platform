@@ -50,7 +50,7 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
     ensureNotNull("user", user);
     ensureWhitelistedResourceId(commandContext, "User", user.getId());
     
-    if(!skipPasswordPolicy && !commandContext.getProcessEngineConfiguration().isDisablePasswordPolicy()) {
+    if(!skipPasswordPolicy && commandContext.getProcessEngineConfiguration().isEnablePasswordPolicy()) {
       if(!user.checkPasswordAgainstPolicy()) {
         throw new ProcessEngineException("Password does not match policy");
       }
