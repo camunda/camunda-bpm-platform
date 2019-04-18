@@ -47,5 +47,7 @@ ALTER TABLE ACT_ID_USER
 
 -- https://app.camunda.com/jira/browse/CAM-9920
 ALTER TABLE ACT_HI_OP_LOG
-  ADD CATEGORY_ varchar(64),
+  ADD CATEGORY_ varchar(64);
+  
+ALTER TABLE ACT_HI_OP_LOG
   ADD EXTERNAL_TASK_ID_ varchar(64);
