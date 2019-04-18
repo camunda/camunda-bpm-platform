@@ -79,6 +79,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean withoutTenantId;
   private List<String> activityIds;
   private Boolean rootProcessInstances;
+  private Boolean leafProcessInstances;
   private Boolean isProcessDefinitionWithoutTenantId;
 
   private List<VariableQueryParameterDto> variables;
@@ -298,6 +299,16 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.rootProcessInstances = rootProcessInstances;
   }
 
+
+  public Boolean isLeafProcessInstances() {
+    return leafProcessInstances;
+  }
+
+  @CamundaQueryParam(value = "leafProcessInstances", converter = BooleanConverter.class)
+  public void setLeafProcessInstances(Boolean leafProcessInstances) {
+    this.leafProcessInstances = leafProcessInstances;
+  }
+
   public Boolean isProcessDefinitionWithoutTenantId() {
     return isProcessDefinitionWithoutTenantId;
   }
@@ -385,6 +396,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (TRUE.equals(rootProcessInstances)) {
       query.rootProcessInstances();
+    }
+    if(TRUE.equals(leafProcessInstances)) {
+      query.leafProcessInstances();
     }
     if (TRUE.equals(isProcessDefinitionWithoutTenantId)) {
       query.processDefinitionWithoutTenantId();

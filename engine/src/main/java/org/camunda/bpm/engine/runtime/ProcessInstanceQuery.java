@@ -229,6 +229,9 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   /** Only selects process instances which are top level process instances. */
   ProcessInstanceQuery rootProcessInstances();
 
+  /** Only selects process instances which are subprocesses and don't have subprocesses themselves. */
+  ProcessInstanceQuery leafProcessInstances();
+
   /** Only selects process instances which process definition has no tenant id. */
   ProcessInstanceQuery processDefinitionWithoutTenantId();
 

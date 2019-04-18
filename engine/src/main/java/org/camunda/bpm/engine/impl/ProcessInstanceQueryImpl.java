@@ -61,6 +61,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String subCaseInstanceId;
   protected String[] activityIds;
   protected boolean isRootProcessInstances;
+  protected boolean isLeafProcessInstances;
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
@@ -242,6 +243,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     isRootProcessInstances = true;
+    return this;
+  }
+  
+  public ProcessInstanceQuery leafProcessInstances() {
+    if(subProcessInstanceId != null) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both leafProcessInstances and subProcessInstanceId");
+    }
+    isLeafProcessInstances = true;
     return this;
   }
 

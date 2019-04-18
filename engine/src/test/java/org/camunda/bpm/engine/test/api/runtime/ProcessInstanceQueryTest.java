@@ -299,6 +299,45 @@ public class ProcessInstanceQueryTest {
   }
 
   @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcessWithNestedSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  public void testQueryByLeafInstancesThreeLayers() {
+    /* nested structure:
+     * superProcessWithNestedSubProcess
+     * +-- nestedSubProcess
+     *     +-- subProcess
+     */
+    ProcessInstance threeLayerProcess = runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
+
+    assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("nestedSubProcessQueryTest").count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("nestedSimpleSubProcess").count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("simpleSubProcess").count(), is(1L));
+    
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().leafProcessInstances().singleResult();
+
+    assertThat(instance.getRootProcessInstanceId(), is(threeLayerProcess.getId()));
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  public void testQueryByLeafInstancesTwoLayers() {
+    /* nested structure:
+     * nestedSubProcess
+     * +-- subProcess
+     */
+    ProcessInstance twoLayerProcess = runtimeService.startProcessInstanceByKey("nestedSimpleSubProcess");
+
+    assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("nestedSimpleSubProcess").count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("simpleSubProcess").count(), is(1L));
+    
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().leafProcessInstances().singleResult();
+
+    assertThat(instance.getRootProcessInstanceId(), is(twoLayerProcess.getId()));
+  }
+
+  @Test
   public void testQueryPaging() {
     assertEquals(4, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).count());
     assertEquals(2, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).listPage(0, 2).size());

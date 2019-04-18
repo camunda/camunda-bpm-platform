@@ -915,6 +915,36 @@ public class ProcessInstanceRestServiceQueryTest extends
   }
 
   @Test
+  public void testQueryLeafProcessInstances() {
+    given()
+    .queryParam("leafProcessInstances", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).leafProcessInstances();
+  }
+  
+  @Test
+  public void testQueryLeafProcessInstancesAsPost() {
+    Map<String, Object> params =new HashMap<String, Object>();
+    params.put("leafProcessInstances", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(params)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).leafProcessInstances();
+  }
+
+  @Test
   public void testQueryProcessDefinitionWithoutTenantId() {
     given()
       .queryParam("processDefinitionWithoutTenantId", true)
