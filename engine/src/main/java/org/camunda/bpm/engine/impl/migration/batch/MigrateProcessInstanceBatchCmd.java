@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,27 +17,28 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.AbstractMigrationCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.util.BatchUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> {
 
@@ -86,7 +88,9 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
   protected void checkAuthorizations(CommandContext commandContext, ProcessDefinitionEntity sourceDefinition, ProcessDefinitionEntity targetDefinition,
                                      Collection<String> processInstanceIds) {
 
-    commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES);
+    }
 
     super.checkAuthorizations(commandContext, sourceDefinition, targetDefinition, processInstanceIds);
   }
@@ -106,7 +110,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(calculateSize(processEngineConfiguration, configuration));
+    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
@@ -114,13 +118,6 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     commandContext.getBatchManager().insertBatch(batch);
 
     return batch;
-  }
-
-  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, MigrationBatchConfiguration batchConfiguration) {
-    int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
-    int processInstanceCount = batchConfiguration.getIds().size();
-
-    return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
   @SuppressWarnings("unchecked")

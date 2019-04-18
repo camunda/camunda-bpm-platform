@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,6 +17,8 @@
 package org.camunda.bpm.engine.test.api.identity;
 
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
@@ -27,11 +30,11 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_REVOKE;
-import static org.camunda.bpm.engine.authorization.Permissions.ALL;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.test.api.identity.TestPermissions.ALL;
+import static org.camunda.bpm.engine.test.api.identity.TestPermissions.CREATE;
+import static org.camunda.bpm.engine.test.api.identity.TestPermissions.DELETE;
+import static org.camunda.bpm.engine.test.api.identity.TestPermissions.READ;
+import static org.camunda.bpm.engine.test.api.identity.TestPermissions.UPDATE;
 
 /**
  * @author Stefan Hentschel.
@@ -52,8 +55,8 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
   }
 
   public void testAuthorizationCheckEmptyDb() {
-    TestResource resource1 = new TestResource("resource1",100);
-    TestResource resource2 = new TestResource("resource2",101);
+    Resource resource1 = TestResource.RESOURCE1;
+    Resource resource2 = TestResource.RESOURCE2;
 
     List<String> jonnysGroups = Arrays.asList("sales", "marketing");
     List<String> someOneElsesGroups = Collections.singletonList("marketing");
@@ -68,7 +71,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
   }
 
   public void testUserOverrideGlobalGrantAuthorizationCheck() {
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // create global authorization which grants all permissions to all users  (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -105,7 +108,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
   }
 
   public void testGroupOverrideGlobalGrantAuthorizationCheck() {
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // create global authorization which grants all permissions to all users  (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -150,7 +153,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
   }
 
   public void testUserOverrideGlobalRevokeAuthorizationCheck() {
-    TestResource resource1 = new TestResource("resource1", 100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // create global authorization which revokes all permissions to all users  (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -180,13 +183,35 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1));
   }
 
-  public void testNullAuthorizationCheck() {
-    TestResource resource1 = new TestResource("resource1", 100);
-    assertFalse(authorizationService.isUserAuthorized(null, null, UPDATE, resource1));
+  public void testNullAuthorizationCheckUserGroup() {
+    try {
+      authorizationService.isUserAuthorized(null, null, UPDATE, TestResource.RESOURCE1);
+      fail("Expected NullValueException");
+    } catch (NullValueException e) {
+      assertTrue(e.getMessage().contains("Authorization must have a 'userId' or/and a 'groupId'"));
+    }
+  }
+
+  public void testNullAuthorizationCheckPermission() {
+    try {
+      authorizationService.isUserAuthorized("jonny", null, null, TestResource.RESOURCE1);
+      fail("Expected NullValueException");
+    } catch (NullValueException e) {
+      assertTrue(e.getMessage().contains("Invalid permission for an authorization"));
+    }
+  }
+
+  public void testNullAuthorizationCheckResource() {
+    try {
+      authorizationService.isUserAuthorized("jonny", null, UPDATE, null);
+      fail("Expected NullValueException");
+    } catch (NullValueException e) {
+      assertTrue(e.getMessage().contains("Invalid resource for an authorization"));
+    }
   }
 
   public void testUserOverrideGroupOverrideGlobalAuthorizationCheck() {
-    TestResource resource1 = new TestResource("resource1",100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // create global authorization which grants all permissions to all users  (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -227,7 +252,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
 
   public void testEnabledAuthorizationCheck() {
     // given
-    TestResource resource1 = new TestResource("resource1", 100);
+    Resource resource1 = TestResource.RESOURCE1;
 
     // when
     boolean isAuthorized = authorizationService.isUserAuthorized("jonny", null, UPDATE, resource1);

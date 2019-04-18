@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -44,7 +46,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
 
     ensureNotEmpty(BadUserRequestException.class, "jobIds", jobIds);
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
-    checkAuthorizations(commandContext);
+    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES);
     writeUserOperationLog(commandContext,
         retries,
         jobIds.size(),
@@ -77,7 +79,9 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
     propertyChanges.add(new PropertyChange("retries", null, retries));
 
     commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES,
+        .logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES,
+            null,
+            null,
             null,
             null,
             null,

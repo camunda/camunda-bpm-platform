@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -95,6 +96,19 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
   }
 
   protected void initializeConfiguration(ExecutionEntity context, TimerEntity job) {
+    String dueDateString = resolveAndSetDuedate(context, job, false);
+
+    if (type == TimerDeclarationType.CYCLE && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
+
+      // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
+      if (!isInterruptingTimer) {
+        String prepared = prepareRepeat(dueDateString);
+        job.setRepeat(prepared);
+      }
+    }
+  }
+
+  public String resolveAndSetDuedate(ExecutionEntity context, TimerEntity job, boolean creationDateBased) {
     BusinessCalendar businessCalendar = Context
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
@@ -126,19 +140,18 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     }
 
     if (duedate==null) {
-      duedate = businessCalendar.resolveDuedate(dueDateString);
+      if (creationDateBased) {
+        if (job.getCreateTime() == null) {
+          throw new ProcessEngineException("Timer '"+context.getActivityId()+"' has no creation time and cannot be recalculated based on creation date. Either recalculate on your own or trigger recalculation with creationDateBased set to false.");
+        }
+        duedate = businessCalendar.resolveDuedate(dueDateString, job.getCreateTime());
+      } else {
+        duedate = businessCalendar.resolveDuedate(dueDateString);
+      }
     }
 
     job.setDuedate(duedate);
-
-    if (type == TimerDeclarationType.CYCLE && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
-
-      // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
-      if (!isInterruptingTimer) {
-        String prepared = prepareRepeat(dueDateString);
-        job.setRepeat(prepared);
-      }
-    }
+    return dueDateString;
   }
 
   protected void postInitialize(ExecutionEntity execution, TimerEntity timer) {

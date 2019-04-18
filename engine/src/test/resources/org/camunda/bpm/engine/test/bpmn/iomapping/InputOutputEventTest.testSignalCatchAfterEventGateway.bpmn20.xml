@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_FVEpwO_VEeOtYvXzz5ksgw" exporter="camunda modeler" exporterVersion="2.5.0" targetNamespace="http://camunda.org/schema/1.0/bpmn">
+  <process id="process" isExecutable="true">
+    <startEvent id="StartEvent_1">
+      <outgoing>SequenceFlow_1nicz0p</outgoing>
+    </startEvent>
+    <eventBasedGateway id="ExclusiveGateway_0kv6k9p">
+      <incoming>SequenceFlow_1nicz0p</incoming>
+      <outgoing>SequenceFlow_0ti8f2s</outgoing>
+    </eventBasedGateway>
+    <sequenceFlow id="SequenceFlow_1nicz0p" sourceRef="StartEvent_1" targetRef="ExclusiveGateway_0kv6k9p" />
+    <sequenceFlow id="SequenceFlow_0ti8f2s" sourceRef="ExclusiveGateway_0kv6k9p" targetRef="IntermediateThrowEvent_0ok4v5r" />
+    <sequenceFlow id="SequenceFlow_109gq0w" sourceRef="IntermediateThrowEvent_0ok4v5r" targetRef="Task_140hnfz" />
+    <userTask id="Task_140hnfz">
+      <incoming>SequenceFlow_109gq0w</incoming>
+      <outgoing>SequenceFlow_0jc3pwk</outgoing>
+    </userTask>
+    <endEvent id="EndEvent_1tipx7f">
+      <incoming>SequenceFlow_0jc3pwk</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_0jc3pwk" sourceRef="Task_140hnfz" targetRef="EndEvent_1tipx7f" />
+    <intermediateCatchEvent id="IntermediateThrowEvent_0ok4v5r">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="foo">bar</camunda:outputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+      <incoming>SequenceFlow_0ti8f2s</incoming>
+      <outgoing>SequenceFlow_109gq0w</outgoing>
+      <signalEventDefinition signalRef="Signal_0pzxsm4" />
+    </intermediateCatchEvent>
+  </process>
+  <signal id="Signal_0pzxsm4" name="foo" />
+</definitions>

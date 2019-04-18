@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -73,17 +74,17 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
       .then()
         .expect()
           .body("[0].name", equalTo("metricName"))
-          .body("[0].timestamp", equalTo(withTimezone("1970-01-01T01:45:00")))
+          .body("[0].timestamp", equalTo(withTimezone(new Date(15 * 60 * 1000 * 3))))
           .body("[0].reporter", equalTo("REPORTER"))
           .body("[0].value", equalTo(23))
 
           .body("[1].name", equalTo("metricName"))
-          .body("[1].timestamp", equalTo(withTimezone("1970-01-01T01:30:00")))
+          .body("[1].timestamp", equalTo(withTimezone(new Date(15 * 60 * 1000 * 2))))
           .body("[1].reporter", equalTo("REPORTER"))
           .body("[1].value", equalTo(22))
 
           .body("[2].name", equalTo("metricName"))
-          .body("[2].timestamp", equalTo(withTimezone("1970-01-01T01:15:00")))
+          .body("[2].timestamp", equalTo(withTimezone(new Date(15 * 60 * 1000 * 1))))
           .body("[2].reporter", equalTo("REPORTER"))
           .body("[2].value", equalTo(21))
           .statusCode(Status.OK.getStatusCode())
@@ -165,6 +166,23 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testGetIntervalAggregation() {
+    given()
+      .queryParam("aggregateByReporter", true)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(METRICS_URL);
+
+    verify(meterQueryMock).name(null);
+    verify(meterQueryMock).reporter(null);
+    verify(meterQueryMock).aggregateByReporter();
+    verify(meterQueryMock, times(1)).interval();
+    verifyNoMoreInteractions(meterQueryMock);
+  }
+
+  @Test
   public void testGetIntervalWithStartDate() {
 
     given()
@@ -226,6 +244,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
       .queryParam("firstResult", 10)
       .queryParam("startDate", DATE_FORMAT_WITH_TIMEZONE.format(new Date(0)))
       .queryParam("endDate", DATE_FORMAT_WITH_TIMEZONE.format(new Date(15 * 60 * 1000)))
+      .queryParam("aggregateByReporter", true)
       .queryParam("interval", 300)
       .then()
         .expect()
@@ -239,6 +258,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(meterQueryMock).limit(10);
     verify(meterQueryMock).startDate(new Date(0));
     verify(meterQueryMock).endDate(new Date(15 * 60 * 1000));
+    verify(meterQueryMock).aggregateByReporter();
     verify(meterQueryMock, times(1)).interval(300);
     verifyNoMoreInteractions(meterQueryMock);
   }

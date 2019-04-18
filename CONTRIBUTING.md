@@ -72,6 +72,31 @@ Best practices for writing test cases:
 * Create commit messages that adhere to our commit message style(see below).
 
 
+## License headers
+
+Every source file needs to contain the following license header at it's top:
+
+```
+Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+under one or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information regarding copyright
+ownership. Camunda licenses this file to you under the Apache License,
+Version 2.0; you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+The header can be added manually, it can be set through your IDE's settings so that it is added to new source files automatically, or by running `mvn clean install -Plicense-header-check`. The last option will run a License Header plugin that will go through all the source files and add a license header to the ones that don't have one. It will also re-format an incorrectly formatted license header.
+
+It should be noted that `Java` source files from a contribution, that do not contain a valid license header, will not be merged with the codebase.
+
 ## Commit Message Conventions
 
 > This page defines a convention for commit messages for [camundaBPM](http://camunda.org) related projects.

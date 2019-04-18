@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEntity">
@@ -84,28 +83,17 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
-  <update id="updateJobLogByRootProcessInstanceId_mysql"
+  <update id="updateJobLogByProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_JOB_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-      TIMESTAMP_ = TIMESTAMP_
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+    update ${prefix}ACT_HI_JOB_LOG
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateJobLogByBatchId"
           parameterType="java.util.Map">
       update ${prefix}ACT_HI_JOB_LOG set
       REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
-  </update>
-
-  <update id="updateJobLogByBatchId_mysql"
-          parameterType="java.util.Map">
-      update ${prefix}ACT_HI_JOB_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-      TIMESTAMP_ = TIMESTAMP_
 
       where JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
   </update>
@@ -316,7 +304,7 @@
   <sql id="selectHistoricJobLogByQueryCriteriaSql">
     from ${prefix}ACT_HI_JOB_LOG RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROCESS_DEF_KEY_, '*'))
     </if>
@@ -383,7 +371,7 @@
         </foreach>
       </if>
 
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <!-- incident exists in context of a process definition -->
         and (
           (RES.PROCESS_DEF_KEY_ is not null

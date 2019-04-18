@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,7 +17,6 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -51,13 +51,16 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   protected String batchId;
   protected String userId;
   protected String operationId;
+  protected String externalTaskId;
   protected String operationType;
   protected String entityType;
   protected String property;
+  protected String category;
   protected Date afterTimestamp;
   protected Date beforeTimestamp;
 
   protected String[] entityTypes;
+  protected String[] categories;
 
   public UserOperationLogQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
@@ -117,6 +120,9 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     if (operationId != null) {
       query.operationId(operationId);
     }
+    if (externalTaskId != null) {
+      query.externalTaskId(externalTaskId);
+    }
     if (operationType != null) {
       query.operationType(operationType);
     }
@@ -125,6 +131,12 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     }
     if (entityTypes != null) {
       query.entityTypeIn(entityTypes);
+    }
+    if (category != null) {
+      query.category(category);
+    }
+    if (categories != null) {
+      query.categoryIn(categories);
     }
     if (property != null) {
       query.property(property);
@@ -213,6 +225,11 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   public void setOperationId(String operationId) {
     this.operationId = operationId;
   }
+  
+  @CamundaQueryParam("externalTaskId")
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
+  }
 
   @CamundaQueryParam("operationType")
   public void setOperationType(String operationType) {
@@ -228,7 +245,17 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   public void setEntityTypeIn(String[] entityTypes) {
     this.entityTypes = entityTypes;
   }
+  
+  @CamundaQueryParam("category")
+  public void setcategory(String category) {
+    this.category = category;
+  }
 
+  @CamundaQueryParam(value = "categoryIn", converter = StringArrayConverter.class)
+  public void setCategoryIn(String[] categories) {
+    this.categories = categories;
+  }
+  
   @CamundaQueryParam("property")
   public void setProperty(String property) {
     this.property = property;

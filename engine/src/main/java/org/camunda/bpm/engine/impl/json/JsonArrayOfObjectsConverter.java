@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -18,8 +19,9 @@ package org.camunda.bpm.engine.impl.json;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.util.json.JSONArray;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonArray;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 /**
  * @author Thorben Lindhauer
@@ -32,21 +34,21 @@ public class JsonArrayOfObjectsConverter<T> extends JsonArrayConverter<List<T>> 
     this.objectConverter = objectConverter;
   }
 
-  public JSONArray toJsonArray(List<T> objects) {
-    JSONArray jsonArray = new JSONArray();
+  public JsonArray toJsonArray(List<T> objects) {
+    JsonArray jsonArray = JsonUtil.createArray();
 
     for (T object : objects) {
-      JSONObject jsonObject = objectConverter.toJsonObject(object);
-      jsonArray.put(jsonObject);
+      JsonElement jsonObject = objectConverter.toJsonObject(object);
+      jsonArray.add(jsonObject);
     }
 
     return jsonArray;
   }
 
-  public List<T> toObject(JSONArray jsonArray) {
+  public List<T> toObject(JsonArray jsonArray) {
     List<T> result = new ArrayList<T>();
-    for (int i = 0; i < jsonArray.length(); i++) {
-      T object = objectConverter.toObject(jsonArray.getJSONObject(i));
+    for (JsonElement jsonElement : jsonArray) {
+      T object = objectConverter.toObject(JsonUtil.getObject(jsonElement));
       result.add(object);
     }
 

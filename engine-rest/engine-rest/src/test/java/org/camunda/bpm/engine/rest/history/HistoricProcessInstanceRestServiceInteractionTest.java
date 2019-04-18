@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -22,9 +23,9 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
@@ -32,7 +33,6 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.JsonPathUtil;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -47,6 +47,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -67,9 +68,11 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   
   protected static final String DELETE_REASON = "deleteReason";
   protected static final String TEST_DELETE_REASON = "test";
+  protected static final String FAIL_IF_NOT_EXISTS = "failIfNotExists";
   protected static final String HISTORIC_PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/process-instance";
   protected static final String HISTORIC_SINGLE_PROCESS_INSTANCE_URL = HISTORIC_PROCESS_INSTANCE_URL + "/{id}";
   protected static final String DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL = HISTORIC_PROCESS_INSTANCE_URL + "/delete";
+  protected static final String HISTORIC_SINGLE_PROCESS_INSTANCE_VARIABLES_URL = HISTORIC_PROCESS_INSTANCE_URL + "/{id}/variable-instances";
 
   private HistoryService historyServiceMock;
 
@@ -166,6 +169,15 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   }
 
   @Test
+  public void testDeleteNonExistingProcessInstanceIfExists() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParam("failIfNotExists", false)
+    .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().delete(HISTORIC_SINGLE_PROCESS_INSTANCE_URL);
+    
+    verify(historyServiceMock).deleteHistoricProcessInstanceIfExists(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  @Test
   public void testDeleteProcessInstanceThrowsAuthorizationException() {
     String message = "expected exception";
     doThrow(new AuthorizationException(message)).when(historyServiceMock).deleteHistoricProcessInstance(anyString());
@@ -247,6 +259,32 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
         .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
+  }
+  
+  @Test
+  public void testDeleteAllVariablesByProcessInstanceId() {
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(HISTORIC_SINGLE_PROCESS_INSTANCE_VARIABLES_URL);
+
+    verify(historyServiceMock).deleteHistoricVariableInstancesByProcessInstanceId(EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+  
+  @Test
+  public void testDeleteAllVariablesForNonExistingProcessInstance() {
+    doThrow(new NotFoundException("No historic process instance found with id: 'NON_EXISTING_ID'"))
+    .when(historyServiceMock).deleteHistoricVariableInstancesByProcessInstanceId("NON_EXISTING_ID");
+    
+    given()
+      .pathParam("id", "NON_EXISTING_ID")
+    .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("No historic process instance found with id: 'NON_EXISTING_ID'"))
+    .when()
+      .delete(HISTORIC_SINGLE_PROCESS_INSTANCE_VARIABLES_URL);
   }
 
   protected void verifyBatchJson(String batchJson) {

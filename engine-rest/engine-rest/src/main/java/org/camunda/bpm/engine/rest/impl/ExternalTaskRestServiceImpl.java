@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -29,7 +30,6 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -133,8 +132,12 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   public BatchDto setRetriesAsync(SetRetriesForExternalTasksDto retriesDto) {
 
     UpdateExternalTaskRetriesBuilder builder = updateRetries(retriesDto);
-    int retries = retriesDto.getRetries();
+    Integer retries = retriesDto.getRetries();
 
+    if (retries == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "The number of retries cannot be null.");
+    }
+    
     try {
       Batch batch = builder.setAsync(retries);
       return BatchDto.fromBatch(batch);
@@ -152,8 +155,12 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   public void setRetries(SetRetriesForExternalTasksDto retriesDto){
 
     UpdateExternalTaskRetriesBuilder builder = updateRetries(retriesDto);
-    int retries = retriesDto.getRetries();
-
+    Integer retries = retriesDto.getRetries();
+    
+    if (retries == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "The number of retries cannot be null.");
+    }
+    
     try {
       builder.set(retries);
     }

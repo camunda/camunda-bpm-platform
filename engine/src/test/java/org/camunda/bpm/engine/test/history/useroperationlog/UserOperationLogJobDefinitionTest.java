@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -53,6 +54,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals(null, userOperationLogEntry.getOrgValue());
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
@@ -82,6 +85,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
 
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
         userOperationLogEntry.getOperationType());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertEquals("overridingPriority", userOperationLogEntry.getProperty());
     assertEquals("43", userOperationLogEntry.getNewValue());
@@ -117,6 +122,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals("42", userOperationLogEntry.getOrgValue());
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
@@ -133,20 +140,25 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     // when I set an overriding priority with cascade=true
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42, true);
 
-    // then there are two op log entries
-    assertEquals(2, historyService.createUserOperationLogQuery().count());
+    // then there are three op log entries
+    assertEquals(3, historyService.createUserOperationLogQuery().count());
 
-    // (1): One for the job definition priority
+    // (1): One for the process instance start
+    UserOperationLogEntry processInstanceStartOpLogEntry = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.PROCESS_INSTANCE).singleResult();
+    assertNotNull(processInstanceStartOpLogEntry);
+
+    // (2): One for the job definition priority
     UserOperationLogEntry jobDefOpLogEntry = historyService.createUserOperationLogQuery()
         .entityType(EntityTypes.JOB_DEFINITION).singleResult();
     assertNotNull(jobDefOpLogEntry);
 
-    // (2): and another one for the job priorities
+    // (3): and another one for the job priorities
     UserOperationLogEntry jobOpLogEntry = historyService.createUserOperationLogQuery()
         .entityType(EntityTypes.JOB).singleResult();
     assertNotNull(jobOpLogEntry);
 
-    assertEquals("both entries should be part of the same operation",
+    assertEquals("the two job related entries should be part of the same operation",
         jobDefOpLogEntry.getOperationId(), jobOpLogEntry.getOperationId());
 
     assertEquals(EntityTypes.JOB, jobOpLogEntry.getEntityType());
@@ -160,6 +172,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
         jobOpLogEntry.getOrgValue());
 
     assertEquals(USER_ID, jobOpLogEntry.getUserId());
+    
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, jobOpLogEntry.getCategory());
 
     // these properties should be there to narrow down the bulk update (like a SQL WHERE clasue)
     assertEquals(job.getJobDefinitionId(), jobOpLogEntry.getJobDefinitionId());

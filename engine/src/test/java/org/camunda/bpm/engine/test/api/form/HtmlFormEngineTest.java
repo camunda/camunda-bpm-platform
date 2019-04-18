@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -129,7 +130,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderStartForm.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderStartForm.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -145,7 +146,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderEnumField.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderEnumField.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -161,7 +162,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderTaskForm.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderTaskForm.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -173,7 +174,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateField.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateField.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -185,7 +186,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateFieldWithPattern.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateFieldWithPattern.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -201,7 +202,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupport.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupport.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -217,7 +218,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -233,7 +234,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportRequired.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportRequired.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -246,7 +247,7 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testBusinessKey.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testBusinessKey.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 

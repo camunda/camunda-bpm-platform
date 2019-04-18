@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -191,6 +192,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   protected Boolean withoutCandidateGroups;
   protected Boolean withCandidateUsers;
   protected Boolean withoutCandidateUsers;
+  
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
@@ -643,6 +647,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public void setCaseInstanceVariables(List<VariableQueryParameterDto> caseInstanceVariables) {
     this.caseInstanceVariables = caseInstanceVariables;
   }
+  
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesCaseInsensitive) {
+    this.variableNamesIgnoreCase = variableNamesCaseInsensitive;
+  }
+
+  @CamundaQueryParam(value ="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesCaseInsensitive) {
+    this.variableValuesIgnoreCase = variableValuesCaseInsensitive;
+  }
 
   @Override
   protected boolean isValidSortByValue(String value) {
@@ -969,6 +983,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public List<TaskQueryDto> getOrQueries() {
     return orQueries;
   }
+  
+  public Boolean isVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public Boolean isVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
+  }
 
   @Override
   protected void applyFilters(TaskQuery query) {
@@ -1222,6 +1244,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
     }
+    if(variableValuesIgnoreCase != null && variableValuesIgnoreCase) {
+      query.matchVariableValuesIgnoreCase();
+    }
+    if(variableNamesIgnoreCase != null && variableNamesIgnoreCase) {
+      query.matchVariableNamesIgnoreCase();
+    }
 
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
@@ -1300,7 +1328,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid case variable comparator specified: " + op);
         }
-
       }
     }
   }
@@ -1458,6 +1485,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.dueBefore = taskQuery.getDueBefore();
     dto.dueDate = taskQuery.getDueDate();
     dto.followUpAfter = taskQuery.getFollowUpAfter();
+    
+    dto.variableNamesIgnoreCase = taskQuery.isVariableNamesIgnoreCase();
+    dto.variableValuesIgnoreCase = taskQuery.isVariableValuesIgnoreCase();
 
     if (taskQuery.isFollowUpNullAccepted()) {
       dto.followUpBeforeOrNotExistent = taskQuery.getFollowUpBefore();
@@ -1698,5 +1728,4 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     return parameters;
   }
-
 }

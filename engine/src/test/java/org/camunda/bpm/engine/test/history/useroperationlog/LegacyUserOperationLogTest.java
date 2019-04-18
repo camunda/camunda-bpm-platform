@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -108,7 +109,8 @@ public class LegacyUserOperationLogTest {
       assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "serviceTaskCalled"));
 
       UserOperationLogQuery query = userOperationLogQuery().userId(USER_ID);
-      assertEquals(3, query.count());
+      assertEquals(4, query.count());
+      assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
       assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE).count());
       assertEquals(2, query.operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
 
@@ -132,10 +134,17 @@ public class LegacyUserOperationLogTest {
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "taskListenerCalled"));
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "serviceTaskCalled"));
 
-    assertEquals(4, userOperationLogQuery().count());
+    assertEquals(5, userOperationLogQuery().count());
     assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE).count());
     assertEquals(2, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
-    assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
+    assertEquals(1, userOperationLogQuery()
+            .entityType(EntityTypes.DEPLOYMENT)
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+            .count());
+    assertEquals(1, userOperationLogQuery()
+            .entityType(EntityTypes.PROCESS_INSTANCE)
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+            .count());
   }
 
   @Test
@@ -148,9 +157,16 @@ public class LegacyUserOperationLogTest {
     runtimeService.setVariable(processInstanceId, "aVariable", "aValue");
 
     // then
-    assertEquals(2, userOperationLogQuery().count());
+    assertEquals(3, userOperationLogQuery().count());
     assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
-    assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
+    assertEquals(1, userOperationLogQuery()
+            .entityType(EntityTypes.DEPLOYMENT)
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+            .count());
+    assertEquals(1, userOperationLogQuery()
+            .entityType(EntityTypes.PROCESS_INSTANCE)
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+            .count());
   }
 
   @Test
@@ -169,7 +185,7 @@ public class LegacyUserOperationLogTest {
       managementService.executeJob(pending.getId());
     }
 
-    assertEquals(4, userOperationLogQuery().count());
+    assertEquals(5, userOperationLogQuery().count());
   }
 
   @Test
@@ -200,10 +216,14 @@ public class LegacyUserOperationLogTest {
     managementService.executeJob(migrationJob.getId());
 
     // then
-    assertEquals(5, userOperationLogQuery().count());
+    assertEquals(7, userOperationLogQuery().count());
     assertEquals(2, userOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
         .entityType(EntityTypes.DEPLOYMENT)
+        .count());
+    assertEquals(1, userOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+        .entityType(EntityTypes.PROCESS_INSTANCE)
         .count());
     assertEquals(3, userOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_MIGRATE)

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,11 +16,16 @@
  */
 package org.camunda.bpm.engine.rest.sub.history.impl;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.AbstractResourceProvider;
 import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -68,6 +74,17 @@ public class HistoricVariableInstanceResourceImpl extends
   @Override
   protected String getResourceNameForErrorMessage() {
     return "Historic variable instance";
+  }
+  
+  @Override
+  public Response deleteVariableInstance() {
+    try {
+      getEngine().getHistoryService().deleteHistoricVariableInstance(id);
+    } catch (NotFoundException nfe) { // rewrite status code from bad request (400) to not found (404)
+      throw new InvalidRequestException(Status.NOT_FOUND, nfe, nfe.getMessage());
+    }
+    // return no content (204) since resource is deleted
+    return Response.noContent().build();
   }
 
 }

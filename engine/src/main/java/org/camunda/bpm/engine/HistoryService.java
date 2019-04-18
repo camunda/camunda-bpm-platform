@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,7 +16,9 @@
  */
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
@@ -61,9 +64,11 @@ import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -101,7 +106,15 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricDetail}s. */
   HistoricDetailQuery createHistoricDetailQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricVariableInstance}s. */
+  /**
+   * Creates a new programmatic query to search for {@link HistoricVariableInstance}s.
+   * <p>
+   * The result of the query is empty:
+   * <li>if the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION} or</li>
+   * <li>the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}
+   * in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission} is enabled.</li>
+   * </p>
+   */
   HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
   /** Creates a new programmatic query to search for {@link UserOperationLogEntry} instances. */
@@ -146,6 +159,16 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstance(String processInstanceId);
+  
+  /**
+   * Deletes historic process instance. All historic activities, historic task and
+   * historic details (variable updates, form properties) are deleted as well.
+   * Does not fail if a process instance was not found.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricProcessInstanceIfExists(String processInstanceId);
 
   /**
    * Deletes historic process instances. All historic activities, historic task and
@@ -157,6 +180,16 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstances(List<String> processInstanceIds);
+
+  /**
+   * Deletes historic process instances. All historic activities, historic task and
+   * historic details (variable updates, form properties) are deleted as well. Does not
+   * fail if a process instance was not found.
+   * 
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricProcessInstancesIfExists(List<String> processInstanceIds);
 
   /**
    * Deletes historic process instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
@@ -218,7 +251,8 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, String deleteReason);
 
@@ -229,7 +263,8 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(HistoricProcessInstanceQuery query, String deleteReason);
 
@@ -241,7 +276,8 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason);
 
@@ -325,7 +361,8 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, String deleteReason);
 
@@ -335,7 +372,8 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query, String deleteReason);
 
@@ -346,10 +384,37 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query, String deleteReason);
 
+  /**
+   * Deletes a historic variable instance by its id. All related historic
+   * details (variable updates, form properties) are deleted as well.
+   * 
+   * @param variableInstanceId
+   *          the id of the variable instance
+   * @throws BadUserRequestException
+   *           when the historic variable instance is not found by the given id
+   *           or if id is null
+   * @throws AuthorizationException
+   *           If the variable instance has a process definition key and
+   *           the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricVariableInstance(String variableInstanceId);
+  
+  /**
+   * Deletes all historic variables and historic details (variable updates, form properties) of a process instance.
+   *
+   * @param processInstanceId
+   *          the id of the process instance
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
+  
   /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL
    */
@@ -496,4 +561,23 @@ public interface HistoryService {
    * @since 7.7
    */
   String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId);
+
+  /**
+   * Set a removal time asynchronously to historic process instances and
+   * all associated historic entities using a fluent builder.
+   *
+   * Historic process instances can be specified by passing a query to
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#byQuery(HistoricProcessInstanceQuery)}.
+   *
+   * An absolute or no removal time can be specified via
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#removalTime(Date)}.
+   * Pass {@code null} to set no removal time.
+   *
+   * To create the batch and complete the configuration chain, call
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#executeAsync()}.
+   *
+   * @since 7.11
+   */
+  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder setRemovalTimeToHistoricProcessInstancesAsync();
+
 }

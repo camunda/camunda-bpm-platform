@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -103,6 +104,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected SuspensionState suspensionState;
   protected boolean initializeFormKeys = false;
   protected boolean taskNameCaseInsensitive = false;
+  
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
 
   protected String parentTaskId;
   protected boolean isTenantIdSet = false;
@@ -619,7 +623,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, true, false);
     return this;
   }
-
+  
   @Override
   public TaskQuery taskVariableValueLike(String variableName, String variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LIKE, true, false);
@@ -655,7 +659,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     addVariable(variableName, variableValue, QueryOperator.EQUALS, false, true);
     return this;
   }
-
+  
   @Override
   public TaskQuery processVariableValueNotEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, true);
@@ -1030,7 +1034,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       }
     }
   }
-
+  
   public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
     ensureNotNull("name", name);
 
@@ -1051,7 +1055,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         break;
       }
     }
-    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
+
+    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable, Boolean.TRUE.equals(variableNamesIgnoreCase), shouldMatchVariableValuesIgnoreCase));
   }
 
   protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
@@ -1585,6 +1591,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public boolean getIsTenantIdSet() {
     return isTenantIdSet;
+  }
+
+  public Boolean isVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public Boolean isVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
   }
 
   public List<TaskQueryImpl> getQueries() {
@@ -2153,4 +2167,21 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return queries.get(0);
   }
 
+  @Override
+  public TaskQuery matchVariableNamesIgnoreCase() {
+    this.variableNamesIgnoreCase = true;
+    for (TaskQueryVariableValue variable : this.variables) {
+      variable.setVariableNameIgnoreCase(true);
+    }
+    return this;
+  }
+
+  @Override
+  public TaskQuery matchVariableValuesIgnoreCase() {
+    this.variableValuesIgnoreCase = true;
+    for (TaskQueryVariableValue variable : this.variables) {
+      variable.setVariableValueIgnoreCase(true);
+    }
+    return this;
+  }
 }

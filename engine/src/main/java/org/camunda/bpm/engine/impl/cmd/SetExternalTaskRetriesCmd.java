@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,12 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -47,17 +47,22 @@ public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
 
   @Override
   protected void execute(ExternalTaskEntity externalTask) {
-    if (writeUserOperationLog) {
-      List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-      propertyChanges.add(new PropertyChange("retries", externalTask.getRetries(), retries));
-
-      Context.getCommandContext().getOperationLogManager()
-          .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES,
-              externalTask.getProcessInstanceId(),
-              externalTask.getProcessDefinitionId(),
-              externalTask.getProcessDefinitionKey(),
-              propertyChanges);
-    }
     externalTask.setRetriesAndManageIncidents(retries);
+  }
+  
+  @Override
+  protected String getUserOperationLogOperationType() {
+    if (writeUserOperationLog) {
+      return UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES;
+    }
+    return super.getUserOperationLogOperationType();
+  }
+  
+  @Override
+  protected List<PropertyChange> getUserOperationLogPropertyChanges(ExternalTaskEntity externalTask) {
+    if (writeUserOperationLog) {
+      return Collections.singletonList(new PropertyChange("retries", externalTask.getRetries(), retries));
+    }
+    return super.getUserOperationLogPropertyChanges(externalTask);
   }
 }

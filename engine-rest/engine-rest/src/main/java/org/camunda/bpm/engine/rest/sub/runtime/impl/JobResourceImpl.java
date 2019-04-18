@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -18,7 +19,6 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -102,6 +102,20 @@ public class JobResourceImpl implements JobResource {
       managementService.setJobDuedate(jobId, dto.getDuedate());
     } catch (AuthorizationException e) {
       throw e;
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+  }
+  
+  @Override
+  public void recalculateDuedate(boolean creationDateBased) {
+    try {
+      ManagementService managementService = engine.getManagementService();
+      managementService.recalculateJobDuedate(jobId, creationDateBased);
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch(NotFoundException e) {// rewrite status code from bad request (400) to not found (404)
+      throw new InvalidRequestException(Status.NOT_FOUND, e, e.getMessage());
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
     }

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.10.0</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -16,7 +16,7 @@
     <version.chromedriver>2.27</version.chromedriver>
 
     <!-- Needs to be updated after a new WildFly release (check support on Codehaus Cargo first) -->
-    <cargo.wildfly.container.id>wildfly14x</cargo.wildfly.container.id>
+    <cargo.wildfly.container.id>wildfly15x</cargo.wildfly.container.id>
 
     <redirect.test.output>true</redirect.test.output>
   </properties>
@@ -105,7 +105,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.3.6</version>
+      <version>4.5.7</version>
       <scope>test</scope>
     </dependency>
 

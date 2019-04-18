@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -17,6 +18,7 @@ package org.camunda.bpm.engine.runtime;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -153,7 +155,9 @@ public interface ProcessInstanceModificationBuilder extends
    * Execute all instructions asynchronously. Custom execution and task listeners, as well as task input output mappings
    * are executed.
    *
-   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   * @throws AuthorizationException
+   *              if the user has no {@link Permissions#CREATE} or
+   *              {@link BatchPermissions#CREATE_BATCH_MODIFY_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
    *
    * @return a batch job to be executed by the executor
    */
@@ -165,7 +169,9 @@ public interface ProcessInstanceModificationBuilder extends
    * @param skipIoMappings specifies whether input/output mappings for tasks should be invoked
    *   throughout the transaction when executing the instructions
    *
-   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   * @throws AuthorizationException
+   *               if the user has no {@link Permissions#CREATE} or
+   *               {@link BatchPermissions#CREATE_BATCH_MODIFY_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
    *
    * @return a batch job to be executed by the executor
    */

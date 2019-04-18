@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,10 +16,14 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  * @author Roman Smirnov
@@ -290,6 +295,76 @@ public class UserOperationLogWithoutUserTest extends PluggableProcessEngineTestC
 
     // then
     verifyNoUserOperationLogged();
+  }
+  
+  @Deployment(resources = PROCESS_PATH)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testDeleteHistoricVariable() {
+    // given
+    String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+    runtimeService.setVariable(id, "aVariable", "aValue");
+    runtimeService.deleteProcessInstance(id, "none");
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
+    String historicVariableId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
+    
+    // when
+    historyService.deleteHistoricVariableInstance(historicVariableId);
+
+    // then
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
+    verifyNoUserOperationLogged();
+  }
+  
+  @Deployment(resources = PROCESS_PATH)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testDeleteAllHistoricVariables() {
+    // given
+    String id = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+    runtimeService.setVariable(id, "aVariable", "aValue");
+    runtimeService.deleteProcessInstance(id, "none");
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
+    
+    // when
+    historyService.deleteHistoricVariableInstancesByProcessInstanceId(id);
+
+    // then
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
+    verifyNoUserOperationLogged();
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testQueryDeleteVariableHistoryOperationOnCase() {
+    // given
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+    caseService.setVariable(caseInstance.getId(), "myVariable", 1);
+    caseService.setVariable(caseInstance.getId(), "myVariable", 2);
+    caseService.setVariable(caseInstance.getId(), "myVariable", 3);
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    
+    // when
+    historyService.deleteHistoricVariableInstance(variableInstance.getId());
+
+    // then
+    verifyNoUserOperationLogged();
+  }
+  
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
+    // given
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskService.setVariable(task.getId(), "testVariable", "testValue");
+    taskService.setVariable(task.getId(), "testVariable", "testValue2");
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    
+    // when
+    historyService.deleteHistoricVariableInstance(variableInstance.getId());
+    
+    // then
+    verifyNoUserOperationLogged();
+    
+    taskService.deleteTask(task.getId(), true);
   }
 
   protected void verifyNoUserOperationLogged() {

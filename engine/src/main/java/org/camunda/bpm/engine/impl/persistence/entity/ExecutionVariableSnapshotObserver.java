@@ -1,8 +1,9 @@
 /*
- * Copyright 2016 camunda services GmbH.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -31,26 +32,34 @@ public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
 
   protected ExecutionEntity execution;
 
+  protected boolean localVariables = true;
+
   public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity) {
+    this(executionEntity, true);
+  }
+
+  public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity, boolean localVariables) {
     this.execution = executionEntity;
     this.execution.addExecutionObserver(this);
+    this.localVariables = localVariables;
   }
 
   @Override
   public void onClear(ExecutionEntity execution) {
-    if (variableSnapshot == null)
-    {
-      variableSnapshot = execution.getVariablesLocalTyped(false);
+    if (variableSnapshot == null) {
+      variableSnapshot = getVariables(this.localVariables);
     }
   }
 
   public VariableMap getVariables() {
-    if (variableSnapshot == null)
-    {
-      return execution.getVariablesLocalTyped(false);
-    }
-    else {
+    if (variableSnapshot == null) {
+      return getVariables(this.localVariables);
+    } else {
       return variableSnapshot;
     }
+  }
+  
+  private VariableMap getVariables(final boolean localVariables) {
+    return this.localVariables ? execution.getVariablesLocalTyped(false) : execution.getVariablesTyped(false);
   }
 }

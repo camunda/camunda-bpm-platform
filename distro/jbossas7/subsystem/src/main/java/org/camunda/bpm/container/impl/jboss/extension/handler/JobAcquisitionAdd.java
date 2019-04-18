@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2011, 2012 camunda services GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -29,11 +30,13 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VAL
 import java.util.List;
 import java.util.Locale;
 
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerJobExecutor;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.RuntimeContainerJobExecutor;
 import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
@@ -78,24 +81,9 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
 
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    String name = "default";
-    if (operation.hasDefined(NAME)) {
-      name = operation.get(NAME).asString();
+    for (AttributeDefinition attr : SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES) {
+      attr.validateAndSet(operation, model);
     }
-    model.get(NAME).set(name);
-
-    String acquisitionStrategy = "SEQUENTIAL";
-    if (operation.hasDefined(ACQUISITION_STRATEGY)) {
-      acquisitionStrategy = operation.get(ACQUISITION_STRATEGY).asString();
-    }
-    model.get(ACQUISITION_STRATEGY).set(acquisitionStrategy);
-
-    // retrieve all properties
-    ModelNode properties = new ModelNode();
-    if (operation.hasDefined(PROPERTIES)) {
-      properties = operation.get(PROPERTIES).asObject();
-    }
-    model.get(PROPERTIES).set(properties);
   }
 
   @Override
@@ -109,7 +97,7 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
 
     if (model.hasDefined(PROPERTIES)) {
 
-      List<Property> properties = model.get(PROPERTIES).asPropertyList();
+      List<Property> properties = SubsystemAttributeDefinitons.PROPERTIES.resolveModelAttribute(context, model).asPropertyList();
 
       for (Property property : properties) {
         String name = property.getName();

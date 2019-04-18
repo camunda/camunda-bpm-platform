@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -19,6 +20,7 @@ import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.application.impl.ProcessApplicationScriptEnvironment;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -51,6 +53,8 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   protected VariableSerializers variableSerializers;
 
   protected boolean isDeployed = false;
+
+  protected String defaultDeployToEngineName = ProcessEngines.NAME_DEFAULT;
 
   // deployment /////////////////////////////////////////////////////
 
@@ -127,7 +131,6 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     // allows to hook into the invocation
     return execute(callable);
   }
-
 
   public ClassLoader getProcessApplicationClassloader() {
     // the default implementation uses the classloader that loaded
@@ -223,4 +226,25 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     this.variableSerializers = variableSerializers;
   }
 
+  /**
+   * <p>Provides the default Process Engine name to deploy to, if no Process Engine
+   * was defined in <code>processes.xml</code>.</p>
+   *
+   * @return the default deploy-to Process Engine name.
+   *         The default value is "default".
+   */
+  public String getDefaultDeployToEngineName() {
+    return defaultDeployToEngineName;
+  }
+
+  /**
+   * <p>Programmatically set the name of the Process Engine to deploy to if no Process Engine
+   * is defined in <code>processes.xml</code>. This allows to circumvent the "default" Process
+   * Engine name and set a custom one.</p>
+   *
+   * @param defaultDeployToEngineName
+   */
+  protected void setDefaultDeployToEngineName(String defaultDeployToEngineName) {
+    this.defaultDeployToEngineName = defaultDeployToEngineName;
+  }
 }

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,7 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,10 +37,13 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -61,32 +67,126 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectUserOperationLogEntriesByQueryCriteria", query, page);
   }
 
+  public void addRemovalTimeToUserOperationLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+  
+    getDbEntityManager()
+      .updatePreserveOrder(UserOperationLogEntryEventEntity.class, "updateUserOperationLogByRootProcessInstanceId", parameters);
+  }
+
+  public void addRemovalTimeToUserOperationLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(UserOperationLogEntryEventEntity.class, "updateUserOperationLogByProcessInstanceId", parameters);
+  }
+
   public void deleteOperationLogEntryById(String entryId) {
     if (isHistoryEventProduced()) {
       getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntryById", entryId);
     }
   }
 
-  protected boolean isHistoryEventProduced() {
-    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    return historyLevel.isHistoryEventProduced(HistoryEventTypes.USER_OPERATION_LOG, null);
-  }
-
-  protected void fireUserOperationLog(final UserOperationLogContext context) {
-    if (context.getUserId() == null) {
-      context.setUserId(getAuthenticatedUserId());
+  public DbOperation deleteOperationLogByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("removalTime", removalTime);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
     }
-
-    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-      @Override
-      public List<HistoryEvent> createHistoryEvents(HistoryEventProducer producer) {
-        return producer.createUserOperationLogEvents(context);
-      }
-    });
+    parameters.put("batchSize", batchSize);
+  
+    return getDbEntityManager()
+      .deletePreserveOrder(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogByRemovalTime",
+        new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
   public void logUserOperations(UserOperationLogContext context) {
     if (isUserOperationLogEnabled()) {
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logUserOperation(IdentityOperationResult operationResult, String userId) {
+    logUserOperation(getOperationType(operationResult), userId);
+  }
+
+  public void logUserOperation(String operation, String userId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.USER)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN)
+            .propertyChanges(new PropertyChange("userId", null, userId));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logGroupOperation(IdentityOperationResult operationResult, String groupId) {
+    logGroupOperation(getOperationType(operationResult), groupId);
+  }
+
+  public void logGroupOperation(String operation, String groupId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.GROUP)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN)
+            .propertyChanges(new PropertyChange("groupId", null, groupId));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logTenantOperation(IdentityOperationResult operationResult, String tenantId) {
+    logTenantOperation(getOperationType(operationResult), tenantId);
+  }
+
+  public void logTenantOperation(String operation, String tenantId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TENANT)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN)
+            .propertyChanges(new PropertyChange("tenantId", null, tenantId));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logMembershipOperation(IdentityOperationResult operationResult, String userId, String groupId, String tenantId) {
+    logMembershipOperation(getOperationType(operationResult), userId, groupId, tenantId);
+  }
+
+  public void logMembershipOperation(String operation, String userId, String groupId, String tenantId) {
+    if (operation != null && isUserOperationLogEnabled()) {
+      String entityType = tenantId == null ? EntityTypes.GROUP_MEMBERSHIP : EntityTypes.TENANT_MEMBERSHIP;
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, entityType)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN);
+      List<PropertyChange> propertyChanges = new ArrayList<>();
+      if (userId != null) {
+        propertyChanges.add(new PropertyChange("userId", null, userId));
+      }
+      if (groupId != null) {
+        propertyChanges.add(new PropertyChange("groupId", null, groupId));
+      }
+      if (tenantId != null) {
+        propertyChanges.add(new PropertyChange("tenantId", null, tenantId));
+      }
+      entryBuilder.propertyChanges(propertyChanges);
+
+      context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
     }
   }
@@ -96,7 +196,22 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TASK)
+            .category(UserOperationLogEntry.CATEGORY_TASK_WORKER)
             .inContextOf(task, propertyChanges);
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logTaskOperations(String operation, String taskId, List<PropertyChange> propertyChanges, String operationCategory) {
+    if (isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TASK)
+          .propertyChanges(propertyChanges)
+          .taskId(taskId)
+          .category(operationCategory);
 
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
@@ -108,6 +223,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.IDENTITY_LINK)
+            .category(UserOperationLogEntry.CATEGORY_TASK_WORKER)
             .inContextOf(task, Arrays.asList(propertyChange));
 
       context.addEntry(entryBuilder.create());
@@ -124,7 +240,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
             .propertyChanges(propertyChanges)
             .processInstanceId(processInstanceId)
             .processDefinitionId(processDefinitionId)
-            .processDefinitionKey(processDefinitionKey);
+            .processDefinitionKey(processDefinitionKey)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if(processInstanceId != null) {
         ExecutionEntity instance = getProcessInstanceManager().findExecutionById(processInstanceId);
@@ -154,7 +271,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_DEFINITION)
             .propertyChanges(propertyChange)
             .processDefinitionId(processDefinitionId)
-            .processDefinitionKey(processDefinitionKey);
+            .processDefinitionKey(processDefinitionKey)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if (processDefinitionId != null) {
         ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
@@ -167,8 +285,43 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logCaseDefinitionOperation(String operation, String caseDefinitionId, List<PropertyChange> propertyChanges) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.CASE_DEFINITION)
+          .propertyChanges(propertyChanges)
+          .caseDefinitionId(caseDefinitionId)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logDecisionDefinitionOperation(String operation, List<PropertyChange> propertyChanges) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DECISION_DEFINITION)
+          .propertyChanges(propertyChanges)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
   public void logJobOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
       String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
+    logJobOperation(operation, jobId, jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey, 
+        Collections.singletonList(propertyChange));
+  }
+
+  public void logJobOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
+      String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
@@ -178,7 +331,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
             .jobDefinitionId(jobDefinitionId)
             .processDefinitionId(processDefinitionId)
             .processDefinitionKey(processDefinitionKey)
-            .propertyChanges(propertyChange);
+            .propertyChanges(propertyChanges)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if(jobId != null) {
         JobEntity job = getJobManager().findJobById(jobId);
@@ -224,7 +378,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
             .jobDefinitionId(jobDefinitionId)
             .processDefinitionId(processDefinitionId)
             .processDefinitionKey(processDefinitionKey)
-            .propertyChanges(propertyChange);
+            .propertyChanges(propertyChange)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       if(jobDefinitionId != null) {
         JobDefinitionEntity jobDefinition = getJobDefinitionManager().findById(jobDefinitionId);
@@ -253,6 +408,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.ATTACHMENT)
+            .category(UserOperationLogEntry.CATEGORY_TASK_WORKER)
             .inContextOf(task, Arrays.asList(propertyChange));
       context.addEntry(entryBuilder.create());
 
@@ -266,7 +422,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.ATTACHMENT)
-              .inContextOf(processInstance, Arrays.asList(propertyChange));
+            .category(UserOperationLogEntry.CATEGORY_TASK_WORKER)  
+            .inContextOf(processInstance, Arrays.asList(propertyChange));
       context.addEntry(entryBuilder.create());
 
       fireUserOperationLog(context);
@@ -284,12 +441,46 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
       if (executionId != null) {
         ExecutionEntity execution = getProcessInstanceManager().findExecutionById(executionId);
-        entryBuilder.inContextOf(execution);
+        entryBuilder.inContextOf(execution)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
       }
       else if (taskId != null) {
         TaskEntity task = getTaskManager().findTaskById(taskId);
-        entryBuilder.inContextOf(task, Arrays.asList(propertyChange));
+        entryBuilder.inContextOf(task, Arrays.asList(propertyChange))
+          .category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
       }
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logHistoricVariableOperation(String operation, HistoricProcessInstanceEntity historicProcessInstance, ResourceDefinitionEntity<?> definition, PropertyChange propertyChange) {
+    if(isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.VARIABLE)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR)
+            .propertyChanges(propertyChange)
+            .inContextOf(historicProcessInstance, definition, Arrays.asList(propertyChange));
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logHistoricVariableOperation(String operation, HistoricVariableInstanceEntity historicVariableInstance, ResourceDefinitionEntity<?> definition, PropertyChange propertyChange) {
+    if(isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.VARIABLE)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR)
+            .propertyChanges(propertyChange)
+            .inContextOf(historicVariableInstance, definition, Arrays.asList(propertyChange));
 
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
@@ -303,8 +494,9 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DEPLOYMENT)
-          .deploymentId(deploymentId)
-          .propertyChanges(propertyChanges);
+            .deploymentId(deploymentId)
+            .propertyChanges(propertyChanges)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
@@ -312,10 +504,96 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   }
 
+  public void logBatchOperation(String operation, String batchId, PropertyChange propertyChange) {
+    if(isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.BATCH)
+          .batchId(batchId)
+          .propertyChanges(propertyChange)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+  
+      context.addEntry(entryBuilder.create());
+  
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logDecisionInstanceOperation(String operation, List<PropertyChange> propertyChanges) {
+    if(isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DECISION_INSTANCE)
+          .propertyChanges(propertyChanges)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+  
+      context.addEntry(entryBuilder.create());
+  
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logExternalTaskOperation(String operation, ExternalTaskEntity externalTask, List<PropertyChange> propertyChanges) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.EXTERNAL_TASK)
+            .propertyChanges(propertyChanges)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      if (externalTask != null) {
+        ExecutionEntity instance = null;
+        ProcessDefinitionEntity definition = null;
+        if (externalTask.getProcessInstanceId() != null) {
+          instance = getProcessInstanceManager().findExecutionById(externalTask.getProcessInstanceId());
+        } else if (externalTask.getProcessDefinitionId() != null) {
+          definition = getProcessDefinitionManager().findLatestProcessDefinitionById(externalTask.getProcessDefinitionId());
+        }
+        entryBuilder.processInstanceId(externalTask.getProcessInstanceId())
+          .processDefinitionId(externalTask.getProcessDefinitionId())
+          .processDefinitionKey(externalTask.getProcessDefinitionKey())
+          .inContextOf(externalTask, instance, definition);
+      }
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
+  public void logAuthorizationOperation(String operation, AuthorizationEntity authorization) {
+    if (isUserOperationLogEnabled()) {
+      List<PropertyChange> propertyChanges = new ArrayList<>();
+      propertyChanges.add(new PropertyChange("permissions", null, authorization.getPermissions()));
+      propertyChanges.add(new PropertyChange("type", null, authorization.getAuthorizationType()));
+      propertyChanges.add(new PropertyChange("resource", null, ResourceTypeUtil.getResourceByType(authorization.getResourceType()).resourceName()));
+      propertyChanges.add(new PropertyChange("resourceId", null, authorization.getResourceId()));
+      if (authorization.getUserId() != null) {
+        propertyChanges.add(new PropertyChange("userId", null, authorization.getUserId()));
+      }
+      if (authorization.getGroupId() != null) {
+        propertyChanges.add(new PropertyChange("groupId", null, authorization.getGroupId()));
+      }
+      
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.AUTHORIZATION)
+            .propertyChanges(propertyChanges)
+            .category(UserOperationLogEntry.CATEGORY_ADMIN);
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+
   public boolean isUserOperationLogEnabled() {
     return isHistoryEventProduced() &&
         ((isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) ||
             !writeUserOperationLogOnlyWithLoggedInUser());
+  }
+
+  protected boolean isHistoryEventProduced() {
+    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    return historyLevel.isHistoryEventProduced(HistoryEventTypes.USER_OPERATION_LOG, null);
   }
 
   protected boolean isUserAuthenticated() {
@@ -328,6 +606,19 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     return commandContext.getAuthenticatedUserId();
   }
 
+  protected void fireUserOperationLog(final UserOperationLogContext context) {
+    if (context.getUserId() == null) {
+      context.setUserId(getAuthenticatedUserId());
+    }
+  
+    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+      @Override
+      public List<HistoryEvent> createHistoryEvents(HistoryEventProducer producer) {
+        return producer.createUserOperationLogEvents(context);
+      }
+    });
+  }
+
   protected boolean writeUserOperationLogOnlyWithLoggedInUser() {
     return Context.getCommandContext().isRestrictUserOperationLogToAuthenticatedUsers();
   }
@@ -336,54 +627,19 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     return Context.getCommandContext().isUserOperationLogEnabled();
   }
 
-  public void logBatchOperation(String operation, String batchId, PropertyChange propertyChange) {
-    if(isUserOperationLogEnabled()) {
-      UserOperationLogContext context = new UserOperationLogContext();
-      UserOperationLogContextEntryBuilder entryBuilder =
-        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.BATCH)
-          .batchId(batchId)
-          .propertyChanges(propertyChange);
-
-      context.addEntry(entryBuilder.create());
-
-      fireUserOperationLog(context);
+  protected String getOperationType(IdentityOperationResult operationResult) {
+    switch (operationResult.getOperation()) {
+    case IdentityOperationResult.OPERATION_CREATE:
+      return UserOperationLogEntry.OPERATION_TYPE_CREATE;
+    case IdentityOperationResult.OPERATION_UPDATE:
+      return UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+    case IdentityOperationResult.OPERATION_DELETE:
+      return UserOperationLogEntry.OPERATION_TYPE_DELETE;
+    case IdentityOperationResult.OPERATION_UNLOCK:
+      return UserOperationLogEntry.OPERATION_TYPE_UNLOCK;
+    default:
+      return null;
     }
-  }
-
-  public void logDecisionInstanceOperation(String operation, List<PropertyChange> propertyChanges) {
-    if(isUserOperationLogEnabled()) {
-      UserOperationLogContext context = new UserOperationLogContext();
-      UserOperationLogContextEntryBuilder entryBuilder =
-        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DECISION_INSTANCE)
-          .propertyChanges(propertyChanges);
-
-      context.addEntry(entryBuilder.create());
-
-      fireUserOperationLog(context);
-    }
-  }
-
-  public void addRemovalTimeToUserOperationLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
-    parameters.put("removalTime", removalTime);
-
-    getDbEntityManager()
-      .updatePreserveOrder(UserOperationLogEntryEventEntity.class, "updateUserOperationLogByRootProcessInstanceId", parameters);
-  }
-
-  public DbOperation deleteOperationLogByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("removalTime", removalTime);
-    if (minuteTo - minuteFrom + 1 < 60) {
-      parameters.put("minuteFrom", minuteFrom);
-      parameters.put("minuteTo", minuteTo);
-    }
-    parameters.put("batchSize", batchSize);
-
-    return getDbEntityManager()
-      .deletePreserveOrder(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogByRemovalTime",
-        new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }

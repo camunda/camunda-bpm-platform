@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -79,8 +80,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.apache.commons.lang.time.DateUtils.addDays;
-import static org.apache.commons.lang.time.DateUtils.addMinutes;
+import static org.apache.commons.lang3.time.DateUtils.addDays;
+import static org.apache.commons.lang3.time.DateUtils.addMinutes;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
@@ -144,6 +145,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     engineConfiguration.setBatchOperationHistoryTimeToLive(null);
     engineConfiguration.setBatchOperationsForHistoryCleanup(null);
+    
+    engineConfiguration.setHistoryTimeToLive(null);
 
     engineConfiguration.initHistoryCleanup();
 
@@ -207,6 +210,12 @@ public class HistoryCleanupRemovalTimeTest {
       .callActivity()
         .calledElement(PROCESS_KEY)
     .endEvent().done();
+  
+  protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
+      .startEvent()
+        .callActivity()
+          .calledElement(PROCESS_KEY)
+      .endEvent().done();
 
   protected final String CALLING_PROCESS_CALLS_DMN_KEY = "callingProcessCallsDmn";
   protected final BpmnModelInstance CALLING_PROCESS_CALLS_DMN = Bpmn.createExecutableProcess(CALLING_PROCESS_CALLS_DMN_KEY)
@@ -410,6 +419,80 @@ public class HistoryCleanupRemovalTimeTest {
   public void shouldCleanupProcessInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.complete(taskId);
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // assume
+    assertThat(historicProcessInstances.size(), is(1));
+
+    Date removalTime = addDays(END_DATE, 5);
+    ClockUtil.setCurrentTime(removalTime);
+
+    // when
+    runHistoryCleanup();
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // then
+    assertThat(historicProcessInstances.size(), is(0));
+  }
+  
+  @Test
+  public void shouldNotCleanupProcessInstanceWithoutTTL() {
+    // given
+    testRule.deploy(CALLING_PROCESS_WO_TTL);
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+
+    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.complete(taskId);
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // assume
+    assertThat(historicProcessInstances.size(), is(1));
+
+    Date removalTime = addDays(END_DATE, 5);
+    ClockUtil.setCurrentTime(removalTime);
+
+    // when
+    runHistoryCleanup();
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey(PROCESS_KEY)
+      .list();
+
+    // then
+    assertThat(historicProcessInstances.size(), is(1));
+  }
+  
+  @Test
+  public void shouldCleanupProcessInstanceWithoutTTLWithConfigDefault() {
+    // given
+    engineConfiguration.setHistoryTimeToLive("5");
+    
+    testRule.deploy(CALLING_PROCESS_WO_TTL);
 
     testRule.deploy(PROCESS);
 
@@ -2142,7 +2225,7 @@ public class HistoryCleanupRemovalTimeTest {
   // report tests //////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @Test
-  public void shouldSeeCleanableProcessInstances() {
+  public void shouldSeeCleanableButNoFinishedProcessInstancesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
@@ -2165,10 +2248,39 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableProcessInstanceCount(), is(5L));
+    assertThat(report.getFinishedProcessInstanceCount(), is(0L));
   }
 
   @Test
-  public void shouldNotSeeCleanableProcessInstances() {
+  public void shouldSeeFinishedButNoCleanableProcessInstancesInReport() {
+    // given
+    engineConfiguration
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
+      .initHistoryRemovalTime();
+
+    testRule.deploy(PROCESS);
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+
+      String taskId = taskService.createTaskQuery().singleResult().getId();
+      taskService.complete(taskId);
+    }
+
+    // when
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
+      .compact()
+      .singleResult();
+
+    // then
+    assertThat(report.getFinishedProcessInstanceCount(), is(5L));
+    assertThat(report.getCleanableProcessInstanceCount(), is(0L));
+  }
+
+  @Test
+  public void shouldNotSeeCleanableProcessInstancesReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
@@ -2197,7 +2309,7 @@ public class HistoryCleanupRemovalTimeTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
-  public void shouldSeeCleanableDecisionInstances() {
+  public void shouldSeeCleanableDecisionInstancesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
@@ -2224,13 +2336,14 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableDecisionInstanceCount(), is(5L));
+    assertThat(report.getFinishedDecisionInstanceCount(), is(5L));
   }
 
   @Test
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
-  public void shouldNotSeeCleanableDecisionInstances() {
+  public void shouldNotSeeCleanableDecisionInstancesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
@@ -2257,10 +2370,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableDecisionInstanceCount(), is(0L));
+    assertThat(report.getFinishedDecisionInstanceCount(), is(5L));
   }
 
   @Test
-  public void shouldSeeCleanableBatches() {
+  public void shouldSeeCleanableBatchesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
@@ -2284,13 +2398,14 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableBatchesCount(), is(1L));
+    assertThat(report.getFinishedBatchesCount(), is(0L));
 
     // cleanup
     managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
-  public void shouldNotSeeCleanableBatches() {
+  public void shouldNotSeeCleanableBatchesInReport() {
     // given
     engineConfiguration
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
@@ -2314,6 +2429,7 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(report.getCleanableBatchesCount(), is(0L));
+    assertThat(report.getFinishedBatchesCount(), is(0L));
 
     // cleanup
     managementService.deleteBatch(batch.getId(), true);

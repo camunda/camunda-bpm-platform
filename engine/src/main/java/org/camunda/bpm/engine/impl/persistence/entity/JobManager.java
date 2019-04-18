@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -94,7 +95,7 @@ public class JobManager extends AbstractManager {
   }
 
   public void reschedule(JobEntity jobEntity, Date newDuedate) {
-    jobEntity.init(Context.getCommandContext());
+    ((EverLivingJobEntity)jobEntity).init(Context.getCommandContext(), true);
     jobEntity.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
     jobEntity.setDuedate(newDuedate);
     hintJobExecutorIfNeeded(jobEntity, newDuedate);
@@ -169,6 +170,7 @@ public class JobManager extends AbstractManager {
     Map<String,Object> params = new HashMap<String, Object>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
+    params.put("alwaysSetDueDate", isEnsureJobDueDateNotNull());
     params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
     if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
@@ -351,4 +353,7 @@ public class JobManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
+  protected boolean isEnsureJobDueDateNotNull() {
+    return Context.getProcessEngineConfiguration().isEnsureJobDueDateNotNull();
+  }
 }

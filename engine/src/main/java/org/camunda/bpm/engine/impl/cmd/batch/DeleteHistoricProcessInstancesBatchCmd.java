@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd.batch;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -43,9 +45,7 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
   protected List<String> historicProcessInstanceIds;
   protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
 
-  public DeleteHistoricProcessInstancesBatchCmd(
-      List<String> historicProcessInstanceIds,
-      HistoricProcessInstanceQuery historicProcessInstanceQuery,
+  public DeleteHistoricProcessInstancesBatchCmd(List<String> historicProcessInstanceIds, HistoricProcessInstanceQuery historicProcessInstanceQuery,
       String deleteReason) {
     super();
     this.historicProcessInstanceIds = historicProcessInstanceIds;
@@ -81,7 +81,7 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
     List<String> processInstanceIds = collectHistoricProcessInstanceIds();
 
     ensureNotEmpty(BadUserRequestException.class, "historicProcessInstanceIds", processInstanceIds);
-    checkAuthorizations(commandContext);
+    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES);
     writeUserOperationLog(commandContext,
         deleteReason,
         processInstanceIds.size(),
@@ -106,15 +106,12 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
                                        boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-        null,
-        numInstances));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
-    propertyChanges.add(new PropertyChange("type", null, "history"));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
     commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
             null,
             null,
             null,
@@ -123,7 +120,7 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
 
   @Override
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new BatchConfiguration(processInstanceIds);
+    return new BatchConfiguration(processInstanceIds, false);
   }
 
   @Override

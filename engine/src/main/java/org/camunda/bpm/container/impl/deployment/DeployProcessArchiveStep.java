@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -37,6 +38,7 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -78,7 +80,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
     final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();
 
-    ProcessEngine processEngine = getProcessEngine(serviceContainer);
+    ProcessEngine processEngine = getProcessEngine(serviceContainer, processApplication.getDefaultDeployToEngineName());
 
     // start building deployment map
     Map<String, byte[]> deploymentMap = new HashMap<String, byte[]>();
@@ -186,8 +188,9 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
   public void cancelOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
+    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
 
-    ProcessEngine processEngine = getProcessEngine(serviceContainer);
+    ProcessEngine processEngine = getProcessEngine(serviceContainer, processApplication.getDefaultDeployToEngineName());
 
     // if a registration was performed, remove it.
     if (deployment != null && deployment.getProcessApplicationRegistration() != null) {
@@ -205,6 +208,10 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
   }
 
   protected ProcessEngine getProcessEngine(final PlatformServiceContainer serviceContainer) {
+    return getProcessEngine(serviceContainer, ProcessEngines.NAME_DEFAULT);
+  }
+
+  protected ProcessEngine getProcessEngine(final PlatformServiceContainer serviceContainer, String defaultDeployToProcessEngineName) {
     String processEngineName = processArchive.getProcessEngineName();
     if (processEngineName != null) {
       ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
@@ -213,7 +220,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       return processEngine;
 
     } else {
-      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, "default");
+      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, defaultDeployToProcessEngineName);
       ensureNotNull("Cannot deploy process archive '" + processArchive.getName() + "' to default process: no such process engine exists", "processEngine",
           processEngine);
       return processEngine;

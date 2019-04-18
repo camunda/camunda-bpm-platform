@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -54,6 +55,12 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   public void deleteHistoricDetailsByTaskCaseInstanceIds(List<String> historicCaseInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskCaseInstanceIds", historicCaseInstanceIds);
+    deleteHistoricDetails(parameters);
+  }
+  
+  public void deleteHistoricDetailsByVariableInstanceId(String historicVariableInstanceId) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("variableInstanceId", historicVariableInstanceId);
     deleteHistoricDetails(parameters);
   }
 
@@ -111,6 +118,15 @@ public class HistoricDetailManager extends AbstractHistoricManager {
 
     getDbEntityManager()
       .updatePreserveOrder(HistoricDetailEventEntity.class, "updateHistoricDetailsByRootProcessInstanceId", parameters);
+  }
+
+  public void addRemovalTimeToDetailsByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDetailEventEntity.class, "updateHistoricDetailsByProcessInstanceId", parameters);
   }
 
   public DbOperation deleteHistoricDetailsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {

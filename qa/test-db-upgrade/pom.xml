@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.10.0</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -18,7 +18,7 @@
          See CAM-6338
     -->
     <camunda.version.old>
-      7.9.0
+      7.10.0
     </camunda.version.old>
   </properties>
 
@@ -357,6 +357,7 @@
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
 
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+                <exclude>**/ProcessDiagramParseTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -408,6 +409,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
@@ -452,6 +459,12 @@
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
       <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

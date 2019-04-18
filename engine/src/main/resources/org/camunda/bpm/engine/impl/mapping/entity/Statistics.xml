@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionStatisticsEntity">
@@ -203,7 +202,7 @@
 
         ) RES
 
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
         AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, RES.KEY_, '*'))      
       </if>
@@ -266,7 +265,7 @@
                       EXECUTION.ID_ = EXECUTION.PROC_INST_ID_
                       and EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
 
-                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+                    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" collection="processInstancePermissionChecks" separator=",">
@@ -300,7 +299,7 @@
                   where
                       RETRIES_ = 0
 
-                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+                    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" collection="jobPermissionChecks" separator=",">
@@ -340,7 +339,7 @@
                       and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
                       </if>
 
-                      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+                      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" collection="incidentPermissionChecks" separator=",">
@@ -421,7 +420,7 @@
          from
           ${prefix}ACT_RU_EXECUTION E
 
-        <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authUserId != null">
         inner join
             ${prefix}ACT_RE_PROCDEF P
         on
@@ -480,7 +479,7 @@
                       distinct E.ACT_ID_
                   from
                       ${prefix}ACT_RU_EXECUTION E
-                  <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                  <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authUserId != null">
                   inner join
                       ${prefix}ACT_RE_PROCDEF P
                   on
@@ -517,7 +516,7 @@
                       on
                           JOB.JOB_DEF_ID_ = JOBDEF.ID_
 
-                      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !revokeAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !revokeAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                         <bind name="atomicChecks" value="jobPermissionChecks" />
                         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
                         AUTH ON (AUTH.RESOURCE_ID_ in (JOB.PROCESS_INSTANCE_ID_, JOB.PROCESS_DEF_KEY_, '*'))
@@ -539,7 +538,7 @@
                       from
                           ${prefix}ACT_RU_INCIDENT I
 
-                      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+                      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
                       inner join
                           ${prefix}ACT_RE_PROCDEF PROCDEF
                       on
@@ -576,7 +575,7 @@
                    , count(distinct E.ID_) as INSTANCE_COUNT_
                    from
                     ${prefix}ACT_RU_EXECUTION E
-                  <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+                  <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
                   inner join
                       ${prefix}ACT_RE_PROCDEF P
                   on
@@ -618,7 +617,7 @@
                 on
                     JOB.JOB_DEF_ID_ = JOBDEF.ID_
 
-                <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !revokeAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !revokeAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                   <bind name="atomicChecks" value="jobPermissionChecks" />
                   <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
                   AUTH ON (AUTH.RESOURCE_ID_ in (JOB.PROCESS_INSTANCE_ID_, JOB.PROCESS_DEF_KEY_, '*'))
@@ -650,7 +649,7 @@
                 , count(distinct I.ID_) as INCIDENT_COUNT_
               from
                   ${prefix}ACT_RU_INCIDENT I
-              <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+              <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
               inner join
                   ${prefix}ACT_RE_PROCDEF PROCDEF
               on
@@ -680,7 +679,7 @@
   </sql>
 
   <sql id="acitivityStatisticsAuthorizationCheck">
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       <choose>
         <when test="authCheck.revokeAuthorizationCheckEnabled">
           and

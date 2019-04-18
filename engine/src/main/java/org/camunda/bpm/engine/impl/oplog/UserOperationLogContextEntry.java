@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -42,7 +43,9 @@ public class UserOperationLogContextEntry {
   protected String jobDefinitionId;
   protected String jobId;
   protected String batchId;
+  protected String category;
   protected String rootProcessInstanceId;
+  protected String externalTaskId;
 
   public UserOperationLogContextEntry(String operationType, String entityType) {
     this.operationType = operationType;
@@ -169,12 +172,28 @@ public class UserOperationLogContextEntry {
     this.batchId = batchId;
   }
 
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
   public String getRootProcessInstanceId() {
     return rootProcessInstanceId;
   }
 
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+  
+  public String getExternalTaskId() {
+    return externalTaskId;
+  }
+  
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
   }
 
 }

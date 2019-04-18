@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -433,6 +434,16 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike);
 
   /**
+   * All queries for task-, process- and case-variables will match the variable names in a case-insensitive way.
+   */
+  TaskQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * All queries for task-, process- and case-variables will match the variable values in a case-insensitive way.
+   */
+  TaskQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select tasks which have a local task variable with the given name
    * set to the given value.
    */
@@ -559,7 +570,6 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * starts with (string%), ends with (%string) or contains (%string%).
    */
   TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue);
-
 
   /**
    * Only select tasks which are part of a case instance that have a variable

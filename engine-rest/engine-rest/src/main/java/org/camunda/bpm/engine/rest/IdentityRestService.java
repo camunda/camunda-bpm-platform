@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -16,7 +17,7 @@
 package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
-import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.identity.PasswordDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 
@@ -45,4 +46,14 @@ public interface IdentityRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   AuthenticationResult verifyUser(BasicUserCredentialsDto credentialsDto);
 
+  @GET
+  @Path("/password-policy")
+  @Produces(MediaType.APPLICATION_JSON)
+  Response getPasswordPolicy();
+
+  @POST
+  @Path("/password-policy")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  Response checkPassword(PasswordDto password);
 }

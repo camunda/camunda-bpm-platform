@@ -1,20 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-	/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -32,6 +21,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.ReportResult;
@@ -168,10 +158,8 @@ import java.util.List;
     }
 
     try {
-      Batch batch = historyService.deleteHistoricProcessInstancesAsync(
-          dto.getHistoricProcessInstanceIds(),
-          historicProcessInstanceQuery,
-          dto.getDeleteReason());
+      Batch batch;
+      batch = historyService.deleteHistoricProcessInstancesAsync(dto.getHistoricProcessInstanceIds(), historicProcessInstanceQuery, dto.getDeleteReason());
       return BatchDto.fromBatch(batch);
 
     } catch (BadUserRequestException e) {
@@ -193,5 +181,16 @@ import java.util.List;
     MultivaluedMap<String,String> queryParameters = uriInfo.getQueryParameters();
     String reportType = queryParameters.getFirst("reportType");
     return ReportResultToCsvConverter.convertReportResult(reports, reportType);
+  }
+  
+  @Override
+  public Response deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
+    try {
+      processEngine.getHistoryService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+    } catch (NotFoundException nfe) { // rewrite status code from bad request (400) to not found (404)
+      throw new InvalidRequestException(Status.NOT_FOUND, nfe.getMessage());
+    }
+    // return no content (204) since resource is deleted
+    return Response.noContent().build();
   }
 }

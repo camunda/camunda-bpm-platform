@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -69,6 +70,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean active;
   private Boolean suspended;
   private Set<String> processInstanceIds;
+  private Boolean hasIncident;
   private String incidentId;
   private String incidentType;
   private String incidentMessage;
@@ -77,6 +79,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean withoutTenantId;
   private List<String> activityIds;
   private Boolean rootProcessInstances;
+  private Boolean isProcessDefinitionWithoutTenantId;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -214,6 +217,15 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.variables = variables;
   }
 
+  public Boolean isHasIncident() {
+    return hasIncident;
+  }
+
+  @CamundaQueryParam(value = "hasIncident", converter = BooleanConverter.class)
+  public void setHasIncident(Boolean hasIncident) {
+    this.hasIncident = hasIncident;
+  }
+
   public String getIncidentId() {
     return incidentId;
   }
@@ -286,6 +298,15 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.rootProcessInstances = rootProcessInstances;
   }
 
+  public Boolean isProcessDefinitionWithoutTenantId() {
+    return isProcessDefinitionWithoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionWithoutTenantId", converter = BooleanConverter.class)
+  public void setProcessDefinitionWithoutTenantId(Boolean isProcessDefinitionWithoutTenantId) {
+    this.isProcessDefinitionWithoutTenantId = isProcessDefinitionWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -313,6 +334,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (businessKeyLike != null) {
       query.processInstanceBusinessKeyLike(businessKeyLike);
+    }
+    if(TRUE.equals(hasIncident)) {
+      query.hasIncident();
     }
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
@@ -361,6 +385,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (TRUE.equals(rootProcessInstances)) {
       query.rootProcessInstances();
+    }
+    if (TRUE.equals(isProcessDefinitionWithoutTenantId)) {
+      query.processDefinitionWithoutTenantId();
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

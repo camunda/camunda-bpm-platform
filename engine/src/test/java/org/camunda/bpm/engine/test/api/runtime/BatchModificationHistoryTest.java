@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,15 +15,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.api.runtime;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -46,7 +38,22 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+@RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class BatchModificationHistoryTest {
 
@@ -54,18 +61,31 @@ public class BatchModificationHistoryTest {
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
   protected BatchModificationHelper helper = new BatchModificationHelper(rule);
 
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+  protected BpmnModelInstance instance;
+
+  private int defaultBatchJobsPerSeed;
+  private int defaultInvocationsPerBatchJob;
+  private boolean defaultEnsureJobDueDateSet;
+
+  protected static final Date START_DATE = new Date(1457326800000L);
+
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
 
-  protected RuntimeService runtimeService;
-  protected BpmnModelInstance instance;
-  private int defaultBatchJobsPerSeed;
-  private int defaultInvocationsPerBatchJob;
-  protected static final Date START_DATE = new Date(1457326800000L);
+  @Parameterized.Parameter(0)
+  public boolean ensureJobDueDateSet;
 
-  @Before
-  public void initServices() {
-    runtimeService = rule.getRuntimeService();
+  @Parameterized.Parameter(1)
+  public Date currentTime;
+
+  @Parameterized.Parameters(name = "Job DueDate is set: {0}")
+  public static Collection<Object[]> scenarios() throws ParseException {
+    return Arrays.asList(new Object[][] {
+      { false, null },
+      { true, START_DATE }
+    });
   }
 
   @Before
@@ -84,23 +104,18 @@ public class BatchModificationHistoryTest {
         .done();
   }
 
-  @After
-  public void resetClock() {
-    ClockUtil.reset();
+  @Before
+  public void initServices() {
+    runtimeService = rule.getRuntimeService();
   }
 
   @Before
   public void storeEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
-    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
-    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
-  }
-
-  @After
-  public void restoreEngineSettings() {
-    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
-    configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
-    configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+    processEngineConfiguration = rule.getProcessEngineConfiguration();
+    defaultBatchJobsPerSeed = processEngineConfiguration.getBatchJobsPerSeed();
+    defaultInvocationsPerBatchJob = processEngineConfiguration.getInvocationsPerBatchJob();
+    defaultEnsureJobDueDateSet = processEngineConfiguration.isEnsureJobDueDateNotNull();
+    processEngineConfiguration.setEnsureJobDueDateNotNull(ensureJobDueDateSet);
   }
 
   @After
@@ -111,6 +126,18 @@ public class BatchModificationHistoryTest {
   @After
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
+  }
+
+  @After
+  public void restoreEngineSettings() {
+    processEngineConfiguration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    processEngineConfiguration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+    processEngineConfiguration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
+  }
+
+  @After
+  public void resetClock() {
+    ClockUtil.reset();
   }
 
   @Test
@@ -169,7 +196,7 @@ public class BatchModificationHistoryTest {
     assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     // when the seed job is executed
     Date executionDate = helper.addSecondsToClock(12);
@@ -186,7 +213,7 @@ public class BatchModificationHistoryTest {
     assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
   }
 
@@ -207,7 +234,7 @@ public class BatchModificationHistoryTest {
     assertCommonMonitorJobLogProperties(batch, jobLog);
     assertTrue(jobLog.isCreationLog());
     assertEquals(START_DATE, jobLog.getTimestamp());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     // when the monitor job is executed
     Date executionDate = helper.addSecondsToClock(15);
@@ -222,7 +249,7 @@ public class BatchModificationHistoryTest {
     assertCommonMonitorJobLogProperties(batch, jobLog);
     assertTrue(jobLog.isSuccessLog());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     // and a creation job log for the new monitor job was created with due date
     monitorJob = helper.getMonitorJob(batch);
@@ -272,7 +299,7 @@ public class BatchModificationHistoryTest {
     assertEquals(processDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(currentTime, jobLog.getJobDueDate());
 
     jobLog = helper.getHistoricBatchJobLog(batch).get(1);
     assertNotNull(jobLog);
@@ -284,7 +311,7 @@ public class BatchModificationHistoryTest {
     assertEquals(processDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
-    assertNull(jobLog.getJobDueDate());
+    assertEquals(currentTime, jobLog.getJobDueDate());
   }
 
   @Test

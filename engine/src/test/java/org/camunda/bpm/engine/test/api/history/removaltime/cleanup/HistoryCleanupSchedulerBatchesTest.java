@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -36,8 +37,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static org.apache.commons.lang.time.DateUtils.addDays;
-import static org.apache.commons.lang.time.DateUtils.addSeconds;
+import static org.apache.commons.lang3.time.DateUtils.addDays;
+import static org.apache.commons.lang3.time.DateUtils.addSeconds;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration.START_DELAY;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -107,7 +108,7 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY).getId();
 
     for (int i = 0; i < 5; i++) {
-      String processInstanceId = runtimeService.createProcessInstanceQuery().list().get(0).getId();
+      String processInstanceId = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list().get(0).getId();
       runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
       ClockUtil.setCurrentTime(END_DATE);
@@ -149,7 +150,7 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY).getId();
 
     for (int i = 0; i < 5; i++) {
-      String processInstanceId = runtimeService.createProcessInstanceQuery().list().get(0).getId();
+        String processInstanceId = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list().get(0).getId();
       runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
       ClockUtil.setCurrentTime(END_DATE);

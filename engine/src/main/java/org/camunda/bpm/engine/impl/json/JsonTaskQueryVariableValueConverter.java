@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -17,27 +18,28 @@ package org.camunda.bpm.engine.impl.json;
 
 import org.camunda.bpm.engine.impl.QueryOperator;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 /**
  * @author Sebastian Menski
  */
 public class JsonTaskQueryVariableValueConverter extends JsonObjectConverter<TaskQueryVariableValue> {
 
-  public JSONObject toJsonObject(TaskQueryVariableValue variable) {
-    JSONObject json = new JSONObject();
-    json.put("name", variable.getName());
-    json.put("value", variable.getValue());
-    json.put("operator", variable.getOperator());
-    return json;
+  public JsonObject toJsonObject(TaskQueryVariableValue variable) {
+    JsonObject jsonObject = JsonUtil.createObject();
+    JsonUtil.addField(jsonObject, "name", variable.getName());
+    JsonUtil.addFieldRawValue(jsonObject, "value", variable.getValue());
+    JsonUtil.addField(jsonObject, "operator", variable.getOperator().name());
+    return jsonObject;
   }
 
-  public TaskQueryVariableValue toObject(JSONObject json) {
-    String name = json.getString("name");
-    Object value = json.get("value");
-    QueryOperator operator = QueryOperator.valueOf(json.getString("operator"));
-    boolean isTaskVariable = json.getBoolean("taskVariable");
-    boolean isProcessVariable = json.getBoolean("processVariable");
+  public TaskQueryVariableValue toObject(JsonObject json) {
+    String name = JsonUtil.getString(json, "name");
+    Object value = JsonUtil.getRawObject(json, "value");
+    QueryOperator operator = QueryOperator.valueOf(JsonUtil.getString(json, "operator"));
+    boolean isTaskVariable = JsonUtil.getBoolean(json, "taskVariable");
+    boolean isProcessVariable = JsonUtil.getBoolean(json, "processVariable");
     return new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessVariable);
   }
 }

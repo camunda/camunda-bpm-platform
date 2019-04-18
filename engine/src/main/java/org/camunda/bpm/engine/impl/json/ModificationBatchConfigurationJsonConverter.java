@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,13 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.json;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.ModificationBatchConfiguration;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 
 public class ModificationBatchConfigurationJsonConverter extends JsonObjectConverter<ModificationBatchConfiguration>{
 
@@ -33,8 +33,8 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
   public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
 
   @Override
-  public JSONObject toJsonObject(ModificationBatchConfiguration configuration) {
-    JSONObject json = new JSONObject();
+  public JsonObject toJsonObject(ModificationBatchConfiguration configuration) {
+    JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, INSTRUCTIONS, ModificationCmdJsonConverter.INSTANCE, configuration.getInstructions());
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
@@ -46,14 +46,14 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
   }
 
   @Override
-  public ModificationBatchConfiguration toObject(JSONObject json) {
+  public ModificationBatchConfiguration toObject(JsonObject json) {
 
     List<String> processInstanceIds = readProcessInstanceIds(json);
-    String processDefinitionId = json.getString(PROCESS_DEFINITION_ID);
-    List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil.jsonArrayAsList(json.getJSONArray(INSTRUCTIONS),
+    String processDefinitionId = JsonUtil.getString(json, PROCESS_DEFINITION_ID);
+    List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil.asList(JsonUtil.getArray(json, INSTRUCTIONS),
         ModificationCmdJsonConverter.INSTANCE);
-    boolean skipCustomListeners = json.getBoolean(SKIP_LISTENERS);
-    boolean skipIoMappings = json.getBoolean(SKIP_IO_MAPPINGS);
+    boolean skipCustomListeners = JsonUtil.getBoolean(json, SKIP_LISTENERS);
+    boolean skipIoMappings = JsonUtil.getBoolean(json, SKIP_IO_MAPPINGS);
 
     return new ModificationBatchConfiguration(
         processInstanceIds,
@@ -63,13 +63,8 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
         skipIoMappings);
   }
 
-  protected List<String> readProcessInstanceIds(JSONObject jsonObject) {
-    List<Object> objects = JsonUtil.jsonArrayAsList(jsonObject.getJSONArray(PROCESS_INSTANCE_IDS));
-    List<String> processInstanceIds = new ArrayList<String>();
-    for (Object object : objects) {
-      processInstanceIds.add((String) object);
-    }
-    return processInstanceIds;
+  protected List<String> readProcessInstanceIds(JsonObject jsonObject) {
+    return JsonUtil.asStringList(JsonUtil.getArray(jsonObject, PROCESS_INSTANCE_IDS));
   }
 
 }

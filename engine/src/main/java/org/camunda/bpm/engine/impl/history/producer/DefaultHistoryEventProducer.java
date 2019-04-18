@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -323,8 +324,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobId(contextEntry.getJobId());
     evt.setJobDefinitionId(contextEntry.getJobDefinitionId());
     evt.setBatchId(contextEntry.getBatchId());
+    evt.setCategory(contextEntry.getCategory());
     evt.setTimestamp(ClockUtil.getCurrentTime());
     evt.setRootProcessInstanceId(contextEntry.getRootProcessInstanceId());
+    evt.setExternalTaskId(contextEntry.getExternalTaskId());
 
     if (isHistoryRemovalTimeStrategyStart()) {
       provideRemovalTime(evt);
@@ -351,6 +354,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setIncidentMessage(incident.getIncidentMessage());
     evt.setTenantId(incident.getTenantId());
     evt.setJobDefinitionId(incident.getJobDefinitionId());
+
+    String jobId = incident.getConfiguration();
+    if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
+      HistoricBatchEntity historicBatch = getHistoricBatchByJobId(jobId);
+      if (historicBatch != null) {
+        evt.setRemovalTime(historicBatch.getRemovalTime());
+      }
+    }
 
     IncidentEntity incidentEntity = (IncidentEntity) incident;
     ProcessDefinitionEntity definition = incidentEntity.getProcessDefinition();
@@ -965,6 +976,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       provideRemovalTime((HistoricBatchEntity) historicBatch);
 
       addRemovalTimeToHistoricJobLog((HistoricBatchEntity) historicBatch);
+      addRemovalTimeToHistoricIncidents((HistoricBatchEntity) historicBatch);
     }
 
     return historicBatch;
@@ -1235,12 +1247,27 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       .findHistoricBatchById(batchId);
   }
 
+  protected HistoricBatchEntity getHistoricBatchByJobId(String jobId) {
+    return Context.getCommandContext()
+      .getHistoricBatchManager()
+      .findHistoricBatchByJobId(jobId);
+  }
+
   protected void addRemovalTimeToHistoricJobLog(HistoricBatchEntity historicBatch) {
     Date removalTime = historicBatch.getRemovalTime();
     if (removalTime != null) {
       Context.getCommandContext()
         .getHistoricJobLogManager()
         .addRemovalTimeToJobLogByBatchId(historicBatch.getId(), removalTime);
+    }
+  }
+
+  protected void addRemovalTimeToHistoricIncidents(HistoricBatchEntity historicBatch) {
+    Date removalTime = historicBatch.getRemovalTime();
+    if (removalTime != null) {
+      Context.getCommandContext()
+        .getHistoricIncidentManager()
+        .addRemovalTimeToHistoricIncidentsByBatchId(historicBatch.getId(), removalTime);
     }
   }
 

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -141,6 +143,91 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     Map<String, Object> mappedVariables = VariableLogDelegate.LOCAL_VARIABLES;
     assertEquals(1, mappedVariables.size());
     assertEquals("mappedValue", mappedVariables.get("mappedVariable"));
+  }
+
+  @Deployment
+  public void testMessageCatchAfterEventGateway() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    runtimeService.createMessageCorrelation("foo")
+      .processInstanceId(processInstance.getId())
+      .correlate();
+
+    // then
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+      .processInstanceIdIn(processInstance.getId())
+      .variableName("foo")
+      .singleResult();
+
+    assertNotNull(variableInstance);
+    assertEquals("bar", variableInstance.getValue());
+  }
+
+  @Deployment
+  public void testTimerCatchAfterEventGateway() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+
+    // when
+    managementService.executeJob(job.getId());
+
+    // then
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+      .processInstanceIdIn(processInstance.getId())
+      .variableName("foo")
+      .singleResult();
+
+    assertNotNull(variableInstance);
+    assertEquals("bar", variableInstance.getValue());
+  }
+
+  @Deployment
+  public void testSignalCatchAfterEventGateway() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Execution execution = runtimeService.createExecutionQuery()
+      .processInstanceId(processInstance.getId())
+      .signalEventSubscriptionName("foo")
+      .singleResult();
+
+    assertNotNull(execution);
+
+    // when
+    runtimeService.signalEventReceived("foo", execution.getId());
+
+    // then
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+      .processInstanceIdIn(processInstance.getId())
+      .variableName("foo")
+      .singleResult();
+
+    assertNotNull(variableInstance);
+    assertEquals("bar", variableInstance.getValue());
+  }
+
+  @Deployment
+  public void testConditionalCatchAfterEventGateway() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    runtimeService.setVariable(processInstance.getId(), "var", 1);
+
+    // then
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+      .processInstanceIdIn(processInstance.getId())
+      .variableName("foo")
+      .singleResult();
+
+    assertNotNull(variableInstance);
+    assertEquals("bar", variableInstance.getValue());
   }
 
   public void testMessageBoundaryEvent() {

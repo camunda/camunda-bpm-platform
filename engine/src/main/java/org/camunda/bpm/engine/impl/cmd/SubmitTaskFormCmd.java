@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -25,6 +26,8 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -37,7 +40,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SubmitTaskFormCmd implements Command<Object>, Serializable {
+public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -49,7 +52,7 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     this.properties = Variables.fromMap(properties);
   }
 
-  public Object execute(CommandContext commandContext) {
+  public VariableMap execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
     TaskManager taskManager = commandContext.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
@@ -68,6 +71,12 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
       task.setVariables(properties);
     }
 
+    ExecutionEntity execution = task.getProcessInstance();
+    ExecutionVariableSnapshotObserver variablesListener = null;
+    if(execution != null) {
+      variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
+    }
+
     // complete or resolve the task
     if (DelegationState.PENDING.equals(task.getDelegationState())) {
       task.resolve();
@@ -77,6 +86,10 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     }
 
-    return null;
+    if (variablesListener != null) {
+      return variablesListener.getVariables();
+    } else {
+      return task.getCaseDefinitionId() == null ? null : task.getVariablesTyped(false);
+    }
   }
 }

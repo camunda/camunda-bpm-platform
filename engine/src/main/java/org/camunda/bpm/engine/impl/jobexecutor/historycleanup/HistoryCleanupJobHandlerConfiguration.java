@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -18,7 +19,8 @@ package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 import java.util.Calendar;
 import java.util.Date;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 /**
  * @author Svetlana Dorokhova
@@ -55,24 +57,24 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
 
   @Override
   public String toCanonicalString() {
-    JSONObject json = new JSONObject();
-    json.put(JOB_CONFIG_COUNT_EMPTY_RUNS, countEmptyRuns);
-    json.put(JOB_CONFIG_EXECUTE_AT_ONCE, immediatelyDue);
-    json.put(JOB_CONFIG_MINUTE_FROM, minuteFrom);
-    json.put(JOB_CONFIG_MINUTE_TO, minuteTo);
+    JsonObject json = JsonUtil.createObject();
+    JsonUtil.addField(json, JOB_CONFIG_COUNT_EMPTY_RUNS, countEmptyRuns);
+    JsonUtil.addField(json, JOB_CONFIG_EXECUTE_AT_ONCE, immediatelyDue);
+    JsonUtil.addField(json, JOB_CONFIG_MINUTE_FROM, minuteFrom);
+    JsonUtil.addField(json, JOB_CONFIG_MINUTE_TO, minuteTo);
     return json.toString();
   }
 
-  public static HistoryCleanupJobHandlerConfiguration fromJson(JSONObject jsonObject) {
+  public static HistoryCleanupJobHandlerConfiguration fromJson(JsonObject jsonObject) {
     HistoryCleanupJobHandlerConfiguration config = new HistoryCleanupJobHandlerConfiguration();
     if (jsonObject.has(JOB_CONFIG_COUNT_EMPTY_RUNS)) {
-      config.setCountEmptyRuns(jsonObject.getInt(JOB_CONFIG_COUNT_EMPTY_RUNS));
+      config.setCountEmptyRuns(JsonUtil.getInt(jsonObject, JOB_CONFIG_COUNT_EMPTY_RUNS));
     }
     if (jsonObject.has(JOB_CONFIG_EXECUTE_AT_ONCE)) {
-      config.setImmediatelyDue(jsonObject.getBoolean(JOB_CONFIG_EXECUTE_AT_ONCE));
+      config.setImmediatelyDue(JsonUtil.getBoolean(jsonObject, JOB_CONFIG_EXECUTE_AT_ONCE));
     }
-    config.setMinuteFrom(jsonObject.getInt(JOB_CONFIG_MINUTE_FROM));
-    config.setMinuteTo(jsonObject.getInt(JOB_CONFIG_MINUTE_TO));
+    config.setMinuteFrom(JsonUtil.getInt(jsonObject, JOB_CONFIG_MINUTE_FROM));
+    config.setMinuteTo(JsonUtil.getInt(jsonObject, JOB_CONFIG_MINUTE_TO));
     return config;
   }
 

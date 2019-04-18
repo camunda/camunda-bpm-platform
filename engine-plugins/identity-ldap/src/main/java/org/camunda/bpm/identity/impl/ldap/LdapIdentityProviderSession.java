@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -58,6 +59,7 @@ import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 
 /**
  * <p>LDAP {@link ReadOnlyIdentityProvider}.</p>
@@ -88,13 +90,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         initialContext.close();
       } catch (Exception e) {
         // ignore
-        LOG.log(Level.FINE, "exception while closing LDAP DIR CTX", e);
+        LdapPluginLogger.INSTANCE.exceptionWhenClosingLdapCOntext(e);
       }
     }
   }
 
   protected InitialLdapContext openContext(String userDn, String password) {
-    Hashtable<String, String> env = new Hashtable<String, String>();
+    Hashtable<String, String> env = new Hashtable<>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfiguration.getInitialContextFactory());
     env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
     env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
@@ -181,7 +183,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     try {
       enumeration = initialContext.search(baseDn, groupSearchFilter, ldapConfiguration.getSearchControls());
 
-      List<String> groupMemberList = new ArrayList<String>();
+      List<String> groupMemberList = new ArrayList<>();
 
       // first find group
       while (enumeration.hasMoreElements()) {
@@ -197,7 +199,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         }
       }
 
-      List<User> userList = new ArrayList<User>();
+      List<User> userList = new ArrayList<>();
       String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
       int memberCount = 0;
       for (String memberId : groupMemberList) {
@@ -243,20 +245,50 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       // perform client-side paging
       int resultCount = 0;
-      List<User> userList = new ArrayList<User>();
+      List<User> userList = new ArrayList<>();
+
+      StringBuilder resultLogger = new StringBuilder();
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("LDAP user query results: [");
+      }
+
       while (enumeration.hasMoreElements() && (userList.size() < query.getMaxResults() || ignorePagination)) {
         SearchResult result = enumeration.nextElement();
 
         UserEntity user = transformUser(result);
 
-        if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
+        String userId = user.getId();
 
-          if(resultCount >= query.getFirstResult() || ignorePagination) {
-            userList.add(user);
-          }
-
-          resultCount ++;
+        if (userId == null)
+        {
+          LdapPluginLogger.INSTANCE.invalidLdapUserReturned(user, result);
         }
+        else
+        {
+          if(isAuthenticatedUser(user) || isAuthorized(READ, USER, userId)) {
+
+            if(resultCount >= query.getFirstResult() || ignorePagination) {
+              if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+              {
+                resultLogger.append(user);
+                resultLogger.append(" based on ");
+                resultLogger.append(result);
+                resultLogger.append(", ");
+              }
+
+              userList.add(user);
+            }
+
+            resultCount ++;
+          }
+        }
+      }
+
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("]");
+        LdapPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
       }
 
       return userList;
@@ -400,21 +432,50 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       // perform client-side paging
       int resultCount = 0;
-      List<Group> groupList = new ArrayList<Group>();
+      List<Group> groupList = new ArrayList<>();
+
+      StringBuilder resultLogger = new StringBuilder();
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("LDAP group query results: [");
+      }
+
       while (enumeration.hasMoreElements() && groupList.size() < query.getMaxResults()) {
         SearchResult result = enumeration.nextElement();
 
         GroupEntity group = transformGroup(result);
 
-        if(isAuthorized(READ, GROUP, group.getId())) {
+        String groupId = group.getId();
 
-          if(resultCount >= query.getFirstResult()) {
-            groupList.add(group);
-          }
-
-          resultCount ++;
+        if (groupId == null)
+        {
+          LdapPluginLogger.INSTANCE.invalidLdapGroupReturned(group, result);
         }
+        else
+        {
+          if(isAuthorized(READ, GROUP, groupId)) {
 
+            if(resultCount >= query.getFirstResult()) {
+              if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+              {
+                resultLogger.append(group);
+                resultLogger.append(" based on ");
+                resultLogger.append(result);
+                resultLogger.append(", ");
+              }
+
+              groupList.add(group);
+            }
+
+            resultCount ++;
+          }
+        }
+      }
+
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("]");
+        LdapPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
       }
 
       return groupList;
@@ -537,7 +598,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   protected void applyRequestControls(AbstractQuery<?, ?> query) {
 
     try {
-      List<Control> controls = new ArrayList<Control>();
+      List<Control> controls = new ArrayList<>();
 
       List<QueryOrderingProperty> orderBy = query.getOrderingProperties();
       if(orderBy != null) {

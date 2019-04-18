@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -15,19 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -66,12 +54,28 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -362,6 +366,40 @@ public class TaskServiceTest {
 
       taskService.deleteTask(taskId, true);
     }
+  }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testProcessAttachmentsOneProcessExecution() {
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+      // create attachment
+      Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+
+      assertEquals("weatherforcast", attachment.getName());
+      assertEquals("temperatures and more", attachment.getDescription());
+      assertEquals("web page", attachment.getType());
+      assertNull(attachment.getTaskId());
+      assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
+      assertEquals("http://weather.com", attachment.getUrl());
+      assertNull(taskService.getAttachmentContent(attachment.getId()));
+    }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml"})
+  public void testProcessAttachmentsTwoProcessExecutions() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoParallelTasksProcess");
+    
+    // create attachment
+    Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+    
+    assertEquals("weatherforcast", attachment.getName());
+    assertEquals("temperatures and more", attachment.getDescription());
+    assertEquals("web page", attachment.getType());
+    assertNull(attachment.getTaskId());
+    assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
+    assertEquals("http://weather.com", attachment.getUrl());
+    assertNull(taskService.getAttachmentContent(attachment.getId()));
   }
 
   @Test
@@ -736,6 +774,127 @@ public class TaskServiceTest {
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
     assertEquals(1, variables.size());
     assertEquals("myValue", variables.get("myParam"));
+  }
+  
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.testCompleteTaskWithVariablesInReturn.bpmn20.xml" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturn() {
+    String processVarName = "processVar";
+    String processVarValue = "processVarValue";
+
+    String taskVarName = "taskVar";
+    String taskVarValue = "taskVarValue";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(processVarName, processVarValue);
+
+    runtimeService.startProcessInstanceByKey("TaskServiceTest.testCompleteTaskWithVariablesInReturn", variables);
+
+    Task firstUserTask = taskService.createTaskQuery().taskName("First User Task").singleResult();
+    taskService.setVariable(firstUserTask.getId(), "x", 1);
+    // local variables should not be returned
+    taskService.setVariableLocal(firstUserTask.getId(), "localVar", "localVarValue");
+
+    Map<String, Object> additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put(taskVarName, taskVarValue);
+
+    // After completion of firstUserTask a script Task sets 'x' = 5
+    VariableMap vars = taskService.completeWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+
+    assertEquals(3, vars.size());
+    assertEquals(5, vars.get("x"));
+    assertEquals(ValueType.INTEGER, vars.getValueTyped("x").getType());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(taskVarValue, vars.get(taskVarName));
+    assertEquals(ValueType.STRING, vars.getValueTyped(taskVarName).getType());
+
+    additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put("x", 7);
+    Task secondUserTask = taskService.createTaskQuery().taskName("Second User Task").singleResult();
+
+    vars = taskService.completeWithVariablesInReturn(secondUserTask.getId(), additionalVariables);
+    assertEquals(3, vars.size());
+    assertEquals(7, vars.get("x"));
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(taskVarValue, vars.get(taskVarName));
+  }
+  
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testCompleteStandaloneTaskWithVariablesInReturn() {
+    String taskVarName = "taskVar";
+    String taskVarValue = "taskVarValue";
+
+    String taskId = "myTask";
+    Task standaloneTask = taskService.newTask(taskId);
+    taskService.saveTask(standaloneTask);
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(taskVarName, taskVarValue);
+    
+    Map<String, Object> returnedVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+    // expect empty Map for standalone tasks
+    assertEquals(0, returnedVariables.size());
+
+    historyService.deleteHistoricTaskInstance(taskId);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturnParallel() {
+    String processVarName = "processVar";
+    String processVarValue = "processVarValue";
+
+    String task1VarName = "taskVar1";
+    String task2VarName = "taskVar2";
+    String task1VarValue = "taskVarValue1";
+    String task2VarValue = "taskVarValue2";
+
+    String additionalVar = "additionalVar";
+    String additionalVarValue = "additionalVarValue";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(processVarName, processVarValue);
+    runtimeService.startProcessInstanceByKey("twoParallelTasksProcess", variables);
+
+    Task firstTask = taskService.createTaskQuery().taskName("First Task").singleResult();
+    taskService.setVariable(firstTask.getId(), task1VarName, task1VarValue);
+    Task secondTask = taskService.createTaskQuery().taskName("Second Task").singleResult();
+    taskService.setVariable(secondTask.getId(), task2VarName, task2VarValue);
+
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(firstTask.getId(), null);
+
+    assertEquals(3, vars.size());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(task1VarValue, vars.get(task1VarName));
+    assertEquals(task2VarValue, vars.get(task2VarName));
+
+    Map<String, Object> additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put(additionalVar, additionalVarValue);
+
+    vars = taskService.completeWithVariablesInReturn(secondTask.getId(), additionalVariables);
+    assertEquals(4, vars.size());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(task1VarValue, vars.get(task1VarName));
+    assertEquals(task2VarValue, vars.get(task2VarName));
+    assertEquals(additionalVarValue, vars.get(additionalVar));
+  }
+  
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturnCMMN() {
+    String taskVariableName = "taskVar";
+    String taskVariableValue = "taskVal";
+
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
+    caseService.withCaseDefinition(caseDefinitionId).create();
+
+    Task task1 = taskService.createTaskQuery().singleResult();
+    assertNotNull(task1);
+
+    taskService.setVariable(task1.getId(), taskVariableName, taskVariableValue);
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(task1.getId(), null);
+    assertNull(vars);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})

@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -46,13 +47,16 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected String batchId;
   protected String userId;
   protected String operationId;
+  protected String externalTaskId;
   protected String operationType;
   protected String property;
   protected String entityType;
+  protected String category;
   protected Date timestampAfter;
   protected Date timestampBefore;
 
   protected String[] entityTypes;
+  protected String[] categories;
 
   public UserOperationLogQueryImpl() {
   }
@@ -145,6 +149,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     this.operationId = operationId;
     return this;
   }
+  
+  public UserOperationLogQuery externalTaskId(String externalTaskId) {
+    ensureNotNull("externalTaskId", externalTaskId);
+    this.externalTaskId = externalTaskId;
+    return this;
+  }
 
   public UserOperationLogQuery operationType(String operationType) {
     ensureNotNull("operationType", operationType);
@@ -167,6 +177,18 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   public UserOperationLogQuery entityTypeIn(String... entityTypes) {
     ensureNotNull("entity types", (Object[]) entityTypes);
     this.entityTypes = entityTypes;
+    return this;
+  }
+  
+  public UserOperationLogQuery category(String category) {
+    ensureNotNull("category", category);
+    this.category = category;
+    return this;
+  }
+  
+  public UserOperationLogQuery categoryIn(String... categories) {
+    ensureNotNull("categories", (Object[]) categories);
+    this.categories = categories;
     return this;
   }
 

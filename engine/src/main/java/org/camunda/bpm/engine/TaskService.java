@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -21,7 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.task.Attachment;
@@ -291,6 +294,28 @@ public interface TaskService {
   void complete(String taskId, Map<String, Object> variables);
 
   /**
+   * Marks a task as done and continues process execution.
+   *
+   * This method is typically called by a task list user interface
+   * after a task form has been submitted by the
+   * {@link Task#getAssignee() assignee}
+   * and the required task parameters have been provided.
+   *
+   * @param taskId the id of the task to complete, cannot be null.
+   * @param variables task parameters. May be null or empty.
+   *
+   * @return All task variables with their current value
+   *
+   * @throws ProcessEngineException
+   *          when no task exists with the given id.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
+  VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables);
+
+  /**
    * Changes the assignee of the given task to the given userId.
    * No check is done whether the user is known by the identity component.
    *
@@ -497,9 +522,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariable(String taskId, String variableName, Object value);
 
@@ -511,9 +541,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariables(String taskId, Map<String, ? extends Object> variables);
 
@@ -524,9 +559,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariableLocal(String taskId, String variableName, Object value);
 
@@ -537,9 +577,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void setVariablesLocal(String taskId, Map<String, ? extends Object> variables);
 
@@ -549,9 +594,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    */
   Object getVariable(String taskId, String variableName);
 
@@ -568,9 +620,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -590,9 +649,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -604,9 +670,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    */
   Object getVariableLocal(String taskId, String variableName);
 
@@ -623,9 +696,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -645,9 +725,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -661,9 +748,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    */
   Map<String, Object> getVariables(String taskId);
 
@@ -677,10 +771,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
-   *
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    * @since 7.2
    */
   VariableMap getVariablesTyped(String taskId);
@@ -696,9 +796,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -712,9 +819,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    */
   Map<String, Object> getVariablesLocal(String taskId);
 
@@ -729,9 +843,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -748,9 +869,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -762,9 +890,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    */
   Map<String, Object> getVariables(String taskId, Collection<String> variableNames);
@@ -779,9 +914,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    * */
@@ -793,9 +935,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    */
   Map<String,Object> getVariablesLocal(String taskId, Collection<String> variableNames);
@@ -810,9 +959,16 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *          <p>In case of standalone tasks:
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} or</li>
+   *          <li>if {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK}</li></p>
+   *          <p>In case the task is part of a running process instance:</li>
+   *          <li>if the user has no {@link Permissions#READ} permission on {@link Resources#TASK} and
+   *           no {@link Permissions#READ_TASK} permission on {@link Resources#PROCESS_DEFINITION} </li>
+   *          <li>in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission this} configuration is enabled and
+   *          the user has no {@link TaskPermissions#READ_VARIABLE} permission on {@link Resources#TASK} and
+   *          no {@link ProcessDefinitionPermissions#READ_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li></p>
    *
    * @since 7.2
    */
@@ -825,9 +981,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariable(String taskId, String variableName);
 
@@ -838,9 +999,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariableLocal(String taskId, String variableName);
 
@@ -851,9 +1017,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariables(String taskId, Collection<String> variableNames);
 
@@ -864,9 +1035,14 @@ public interface TaskService {
    * @throws ProcessEngineException
    *          when the task doesn't exist.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   *           If the user has none of the following:
+   *           <li>{@link TaskPermissions#UPDATE_VARIABLE} permission on {@link Resources#TASK}</li>
+   *           <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK}</li>
+   *           <li>or if the task is part of a running process instance:</li>
+   *           <ul>
+   *           <li>{@link ProcessDefinitionPermissions#UPDATE_TASK_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void removeVariablesLocal(String taskId, Collection<String> variableNames);
 

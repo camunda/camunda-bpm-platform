@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,6 +15,16 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.api.optimize;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
@@ -33,6 +44,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -40,15 +52,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 
 
@@ -188,8 +191,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     ClockUtil.setCurrentTime(now);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("stringVar", "value1");
-    ProcessInstance processInstance =
-      runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("process", variables);
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     variables.put("stringVar", "value2");
@@ -288,6 +290,43 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // then
     assertThat(variableUpdates.size(), is(1));
+  }
+
+  @Test
+  public void getHistoricVariableByteArrayUpdates() {
+     // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .endEvent()
+      .done();
+    testHelper.deploy(simpleDefinition);
+
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", serializable);
+
+    runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    // when
+    List<HistoricVariableUpdate> historicVariableUpdates =
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10);
+
+    // then
+    assertThat(historicVariableUpdates.size(), is(4));
+
+    for (HistoricVariableUpdate variableUpdate : historicVariableUpdates) {
+      ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
+      assertThat(typedValue.isDeserialized(), is(false));
+      assertThat(typedValue.getValueSerialized(), notNullValue());
+    }
+
   }
 
   private Date pastDate() {

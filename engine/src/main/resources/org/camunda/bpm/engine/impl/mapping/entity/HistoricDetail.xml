@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailEntity">
@@ -137,6 +136,13 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricDetailsByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_DETAIL
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- HISTORIC DETAILS DELETE -->
 
   <delete id="deleteHistoricDetailVariableInstanceUpdate">
@@ -148,6 +154,7 @@
     <where>
       <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
       <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql"/>
+      <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
     </where>
   </delete>
 
@@ -161,6 +168,7 @@
       <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
         and D.TASK_ID_ is not null
       </if>
+      <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
     </where>
   </delete>
 
@@ -172,6 +180,7 @@
       <where>
         <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
         <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql"/>
+        <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
         and BYTEARRAY_ID_ is not NULL
       </where>)
   </delete>
@@ -183,6 +192,7 @@
       <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
       <where>
         <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
+        <include refid="selectHistoricDetailsVariableInstanceByIdSql"/>
         and D.BYTEARRAY_ID_ is not NULL
       </where>
   </delete>
@@ -301,7 +311,7 @@
   <sql id="selectHistoricDetailsByQueryCriteriaSql">
     from ${prefix}ACT_HI_DETAIL RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
@@ -388,7 +398,7 @@
         and RES.TIME_ &gt;= #{occurredAfter}
       </if>
 
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         and (
         (RES.EXECUTION_ID_ is not null
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
@@ -455,6 +465,12 @@
           <bind name="listOfIds" value="taskCaseInstanceIds"/>
           <bind name="fieldName" value="'T.CASE_INST_ID_'"/>
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    </if>
+  </sql>
+  
+  <sql id="selectHistoricDetailsVariableInstanceByIdSql">
+    <if test="variableInstanceId != null">
+      and VAR_INST_ID_ = #{variableInstanceId}
     </if>
   </sql>
 

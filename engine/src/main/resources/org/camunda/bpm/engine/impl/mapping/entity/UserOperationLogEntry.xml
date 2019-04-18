@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
 
-    Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
         http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
@@ -49,7 +48,9 @@
         ORG_VALUE_,
         NEW_VALUE_,
         TENANT_ID_,
-        REMOVAL_TIME_
+        REMOVAL_TIME_,
+        CATEGORY_,
+        EXTERNAL_TASK_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{deploymentId, jdbcType=VARCHAR},
@@ -74,7 +75,9 @@
         #{orgValue, jdbcType=VARCHAR},
         #{newValue ,jdbcType=VARCHAR},
         #{tenantId ,jdbcType=VARCHAR},
-        #{removalTime, jdbcType=TIMESTAMP}
+        #{removalTime, jdbcType=TIMESTAMP},
+        #{category, jdbcType=VARCHAR},
+        #{externalTaskId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -97,8 +100,15 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateUserOperationLogByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_OP_LOG
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- OPERATION LOG ENTRY DELETE -->
-  
+
   <delete id="deleteUserOperationLogEntryById">
     delete from ${prefix}ACT_HI_OP_LOG where ID_ = #{id}
   </delete>
@@ -177,6 +187,8 @@
     <result property="newValue" column="NEW_VALUE_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
+    <result property="externalTaskId" column="EXTERNAL_TASK_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- OPERATION LOG ENTRY SELECT -->
@@ -203,7 +215,7 @@
   <sql id="selectUserOperationLogEntriesByQueryCriteriaSql">
     from ${prefix}ACT_HI_OP_LOG RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
@@ -251,6 +263,9 @@
       <if test="operationId != null">
         and RES.OPERATION_ID_ = #{operationId}
       </if>
+      <if test="externalTaskId != null">
+        and RES.EXTERNAL_TASK_ID_ = #{externalTaskId}
+      </if>
       <if test="operationType != null">
         and RES.OPERATION_TYPE_ = #{operationType}
       </if>
@@ -272,8 +287,17 @@
       <if test="timestampBefore != null">
         and RES.TIMESTAMP_ &lt; #{timestampBefore}
       </if>
-
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categories != null &amp;&amp; categories.length > 0">
+        and RES.CATEGORY_ in
+        <foreach item="category" collection="categories" open="(" separator="," close=")">
+          #{category}
+        </foreach>
+      </if>
+      
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <!-- may not exist in the context of a process definition -->
         and (
           (RES.PROC_DEF_KEY_ is not null

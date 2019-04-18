@@ -116,7 +116,18 @@
       <outputDirectory></outputDirectory>
       <fileMode>0755</fileMode>
     </file>
-    
+    <file>
+      <source>src/shutdown-camunda.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
+      <source>src/shutdown-camunda.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+
     <file>
       <source>src/conf/server.xml</source>
       <outputDirectory>server/apache-tomcat-${version.tomcat}/conf/</outputDirectory>

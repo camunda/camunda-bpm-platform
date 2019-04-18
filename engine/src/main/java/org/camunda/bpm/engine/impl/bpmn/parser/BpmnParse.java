@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -544,7 +545,8 @@ public class BpmnParse extends Parse {
     processDefinition.setVersionTag(processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag"));
 
     try {
-      String historyTimeToLive = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive");
+      String historyTimeToLive = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive",
+          Context.getProcessEngineConfiguration().getHistoryTimeToLive());
       processDefinition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(historyTimeToLive));
     }
     catch (Exception e) {
@@ -1994,7 +1996,12 @@ public class BpmnParse extends Parse {
         Element sibling = siblingsMap.get(targetRef);
         if (sibling != null) {
           if (sibling.getTagName().equals(ActivityTypes.INTERMEDIATE_EVENT_CATCH)) {
-            parseIntermediateCatchEvent(sibling, scope, activity);
+            ActivityImpl catchEventActivity = parseIntermediateCatchEvent(sibling, scope, activity);
+
+            if (catchEventActivity != null) {
+              parseActivityInputOutput(sibling, catchEventActivity);
+            }
+
           } else {
             addError("Event based gateway can only be connected to elements of type intermediateCatchEvent", sibling);
           }

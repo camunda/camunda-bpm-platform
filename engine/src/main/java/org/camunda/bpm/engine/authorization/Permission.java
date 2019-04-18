@@ -1,12 +1,13 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +23,7 @@ package org.camunda.bpm.engine.authorization;
  *  
  * <p>In camunda BPM, multiple permissions are grouped into an {@link Authorization}.
  * For efficient storage and checking of authorizations, the permissons that make
- * up an autorization are coded into a single integer. 
+ * up an authorization are coded into a single integer.
  * The implication of this design is that a permission must have a unique integer value 
  * and it must be a power of two, ie 2^0, 2^1, 2^2, 2^3, 2^4 ...
  * 
@@ -42,12 +43,17 @@ package org.camunda.bpm.engine.authorization;
  * </pre>
  * 
  * <h2>Defining a custom Permission</h2>
- * The {@link Permissions} class contains the values of the  built-in
- * permissions. In order to define a custom permission, you must provide 
+ * The XxxPermissions classes contains the values of the  built-in
+ * permissions (i.e. {@link Permissions}, {@link ProcessDefinitionPermissions},
+ * {@link ProcessInstancePermissions}, {@link TaskPermissions},
+ * all can be found in {@link org.camunda.bpm.engine.authorization authorization} package).
+ * In order to define a custom permission, you must provide
  * an implementation of this interface such that the {@link #getValue()} 
- * method returns an integer which is a power of two and not yet used by the
- * built-in {@link Permissions} and not reserved (values <=2^14 are reserved). 
- * Valid example: 2^15=32768.</p>
+ * method returns an integer which is a power of two and not yet used by any of the
+ * built-in Permissions. Keep the Permission's names unique as well.
+ * You must implement also {@link #getTypes()} and make sure that
+ * the permission values are not already reserved for the desired
+ * {@link Resource}.</p>
  * 
  * 
  * @author Daniel Meyer
@@ -55,11 +61,14 @@ package org.camunda.bpm.engine.authorization;
  */
 public interface Permission {
   
-  /** returns the name of the perwission, ie. 'WRITE' */
+  /** returns the name of the permission, ie. 'UPDATE' */
   String getName();
   
   /** returns the unique numeric value of the permission.
    * Must be a power of 2. ie 2^0, 2^1, 2^2, 2^3, 2^4 ... */
   int getValue();
   
+  /** returns the resource types which are allowed for this permission */
+  Resource[] getTypes();
+
 }

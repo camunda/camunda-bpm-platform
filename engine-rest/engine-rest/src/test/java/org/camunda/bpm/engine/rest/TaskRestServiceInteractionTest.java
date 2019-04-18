@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -129,8 +130,9 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
-import org.fest.assertions.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -453,6 +455,7 @@ public class TaskRestServiceInteractionTest extends
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME, embeddedProcessDefinition.get("name"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION, embeddedProcessDefinition.get("description"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, embeddedProcessDefinition.get("version"));
+    Assert.assertEquals(MockProvider.EXAMPLE_VERSION_TAG, embeddedProcessDefinition.get("versionTag"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME, embeddedProcessDefinition.get("resource"));
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, embeddedProcessDefinition.get("deploymentId"));
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, embeddedProcessDefinition.get("diagram"));
@@ -688,6 +691,29 @@ public class TaskRestServiceInteractionTest extends
       .when().post(SUBMIT_FORM_URL);
 
     verify(formServiceMock).submitTaskForm(EXAMPLE_TASK_ID, null);
+  }
+
+  @Test
+  public void testSubmitFormWithVariablesInReturn() {
+    String mockVar = "mockVar";
+    String mockVarVal = "mockVarVal";
+    VariableMap mockMap = Variables.putValue(mockVar, mockVarVal);
+    when(formServiceMock.submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null)).thenReturn(mockMap);
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("withVariablesInReturn", true);
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(queryParameters)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body(mockVar, equalTo(mockVarVal))
+    .when().post(SUBMIT_FORM_URL);
+
+    verify(formServiceMock).submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null);
   }
 
   @Test
@@ -1530,6 +1556,30 @@ public class TaskRestServiceInteractionTest extends
     expectedVariables.put("aThirdValue", Boolean.TRUE);
 
     verify(taskServiceMock).complete(eq(EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
+  }
+
+  @Test
+  public void testCompleteTaskWithVariablesInReturn() {
+    String mockVar = "mockVar";
+    String mockVarVal = "mockVarVal";
+    VariableMap mockMap = Variables.putValue(mockVar, mockVarVal);
+    when(taskServiceMock.completeWithVariablesInReturn(EXAMPLE_TASK_ID, null)).thenReturn(mockMap);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("withVariablesInReturn", Boolean.TRUE);
+    
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body(mockVar, equalTo(mockVarVal))
+    .when()
+      .post(COMPLETE_TASK_URL);
+
+    verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
   }
 
   @Test

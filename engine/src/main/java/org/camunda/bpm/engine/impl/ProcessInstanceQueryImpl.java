@@ -1,8 +1,9 @@
 /*
- * Copyright © 2012 - 2018 camunda services GmbH and various authors (info@camunda.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -50,6 +51,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   protected SuspensionState suspensionState;
+  protected boolean hasIncident;
   protected String incidentType;
   protected String incidentId;
   protected String incidentMessage;
@@ -62,6 +64,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean isProcessDefinitionWithoutTenantId = false;
 
   public ProcessInstanceQueryImpl() {
   }
@@ -186,6 +189,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery hasIncident() {
+    this.hasIncident = true;
+    return this;
+  }
+
   public ProcessInstanceQuery incidentType(String incidentType) {
     ensureNotNull("incident type", incidentType);
     this.incidentType = incidentType;
@@ -234,6 +242,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     isRootProcessInstances = true;
+    return this;
+  }
+
+  public ProcessInstanceQuery processDefinitionWithoutTenantId() {
+    isProcessDefinitionWithoutTenantId = true;
     return this;
   }
 
@@ -311,6 +324,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     this.suspensionState = suspensionState;
   }
 
+  public boolean isHasIncident() {
+    return hasIncident;
+  }
+
   public String getIncidentId() {
     return incidentId;
   }
@@ -341,5 +358,9 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public boolean isRootProcessInstances() {
     return isRootProcessInstances;
+  }
+
+  public boolean isProcessDefinitionWithoutTenantId() {
+    return isProcessDefinitionWithoutTenantId;
   }
 }
