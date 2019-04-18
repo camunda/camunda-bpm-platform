@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +46,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
@@ -57,6 +61,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -79,7 +84,7 @@ public class ProcessInstanceRestServiceQueryTest extends
   }
 
   private ProcessInstanceQuery setUpMockInstanceQuery(List<ProcessInstance> mockedInstances) {
-    ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQuery.class);
+    ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQueryImpl.class);
     when(sampleInstanceQuery.list()).thenReturn(mockedInstances);
     when(sampleInstanceQuery.count()).thenReturn((long) mockedInstances.size());
     when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(sampleInstanceQuery);
@@ -1063,4 +1068,34 @@ public class ProcessInstanceRestServiceQueryTest extends
     verify(mockedQuery).processDefinitionKeyNotIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY);
     verify(mockedQuery).list();
   }
+
+  @Test
+  public void testOrQuery() {
+    // given
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+
+    ProcessInstanceQueryDto orQuery = new ProcessInstanceQueryDto();
+    orQuery.setProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    orQuery.setBusinessKey(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+
+    processInstanceQueryDto.setOrQueries(Collections.singletonList(orQuery));
+
+    // when
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header(ACCEPT_JSON_HEADER)
+      .body(processInstanceQueryDto)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    ArgumentCaptor<ProcessInstanceQueryImpl> argument = ArgumentCaptor.forClass(ProcessInstanceQueryImpl.class);
+    verify(((ProcessInstanceQueryImpl) mockedQuery)).addOrQuery(argument.capture());
+
+    // then
+    assertThat(argument.getValue().getProcessDefinitionId()).isEqualTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    assertThat(argument.getValue().getBusinessKey()).isEqualTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+  }
+
 }
