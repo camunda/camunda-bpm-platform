@@ -149,17 +149,29 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery withIncidents() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set withIncidents() within 'or' query");
+    }
+
     this.withIncidents = true;
 
     return this;
   }
 
   public HistoricProcessInstanceQuery withRootIncidents() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set withRootIncidents() within 'or' query");
+    }
+
     this.withRootIncidents = true;
     return this;
   }
 
   public HistoricProcessInstanceQuery incidentType(String incidentType) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set incidentType() within 'or' query");
+    }
+
     ensureNotNull("incident type", incidentType);
     this.incidentType = incidentType;
     return this;
@@ -167,11 +179,19 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   @Override
   public HistoricProcessInstanceQuery incidentStatus(String status) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set incidentStatus() within 'or' query");
+    }
+
     this.incidentStatus = status;
     return this;
   }
 
   public HistoricProcessInstanceQuery incidentMessage(String incidentMessage) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set incidentMessage() within 'or' query");
+    }
+
     ensureNotNull("incidentMessage", incidentMessage);
     this.incidentMessage = incidentMessage;
 
@@ -179,6 +199,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery incidentMessageLike(String incidentMessageLike) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set incidentMessageLike() within 'or' query");
+    }
+
     ensureNotNull("incidentMessageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
 
@@ -324,9 +348,15 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return orderBy(HistoricProcessInstanceQueryProperty.TENANT_ID);
   }
 
-  public long executeCount(CommandContext commandContext) {
+  @Override
+  protected void checkQueryOk() {
     ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+
+    super.checkQueryOk();
+  }
+
+  public long executeCount(CommandContext commandContext) {
     checkQueryOk();
 
     return commandContext
@@ -335,8 +365,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public List<HistoricProcessInstance> executeList(CommandContext commandContext, Page page) {
-    ensureOrExpressionsEvaluated();
-    ensureVariablesInitialized();
     checkQueryOk();
 
     return commandContext
@@ -345,8 +373,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public List<String> executeIdsList(CommandContext commandContext) {
-    ensureOrExpressionsEvaluated();
-    ensureVariablesInitialized();
     checkQueryOk();
 
     return commandContext
