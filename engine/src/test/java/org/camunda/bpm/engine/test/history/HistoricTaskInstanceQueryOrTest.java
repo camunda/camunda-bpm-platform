@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -362,129 +361,6 @@ public class HistoricTaskInstanceQueryOrTest {
 
     // then
     assertEquals(1, tasks.size());
-  }
-
-  @Test
-  public void shouldReturnHistoricTasksWithProcessDefinitionNameOrProcessDefinitionKey() {
-    // given
-    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .name("process1")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
-
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
-
-    runtimeService.startProcessInstanceByKey("aProcessDefinition");
-
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
-
-     repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy();
-
-    runtimeService.startProcessInstanceByKey("anotherProcessDefinition");
-
-    // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .processDefinitionName("process1")
-        .processDefinitionKey("anotherProcessDefinition")
-      .endOr()
-      .list();
-
-    // then
-    assertEquals(2, tasks.size());
-  }
-
-  @Test
-  public void shouldReturnHistoricTasksWithProcessInstanceBusinessKeyOrProcessInstanceBusinessKeyLike() {
-    // given
-    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
-
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
-
-    runtimeService
-      .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
-
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
-
-     repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy();
-
-    runtimeService
-      .startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
-
-    // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .processInstanceBusinessKey("aBusinessKey")
-        .processInstanceBusinessKeyLike("anotherBusinessKey")
-      .endOr()
-      .list();
-
-    // then
-    assertEquals(2, tasks.size());
-  }
-
-  @Test
-  @Deployment(resources={
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn"})
-  public void shouldReturnHistoricTasksWithCaseDefinitionKeyCaseDefinitionName() {
-    // given
-    String caseDefinitionId1 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase")
-      .singleResult()
-      .getId();
-
-    caseService
-      .withCaseDefinition(caseDefinitionId1)
-      .create();
-
-    String caseDefinitionId2 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase2")
-      .singleResult()
-      .getId();
-
-    caseService
-      .withCaseDefinition(caseDefinitionId2)
-      .create();
-
-    // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .caseDefinitionKey("oneTaskCase")
-        .caseDefinitionName("One")
-      .endOr()
-      .list();
-
-    // then
-    assertEquals(2, tasks.size());
   }
 
   @Test

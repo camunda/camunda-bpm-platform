@@ -106,9 +106,15 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   @Override
-  public long executeCount(CommandContext commandContext) {
+  protected void checkQueryOk() {
     ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
+
+    super.checkQueryOk();
+  }
+
+  @Override
+  public long executeCount(CommandContext commandContext) {
     checkQueryOk();
 
     return commandContext
@@ -118,8 +124,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   @Override
   public List<HistoricTaskInstance> executeList(CommandContext commandContext, Page page) {
-    ensureOrExpressionsEvaluated();
-    ensureVariablesInitialized();
     checkQueryOk();
 
     return commandContext
@@ -133,12 +137,20 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set processInstanceBusinessKey() within 'or' query");
+    }
+
     this.processInstanceBusinessKey = processInstanceBusinessKey;
     return this;
   }
 
   @Override
   public HistoricTaskInstanceQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set processInstanceBusinessKeyIn() within 'or' query");
+    }
+
     ensureNotNull("processInstanceBusinessKeys", (Object[]) processInstanceBusinessKeys);
     this.processInstanceBusinessKeys = processInstanceBusinessKeys;
     return this;
@@ -146,6 +158,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   @Override
   public HistoricTaskInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set processInstanceBusinessKeyLike() within 'or' query");
+    }
+
     this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
     return this;
   }
@@ -167,11 +183,19 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery processDefinitionKey(String processDefinitionKey) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set processDefinitionKey() within 'or' query");
+    }
+
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
   public HistoricTaskInstanceQuery processDefinitionName(String processDefinitionName) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set processDefinitionName() within 'or' query");
+    }
+
     this.processDefinitionName = processDefinitionName;
     return this;
   }
@@ -252,11 +276,19 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery caseDefinitionKey(String caseDefinitionKey) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set caseDefinitionKey() within 'or' query");
+    }
+
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
   }
 
   public HistoricTaskInstanceQuery caseDefinitionName(String caseDefinitionName) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set caseDefinitionName() within 'or' query");
+    }
+
     this.caseDefinitionName = caseDefinitionName;
     return this;
   }
@@ -342,6 +374,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery processFinished() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set processFinished() within 'or' query");
+    }
+
     this.processFinished = true;
     return this;
   }
@@ -385,6 +421,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery processUnfinished() {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set processUnfinished() within 'or' query");
+    }
+
     this.processUnfinished = true;
     return this;
   }
