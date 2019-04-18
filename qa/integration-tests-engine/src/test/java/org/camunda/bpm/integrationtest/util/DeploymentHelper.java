@@ -110,6 +110,10 @@ public class DeploymentHelper {
           .addDependencies(
               MavenDependencies.createDependency("org.camunda.bpm:camunda-engine-spring", ScopeType.COMPILE, false,
                   MavenDependencies.createExclusion("org.camunda.bpm:camunda-engine")),
+                  MavenDependencies.createDependency("org.springframework:spring-context", ScopeType.COMPILE, false),
+                  MavenDependencies.createDependency("org.springframework:spring-jdbc", ScopeType.COMPILE, false),
+                  MavenDependencies.createDependency("org.springframework:spring-tx", ScopeType.COMPILE, false),
+                  MavenDependencies.createDependency("org.springframework:spring-orm", ScopeType.COMPILE, false),
                   MavenDependencies.createDependency("org.springframework:spring-web", ScopeType.COMPILE, false))
           .resolve()
           .withTransitivity()
