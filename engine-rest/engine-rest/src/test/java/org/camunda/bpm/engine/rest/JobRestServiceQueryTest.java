@@ -175,25 +175,72 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_CREATE_TIME, returnedCreateTime);
   }
 
-  @Test
-  public void testInvalidDueDateComparator() {
+  private interface DateParameters {
+    String name();
+
+    String description();
+
+    void expectLowerThan(JobQuery query, Date date);
+
+    void expectHigherThan(JobQuery query, Date date);
+  }
+
+  private static final DateParameters DUE_DATES = new DateParameters() {
+    @Override
+    public String name() {
+      return "dueDates";
+    }
+
+    @Override
+    public String description() {
+      return "due date";
+    }
+
+    @Override
+    public void expectLowerThan(JobQuery query, Date date) {
+      query.duedateLowerThan(date);
+    }
+
+    @Override
+    public void expectHigherThan(JobQuery query, Date date) {
+      query.duedateHigherThan(date);
+    }
+  };
+
+  private static final DateParameters CREATE_TIMES = new DateParameters() {
+    @Override
+    public String name() {
+      return "createTimes";
+    }
+
+    @Override
+    public String description() {
+      return "create time";
+    }
+
+    @Override
+    public void expectLowerThan(JobQuery query, Date date) {
+      query.createdBefore(date);
+    }
+
+    @Override
+    public void expectHigherThan(JobQuery query, Date date) {
+      query.createdAfter(date);
+    }
+  };
+
+  private void testInvalidDateComparator(DateParameters parameters) {
 
     String variableValue = withTimezone("2013-05-05T00:00:00");
     String invalidComparator = "bt";
 
     String queryValue = invalidComparator + "_" + variableValue;
-    given().queryParam("dueDates", queryValue)
-        .then()
-        .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .contentType(ContentType.JSON)
-        .body("type",equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", equalTo("Invalid due date comparator specified: " + invalidComparator))
-        .when().get(JOBS_RESOURCE_URL);
+    given().queryParam(parameters.name(), queryValue).then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Invalid " + parameters.description() + " comparator specified: " + invalidComparator)).when().get(JOBS_RESOURCE_URL);
   }
 
-  @Test
-  public void testInvalidDueDateComperatorAsPost() {
+  private void testInvalidDateComparatorAsPost(DateParameters parameters) {
     String invalidComparator = "bt";
 
     Map<String, Object> conditionJson = new HashMap<String, Object>();
@@ -204,31 +251,25 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     conditions.add(conditionJson);
 
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("dueDates", conditions);
+    json.put(parameters.name(), conditions);
 
-    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Invalid due date comparator specified: " + invalidComparator))
-    .when().post(JOBS_RESOURCE_URL);
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json).then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Invalid " + parameters.description() + " comparator specified: " + invalidComparator)).when().post(JOBS_RESOURCE_URL);
   }
 
-  @Test
-  public void testInvalidDueDate() {
-
+  private void testInvalidDate(DateParameters parameters) {
     String variableValue = "invalidValue";
     String invalidComparator = "lt";
 
     String queryValue = invalidComparator + "_" + variableValue;
-    given().queryParam("dueDates", queryValue)
-    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Invalid due date format: Cannot convert value \"invalidValue\" to java type java.util.Date"))
-    .when().get(JOBS_RESOURCE_URL);
+    given().queryParam(parameters.name(), queryValue).then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Invalid " + parameters.description() + " format: Cannot convert value \"invalidValue\" to java type java.util.Date")).when()
+        .get(JOBS_RESOURCE_URL);
   }
 
-  @Test
-  public void testInvalidDueDateAsPost() {
+  private void testInvalidDateAsPost(DateParameters parameters) {
     Map<String, Object> conditionJson = new HashMap<String, Object>();
     conditionJson.put("operator", "lt");
     conditionJson.put("value", "invalidValue");
@@ -237,15 +278,53 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     conditions.add(conditionJson);
 
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("dueDates", conditions);
+    json.put(parameters.name(), conditions);
 
-    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Invalid due date format: Cannot convert value \"invalidValue\" to java type java.util.Date"))
-    .when().post(JOBS_RESOURCE_URL);
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json).then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Invalid " + parameters.description() + " format: Cannot convert value \"invalidValue\" to java type java.util.Date")).when()
+        .post(JOBS_RESOURCE_URL);
   }
 
+  @Test
+  public void testInvalidDueDateComparator() {
+    testInvalidDateComparator(DUE_DATES);
+  }
+
+  @Test
+  public void testInvalidCreateTimeComparator() {
+    testInvalidDateComparator(CREATE_TIMES);
+  }
+
+  @Test
+  public void testInvalidDueDateComperatorAsPost() {
+    testInvalidDateComparatorAsPost(DUE_DATES);
+  }
+
+  @Test
+  public void testInvalidCreateTimeComparatorAsPost() {
+    testInvalidDateComparatorAsPost(CREATE_TIMES);
+  }
+
+  @Test
+  public void testInvalidDueDate() {
+    testInvalidDate(DUE_DATES);
+  }
+
+  @Test
+  public void testInvalidCreateTime() {
+    testInvalidDate(CREATE_TIMES);
+  }
+
+  @Test
+  public void testInvalidDueDateAsPost() {
+    testInvalidDateAsPost(DUE_DATES);
+  }
+
+  @Test
+  public void testInvalidCreateTimeAsPost() {
+    testInvalidDateAsPost(CREATE_TIMES);
+  }
 
   @Test
   public void testAdditionalParametersExcludingDueDates() {
@@ -371,32 +450,26 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
   }
 
-  @Test
-  public void testDueDateParameters() {
+  private void testDateParameters(DateParameters parameters) {
     String variableValue = withTimezone("2013-05-05T00:00:00");
     Date date = DateTimeUtil.parseDate(variableValue);
 
     String queryValue = "lt_" + variableValue;
-    given().queryParam("dueDates", queryValue).then().expect()
-        .statusCode(Status.OK.getStatusCode()).when()
-        .get(JOBS_RESOURCE_URL);
+    given().queryParam(parameters.name(), queryValue).then().expect().statusCode(Status.OK.getStatusCode()).when().get(JOBS_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);
-    inOrder.verify(mockQuery).duedateLowerThan(date);
+    parameters.expectLowerThan(inOrder.verify(mockQuery), date);
     inOrder.verify(mockQuery).list();
 
     queryValue = "gt_" + variableValue;
-    given().queryParam("dueDates", queryValue).then().expect()
-        .statusCode(Status.OK.getStatusCode()).when()
-        .get(JOBS_RESOURCE_URL);
+    given().queryParam(parameters.name(), queryValue).then().expect().statusCode(Status.OK.getStatusCode()).when().get(JOBS_RESOURCE_URL);
 
     inOrder = inOrder(mockQuery);
-    inOrder.verify(mockQuery).duedateHigherThan(date);
+    parameters.expectHigherThan(inOrder.verify(mockQuery), date);
     inOrder.verify(mockQuery).list();
   }
 
-  @Test
-  public void testDueDateParametersAsPost() {
+  private void testDateParametersAsPost(DateParameters parameters) {
     String value = withTimezone("2013-05-18T00:00:00");
     String anotherValue = withTimezone("2013-05-05T00:00:00");
 
@@ -416,19 +489,16 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     conditions.add(anotherConditionJson);
 
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("dueDates", conditions);
+    json.put(parameters.name(), conditions);
 
-    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
-    .then().expect().statusCode(Status.OK.getStatusCode())
-    .when().post(JOBS_RESOURCE_URL);
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json).then().expect().statusCode(Status.OK.getStatusCode()).when().post(JOBS_RESOURCE_URL);
 
-    verify(mockQuery).duedateHigherThan(anotherDate);
-    verify(mockQuery).duedateLowerThan(date);
+    parameters.expectHigherThan(verify(mockQuery), anotherDate);
+    parameters.expectLowerThan(verify(mockQuery), date);
   }
 
-  @Test
-  public void testMultipleDueDateParameters() {
-    String variableValue1 =  withTimezone("2012-05-05T00:00:00");
+  private void testMultipleDateParameters(DateParameters parameters) {
+    String variableValue1 = withTimezone("2012-05-05T00:00:00");
     String variableParameter1 = "gt_" + variableValue1;
 
     String variableValue2 = withTimezone("2013-02-02T00:00:00");
@@ -439,12 +509,40 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
     String queryValue = variableParameter1 + "," + variableParameter2;
 
-    given().queryParam("dueDates", queryValue).then().expect()
-        .statusCode(Status.OK.getStatusCode()).when()
-        .get(JOBS_RESOURCE_URL);
+    given().queryParam(parameters.name(), queryValue).then().expect().statusCode(Status.OK.getStatusCode()).when().get(JOBS_RESOURCE_URL);
 
-    verify(mockQuery).duedateHigherThan(date);
-    verify(mockQuery).duedateLowerThan(anotherDate);
+    parameters.expectHigherThan(verify(mockQuery), date);
+    parameters.expectLowerThan(verify(mockQuery), anotherDate);
+  }
+
+  @Test
+  public void testDueDateParameters() {
+    testDateParameters(DUE_DATES);
+  }
+
+  @Test
+  public void testCreateTimeParameters() {
+    testDateParameters(CREATE_TIMES);
+  }
+
+  @Test
+  public void testDueDateParametersAsPost() {
+    testDateParametersAsPost(DUE_DATES);
+  }
+
+  @Test
+  public void testCreateTimeParametersAsPost() {
+    testDateParametersAsPost(CREATE_TIMES);
+  }
+
+  @Test
+  public void testMultipleDueDateParameters() {
+    testMultipleDateParameters(DUE_DATES);
+  }
+
+  @Test
+  public void testMultipleCreateTimeParameters() {
+    testMultipleDateParameters(CREATE_TIMES);
   }
 
   @Test
