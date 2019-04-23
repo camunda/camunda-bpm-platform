@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -49,6 +50,7 @@ import java.util.List;
 
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.junit.Assert.assertEquals;
@@ -189,17 +191,24 @@ public class DeleteBatchAuthorizationTest {
       Assert.assertEquals(0, engineRule.getManagementService().createBatchQuery().count());
       Assert.assertEquals(0, engineRule.getHistoryService().createHistoricBatchQuery().count());
 
-      List<UserOperationLogEntry> userOperationLogEntries = engineRule.getHistoryService()
-        .createUserOperationLogQuery()
-        .operationType(OPERATION_TYPE_DELETE)
-        .list();
+      UserOperationLogQuery query = engineRule.getHistoryService()
+        .createUserOperationLogQuery();
 
+      List<UserOperationLogEntry> userOperationLogEntries = query.operationType(OPERATION_TYPE_DELETE)
+        .batchId(batch.getId())
+        .list();
       assertEquals(1, userOperationLogEntries.size());
 
       UserOperationLogEntry entry = userOperationLogEntries.get(0);
       assertEquals("cascadeToHistory", entry.getProperty());
       assertEquals("true", entry.getNewValue());
       assertEquals(CATEGORY_OPERATOR, entry.getCategory());
+
+      // Ensure that HistoricBatch deletion is not logged
+      List<UserOperationLogEntry> userOperationLogHistoricEntries = query.operationType(OPERATION_TYPE_DELETE_HISTORY)
+        .batchId(batch.getId())
+        .list();
+      assertEquals(0, userOperationLogHistoricEntries.size());
     }
   }
 }
