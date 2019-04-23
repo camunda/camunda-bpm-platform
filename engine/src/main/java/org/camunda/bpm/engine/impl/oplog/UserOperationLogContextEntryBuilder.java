@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.oplog;
 
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -124,6 +125,28 @@ public class UserOperationLogContextEntryBuilder {
     if (execution != null) {
       entry.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     }
+
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricTaskInstance task, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+
+    entry.setProcessDefinitionKey(task.getProcessDefinitionKey());
+    entry.setProcessDefinitionId(task.getProcessDefinitionId());
+    entry.setProcessInstanceId(task.getProcessInstanceId());
+    entry.setExecutionId(task.getExecutionId());
+    entry.setCaseDefinitionId(task.getCaseDefinitionId());
+    entry.setCaseInstanceId(task.getCaseInstanceId());
+    entry.setCaseExecutionId(task.getCaseExecutionId());
+    entry.setTaskId(task.getId());
+    entry.setRootProcessInstanceId(task.getRootProcessInstanceId());
 
     return this;
   }

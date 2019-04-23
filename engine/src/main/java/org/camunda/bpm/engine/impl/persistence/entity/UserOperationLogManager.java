@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
@@ -204,14 +205,13 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logTaskOperations(String operation, String taskId, List<PropertyChange> propertyChanges, String operationCategory) {
+  public void logTaskOperations(String operation, HistoricTaskInstance historicTask, List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TASK)
-          .propertyChanges(propertyChanges)
-          .taskId(taskId)
-          .category(operationCategory);
+          .inContextOf(historicTask, propertyChanges)
+          .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);

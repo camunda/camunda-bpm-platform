@@ -50,7 +50,7 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
       checker.checkDeleteHistoricTaskInstance(task);
     }
 
-    writeUserOperationLog(commandContext);
+    writeUserOperationLog(commandContext, task);
 
     commandContext
       .getHistoricTaskInstanceManager()
@@ -59,15 +59,14 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
     return null;
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext) {
+  protected void writeUserOperationLog(CommandContext commandContext, HistoricTaskInstanceEntity historicTask) {
     List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, 1));
     propertyChanges.add(new PropertyChange("async", null, false));
 
     commandContext.getOperationLogManager()
       .logTaskOperations(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
-        taskId,
-        propertyChanges,
-        UserOperationLogEntry.CATEGORY_OPERATOR);
+        historicTask,
+        propertyChanges);
   }
 }
