@@ -267,13 +267,9 @@
         and RES.SUPER_EXEC_ is null
       </if>
       <if test="isLeafProcessInstances">
-        AND RES.SUPER_EXEC_ is not null
-        AND not exists(
-          select E1.* from ACT_RU_EXECUTION E1
-          inner join ACT_RU_EXECUTION E2 on E2.PROC_INST_ID_ = E1.ID_
-          AND RES.ID_ in (
-            select SUPER.PROC_INST_ID_ from ACT_RU_EXECUTION SUPER
-            inner join ACT_RU_EXECUTION CALLED on SUPER.ID_ = CALLED.SUPER_EXEC_ and CALLED.ID_ = CALLED.PROC_INST_ID_))
+        and RES.ID_ not in (
+            select SUPER.PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION SUPER
+            inner join ${prefix}ACT_RU_EXECUTION CALLED on SUPER.ID_ = CALLED.SUPER_EXEC_ where CALLED.ID_ = CALLED.PROC_INST_ID_)
       </if>
       <if test="subProcessInstanceId != null">
         and RES.ID_ = (select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = (select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{subProcessInstanceId}))
