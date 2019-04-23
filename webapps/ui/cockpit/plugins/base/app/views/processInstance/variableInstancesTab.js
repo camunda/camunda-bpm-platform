@@ -31,9 +31,9 @@ var uploadTemplate = require('../../../../../client/scripts/components/variables
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
     '$scope', '$sce', 'search', 'Uri', 'LocalExecutionVariableResource',
-    'Notifications', '$uibModal', '$q', 'camAPI', 'fixDate', 'unfixDate', '$translate', 'localConf',
+    'Notifications', '$uibModal', '$q', 'camAPI', 'fixDate', 'unfixDate', '$translate', 'localConf', 'escapeHtml',
     function($scope, $sce, search, Uri, LocalExecutionVariableResource,
-      Notifications, $modal, $q, camAPI, fixDate, unfixDate, $translate,localConf) {
+      Notifications, $modal, $q, camAPI, fixDate, unfixDate, $translate, localConf, escapeHtml) {
 
       // input: processInstance, processData
       var variableInstanceData = $scope.processData.newChild($scope),
@@ -340,7 +340,7 @@ module.exports = function(ngModule) {
                       '" title="' +
                       instance.id +
                       '">' +
-                      instance.name  +
+                      escapeHtml.escape(instance.name)  +
                       '</a>';
                   }
 
