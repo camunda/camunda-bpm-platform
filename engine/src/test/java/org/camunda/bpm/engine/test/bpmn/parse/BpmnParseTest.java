@@ -528,13 +528,13 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(EventSubProcessStartEventActivityBehavior.class, escalationStartEvent.getActivityBehavior().getClass());
   }
   
-  public void testParseServiceTaskWithoutClass(){
+  public void testServiceTaskWithoutClassThrowsError(){
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseServiceTaskWithoutClass");
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
       fail();
     } catch (ProcessEngineException e) {
-      assertEquals("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on serviceTask. | org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseServiceTaskWithoutClass.bpmn | line 4 | column 43 | element ServiceTask_1\n", e.getMessage());
+      assertTextPresent("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on serviceTask. | org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseServiceTaskWithoutClass.bpmn | line 4 | column 43 | element ServiceTask_1", e.getMessage());
     }
   }
 
