@@ -8,7 +8,7 @@
   <message id="message1" name="task1Message" />
   <message id="message2" name="task2Message" />
   
-  <process id="boundaryEvent">
+  <process id="boundaryEvent" isExecutable="true">
   
     <startEvent id="theStart" />
     

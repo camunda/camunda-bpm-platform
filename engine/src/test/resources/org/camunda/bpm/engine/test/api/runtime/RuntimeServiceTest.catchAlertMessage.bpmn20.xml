@@ -6,7 +6,7 @@
 
 	<message id="panicMessage" name="panic" />
 
-	<process id="catchPanicMessage">
+	<process id="catchPanicMessage" isExecutable="true">
 
 		<startEvent id="start" />
 

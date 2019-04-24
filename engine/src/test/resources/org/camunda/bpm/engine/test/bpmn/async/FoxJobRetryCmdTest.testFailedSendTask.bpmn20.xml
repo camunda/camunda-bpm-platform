@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+
+	<process id="failedSendTask" isExecutable="true">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingSendTask" />
+
+		<sendTask id="failingSendTask" camunda:type="mail" camunda:async="true">
+			<extensionElements>
+	       		<fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
+	       		<camunda:field name="to">
+					<camunda:string>Hello Kermit!</camunda:string>
+				</camunda:field>
+				<camunda:field name="subject">
+					<camunda:string>Hello Kermit!</camunda:string>
+				</camunda:field>
+				<camunda:field name="text">
+					<camunda:string>This a text only e-mail.</camunda:string>
+				</camunda:field>
+			</extensionElements>
+		</sendTask>
+		
+		<sequenceFlow id="flow2" sourceRef="failingSendTask" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+	
+</definitions>

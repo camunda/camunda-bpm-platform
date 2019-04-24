@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 import java.util.Date;
@@ -28,7 +32,7 @@ import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Sebastian Menski
@@ -56,12 +60,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   protected Date closedBefore;
   protected Date closedAfter;
   protected String caseDefinitionKey;
+  protected String[] caseActivityIds;
+
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
 
   public HistoricCaseInstanceQueryImpl() {
-  }
-
-  public HistoricCaseInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public HistoricCaseInstanceQueryImpl(CommandExecutor commandExecutor) {
@@ -121,6 +125,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     return this;
   }
 
+  public HistoricCaseInstanceQuery caseActivityIdIn(String... caseActivityIds) {
+    ensureNotNull("caseActivityIds", (Object[]) caseActivityIds);
+    this.caseActivityIds = caseActivityIds;
+    return this;
+  }
+
   public HistoricCaseInstanceQuery createdAfter(Date date) {
     createdAfter = date;
     return this;
@@ -168,6 +178,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
   public HistoricCaseInstanceQuery subProcessInstanceId(String subProcessInstanceId) {
     this.subProcessInstanceId = subProcessInstanceId;
+    return this;
+  }
+
+  public HistoricCaseInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public HistoricCaseInstanceQuery withoutTenantId() {
+    tenantIds = null;
+    isTenantIdSet = true;
     return this;
   }
 
@@ -236,6 +259,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     return orderBy(HistoricCaseInstanceQueryProperty.PROCESS_INSTANCE_ID_);
   }
 
+  public HistoricCaseInstanceQuery orderByTenantId() {
+    return orderBy(HistoricCaseInstanceQueryProperty.TENANT_ID);
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -250,6 +277,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     return commandContext
       .getHistoricCaseInstanceManager()
       .findHistoricCaseInstancesByQueryCriteria(this, page);
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+      || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore)
+      || CompareUtil.areNotInAscendingOrder(closedAfter, closedBefore)
+      || CompareUtil.elementIsNotContainedInList(caseInstanceId, caseInstanceIds)
+      || CompareUtil.elementIsContainedInList(caseDefinitionKey, caseKeyNotIn);
   }
 
   public String getBusinessKey() {

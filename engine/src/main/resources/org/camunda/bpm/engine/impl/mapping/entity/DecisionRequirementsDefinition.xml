@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
+
+  <!-- INSERT -->
+
+  <insert id="insertDecisionRequirementsDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
+    insert into ${prefix}ACT_RE_DECISION_REQ_DEF(
+      ID_, 
+      CATEGORY_, 
+      NAME_, 
+      KEY_, 
+      VERSION_, 
+      DEPLOYMENT_ID_, 
+      RESOURCE_NAME_, 
+      DGRM_RESOURCE_NAME_, 
+      TENANT_ID_,
+      REV_)
+    values (#{id, jdbcType=VARCHAR},
+            #{category, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{key, jdbcType=VARCHAR},
+            #{version, jdbcType=INTEGER},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=VARCHAR},
+            #{diagramResourceName, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR},
+            1
+           )
+  </insert>
+
+  <!-- UPDATE -->
+
+  <update id="updateDecisionRequirementsDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
+    update ${prefix}ACT_RE_DECISION_REQ_DEF set
+      REV_ = #{revisionNext, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- DELETE -->
+
+  <delete id="deleteDecisionRequirementsDefinitionsByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_RE_DECISION_REQ_DEF where DEPLOYMENT_ID_ = #{deploymentId}
+  </delete>
+
+  <!-- RESULTMAP -->
+
+  <resultMap id="decisionRequirementsDefinitionsResultMap" type="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" />
+    <result property="category" column="CATEGORY_" />
+    <result property="name" column="NAME_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!-- SELECT -->
+
+  <select id="selectDecisionRequirementsDefinition" parameterType="string" resultMap="decisionRequirementsDefinitionsResultMap">
+    select * from ${prefix}ACT_RE_DECISION_REQ_DEF where ID_ = #{decisionRequirementsDefinitionId}
+  </select>
+  
+  <select id="selectDecisionRequirementsDefinitionByDeploymentId" parameterType="string" resultMap="decisionRequirementsDefinitionsResultMap">
+    select * from ${prefix}ACT_RE_DECISION_REQ_DEF where DEPLOYMENT_ID_ = #{parameter}
+  </select>
+
+  <select id="selectDecisionRequirementsDefinitionByDeploymentAndKey" parameterType="map" resultMap="decisionRequirementsDefinitionsResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_REQ_DEF
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{decisionRequirementsDefinitionKey}
+  </select>
+
+  <select id="selectLatestDecisionRequirementsDefinitionByKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionRequirementsDefinitionsResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_REQ_DEF d1
+      inner join
+          (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
+          from ${prefix}ACT_RE_DECISION_REQ_DEF RES
+          where KEY_ = #{parameter}
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+          group by TENANT_ID_, KEY_) d2
+        on d1.KEY_ = d2.KEY_
+    where d1.VERSION_ = d2.MAX_VERSION and 
+          (d1.TENANT_ID_ = d2.TENANT_ID_ or (d1.TENANT_ID_ is null and d2.TENANT_ID_ is null))
+  </select>
+  
+  <select id="selectLatestDecisionRequirementsDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="decisionRequirementsDefinitionsResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_REQ_DEF 
+    where KEY_ = #{decisionRequirementsDefinitionKey}
+          and TENANT_ID_ is null
+          and VERSION_ = (
+              select max(VERSION_) 
+              from ${prefix}ACT_RE_DECISION_REQ_DEF 
+              where KEY_ = #{decisionRequirementsDefinitionKey} and TENANT_ID_ is null)
+  </select>
+  
+  <select id="selectLatestDecisionRequirementsDefinitionByKeyAndTenantId" parameterType="map" resultMap="decisionRequirementsDefinitionsResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_REQ_DEF RES
+    where KEY_ = #{decisionRequirementsDefinitionKey}
+          and TENANT_ID_ = #{tenantId}
+          and VERSION_ = (
+              select max(VERSION_) 
+              from ${prefix}ACT_RE_DECISION_REQ_DEF 
+              where KEY_ = #{decisionRequirementsDefinitionKey} and TENANT_ID_ = #{tenantId})
+  </select>
+
+  <select id="selectPreviousDecisionRequirementsDefinitionId" parameterType="map" resultType="string">
+    select distinct RES.*
+      from ${prefix}ACT_RE_DECISION_REQ_DEF RES
+     where RES.KEY_ = #{key}
+       <if test="tenantId != null">
+          AND TENANT_ID_ = #{tenantId}
+        </if>
+        <if test="tenantId == null">
+          AND TENANT_ID_ is null
+        </if>
+       and RES.VERSION_ = (
+        select MAX(VERSION_) 
+        from ${prefix}ACT_RE_DECISION_REQ_DEF 
+        where KEY_ = #{key} 
+          <if test="tenantId != null">
+            AND TENANT_ID_ = #{tenantId}
+          </if>
+          <if test="tenantId == null">
+            AND TENANT_ID_ is null
+          </if>
+          AND VERSION_ &lt; #{version})
+  </select>
+
+  <select id="selectDecisionRequirementsDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultMap="decisionRequirementsDefinitionsResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectDecisionRequirementsDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
+  </select>
+   
+  <!-- mysql specific sql -->
+  <select id="selectDecisionRequirementsDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultMap="decisionRequirementsDefinitionsResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectDecisionRequirementsDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectDecisionRequirementsDefinitionsByQueryCriteriaSql">
+
+    from ${prefix}ACT_RE_DECISION_REQ_DEF RES
+    <if test="latest">
+      inner join
+          (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
+          from ${prefix}ACT_RE_DECISION_REQ_DEF
+          <where>
+            <if test="key != null">
+              KEY_ = #{key}
+            </if>
+          </where>
+          group by TENANT_ID_, KEY_) VER
+        on RES.KEY_ = VER.KEY_
+    </if>
+    
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, RES.KEY_, '*'))      
+    </if>
+    
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.length > 0">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryLike != null">
+        and RES.CATEGORY_ like #{categoryLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
+      </if>
+      <if test="keyLike != null">
+        and RES.KEY_ like #{keyLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="resourceName != null">
+        and RES.RESOURCE_NAME_ = #{resourceName}
+      </if>
+      <if test="resourceNameLike != null">
+        and RES.RESOURCE_NAME_ like #{resourceNameLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="version != null">
+        and RES.VERSION_ = #{version}
+      </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="latest">
+       and RES.VERSION_ = VER.MAX_VERSION and 
+          (RES.TENANT_ID_ = VER.TENANT_ID_ or (RES.TENANT_ID_ is null and VER.TENANT_ID_ is null)) 
+      </if>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and ( RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+          <if test="includeDefinitionsWithoutTenantId">
+            or RES.TENANT_ID_ is null 
+          </if>
+          )
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      
+    </where>
+  </sql>
+
+</mapper>

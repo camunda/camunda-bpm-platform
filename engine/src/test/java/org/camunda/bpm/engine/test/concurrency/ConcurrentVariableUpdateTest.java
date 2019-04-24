@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,18 +16,25 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.sql.Connection;
 import java.util.Collections;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.slf4j.Logger;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase {
+
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   static ControllableThread activeThread;
 
@@ -58,10 +69,26 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
       } catch (Exception e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 
+
+  @Override
+  protected void runTest() throws Throwable {
+
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if (DbSqlSessionFactory.DB2.equals(databaseType) && "testConcurrentVariableCreate".equals(getName())) {
+      // skip test method - if database is DB2
+    } else {
+      // invoke the test method
+      super.runTest();
+    }
+  }
+
+  // Test is skipped when testing on DB2.
+  // Please update the IF condition in #runTest, if the method name is changed.
   @Deployment(resources="org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
   public void testConcurrentVariableCreate() {
 
@@ -82,8 +109,8 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
     assertNull(thread1.optimisticLockingException);
 
     thread2.proceedAndWaitTillDone();
-    assertNotNull(thread2.exception);
-    assertNull(thread2.optimisticLockingException);
+    assertNull(thread2.exception);
+    assertNotNull(thread2.optimisticLockingException);
 
     // should not fail with FK violation because one of the variables is not deleted.
     taskService.complete(taskId);

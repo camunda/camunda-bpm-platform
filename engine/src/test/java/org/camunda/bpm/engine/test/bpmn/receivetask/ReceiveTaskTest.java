@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,8 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.receivetask;
 import java.util.List;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
-import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -35,12 +38,12 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
   private List<EventSubscription> getEventSubscriptionList() {
     return runtimeService.createEventSubscriptionQuery()
-        .eventType(MessageEventHandler.EVENT_HANDLER_TYPE).list();
+        .eventType(EventType.MESSAGE.name()).list();
   }
 
   private List<EventSubscription> getEventSubscriptionList(String activityId) {
     return runtimeService.createEventSubscriptionQuery()
-        .eventType(MessageEventHandler.EVENT_HANDLER_TYPE).activityId(activityId).list();
+        .eventType(EventType.MESSAGE.name()).activityId(activityId).list();
   }
 
   private String getExecutionId(String processInstanceId, String activityId) {
@@ -347,14 +350,14 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
     // expect: after completing the first receive task there is one event subscription for compensation
     assertEquals(1, runtimeService.createEventSubscriptionQuery()
-        .eventType(CompensationEventHandler.EVENT_HANDLER_TYPE).count());
+        .eventType(EventType.COMPENSATE.name()).count());
 
     // then: we can trigger the second event subscription
     runtimeService.messageEventReceived(subscriptions.get(1).getEventName(), subscriptions.get(1).getExecutionId());
 
     // expect: there are three event subscriptions for compensation (two subscriptions for tasks and one for miBody)
     assertEquals(3, runtimeService.createEventSubscriptionQuery()
-        .eventType(CompensationEventHandler.EVENT_HANDLER_TYPE).count());
+        .eventType(EventType.COMPENSATE.name()).count());
 
     // expect: one user task is created
     Task task = taskService.createTaskQuery().singleResult();
@@ -494,5 +497,18 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
     // expect: this ends the process instance
     assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void testWaitStateBehavior() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
+    Execution execution = runtimeService.createExecutionQuery()
+      .processInstanceId(pi.getId())
+      .activityId("waitState")
+      .singleResult();
+    assertNotNull(execution);
+
+    runtimeService.signal(execution.getId());
+    assertProcessEnded(pi.getId());
   }
 }

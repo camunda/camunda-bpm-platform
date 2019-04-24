@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +19,7 @@ package org.camunda.spin.plugin.impl;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.JSON;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.XML;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -27,7 +29,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 import org.camunda.spin.DataFormats;
-import org.camunda.spin.spi.DataFormat;
 
 /**
  * @author Thorben Lindhauer
@@ -48,6 +49,11 @@ public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
     registerScriptResolver(processEngineConfiguration);
     registerSerializers(processEngineConfiguration);
     registerValueTypes(processEngineConfiguration);
+    registerFallbackSerializer(processEngineConfiguration);
+  }
+
+  protected void registerFallbackSerializer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.setFallbackSerializerFactory(new SpinFallbackSerializerFactory());
   }
 
   protected void registerSerializers(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -65,18 +71,10 @@ public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
   }
 
   protected List<TypedValueSerializer<?>> lookupSpinSerializers() {
-    List<TypedValueSerializer<?>> serializers = new ArrayList<TypedValueSerializer<?>>();
-
-    Set<DataFormat<?>> availableDataFormats = DataFormats.getAvailableDataFormats();
-    for (DataFormat<?> dataFormat : availableDataFormats) {
-      serializers.add(new SpinObjectValueSerializer("spin://"+dataFormat.getName(), dataFormat));
-    }
-    if(DataFormats.json() != null) {
-      serializers.add(new JsonValueSerializer());
-    }
-    if(DataFormats.xml() != null){
-      serializers.add(new XmlValueSerializer());
-    }
+    DataFormats globalFormats = DataFormats.getInstance();
+    List<TypedValueSerializer<?>> serializers =
+        SpinVariableSerializers.createObjectValueSerializers(globalFormats);
+    serializers.addAll(SpinVariableSerializers.createSpinValueSerializers(globalFormats));
 
     return serializers;
   }

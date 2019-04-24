@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions id="taskAssigneeExample" 
+<definitions id="taskAssigneeExample"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
-  
-  <process id="testProcessExpression">
-  
+
+  <process id="testProcessExpression" isExecutable="true">
+
     <startEvent id="start"/>
-    
+
     <sequenceFlow sourceRef="start" targetRef="task" />
 
     <businessRuleTask id="task"
                       camunda:decisionRef="${decision}"
                       camunda:decisionRefBinding="version"
                       camunda:decisionRefVersion="${version}"
-                      camunda:resultVariable="decisionResult" />
+                      camunda:mapDecisionResult="singleEntry"
+                      camunda:resultVariable="result" />
 
     <sequenceFlow sourceRef="task" targetRef="end" />
 

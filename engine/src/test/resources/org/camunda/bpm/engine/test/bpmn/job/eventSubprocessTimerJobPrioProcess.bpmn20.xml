@@ -4,14 +4,14 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
-  <process id="eventSubprocessTimerJobPrioProcess" camunda:jobPriority="8">
-  
+  <process id="eventSubprocessTimerJobPrioProcess" camunda:jobPriority="8" isExecutable="true">
+
     <startEvent id="start"/>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="task1" />
     <userTask id="task1" />
     <sequenceFlow id="flow2" sourceRef="task1" targetRef="end" />
     <endEvent id="end" />
-    
+
     <!-- event subprocess -->
     <subProcess id="subProcess" name="Subprocess" triggeredByEvent="true">
       <startEvent id="subprocessStartEvent" isInterrupting="true" camunda:jobPriority="25">

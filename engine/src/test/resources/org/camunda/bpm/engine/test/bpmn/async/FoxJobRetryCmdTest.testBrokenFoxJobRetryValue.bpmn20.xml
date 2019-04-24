@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+
+	<process id="brokenFoxJobRetryValue" isExecutable="true">
+
+		<startEvent id="theStart">
+			<extensionElements>
+     		<fox:failedJobRetryTimeCycle>RASDASDAD5/PT5M</fox:failedJobRetryTimeCycle>
+     	</extensionElements>
+     	<timerEventDefinition id="failingTimer">
+        <timeCycle>0 0/5 * * * ?</timeCycle>
+      </timerEventDefinition>
+		</startEvent>
+
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingServiceTask" />
+		
+		<serviceTask id="failingServiceTask" camunda:class="com.camunda.fox.engine.test.cmd.FailingDelegate" />
+        
+		<sequenceFlow id="flow2" sourceRef="failingServiceTask" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

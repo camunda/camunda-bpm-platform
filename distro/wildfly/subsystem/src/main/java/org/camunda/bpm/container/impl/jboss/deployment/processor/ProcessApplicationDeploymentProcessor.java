@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,6 +16,18 @@
  */
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
+import static org.jboss.as.server.deployment.Attachments.MODULE;
+
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
@@ -20,10 +36,12 @@ import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplication
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessApplication;
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationDeploymentService;
 import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationStartService;
+import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationStopService;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -45,18 +63,6 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.vfs.VirtualFile;
 
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.jboss.as.server.deployment.Attachments.MODULE;
-
 
 /**
  * <p>This processor installs the process application into the container.</p>
@@ -71,8 +77,9 @@ import static org.jboss.as.server.deployment.Attachments.MODULE;
  */
 public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProcessor {
 
-  public static final int PRIORITY = 0x0000; // this can happen at the beginning of the phase
+  public static final int PRIORITY = 0x0001; // this can happen early in the phase
 
+  @Override
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
@@ -87,9 +94,24 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     Module module = deploymentUnit.getAttachment(Attachments.MODULE);
     final String moduleName = module.getIdentifier().toString();
     final ServiceName paStartServiceName = ServiceNames.forProcessApplicationStartService(moduleName);
+    final ServiceName paStopServiceName = ServiceNames.forProcessApplicationStopService(moduleName);
     final ServiceName noViewStartService = ServiceNames.forNoViewProcessApplicationStartService(moduleName);
 
     List<ServiceName> deploymentServiceNames = new ArrayList<ServiceName>();
+
+    ProcessApplicationStopService paStopService = new ProcessApplicationStopService();
+    ServiceBuilder<ProcessApplicationStopService> stopServiceBuilder = phaseContext.getServiceTarget().addService(paStopServiceName, paStopService)
+      .addDependency(phaseContext.getPhaseServiceName())
+      .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStopService.getPlatformPluginsInjector())
+      .setInitialMode(Mode.ACTIVE);
+
+    if(paViewServiceName != null) {
+      stopServiceBuilder.addDependency(paViewServiceName, ComponentView.class, paStopService.getPaComponentViewInjector());
+    } else {
+      stopServiceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, paStopService.getNoViewProcessApplication());
+    }
+
+    stopServiceBuilder.install();
 
     // deploy all process archives
     List<ProcessesXmlWrapper> processesXmlWrappers = ProcessApplicationAttachments.getProcessesXmls(deploymentUnit);
@@ -111,6 +133,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
         ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArachiveName);
         ServiceBuilder<ProcessApplicationDeploymentService> serviceBuilder = phaseContext.getServiceTarget().addService(deploymentServiceName, deploymentService)
           .addDependency(phaseContext.getPhaseServiceName())
+          .addDependency(paStopServiceName)
           .addDependency(processEngineServiceName, ProcessEngine.class, deploymentService.getProcessEngineInjector())
           .setInitialMode(Mode.ACTIVE);
 
@@ -138,10 +161,13 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames, postDeploy, preUndeploy, module);
     ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
       .addDependency(phaseContext.getPhaseServiceName())
-      .addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector())
+      .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStartService.getPlatformPluginsInjector())
       .addDependencies(deploymentServiceNames)
       .setInitialMode(Mode.ACTIVE);
 
+    if (phaseContext.getServiceRegistry().getService(ServiceNames.forDefaultProcessEngine()) != null) {
+      serviceBuilder.addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector());
+    }
     if(paViewServiceName != null) {
       serviceBuilder.addDependency(paViewServiceName, ComponentView.class, paStartService.getPaComponentViewInjector());
     } else {
@@ -151,6 +177,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     serviceBuilder.install();
   }
 
+  @Override
   public void undeploy(DeploymentUnit deploymentUnit) {
 
   }

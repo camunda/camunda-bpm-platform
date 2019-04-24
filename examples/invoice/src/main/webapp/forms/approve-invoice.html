@@ -1,18 +1,18 @@
 <form class="form-horizontal"
       role="form">
 
-  <div class="panel panel-info">Do you approve this invoice?</div>
+  <p>Do you approve this invoice?</p>
 
-  <div class="control-group">
-    <label class="control-label">Invoice Document</label>
-    <div class="controls">
+  <div class="form-group">
+    <label class="control-label col-md-2">Invoice Document</label>
+    <div class="form-control-static col-md-10">
       <a cam-file-download="invoiceDocument"></a>
     </div>
   </div>
 
-  <div class="control-group">
-    <label class="control-label">Creditor</label>
-    <div class="controls">
+  <div class="form-group">
+    <label class="control-label col-md-2">Creditor</label>
+    <div class="col-md-10">
       <input cam-variable-name="creditor"
              type="text"
              name="creditor"
@@ -20,9 +20,9 @@
              class="form-control" />
     </div>
   </div>
-  <div class="control-group">
-    <label class="control-label">Amount</label>
-    <div class="controls">
+  <div class="form-group">
+    <label class="control-label col-md-2">Amount</label>
+    <div class="col-md-10">
       <input cam-variable-name="amount"
              type="text"
              name="amount"
@@ -30,9 +30,9 @@
              class="form-control" />
     </div>
   </div>
-  <div class="control-group">
-    <label class="control-label">Invoice Category</label>
-    <div class="controls">
+  <div class="form-group">
+    <label class="control-label col-md-2">Invoice Category</label>
+    <div class="col-md-10">
       <input cam-variable-name="invoiceCategory"
              type="text"
              name="amount"
@@ -40,9 +40,9 @@
              class="form-control" />
     </div>
   </div>
-  <div class="control-group">
-    <label class="control-label">Invoice Number</label>
-    <div class="controls">
+  <div class="form-group">
+    <label class="control-label col-md-2">Invoice Number</label>
+    <div class="col-md-10">
       <input cam-variable-name="invoiceNumber"
              type="text"
              name="invoiceNumber"
@@ -50,14 +50,19 @@
              class="form-control" />
     </div>
   </div>
-  <div class="control-group">
-    <label class="control-label">Do you approve? </label>
-    <div class="controls">
-      <input cam-variable-name="approved"
-             cam-variable-type="Boolean"
-             type="checkbox"
-             name="approved"
-             class="form-control" />
+
+  <div class="form-group">
+    <div class="col-md-10 col-md-offset-2">
+      <div class="checkbox">
+        <label>
+          <input cam-variable-name="approved"
+                 cam-variable-type="Boolean"
+                 type="checkbox"
+                 name="approved"
+                 class="form-control" />
+          Do you approve?
+        </label>
+      </div>
     </div>
   </div>
 </form>

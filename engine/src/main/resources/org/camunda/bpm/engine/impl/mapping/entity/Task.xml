@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TaskEntity">
@@ -27,6 +44,7 @@
       DUE_DATE_,
       FOLLOW_UP_DATE_,
       SUSPENSION_STATE_,
+      TENANT_ID_,
       REV_
     ) values (
       #{id, jdbcType=VARCHAR},
@@ -48,6 +66,7 @@
       #{dueDate, jdbcType=TIMESTAMP},
       #{followUpDate, jdbcType=TIMESTAMP},
       #{suspensionState, jdbcType=INTEGER},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -70,34 +89,54 @@
       CASE_EXECUTION_ID_ = #{caseExecutionId, jdbcType=VARCHAR},
       CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
       CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+      TASK_DEF_KEY_ = #{taskDefinitionKey, jdbcType=VARCHAR},
       DESCRIPTION_ = #{description, jdbcType=VARCHAR},
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
       FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP},
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
-  <update id="updateTaskSuspensionStateByParameters" parameterType="java.util.Map">
+  <update id="updateTaskSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_TASK set
-      REV_ = REV_ + 1,
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      REV_ = 1 + REV_ ,
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
-      <if test="processInstanceId != null">
-        PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-      </if>
-      <if test="processDefinitionId != null">
-        PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
-      </if>
-      <if test="processDefinitionKey != null">
-        PROC_DEF_ID_ IN (SELECT ID_ FROM ${prefix}ACT_RE_PROCDEF WHERE KEY_ = #{processDefinitionKey, jdbcType=VARCHAR})
-      </if>
-      <if test="caseExecutionId != null">
-        CASE_EXECUTION_ID_ = #{caseExecutionId, jdbcType=VARCHAR}
-      </if>
+      <include refid="updateTaskSuspensionStateByParametersSql" />
     </where>
   </update>
+
+  <sql id="updateTaskSuspensionStateByParametersSql">
+    <if test="parameter.processInstanceId != null">
+      PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
+    </if>
+    <if test="parameter.processDefinitionId != null">
+      PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
+    </if>
+    <if test="parameter.processDefinitionKey != null">
+      PROC_DEF_ID_ IN (
+      SELECT ID_
+      FROM ${prefix}ACT_RE_PROCDEF PD
+      WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+      <if test="parameter.isProcessDefinitionTenantIdSet">
+        <if test="parameter.processDefinitionTenantId != null">
+          and PD.TENANT_ID_ = #{parameter.processDefinitionTenantId, jdbcType=VARCHAR}
+        </if>
+        <if test="parameter.processDefinitionTenantId == null">
+          and PD.TENANT_ID_ is null
+        </if>
+      </if>
+      )
+      <bind name="columnPrefix" value="''"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </if>
+    <if test="parameter.caseExecutionId != null">
+      CASE_EXECUTION_ID_ = #{parameter.caseExecutionId, jdbcType=VARCHAR}
+    </if>
+  </sql>
 
   <!-- TASK DELETE -->
   <delete id="deleteTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TaskEntity">
@@ -127,6 +166,8 @@
     <result property="dueDateWithoutCascade" column="DUE_DATE_" jdbcType="TIMESTAMP"/>
     <result property="followUpDateWithoutCascade" column="FOLLOW_UP_DATE_" jdbcType="TIMESTAMP"/>
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <!-- note: if you add mappings here, make sure to select the columns in 'columnSelection' -->
   </resultMap>
 
   <!-- TASK SELECT -->
@@ -160,13 +201,13 @@
   <select id="selectTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TaskQueryImpl" resultMap="taskResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select distinct
+    select ${distinct}
     <include refid="columnSelection"/>
     ${limitBetween}
     <if test="taskNameCaseInsensitive">
       , lower(RES.NAME_) LOWER_NAME_
     </if>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/> 
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectTaskByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -182,36 +223,70 @@
     RES.CREATE_TIME_, RES.OWNER_, RES.ASSIGNEE_, RES.DELEGATION_, RES.EXECUTION_ID_,
     RES.PROC_INST_ID_, RES.PROC_DEF_ID_, RES.CASE_EXECUTION_ID_, RES.CASE_INST_ID_,
     RES.CASE_DEF_ID_, RES.TASK_DEF_KEY_, RES.DUE_DATE_, RES.FOLLOW_UP_DATE_,
-    RES.SUSPENSION_STATE_
+    RES.SUSPENSION_STATE_, RES.TENANT_ID_
   </sql>
 
   <sql id="selectTaskByQueryCriteriaSql">
+
     from ${prefix}ACT_RU_TASK RES
-    <if test="candidateUser != null || candidateGroups != null || involvedUser != null">
+    <bind name="I_JOIN" value="false" />
+    <bind name="D_JOIN" value="false" />
+    <bind name="E_JOIN" value="false" />
+    <bind name="CD_JOIN" value="false" />
+    <bind name="CE_JOIN" value="false" />
+    <bind name="E1_JOIN" value="false" />
+
+    <foreach collection="queries" item="query">
+      <if test="query != null &amp;&amp; (query.candidateUser != null || query.candidateGroups != null || query.involvedUser != null || query.withCandidateGroups || query.withCandidateUsers)">
+        <bind name="I_JOIN" value="true" />
+      </if>
+      <if test="query != null &amp;&amp; (query.processDefinitionKey != null || query.processDefinitionName != null || query.processDefinitionNameLike != null ||
+              (query.processDefinitionKeys != null &amp;&amp; query.processDefinitionKeys.length > 0))">
+        <bind name="D_JOIN" value="true" />
+      </if>
+      <if test="query != null &amp;&amp; (query.processInstanceBusinessKey != null || query.processInstanceBusinessKeyLike != null ||
+              (query.processInstanceBusinessKeys != null &amp;&amp; query.processInstanceBusinessKeys.length > 0))">
+        <bind name="E_JOIN" value="true" />
+      </if>
+      <if test="query != null &amp;&amp; (query.caseDefinitionKey != null || query.caseDefinitionName != null || query.caseDefinitionNameLike != null)">
+        <bind name="CD_JOIN" value="true" />
+      </if>
+      <if test="query != null &amp;&amp; (query.caseInstanceBusinessKey != null || query.caseInstanceBusinessKeyLike != null)">
+        <bind name="CE_JOIN" value="true" />
+      </if>
+      <if test="query != null &amp;&amp; (query.activityInstanceIdIn != null &amp;&amp; query.activityInstanceIdIn.length > 0)">
+        <bind name="E1_JOIN" value="true" />
+      </if>
+    </foreach>
+
+    <if test="I_JOIN">
       inner join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
     </if>
-    <if test="processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null ||
-              (processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0)">
+    <if test="D_JOIN">
       inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
     </if>
-    <if test="processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null ||
-              (processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0)">
-        inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
+    <if test="E_JOIN">
+      inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
     </if>
-    <if test="caseDefinitionKey != null || caseDefinitionName != null || caseDefinitionNameLike != null">
+    <if test="CD_JOIN">
       inner join ${prefix}ACT_RE_CASE_DEF CD on RES.CASE_DEF_ID_ = CD.ID_
     </if>
-    <if test="caseInstanceBusinessKey != null || caseInstanceBusinessKeyLike != null">
-        inner join ${prefix}ACT_RU_CASE_EXECUTION CE on RES.CASE_INST_ID_ = CE.ID_
+    <if test="CE_JOIN">
+      inner join ${prefix}ACT_RU_CASE_EXECUTION CE on RES.CASE_INST_ID_ = CE.ID_
     </if>
-    <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
-        left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
-    </if>
-
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-      left join ${prefix}ACT_RE_PROCDEF PROCDEF on RES.PROC_DEF_ID_ = PROCDEF.ID_
+    <if test="E1_JOIN">
+      left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
 
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+      left join ${prefix}ACT_RE_PROCDEF PROCDEF
+      on RES.PROC_DEF_ID_ = PROCDEF.ID_           
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">    
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, PROCDEF.KEY_, '*'))      
+      </if>
+    </if>
+    
     <foreach collection="orderingProperties" item="orderingProperty" index="i">
       <if test="orderingProperty.relation != null">
         <bind name="tableAlias" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@tableAlias(orderingProperty.relation, i)"/>
@@ -223,247 +298,345 @@
       </if>
     </foreach>
     <where>
-      <if test="taskId != null">
-        RES.ID_ = #{taskId}
-      </if>
-      <if test="name != null">
-        and RES.NAME_ = #{name}
-      </if>
-      <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
-      </if>
-      <if test="description != null">
-        and RES.DESCRIPTION_ = #{description}
-      </if>
-      <if test="descriptionLike != null">
-        and RES.DESCRIPTION_ like #{descriptionLike}
-      </if>
-      <if test="priority != null">
-        and RES.PRIORITY_ = #{priority}
-      </if> 
-      <if test="minPriority != null">
-        and RES.PRIORITY_ &gt;= #{minPriority}
-      </if> 
-      <if test="maxPriority != null">
-        and RES.PRIORITY_ &lt;= #{maxPriority}
-      </if> 
-      <if test="assignee != null">
-        and RES.ASSIGNEE_ = #{assignee}
-      </if>
-      <if test="assigneeLike != null">
-        and RES.ASSIGNEE_ like #{assigneeLike}
-      </if>
-      <if test="owner != null">
-        and RES.OWNER_ = #{owner}
-      </if>
-      <if test="unassigned">
-        and RES.ASSIGNEE_ IS NULL
-      </if>
-      <if test="noDelegationState">
-        and RES.DELEGATION_ IS NULL
-      </if>
-      <if test="delegationState != null">
-        and RES.DELEGATION_ = #{delegationStateString}
-      </if>
-      <if test="processInstanceId != null">
-        and RES.PROC_INST_ID_ = #{processInstanceId}
-      </if>
-      <if test="processInstanceBusinessKey != null">
-        and E.BUSINESS_KEY_ = #{processInstanceBusinessKey}
-      </if>
-      <if test="processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0">
-        and E.BUSINESS_KEY_ in
-        <foreach item="item" index="index" collection="processInstanceBusinessKeys"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="processInstanceBusinessKeyLike != null">
-        and E.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike}
-      </if>
-      <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
-      </if>
-      <if test="caseInstanceId != null">
-        and RES.CASE_INST_ID_ = #{caseInstanceId}
-      </if>
-      <if test="caseInstanceBusinessKey != null">
-        and CE.BUSINESS_KEY_ = #{caseInstanceBusinessKey}
-      </if>
-      <if test="caseInstanceBusinessKeyLike != null">
-        and CE.BUSINESS_KEY_ like #{caseInstanceBusinessKeyLike}
-      </if>
-      <if test="caseExecutionId != null">
-        and RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
-      </if>
-      <if test="createTime != null">
-        and RES.CREATE_TIME_ = #{createTime}
-      </if>
-      <if test="createTimeBefore != null">
-        and RES.CREATE_TIME_ &lt; #{createTimeBefore}
-      </if>
-      <if test="createTimeAfter != null">
-        and RES.CREATE_TIME_ &gt; #{createTimeAfter}
-      </if>
-      <if test="key != null">
-        and RES.TASK_DEF_KEY_ = #{key}
-      </if>
-      <if test="keyLike != null">
-        and RES.TASK_DEF_KEY_ like #{keyLike}
-      </if>
-      <if test="parentTaskId != null">
-        and RES.PARENT_TASK_ID_ = #{parentTaskId}
-      </if>
-      <if test ="taskDefinitionKeys != null &amp;&amp; taskDefinitionKeys.length > 0">
-        and RES.TASK_DEF_KEY_ in
-        <foreach item="item" index="index" collection="taskDefinitionKeys"
-                       open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
-      </if>
-      <if test="processDefinitionKey != null">
-        and D.KEY_ = #{processDefinitionKey}
-      </if>
-      <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
-        and D.KEY_ in
-        <foreach item="item" index="index" collection="processDefinitionKeys"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="processDefinitionName != null">
-        and D.NAME_ = #{processDefinitionName}
-      </if>
-      <if test="processDefinitionNameLike != null">
-        and D.NAME_ like #{processDefinitionNameLike}
-      </if>
-      <if test="caseDefinitionId != null">
-        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
-      </if>
-      <if test="caseDefinitionKey != null">
-        and CD.KEY_ = #{caseDefinitionKey}
-      </if>
-      <if test="caseDefinitionName != null">
-        and CD.NAME_ = #{caseDefinitionName}
-      </if>
-      <if test="caseDefinitionNameLike != null">
-        and CD.NAME_ like #{caseDefinitionNameLike}
-      </if>
-      <if test="dueDate != null">
-        and RES.DUE_DATE_ = #{dueDate}
-      </if>
-      <if test="dueBefore != null">
-        and RES.DUE_DATE_ &lt; #{dueBefore}
-      </if>
-      <if test="dueAfter != null">
-        and RES.DUE_DATE_ &gt; #{dueAfter}
-      </if>
-      <if test="dueDate != null || dueBefore != null || dueAfter != null">
-        and RES.DUE_DATE_ is not null
-      </if>
-      <if test="followUpDate != null">
-        and RES.FOLLOW_UP_DATE_ = #{followUpDate}
-      </if>
-      <if test="followUpBefore != null &amp;&amp; !followUpNullAccepted">
-          and RES.FOLLOW_UP_DATE_ &lt; #{followUpBefore}
-      </if>
-      <if test="followUpBefore != null &amp;&amp; followUpNullAccepted">
-          and (RES.FOLLOW_UP_DATE_ IS NULL OR RES.FOLLOW_UP_DATE_ &lt; #{followUpBefore})
-      </if>
-      <if test="followUpAfter != null">
-        and RES.FOLLOW_UP_DATE_ &gt; #{followUpAfter}
-      </if>
-      <if test="(followUpDate != null || followUpBefore != null || followUpAfter != null) &amp;&amp; !followUpNullAccepted">
-        and RES.FOLLOW_UP_DATE_ is not null
-      </if>
-      <if test="excludeSubtasks">
-        and RES.PARENT_TASK_ID_ IS NULL
-      </if>
-      <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
-        and E1.ACT_INST_ID_ in
-        <foreach item="item" index="index" collection="activityInstanceIdIn"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="candidateUser != null || candidateGroups != null">
-        <if test="!includeAssignedTasks">
-          and RES.ASSIGNEE_ is null
-        </if>
-        and I.TYPE_ = 'candidate'
-        and
-        (
-          <if test="candidateUser != null">
-            I.USER_ID_ = #{candidateUser}
-          </if>
-          <if test="candidateUser != null &amp;&amp; candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
-            or
-          </if>
-          <if test="candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
-            I.GROUP_ID_ IN
-            <foreach item="group" index="index" collection="candidateGroups"
-                     open="(" separator="," close=")">
-              #{group}
-            </foreach>
-          </if>
-        )
-      </if>
-      <if test="involvedUser != null">
-        and I.USER_ID_ = #{involvedUser}
-      </if>
-      
-      <!-- queryVariables -->
-      <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
-      <foreach collection="variables" index="index" item="queryVariableValue">
-      and EXISTS (
-        select
-          ID_
-        from
-          ${prefix}ACT_RU_VARIABLE
-        WHERE
-          NAME_= #{queryVariableValue.name}
-
+      <foreach collection="queries" item="query" index="i">
         <choose>
-          <when test="queryVariableValue.local">
-            and RES.ID_ = TASK_ID_
+          <when test="i == 0">
+            <bind name="queryType" value="'and'" />
           </when>
           <otherwise>
-            <!-- When process instance or case instance variable is queried for, taskId should be null -->
-            and TASK_ID_ is null
-
-            <choose>
-              <when test="queryVariableValue.processInstanceVariable">
-                and RES.PROC_INST_ID_ = PROC_INST_ID_
-              </when>
-              <otherwise>
-                and RES.CASE_INST_ID_ = CASE_INST_ID_
-              </otherwise>
-            </choose>
-
+            <bind name="queryType" value="'or'" />
           </otherwise>
         </choose>
-        <bind name="varTypeField" value="'TYPE_'"/>
-        <bind name="varPrefix" value="''"/>
-        <if test="queryVariableValue.valueConditions != null">
-          and 
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
-        </if>
-      )
+        and (
+        <trim suffixOverrides="and">
+          1 = 1 and
+          <trim prefixOverrides="or|and">
+            <if test="query.taskId != null">
+              ${queryType} RES.ID_ = #{query.taskId}
+            </if>
+            <if test="query.name != null">
+              <!-- based on CAM-6363 compare name case insensitive -->
+              ${queryType} UPPER(RES.NAME_) = UPPER(#{query.name})
+            </if>
+            <if test="query.nameNotEqual != null">
+              ${queryType} UPPER(RES.NAME_) != UPPER(#{query.nameNotEqual})
+            </if>
+            <if test="query.nameLike != null">
+              <!-- based on CAM-6165 compare name like case insensitive -->
+              ${queryType} UPPER(RES.NAME_) like UPPER(#{query.nameLike}) ESCAPE ${escapeChar}
+            </if>
+            <if test="query.nameNotLike != null">
+              ${queryType} UPPER(RES.NAME_) not like UPPER(#{query.nameNotLike}) ESCAPE ${escapeChar}
+            </if>
+            <if test="query.description != null">
+              ${queryType} RES.DESCRIPTION_ = #{query.description}
+            </if>
+            <if test="query.descriptionLike != null">
+              ${queryType} RES.DESCRIPTION_ like #{query.descriptionLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.priority != null">
+              ${queryType} RES.PRIORITY_ = #{query.priority}
+            </if>
+            <if test="query.minPriority != null">
+              ${queryType} RES.PRIORITY_ &gt;= #{query.minPriority}
+            </if>
+            <if test="query.maxPriority != null">
+              ${queryType} RES.PRIORITY_ &lt;= #{query.maxPriority}
+            </if>
+            <if test="query.assignee != null">
+              ${queryType} RES.ASSIGNEE_ = #{query.assignee}
+            </if>
+            <if test="query.assigneeLike != null">
+              ${queryType} RES.ASSIGNEE_ like #{query.assigneeLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.owner != null">
+              ${queryType} RES.OWNER_ = #{query.owner}
+            </if>
+            <if test="query.unassigned">
+              ${queryType} RES.ASSIGNEE_ IS NULL
+            </if>
+            <if test="query.assigned">
+              ${queryType} RES.ASSIGNEE_ IS NOT NULL
+            </if>
+            <if test="query.noDelegationState">
+              ${queryType} RES.DELEGATION_ IS NULL
+            </if>
+            <if test="query.delegationState != null">
+              ${queryType} RES.DELEGATION_ = #{query.delegationStateString}
+            </if>
+            <if test="query.processInstanceId != null">
+              ${queryType} RES.PROC_INST_ID_ = #{query.processInstanceId}
+            </if>
+            <if test="query.processInstanceBusinessKey != null">
+              ${queryType} E.BUSINESS_KEY_ = #{query.processInstanceBusinessKey}
+            </if>
+            <if test="query.processInstanceBusinessKeys != null &amp;&amp; query.processInstanceBusinessKeys.length > 0">
+              ${queryType} E.BUSINESS_KEY_ in
+              <foreach item="item" index="index" collection="query.processInstanceBusinessKeys"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            <if test="query.processInstanceBusinessKeyLike != null">
+              ${queryType} E.BUSINESS_KEY_ like #{query.processInstanceBusinessKeyLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.executionId != null">
+              ${queryType} RES.EXECUTION_ID_ = #{query.executionId}
+            </if>
+            <if test="query.caseInstanceId != null">
+              ${queryType} RES.CASE_INST_ID_ = #{query.caseInstanceId}
+            </if>
+            <if test="query.caseInstanceBusinessKey != null">
+              ${queryType} CE.BUSINESS_KEY_ = #{query.caseInstanceBusinessKey}
+            </if>
+            <if test="query.caseInstanceBusinessKeyLike != null">
+              ${queryType} CE.BUSINESS_KEY_ like #{query.caseInstanceBusinessKeyLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.caseExecutionId != null">
+              ${queryType} RES.CASE_EXECUTION_ID_ = #{query.caseExecutionId}
+            </if>
+            <if test="query.createTime != null">
+              ${queryType} RES.CREATE_TIME_ = #{query.createTime}
+            </if>
+            <if test="query.createTimeBefore != null">
+              ${queryType} RES.CREATE_TIME_ &lt; #{query.createTimeBefore}
+            </if>
+            <if test="query.createTimeAfter != null">
+              ${queryType} RES.CREATE_TIME_ &gt; #{query.createTimeAfter}
+            </if>
+            <if test="query.key != null">
+              ${queryType} RES.TASK_DEF_KEY_ = #{query.key}
+            </if>
+            <if test="query.keyLike != null">
+              ${queryType} RES.TASK_DEF_KEY_ like #{query.keyLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.parentTaskId != null">
+              ${queryType} RES.PARENT_TASK_ID_ = #{query.parentTaskId}
+            </if>
+            <if test="query.taskDefinitionKeys != null &amp;&amp; query.taskDefinitionKeys.length > 0">
+              ${queryType} RES.TASK_DEF_KEY_ in
+              <foreach item="item" index="index" collection="query.taskDefinitionKeys"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            <if test="query.processDefinitionId != null">
+              ${queryType} RES.PROC_DEF_ID_ = #{query.processDefinitionId}
+            </if>
+            <if test="query.processDefinitionKey != null">
+              ${queryType} D.KEY_ = #{query.processDefinitionKey}
+            </if>
+            <if test="query.processDefinitionKeys != null &amp;&amp; query.processDefinitionKeys.length > 0">
+              ${queryType} D.KEY_ in
+              <foreach item="item" index="index" collection="query.processDefinitionKeys"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            <if test="query.processDefinitionName != null">
+              ${queryType} D.NAME_ = #{query.processDefinitionName}
+            </if>
+            <if test="query.processDefinitionNameLike != null">
+              ${queryType} D.NAME_ like #{query.processDefinitionNameLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.caseDefinitionId != null">
+              ${queryType} RES.CASE_DEF_ID_ = #{query.caseDefinitionId}
+            </if>
+            <if test="query.caseDefinitionKey != null">
+              ${queryType} CD.KEY_ = #{query.caseDefinitionKey}
+            </if>
+            <if test="query.caseDefinitionName != null">
+              ${queryType} CD.NAME_ = #{query.caseDefinitionName}
+            </if>
+            <if test="query.caseDefinitionNameLike != null">
+              ${queryType} CD.NAME_ like #{query.caseDefinitionNameLike} ESCAPE ${escapeChar}
+            </if>
+            <if test="query.dueDate != null || query.dueBefore != null || query.dueAfter != null">
+              ${queryType}
+              <trim prefix="(" suffix=")" prefixOverrides="and|or">
+                <if test="query.dueDate != null">
+                  ${queryType} RES.DUE_DATE_ = #{query.dueDate}
+                </if>
+                <if test="query.dueBefore != null">
+                  ${queryType} RES.DUE_DATE_ &lt; #{query.dueBefore}
+                </if>
+                <if test="query.dueAfter != null">
+                  ${queryType} RES.DUE_DATE_ &gt; #{query.dueAfter}
+                </if>
+
+                and RES.DUE_DATE_ is not null
+              </trim>
+            </if>
+            <if test="query.followUpDate != null || query.followUpBefore != null || query.followUpAfter != null">
+              ${queryType}
+              <trim prefix="(" suffix=")" prefixOverrides="and|or">
+                <if test="query.followUpDate != null">
+                  ${queryType} RES.FOLLOW_UP_DATE_ = #{query.followUpDate}
+                </if>
+                <if test="query.followUpBefore != null &amp;&amp; !query.followUpNullAccepted">
+                  ${queryType} RES.FOLLOW_UP_DATE_ &lt; #{query.followUpBefore}
+                </if>
+                <if test="query.followUpBefore != null &amp;&amp; query.followUpNullAccepted">
+                  ${queryType} (RES.FOLLOW_UP_DATE_ IS NULL OR RES.FOLLOW_UP_DATE_ &lt; #{query.followUpBefore})
+                </if>
+                <if test="query.followUpAfter != null">
+                  ${queryType} RES.FOLLOW_UP_DATE_ &gt; #{query.followUpAfter}
+                </if>
+
+                <if test="!query.followUpNullAccepted">
+                  and RES.FOLLOW_UP_DATE_ is not null
+                </if>
+              </trim>
+            </if>
+            <if test="query.excludeSubtasks">
+              ${queryType} RES.PARENT_TASK_ID_ IS NULL
+            </if>
+            <if test="query.activityInstanceIdIn != null &amp;&amp; query.activityInstanceIdIn.length > 0">
+              ${queryType} E1.ACT_INST_ID_ in
+              <foreach item="item" index="index" collection="query.activityInstanceIdIn"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+            <if test="query.isTenantIdSet">
+              <if test="query.tenantIds != null &amp;&amp; query.tenantIds.length > 0">
+                ${queryType} RES.TENANT_ID_ in
+                <foreach item="tenantId" index="index" collection="query.tenantIds"
+                         open="(" separator="," close=")">
+                  #{tenantId}
+                </foreach>
+              </if>
+              <if test="query.tenantIds == null">
+                ${queryType} RES.TENANT_ID_ is null
+              </if>
+            </if>
+            <if test="query.candidateUser != null || query.candidateGroups != null || query.withCandidateGroups || query.withCandidateUsers">
+              ${queryType}
+              <trim prefixOverrides="and" prefix="(" suffix=")">
+                <if test="!query.includeAssignedTasks">
+                  and RES.ASSIGNEE_ is null
+                </if>
+                and I.TYPE_ = 'candidate'
+                <if test="query.candidateUser != null || query.candidateGroups != null">
+                  and
+                  (
+                  <if test="query.candidateUser != null">
+                    I.USER_ID_ = #{query.candidateUser}
+                  </if>
+                  <if test="query.candidateUser != null &amp;&amp; query.candidateGroups != null &amp;&amp; query.candidateGroups.size() &gt; 0">
+                    or
+                  </if>
+                  <if test="query.candidateGroups != null &amp;&amp; query.candidateGroups.size() &gt; 0">
+                    I.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="query.candidateGroups"
+                             open="(" separator="," close=")">
+                      #{group}
+                    </foreach>
+                  </if>
+                  )
+                </if>
+
+                <if test="query.withCandidateGroups">
+                  and I.GROUP_ID_ is not null
+                </if>
+
+                <if test="query.withCandidateUsers">
+                  and I.USER_ID_ is not null
+                </if>
+              </trim>
+            </if>
+
+            <if test="query.withoutCandidateGroups || query.withoutCandidateUsers">
+              ${queryType}
+              <trim prefixOverrides="and" prefix="(" suffix=")">
+                <if test="!query.includeAssignedTasks">
+                  and RES.ASSIGNEE_ is null
+                </if>
+                and RES.ID_ not in (
+                select
+                TASK_ID_
+                from
+                ${prefix}ACT_RU_IDENTITYLINK ARIEL
+                <where>
+                  ARIEL.TYPE_ = 'candidate'
+                  <if test="query.withoutCandidateGroups">
+                    and ARIEL.GROUP_ID_ is not null
+                  </if>
+                  <if test="query.withoutCandidateUsers">
+                    and ARIEL.USER_ID_ is not null
+                  </if>
+                </where>
+                )
+              </trim>
+            </if>
+
+            <if test="query.involvedUser != null">
+              ${queryType} I.USER_ID_ = #{involvedUser}
+            </if>
+
+
+            <!-- queryVariables -->
+            <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
+            <foreach collection="query.variables" index="index" item="queryVariableValue">
+              ${queryType} EXISTS (
+              select
+              ID_
+              from
+              ${prefix}ACT_RU_VARIABLE
+              WHERE
+              <choose>
+                <when test="queryVariableValue.variableNameIgnoreCase">
+                  UPPER(NAME_)= UPPER(#{queryVariableValue.name})
+                </when>
+                <otherwise>
+                  NAME_= #{queryVariableValue.name}
+                </otherwise>
+              </choose>
+              ${collationForCaseSensitivity}
+
+              <choose>
+                <when test="queryVariableValue.local">
+                  and RES.ID_ = TASK_ID_
+                </when>
+                <otherwise>
+                  <!-- When process instance or case instance variable is queried for, taskId should be null -->
+                  and TASK_ID_ is null
+
+                  <choose>
+                    <when test="queryVariableValue.processInstanceVariable">
+                      and RES.PROC_INST_ID_ = PROC_INST_ID_
+                    </when>
+                    <otherwise>
+                      and RES.CASE_INST_ID_ = CASE_INST_ID_
+                    </otherwise>
+                  </choose>
+
+                </otherwise>
+              </choose>
+              <bind name="varTypeField" value="'TYPE_'"/>
+              <bind name="varPrefix" value="''"/>
+              <if test="queryVariableValue.valueConditions != null">
+                and
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+              </if>
+              )
+            </foreach>
+            <if test="query.suspensionState != null">
+              <if test="query.suspensionState.stateCode == 1">
+                ${queryType} RES.SUSPENSION_STATE_ = 1
+              </if>
+              <if test="query.suspensionState.stateCode == 2">
+                ${queryType} RES.SUSPENSION_STATE_ = 2
+              </if>
+            </if>
+          </trim>
+        </trim>
+        )
       </foreach>
-      <if test="suspensionState != null">
-        <if test="suspensionState.stateCode == 1">
-            and RES.SUSPENSION_STATE_ = 1
-        </if>
-        <if test="suspensionState.stateCode == 2">
-            and RES.SUSPENSION_STATE_ = 2
-        </if>
-      </if>
-
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
-
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" /> 
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+ 
     </where>
   </sql>
 
@@ -489,6 +662,37 @@
 
   <select id="selectTaskCountByNativeQuery" parameterType="java.util.Map" resultType="long">
      ${sql}
+  </select>
+
+  <!-- TASK GROUP ASSIGNMENT REPORT RESULT MAP -->
+
+  <resultMap id="taskCountByCandidateGroupReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TaskCountByCandidateGroupResultEntity">
+    <result property="taskCount" column="TASK_COUNT_" jdbcType="INTEGER" />
+    <result property="groupName" column="GROUP_NAME_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="selectTaskCountByCandidateGroupReportQuery" parameterType="org.camunda.bpm.engine.impl.TaskReportImpl" resultMap="taskCountByCandidateGroupReportResultMap">
+    SELECT
+        COUNT(T.ID_) AS TASK_COUNT_,
+        I.GROUP_ID_ AS GROUP_NAME_
+    FROM
+        ${prefix}ACT_RU_TASK T
+    LEFT JOIN
+        ${prefix}ACT_RU_IDENTITYLINK I
+    ON
+        I.TASK_ID_ = T.ID_
+
+    <where>
+      T.ASSIGNEE_ IS NULL
+      <bind name="columnPrefix" value="'T.'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </where>
+
+    GROUP BY
+        I.GROUP_ID_
+    ORDER BY
+        GROUP_NAME_
+    ASC
   </select>
 
 </mapper>

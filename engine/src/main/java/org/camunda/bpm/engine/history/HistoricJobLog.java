@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,7 +72,7 @@ public interface HistoricJobLog {
    *
    * @since 7.4
    */
-  int getJobPriority();
+  long getJobPriority();
 
   /**
    * Returns the message of the exception that occurred by executing the associated job.
@@ -104,6 +108,12 @@ public interface HistoricJobLog {
   String getExecutionId();
 
   /**
+   * Returns the specific root process instance id of the process instance
+   * on which the associated job was created.
+   */
+  String getRootProcessInstanceId();
+
+  /**
    * Returns the specific process instance id on which the associated job was created.
    */
   String getProcessInstanceId();
@@ -122,6 +132,12 @@ public interface HistoricJobLog {
    * Returns the specific deployment id on which the associated job was created.
    */
   String getDeploymentId();
+
+  /**
+   * Returns the id of the tenant this job log entry belongs to. Can be <code>null</code>
+   * if the job log entry belongs to no single tenant.
+   */
+  public String getTenantId();
 
   /**
    * Returns <code>true</code> when <code>this</code> log represents
@@ -146,5 +162,8 @@ public interface HistoricJobLog {
    * the deletion of the associated job.
    */
   boolean isDeletionLog();
+
+  /** The time the historic job log will be removed. */
+  Date getRemovalTime();
 
 }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.repository;
 
 import java.util.Date;
@@ -44,11 +47,31 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Only select deployments with a name like the given string. */
   DeploymentQuery deploymentNameLike(String nameLike);
 
+  /**
+   * If the given <code>source</code> is <code>null</code>,
+   * then deployments are returned where source is equal to null.
+   * Otherwise only deployments with the given source are
+   * selected.
+   */
+  DeploymentQuery deploymentSource(String source);
+
   /** Only select deployments deployed before the given date */
   DeploymentQuery deploymentBefore(Date before);
 
   /** Only select deployments deployed after the given date */
   DeploymentQuery deploymentAfter(Date after);
+
+  /** Only select deployments with one of the given tenant ids. */
+  DeploymentQuery tenantIdIn(String... tenantIds);
+
+  /** Only select deployments which have no tenant id. */
+  DeploymentQuery withoutTenantId();
+
+  /**
+   * Select deployments which have no tenant id. Can be used in
+   * combination with {@link #tenantIdIn(String...)}.
+   */
+  DeploymentQuery includeDeploymentsWithoutTenantId();
 
   //sorting ////////////////////////////////////////////////////////
 
@@ -58,6 +81,16 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Order by deployment name (needs to be followed by {@link #asc()} or {@link #desc()}). */
   DeploymentQuery orderByDeploymentName();
 
-  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * @deprecated Use {@link #orderByDeploymentTime()} instead</p>*/
+  @Deprecated
   DeploymentQuery orderByDeploymenTime();
+
+  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  DeploymentQuery orderByDeploymentTime();
+
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of process instances without tenant id is database-specific. */
+  DeploymentQuery orderByTenantId();
+
 }

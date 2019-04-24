@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
@@ -10,6 +27,7 @@
     insert into ${prefix}ACT_RU_EXECUTION
     (
       ID_,
+      ROOT_PROC_INST_ID_,
       PROC_INST_ID_,
       BUSINESS_KEY_,
       PROC_DEF_ID_,
@@ -26,13 +44,15 @@
       SUSPENSION_STATE_,
       CACHED_ENT_STATE_,
       SEQUENCE_COUNTER_,
+      TENANT_ID_,
       REV_
     )
     values
     (
       #{id ,jdbcType=VARCHAR},
+      #{rootProcessInstanceIdRaw, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
-      #{businessKey, jdbcType=VARCHAR},
+      #{businessKeyWithoutCascade, jdbcType=VARCHAR},
       #{processDefinitionId ,jdbcType=VARCHAR},
       #{activityId ,jdbcType=VARCHAR},
       #{activityInstanceId ,jdbcType=VARCHAR},
@@ -47,6 +67,7 @@
       #{suspensionState, jdbcType=INTEGER},
       #{cachedEntityState, jdbcType=INTEGER},
       #{sequenceCounter, jdbcType=BIGINT},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -57,6 +78,7 @@
     update ${prefix}ACT_RU_EXECUTION set
       REV_ = #{revisionNext, jdbcType=INTEGER},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      BUSINESS_KEY_ = #{businessKeyWithoutCascade, jdbcType=VARCHAR},
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       ACT_INST_ID_ = #{activityInstanceId, jdbcType=VARCHAR},
       IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN},
@@ -67,24 +89,39 @@
       SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
       CACHED_ENT_STATE_ = #{cachedEntityState, jdbcType=INTEGER},
-      SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
+      SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT},
+      TENANT_ID_ = #{tenantId, jdbcType=BIGINT}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
-  <update id="updateExecutionSuspensionStateByParameters" parameterType="java.util.Map">
+  <update id="updateExecutionSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_EXECUTION set
-      REV_ = REV_ + 1,
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      REV_ = 1 + REV_ ,
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
-      <if test="processInstanceId != null">
-        PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      <if test="parameter.processInstanceId != null">
+        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionId != null">
-        and PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      <if test="parameter.processDefinitionId != null">
+        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionKey != null">
-        and PROC_DEF_ID_ IN (SELECT ID_ FROM ${prefix}ACT_RE_PROCDEF WHERE KEY_ = #{processDefinitionKey, jdbcType=VARCHAR})
+      <if test="parameter.processDefinitionKey != null">
+        and PROC_DEF_ID_ IN (
+          SELECT ID_ 
+          FROM ${prefix}ACT_RE_PROCDEF PD
+          WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+          <if test="parameter.isTenantIdSet">
+            <if test="parameter.tenantId != null">
+              and PD.TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.tenantId == null">
+              and PD.TENANT_ID_ is null
+            </if>
+          </if>
+        )
+        <bind name="columnPrefix" value="''"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
       </if>
     </where>
   </update>
@@ -100,6 +137,7 @@
   <resultMap id="executionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
@@ -116,6 +154,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
   <!-- EXECUTION SELECT -->
@@ -133,7 +172,7 @@
     select * from ${prefix}ACT_RU_EXECUTION
     where PROC_INST_ID_ = #{parameter}
   </select>
-  
+
   <select id="selectProcessInstanceIdsByProcessDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_RU_EXECUTION
@@ -143,7 +182,7 @@
   <select id="selectExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectExecutionsByQueryCriteriaSql"/>
@@ -152,75 +191,85 @@
   </select>
   
   <select id="selectExecutionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectExecutionsByQueryCriteriaSql"/>
   </select>
   
-  <!--  same as selectExecutionByQueryCriteria, but with different parameterType -->
   <select id="selectProcessInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="executionResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
-    <include refid="selectExecutionsByQueryCriteriaSql"/>
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
   
   <select id="selectProcessInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="long">
-    select count(*)
-    <include refid="selectExecutionsByQueryCriteriaSql"/>
+    select count(distinct RES.ID_)
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
   </select>
-  
-  <sql id="selectExecutionsByQueryCriteriaSql">
+
+  <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">
+    select distinct RES.ID_
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectProcessInstanceByQueryCriteriaSql">
+
     from ${prefix}ACT_RU_EXECUTION RES
-    <if test="businessKey != null">
-        inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
+    <if test="hasIncident || incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
+      inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
     </if>
-    <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
-      <choose>
-        <when test="onlyProcessInstances">
-          inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
-        </when>
-        <otherwise>
-          inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.EXECUTION_ID_
-        </otherwise>
-      </choose>
+    <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+      left join ${prefix}ACT_RU_EXECUTION EXE on RES.ID_ = EXE.PROC_INST_ID_
     </if>
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, P.KEY_, '*'))
+    </if>
+    
     <where>
-      <if test="onlyProcessInstances">
-        RES.PARENT_ID_ is null
-      </if>
+      RES.PARENT_ID_ is null
       <if test="processDefinitionId != null">
         and P.ID_ = #{processDefinitionId}
       </if>
       <if test="processDefinitionKey != null">
         and P.KEY_ = #{processDefinitionKey}
       </if>
-      <if test="executionId != null">
-        and RES.ID_ = #{executionId}
+      <if test="deploymentId != null">
+        and P.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
-        and RES.PROC_INST_ID_ in
-        <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{item}
-        </foreach>
+        and
+        <bind name="listOfIds" value="processInstanceIds" />
+        <bind name="fieldName" value="'RES.PROC_INST_ID_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
       </if>
       <if test="businessKey != null">
-        and INST.BUSINESS_KEY_ = #{businessKey}
+        and RES.BUSINESS_KEY_ = #{businessKey}
       </if>
-      <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId}
+      <if test="businessKeyLike != null">
+        and RES.BUSINESS_KEY_ like #{businessKeyLike} ESCAPE ${escapeChar}
       </if>
       <if test="superProcessInstanceId != null">
         <!-- A sub process instance is stored under a certain *execution*, potentially nested.
              A sub process instance is NOT stored under the process instance, hence the following: -->
         and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{superProcessInstanceId})
+      </if>
+      <if test="isRootProcessInstances">
+        and RES.SUPER_EXEC_ is null
+      </if>
+      <if test="isLeafProcessInstances">
+        and RES.ID_ not in (
+            select SUPER.PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION SUPER
+            inner join ${prefix}ACT_RU_EXECUTION CALLED on SUPER.ID_ = CALLED.SUPER_EXEC_ where CALLED.ID_ = CALLED.PROC_INST_ID_)
       </if>
       <if test="subProcessInstanceId != null">
         and RES.ID_ = (select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = (select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{subProcessInstanceId}))
@@ -265,12 +314,120 @@
         </if>
       )
       </foreach>
+      <if test="incidentType != null">
+        and INC.INCIDENT_TYPE_ = #{incidentType}
+      </if>
+      <if test="incidentId != null">
+        and INC.ID_ = #{incidentId}
+      </if>
+      <if test="incidentMessage != null">
+        and INC.INCIDENT_MSG_ = #{incidentMessage}
+      </if>
+      <if test="incidentMessageLike != null">
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="isProcessDefinitionWithoutTenantId">
+        and P.TENANT_ID_ IS NULL
+      </if>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
+      </if>
+      <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+        and EXE.IS_EVENT_SCOPE_ = ${falseConstant}
+        and EXE.ACT_ID_ in
+        <foreach item="activityId" index="index" collection="activityIds"
+                 open="(" separator="," close=")">
+          #{activityId}
+        </foreach>
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+    </where>
+  </sql>
+
+  <sql id="selectExecutionsByQueryCriteriaSql">
+
+    from ${prefix}ACT_RU_EXECUTION RES
+    <if test="businessKey != null">
+      inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
+    </if>
+    <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
+      inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.EXECUTION_ID_
+    </if>
+    inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, P.KEY_, '*'))
+    </if>
+
+    <where>
+      <if test="processDefinitionId != null">
+        and P.ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKey != null">
+        and P.KEY_ = #{processDefinitionKey}
+      </if>
+      <if test="executionId != null">
+        and RES.ID_ = #{executionId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="businessKey != null">
+        and INST.BUSINESS_KEY_ = #{businessKey}
+      </if>
+      <if test="activityId != null">
+        and RES.ACT_ID_ = #{activityId}
+      </if>
+      <if test="suspensionState != null">
+        and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
+      </if>
+      <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
+      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+        and EXISTS (
+        select
+        ID_
+        from
+        ${prefix}ACT_RU_VARIABLE
+        WHERE
+        NAME_= #{queryVariableValue.name}
+
+        <choose>
+          <when test="queryVariableValue.local">
+            and RES.ID_ = EXECUTION_ID_
+          </when>
+          <otherwise>
+            <!-- When process instance or case instance variable is queried for, taskId should be null -->
+            and TASK_ID_ is null and RES.PROC_INST_ID_ = PROC_INST_ID_
+          </otherwise>
+        </choose>
+
+        <bind name="varTypeField" value="'TYPE_'"/>
+        <bind name="varPrefix" value="''"/>
+        <if test="queryVariableValue.valueConditions != null">
+          and
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+        </if>
+        )
+      </foreach>
       <!-- event subscriptions -->
       <if test="eventSubscriptions != null">
         <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
           and exists (select ID_ from ${prefix}ACT_RU_EVENT_SUBSCR EVT where
           EVT.EXECUTION_ID_ = RES.ID_ and
-          EVT.EVENT_TYPE_ = #{eventSubscriptionValue.eventType} 
+          EVT.EVENT_TYPE_ = #{eventSubscriptionValue.eventType}
           <if test = "eventSubscriptionValue.eventName != null">
             and EVT.EVENT_NAME_ = #{eventSubscriptionValue.eventName}
           </if>
@@ -287,10 +444,23 @@
         and INC.INCIDENT_MSG_ = #{incidentMessage}
       </if>
       <if test="incidentMessageLike != null">
-        and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="TransactionCancelCompensationScenario" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow sourceRef="start" targetRef="tx" />
+    <transaction id="tx">
+      <startEvent id="txStart" />
+      <sequenceFlow sourceRef="txStart" targetRef="userTask" />
+      <userTask id="userTask"/>
+      <sequenceFlow sourceRef="userTask" targetRef="beforeCompensate" />
+      <userTask id="beforeCompensate" />
+      <sequenceFlow sourceRef="beforeCompensate" targetRef="txEnd" />
+      <endEvent id="txEnd">
+        <cancelEventDefinition id="cancelTx" />
+      </endEvent>
+    
+      <!-- compensation -->
+      <boundaryEvent id="compensateBoundaryEvent" attachedToRef="userTask">
+        <compensateEventDefinition />
+      </boundaryEvent>
+      <userTask id="undoTask" isForCompensation="true"/>
+      <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoTask" />
+    </transaction>
+    <sequenceFlow sourceRef="tx" targetRef="end" />
+    <endEvent id="end" />
+    
+    <!-- boundary event catching the cancellation -->
+    <boundaryEvent attachedToRef="tx" id="catchCancelTx">
+      <cancelEventDefinition />     
+    </boundaryEvent>
+    <sequenceFlow sourceRef="catchCancelTx" targetRef="afterCancel" />
+    <userTask id="afterCancel" />
+    <sequenceFlow sourceRef="afterCancel" targetRef="afterCancelEnd" />
+    <endEvent id="afterCancelEnd" />
+  </process>
+</definitions>

@@ -8,7 +8,7 @@
   <message id="messageId_one" name="messageName_one" />
   <message id="messageId_two" name="messageName_two" />
   
-  <process id="process">
+  <process id="process" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="subProcess" />

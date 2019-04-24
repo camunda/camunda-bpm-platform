@@ -6,7 +6,7 @@
   
   <error id="myException" errorCode="org.some.other.Exception"/>
   
-  <process id="testUncaughtBusinessExceptionWrongErrorCode">
+  <process id="testUncaughtBusinessExceptionWrongErrorCode" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask" />

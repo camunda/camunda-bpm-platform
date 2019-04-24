@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +38,11 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   protected String orgValue;
   protected String newValue;
   protected String entityType;
+  protected String deploymentId;
+  protected String tenantId;
+  protected String batchId;
+  protected String category;
+  protected String externalTaskId;
 
   public String getOperationId() {
     return operationId;
@@ -123,13 +132,63 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
     this.jobDefinitionId = jobDefinitionId;
   }
 
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
+  }
+  
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+  
+  public String getExternalTaskId() {
+    return externalTaskId;
+  }
+  
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
         + "[taskId" + taskId
+        + ", deploymentId" + deploymentId
         + ", processDefinitionKey =" + processDefinitionKey
         + ", jobId = " + jobId
         + ", jobDefinitionId = " + jobDefinitionId
+        + ", batchId = " + batchId
         + ", operationId =" + operationId
         + ", operationType =" + operationType
         + ", userId =" + userId
@@ -141,8 +200,12 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
         + ", eventType=" + eventType
         + ", executionId=" + executionId
         + ", processDefinitionId=" + processDefinitionId
+        + ", rootProcessInstanceId=" + rootProcessInstanceId
         + ", processInstanceId=" + processInstanceId
+        + ", externalTaskId=" + externalTaskId
+        + ", tenantId=" + tenantId
         + ", entityType=" + entityType
+        + ", category=" + category
         + "]";
   }
 }

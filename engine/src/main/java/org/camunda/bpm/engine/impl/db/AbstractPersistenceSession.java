@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.db;
 
 import java.util.ArrayList;
@@ -18,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.WrongDbException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -108,6 +110,10 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
 
     if (processEngineConfiguration.isDmnEnabled()) {
       dbSchemaCreateDmn();
+
+      if(processEngineConfiguration.isDbHistoryUsed()) {
+        dbSchemaCreateDmnHistory();
+      }
     }
   }
 
@@ -123,12 +129,18 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
 
   protected abstract void dbSchemaCreateDmn();
 
+  protected abstract void dbSchemaCreateDmnHistory();
+
 
   public void dbSchemaDrop() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
     if (processEngineConfiguration.isDmnEnabled()) {
       dbSchemaDropDmn();
+
+      if(processEngineConfiguration.isDbHistoryUsed()) {
+        dbSchemaDropDmnHistory();
+      }
     }
 
     if (processEngineConfiguration.isCmmnEnabled()) {
@@ -162,6 +174,8 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
 
   protected abstract void dbSchemaDropDmn();
 
+  protected abstract void dbSchemaDropDmnHistory();
+
   public void dbSchemaPrune() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (isHistoryTablePresent() && !processEngineConfiguration.isDbHistoryUsed()) {
@@ -179,6 +193,9 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
     if (isDmnTablePresent() && !processEngineConfiguration.isDmnEnabled()) {
       dbSchemaDropDmn();
     }
+    if(isDmnHistoryTablePresent() && (!processEngineConfiguration.isDmnEnabled() || !processEngineConfiguration.isDbHistoryUsed())) {
+      dbSchemaDropDmnHistory();
+    }
   }
 
   public abstract boolean isEngineTablePresent();
@@ -192,6 +209,8 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
   public abstract boolean isCmmnHistoryTablePresent();
 
   public abstract boolean isDmnTablePresent();
+
+  public abstract boolean isDmnHistoryTablePresent();
 
   public void dbSchemaUpdate() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
@@ -220,6 +239,10 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
       dbSchemaCreateDmn();
     }
 
+    if(!isDmnHistoryTablePresent() && processEngineConfiguration.isDmnEnabled() && processEngineConfiguration.isDbHistoryUsed()) {
+      dbSchemaCreateDmnHistory();
+    }
+
   }
 
   public List<String> getTableNamesPresent() {
@@ -229,7 +252,7 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
   public void addEntityLoadListener(EntityLoadListener listener) {
     this.listeners.add(listener);
   }
-  
+
 
   protected void fireEntityLoaded(Object result) {
     if(result != null && result instanceof DbEntity) {

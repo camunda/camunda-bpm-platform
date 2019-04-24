@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,11 +40,11 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
   public final static ExecutionListener EXECUTION_LISTENER = new ProcessApplicationEventListenerDelegate();
   public final static TaskListener TASK_LISTENER = new ProcessApplicationEventListenerDelegate();
 
-  protected void addEndEventListener(ActivityImpl activity) {
+  protected void addEndEventListener(ScopeImpl activity) {
     activity.addExecutionListener(ExecutionListener.EVENTNAME_END, EXECUTION_LISTENER);
   }
 
-  protected void addStartEventListener(ActivityImpl activity) {
+  protected void addStartEventListener(ScopeImpl activity) {
     activity.addExecutionListener(ExecutionListener.EVENTNAME_START, EXECUTION_LISTENER);
   }
 
@@ -68,6 +72,8 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
+    addStartEventListener(processDefinition);
+    addEndEventListener(processDefinition);
   }
 
   @Override
@@ -191,8 +197,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity) {
-    addStartEventListener(timerActivity);
-    addEndEventListener(timerActivity);
+    // start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
@@ -203,8 +208,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseIntermediateSignalCatchEventDefinition(Element signalEventDefinition, ActivityImpl signalActivity) {
-    addStartEventListener(signalActivity);
-    addEndEventListener(signalActivity);
+    // start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
@@ -259,4 +263,14 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
   public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity) {
   }
 
+  @Override
+  public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
+  }
+
+  @Override
+  public void parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition, ActivityImpl conditionalActivity) {
+  }
+
+  public void parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
+  }
 }

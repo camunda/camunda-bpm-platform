@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  
+    <property name="processEngineName" value="IdGeneratorDataSourceTest-engine" />
+    
+    <!-- Database configurations -->
+    <property name="history" value="full" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:IdGeneratorDataSourceTest" />
+    
+    <property name="jdbcMaxActiveConnections" value="2" />
+    <property name="idBlockSize" value="3" />
+    <property name="idGeneratorDataSource" ref="idGeneratorDataSource" />
+    
+    
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+    
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+    
+  </bean>
+  
+  <bean name="idGeneratorDataSource" class="org.camunda.bpm.engine.test.api.cfg.IdGeneratorDataSource" />
+
+</beans>

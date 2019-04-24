@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,13 +18,10 @@ package org.camunda.bpm.engine.test.api.form;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.form.FormException;
 import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorContext;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.api.runtime.util.TestVariableScope;
 
 /**
  * @author Daniel Meyer
@@ -93,8 +95,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate(4, new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
-      e.printStackTrace();
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
     }
 
@@ -117,8 +118,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate(4, new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
-      e.printStackTrace();
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
     }
 
@@ -141,7 +141,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate("test", new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate \"maxlength\": configuration 4.4 cannot be interpreted as Integer"));
     }
   }
@@ -157,7 +157,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate("test", new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate \"minlength\": configuration 4.4 cannot be interpreted as Integer"));
     }
   }
@@ -198,16 +198,4 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected static class TestVariableScope extends AbstractVariableScope {
-
-    protected SimpleVariableStore variableStore = new SimpleVariableStore();
-
-    protected CoreVariableStore getVariableStore() {
-      return variableStore;
-    }
-
-    public AbstractVariableScope getParentVariableScope() {
-      return null;
-    }
-  }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="RollbackAfterSubProcess" isExecutable="true">
+    <startEvent id="start"/>
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="callactivity"/>
+    
+    <callActivity id="callactivity" calledElement="TrivialSubProcess"></callActivity>
+
+	<sequenceFlow id="flow2" sourceRef="callactivity" targetRef="buzzz"/>
+	
+	<serviceTask id="buzzz" camunda:class="org.camunda.bpm.engine.test.api.runtime.util.Buzzz" />
+	
+	<sequenceFlow id="flow3" sourceRef="buzzz" targetRef="end"/>
+    
+    <endEvent id="end"/>
+    
+  </process>
+  
+</definitions>

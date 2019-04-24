@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
@@ -26,6 +29,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -51,12 +55,12 @@ public class ExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
+  public void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
     List<String> processInstanceIds = getDbEntityManager()
       .selectList("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
 
     for (String processInstanceId: processInstanceIds) {
-      deleteProcessInstance(processInstanceId, deleteReason, cascade, skipCustomListeners);
+      deleteProcessInstance(processInstanceId, deleteReason, cascade, skipCustomListeners, false, skipIoMappings, false);
     }
 
     if (cascade) {
@@ -69,6 +73,11 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
+    deleteProcessInstance(processInstanceId, deleteReason, cascade, skipCustomListeners, false, false, false);
+  }
+
+  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners, boolean externallyTerminated,
+      boolean skipIoMappings, boolean skipSubprocesses) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
 
     if(execution == null) {
@@ -78,10 +87,10 @@ public class ExecutionManager extends AbstractManager {
     getTaskManager().deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade, skipCustomListeners);
 
     // delete the execution BEFORE we delete the history, otherwise we will produce orphan HistoricVariableInstance instances
-    execution.deleteCascade(deleteReason, skipCustomListeners);
+    execution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, externallyTerminated, skipSubprocesses);
 
     if (cascade) {
-      getHistoricProcessInstanceManager().deleteHistoricProcessInstanceById(processInstanceId);
+      getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(Arrays.asList(processInstanceId));
     }
   }
 
@@ -99,7 +108,7 @@ public class ExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId) {
+  public List<ExecutionEntity> findExecutionsByProcessInstanceId(String processInstanceId) {
     return getDbEntityManager().selectList("selectExecutionsByProcessInstanceId", processInstanceId);
   }
 
@@ -108,25 +117,31 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery) {
-    configureAuthorizationCheck(executionQuery);
+    configureQuery(executionQuery);
     return (Long) getDbEntityManager().selectOne("selectExecutionCountByQueryCriteria", executionQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page) {
-    configureAuthorizationCheck(executionQuery);
+    configureQuery(executionQuery);
     return getDbEntityManager().selectList("selectExecutionsByQueryCriteria", executionQuery, page);
   }
 
   public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
-    configureAuthorizationCheck(processInstanceQuery);
+    configureQuery(processInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectProcessInstanceCountByQueryCriteria", processInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery, Page page) {
-    configureAuthorizationCheck(processInstanceQuery);
+  public List<ProcessInstance> findProcessInstancesByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery, Page page) {
+    configureQuery(processInstanceQuery);
     return getDbEntityManager().selectList("selectProcessInstanceByQueryCriteria", processInstanceQuery, page);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> findProcessInstancesIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+    configureQuery(processInstanceQuery);
+    return getDbEntityManager().selectList("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
@@ -155,21 +170,31 @@ public class ExecutionManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateExecutionSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateExecutionSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", configureParameterizedQuery(parameters));
+  }
+
+  public void updateExecutionSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String tenantId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isTenantIdSet", true);
+    parameters.put("tenantId", tenantId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbEntityManager().update(ExecutionEntity.class, "updateExecutionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   // helper ///////////////////////////////////////////////////////////
@@ -182,8 +207,13 @@ public class ExecutionManager extends AbstractManager {
     }
   }
 
-  protected void configureAuthorizationCheck(AbstractQuery<?, ?> query) {
+  protected void configureQuery(AbstractQuery<?, ?> query) {
     getAuthorizationManager().configureExecutionQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
   }
 
 }

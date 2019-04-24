@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -25,14 +30,17 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  * @author Roman Smirnov
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -346,4 +354,120 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
       assertEquals(theTaskId, thirdVariableDetail.getActivityInstanceId());
     }
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCmmnActivityInstanceIdOnCaseInstance() {
+
+    // given
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    String taskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(taskExecutionId)
+      .setVariable("foo", "bar")
+      .execute();
+
+    // then
+    HistoricVariableInstance variable = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("foo")
+        .singleResult();
+
+    assertNotNull(variable);
+    assertEquals(caseInstance.getId(), variable.getActivityInstanceId());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail variableDetail = historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(variable.getId())
+        .singleResult();
+      assertEquals(taskExecutionId, variableDetail.getActivityInstanceId());
+    }
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCmmnActivityInstanceIdOnCaseExecution() {
+
+    // given
+    caseService.createCaseInstanceByKey("oneTaskCase");
+
+    String taskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    caseService
+      .withCaseExecution(taskExecutionId)
+      .setVariableLocal("foo", "bar")
+      .execute();
+
+    // then
+    HistoricVariableInstance variable = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("foo")
+        .singleResult();
+
+    assertNotNull(variable);
+    assertEquals(taskExecutionId, variable.getActivityInstanceId());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail variableDetail = historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(variable.getId())
+        .singleResult();
+      assertEquals(taskExecutionId, variableDetail.getActivityInstanceId());
+    }
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testCmmnActivityInstanceIdOnTask() {
+
+    // given
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    String taskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    // when
+    taskService.setVariable(task.getId(), "foo", "bar");
+
+    // then
+    HistoricVariableInstance variable = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("foo")
+        .singleResult();
+
+    assertNotNull(variable);
+    assertEquals(caseInstance.getId(), variable.getActivityInstanceId());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail variableDetail = historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(variable.getId())
+        .singleResult();
+      assertEquals(taskExecutionId, variableDetail.getActivityInstanceId());
+    }
+
+  }
+
 }

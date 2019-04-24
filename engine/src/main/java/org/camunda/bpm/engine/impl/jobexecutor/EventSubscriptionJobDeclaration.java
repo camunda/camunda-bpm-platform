@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +21,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler.EventSubscriptionJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -72,7 +77,7 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
   }
 
   public String getEventName() {
-    return eventSubscriptionDeclaration.getEventName();
+    return eventSubscriptionDeclaration.getUnresolvedEventName();
   }
 
   public String getActivityId() {
@@ -83,8 +88,8 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
     return context.getExecution();
   }
 
-  protected String resolveJobHandlerConfiguration(EventSubscriptionEntity context) {
-    return context.getId();
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(EventSubscriptionEntity context) {
+    return new EventSubscriptionJobConfiguration(context.getId());
   }
 
   @SuppressWarnings("unchecked")
@@ -98,13 +103,13 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
   }
 
   /**
-   * Assumes that an activity has at most one declaration of a eventName + eventType combination.
+   * Assumes that an activity has at most one declaration of a certain eventType.
    */
   public static EventSubscriptionJobDeclaration findDeclarationForSubscription(EventSubscriptionEntity eventSubscription) {
     List<EventSubscriptionJobDeclaration> declarations = getDeclarationsForActivity(eventSubscription.getActivity());
 
     for (EventSubscriptionJobDeclaration declaration : declarations) {
-      if (declaration.getEventName().equals(eventSubscription.getEventName()) && declaration.getEventType().equals(eventSubscription.getEventType())) {
+      if (declaration.getEventType().equals(eventSubscription.getEventType())) {
         return declaration;
       }
     }

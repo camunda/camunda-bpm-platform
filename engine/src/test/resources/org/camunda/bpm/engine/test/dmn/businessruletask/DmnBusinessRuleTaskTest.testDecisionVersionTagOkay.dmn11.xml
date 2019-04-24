@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" xmlns:camunda="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision" name="testDecision" camunda:versionTag="0.0.2">
+    <decisionTable id="decisionTable">
+      <input id="input1" label="status">
+        <inputExpression id="inputExpression1" typeRef="string">        <text>status</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="result" name="result" typeRef="string" />
+      <rule id="row-928575414-1">
+        <description></description>
+        <inputEntry id="UnaryTests_0yaqbiy">        <text><![CDATA["gold"]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_00jmzea">        <text><![CDATA["A"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-928575414-2">
+        <inputEntry id="UnaryTests_0v7sw35">        <text><![CDATA["silber"]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0p0k6xd">        <text><![CDATA["B"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-928575414-3">
+        <inputEntry id="UnaryTests_17w26sl">        <text><![CDATA["bronze"]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1yupghb">        <text><![CDATA["C"]]></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

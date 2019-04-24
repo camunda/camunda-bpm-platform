@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="caller" />
+
+    <callActivity id="caller" calledElement="throwException" />
+    <sequenceFlow id="flow2" sourceRef="caller" targetRef="userTask" />
+
+    <userTask id="userTask" />
+    <sequenceFlow id="flow3" sourceRef="userTask" targetRef="end" />
+
+    <endEvent id="end" />
+
+  </process>
+
+</definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,14 +60,11 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   /** the id of the called case in case of a case task */
   protected String calledCaseInstanceId;
 
+  /** id of the tenant which belongs to the case activity instance  */
+  protected String tenantId;
+
   /** the flag whether this case activity is required */
   protected boolean required = false;
-
-  /** the flag whether this case activity is repeatable */
-  protected boolean repeatable = false;
-
-  /** the flag whether this case activity is a repetition */
-  protected boolean repetition = false;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -135,6 +136,14 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
     this.calledCaseInstanceId = calledCaseInstanceId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public Date getCreateTime() {
     return startTime;
   }
@@ -149,22 +158,6 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
 
   public void setRequired(boolean required) {
     this.required = required;
-  }
-
-  public boolean isRepeatable() {
-    return repeatable;
-  }
-
-  public void setRepeatable(boolean repeatable) {
-    this.repeatable = repeatable;
-  }
-
-  public boolean isRepetition() {
-    return repetition;
-  }
-
-  public void setRepetition(boolean repetition) {
-    this.repetition = repetition;
   }
 
   public boolean isAvailable() {
@@ -212,6 +205,7 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
            + ", caseExecutionId=" + caseExecutionId
            + ", caseDefinitionId=" + caseDefinitionId
            + ", caseInstanceId=" + caseInstanceId
+           + ", tenantId=" + tenantId
            + "]";
   }
 }

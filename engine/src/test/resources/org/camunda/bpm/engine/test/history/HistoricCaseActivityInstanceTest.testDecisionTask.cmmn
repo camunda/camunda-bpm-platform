@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<definitions name="Test Case"
+                xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                targetNamespace="Examples">
+
+  <case id="case">
+
+    <casePlanModel id="CasePlanModel_1">
+
+      <planItem id="PI_DecisionTask_1" definitionRef="DecisionTask_1" />
+      <decisionTask id="DecisionTask_1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </decisionTask>
+
+    </casePlanModel>
+
+  </case>
+
+</definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +17,10 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
@@ -39,7 +45,7 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
  * @author Daniel Meyer
  *
  */
-public class HistoryEvent implements Serializable, DbEntity {
+public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
 
   private static final long serialVersionUID = 1L;
 
@@ -78,8 +84,15 @@ public class HistoryEvent implements Serializable, DbEntity {
   @Deprecated
   public static final String INCIDENT_RESOLVE = HistoryEventTypes.INCIDENT_RESOLVE.getEventName();
 
+  public static final String IDENTITY_LINK_ADD = HistoryEventTypes.IDENTITY_LINK_ADD.getEventName();
+
+  public static final String IDENTITY_LINK_DELETE = HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName();
+
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
+
+  /** the root process instance in which the event has happened */
+  protected String rootProcessInstanceId;
 
   /** the process instance in which the event has happened */
   protected String processInstanceId;
@@ -93,6 +106,12 @@ public class HistoryEvent implements Serializable, DbEntity {
   /** the key of the process definition */
   protected String processDefinitionKey;
 
+  /** the name of the process definition */
+  protected String processDefinitionName;
+
+  /** the version of the process definition */
+  protected Integer processDefinitionVersion;
+
   /** the case instance in which the event has happened */
   protected String caseInstanceId;
 
@@ -105,6 +124,9 @@ public class HistoryEvent implements Serializable, DbEntity {
   /** the key of the case definition */
   protected String caseDefinitionKey;
 
+  /** the name of the case definition */
+  protected String caseDefinitionName;
+
   /**
    * The type of the activity audit event.
    * @see HistoryEventType#getEventName()
@@ -112,6 +134,9 @@ public class HistoryEvent implements Serializable, DbEntity {
   protected String eventType;
 
   protected long sequenceCounter;
+
+  /* the time when the history event will be deleted */
+  protected Date removalTime;
 
   // getters / setters ///////////////////////////////////
 
@@ -121,6 +146,14 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   public String getExecutionId() {
@@ -145,6 +178,30 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
+  }
+
+  public void setProcessDefinitionName(String processDefinitionName) {
+    this.processDefinitionName = processDefinitionName;
+  }
+
+  public Integer getProcessDefinitionVersion() {
+    return processDefinitionVersion;
+  }
+
+  public void setProcessDefinitionVersion(Integer processDefinitionVersion) {
+    this.processDefinitionVersion = processDefinitionVersion;
+  }
+
+  public String getCaseDefinitionName() {
+    return caseDefinitionName;
+  }
+
+  public void setCaseDefinitionName(String caseDefinitionName) {
+    this.caseDefinitionName = caseDefinitionName;
   }
 
   public String getCaseDefinitionKey() {
@@ -203,11 +260,25 @@ public class HistoryEvent implements Serializable, DbEntity {
     this.sequenceCounter = sequenceCounter;
   }
 
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   // persistent object implementation ///////////////
 
   public Object getPersistentState() {
     // events are immutable
     return HistoryEvent.class;
+  }
+
+  // state inspection
+
+  public boolean isEventOfType(HistoryEventType type) {
+    return type.getEventName().equals(eventType);
   }
 
   @Override
@@ -218,6 +289,8 @@ public class HistoryEvent implements Serializable, DbEntity {
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
+           + ", removalTime=" + removalTime
            + "]";
   }
 

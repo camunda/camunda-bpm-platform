@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callActivity" />
+
+    <callActivity id="callActivity" camunda:caseRef="oneTaskCase">
+      <extensionElements>
+        <camunda:in sourceExpression="Prefix${aVariable}" target="aVariable" />
+        <camunda:in sourceExpression="Prefix${anotherVariable + 1}" target="anotherVariable" />
+      </extensionElements>
+    </callActivity>
+
+    <sequenceFlow id="flow2" sourceRef="callActivity" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

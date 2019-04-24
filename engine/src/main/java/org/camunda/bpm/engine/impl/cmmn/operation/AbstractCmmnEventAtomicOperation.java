@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,6 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
+
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.operation.AbstractEventAtomicOperation;
@@ -30,10 +37,16 @@ public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtom
     return false;
   }
 
-  protected final void eventNotificationsCompleted(CmmnExecution execution) {
+  protected void eventNotificationsCompleted(CmmnExecution execution) {
+    repetition(execution);
     preTransitionNotification(execution);
     performTransitionNotification(execution);
     postTransitionNotification(execution);
+  }
+
+  protected void repetition(CmmnExecution execution) {
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.repeat(execution, getEventName());
   }
 
   protected void preTransitionNotification(CmmnExecution execution) {

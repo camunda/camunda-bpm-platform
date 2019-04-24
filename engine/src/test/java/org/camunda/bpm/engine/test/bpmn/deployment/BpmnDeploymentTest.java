@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.deployment;
 
 import java.io.InputStream;
@@ -27,11 +30,14 @@ import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
 
 /**
@@ -256,9 +262,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     List<org.camunda.bpm.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     assertEquals(2, deploymentList.size());
 
-    for (org.camunda.bpm.engine.repository.Deployment deployment : deploymentList) {
-      repositoryService.deleteDeployment(deployment.getId());
-    }
+    deleteDeployments(deploymentList);
   }
 
   public void testDiagramCreationDisabled() {
@@ -267,6 +271,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     // Graphical information is not yet exposed publicly, so we need to do some plumbing
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     ProcessDefinitionEntity processDefinitionEntity = commandExecutor.execute(new Command<ProcessDefinitionEntity>() {
+      @Override
       public ProcessDefinitionEntity execute(CommandContext commandContext) {
         return Context.getProcessEngineConfiguration()
                       .getDeploymentCache()
@@ -338,7 +343,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     catch(ProcessEngineException expected) {
       // Check if no deployments are made
       assertEquals(0, repositoryService.createDeploymentQuery().count());
-      assertEquals("ENGINE-01009 Error while parsing process", expected.getMessage());
+      assertTextPresent("ENGINE-01009 Error while parsing process", expected.getMessage());
     }
   }
 
@@ -351,6 +356,68 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
 
     Resource resource = resources.get(0);
     assertEquals(deploymentId, resource.getDeploymentId());
+  }
+
+  private void deleteDeployments(List<org.camunda.bpm.engine.repository.Deployment> deploymentList) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : deploymentList) {
+      repositoryService.deleteDeployment(deployment.getId());
+    }
+  }
+
+  public void testDeployBpmnModelInstance() throws Exception {
+
+    // given
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent().userTask().endEvent().done();
+
+    // when
+    deploymentWithBuilder(repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", modelInstance));
+
+    // then
+    assertNotNull(repositoryService.createProcessDefinitionQuery().processDefinitionResourceName("foo.bpmn").singleResult());
+  }
+
+  public void testDeployAndGetProcessDefinition() throws Exception {
+
+    // given process model
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent().userTask().endEvent().done();
+
+    // when process model is deployed
+    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn", modelInstance).deployWithResult();
+    deploymentIds.add(deployment.getId());
+
+    // then deployment contains deployed process definitions
+    List<ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedProcessDefinitions();
+    assertEquals(1, deployedProcessDefinitions.size());
+    assertNull(deployment.getDeployedCaseDefinitions());
+    assertNull(deployment.getDeployedDecisionDefinitions());
+    assertNull(deployment.getDeployedDecisionRequirementsDefinitions());
+
+    // and persisted process definition is equal to deployed process definition
+    ProcessDefinition persistedProcDef = repositoryService.createProcessDefinitionQuery()
+                                                          .processDefinitionResourceName("foo.bpmn")
+                                                          .singleResult();
+    assertEquals(persistedProcDef.getId(), deployedProcessDefinitions.get(0).getId());
+  }
+
+  public void testDeployNonExecutableProcess() throws Exception {
+
+    // given non executable process definition
+    final BpmnModelInstance modelInstance = Bpmn.createProcess("foo").startEvent().userTask().endEvent().done();
+
+    // when process model is deployed
+    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn", modelInstance).deployWithResult();
+    deploymentIds.add(deployment.getId());
+
+    // then deployment contains no deployed process definition
+    assertNull(deployment.getDeployedProcessDefinitions());
+
+    // and there exist no persisted process definitions
+    assertNull(repositoryService.createProcessDefinitionQuery()
+                                .processDefinitionResourceName("foo.bpmn")
+                                .singleResult());
   }
 
 }

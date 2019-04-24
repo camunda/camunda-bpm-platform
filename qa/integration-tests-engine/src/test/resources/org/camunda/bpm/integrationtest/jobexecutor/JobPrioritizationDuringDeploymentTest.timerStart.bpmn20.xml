@@ -5,7 +5,7 @@
   targetNamespace="Examples">
 
 
-  <process id="timerStartProcess">
+  <process id="timerStartProcess" isExecutable="true">
 
     <startEvent id="start" camunda:jobPriority="${priorityBean.getPriority()}"  > 
       <timerEventDefinition>

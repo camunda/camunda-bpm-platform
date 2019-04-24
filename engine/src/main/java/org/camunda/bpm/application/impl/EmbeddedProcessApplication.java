@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +21,7 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>An embedded process application is a ProcessApplication that uses an embedded
@@ -30,8 +35,11 @@ import org.camunda.bpm.application.ProcessApplicationReference;
  */
 public class EmbeddedProcessApplication extends AbstractProcessApplication {
 
+  public static final String DEFAULT_NAME = "Process Application";
+  private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
+
   protected String autodetectProcessApplicationName() {
-    return "Process Application";
+    return DEFAULT_NAME;
   }
 
   public ProcessApplicationReference getReference() {
@@ -45,8 +53,9 @@ public class EmbeddedProcessApplication extends AbstractProcessApplication {
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
     try {
       return callable.call();
-    } catch (Exception e) {
-      throw new ProcessApplicationExecutionException(e);
+    }
+    catch (Exception e) {
+      throw LOG.processApplicationExecutionException(e);
     }
   }
 

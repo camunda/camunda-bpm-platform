@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,6 +16,7 @@
  */
 package org.camunda.bpm.engine.history;
 
+import java.util.Date;
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -36,6 +41,18 @@ public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityS
    * which consumed a token and did not produced a new one), in the result.
    */
   HistoricActivityStatisticsQuery includeCompleteScope();
+
+  /** Only select historic activities of process instances that were started before the given date. */
+  HistoricActivityStatisticsQuery startedBefore(Date date);
+
+  /** Only select historic activities of process instances that were started after the given date. */
+  HistoricActivityStatisticsQuery startedAfter(Date date);
+
+  /** Only select historic activities of process instances that were finished before the given date. */
+  HistoricActivityStatisticsQuery finishedBefore(Date date);
+
+  /** Only select historic activities of process instances that were finished after the given date. */
+  HistoricActivityStatisticsQuery finishedAfter(Date date);
 
   /**
    * Order by activity id (needs to be followed by {@link #asc()} or {@link #desc()}).

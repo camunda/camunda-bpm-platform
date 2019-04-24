@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="javaServiceDelegation" isExecutable="true">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="javaService" />
+    
+    <serviceTask id="javaService" 
+                 name="Java service invocation" 
+                 camunda:class="org.camunda.bpm.engine.test.bpmn.servicetask.util.ToUppercase" />
+    
+    <sequenceFlow id="flow2" sourceRef="javaService" targetRef="waitState" />
+    
+    <receiveTask id="waitState" />
+    
+    <sequenceFlow id="flow3" sourceRef="waitState" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

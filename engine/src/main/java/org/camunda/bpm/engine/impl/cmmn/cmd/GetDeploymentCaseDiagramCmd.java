@@ -1,23 +1,27 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmmn.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.logging.Logger;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -27,13 +31,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * Gives access to a deployed case diagram, e.g., a PNG image, through a stream
  * of bytes.
- * 
+ *
  * @author Simon Zambrovski
  */
 public class GetDeploymentCaseDiagramCmd implements Command<InputStream>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static Logger log = Logger.getLogger(GetDeploymentCaseDiagramCmd.class.getName());
 
   protected String caseDefinitionId;
 
@@ -50,15 +53,26 @@ public class GetDeploymentCaseDiagramCmd implements Command<InputStream>, Serial
         .getProcessEngineConfiguration()
         .getDeploymentCache()
         .findDeployedCaseDefinitionById(caseDefinitionId);
-    String deploymentId = caseDefinition.getDeploymentId();
-    String resourceName = caseDefinition.getDiagramResourceName();
-    if (resourceName == null) {
-      log.info("Resource name is null! No case diagram stream exists.");
-      return null;
-    } else {
-      InputStream caseDiagramStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-      return caseDiagramStream;
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadCaseDefinition(caseDefinition);
     }
+
+    final String deploymentId = caseDefinition.getDeploymentId();
+    final String resourceName = caseDefinition.getDiagramResourceName();
+
+    InputStream caseDiagramStream = null;
+
+    if (resourceName != null) {
+
+      caseDiagramStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
+        public InputStream call() throws Exception {
+          return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+        }
+      });
+    }
+
+    return caseDiagramStream;
   }
 
 }

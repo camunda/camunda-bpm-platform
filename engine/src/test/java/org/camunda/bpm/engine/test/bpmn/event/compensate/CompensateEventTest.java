@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
@@ -19,31 +22,63 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
+import org.camunda.bpm.engine.test.bpmn.event.compensate.ReadLocalVariableListener.VariableEvent;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.BookFlightService;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.CancelFlightService;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDelegate;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 
 /**
  * @author Daniel Meyer
  */
 public class CompensateEventTest extends PluggableProcessEngineTestCase {
+
+  public void testCompensateOrder() {
+    //given two process models, only differ in order of the activities
+    final String PROCESS_MODEL_WITH_REF_BEFORE = "org/camunda/bpm/engine/test/bpmn/event/compensate/compensation_reference-before.bpmn";
+    final String PROCESS_MODEL_WITH_REF_AFTER = "org/camunda/bpm/engine/test/bpmn/event/compensate/compensation_reference-after.bpmn";
+
+    //when model with ref before is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
+            .addClasspathResource(PROCESS_MODEL_WITH_REF_BEFORE)
+            .deploy();
+    //then no problem will occure
+
+    //when model with ref after is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
+            .addClasspathResource(PROCESS_MODEL_WITH_REF_AFTER)
+            .deploy();
+    //then also no problem should occure
+
+    //clean up
+    repositoryService.deleteDeployment(deployment1.getId());
+    repositoryService.deleteDeployment(deployment2.getId());
+  }
 
   @Deployment
   public void testCompensateSubprocess() {
@@ -656,6 +691,39 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       .done());
   }
 
+  /**
+   * CAM-4903
+   */
+  @Deployment
+  public void FAILING_testActivityInstanceTreeForMiSubProcessDefaultHandler() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    completeTasks("Book Hotel", 5);
+    // throw compensation event
+    completeTask("throwCompensation");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("throwingCompensation")
+        .beginMiBody("scope")
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+      .done());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.activityWithCompensationEndEvent.bpmn20.xml")
   public void testCancelProcessInstanceWithActiveCompensation() {
     // given
@@ -719,12 +787,12 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(tree).hasStructure(
-          describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-            .activity("throwCompensation")
-            .beginScope("booking-subprocess")
-              .activity("cancelFlight")
-              .beginScope("compensationSubProcess")
-                .activity("compensateFlight")
+         describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+           .activity("throwCompensation")
+           .beginScope("booking-subprocess")
+             .activity("cancelFlight")
+             .beginScope("compensationSubProcess")
+               .activity("compensateFlight")
          .done());
   }
 
@@ -869,10 +937,10 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     // then the activity instance tree is correct
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(tree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .activity("throwCompensate")
-          .beginScope("compensationHandler")
-            .activity("subProcessTask")
+       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+         .activity("throwCompensate")
+         .beginScope("compensationHandler")
+           .activity("subProcessTask")
        .done());
   }
 
@@ -949,7 +1017,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     // then there is a message event subscription for the receive task compensation handler
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
     assertNotNull(eventSubscription);
-    assertEquals(MessageEventHandler.EVENT_HANDLER_TYPE, eventSubscription.getEventType());
+    assertEquals(EventType.MESSAGE, eventSubscription.getEventType());
 
     // and triggering the message completes compensation
     runtimeService.correlateMessage("Message");
@@ -993,6 +1061,88 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     // and after completing the concurrent task, the process instance ends successfully
     taskService.complete(concurrentTask.getId());
     assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void testLocalVariablesInEndExecutionListener() {
+    // given
+    SetLocalVariableListener setListener = new SetLocalVariableListener("foo", "bar");
+    ReadLocalVariableListener readListener = new ReadLocalVariableListener("foo");
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+      Variables.createVariables()
+        .putValue("setListener", setListener)
+        .putValue("readListener", readListener));
+
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+
+    // when executing the compensation handler
+    taskService.complete(beforeCompensationTask.getId());
+
+    // then the variable listener has been invoked and was able to read the variable on the end event
+    readListener = (ReadLocalVariableListener) runtimeService.getVariable(processInstance.getId(), "readListener");
+
+    Assert.assertEquals(1, readListener.getVariableEvents().size());
+
+    VariableEvent event = readListener.getVariableEvents().get(0);
+    Assert.assertEquals("foo", event.getVariableName());
+    Assert.assertEquals("bar", event.getVariableValue());
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  public void FAILING_testDeleteInstanceWithEventScopeExecution()
+  {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+    .startEvent("start")
+    .subProcess("subProcess")
+      .embeddedSubProcess()
+        .startEvent("subProcessStart")
+        .endEvent("subProcessEnd")
+    .subProcessDone()
+    .userTask("userTask")
+    .done();
+
+    modelInstance = ModifiableBpmnModelInstance.modify(modelInstance)
+      .addSubProcessTo("subProcess")
+      .id("eventSubProcess")
+        .triggerByEvent()
+        .embeddedSubProcess()
+          .startEvent()
+            .compensateEventDefinition()
+            .compensateEventDefinitionDone()
+          .endEvent()
+      .done();
+
+    deployment(modelInstance);
+
+    long dayInMillis = 1000 * 60 * 60 * 24;
+    Date date1 = new Date(10 * dayInMillis);
+    ClockUtil.setCurrentTime(date1);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("foo");
+
+    // when
+    Date date2 = new Date(date1.getTime() + dayInMillis);
+    ClockUtil.setCurrentTime(date2);
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+        .orderByActivityId().asc().list();
+    assertEquals(5, historicActivityInstance.size());
+
+    assertEquals("start", historicActivityInstance.get(0).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(0).getEndTime());
+    assertEquals("subProcess", historicActivityInstance.get(1).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(1).getEndTime());
+    assertEquals("subProcessEnd", historicActivityInstance.get(2).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(2).getEndTime());
+    assertEquals("subProcessStart", historicActivityInstance.get(3).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(3).getEndTime());
+    assertEquals("userTask", historicActivityInstance.get(4).getActivityId());
+    assertEquals(date2, historicActivityInstance.get(4).getEndTime());
+
+
   }
 
   private void completeTask(String taskName) {

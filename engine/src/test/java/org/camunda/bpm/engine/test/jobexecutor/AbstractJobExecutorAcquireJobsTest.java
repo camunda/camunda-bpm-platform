@@ -1,97 +1,88 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import java.io.FileNotFoundException;
-import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 
-public abstract class AbstractJobExecutorAcquireJobsTest extends AbstractProcessEngineTestCase {
+public abstract class AbstractJobExecutorAcquireJobsTest {
 
-  protected static final Date START_TIME = new Date(1430134560000l);
+  @Rule
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
-  protected void initializeProcessEngine() {
-    ProcessEngineConfiguration processEngineConfiguration;
-    try {
-      processEngineConfiguration = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-    } catch (RuntimeException ex) {
-      if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
-        processEngineConfiguration = ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("activiti.cfg.xml");
-      } else {
-        throw ex;
-      }
-    }
+  protected ManagementService managementService;
+  protected RuntimeService runtimeService;
 
-    // only set values if required otherwise test default behavior
-    if (isJobExecutorPreferTimerJobs()) {
-      processEngineConfiguration.setJobExecutorPreferTimerJobs(true);
-    }
+  protected ProcessEngineConfigurationImpl configuration;
 
-    if (isJobExecutorPreferOldJobs()) {
-      processEngineConfiguration.setJobExecutorAcquireByDueDate(true);
-    }
+  private boolean jobExecutorAcquireByDueDate;
+  private boolean jobExecutorAcquireByPriority;
+  private boolean jobExecutorPreferTimerJobs;
+  private boolean jobEnsureDueDateSet;
 
-    if (isJobExecutorAcquireByPriority()) {
-      processEngineConfiguration.setProducePrioritizedJobs(true);
-      processEngineConfiguration.setJobExecutorAcquireByPriority(true);
-    }
-
-    configure(processEngineConfiguration);
-
-    processEngine = processEngineConfiguration.buildProcessEngine();
-  }
-
-  protected void configure(ProcessEngineConfiguration configuration) {
-    // may be overriden for additional test-specific configuration
-  }
-
-  protected void closeDownProcessEngine() {
-    super.closeDownProcessEngine();
-    processEngine.close();
-    ProcessEngines.unregister(processEngine);
-    processEngine = null;
-  }
-
-  protected boolean isJobExecutorPreferTimerJobs() {
-    return false;
-  }
-
-  protected boolean isJobExecutorPreferOldJobs() {
-    return false;
-  }
-
-  protected boolean isJobExecutorAcquireByPriority() {
-    return false;
+  @Before
+  public void initServices() {
+    runtimeService = rule.getRuntimeService();
+    managementService = rule.getManagementService();
   }
 
   @Before
-  public void setUp() throws Exception {
-    super.setUp();
-    // set clock to an initial time without milliseconds
-    ClockUtil.setCurrentTime(START_TIME);
+  public void saveProcessEngineConfiguration() {
+    configuration = (ProcessEngineConfigurationImpl) rule.getProcessEngine().getProcessEngineConfiguration();
+    jobExecutorAcquireByDueDate = configuration.isJobExecutorAcquireByDueDate();
+    jobExecutorAcquireByPriority = configuration.isJobExecutorAcquireByPriority();
+    jobExecutorPreferTimerJobs = configuration.isJobExecutorPreferTimerJobs();
+    jobEnsureDueDateSet = configuration.isEnsureJobDueDateNotNull();
+  }
+
+  @Before
+  public void setClock() {
+    ClockTestUtil.setClockToDateWithoutMilliseconds();
   }
 
   @After
-  public void tearDown() throws Exception {
-    processEngineConfiguration.setJobExecutorPreferTimerJobs(false);
-    processEngineConfiguration.setJobExecutorAcquireByDueDate(false);
+  public void restoreProcessEngineConfiguration() {
+    configuration.setJobExecutorAcquireByDueDate(jobExecutorAcquireByDueDate);
+    configuration.setJobExecutorAcquireByPriority(jobExecutorAcquireByPriority);
+    configuration.setJobExecutorPreferTimerJobs(jobExecutorPreferTimerJobs);
+    configuration.setEnsureJobDueDateNotNull(jobEnsureDueDateSet);
+  }
+
+  @After
+  public void resetClock() {
     ClockUtil.reset();
-    super.tearDown();
   }
 
   protected List<JobEntity> findAcquirableJobs() {
-    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
+    return configuration.getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
 
       @Override
       public List<JobEntity> execute(CommandContext commandContext) {
@@ -100,11 +91,6 @@ public abstract class AbstractJobExecutorAcquireJobsTest extends AbstractProcess
           .findNextJobsToExecute(new Page(0, 100));
       }
     });
-  }
-
-  protected void incrementClock(long seconds) {
-    long time = ClockUtil.getCurrentTime().getTime();
-    ClockUtil.setCurrentTime(new Date(time + seconds * 1000));
   }
 
   protected String startProcess(String processDefinitionKey, String activity) {
@@ -119,4 +105,5 @@ public abstract class AbstractJobExecutorAcquireJobsTest extends AbstractProcess
       startProcess(processDefinitionKey, activity);
     }
   }
+
 }

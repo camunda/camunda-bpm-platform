@@ -4,7 +4,7 @@
   xmlns:camundabpm="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
-  <process id="asyncEndEvent">
+  <process id="asyncEndEvent" isExecutable="true">
     <extensionElements>
 	    <camundabpm:executionListener event="end"
 	      class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener"></camundabpm:executionListener>

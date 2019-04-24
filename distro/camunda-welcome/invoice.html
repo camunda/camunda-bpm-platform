@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=X-UA-Compatible content="IE=edge">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <meta name="author" content="camunda.org community" />
+
+  <title>Welcome to the Camunda BPM Platform</title>
+
+  <base app-base="." />
+
+
+  <link rel="stylesheet" href="./assets/css/styles.min.css">
+  <link rel="stylesheet" href="./assets/css/welcome.css">
+  <link rel="shortcut icon" href="assets/img/favicon.ico" />
+</head>
+<body>
+  <header class="cam-brand-header">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-8">
+          <a class="navbar-brand" href="./index.html" title="Camunda BPM platform">
+            <span class="brand-logo"></span>
+            <span class="brand-name">Camunda BPM Platform</span>
+          </a>
+        </div>
+        <div class="col-xs-4 text-right">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-content">
+    <div class="row">
+      <div class="col-xs-12">
+        <!-- content start -->
+
+
+
+
+
+          <section>
+            <header>
+              <h1>Overview</h1>
+            </header>
+
+            <p>
+              This example allows you to walk through the features of camundaBPM guided by a simple invoice process.
+            </p>
+
+            <p>
+              Get started with the example by logging into the <a target="_blank" href="/camunda/app/tasklist/">camunda Tasklist</a> using
+              the credentials <code>demo:demo</code>.
+            </p>
+          </section>
+
+
+          <section>
+
+            <header>
+              <h1>Available Personas</h1>
+            </header>
+
+            <p>
+              The following logins are provided by the show case and can be used to play around with the invoice process:
+            </p>
+
+            <table class="table table-bordered table-striped">
+              <tr>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Groups</th>
+              </tr>
+
+              <tr>
+                <td>demo</td>
+                <td>demo</td>
+                <td>Sales, Accounting, Management</td>
+              </tr>
+
+              <tr>
+                <td>john</td>
+                <td>john</td>
+                <td>Sales</td>
+              </tr>
+
+              <tr>
+                <td>mary</td>
+                <td>mary</td>
+                <td>Accounting</td>
+              </tr>
+
+              <tr>
+                <td>peter</td>
+                <td>peter</td>
+                <td>Management</td>
+              </tr>
+            </table>
+          </section>
+
+          <section>
+
+            <header>
+              <h1>Async Continuation Demo</h1>
+            </header>
+
+            <p>
+              This process allows you to experiment with <a href="http://docs.camunda.org/latest/guides/user-guide/#process-engine-transactions-in-processes-asynchronous-continuations">asychronous continuations</a>:
+            </p>
+            <ol>
+              <li>Start a new instance of the <em>Invoice Receipt</em> process.</li>
+              <li>Log into cockpit. Select an instance of the <em>Invoice Receipt</em> process.</li>
+              <li>Add a variable named <code>shouldFail</code> to the process and set it to <code>true</code></li>
+              <li>Using the tasklist, make the process advance to the <em>Archive Invoice</em> service task.</li>
+              <li>Back to cockpit, you see an Incident which has been created for the service task.</li>
+              <li>Set the value of the variable <code>shouldFail</code> to <code>false</code> and increment the retries of the failed job.
+              As a result, the process instance is completed.</li>
+          </section>
+
+
+
+
+
+
+
+
+
+
+
+        <!-- content end -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="cam-brand-footer">
+  </footer>
+</body>
+</html>

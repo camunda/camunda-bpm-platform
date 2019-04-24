@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,10 +39,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelException;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -184,7 +189,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     transformer.initializeExitCriterias(casePlanModel, newActivity, context);
 
     for (CmmnTransformListener transformListener : transformListeners) {
-      transformListener.transformCasePlanModel(casePlanModel, newActivity);
+      transformListener.transformCasePlanModel((org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel) casePlanModel, newActivity);
     }
   }
 
@@ -262,6 +267,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       planItemTransformer = getPlanItemHandler(ProcessTask.class);
     } else if (definition instanceof CaseTask) {
       planItemTransformer = getPlanItemHandler(CaseTask.class);
+    } else if (definition instanceof DecisionTask) {
+      planItemTransformer = getPlanItemHandler(DecisionTask.class);
     } else if (definition instanceof Task) {
       planItemTransformer = getPlanItemHandler(Task.class);
     } else if (definition instanceof Stage) {
@@ -299,6 +306,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
           transformListener.transformProcessTask(planItem, (ProcessTask) definition, newActivity);
         } else if (definition instanceof CaseTask) {
           transformListener.transformCaseTask(planItem, (CaseTask) definition, newActivity);
+        } else if (definition instanceof DecisionTask) {
+          transformListener.transformDecisionTask(planItem, (DecisionTask) definition, newActivity);
         } else if (definition instanceof Task) {
           transformListener.transformTask(planItem, (Task) definition, newActivity);
         } else if (definition instanceof Stage) {

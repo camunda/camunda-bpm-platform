@@ -9,6 +9,7 @@
     <process-engine>default</process-engine>
   
     <resource>org/camunda/bpm/application/impl/el/ProcessApplicationElResolverTest.callingProcess.bpmn20.xml</resource>
+    <resource>org/camunda/bpm/application/impl/el/ProcessApplicationElResolverTest.callingProcessConditionalFlow.bpmn20.xml</resource>
     
     <properties>
         <property name="isScanForProcessDefinitions">false</property>

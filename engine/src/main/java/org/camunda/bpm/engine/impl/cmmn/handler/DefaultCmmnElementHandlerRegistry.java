@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -45,6 +50,7 @@ public class DefaultCmmnElementHandlerRegistry {
   protected HumanTaskItemHandler humanTaskPlanItemHandler = new HumanTaskItemHandler();
   protected ProcessTaskItemHandler processTaskPlanItemHandler = new ProcessTaskItemHandler();
   protected CaseTaskItemHandler caseTaskPlanItemHandler = new CaseTaskItemHandler();
+  protected DecisionTaskItemHandler decisionTaskPlanItemHandler = new DecisionTaskItemHandler();
   protected MilestoneItemHandler milestonePlanItemHandler = new MilestoneItemHandler();
   protected EventListenerItemHandler eventListenerPlanItemHandler = new EventListenerItemHandler();
 
@@ -68,6 +74,7 @@ public class DefaultCmmnElementHandlerRegistry {
     planItemElementHandlers.put(Task.class, taskPlanItemHandler);
     planItemElementHandlers.put(HumanTask.class, humanTaskPlanItemHandler);
     planItemElementHandlers.put(ProcessTask.class, processTaskPlanItemHandler);
+    planItemElementHandlers.put(DecisionTask.class, decisionTaskPlanItemHandler);
     planItemElementHandlers.put(CaseTask.class, caseTaskPlanItemHandler);
     planItemElementHandlers.put(Milestone.class, milestonePlanItemHandler);
 

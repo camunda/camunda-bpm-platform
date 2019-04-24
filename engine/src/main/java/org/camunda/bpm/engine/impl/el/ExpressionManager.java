@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import org.camunda.bpm.engine.delegate.Expression;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
@@ -25,10 +32,8 @@ import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.camunda.bpm.engine.test.mock.MockElResolver;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 
 /**
@@ -69,8 +74,12 @@ public class ExpressionManager {
   }
 
   public Expression createExpression(String expression) {
-    ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression, Object.class);
+    ValueExpression valueExpression = createValueExpression(expression);
     return new JuelExpression(valueExpression, this, expression);
+  }
+
+  public ValueExpression createValueExpression(String expression) {
+    return expressionFactory.createValueExpression(parsingElContext, expression, Object.class);
   }
 
   public void setExpressionFactory(ExpressionFactory expressionFactory) {
@@ -91,6 +100,14 @@ public class ExpressionManager {
       }
     }
 
+    return elContext;
+  }
+
+  public ELContext createElContext(VariableContext variableContext) {
+    ELResolver elResolver = getCachedElResolver();
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    elContext.putContext(ExpressionFactory.class, expressionFactory);
+    elContext.putContext(VariableContext.class, variableContext);
     return elContext;
   }
 
@@ -117,6 +134,8 @@ public class ExpressionManager {
   protected ELResolver createElResolver() {
     CompositeELResolver elResolver = new CompositeELResolver();
     elResolver.add(new VariableScopeElResolver());
+    elResolver.add(new VariableContextElResolver());
+    elResolver.add(new MockElResolver());
 
     if(beans != null) {
       // ACT-1102: Also expose all beans in configuration when using standalone engine, not

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,11 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.core.instance;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateListener;
+import org.camunda.bpm.engine.impl.core.CoreLogger;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
@@ -33,7 +35,7 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
 
   private static final long serialVersionUID = 1L;
 
-  private static Logger log = Logger.getLogger(CoreExecution.class.getName());
+  private final static CoreLogger LOG = CoreLogger.CORE_LOGGER;
 
   protected String id;
 
@@ -41,6 +43,9 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
    * the business key for this execution
    */
   protected String businessKey;
+  protected String businessKeyWithoutCascade;
+
+  protected String tenantId;
 
   // events ///////////////////////////////////////////////////////////////////
 
@@ -49,22 +54,19 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
   protected int listenerIndex = 0;
   protected boolean skipCustomListeners;
   protected boolean skipIoMapping;
+  protected boolean skipSubprocesses;
 
   // atomic operations ////////////////////////////////////////////////////////
 
   @SuppressWarnings("unchecked")
   public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
-    if (log.isLoggable(Level.FINEST)) {
-      log.finest("AtomicOperation: " + operation + " on " + this);
-    }
+    LOG.debugPerformingAtomicOperation(operation, this);
     operation.execute((T) this);
   }
 
   @SuppressWarnings("unchecked")
   public <T extends CoreExecution> void performOperationSync(CoreAtomicOperation<T> operation) {
-    if (log.isLoggable(Level.FINEST)) {
-      log.finest("AtomicOperation: " + operation + " on " + this);
-    }
+    LOG.debugPerformingAtomicOperation(operation, this);
     operation.execute((T) this);
   }
 
@@ -109,12 +111,21 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
     this.id = id;
   }
 
-  public String getBusinessKey() {
-    return businessKey;
+  public String getBusinessKeyWithoutCascade() {
+    return businessKeyWithoutCascade;
   }
 
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+    this.businessKeyWithoutCascade = businessKey;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public boolean isSkipCustomListeners() {
@@ -131,6 +142,14 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
 
   public void setSkipIoMappings(boolean skipIoMappings) {
     this.skipIoMapping = skipIoMappings;
+  }
+
+  public boolean isSkipSubprocesses() {
+    return skipSubprocesses;
+  }
+
+  public void setSkipSubprocesseses(boolean skipSubprocesses) {
+    this.skipSubprocesses = skipSubprocesses;
   }
 
 }

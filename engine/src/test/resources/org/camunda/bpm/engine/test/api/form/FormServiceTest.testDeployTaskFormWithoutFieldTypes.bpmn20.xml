@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+    typeLanguage="http://www.w3.org/2001/XMLSchema" 
+    expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="test">
+
+  <process id="testProcess" isExecutable="true">
+
+    <startEvent id="start">
+    </startEvent>
+
+    <sequenceFlow sourceRef="start" targetRef="usertask" />
+
+    <userTask id="usertask" name="Task" camunda:candidateGroups="dummy">
+     <extensionElements>
+        <camunda:formData>
+          <camunda:formField id="stringField" label="Some Field" defaultValue="someString">
+            <camunda:validation>
+              <camunda:constraint name="maxlength" config="10" />
+              <camunda:constraint name="minlength" config="5" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="longField" label="Another Field" defaultValue="5">
+            <camunda:validation>
+              <camunda:constraint name="max" config="10" />
+              <camunda:constraint name="min" config="3" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="customField" label="A Third Field">
+            <camunda:validation>
+              <camunda:constraint name="validator" config="org.camunda.bpm.engine.test.api.form.CustomValidator" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow sourceRef="usertask" targetRef="task2" />
+
+    <userTask id="task2" />
+
+  </process>
+
+</definitions>

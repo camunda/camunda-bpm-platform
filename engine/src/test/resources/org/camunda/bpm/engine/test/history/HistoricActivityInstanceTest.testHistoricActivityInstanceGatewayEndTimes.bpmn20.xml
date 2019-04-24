@@ -5,7 +5,7 @@
 
   <!-- CAM-1537 -->
 
-  <process id="gatewayEndTimes" name="gatewayEndTimes">
+  <process id="gatewayEndTimes" name="gatewayEndTimes" isExecutable="true">
 
     <startEvent id="Start" name="Start"></startEvent>
 

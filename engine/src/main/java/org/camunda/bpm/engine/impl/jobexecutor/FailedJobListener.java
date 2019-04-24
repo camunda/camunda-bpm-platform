@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,66 +14,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.management.Metrics;
-
 
 /**
  * @author Frederik Heremans
  * @author Bernd Ruecker
  */
-public class FailedJobListener implements TransactionListener, CommandContextListener {
-
-  private static Logger log = Logger.getLogger(FailedJobListener.class.getName());
+public class FailedJobListener implements Command<Void> {
 
   protected CommandExecutor commandExecutor;
   protected String jobId;
   protected Throwable exception;
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
+  private int countRetries = 0;
+  private int totalRetries = ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   public FailedJobListener(CommandExecutor commandExecutor, String jobId, Throwable exception) {
-    this(commandExecutor, jobId);
+    this.commandExecutor = commandExecutor;
+    this.jobId = jobId;
     this.exception = exception;
   }
 
-  public FailedJobListener(CommandExecutor commandExecutor, String jobId) {
-    this.commandExecutor = commandExecutor;
-    this.jobId = jobId;
-  }
+  public Void execute(CommandContext commandContext) {
+    initTotalRetries(commandContext);
 
-  public void execute(CommandContext commandContext) {
     logJobFailure(commandContext);
 
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
     final Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
 
-    log.fine("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + "'");
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        fireHistoricJobFailedEvt(jobId);
-        cmd.execute(commandContext);
+        JobEntity job = commandContext
+                .getJobManager()
+                .findJobById(jobId);
+
+        if (job != null) {
+          fireHistoricJobFailedEvt(job);
+          cmd.execute(commandContext);
+        } else {
+          LOG.debugFailedJobNotFound(jobId);
+        }
         return null;
       }
-
     });
+
+    return null;
   }
 
-  protected void fireHistoricJobFailedEvt(String jobId) {
+  private void initTotalRetries(CommandContext commandContext) {
+    totalRetries = commandContext.getProcessEngineConfiguration().getFailedJobListenerMaxRetries();
+  }
+
+  protected void fireHistoricJobFailedEvt(JobEntity job) {
     CommandContext commandContext = Context.getCommandContext();
-    JobEntity job = commandContext
-        .getJobManager()
-        .findJobById(jobId);
 
     // the given job failed and a rollback happened,
     // that's why we have to increment the job
@@ -77,35 +85,23 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
     job.incrementSequenceCounter();
 
     commandContext
-      .getHistoricJobLogManager()
-      .fireJobFailedEvent(job, exception);
+            .getHistoricJobLogManager()
+            .fireJobFailedEvent(job, exception);
   }
 
   protected void logJobFailure(CommandContext commandContext) {
     if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
       commandContext.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_FAILED);
+              .getMetricsRegistry()
+              .markOccurrence(Metrics.JOB_FAILED);
     }
   }
 
-  public void setException(Throwable exception) {
-    this.exception = exception;
+  public void incrementCountRetries() {
+    this.countRetries++;
   }
 
-  public Throwable getException() {
-    return exception;
+  public int getRetriesLeft() {
+    return Math.max(0, totalRetries - countRetries);
   }
-
-  public void onCommandContextClose(CommandContext commandContext) {
-    // ignored
-  }
-
-  public void onCommandFailed(CommandContext commandContext, Throwable t) {
-    // log exception if not already present
-    if(this.exception == null) {
-      this.exception = t;
-    }
-  }
-
 }

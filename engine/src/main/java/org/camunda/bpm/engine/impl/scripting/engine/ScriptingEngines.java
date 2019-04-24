@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,16 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.scripting.engine;
 
-import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.ScriptCompilationException;
-import org.camunda.bpm.engine.delegate.VariableScope;
-
-import javax.script.*;
-import java.util.*;
-import java.util.logging.Logger;
-
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+
+import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 
 /**
  * <p>Manager for JSR-223 {@link ScriptEngine} handling.</p>
@@ -39,17 +49,13 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class ScriptingEngines implements ScriptEngineResolver {
-
-  private static Logger LOG = Logger.getLogger(ScriptingEngines.class.getName());
+public class ScriptingEngines implements DmnScriptEngineResolver {
 
   public static final String DEFAULT_SCRIPTING_LANGUAGE = "juel";
   public static final String GROOVY_SCRIPTING_LANGUAGE = "groovy";
 
-  private final ScriptEngineManager scriptEngineManager;
+  protected ScriptEngineResolver scriptEngineResolver;
   protected ScriptBindingsFactory scriptBindingsFactory;
-
-  protected Map<String, ScriptEngine> cachedEngines = new HashMap<String, ScriptEngine>();
 
   protected boolean enableScriptEngineCaching = true;
 
@@ -59,71 +65,24 @@ public class ScriptingEngines implements ScriptEngineResolver {
   }
 
   public ScriptingEngines(ScriptEngineManager scriptEngineManager) {
-    this.scriptEngineManager = scriptEngineManager;
-  }
-
-  public void setEnableScriptEngineCaching(boolean cacheScriptEngines) {
-    this.enableScriptEngineCaching = cacheScriptEngines;
+    this.scriptEngineResolver = new ScriptEngineResolver(scriptEngineManager);
   }
 
   public boolean isEnableScriptEngineCaching() {
     return enableScriptEngineCaching;
   }
 
+  public void setEnableScriptEngineCaching(boolean enableScriptEngineCaching) {
+    this.enableScriptEngineCaching = enableScriptEngineCaching;
+  }
+
   public ScriptEngineManager getScriptEngineManager() {
-    return scriptEngineManager;
+    return scriptEngineResolver.getScriptEngineManager();
   }
 
   public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
-    scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
+    scriptEngineResolver.addScriptEngineFactory(scriptEngineFactory);
     return this;
-  }
-
-  public void setScriptEngineFactories(List<ScriptEngineFactory> scriptEngineFactories) {
-    if (scriptEngineFactories != null) {
-      for (ScriptEngineFactory scriptEngineFactory : scriptEngineFactories) {
-        scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
-      }
-    }
-  }
-
-  /**
-   * <p>Used to compile a script provided as String into an engine-specific {@link CompiledScript}.</p>
-   *
-   * <p><strong>Note on caching of compiled scripts:</strong> only cache the returned script if
-   * {@link #enableScriptEngineCaching} is set to 'true'. Depending on the implementation, the compiled
-   * script will keep references to the script engine which created it.</p>
-   *
-   * @param language the script language in which the script is written
-   * @param src a string of the source of the script
-   * @return a {@link CompiledScript} or null if script engine can be found but does not support compilation.
-   * @throws ProcessEngineException if no {@link ScriptEngine} can be resolved for the provided language or
-   *         if the script cannot be compiled (syntax error ...).
-   */
-  public CompiledScript compile(String language, String src) {
-    ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
-
-    if(scriptEngine instanceof Compilable && !scriptEngine.getFactory().getLanguageName().equalsIgnoreCase("ecmascript")) {
-      Compilable compilingEngine = (Compilable) scriptEngine;
-
-      try {
-        CompiledScript compiledScript = compilingEngine.compile(src);
-
-        LOG.fine("Compiled script using " + language + " script engine");
-
-        return compiledScript;
-
-      } catch (ScriptException e) {
-        throw new ScriptCompilationException("Unable to compile script: " + e.getMessage(), e);
-
-      }
-
-    } else {
-      // engine does not support compilation
-      return null;
-
-    }
-
   }
 
   /**
@@ -139,85 +98,50 @@ public class ScriptingEngines implements ScriptEngineResolver {
       language = language.toLowerCase();
     }
 
-    ScriptEngine scriptEngine = null;
+    ProcessApplicationReference pa = Context.getCurrentProcessApplication();
+    ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
 
-    if (enableScriptEngineCaching) {
-      scriptEngine = getCachedScriptEngine(language);
-
-    } else {
-      scriptEngine = scriptEngineManager.getEngineByName(language);
-
+    ScriptEngine engine = null;
+    if (config.isEnableFetchScriptEngineFromProcessApplication()) {
+      if(pa != null) {
+        engine = getPaScriptEngine(language, pa);
+      }
     }
+
+    if(engine == null) {
+      engine = getGlobalScriptEngine(language);
+    }
+
+    return engine;
+  }
+
+  protected ScriptEngine getPaScriptEngine(String language, ProcessApplicationReference pa) {
+    try {
+      ProcessApplicationInterface processApplication = pa.getProcessApplication();
+      ProcessApplicationInterface rawObject = processApplication.getRawObject();
+
+      if (rawObject instanceof AbstractProcessApplication) {
+        AbstractProcessApplication abstractProcessApplication = (AbstractProcessApplication) rawObject;
+        return abstractProcessApplication.getScriptEngineForName(language, enableScriptEngineCaching);
+      }
+      return null;
+    }
+    catch (ProcessApplicationUnavailableException e) {
+      throw new ProcessEngineException("Process Application is unavailable.", e);
+    }
+  }
+
+  protected ScriptEngine getGlobalScriptEngine(String language) {
+
+    ScriptEngine scriptEngine = scriptEngineResolver.getScriptEngine(language, enableScriptEngineCaching);
 
     ensureNotNull("Can't find scripting engine for '" + language + "'", "scriptEngine", scriptEngine);
 
     return scriptEngine;
-
-  }
-
-  public Set<String> getAllSupportedLanguages() {
-    Set<String> languages = new HashSet<String>();
-    List<ScriptEngineFactory> engineFactories = scriptEngineManager.getEngineFactories();
-    for (ScriptEngineFactory scriptEngineFactory : engineFactories) {
-      languages.add(scriptEngineFactory.getLanguageName());
-    }
-    return languages;
-  }
-
-  /**
-   * Returns a cached script engine or creates a new script engine if no such engine is currently cached.
-   *
-   * @param language the language (such as 'groovy' for the script engine)
-   * @return the cached engine or null if no script engine can be created for the given language
-   */
-  protected ScriptEngine getCachedScriptEngine(String language) {
-
-    ScriptEngine scriptEngine = cachedEngines.get(language);
-
-    if(scriptEngine == null) {
-      scriptEngine = scriptEngineManager.getEngineByName(language);
-
-      if(scriptEngine != null) {
-
-        if(GROOVY_SCRIPTING_LANGUAGE.equals(language)) {
-          configureGroovyScriptEngine(scriptEngine);
-        }
-
-        if(isCachable(scriptEngine)) {
-          cachedEngines.put(language, scriptEngine);
-        }
-
-      }
-
-    }
-    return scriptEngine;
-  }
-
-  /**
-   * Allows checking whether the script engine can be cached.
-   *
-   * @param scriptEngine the script engine to check.
-   * @return true if the script engine may be cached.
-   */
-  protected boolean isCachable(ScriptEngine scriptEngine) {
-    // Check if script-engine supports multithreading. If true it can be cached.
-    Object threadingParameter = scriptEngine.getFactory().getParameter("THREADING");
-    return threadingParameter != null;
-  }
-
-  /**
-   * Allows providing custom configuration for the groovy script engine.
-   * @param scriptEngine the groovy script engine to configure.
-   */
-  protected void configureGroovyScriptEngine(ScriptEngine scriptEngine) {
-
-    // make sure Groovy compiled scripts only hold weak references to java methods
-    scriptEngine.getContext().setAttribute("#jsr223.groovy.engine.keep.globals", "weak", ScriptContext.ENGINE_SCOPE);
-
   }
 
   /** override to build a spring aware ScriptingEngines
-   * @param engineBindings
+   * @param engineBindin
    * @param scriptEngine */
   public Bindings createBindings(ScriptEngine scriptEngine, VariableScope variableScope) {
     return scriptBindingsFactory.createBindings(variableScope, scriptEngine.createBindings());

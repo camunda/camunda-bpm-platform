@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,80 +14,88 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Thorben Lindhauer
  * @author Daniel Meyer
  * @author Michael Scholz
+ * @author Christopher Zell
  */
-public abstract class AbstractCorrelateMessageCmd implements Command<Void> {
+public abstract class AbstractCorrelateMessageCmd {
 
   protected final String messageName;
-  protected final String businessKey;
-  protected final Map<String, Object> correlationKeys;
-  protected final Map<String, Object> processVariables;
-  protected String processInstanceId;
-  protected boolean isExclusiveCorrelation = false;
 
-  protected AbstractCorrelateMessageCmd(String messageName, String businessKey,
-      Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    this.messageName = messageName;
-    this.businessKey = businessKey;
-    this.correlationKeys = correlationKeys;
-    this.processVariables = processVariables;
-  }
+  protected final MessageCorrelationBuilderImpl builder;
 
   /**
    * Initialize the command with a builder
    *
-   * @param messageCorrelationBuilderImpl
+   * @param builder
    */
-  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
-    this.messageName = messageCorrelationBuilderImpl.getMessageName();
-    this.processVariables = messageCorrelationBuilderImpl.getPayloadProcessInstanceVariables();
-    this.correlationKeys = messageCorrelationBuilderImpl.getCorrelationProcessInstanceVariables();
-    this.businessKey = messageCorrelationBuilderImpl.getBusinessKey();
-    this.processInstanceId = messageCorrelationBuilderImpl.getProcessInstanceId();
-    this.isExclusiveCorrelation = messageCorrelationBuilderImpl.isExclusiveCorrelation();
+  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder) {
+    this.builder = builder;
+    this.messageName = builder.getMessageName();
   }
 
-  protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {
-    new MessageEventReceivedCmd(messageName, correlationResult.getExecutionEntity().getId(), processVariables, isExclusiveCorrelation).execute(commandContext);
+  protected void triggerExecution(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
+    String executionId = correlationResult.getExecutionEntity().getId();
+
+    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.getPayloadProcessInstanceVariablesLocal(), builder.isExclusiveCorrelation());
+    command.execute(commandContext);
   }
 
-  protected void instantiateProcess(CommandContext commandContext, MessageCorrelationResult correlationResult) {
+  protected ProcessInstance instantiateProcess(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
     ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
+
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
-    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(businessKey, messageStartEvent);
-    processInstance.start(processVariables);
+    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), messageStartEvent);
+
+    processInstance.setVariablesLocal(builder.getPayloadProcessInstanceVariablesLocal());
+
+    processInstance.start(builder.getPayloadProcessInstanceVariables());
+
+    return processInstance;
   }
 
-  protected void checkAuthorization(MessageCorrelationResult correlation) {
-    AuthorizationManager authorizationManager = Context.getCommandContext().getAuthorizationManager();
+  protected void checkAuthorization(CorrelationHandlerResult correlation) {
+    CommandContext commandContext = Context.getCommandContext();
 
-    if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlation.getResultType())) {
-      ExecutionEntity execution = correlation.getExecutionEntity();
-      authorizationManager.checkUpdateProcessInstanceById(execution.getProcessInstanceId());
-    }
-    else {
-      ProcessDefinitionEntity definition = correlation.getProcessDefinitionEntity();
-      authorizationManager.checkCreateProcessInstance(definition);
-    }
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (MessageCorrelationResultType.Execution.equals(correlation.getResultType())) {
+        ExecutionEntity execution = correlation.getExecutionEntity();
+        checker.checkUpdateProcessInstanceById(execution.getProcessInstanceId());
 
+      } else {
+        ProcessDefinitionEntity definition = correlation.getProcessDefinitionEntity();
+
+        checker.checkCreateProcessInstance(definition);
+      }
+    }
+  }
+
+  protected MessageCorrelationResult createMessageCorrelationResult(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
+    MessageCorrelationResultImpl result = new MessageCorrelationResultImpl(handlerResult);
+    if (MessageCorrelationResultType.Execution.equals(handlerResult.getResultType())) {
+      triggerExecution(commandContext, handlerResult);
+    } else {
+      ProcessInstance instance = instantiateProcess(commandContext, handlerResult);
+      result.setProcessInstance(instance);
+    }
+    return result;
   }
 
 }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.interceptor.AtomicOperationInvocation;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler.AsyncContinuationConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -23,7 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
  * @author Daniel Meyer
  *
  */
-public class MessageJobDeclaration extends JobDeclaration<ExecutionEntity, MessageEntity> {
+public class MessageJobDeclaration extends JobDeclaration<AtomicOperationInvocation, MessageEntity> {
 
   public static final String ASYNC_BEFORE = "async-before";
   public static final String ASYNC_AFTER = "async-after";
@@ -37,27 +43,12 @@ public class MessageJobDeclaration extends JobDeclaration<ExecutionEntity, Messa
     this.operationIdentifier = operationsIdentifier;
   }
 
-  protected MessageEntity newJobInstance(ExecutionEntity execution) {
+  @Override
+  protected MessageEntity newJobInstance(AtomicOperationInvocation context) {
     MessageEntity message = new MessageEntity();
-    message.setExecution(execution);
+    message.setExecution(context.getExecution());
+
     return message;
-  }
-
-  public void setJobHandlerConfiguration(MessageEntity message, ExecutionEntity execution, AtomicOperation executionOperation) {
-    String configuration = executionOperation.getCanonicalName();
-    PvmActivity activity = execution.getActivity();
-
-    if(activity != null && activity.isAsyncAfter()) {
-      if(execution.getTransition() != null) {
-        // store id of selected transition in case this is async after.
-        // id is not serialized with the execution -> we need to remember it as
-        // job handler configuration.
-        configuration += "$"+execution.getTransition().getId();
-      }
-    }
-
-    message.setJobHandlerConfiguration(configuration);
-
   }
 
   public boolean isApplicableForOperation(AtomicOperation operation) {
@@ -69,9 +60,28 @@ public class MessageJobDeclaration extends JobDeclaration<ExecutionEntity, Messa
     return false;
   }
 
-  protected ExecutionEntity resolveExecution(ExecutionEntity context) {
-    return context;
+  protected ExecutionEntity resolveExecution(AtomicOperationInvocation context) {
+    return context.getExecution();
   }
 
+  @Override
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(AtomicOperationInvocation context) {
+    AsyncContinuationConfiguration configuration = new AsyncContinuationConfiguration();
 
+    configuration.setAtomicOperation(context.getOperation().getCanonicalName());
+
+    ExecutionEntity execution = context.getExecution();
+    PvmActivity activity = execution.getActivity();
+    if(activity != null && activity.isAsyncAfter()) {
+      if(execution.getTransition() != null) {
+        // store id of selected transition in case this is async after.
+        // id is not serialized with the execution -> we need to remember it as
+        // job handler configuration.
+        configuration.setTransitionId(execution.getTransition().getId());
+      }
+    }
+
+    return configuration;
+  }
+  
 }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +18,7 @@ package org.camunda.bpm.engine.impl.form.validator;
 
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -52,11 +57,13 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
     final DelegateExecution execution = validatorContext.getExecution();
 
     if(shouldPerformPaContextSwitch(validatorContext.getExecution())) {
+      ProcessApplicationReference processApplicationReference = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
+
       return Context.executeWithinProcessApplication(new Callable<Boolean>() {
         public Boolean call() throws Exception {
           return doValidate(submittedValue, validatorContext);
         }
-      }, ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution));
+      }, processApplicationReference, new InvocationContext(execution));
 
     } else {
       return doValidate(submittedValue, validatorContext);

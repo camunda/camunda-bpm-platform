@@ -1,16 +1,17 @@
 camunda BPM - The open source BPM platform
 ==========================================
 
-[![Build Status](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/badge/icon)](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/)
+[![Build Status](https://travis-ci.org/camunda/camunda-bpm-platform.svg?branch=master)](https://travis-ci.org/camunda/camunda-bpm-platform)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-parent)
 
 camunda BPM platform is a flexible framework for workflow and process automation. It's core is a native BPMN 2.0 process engine that runs inside the Java Virtual Machine. It can be embedded inside any Java application and any Runtime Container. It integrates with Java EE 6 and is a perfect match for the Spring Framework. On top of the process engine, you can choose from a stack of tools for human workflow management, operations & monitoring.
 
-* Web Site: http://www.camunda.org/
-* Getting Started: http://www.camunda.org/implement-getting-started.html
+* Web Site: https://www.camunda.org/
+* Getting Started: https://docs.camunda.org/get-started/
+* User Forum: https://forum.camunda.org/
 * Issue Tracker: https://app.camunda.com/jira
-* Contribution Guildelines: http://www.camunda.org/community/contribute.html
-* License: Apache License, Version 2.0  http://www.apache.org/licenses/LICENSE-2.0
+* Contribution Guidelines: https://camunda.org/contribute/
+* License: The source files in this repository are made available under the [Apache License Version 2.0](./LICENSE).
 
 Components
 ----------
@@ -23,20 +24,21 @@ camunda BPM platform provides a rich set of components centered around the BPM l
  * Spring, CDI integration - Programming model integration that allows developers to write Java Applications that interact with running processes.
 
 #### Process Design
- * camunda modeler - A [modeler plugin for eclipse](https://github.com/camunda/camunda-modeler) that allows developers to design & refactor processes inside their IDE.
+ * camunda modeler - A [standalone desktop application](https://github.com/camunda/camunda-modeler) that allows business users and developers to design & configure processes.
  * camunda cycle - Enables BPMN 2.0 based Roundtrip between Business and IT parties involved in a project. Allows to use any BPMN 2.0 modeling tool with camunda BPM.
 
 #### Process Operations
  * camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
  * camunda cockpit - Web application tool for process operations.
+ * camunda admin - Web application for managing users, groups, and their access permissions.
 
 #### Human Task Management
- * camunda tasklist - Simple web application demonstrating how the process engine task API can be used.
+ * camunda tasklist - Web application for managing and completing user tasks in the context of processes.
 
 #### And there's more...
 
- * [camunda-bpmn.js](https://github.com/camunda/camunda-bpmn.js) - We have started building a complete BPMN toolkit for Java Script (Parser, Process Engine, Renderer)
- * [camunda BPM incubation](https://github.com/camunda/camunda-bpm-incubation) - This is where we, together with the community, try out new ideas.
+ * [bpmn.io](https://bpmn.io/) - Toolkits for BPMN, CMMN, and DMN in Java Script (rendering, modeling)
+ * [Community Extensions](https://docs.camunda.org/manual/7.5/introduction/extensions/) - Extensions on top of Camunda BPM provided and maintained by our great open source community
 
 
 A Framework
@@ -80,7 +82,7 @@ Add the following lines to it:
 </activeProfiles>
 ```
 
-Apache Maven 3 and Java JDK 6 or 7 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
+Apache Maven 3 and Java JDK 7/8 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
 
 ```
 mvn clean install
@@ -90,7 +92,6 @@ This will build all the modules that make up the camunda BPM platform but will n
 
 ```
 distro/tomcat/distro/target     (Apache Tomcat 7 Distribution)
-distro/gf31/distro/target       (Glassfish 3 Distribution)
 distro/jbossas7/distro/target   (JBoss AS 7 Distribution)
 ```
 
@@ -103,14 +104,20 @@ The integration testsuites are located under `qa/`. There you'll find a folder n
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
 We have different maven profiles for selecting
-* *Runtime containers & environments*: jboss, glassfish, tomcat, wildfly
+* *Runtime containers & environments*: jboss, tomcat, wildfly
 * *The testsuite*: engine-integration, webapps-integration
-* *The database*: h2,h2-xa,db2,db2-xa,sqlserver,sqlserver-xa,oracle,oracle-xa,postgresql,postgresql-xa,mysql,mysql-xa (XA is only supprted on JBoss & Glassfish ATM)
+* *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 / postgresql is supported in engine-integration tests)
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
 ```
 mvn clean install -Pengine-integration,jboss,h2
+```
+
+For using wildfly as the runtime container you have to additionally specify the wildfly version: wildfly8, wildfly10, wildfly11, wildfly12 or wildfly13. Example:
+
+```
+mvn clean install -Pengine-integration,wildfly,wildfly10,h2
 ```
 
 If you want to test against an XA database, just add the corresponding XA database profile to the mvn cmdline above. Example:
@@ -122,7 +129,7 @@ mvn clean install -Pengine-integration,jboss,postgresql,postgresql-xa
 You can select multiple testsuites but only a single database and a single runtime container. This is valid:
 
 ```
-mvn clean install -Pengine-integration,webapps-integration,tomcat,db2
+mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
 ```
 
 There is a special profile for JBoss Application Server:

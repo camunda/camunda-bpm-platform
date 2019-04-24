@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,6 +50,18 @@ public interface CaseInstanceBuilder {
    *
    */
   CaseInstanceBuilder businessKey(String businessKey);
+
+  /**
+   * Specify the id of the tenant the case definition belongs to. Can only be
+   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   */
+  CaseInstanceBuilder caseDefinitionTenantId(String tenantId);
+
+  /**
+   * Specify that the case definition belongs to no tenant. Can only be
+   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   */
+  CaseInstanceBuilder caseDefinitionWithoutTenantId();
 
   /**
    * <p>Pass a variable to the case instance.</p>

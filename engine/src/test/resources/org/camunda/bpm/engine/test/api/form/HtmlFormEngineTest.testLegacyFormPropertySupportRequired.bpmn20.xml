@@ -9,7 +9,7 @@
     expressionLanguage="http://www.w3.org/1999/XPath"
     targetNamespace="test">
 
-  <process id="HtmlFormEngineTest.testLegacyFormPropertySupportRequired">
+  <process id="HtmlFormEngineTest.testLegacyFormPropertySupportRequired" isExecutable="true">
 
     <startEvent id="start" />
 

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,13 +23,13 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmmn.CaseInstanceBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 
 /**
@@ -40,38 +44,64 @@ public class CreateCaseInstanceCmd implements Command<CaseInstance>, Serializabl
   protected Map<String, Object> variables;
   protected String businessKey;
 
+  protected String caseDefinitionTenantId;
+  protected boolean isTenantIdSet = false;
+
   public CreateCaseInstanceCmd(CaseInstanceBuilderImpl builder) {
     this.caseDefinitionKey = builder.getCaseDefinitionKey();
     this.caseDefinitionId = builder.getCaseDefinitionId();
     this.businessKey = builder.getBusinessKey();
     this.variables = builder.getVariables();
+    this.caseDefinitionTenantId = builder.getCaseDefinitionTenantId();
+    this.isTenantIdSet = builder.isTenantIdSet();
   }
 
   public CaseInstance execute(CommandContext commandContext) {
-    DeploymentCache deploymentCache = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache();
+    ensureAtLeastOneNotNull("caseDefinitionId and caseDefinitionKey are null", caseDefinitionId, caseDefinitionKey);
 
-    // Find the case definition
-    CaseDefinitionEntity caseDefinition = null;
+    CaseDefinitionEntity caseDefinition = find(commandContext);
 
-    ensureAtLeastOneNotNull("caseDefinition and caseDefinitionKey are null", caseDefinitionId, caseDefinitionKey);
-
-    if (caseDefinitionId!=null) {
-      caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
-
-      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
-
-    } else {
-      caseDefinition = deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
-
-      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateCaseInstance(caseDefinition);
     }
 
     // Start the case instance
     CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
     caseInstance.create(variables);
     return caseInstance;
+  }
+
+  protected CaseDefinitionEntity find(CommandContext commandContext) {
+    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
+
+    // Find the case definition
+    CaseDefinitionEntity caseDefinition = null;
+
+    if (caseDefinitionId!=null) {
+      caseDefinition =  findById(deploymentCache, caseDefinitionId);
+
+      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
+
+    } else {
+      caseDefinition = findByKey(deploymentCache, caseDefinitionKey);
+
+      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
+    }
+
+    return caseDefinition;
+  }
+
+  protected CaseDefinitionEntity findById(DeploymentCache deploymentCache, String caseDefinitionId) {
+    return deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
+  }
+
+  protected CaseDefinitionEntity findByKey(DeploymentCache deploymentCache, String caseDefinitionKey) {
+    if (isTenantIdSet) {
+      return deploymentCache.findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, caseDefinitionTenantId);
+
+    } else {
+      return deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
+    }
   }
 
 }

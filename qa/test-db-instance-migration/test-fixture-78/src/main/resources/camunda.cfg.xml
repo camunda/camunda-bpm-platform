@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  
+    <property name="jdbcUrl" value="${database.url}" />
+    <property name="jdbcDriver" value="${database.driver}" />
+    <property name="jdbcUsername" value="${database.username}" />
+    <property name="jdbcPassword" value="${database.password}" />
+    
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="false" />
+    
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+
+    <!-- mail server configurations -->
+    <property name="mailServerPort" value="${mail.server.port}" />
+    <property name="history" value="full" />
+
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+
+    <property name="defaultSerializationFormat" value="application/json"/>
+    <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+
+    <property name="processEnginePlugins">
+      <list>
+        <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin" />
+      </list>
+    </property>
+
+  </bean>
+  
+</beans>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.mgmt">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart">
+      <timerEventDefinition>
+        <timeDuration>PT1H</timeDuration>
+      </timerEventDefinition>
+    </startEvent>
+
+    <sequenceFlow sourceRef="theStart" targetRef="scriptTask" />
+
+    <scriptTask id="scriptTask" scriptFormat="groovy">
+      <script>
+        throw new RuntimeException("This is an exception thrown from scriptTask")
+      </script>
+    </scriptTask>
+
+    <sequenceFlow sourceRef="scriptTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

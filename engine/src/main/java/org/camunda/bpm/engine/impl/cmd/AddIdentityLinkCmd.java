@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +21,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -76,9 +80,8 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     task = taskManager.findTaskById(taskId);
     EnsureUtil.ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
-
+    checkAddIdentityLink(task, commandContext);
+    
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);
     } else if (IdentityLinkType.OWNER.equals(type)) {
@@ -88,6 +91,12 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     }
 
     return null;
+  }
+
+  protected void checkAddIdentityLink(TaskEntity task, CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkTaskAssign(task);
+    }
   }
 
 }

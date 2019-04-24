@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.form.type;
 
 import java.util.HashMap;
@@ -18,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 
@@ -37,6 +41,10 @@ public class FormTypes {
 
     String typeText = formFieldElement.attribute("type");
     String datePatternText = formFieldElement.attribute("datePattern");
+
+    if (typeText == null && DefaultFormHandler.FORM_FIELD_ELEMENT.equals(formFieldElement.getTagName())) {
+      bpmnParse.addError("form field must have a 'type' attribute", formFieldElement);
+    }
 
     if ("date".equals(typeText) && datePatternText!=null) {
       formType = new DateFormType(datePatternText);

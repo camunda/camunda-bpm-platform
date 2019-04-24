@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,11 +24,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.QueryValidators.AdhocQueryValidator;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -47,27 +54,27 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public static final String SORTORDER_ASC = "asc";
   public static final String SORTORDER_DESC = "desc";
 
-  private static enum ResultType {
-    LIST, LIST_PAGE, SINGLE_RESULT, COUNT
+  protected enum ResultType {
+    LIST, LIST_PAGE, LIST_IDS, SINGLE_RESULT, COUNT
   }
   protected transient CommandExecutor commandExecutor;
-  protected transient CommandContext commandContext;
 
   protected ResultType resultType;
 
-  protected List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
-
   protected Map<String, String> expressions = new HashMap<String, String>();
+
+  protected Set<Validator<AbstractQuery<?, ?>>> validators = new HashSet<Validator<AbstractQuery<?, ?>>>();
 
   protected AbstractQuery() {
   }
 
   protected AbstractQuery(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
-  }
 
-  public AbstractQuery(CommandContext commandContext) {
-    this.commandContext = commandContext;
+    // all queries that are created with a dedicated command executor
+    // are treated as adhoc queries (i.e. queries not created in the context
+    // of a command)
+    addValidator(AdhocQueryValidator.<AbstractQuery<?, ?>>get());
   }
 
   public AbstractQuery<T, U> setCommandExecutor(CommandExecutor commandExecutor) {
@@ -116,6 +123,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     for (QueryOrderingProperty orderingProperty : orderingProperties) {
       ensureNotNull(NotValidException.class, "Invalid query: call asc() or desc() after using orderByXX()", "direction", orderingProperty.getDirection());
     }
+
   }
 
   @SuppressWarnings("unchecked")
@@ -162,21 +170,36 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       return executeSingleResult(commandContext);
     } else if (resultType==ResultType.LIST_PAGE) {
       return evaluateExpressionsAndExecuteList(commandContext, null);
+    } else if (resultType == ResultType.LIST_IDS) {
+      return evaluateExpressionsAndExecuteIdsList(commandContext);
     } else {
       return evaluateExpressionsAndExecuteCount(commandContext);
     }
   }
 
   public long evaluateExpressionsAndExecuteCount(CommandContext commandContext) {
+    validate();
     evaluateExpressions();
-    return executeCount(commandContext);
+    return !hasExcludingConditions() ? executeCount(commandContext) : 0l;
   }
 
   public abstract long executeCount(CommandContext commandContext);
 
   public List<U> evaluateExpressionsAndExecuteList(CommandContext commandContext, Page page) {
+    validate();
     evaluateExpressions();
-    return executeList(commandContext, page);
+    return !hasExcludingConditions() ? executeList(commandContext, page) : new ArrayList<U>();
+  }
+
+  /**
+   * Whether or not the query has excluding conditions. If the query has excluding conditions,
+   * (e.g. task due date before and after are excluding), the SQL query is avoided and a default result is
+   * returned. The returned result is the same as if the SQL was executed and there were no entries.
+   *
+   * @return {@code true} if the query does have excluding conditions, {@code false} otherwise
+   */
+  protected boolean hasExcludingConditions() {
+    return false;
   }
 
   /**
@@ -193,23 +216,6 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
      throw new ProcessEngineException("Query return "+results.size()+" results instead of max 1");
     }
     return null;
-  }
-
-  @Deprecated
-  public String getOrderBy() {
-    if(orderBy == null) {
-      return super.getOrderBy();
-    } else {
-      return orderBy;
-    }
-  }
-
-  public List<QueryOrderingProperty> getOrderingProperties() {
-    return orderingProperties;
-  }
-
-  public void setOrderingProperties(List<QueryOrderingProperty> orderingProperties) {
-    this.orderingProperties = orderingProperties;
   }
 
   public Map<String, String> getExpressions() {
@@ -294,6 +300,43 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       }
     }
     extendedQuery.setExpressions(mergedExpressions);
+  }
+
+  public void validate() {
+    for (Validator<AbstractQuery<?, ?>> validator : validators) {
+      validate(validator);
+    }
+  }
+
+  public void validate(Validator<AbstractQuery<?, ?>> validator) {
+    validator.validate(this);
+  }
+
+  public void addValidator(Validator<AbstractQuery<?, ?>> validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(Validator<AbstractQuery<?, ?>> validator) {
+    validators.remove(validator);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> listIds() {
+    this.resultType = ResultType.LIST_IDS;
+    if (commandExecutor != null) {
+      return (List<String>) commandExecutor.execute(this);
+    }
+    return evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
+  }
+
+  public List<String> evaluateExpressionsAndExecuteIdsList(CommandContext commandContext) {
+    validate();
+    evaluateExpressions();
+    return !hasExcludingConditions() ? executeIdsList(commandContext) : new ArrayList<String>();
+  }
+
+  public List<String> executeIdsList(CommandContext commandContext) {
+    throw new UnsupportedOperationException();
   }
 
 }

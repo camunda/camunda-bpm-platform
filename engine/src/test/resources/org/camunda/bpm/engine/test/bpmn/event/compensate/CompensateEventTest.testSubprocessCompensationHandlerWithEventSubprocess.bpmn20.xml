@@ -6,7 +6,7 @@
   
   <message id="messageId" name="Message" />
   
-  <process id="subProcessCompensationHandlerWithEventSubprocess">
+  <process id="subProcessCompensationHandlerWithEventSubprocess" isExecutable="true">
 
     <startEvent id="start" />
     

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.concurrency;
 
-import java.util.logging.Logger;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.slf4j.Logger;
 
 
 /**
@@ -21,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class ControllableThread extends Thread {
 
-  private static Logger log = Logger.getLogger(ControllableThread.class.getName());
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   public ControllableThread() {
     super();
@@ -40,7 +44,7 @@ public class ControllableThread extends Thread {
   }
 
   public synchronized void startAndWaitUntilControlIsReturned() {
-    log.fine("test thread will start "+getName()+" and wait till it returns control");
+    LOG.debug("test thread will start "+getName()+" and wait till it returns control");
     start();
     try {
       wait();
@@ -50,7 +54,7 @@ public class ControllableThread extends Thread {
   }
 
   public synchronized void returnControlToTestThreadAndWait() {
-    log.fine(getName()+" will notify test thread and till test thread proceeds this thread");
+    LOG.debug(getName()+" will notify test thread and till test thread proceeds this thread");
     this.notify();
     try {
       this.wait();
@@ -65,7 +69,7 @@ public class ControllableThread extends Thread {
   }
 
   public synchronized void proceedAndWaitTillDone() {
-    log.fine("test thread will notify "+getName()+" and wait until it completes");
+    LOG.debug("test thread will notify "+getName()+" and wait until it completes");
     notify();
     try {
       join();

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="task" />
+
+    <userTask id="task" />
+
+    <sequenceFlow sourceRef="task" targetRef="gtw" />
+
+    <exclusiveGateway id="gtw" />
+
+    <sequenceFlow sourceRef="gtw" targetRef="task1">
+      <conditionExpression xsi:type="tFormalExpression">
+        ${false}
+      </conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="task1" />
+
+    <sequenceFlow sourceRef="task1" targetRef="theEnd1" />
+
+    <endEvent id="theEnd1" />
+
+    <sequenceFlow sourceRef="gtw" targetRef="task2">
+      <conditionExpression xsi:type="tFormalExpression" language="groovy">
+        services = execution.getProcessEngineServices();
+
+        // fetch current authentication
+        identityService = services.getIdentityService();
+        execution.setVariable('userId', identityService.getCurrentAuthentication().getUserId());
+
+        // execute query
+        runtimeService = services.getRuntimeService();
+        execution.setVariable('count', runtimeService.createProcessInstanceQuery().count());
+
+        return true;
+      </conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="task2" />
+
+    <sequenceFlow sourceRef="task2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

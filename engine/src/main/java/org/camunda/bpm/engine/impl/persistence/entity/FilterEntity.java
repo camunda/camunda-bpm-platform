@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -19,26 +22,31 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.QueryValidators.StoredQueryValidator;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.query.Query;
 
 /**
  * @author Sebastian Menski
  */
-public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevision {
+public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevision, HasDbReferences, DbEntityLifecycleAware {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -124,12 +132,13 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
   public void setQueryInternal(String query) {
     ensureNotNull(NotValidException.class, "query", query);
     JsonObjectConverter<Object> converter = getConverter();
-    this.query = (AbstractQuery<?, ?>) converter.toObject(new JSONObject(query));
+    this.query = (AbstractQuery<?, ?>) converter.toObject(JsonUtil.asObject(query));
   }
 
   public Map<String, Object> getProperties() {
     if (properties != null) {
-      return JsonUtil.jsonObjectAsMap(new JSONObject(properties));
+      JsonObject json = JsonUtil.asObject(properties);
+      return JsonUtil.asMap(json);
     }
     else {
       return null;
@@ -137,7 +146,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
   }
 
   public String getPropertiesInternal() {
-    return new JSONObject(properties).toString();
+    return JsonUtil.asString(properties);
   }
 
   public Filter setProperties(Map<String, Object> properties) {
@@ -147,8 +156,8 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
 
   public void setPropertiesInternal(String properties) {
     if (properties != null) {
-      JSONObject jsonObject = new JSONObject(properties);
-      this.properties = JsonUtil.jsonObjectAsMap(jsonObject);
+      JsonObject json = JsonUtil.asObject(properties);
+      this.properties = JsonUtil.asMap(json);
     }
     else {
       this.properties = null;
@@ -210,4 +219,22 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
     return copy;
   }
 
+  public void postLoad() {
+    if (query != null) {
+      query.addValidator(StoredQueryValidator.get());
+    }
+
+  }
+
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    return referenceIdAndClass;
+  }
 }

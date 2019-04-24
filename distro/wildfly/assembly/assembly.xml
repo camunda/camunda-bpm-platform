@@ -11,6 +11,13 @@
   <includeBaseDirectory>false</includeBaseDirectory>
 
   <dependencySets>
+   <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm:license-book:zip</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
     <dependencySet>
       <outputDirectory>server</outputDirectory>
       <includes>
@@ -23,6 +30,8 @@
           <exclude>**/standalone/configuration/standalone-full.xml</exclude> 
           <exclude>**/bin/standalone.conf</exclude>
           <exclude>**/bin/standalone.conf.bat</exclude>
+          <!-- exclude wildfly's shipped version of h2database -->
+          <exclude>**/h2database/**</exclude>
         </excludes>        
       </unpackOptions>      
     </dependencySet>

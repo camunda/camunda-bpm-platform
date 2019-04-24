@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,12 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -25,6 +25,9 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -44,8 +47,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     assertNotNull(userTask);
 
     Execution execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNotNull(execution);
 
     // 1. case: message received cancels the task
@@ -67,8 +70,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
 
     execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNull(execution);
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -83,9 +86,9 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     // deployment fails when two boundary message events have the same messageId
     try {
       repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageBoundaryEventTest.testDoubleBoundaryMessageEventSameMessageId.bpmn20.xml")
-        .deploy();
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageBoundaryEventTest.testDoubleBoundaryMessageEventSameMessageId.bpmn20.xml")
+          .deploy();
       fail("Deployment should fail because Activiti cannot handle two boundary message events with same messageId.");
     } catch (Exception e) {
       assertTextPresent("Cannot have more than one message event subscription with name 'messageName' for scope 'task'", e.getMessage());
@@ -104,13 +107,13 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // the executions for both messageEventSubscriptionNames are the same
     Execution execution1 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName_1")
-      .singleResult();
+        .messageEventSubscriptionName("messageName_1")
+        .singleResult();
     assertNotNull(execution1);
 
     Execution execution2 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName_2")
-      .singleResult();
+        .messageEventSubscriptionName("messageName_2")
+        .singleResult();
     assertNotNull(execution2);
 
     assertEquals(execution1.getId(), execution2.getId());
@@ -143,12 +146,12 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
 
     execution1 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName_1")
-      .singleResult();
+        .messageEventSubscriptionName("messageName_1")
+        .singleResult();
     assertNull(execution1);
     execution2 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName_2")
-      .singleResult();
+        .messageEventSubscriptionName("messageName_2")
+        .singleResult();
     assertNull(execution2);
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -218,17 +221,17 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     assertEquals(5, userTasks.size());
 
     // as long as tasks exists, the message subscriptions exist
-    for (int i = 0; i < userTasks.size()-1; i++) {
+    for (int i = 0; i < userTasks.size() - 1; i++) {
       Task task = userTasks.get(i);
       taskService.complete(task.getId());
 
       execution1 = runtimeService.createExecutionQuery()
-              .messageEventSubscriptionName("messageName_1")
-              .singleResult();
+          .messageEventSubscriptionName("messageName_1")
+          .singleResult();
       assertNotNull(execution1);
       execution2 = runtimeService.createExecutionQuery()
-              .messageEventSubscriptionName("messageName_2")
-              .singleResult();
+          .messageEventSubscriptionName("messageName_2")
+          .singleResult();
       assertNotNull(execution2);
     }
 
@@ -239,12 +242,12 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // after last task is completed, no message subscriptions left
     execution1 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName_1")
-      .singleResult();
+        .messageEventSubscriptionName("messageName_1")
+        .singleResult();
     assertNull(execution1);
     execution2 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName_2")
-      .singleResult();
+        .messageEventSubscriptionName("messageName_2")
+        .singleResult();
     assertNull(execution2);
 
     // complete last task to end process
@@ -268,8 +271,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     assertNotNull(userTask);
 
     Execution execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNotNull(execution);
 
     ///////////////////////////////////////////////////
@@ -293,8 +296,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
 
     execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNull(execution);
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -318,13 +321,13 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     assertNotNull(userTask);
 
     Execution execution1 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNotNull(execution1);
 
     Execution execution2 = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName2")
-      .singleResult();
+        .messageEventSubscriptionName("messageName2")
+        .singleResult();
     assertNotNull(execution2);
 
     assertNotSame(execution1.getId(), execution2.getId());
@@ -340,14 +343,14 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // the inner subscription is cancelled
     Execution execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNull(execution);
 
     // the outer subscription still exists
     execution = runtimeService.createExecutionQuery()
-            .messageEventSubscriptionName("messageName2")
-            .singleResult();
+        .messageEventSubscriptionName("messageName2")
+        .singleResult();
     assertNotNull(execution);
 
     // now complete the second usertask
@@ -355,8 +358,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // now the outer event subscription is cancelled as well
     execution = runtimeService.createExecutionQuery()
-            .messageEventSubscriptionName("messageName2")
-            .singleResult();
+        .messageEventSubscriptionName("messageName2")
+        .singleResult();
     assertNull(execution);
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -372,8 +375,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("process");
 
     execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     runtimeService.messageEventReceived("messageName", execution.getId());
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -382,14 +385,14 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // the inner subscription is removed
     execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNull(execution);
 
     // the outer subscription still exists
     execution = runtimeService.createExecutionQuery()
-            .messageEventSubscriptionName("messageName2")
-            .singleResult();
+        .messageEventSubscriptionName("messageName2")
+        .singleResult();
     assertNotNull(execution);
 
     // now complete the second usertask
@@ -397,8 +400,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // now the outer event subscription is cancelled as well
     execution = runtimeService.createExecutionQuery()
-            .messageEventSubscriptionName("messageName2")
-            .singleResult();
+        .messageEventSubscriptionName("messageName2")
+        .singleResult();
     assertNull(execution);
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -414,8 +417,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("process");
 
     execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName2")
-      .singleResult();
+        .messageEventSubscriptionName("messageName2")
+        .singleResult();
     runtimeService.messageEventReceived("messageName2", execution.getId());
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -424,14 +427,14 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // the inner subscription is removed
     execution = runtimeService.createExecutionQuery()
-    .messageEventSubscriptionName("messageName")
-    .singleResult();
+        .messageEventSubscriptionName("messageName")
+        .singleResult();
     assertNull(execution);
 
     // the outer subscription is removed
     execution = runtimeService.createExecutionQuery()
-    .messageEventSubscriptionName("messageName2")
-    .singleResult();
+        .messageEventSubscriptionName("messageName2")
+        .singleResult();
     assertNull(execution);
 
     // now complete the second usertask
@@ -454,8 +457,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     // 1. case: message one received cancels the task
 
     Execution executionMessageOne = runtimeService.createExecutionQuery()
-            .messageEventSubscriptionName("messageName_one")
-            .singleResult();
+        .messageEventSubscriptionName("messageName_one")
+        .singleResult();
     assertNotNull(executionMessageOne);
 
     runtimeService.messageEventReceived("messageName_one", executionMessageOne.getId());
@@ -471,8 +474,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("process");
 
     Execution executionMessageTwo = runtimeService.createExecutionQuery()
-            .messageEventSubscriptionName("messageName_two")
-            .singleResult();
+        .messageEventSubscriptionName("messageName_two")
+        .singleResult();
     assertNotNull(executionMessageTwo);
 
     runtimeService.messageEventReceived("messageName_two", executionMessageTwo.getId());
@@ -493,13 +496,13 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
 
     executionMessageOne = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName_one")
-      .singleResult();
+        .messageEventSubscriptionName("messageName_one")
+        .singleResult();
     assertNull(executionMessageOne);
 
     executionMessageTwo = runtimeService.createExecutionQuery()
-     .messageEventSubscriptionName("messageName_two")
-     .singleResult();
+        .messageEventSubscriptionName("messageName_two")
+        .singleResult();
     assertNull(executionMessageTwo);
 
     userTask = taskService.createTaskQuery().singleResult();
@@ -525,7 +528,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     // the process instance is ended
     assertProcessEnded(processInstance.getId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId()> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // and all activity instances in history have an end time set
       List<HistoricActivityInstance> hais = historyService.createHistoricActivityInstanceQuery().list();
       for (HistoricActivityInstance historicActivityInstance : hais) {
@@ -551,15 +554,15 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
 
     // there are 5 event subscriptions to the event on the inner user task
     List<Execution> executions = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .list();
+        .messageEventSubscriptionName("messageName")
+        .list();
     assertNotNull(executions);
     assertEquals(5, executions.size());
 
     // there is a single event subscription for the event on the subprocess
     executions = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName2")
-      .list();
+        .messageEventSubscriptionName("messageName2")
+        .list();
     assertNotNull(executions);
     assertEquals(1, executions.size());
 
@@ -568,12 +571,12 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     runtimeService.messageEventReceived("messageName2", outerScopeExecution.getId());
 
     executions = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("messageName")
-      .list();
+        .messageEventSubscriptionName("messageName")
+        .list();
     assertEquals(0, executions.size());
 
     Task userTask = taskService.createTaskQuery()
-      .singleResult();
+        .singleResult();
     assertNotNull(userTask);
     assertEquals("taskAfterOuterMessageBoundary", userTask.getTaskDefinitionKey());
 
@@ -603,6 +606,31 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     // then the event subscription for task2 still exists
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
     assertNotNull(runtimeService.createEventSubscriptionQuery().activityId("messageBoundary2").singleResult());
+
+  }
+
+  @Deployment
+  public void testExpressionInBoundaryMessageEventName() {
+
+    // given a process instance with its variables
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+
+    // when message is received
+    Execution execution = runtimeService.createExecutionQuery()
+        .messageEventSubscriptionName("messageName-bar")
+        .singleResult();
+    assertNotNull(execution);
+    runtimeService.messageEventReceived("messageName-bar", execution.getId());
+
+    // then then a task should be completed
+    Task userTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(userTask);
+    assertEquals("taskAfterMessage", userTask.getTaskDefinitionKey());
+    taskService.complete(userTask.getId());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
   }
 

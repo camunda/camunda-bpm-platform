@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -38,7 +41,7 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
     EnsureUtil
     .ensureNotNull("Could not find cancel boundary event for cancel end event " + execution.getActivity(), "cancelBoundaryEvent", cancelBoundaryEvent);
 
-    List<CompensateEventSubscriptionEntity> compensateEventSubscriptions =
+    List<EventSubscriptionEntity> compensateEventSubscriptions =
         CompensationUtil.collectCompensateEventSubscriptionsForScope(execution);
 
     if(compensateEventSubscriptions.isEmpty()) {
@@ -50,7 +53,7 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
 
   }
 
-  protected void leave(ActivityExecution execution) {
+  public void doLeave(ActivityExecution execution) {
     // continue via the appropriate cancel boundary event
     ScopeImpl eventScope = (ScopeImpl) cancelBoundaryEvent.getEventScope();
 

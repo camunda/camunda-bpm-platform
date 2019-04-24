@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
@@ -31,6 +34,7 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Sebastian Menski
@@ -39,11 +43,11 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   private static final long serialVersionUID = 1L;
 
-  protected String caseActivityInstanceId;
+  protected String[] caseActivityInstanceIds;
+  protected String[] caseActivityIds;
+
   protected String caseInstanceId;
   protected String caseDefinitionId;
-  protected String caseExecutionId;
-  protected String caseActivityId;
   protected String caseActivityName;
   protected String caseActivityType;
   protected Date createdBefore;
@@ -53,14 +57,9 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   protected Boolean ended;
   protected Integer caseActivityInstanceState;
   protected Boolean required;
-  protected Boolean repeatable;
-  protected Boolean repetition;
+  protected String[] tenantIds;
 
   public HistoricCaseActivityInstanceQueryImpl() {
-  }
-
-  public HistoricCaseActivityInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public HistoricCaseActivityInstanceQueryImpl(CommandExecutor commandExecutor) {
@@ -83,7 +82,12 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public HistoricCaseActivityInstanceQuery caseActivityInstanceId(String caseActivityInstanceId) {
     ensureNotNull(NotValidException.class, "caseActivityInstanceId", caseActivityInstanceId);
-    this.caseActivityInstanceId = caseActivityInstanceId;
+    return caseActivityInstanceIdIn(caseActivityInstanceId);
+  }
+
+  public HistoricCaseActivityInstanceQuery caseActivityInstanceIdIn(String... caseActivityInstanceIds) {
+    ensureNotNull(NotValidException.class, "caseActivityInstanceIds", (Object[]) caseActivityInstanceIds);
+    this.caseActivityInstanceIds = caseActivityInstanceIds;
     return this;
   }
 
@@ -101,13 +105,17 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public HistoricCaseActivityInstanceQuery caseExecutionId(String caseExecutionId) {
     ensureNotNull(NotValidException.class, "caseExecutionId", caseExecutionId);
-    this.caseActivityInstanceId = caseExecutionId;
-    return this;
+    return caseActivityInstanceIdIn(caseExecutionId);
   }
 
   public HistoricCaseActivityInstanceQuery caseActivityId(String caseActivityId) {
     ensureNotNull(NotValidException.class, "caseActivityId", caseActivityId);
-    this.caseActivityId = caseActivityId;
+    return caseActivityIdIn(caseActivityId);
+  }
+
+  public HistoricCaseActivityInstanceQuery caseActivityIdIn(String... caseActivityIds) {
+    ensureNotNull(NotValidException.class, "caseActivityIds", (Object[]) caseActivityIds);
+    this.caseActivityIds = caseActivityIds;
     return this;
   }
 
@@ -149,16 +157,6 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public HistoricCaseActivityInstanceQuery required() {
     this.required = true;
-    return this;
-  }
-
-  public HistoricCaseActivityInstanceQuery repeatable() {
-    this.repeatable = true;
-    return this;
-  }
-
-  public HistoricCaseActivityInstanceQuery repetition() {
-    this.repetition = true;
     return this;
   }
 
@@ -214,6 +212,19 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return this;
   }
 
+  public HistoricCaseActivityInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+      || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore)
+      || CompareUtil.areNotInAscendingOrder(endedAfter, endedBefore);
+  }
+
   // ordering
 
   public HistoricCaseActivityInstanceQuery orderByHistoricCaseActivityInstanceId() {
@@ -266,10 +277,14 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return this;
   }
 
+  public HistoricCaseActivityInstanceQuery orderByTenantId() {
+    return orderBy(HistoricCaseActivityInstanceQueryProperty.TENANT_ID);
+  }
+
   // getter
 
-  public String getCaseActivityInstanceId() {
-    return caseActivityInstanceId;
+  public String[] getCaseActivityInstanceIds() {
+    return caseActivityInstanceIds;
   }
 
   public String getCaseInstanceId() {
@@ -280,8 +295,8 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return caseDefinitionId;
   }
 
-  public String getCaseActivityId() {
-    return caseActivityId;
+  public String[] getCaseActivityIds() {
+    return caseActivityIds;
   }
 
   public String getCaseActivityName() {
@@ -318,14 +333,6 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public Boolean isRequired() {
     return required;
-  }
-
-  public Boolean isRepeatable() {
-    return repeatable;
-  }
-
-  public Boolean isRepetition() {
-    return repetition;
   }
 
 }

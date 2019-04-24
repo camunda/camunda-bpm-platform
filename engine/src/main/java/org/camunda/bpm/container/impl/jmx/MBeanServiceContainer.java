@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,13 +24,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation.DeploymentOperationBuilder;
 import org.camunda.bpm.container.impl.spi.PlatformService;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -37,6 +45,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  *
  */
 public class MBeanServiceContainer implements PlatformServiceContainer {
+
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   protected MBeanServer mBeanServer;
 
@@ -75,16 +85,18 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
         currentOperationContext.peek().serviceAdded(name);
       }
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("Could not register service " + serviceName + " with the MBean server", e);
+    }
+    catch (Exception e) {
+      throw LOG.cannotRegisterService(serviceName, e);
     }
   }
 
   public static ObjectName getObjectName(String serviceName) {
     try {
       return new ObjectName(serviceName);
-    } catch(Exception e) {
-      throw new ProcessEngineException("Could not compose name for '"+serviceName+"'", e);
+    }
+    catch(Exception e) {
+      throw LOG.cannotComposeNameFor(serviceName, e);
     }
   }
 
@@ -116,9 +128,9 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
       try {
         mBeanServer.unregisterMBean(serviceName);
         servicesByName.remove(serviceName);
-
-      } catch (Throwable t) {
-        throw new ProcessEngineException("Exception while unregistering " + serviceName.getCanonicalName() + " with the MBeanServer", t);
+      }
+      catch (Throwable t) {
+        throw LOG.exceptionWhileUnregisteringService(serviceName.getCanonicalName(), t);
       }
     }
 
@@ -146,8 +158,8 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
       currentOperationContext.push(operation);
       // execute the operation
       operation.execute();
-
-    } finally {
+    }
+    finally {
       currentOperationContext.pop();
       if(currentOperationContext.isEmpty()) {
         activeDeploymentOperations.remove();
@@ -183,7 +195,8 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
     PlatformService<S> service = getService(name);
     if(service != null) {
       return service.getValue();
-    } else {
+    }
+    else {
       return null;
     }
   }

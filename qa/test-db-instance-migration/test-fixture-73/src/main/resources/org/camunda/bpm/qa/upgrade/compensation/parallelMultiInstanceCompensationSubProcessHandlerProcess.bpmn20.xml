@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="ParallelMultiInstanceCompensationSubProcessHandlerScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="userTask" />
+    <userTask id="userTask">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>3</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+
+    <!-- compensation -->
+    <boundaryEvent id="compensateBoundaryEvent" attachedToRef="userTask">
+      <compensateEventDefinition />
+    </boundaryEvent>
+    <subProcess id="undoSubProcess" isForCompensation="true">
+      <startEvent id="undoSubProcessStart" />
+      
+      <sequenceFlow sourceRef="undoSubProcessStart" targetRef="undoTask" />
+      <userTask id="undoTask" />
+      
+      <sequenceFlow sourceRef="undoTask" targetRef="undoSubProcessEnd" />
+      <endEvent id="undoSubProcessEnd" />
+    </subProcess>
+
+    <sequenceFlow sourceRef="userTask" targetRef="beforeCompensate" />
+    <userTask id="beforeCompensate" />
+    <sequenceFlow sourceRef="beforeCompensate" targetRef="throwCompensate" />
+    
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="afterCompensate" />
+    <userTask id="afterCompensate" />
+    <sequenceFlow sourceRef="afterCompensate" targetRef="end" />
+    <endEvent id="end" />
+    
+    <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoSubProcess" />
+  </process>
+</definitions>

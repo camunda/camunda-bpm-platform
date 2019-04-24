@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.5.1">
+
+  <process id="ProcessWithEventSubProcess" isExecutable="true">
+    <startEvent id="StartEvent" name="start Process" />
+
+    <sequenceFlow id="SequenceFlow_1s1yl9q" sourceRef="StartEvent" targetRef="EscalationEndEvent" />
+
+    <endEvent id="EscalationEndEvent" name="escalation end">
+      <escalationEventDefinition escalationRef="Escalation_0hwe6ww" />
+    </endEvent>
+
+    <subProcess id="EventSubProcess" triggeredByEvent="true">
+      <startEvent id="NonInterruptingEscalationStartEvent" name="escalation start" isInterrupting="false">
+        <escalationEventDefinition escalationRef="Escalation_0hwe6ww" />
+      </startEvent>
+
+      <sequenceFlow id="SequenceFlow_0ckftpo" sourceRef="NonInterruptingEscalationStartEvent" targetRef="UserTaskEventSubProcess" />
+
+      <userTask id="UserTaskEventSubProcess" name="UserTask Event SubProcess" />
+
+      <sequenceFlow id="SequenceFlow_1v02uc8" sourceRef="UserTaskEventSubProcess" targetRef="EventSubProcessEndEvent" />
+
+      <endEvent id="EventSubProcessEndEvent" name="event subprocess end" />
+
+    </subProcess>
+
+  </process>
+
+  <escalation id="Escalation_0hwe6ww" name="Escalation_EventSubProcess" escalationCode="EventSubProcess" />
+
+</definitions>

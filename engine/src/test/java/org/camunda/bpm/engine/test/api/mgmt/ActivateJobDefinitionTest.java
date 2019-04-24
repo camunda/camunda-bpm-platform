@@ -1,3 +1,19 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import java.util.Date;
@@ -10,7 +26,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -18,9 +33,11 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
+  @Override
   public void tearDown() throws Exception {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
@@ -29,8 +46,6 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
         return null;
       }
     });
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   // Test ManagementService#activateJobDefinitionById() /////////////////////////
@@ -316,14 +331,9 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // ...which will be suspended with the corresponding jobs
     managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
     // when
     // activate the job definition
-    managementService.activateJobDefinitionById(jobDefinition.getId(), false, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionById(jobDefinition.getId(), false, oneWeekLater());
 
     // then
     // the job definition is still suspended
@@ -377,14 +387,9 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // ...which will be suspended with the corresponding jobs
     managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
     // when
     // activate the job definition
-    managementService.activateJobDefinitionById(jobDefinition.getId(), true, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionById(jobDefinition.getId(), true, oneWeekLater());
 
     // then
     // the job definition is still suspended
@@ -710,14 +715,9 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // ...which will be suspended with the corresponding jobs
     managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
     // when
     // activate the job definition
-    managementService.activateJobDefinitionByProcessDefinitionId(processDefinition.getId(), false, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionByProcessDefinitionId(processDefinition.getId(), false, oneWeekLater());
 
     // then
     // the job definition is still suspended
@@ -771,14 +771,9 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // ...which will be suspended with the corresponding jobs
     managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
     // when
     // activate the job definition
-    managementService.activateJobDefinitionByProcessDefinitionId(processDefinition.getId(), true, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionByProcessDefinitionId(processDefinition.getId(), true, oneWeekLater());
 
     // then
     // the job definition is still suspended
@@ -1104,14 +1099,9 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // ...which will be suspended with the corresponding jobs
     managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
     // when
     // activate the job definition
-    managementService.activateJobDefinitionByProcessDefinitionKey(processDefinition.getKey(), false, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionByProcessDefinitionKey(processDefinition.getKey(), false, oneWeekLater());
 
     // then
     // the job definition is still suspended
@@ -1166,14 +1156,9 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // ...which will be suspended with the corresponding jobs
     managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
     // when
     // activate the job definition
-    managementService.activateJobDefinitionByProcessDefinitionKey(processDefinition.getKey(), true, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionByProcessDefinitionKey(processDefinition.getKey(), true, oneWeekLater());
 
     // then
     // the job definition is still suspended
@@ -1422,12 +1407,6 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // given
     String key = "suspensionProcess";
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
-
     // Deploy three processes and start for each deployment a process instance
     // with a failed job
     int nrOfProcessDefinitions = 3;
@@ -1445,7 +1424,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
     // when
     // activate the job definition
-    managementService.activateJobDefinitionByProcessDefinitionKey(key, false, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionByProcessDefinitionKey(key, false, oneWeekLater());
 
     // then
     // the job definition is still suspended
@@ -1482,12 +1461,6 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     // given
     String key = "suspensionProcess";
 
-    // one week from now
-    Date startTime = new Date();
-    ClockUtil.setCurrentTime(startTime);
-    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
-
-
     // Deploy three processes and start for each deployment a process instance
     // with a failed job
     int nrOfProcessDefinitions = 3;
@@ -1505,7 +1478,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
 
     // when
     // activate the job definition
-    managementService.activateJobDefinitionByProcessDefinitionKey(key, true, new Date(oneWeekFromStartTime));
+    managementService.activateJobDefinitionByProcessDefinitionKey(key, true, oneWeekLater());
 
     // then
     // the job definitions are still suspended
@@ -1536,6 +1509,183 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByIdUsingBuilder() {
+    // given
+    // a deployed process definition with asynchronous continuation
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // a job definition (which was created for the asynchronous continuation)
+    // ...which will be suspended with the corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinition jobDefinition = query.singleResult();
+
+    assertEquals(0, query.active().count());
+    assertEquals(1, query.suspended().count());
+
+    // when
+    // activate the job definition
+    managementService
+      .updateJobDefinitionSuspensionState()
+      .byJobDefinitionId(jobDefinition.getId())
+      .activate();
+
+    // then
+    // there exists a active job definition
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByProcessDefinitionIdUsingBuilder() {
+    // given
+    // a deployed process definition with asynchronous continuation
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // a job definition (which was created for the asynchronous continuation)
+    // ...which will be suspended with the corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertEquals(0, query.active().count());
+    assertEquals(1, query.suspended().count());
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    // when
+    // activate the job definition
+    managementService
+      .updateJobDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
+      .activate();
+
+    // then
+    // there exists a active job definition
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByProcessDefinitionKeyUsingBuilder() {
+    // given
+    // a deployed process definition with asynchronous continuation
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // a job definition (which was created for the asynchronous continuation)
+    // ...which will be suspended with the corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertEquals(0, query.active().count());
+    assertEquals(1, query.suspended().count());
+
+    // when
+    // activate the job definition
+    managementService
+      .updateJobDefinitionSuspensionState()
+      .byProcessDefinitionKey("suspensionProcess")
+      .activate();
+
+    // then
+    // there exists a active job definition
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationJobDefinitionIncludingJobsUsingBuilder() {
+    // given
+    // a deployed process definition with asynchronous continuation
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // a job definition (which was created for the asynchronous continuation)
+    // ...which will be suspended with the corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinition jobDefinition = query.singleResult();
+
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(0, jobQuery.active().count());
+    assertEquals(1, jobQuery.suspended().count());
+
+    // when
+    // activate the job definition
+    managementService
+      .updateJobDefinitionSuspensionState()
+      .byJobDefinitionId(jobDefinition.getId())
+      .includeJobs(true)
+      .activate();
+
+    // then
+    // there exists a active job definition
+    assertEquals(1, jobQuery.active().count());
+    assertEquals(0, jobQuery.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testDelayedActivationUsingBuilder() {
+    // given
+    // a deployed process definition with asynchronous continuation
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // a job definition (which was created for the asynchronous continuation)
+    // ...which will be suspended with the corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinition jobDefinition = query.singleResult();
+
+    // when
+    // activate the job definition
+    managementService
+      .updateJobDefinitionSuspensionState()
+      .byJobDefinitionId(jobDefinition.getId())
+      .executionDate(oneWeekLater())
+      .activate();
+
+    // then
+    // the job definition is still suspended
+    assertEquals(0, query.active().count());
+    assertEquals(1, query.suspended().count());
+
+    // there exists a job for the delayed activation execution
+    Job delayedActivationJob = managementService.createJobQuery().timers().active().singleResult();
+    assertNotNull(delayedActivationJob);
+
+    // execute job
+    managementService.executeJob(delayedActivationJob.getId());
+
+    // the job definition should be suspended
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+  }
+
+  protected Date oneWeekLater() {
+    // one week from now
+    Date startTime = new Date();
+    ClockUtil.setCurrentTime(startTime);
+    long oneWeekFromStartTime = startTime.getTime() + (7 * 24 * 60 * 60 * 1000);
+    return new Date(oneWeekFromStartTime);
   }
 
 }

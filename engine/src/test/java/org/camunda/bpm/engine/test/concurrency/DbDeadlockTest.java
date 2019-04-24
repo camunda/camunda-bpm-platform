@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +18,8 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.Date;
 import java.util.List;
+
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -21,11 +27,13 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  * @author Daniel Meyer
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class DbDeadlockTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
@@ -90,6 +98,7 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
       hpi.setProcessInstanceId(id);
       hpi.setProcessDefinitionId("someProcDefId");
       hpi.setStartTime(new Date());
+      hpi.setState(HistoricProcessInstance.STATE_ACTIVE);
 
       newEntityManager.insert(hpi);
       newEntityManager.flush();
@@ -106,6 +115,7 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
 
   }
 
+  @Override
   protected void tearDown() throws Exception {
 
     // end interaction with Thread 2

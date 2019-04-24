@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <message id="messageId" name="Message" />
+  
+  <process id="InterruptingEventSubprocessCompensationScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="subProcess" />
+    <subProcess id="subProcess">
+      <startEvent id="subProcessStart" />
+      <sequenceFlow sourceRef="subProcessStart" targetRef="waitStateInSubProcess" />
+      <receiveTask id="waitStateInSubProcess"/>
+      <sequenceFlow sourceRef="waitStateInSubProcess" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+      
+      <!-- event subprocess -->
+      <subProcess id="eventSubProcess" triggeredByEvent="true">
+        <startEvent id="eventSubProcessStart">
+          <messageEventDefinition messageRef="messageId" />
+        </startEvent>
+        
+        <sequenceFlow sourceRef="eventSubProcessStart" targetRef="userTask" />
+        <userTask id="userTask"/>
+        <sequenceFlow sourceRef="userTask" targetRef="beforeCompensate" />
+        
+        <userTask id="beforeCompensate" />
+        <sequenceFlow sourceRef="beforeCompensate" targetRef="throwCompensate" />
+        
+        <intermediateThrowEvent id="throwCompensate">
+          <compensateEventDefinition />
+        </intermediateThrowEvent>
+        
+        <sequenceFlow sourceRef="throwCompensate" targetRef="eventSubProcessEnd" />
+        <endEvent id="eventSubProcessEnd" />
+      
+        <!-- compensation -->
+        <boundaryEvent id="compensateBoundaryEvent" attachedToRef="userTask">
+          <compensateEventDefinition />
+        </boundaryEvent>
+        <userTask id="undoTask" isForCompensation="true"/>
+      
+        <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoTask" />
+      </subProcess>
+    </subProcess>
+    
+    <sequenceFlow sourceRef="subProcess" targetRef="afterCompensate" />
+    <userTask id="afterCompensate" />
+    <sequenceFlow sourceRef="afterCompensate" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

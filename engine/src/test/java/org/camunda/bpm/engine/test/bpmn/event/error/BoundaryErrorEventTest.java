@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +32,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -42,6 +47,20 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Falko Menge
  */
 public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+
+    // Normally the UI will do this automatically for us
+    identityService.setAuthenticatedUserId("kermit");
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    identityService.clearAuthentication();
+    super.tearDown();
+  }
 
   @Deployment
   public void testCatchErrorOnEmbeddedSubprocess() {
@@ -350,6 +369,17 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId(), vars);
 
     assertProcessEnded(procId);
+  }
+
+  @Deployment
+  public void testCatchErrorThrownBySignallableActivityBehaviour() {
+    String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownBySignallableActivityBehaviour").getId();
+    assertNotNull("Didn't get a process id from runtime service", procId);
+    ActivityInstance processActivityInstance = runtimeService.getActivityInstance(procId);
+    ActivityInstance serviceTask = processActivityInstance.getChildActivityInstances()[0];
+    assertEquals("Expected the service task to be active after starting the process", "serviceTask", serviceTask.getActivityId());
+    runtimeService.signal(serviceTask.getExecutionIds()[0]);
+    assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment
@@ -823,48 +853,53 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testCatchErrorOnSubprocessSetsErrorCodeVariable(){
+  public void testCatchErrorOnSubprocessSetsErrorVariables(){
     runtimeService.startProcessInstanceByKey("Process_1");
     //the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorVariable";
-    Object errorCode = "error2";
-    checkErrorCodeVariable(variableName, errorCode);
+    Object errorCode = "error1";
+
+    checkErrorVariable(variableName, errorCode);
   }
 
   @Deployment(resources={
       "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorProcess.bpmn",
       "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByCallActivityOnSubprocessSetsErrorCodeVariable.bpmn"
   })
-  public void testCatchErrorThrownByCallActivityOnSubprocessSetsErrorCodeVariable(){
+  public void testCatchErrorThrownByCallActivityOnSubprocessSetsErrorVariables(){
     runtimeService.startProcessInstanceByKey("Process_1");
     //the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorVariable";
     //the code we gave the thrown error
     Object errorCode = "error";
-    checkErrorCodeVariable(variableName, errorCode);
+
+    checkErrorVariable(variableName, errorCode);
   }
 
-  @Deployment
-  public void testCatchErrorThrownByMultiInstanceSubProcessSetsErrorCodeVariable(){
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByMultiInstanceSubProcessSetsErrorCodeVariable.bpmn"
+  })
+  public void testCatchErrorThrownByMultiInstanceSubProcessSetsErrorVariables(){
     runtimeService.startProcessInstanceByKey("Process_1");
     //the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorVariable";
     //the code we gave the thrown error
     Object errorCode = "error";
-    checkErrorCodeVariable(variableName, errorCode);
+
+    checkErrorVariable(variableName, errorCode);
   }
 
-  private void checkErrorCodeVariable(String variableName, Object expectedValue){
+  private void checkErrorVariable(String variableName, Object expectedValue){
     VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
     assertThat(errorVariable, is(notNullValue()));
     assertThat(errorVariable.getValue(), is(expectedValue));
   }
 
   @Deployment(resources={
-    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorCodeVariable.bpmn",
+    "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorVariables.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
   })
-  public void testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorCodeVariable(){
+  public void testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorVariables(){
     runtimeService.startProcessInstanceByKey("Process_1");
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
@@ -872,6 +907,48 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     String variableName = "errorCode";
     //the code we gave the thrown error
     Object errorCode = "errorCode";
-    checkErrorCodeVariable(variableName, errorCode);
+    checkErrorVariable(variableName, errorCode);
+    checkErrorVariable("errorMessageVariable", "ouch!");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/error/reviewSalesLead.bpmn20.xml"})
+  public void testReviewSalesLeadProcess() {
+
+    // After starting the process, a task should be assigned to the 'initiator' (normally set by GUI)
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("details", "very interesting");
+    variables.put("customerName", "Alfresco");
+    String procId = runtimeService.startProcessInstanceByKey("reviewSaledLead", variables).getId();
+    Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
+    assertEquals("Provide new sales lead", task.getName());
+
+    // After completing the task, the review subprocess will be active
+    taskService.complete(task.getId());
+    Task ratingTask = taskService.createTaskQuery().taskCandidateGroup("accountancy").singleResult();
+    assertEquals("Review customer rating", ratingTask.getName());
+    Task profitabilityTask = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
+    assertEquals("Review profitability", profitabilityTask.getName());
+
+    // Complete the management task by stating that not enough info was provided
+    // This should throw the error event, which closes the subprocess
+    variables = new HashMap<String, Object>();
+    variables.put("notEnoughInformation", true);
+    taskService.complete(profitabilityTask.getId(), variables);
+
+    // The 'provide additional details' task should now be active
+    Task provideDetailsTask = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
+    assertEquals("Provide additional details", provideDetailsTask.getName());
+
+    // Providing more details (ie. completing the task), will activate the subprocess again
+    taskService.complete(provideDetailsTask.getId());
+    List<Task> reviewTasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+    assertEquals("Review customer rating", reviewTasks.get(0).getName());
+    assertEquals("Review profitability", reviewTasks.get(1).getName());
+
+    // Completing both tasks normally ends the process
+    taskService.complete(reviewTasks.get(0).getId());
+    variables.put("notEnoughInformation", false);
+    taskService.complete(reviewTasks.get(1).getId(), variables);
+    assertProcessEnded(procId);
   }
 }

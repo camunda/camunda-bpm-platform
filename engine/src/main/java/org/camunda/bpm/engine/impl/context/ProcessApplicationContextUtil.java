@@ -1,20 +1,39 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.engine.impl.context;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+
+import java.util.concurrent.Callable;
 
 public class ProcessApplicationContextUtil {
 
-  private static final Logger LOGG = Logger.getLogger(ProcessApplicationContextUtil.class.getName());
+  private final static ProcessApplicationLogger LOG = ProcessApplicationLogger.PROCESS_APPLICATION_LOGGER;
 
   public static ProcessApplicationReference getTargetProcessApplication(CoreExecution execution) {
     if (execution instanceof ExecutionEntity) {
@@ -29,10 +48,10 @@ public class ProcessApplicationContextUtil {
       return null;
     }
 
-    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication(execution.getProcessDefinition().getDeploymentId());
+    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication((ProcessDefinitionEntity) execution.getProcessDefinition());
 
     // logg application context switch details
-    if(LOGG.isLoggable(Level.FINE) && processApplicationForDeployment == null) {
+    if(LOG.isContextSwitchLoggable() && processApplicationForDeployment == null) {
       loggContextSwitchDetails(execution);
     }
 
@@ -44,14 +63,51 @@ public class ProcessApplicationContextUtil {
       return null;
     }
 
-    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication(((CaseDefinitionEntity) execution.getCaseDefinition()).getDeploymentId());
+    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication((CaseDefinitionEntity) execution.getCaseDefinition());
 
     // logg application context switch details
-    if(LOGG.isLoggable(Level.FINE) && processApplicationForDeployment == null) {
+    if(LOG.isContextSwitchLoggable() && processApplicationForDeployment == null) {
       loggContextSwitchDetails(execution);
     }
 
     return processApplicationForDeployment;
+  }
+
+  public static ProcessApplicationReference getTargetProcessApplication(TaskEntity task) {
+    if (task.getProcessDefinition() != null) {
+      return getTargetProcessApplication(task.getProcessDefinition());
+    }
+    else if (task.getCaseDefinition() != null) {
+      return getTargetProcessApplication(task.getCaseDefinition());
+    }
+    else {
+      return null;
+    }
+  }
+
+  public static ProcessApplicationReference getTargetProcessApplication(ResourceDefinitionEntity definition) {
+    ProcessApplicationReference reference = getTargetProcessApplication(definition.getDeploymentId());
+
+    if (reference == null && areProcessApplicationsRegistered()) {
+      ResourceDefinitionEntity previous = definition.getPreviousDefinition();
+
+      // do it in a iterative way instead of recursive to avoid
+      // a possible StackOverflowException in cases with a lot
+      // of versions of a definition
+      while (previous != null) {
+        reference = getTargetProcessApplication(previous.getDeploymentId());
+
+        if (reference == null) {
+          previous = previous.getPreviousDefinition();
+        }
+        else {
+          return reference;
+        }
+
+      }
+    }
+
+    return reference;
   }
 
   public static ProcessApplicationReference getTargetProcessApplication(String deploymentId) {
@@ -63,18 +119,20 @@ public class ProcessApplicationContextUtil {
     return processApplicationForDeployment;
   }
 
+  public static boolean areProcessApplicationsRegistered() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+
+    return processApplicationManager.hasRegistrations();
+  }
+
   private static void loggContextSwitchDetails(ExecutionEntity execution) {
 
     final CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
     // only log for first atomic op:
     if(executionContext == null ||( executionContext.getExecution() != execution) ) {
       ProcessApplicationManager processApplicationManager = Context.getProcessEngineConfiguration().getProcessApplicationManager();
-      LOGG.log(Level.FINE,
-        String.format("[PA-CONTEXT] no target process application found for Execution[%s], ProcessDefinition[%s], Deployment[%s] Registrations[%s]",
-            execution.getId(),
-            execution.getProcessDefinitionId(),
-            execution.getProcessDefinition().getDeploymentId(),
-            processApplicationManager.getRegistrationSummary()));
+      LOG.debugNoTargetProcessApplicationFound(execution, processApplicationManager);
     }
 
   }
@@ -85,12 +143,7 @@ public class ProcessApplicationContextUtil {
     // only log for first atomic op:
     if(executionContext == null ||( executionContext.getExecution() != execution) ) {
       ProcessApplicationManager processApplicationManager = Context.getProcessEngineConfiguration().getProcessApplicationManager();
-      LOGG.log(Level.FINE,
-        String.format("[PA-CONTEXT] no target process application found for CaseExecution[%s], CaseDefinition[%s], Deployment[%s] Registrations[%s]",
-            execution.getId(),
-            execution.getCaseDefinitionId(),
-            ((CaseDefinitionEntity) execution.getCaseDefinition()).getDeploymentId(),
-            processApplicationManager.getRegistrationSummary()));
+      LOG.debugNoTargetProcessApplicationFoundForCaseExecution(execution, processApplicationManager);
     }
 
   }
@@ -118,6 +171,23 @@ public class ProcessApplicationContextUtil {
         ClassLoader currentClassloader = ClassLoaderUtil.getContextClassloader();
         return currentClassloader != processApplicationClassLoader;
       }
+    }
+  }
+
+  public static void doContextSwitch(final Runnable runnable, ProcessDefinitionEntity contextDefinition) {
+    ProcessApplicationReference processApplication = getTargetProcessApplication(contextDefinition);
+    if (requiresContextSwitch(processApplication)) {
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+
+        @Override
+        public Void call() throws Exception {
+          runnable.run();
+          return null;
+        }
+      }, processApplication);
+    }
+    else {
+      runnable.run();
     }
   }
 }

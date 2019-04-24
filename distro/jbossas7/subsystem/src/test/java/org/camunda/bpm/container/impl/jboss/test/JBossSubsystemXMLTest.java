@@ -1,11 +1,12 @@
-/**
- * Copyright (C) 2011, 2012 camunda services GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +34,8 @@ import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.jboss.as.controller.PathAddress;
@@ -41,6 +45,7 @@ import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
@@ -56,6 +61,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
   public static final String SUBSYSTEM_WITH_SINGLE_ENGINE = "subsystemWithSingleEngine.xml";
   public static final String SUBSYSTEM_WITH_ENGINES = "subsystemWithEngines.xml";
+  public static final String SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS_AND_JOB_EXECUTOR_WITH_EXPRESSIONS = "subsystemWithProcessEnginesPropertiesPluginsAndJobExecutorWithExpressions.xml";
   public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY = "subsystemWithProcessEnginesElementOnly.xml";
   public static final String SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES = "subsystemWithEnginesAndProperties.xml";
   public static final String SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS = "subsystemWithEnginesPropertiesPlugins.xml";
@@ -79,6 +85,25 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
   public JBossSubsystemXMLTest() {
     super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension());
+  }
+  
+  private static Map<String, String> EXPRESSION_PROPERTIES = new HashMap<>();
+  
+  static {
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.isDefault", "true");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.datasource", "java:jboss/datasources/ExampleDS");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.history-level", "audit");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.configuration", "org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.property.job-acquisition-name", "default");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.plugin.ldap.class", "org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.plugin.ldap.property.test", "abc");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.plugin.ldap.property.number", "123");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.process-engine.test.plugin.ldap.property.bool", "true");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.thread-pool-name", "job-executor-tp");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.acquisition-strategy", "SEQUENTIAL");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.lockTimeInMillis", "300000");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.waitTimeInMillis", "5000");
+    EXPRESSION_PROPERTIES.put("org.camunda.bpm.jboss.job-executor.job-acquisition.default.property.maxJobsPerAcquisition", "3");                                             
   }
 
   @Test
@@ -196,6 +221,25 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   }
 
   @Test
+  public void testInstallSubsystemXmlPlatformPlugins() throws Exception {
+    String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY);
+
+    KernelServices services = createKernelServicesBuilder(null)
+        .setSubsystemXml(subsystemXml)
+        .build();
+
+    ServiceContainer container = services.getContainer();
+    ServiceController<?> serviceController = container.getService(ServiceNames.forBpmPlatformPlugins());
+    assertNotNull(serviceController);
+    Object platformPlugins = serviceController.getValue();
+    assertTrue(platformPlugins instanceof BpmPlatformPlugins);
+    assertNotNull(platformPlugins);
+    List<BpmPlatformPlugin> plugins = ((BpmPlatformPlugins) platformPlugins).getPlugins();
+    assertEquals(1, plugins.size());
+    assertTrue(plugins.get(0) instanceof ExampleBpmPlatformPlugin);
+  }
+
+  @Test
   public void testInstallSubsystemWithEnginesXml() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ENGINES);
 
@@ -300,8 +344,6 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     ModelNode jobAcquisition = operations.get(2);
     assertEquals("default", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
     assertEquals("SEQUENTIAL", jobAcquisition.get(Element.ACQUISITION_STRATEGY.getLocalName()).asString());
-    assertTrue(jobAcquisition.has(Element.PROPERTIES.getLocalName()));
-    assertFalse(jobAcquisition.hasDefined(Element.PROPERTIES.getLocalName()));
 
     jobAcquisition = operations.get(3);
     assertEquals("anders", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
@@ -335,8 +377,6 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     // "default" job acquisition ///////////////////////////////////////////////////////////
     ModelNode jobAcquisition = operations.get(2);
     assertEquals("default", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
-    assertTrue(jobAcquisition.has(Element.PROPERTIES.getLocalName()));
-    assertFalse(jobAcquisition.hasDefined(Element.PROPERTIES.getLocalName()));
 
     // "anders" job acquisition ////////////////////////////////////////////////////////////
     jobAcquisition = operations.get(3);
@@ -483,5 +523,86 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 //    System.out.println(persistedSubsystemXml);
     compareXml(null, subsystemXml, persistedSubsystemXml);
   }
+  
+  @Test
+  public void testParseSubsystemXmlWithEnginePropertiesPluginsAndJobExecutorWithExpressions() throws Exception {
+    String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS_AND_JOB_EXECUTOR_WITH_EXPRESSIONS);
 
+    List<ModelNode> operations = parse(subsystemXml);
+
+    assertEquals(4, operations.size());
+    // all elements with expression allowed should be an expression now
+    assertExpressionType(operations.get(1), "default", "datasource", "history-level", "configuration");
+    assertExpressionType(operations.get(1).get("properties"), "job-acquisition-name");
+    assertExpressionType(operations.get(1).get("plugins").get(0), "class");
+    assertExpressionType(operations.get(1).get("plugins").get(0).get("properties"), "test", "number", "bool");
+    assertExpressionType(operations.get(2), "thread-pool-name");
+    assertExpressionType(operations.get(3), "acquisition-strategy");
+    assertExpressionType(operations.get(3).get("properties"), "lockTimeInMillis", "waitTimeInMillis", "maxJobsPerAcquisition");
+    // all other elements should be string still
+    assertStringType(operations.get(1), "name");// process-engine name
+    assertStringType(operations.get(3), "name");// job-acquisition name
+  }
+
+  @Test
+  public void testInstallSubsystemXmlWithEnginePropertiesPluginsAndJobExecutorWithExpressions() throws Exception {
+    System.getProperties().putAll(EXPRESSION_PROPERTIES);
+    try {
+      String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS_AND_JOB_EXECUTOR_WITH_EXPRESSIONS);
+      KernelServices services = createKernelServicesBuilder(null)
+          .setSubsystemXml(subsystemXml)
+          .build();
+      ServiceContainer container = services.getContainer();
+  
+      assertNotNull("platform service should be installed", container.getRequiredService(PLATFORM_SERVICE_NAME));
+      assertNotNull("process engine service should be bound in JNDI", container.getRequiredService(processEngineServiceBindingServiceName));
+
+      ServiceController<?> defaultEngineService = container.getService(ServiceNames.forManagedProcessEngine("__test"));
+
+      assertNotNull("process engine controller for engine __test is installed ", defaultEngineService);
+
+      ManagedProcessEngineMetadata metadata = ((MscManagedProcessEngineController) defaultEngineService.getService()).getProcessEngineMetadata();
+      Map<String, String> configurationProperties = metadata.getConfigurationProperties();
+      assertEquals("default", configurationProperties.get("job-acquisition-name"));
+
+      Map<String, String> foxLegacyProperties = metadata.getFoxLegacyProperties();
+      assertTrue(foxLegacyProperties.isEmpty());
+
+      assertNotNull("process engine controller for engine __test is installed ", container.getRequiredService(ServiceNames.forManagedProcessEngine("__test")));
+
+      // check we have parsed the plugin configurations
+      List<ProcessEnginePluginXml> pluginConfigurations = metadata.getPluginConfigurations();
+      
+      assertEquals(1, pluginConfigurations.size());
+
+      ProcessEnginePluginXml processEnginePluginXml = pluginConfigurations.get(0);
+      assertEquals("org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin", processEnginePluginXml.getPluginClass());
+      Map<String, String> processEnginePluginXmlProperties = processEnginePluginXml.getProperties();
+      assertEquals("abc", processEnginePluginXmlProperties.get("test"));
+      assertEquals("123", processEnginePluginXmlProperties.get("number"));
+      assertEquals("true", processEnginePluginXmlProperties.get("bool"));
+      
+      String persistedSubsystemXml = services.getPersistedSubsystemXml();
+      compareXml(null, subsystemXml, persistedSubsystemXml);
+      
+    } finally {
+      for (String key : EXPRESSION_PROPERTIES.keySet()) {
+        System.clearProperty(key);
+      }
+    }
+  }
+  
+  private void assertExpressionType(ModelNode operation, String... elements) {
+    assertModelType(ModelType.EXPRESSION, operation, elements);
+  }
+  
+  private void assertStringType(ModelNode operation, String... elements) {
+    assertModelType(ModelType.STRING, operation, elements);
+  }
+  
+  private void assertModelType(ModelType type, ModelNode operation, String... elements) {
+    for (String element : elements) {
+      assertEquals(type, operation.get(element).getType());
+    }
+  }
 }

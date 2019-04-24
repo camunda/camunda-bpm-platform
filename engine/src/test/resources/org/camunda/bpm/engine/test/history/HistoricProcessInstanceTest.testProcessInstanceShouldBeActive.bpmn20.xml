@@ -6,7 +6,7 @@
   
   <error id="error" errorCode="errorCode" name="ErrorCodeTest"/>
  
-  <process id="process">
+  <process id="process" isExecutable="true">
   
     <startEvent id="start" />
     

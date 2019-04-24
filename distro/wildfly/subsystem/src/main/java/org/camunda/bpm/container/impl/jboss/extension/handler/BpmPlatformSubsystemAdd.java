@@ -1,11 +1,12 @@
-/**
- * Copyright (C) 2011, 2012 camunda services GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,20 +16,15 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import java.util.List;
-
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ModuleDependencyProcessor;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationDeploymentProcessor;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationProcessor;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessEngineStartProcessor;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessesXmlProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.*;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
+import org.camunda.bpm.container.impl.jboss.service.MscBpmPlatformPlugins;
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
@@ -36,11 +32,14 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
+import java.util.List;
+
 
 /**
  * Provides the description and the implementation of the subsystem#add operation.
  *
  * @author Daniel Meyer
+ * @author Christian Lipphardt
  */
 public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
@@ -51,14 +50,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
   /** {@inheritDoc} */
   @Override
-  protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    model.get(ModelConstants.PROCESS_ENGINES);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler,
-          List<ServiceController< ? >> newControllers) throws OperationFailedException {
+  protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
 
     // add deployment processors
     context.addStep(new AbstractDeploymentChainStep() {
@@ -76,11 +68,17 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     final ServiceController<MscRuntimeContainerDelegate> controller = context.getServiceTarget()
             .addService(ServiceNames.forMscRuntimeContainerDelegate(), processEngineService)
-            .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();
 
-    newControllers.add(controller);
+    // discover and register bpm platform plugins
+    BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
+    MscBpmPlatformPlugins managedPlugins = new MscBpmPlatformPlugins(plugins);
+
+    ServiceController<BpmPlatformPlugins> serviceController = context.getServiceTarget()
+      .addService(ServiceNames.forBpmPlatformPlugins(), managedPlugins)
+      .setInitialMode(Mode.ACTIVE)
+      .install();
   }
 
 }

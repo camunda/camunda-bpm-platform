@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cfg;
 
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.jta.JtaTransactionContextFactory;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
@@ -29,6 +33,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.TxContextCommandContextFactory;
 
 
@@ -36,6 +41,8 @@ import org.camunda.bpm.engine.impl.interceptor.TxContextCommandContextFactory;
  * @author Tom Baeyens
  */
 public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
+
+  private final static ConfigurationLogger LOG = ProcessEngineLogger.CONFIG_LOGGER;
 
   protected TransactionManager transactionManager;
 
@@ -58,6 +65,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false));
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
@@ -67,6 +75,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
     defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
     return defaultCommandInterceptorsTxRequiresNew;
@@ -99,15 +108,14 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     if(transactionManager == null){
 
       if(transactionManagerJndiName == null || transactionManagerJndiName.length() == 0) {
-        throw new ProcessEngineException("Property 'transactionManager' is null and 'transactionManagerJndiName' is not set. \n " +
-        		"Please set either the 'transactionManager' property or the 'transactionManagerJndiName' property.");
+        throw LOG.invalidConfigTransactionManagerIsNull();
       }
 
       try {
         transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJndiName);
 
       } catch(NamingException e) {
-        throw new ProcessEngineException("Cannot lookup Jta TransactionManager in JNDI using name '"+transactionManagerJndiName+"'.", e);
+        throw LOG.invalidConfigCannotFindTransactionManger(transactionManagerJndiName+"'.", e);
       }
     }
   }

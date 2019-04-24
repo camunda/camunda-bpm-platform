@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	targetNamespace="Examples">
+
+	<process id="taskTest" name="taskTest" isExecutable="true">
+
+		<startEvent id="startEvent" />
+
+		<sequenceFlow id="t1" targetRef="user1" sourceRef="startEvent" />
+
+		<userTask id="user1" />
+
+		<sequenceFlow id="t2" targetRef="endEvent" sourceRef="user1" />
+
+		<endEvent id="endEvent" />
+	</process>
+</definitions>

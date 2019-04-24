@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.history;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -22,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
@@ -38,12 +42,14 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Marcel Wieczorek
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
@@ -339,6 +345,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedBefore(hourAgo.getTime()).count());
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedAfter(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").startedAfter(hourFromNow.getTime()).startedBefore(hourAgo.getTime()).count());
 
     // After finishing process
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
@@ -347,6 +354,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourFromNow.getTime()).count());
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedAfter(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("theTask").finishedBefore(hourAgo.getTime()).finishedAfter(hourFromNow.getTime()).count());
   }
 
   @Deployment
@@ -963,7 +971,6 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
         .singleResult()
         .getId();
 
-    caseService.manuallyStartCaseExecution(humanTaskId);
     caseService.completeCaseExecution(humanTaskId);
 
     historicCallActivity = historyService
@@ -1006,6 +1013,30 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     assertThat(activityInstance.size(), is(2));
     assertThat(pi.isEnded(), is(true));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceProperties.bpmn20.xml"})
+  public void testAssigneeSavedWhenTaskSaved() {
+    // given
+    HistoricActivityInstanceQuery query = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("theTask");
+
+    runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
+    HistoricActivityInstance historicActivityInstance = query.singleResult();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // assume
+    assertEquals("kermit", historicActivityInstance.getAssignee());
+
+    // when
+    task.setAssignee("gonzo");
+    taskService.saveTask(task);
+
+    // then
+    historicActivityInstance = query.singleResult();
+    assertEquals("gonzo", historicActivityInstance.getAssignee());
   }
 
 }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
@@ -18,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDele
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -56,6 +60,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
   }
 
   // Activity Behavior
+  @Override
   public void execute(final ActivityExecution execution) throws Exception {
     this.executeWithErrorPropagation(execution, new Callable<Void>() {
       @Override
@@ -67,6 +72,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
   }
 
   // Signallable activity behavior
+  @Override
   public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
     ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
     if(ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
@@ -75,7 +81,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
           signal(execution, signalName, signalData);
           return null;
         }
-      }, targetProcessApplication);
+      }, targetProcessApplication, new InvocationContext(execution));
     }
     else {
       doSignal(execution, signalName, signalData);

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+			 xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+			 xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+			 targetNamespace="Examples">
+
+	<!-- the expression in the name attribute should be evaluated to 'alert-foo' -->
+	<signal id="alertSignal" name="alert-${'foo'}" />
+
+	<process id="startBySignal" isExecutable="true">
+
+		<startEvent id="start">
+			<signalEventDefinition signalRef="alertSignal" />
+		</startEvent>
+
+		<sequenceFlow sourceRef="start" targetRef="task" />
+
+		<userTask id="task" />
+
+		<sequenceFlow sourceRef="task" targetRef="end" />
+
+		<endEvent id="end" />
+
+	</process>
+
+
+
+</definitions>
+

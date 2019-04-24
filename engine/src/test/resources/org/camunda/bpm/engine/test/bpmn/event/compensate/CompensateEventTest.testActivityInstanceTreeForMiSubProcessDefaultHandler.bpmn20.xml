@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="compensateProcess" isExecutable="true">
+
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start"  targetRef="scope" />
+    
+    <subProcess id="scope">
+    
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>5</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    
+      <startEvent id="startInScope" />
+    
+      <sequenceFlow sourceRef="startInScope"  targetRef="bookHotel" />
+      
+      <userTask id="bookHotel" name="Book Hotel" />
+        
+      <sequenceFlow sourceRef="bookHotel" targetRef="endInScope" />    
+      
+      <endEvent id="endInScope" />
+      
+      <!-- compensation boundary event -->
+      <boundaryEvent id="compensateBookHotelEvt" name="Boundary event" attachedToRef="bookHotel">
+        <compensateEventDefinition />
+      </boundaryEvent>
+        
+      <userTask id="undoBookHotel" isForCompensation="true" />
+      
+      <association associationDirection="One" sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
+    
+    </subProcess>
+    
+    <sequenceFlow sourceRef="scope" targetRef="throwCompensation" />
+    
+    <userTask id="throwCompensation" name="throwCompensation" />
+    
+    <sequenceFlow sourceRef="throwCompensation" targetRef="throwingCompensation" />
+    
+    <endEvent id="throwingCompensation">
+      <compensateEventDefinition />
+    </endEvent>
+    
+  </process>
+
+</definitions>

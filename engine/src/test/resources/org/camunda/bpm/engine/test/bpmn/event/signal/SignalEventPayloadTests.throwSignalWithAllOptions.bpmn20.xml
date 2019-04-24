@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+	targetNamespace="Examples">
+	
+	<signal id="alertSignal" name="alert" />
+
+	<process id="throwCompletePayloadSignal" isExecutable="true">
+
+		<startEvent id="start" />
+
+		<sequenceFlow sourceRef="start" targetRef="signalEvent" />
+
+		<intermediateThrowEvent id="signalEvent" name="Alert" >
+			<extensionElements>
+				<camunda:inputOutput>
+					<camunda:inputParameter name="localVar1">localVal1</camunda:inputParameter>
+					<camunda:inputParameter name="localVar2">localVal2</camunda:inputParameter>
+				</camunda:inputOutput>
+			</extensionElements>
+			<signalEventDefinition signalRef="alertSignal">
+				<extensionElements>
+					<camunda:in businessKey="${execution.processBusinessKey}" />
+					<camunda:in variables="all" local="true" />
+					<camunda:in source="payloadVar1" target="payloadVar1Target" />
+					<camunda:in sourceExpression="${payloadVar2.concat('Source')}" target="payloadVar2Target" />
+				</extensionElements>
+			</signalEventDefinition>
+		</intermediateThrowEvent>
+
+		<sequenceFlow sourceRef="signalEvent" targetRef="end" />
+
+		<endEvent id="end" />
+
+	</process>
+
+</definitions>

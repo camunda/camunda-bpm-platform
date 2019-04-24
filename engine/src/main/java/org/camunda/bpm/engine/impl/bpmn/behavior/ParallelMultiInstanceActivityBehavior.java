@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,41 +16,44 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior {
+public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior implements MigrationObserverBehavior {
 
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
-    PvmActivity innerActivity = getInnerActivity(execution);
+    PvmActivity innerActivity = getInnerActivity(execution.getActivity());
 
+    // initialize the scope and create the desired number of child executions
     prepareScopeExecution(execution, nrOfInstances);
 
-    // create the concurrent child executions
     List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
     for (int i = 0; i < nrOfInstances; i++) {
-      ActivityExecution concurrentChild = execution.createExecution();
-      concurrentChild.setConcurrent(true);
-      concurrentChild.setScope(false);
-      concurrentExecutions.add(concurrentChild);
+      concurrentExecutions.add(createConcurrentExecution(execution));
     }
 
     // start the concurrent child executions
-    for (int i = 0; i < nrOfInstances; i++) {
+    // start executions in reverse order (order will be reversed again in command context with the effect that they are
+    // actually be started in correct order :) )
+    for (int i = (nrOfInstances - 1); i >= 0; i--) {
       ActivityExecution activityExecution = concurrentExecutions.get(i);
-      // check for active execution: the completion condition may be satisfied before all executions are started
-      if(activityExecution.isActive()) {
-        performInstance(activityExecution, innerActivity, i);
-      }
+      performInstance(activityExecution, innerActivity, i);
     }
   }
 
@@ -57,6 +64,14 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
     scopeExecution.setActivity(null);
     scopeExecution.inactivate();
+  }
+
+  protected ActivityExecution createConcurrentExecution(ActivityExecution scopeExecution) {
+    ActivityExecution concurrentChild = scopeExecution.createExecution();
+    scopeExecution.forceUpdate();
+    concurrentChild.setConcurrent(true);
+    concurrentChild.setScope(false);
+    return concurrentChild;
   }
 
   @Override
@@ -91,11 +106,18 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       scopeExecution.setActivity((PvmActivity) endedExecution.getActivity().getFlowScope());
       scopeExecution.setActive(true);
       leave(scopeExecution);
+    } else {
+      ((ExecutionEntity) scopeExecution).dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
     }
   }
 
   protected boolean allExecutionsEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
-    return getLocalLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) <= 0;
+    int numberOfInactiveConcurrentExecutions = endedExecution.findInactiveConcurrentExecutions(endedExecution.getActivity()).size();
+    int concurrentExecutions = scopeExecution.getExecutions().size();
+
+    // no active instances exist and all concurrent executions are inactive
+    return getLocalLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) <= 0 &&
+           numberOfInactiveConcurrentExecutions == concurrentExecutions;
   }
 
   @Override
@@ -104,34 +126,73 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
   }
 
   @Override
-  public ActivityExecution initializeScope(ActivityExecution scopeExecution) {
+  public List<ActivityExecution> initializeScope(ActivityExecution scopeExecution, int numberOfInstances) {
 
-    prepareScopeExecution(scopeExecution, 1);
+    prepareScopeExecution(scopeExecution, numberOfInstances);
 
-    // even though there is only one instance, there is always a concurrent child
-    ActivityExecution concurrentChild = scopeExecution.createExecution();
-    concurrentChild.setConcurrent(true);
-    concurrentChild.setScope(false);
+    List<ActivityExecution> executions = new ArrayList<ActivityExecution>();
+    for (int i = 0; i < numberOfInstances; i++) {
+      ActivityExecution concurrentChild = createConcurrentExecution(scopeExecution);
+      setLoopVariable(concurrentChild, LOOP_COUNTER, i);
+      executions.add(concurrentChild);
+    }
 
-    setLoopVariable(concurrentChild, LOOP_COUNTER, 0);
-
-    return concurrentChild;
+    return executions;
   }
 
   @Override
-  public void concurrentExecutionCreated(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
+  public ActivityExecution createInnerInstance(ActivityExecution scopeExecution) {
+    // even though there is only one instance, there is always a concurrent child
+    ActivityExecution concurrentChild = createConcurrentExecution(scopeExecution);
+
     int nrOfInstances = getLoopVariable(scopeExecution, NUMBER_OF_INSTANCES);
     setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, nrOfInstances + 1);
     int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES);
     setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances + 1);
 
-    setLoopVariable(concurrentExecution, LOOP_COUNTER, nrOfInstances);
+    setLoopVariable(concurrentChild, LOOP_COUNTER, nrOfInstances);
+
+    return concurrentChild;
   }
 
   @Override
-  public void concurrentExecutionDeleted(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
+  public void destroyInnerInstance(ActivityExecution concurrentExecution) {
+
+    ActivityExecution scopeExecution = concurrentExecution.getParent();
+    concurrentExecution.remove();
+    scopeExecution.forceUpdate();
+
     int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES);
     setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances - 1);
+
+  }
+
+  @Override
+  public void migrateScope(ActivityExecution scopeExecution) {
+    // migrate already completed instances
+    for (ActivityExecution child : scopeExecution.getExecutions()) {
+      if (!child.isActive()) {
+        ((PvmExecutionImpl) child).setProcessDefinition(((PvmExecutionImpl) scopeExecution).getProcessDefinition());
+      }
+    }
+  }
+
+  @Override
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+    ExecutionEntity scopeExecution = migratingInstance.resolveRepresentativeExecution();
+
+    List<ActivityExecution> concurrentInActiveExecutions =
+        scopeExecution.findInactiveChildExecutions(getInnerActivity((ActivityImpl) migratingInstance.getSourceScope()));
+
+    // variables on ended inner instance executions need not be migrated anywhere
+    // since they are also not represented in the tree of migrating instances, we remove
+    // them from the parse context here to avoid a validation exception
+    for (ActivityExecution execution : concurrentInActiveExecutions) {
+      for (VariableInstanceEntity variable : ((ExecutionEntity) execution).getVariablesInternal()) {
+        parseContext.consume(variable);
+      }
+    }
+
   }
 
 }

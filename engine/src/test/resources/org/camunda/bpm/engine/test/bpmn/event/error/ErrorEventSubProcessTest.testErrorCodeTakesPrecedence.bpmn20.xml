@@ -6,7 +6,7 @@
 	
 	<error id="myError" errorCode="123" />
 
-	<process id="CatchErrorInEmbeddedSubProcess">
+	<process id="CatchErrorInEmbeddedSubProcess" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />

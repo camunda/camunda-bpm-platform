@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +29,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   PROCESS_INSTANCE_START("process-instance", "start"),
   /** fired when a process instance is updated */
   PROCESS_INSTANCE_UPDATE("process-instance-update", "update"),
+  /** fired when a process instance is migrated */
+  PROCESS_INSTANCE_MIGRATE("process-instance", "migrate"),
   /** fired when a process instance is ended. */
   PROCESS_INSTANCE_END("process-instance", "end"),
 
@@ -32,6 +38,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   ACTIVITY_INSTANCE_START("activity-instance", "start"),
   /** fired when an activity instance is updated. */
   ACTIVITY_INSTANCE_UPDATE("activity-instance", "update"),
+  /** fired when an activity instance is migrated. */
+  ACTIVITY_INSTANCE_MIGRATE("activity-instance", "migrate"),
   /** fired when an activity instance is ended. */
   ACTIVITY_INSTANCE_END("activity-instance", "end"),
 
@@ -39,6 +47,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   TASK_INSTANCE_CREATE("task-instance", "create"),
   /** fired when a task instance is updated. */
   TASK_INSTANCE_UPDATE("task-instance", "update"),
+  /** fired when a task instance is migrated. */
+  TASK_INSTANCE_MIGRATE("task-instance", "migrate"),
   /** fired when a task instance is completed. */
   TASK_INSTANCE_COMPLETE("task-instance", "complete"),
   /** fired when a task instance is deleted. */
@@ -48,6 +58,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   VARIABLE_INSTANCE_CREATE("variable-instance", "create"),
   /** fired when a variable instance is updated. */
   VARIABLE_INSTANCE_UPDATE("variable-instance", "update"),
+  /** fired when a variable instance is migrated. */
+  VARIABLE_INSTANCE_MIGRATE("variable-instance", "migrate"),
   /** fired when a variable instance is updated. */
   VARIABLE_INSTANCE_UPDATE_DETAIL("variable-instance", "update-detail"),
   /** fired when a variable instance is deleted. */
@@ -58,6 +70,8 @@ public enum HistoryEventTypes implements HistoryEventType {
 
   /** fired when an incident is created. */
   INCIDENT_CREATE("incident", "create"),
+  /** fired when an incident is migrated. */
+  INCIDENT_MIGRATE("incident", "migrate"),
   /** fired when an incident is deleted. */
   INCIDENT_DELETE("incident", "delete"),
   /** fired when an incident is resolved. */
@@ -103,10 +117,81 @@ public enum HistoryEventTypes implements HistoryEventType {
    *
    * @since 7.3
    */
-  JOB_DELETE("job", "delete");
+  JOB_DELETE("job", "delete"),
+
+  /**
+   * fired when a decision is evaluated.
+   *
+   * @since 7.4
+   */
+  DMN_DECISION_EVALUATE("decision", "evaluate"),
+
+  /**
+   * fired when a batch was started.
+   *
+   * @since 7.5
+   */
+  BATCH_START("batch", "start"),
+
+  /**
+   * fired when a batch was completed.
+   *
+   * @since 7.5
+   */
+  BATCH_END("batch", "end"),
+
+  /**
+   * fired when an identity link is added
+   *
+   * @since 7.5
+   */
+  IDENTITY_LINK_ADD("identity-link-add", "add-identity-link"),
+
+  /**
+   * fired when an identity link is removed
+   *
+   * @since 7.5
+   */
+  IDENTITY_LINK_DELETE("identity-link-delete", "delete-identity-link"),
+
+  /**
+   * fired when an external task is created.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_CREATE("external-task", "create"),
+
+  /**
+   * fired when an external task has failed.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_FAIL("external-task", "fail"),
+
+  /**
+   * fired when an external task has succeeded.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_SUCCESS("external-task", "success"),
+
+  /**
+   * fired when an external task is deleted.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_DELETE("external-task", "delete"),
+
+
+  /**
+   * fired when used operation log is created.
+   *
+   * @since 7.10, 7.9.1, 7.8.7
+   */
+  USER_OPERATION_LOG("user-operation-log", "create");
 
   private HistoryEventTypes(String entityType, String eventName) {
-    this.entityType = eventName;
+    this.entityType = entityType;
     this.eventName = eventName;
   }
 

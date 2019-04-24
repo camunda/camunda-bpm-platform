@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +17,10 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
 
 /**
@@ -42,7 +48,11 @@ public abstract class FlowNodeActivityBehavior implements SignallableActivityBeh
    * Default way of leaving a BPMN 2.0 activity: evaluate the conditions on the
    * outgoing sequence flow and take those that evaluate to true.
    */
-  protected void leave(ActivityExecution execution) {
+  public void leave(ActivityExecution execution) {
+    ((ExecutionEntity) execution).dispatchDelayedEventsAndPerformOperation(PvmAtomicOperation.ACTIVITY_LEAVE);
+  }
+
+  public void doLeave(ActivityExecution execution) {
     bpmnActivityBehavior.performDefaultOutgoingBehavior(execution);
   }
 
@@ -55,5 +65,4 @@ public abstract class FlowNodeActivityBehavior implements SignallableActivityBeh
 
     throw LOG.unsupportedSignalException(execution.getActivity().getId());
   }
-
 }

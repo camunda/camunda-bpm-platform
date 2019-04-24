@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,8 +33,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
-import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -297,16 +301,6 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // happy path
-    }
-  }
-
-  @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
-  public void testStartProcessInstanceWithoutInstantiationInstruction() {
-    try {
-      runtimeService.createProcessInstanceByKey("exclusiveGateway").execute();
-      fail("exception expected; at least one modification instruction required");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("At least one instantiation instruction required", e.getMessage());
     }
   }
 

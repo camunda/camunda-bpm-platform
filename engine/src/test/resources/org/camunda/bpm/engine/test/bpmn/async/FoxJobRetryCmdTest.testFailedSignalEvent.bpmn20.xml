@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+	
+	<signal id="signal" name="failedSignal" />
+
+	<process id="failedSignalEvent" isExecutable="true">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingSignalEvent" />
+		
+		<intermediateThrowEvent id="failingSignalEvent">
+			<extensionElements>
+	       		<fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
+	       	</extensionElements>
+			<signalEventDefinition id="failingSignal" signalRef="signal" camunda:async="true" />
+		</intermediateThrowEvent>
+
+		<sequenceFlow id="flow2" sourceRef="failingSignalEvent" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+	
+	<process id="catchedSignal" isExecutable="true">
+
+		<startEvent id="start" />
+		<sequenceFlow id="flow1a" sourceRef="start" targetRef="catchSignal" />
+		
+		<intermediateCatchEvent id="catchSignal">
+			<signalEventDefinition id="catchingSignal" signalRef="signal" />
+		</intermediateCatchEvent>
+		
+		<sequenceFlow id="flow2a" sourceRef="catchSignal" targetRef="service" />
+
+		<serviceTask id="service"
+			camunda:class="org.camunda.bpm.engine.test.cmd.FailingDelegate"/>
+
+		<sequenceFlow id="flow3a" sourceRef="service" targetRef="end" />
+
+		<endEvent id="end" />
+
+	</process>
+	
+</definitions>

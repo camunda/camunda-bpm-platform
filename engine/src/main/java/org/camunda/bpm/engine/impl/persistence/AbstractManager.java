@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence;
 
 import java.util.concurrent.Callable;
@@ -26,23 +29,30 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.BatchManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricBatchManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricExternalTaskLogManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
@@ -52,8 +62,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+
 
 
 /**
@@ -105,6 +118,14 @@ public abstract class AbstractManager implements Session {
     return getSession(DecisionDefinitionManager.class);
   }
 
+  protected DecisionRequirementsDefinitionManager getDecisionRequirementsDefinitionManager() {
+    return getSession(DecisionRequirementsDefinitionManager.class);
+  }
+
+  protected HistoricDecisionInstanceManager getHistoricDecisionInstanceManager() {
+    return getSession(HistoricDecisionInstanceManager.class);
+  }
+
   protected CaseExecutionManager getCaseInstanceManager() {
     return getSession(CaseExecutionManager.class);
   }
@@ -119,6 +140,10 @@ public abstract class AbstractManager implements Session {
 
   protected TaskManager getTaskManager() {
     return getSession(TaskManager.class);
+  }
+
+  protected TaskReportManager getTaskReportManager() {
+    return getSession(TaskReportManager.class);
   }
 
   protected IdentityLinkManager getIdentityLinkManager() {
@@ -161,8 +186,16 @@ public abstract class AbstractManager implements Session {
     return getSession(HistoricIncidentManager.class);
   }
 
+  protected HistoricIdentityLinkLogManager getHistoricIdentityLinkManager() {
+    return getSession(HistoricIdentityLinkLogManager.class);
+  }
+  
   protected HistoricJobLogManager getHistoricJobLogManager() {
     return getSession(HistoricJobLogManager.class);
+  }
+
+  protected HistoricExternalTaskLogManager getHistoricExternalTaskLogManager() {
+    return getSession(HistoricExternalTaskLogManager.class);
   }
 
   protected JobManager getJobManager() {
@@ -189,6 +222,22 @@ public abstract class AbstractManager implements Session {
     return getSession(AttachmentManager.class);
   }
 
+  protected ReportManager getHistoricReportManager() {
+    return getSession(ReportManager.class);
+  }
+
+  protected BatchManager getBatchManager() {
+    return getSession(BatchManager.class);
+  }
+
+  protected HistoricBatchManager getHistoricBatchManager() {
+    return getSession(HistoricBatchManager.class);
+  }
+
+  protected TenantManager getTenantManager() {
+    return getSession(TenantManager.class);
+  }
+
   public void close() {
   }
 
@@ -213,7 +262,7 @@ public abstract class AbstractManager implements Session {
     getAuthorizationManager().checkAuthorization(permission, resource, resourceId);
   }
 
-  protected boolean isAuthorizationEnabled() {
+  public boolean isAuthorizationEnabled() {
     return Context.getProcessEngineConfiguration().isAuthorizationEnabled();
   }
 
@@ -228,6 +277,14 @@ public abstract class AbstractManager implements Session {
 
   protected void deleteAuthorizations(Resource resource, String resourceId) {
     getAuthorizationManager().deleteAuthorizationsByResourceId(resource, resourceId);
+  }
+
+  protected void deleteAuthorizationsForUser(Resource resource, String resourceId, String userId) {
+    getAuthorizationManager().deleteAuthorizationsByResourceIdAndUserId(resource, resourceId, userId);
+  }
+
+  protected void deleteAuthorizationsForGroup(Resource resource, String resourceId, String groupId) {
+    getAuthorizationManager().deleteAuthorizationsByResourceIdAndGroupId(resource, resourceId, groupId);
   }
 
   public void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {

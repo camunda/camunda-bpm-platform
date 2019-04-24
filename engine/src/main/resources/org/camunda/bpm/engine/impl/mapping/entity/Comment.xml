@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
@@ -21,39 +24,166 @@
   <!-- COMMENT INSERT -->
   
   <insert id="insertComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
       #{time ,jdbcType=TIMESTAMP},
       #{userId ,jdbcType=VARCHAR},
       #{taskId ,jdbcType=VARCHAR},
+      #{rootProcessInstanceId ,jdbcType=VARCHAR},
       #{processInstanceId ,jdbcType=VARCHAR},
       #{action ,jdbcType=VARCHAR},
       #{message ,jdbcType=VARCHAR},
-      #{fullMessageBytes ,jdbcType=BLOB}
+      #{fullMessageBytes ,jdbcType=BLOB},
+      #{tenantId ,jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
 
   <insert id="insertComment_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_, REMOVAL_TIME_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
       #{time ,jdbcType=TIMESTAMP},
       #{userId ,jdbcType=VARCHAR},
       #{taskId ,jdbcType=VARCHAR},
+      #{rootProcessInstanceId ,jdbcType=VARCHAR},
       #{processInstanceId ,jdbcType=VARCHAR},
       #{action ,jdbcType=VARCHAR},
       #{message ,jdbcType=VARCHAR},
-      #{fullMessageBytes ,jdbcType=BINARY}
+      #{fullMessageBytes ,jdbcType=BINARY},
+      #{tenantId ,jdbcType=VARCHAR},
+      #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
+
+  <!-- UPDATE -->
+  <update id="updateCommentsByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_COMMENT set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateCommentsByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_COMMENT
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        or TASK_ID_ in (
+          SELECT ID_
+          FROM ${prefix}ACT_HI_TASKINST
+          WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        )
+  </update>
 
   <!-- COMMENT DELETE -->
 
   <delete id="deleteCommentsByTaskId" parameterType="string">
     delete from ${prefix}ACT_HI_COMMENT where TASK_ID_ = #{taskId} 
+  </delete>
+
+  <delete id="deleteCommentsByIds" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_COMMENT
+    where 
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      TASK_ID_ in (
+        select ID_
+        from ${prefix}ACT_HI_TASKINST
+        where
+          <bind name="listOfIds" value="taskProcessInstanceIds"/>
+          <bind name="fieldName" value="'PROC_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+      )
+    </if>
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+      TASK_ID_ in (
+        select ID_
+        from ${prefix}ACT_HI_TASKINST
+        where
+          <bind name="listOfIds" value="taskCaseInstanceIds"/>
+          <bind name="fieldName" value="'CASE_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+        )
+    </if>
+    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+      <bind name="listOfIds" value="processInstanceIds"/>
+      <bind name="fieldName" value="'PROC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    </if>
+  </delete>
+
+  <delete id="deleteCommentsByIds_mysql" parameterType="java.util.Map">
+    delete CO from ${prefix}ACT_HI_COMMENT CO
+    left join ${prefix}ACT_HI_TASKINST T
+      on CO.TASK_ID_ = T.ID_
+      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+        where
+          <bind name="listOfIds" value="taskProcessInstanceIds"/>
+          <bind name="fieldName" value="'T.PROC_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+      </if>
+      <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+        where
+          <bind name="listOfIds" value="taskCaseInstanceIds"/>
+          <bind name="fieldName" value="'T.CASE_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+      </if>
+      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+        where
+          <bind name="listOfIds" value="processInstanceIds"/>
+          <bind name="fieldName" value="'CO.PROC_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+      </if>
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <delete id="deleteCommentsByRemovalTime"
+    parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_COMMENT
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteCommentsByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_COMMENT
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteCommentsByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_COMMENT
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_COMMENT
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
   </delete>
 
   <!-- COMMENT RESULTMAP -->
@@ -64,10 +194,13 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="time" column="TIME_" jdbcType="TIMESTAMP" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="action" column="ACTION_" jdbcType="VARCHAR" />
     <result property="message" column="MESSAGE_" jdbcType="VARCHAR" />
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BLOB" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <resultMap id="commentResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
@@ -76,10 +209,13 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="time" column="TIME_" jdbcType="TIMESTAMP" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="action" column="ACTION_" jdbcType="VARCHAR" />
     <result property="message" column="MESSAGE_" jdbcType="VARCHAR" />
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BINARY" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
   
   <!-- COMMENT SELECT -->
@@ -109,6 +245,7 @@
   </select>
 
   <sql id="selectEventsByTaskIdSql">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select distinct RES.* ${limitBetween}
     from (

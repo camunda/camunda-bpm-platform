@@ -1,0 +1,73 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.engine.impl.cmd;
+
+import java.util.Collections;
+
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.runtime.Incident;
+
+/**
+ * 
+ * @author Anna Pazola
+ *
+ */
+public class ResolveIncidentCmd implements Command<Void> {
+
+  protected String incidentId;
+
+  public ResolveIncidentCmd(String incidentId) {
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "", "incidentId", incidentId);
+    this.incidentId = incidentId;
+  }
+
+  @Override
+  public Void execute(CommandContext commandContext) {
+    final Incident incident = commandContext.getIncidentManager().findIncidentById(incidentId);
+
+    EnsureUtil.ensureNotNull(NotFoundException.class, "Cannot find an incident with id '" + incidentId + "'",
+        "incident", incident);
+
+    if (incident.getIncidentType().equals("failedJob") || incident.getIncidentType().equals("failedExternalTask")) {
+      throw new BadUserRequestException("Cannot resolve an incident of type " + incident.getIncidentType());
+    }
+
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "", "executionId", incident.getExecutionId());
+    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(incident.getExecutionId());
+
+    EnsureUtil.ensureNotNull(BadUserRequestException.class,
+        "Cannot find an execution for an incident with id '" + incidentId + "'", "execution", execution);
+
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstance(execution);
+    }
+
+    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_RESOLVE, execution.getProcessInstanceId(), 
+        execution.getProcessDefinitionId(), null, Collections.singletonList(new PropertyChange("incidentId", null, incidentId)));
+    
+    execution.resolveIncident(incidentId);
+    return null;
+  }
+}

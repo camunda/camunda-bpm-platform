@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +24,14 @@ import java.util.Map;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 
+import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
@@ -90,6 +101,36 @@ public class ScriptingEnvironment {
     return script.execute(scriptEngine, scope, bindings);
   }
 
+  protected Map<String, List<ExecutableScript>> getEnv(String language) {
+    ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
+    ProcessApplicationReference processApplication = Context.getCurrentProcessApplication();
+
+    Map<String, List<ExecutableScript>> result = null;
+    if (config.isEnableFetchScriptEngineFromProcessApplication()) {
+      if(processApplication != null) {
+        result = getPaEnvScripts(processApplication);
+      }
+    }
+
+    return result != null ? result : env;
+  }
+
+  protected Map<String, List<ExecutableScript>> getPaEnvScripts(ProcessApplicationReference pa) {
+    try {
+      ProcessApplicationInterface processApplication = pa.getProcessApplication();
+      ProcessApplicationInterface rawObject = processApplication.getRawObject();
+
+      if (rawObject instanceof AbstractProcessApplication) {
+        AbstractProcessApplication abstractProcessApplication = (AbstractProcessApplication) rawObject;
+        return abstractProcessApplication.getEnvironmentScripts();
+      }
+      return null;
+    }
+    catch (ProcessApplicationUnavailableException e) {
+      throw new ProcessEngineException("Process Application is unavailable.", e);
+    }
+  }
+
   /**
    * Returns the env scripts for the given language. Performs lazy initialization of the env scripts.
    *
@@ -97,13 +138,14 @@ public class ScriptingEnvironment {
    * @return a list of executable environment scripts. Never null.
    */
   protected List<ExecutableScript> getEnvScripts(String scriptLanguage) {
-    List<ExecutableScript> envScripts = env.get(scriptLanguage);
+    Map<String, List<ExecutableScript>> environment = getEnv(scriptLanguage);
+    List<ExecutableScript> envScripts = environment.get(scriptLanguage);
     if(envScripts == null) {
       synchronized (this) {
-        envScripts = env.get(scriptLanguage);
+        envScripts = environment.get(scriptLanguage);
         if(envScripts == null) {
           envScripts = initEnvForLanguage(scriptLanguage);
-          env.put(scriptLanguage, envScripts);
+          environment.put(scriptLanguage, envScripts);
         }
       }
     }

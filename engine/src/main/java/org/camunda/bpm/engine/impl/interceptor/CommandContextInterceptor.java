@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,15 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.interceptor;
 
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 
 /**
@@ -52,7 +53,7 @@ import org.camunda.bpm.engine.impl.context.Context;
  */
 public class CommandContextInterceptor extends CommandInterceptor {
 
-  private final static Logger LOGGER = Logger.getLogger(CommandContextInterceptor.class.getName());
+  private final static CommandLogger LOG = CommandLogger.CMD_LOGGER;
 
   protected CommandContextFactory commandContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
@@ -74,19 +75,28 @@ public class CommandContextInterceptor extends CommandInterceptor {
   }
 
   public <T> T execute(Command<T> command) {
-    CommandContext context  = Context.getCommandContext();
-    boolean openNew = (alwaysOpenNew || context == null);
+    CommandContext context = null;
+
+    if(!alwaysOpenNew) {
+      // check whether we can reuse the command context
+      CommandContext existingCommandContext = Context.getCommandContext();
+      if(existingCommandContext != null && isFromSameEngine(existingCommandContext)) {
+        context = existingCommandContext;
+      }
+    }
+
+    boolean openNew = (context == null);
 
     CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command);
     Context.setCommandInvocationContext(commandInvocationContext);
 
     try {
       if(openNew) {
-        LOGGER.log(Level.FINE, "Opening new command context.");
+        LOG.debugOpeningNewCommandContext();
         context = commandContextFactory.createCommandContext();
 
       } else {
-        LOGGER.log(Level.FINE, "Reusing existing command context.");
+        LOG.debugReusingExistingCommandContext();
 
       }
 
@@ -96,13 +106,13 @@ public class CommandContextInterceptor extends CommandInterceptor {
       // delegate to next interceptor in chain
       return next.execute(command);
 
-    } catch (Exception e) {
-      commandInvocationContext.trySetThrowable(e);
+    } catch (Throwable t) {
+      commandInvocationContext.trySetThrowable(t);
 
     } finally {
       try {
         if (openNew) {
-          LOGGER.log(Level.FINE, "Closing command context.");
+          LOG.closingCommandContext();
           context.close(commandInvocationContext);
         } else {
           commandInvocationContext.rethrow();
@@ -115,6 +125,10 @@ public class CommandContextInterceptor extends CommandInterceptor {
     }
 
     return null;
+  }
+
+  protected boolean isFromSameEngine(CommandContext existingCommandContext) {
+    return processEngineConfiguration == existingCommandContext.getProcessEngineConfiguration();
   }
 
   public CommandContextFactory getCommandContextFactory() {

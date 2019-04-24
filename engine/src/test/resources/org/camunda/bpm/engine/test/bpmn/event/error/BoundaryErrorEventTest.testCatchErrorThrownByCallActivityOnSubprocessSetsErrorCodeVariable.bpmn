@@ -16,7 +16,7 @@
     <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="CallActivity_1" targetRef="EndEvent_1"/>
     <bpmn2:boundaryEvent id="BoundaryEvent_1" name="" attachedToRef="CallActivity_1">
       <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
-      <bpmn2:errorEventDefinition id="_ErrorEventDefinition_4" camunda:errorCodeVariable="errorVariable"/>
+      <bpmn2:errorEventDefinition id="_ErrorEventDefinition_4" camunda:errorCodeVariable="errorVariable" camunda:errorMessageVariable="errorMessageVariable"/>
     </bpmn2:boundaryEvent>
     <bpmn2:userTask id="UserTask_1" name="User Task">
       <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>

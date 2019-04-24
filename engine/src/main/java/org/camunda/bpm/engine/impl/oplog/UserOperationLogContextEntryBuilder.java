@@ -1,9 +1,13 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,18 +16,24 @@
  */
 package org.camunda.bpm.engine.impl.oplog;
 
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
 
 public class UserOperationLogContextEntryBuilder {
 
@@ -40,6 +50,12 @@ public class UserOperationLogContextEntryBuilder {
     entry.setProcessInstanceId(job.getProcessInstanceId());
     entry.setProcessDefinitionId(job.getProcessDefinitionId());
     entry.setProcessDefinitionKey(job.getProcessDefinitionKey());
+    entry.setDeploymentId(job.getDeploymentId());
+
+    ExecutionEntity execution = job.getExecution();
+    if (execution != null) {
+      entry.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+    }
 
     return this;
   }
@@ -49,15 +65,25 @@ public class UserOperationLogContextEntryBuilder {
     entry.setProcessDefinitionId(jobDefinition.getProcessDefinitionId());
     entry.setProcessDefinitionKey(jobDefinition.getProcessDefinitionKey());
 
+    if (jobDefinition.getProcessDefinitionId() != null) {
+      ProcessDefinitionEntity processDefinition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findDeployedProcessDefinitionById(jobDefinition.getProcessDefinitionId());
+      entry.setDeploymentId(processDefinition.getDeploymentId());
+    }
+
     return this;
   }
 
   public UserOperationLogContextEntryBuilder inContextOf(ExecutionEntity execution) {
     entry.setProcessInstanceId(execution.getProcessInstanceId());
+    entry.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     entry.setProcessDefinitionId(execution.getProcessDefinitionId());
 
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     entry.setProcessDefinitionKey(processDefinition.getKey());
+    entry.setDeploymentId(processDefinition.getDeploymentId());
 
     return this;
   }
@@ -65,6 +91,7 @@ public class UserOperationLogContextEntryBuilder {
   public UserOperationLogContextEntryBuilder inContextOf(ProcessDefinitionEntity processDefinition) {
     entry.setProcessDefinitionId(processDefinition.getId());
     entry.setProcessDefinitionKey(processDefinition.getKey());
+    entry.setDeploymentId(processDefinition.getDeploymentId());
 
     return this;
   }
@@ -81,6 +108,9 @@ public class UserOperationLogContextEntryBuilder {
     ProcessDefinitionEntity definition = task.getProcessDefinition();
     if (definition != null) {
       entry.setProcessDefinitionKey(definition.getKey());
+      entry.setDeploymentId(definition.getDeploymentId());
+    } else if (task.getCaseDefinitionId() != null) {
+      entry.setDeploymentId(task.getCaseDefinition().getDeploymentId());
     }
 
     entry.setProcessDefinitionId(task.getProcessDefinitionId());
@@ -91,6 +121,119 @@ public class UserOperationLogContextEntryBuilder {
     entry.setCaseExecutionId(task.getCaseExecutionId());
     entry.setTaskId(task.getId());
 
+    ExecutionEntity execution = task.getExecution();
+    if (execution != null) {
+      entry.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+    }
+
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricTaskInstance task, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+
+    entry.setProcessDefinitionKey(task.getProcessDefinitionKey());
+    entry.setProcessDefinitionId(task.getProcessDefinitionId());
+    entry.setProcessInstanceId(task.getProcessInstanceId());
+    entry.setExecutionId(task.getExecutionId());
+    entry.setCaseDefinitionId(task.getCaseDefinitionId());
+    entry.setCaseInstanceId(task.getCaseInstanceId());
+    entry.setCaseExecutionId(task.getCaseExecutionId());
+    entry.setTaskId(task.getId());
+    entry.setRootProcessInstanceId(task.getRootProcessInstanceId());
+
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder inContextOf(ExecutionEntity processInstance, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+    entry.setRootProcessInstanceId(processInstance.getRootProcessInstanceId());
+    entry.setProcessInstanceId(processInstance.getProcessInstanceId());
+    entry.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+    entry.setExecutionId(processInstance.getId());
+    entry.setCaseInstanceId(processInstance.getCaseInstanceId());
+
+    ProcessDefinitionEntity definition = processInstance.getProcessDefinition();
+    if (definition != null) {
+      entry.setProcessDefinitionKey(definition.getKey());
+      entry.setDeploymentId(definition.getDeploymentId());
+    }
+
+    return this;
+  }
+  
+  public UserOperationLogContextEntryBuilder inContextOf(HistoryEvent historyEvent, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+    entry.setRootProcessInstanceId(historyEvent.getRootProcessInstanceId());
+    entry.setProcessDefinitionId(historyEvent.getProcessDefinitionId());
+    entry.setProcessInstanceId(historyEvent.getProcessInstanceId());
+    entry.setExecutionId(historyEvent.getExecutionId());
+    entry.setCaseDefinitionId(historyEvent.getCaseDefinitionId());
+    entry.setCaseInstanceId(historyEvent.getCaseInstanceId());
+    entry.setCaseExecutionId(historyEvent.getCaseExecutionId());
+
+    if (definition != null) {
+      if (definition instanceof ProcessDefinitionEntity) {
+        entry.setProcessDefinitionKey(definition.getKey());
+      }
+      entry.setDeploymentId(definition.getDeploymentId());
+    }
+
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricVariableInstanceEntity variable, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+    entry.setRootProcessInstanceId(variable.getRootProcessInstanceId());
+    entry.setProcessDefinitionId(variable.getProcessDefinitionId());
+    entry.setProcessInstanceId(variable.getProcessInstanceId());
+    entry.setExecutionId(variable.getExecutionId());
+    entry.setCaseDefinitionId(variable.getCaseDefinitionId());
+    entry.setCaseInstanceId(variable.getCaseInstanceId());
+    entry.setCaseExecutionId(variable.getCaseExecutionId());
+    entry.setTaskId(variable.getTaskId());
+
+    if (definition != null) {
+      if (definition instanceof ProcessDefinitionEntity) {
+        entry.setProcessDefinitionKey(definition.getKey());
+      }
+      entry.setDeploymentId(definition.getDeploymentId());
+    }
+    
+    return this;
+  }
+  
+  public UserOperationLogContextEntryBuilder inContextOf(ExternalTaskEntity task, ExecutionEntity execution, ProcessDefinitionEntity definition) {
+    if (execution != null) {
+      inContextOf(execution);
+    } else if (definition != null) {
+      inContextOf(definition);
+    }
+    entry.setExternalTaskId(task.getId());
     return this;
   }
 
@@ -134,4 +277,30 @@ public class UserOperationLogContextEntryBuilder {
     entry.setProcessInstanceId(processInstanceId);
     return this;
   }
+
+  public UserOperationLogContextEntryBuilder caseDefinitionId(String caseDefinitionId) {
+    entry.setCaseDefinitionId(caseDefinitionId);
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder deploymentId(String deploymentId) {
+    entry.setDeploymentId(deploymentId);
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder batchId(String batchId) {
+    entry.setBatchId(batchId);
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder taskId(String taskId) {
+    entry.setTaskId(taskId);
+    return this;
+  }
+  
+  public UserOperationLogContextEntryBuilder category(String category) {
+    entry.setCategory(category);
+    return this;
+  }
+
 }

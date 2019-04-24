@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+
+    <property name="processEngineName" value="HistoryCleanupBatchTest-engine" />
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:HistoryCleanupBatchTest;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="create-drop" />
+
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+
+    <!-- login configuration -->
+    <property name="loginMaxAttempts" value="5" />
+    <property name="loginDelayFactor" value="2" />
+    <property name="loginDelayMaxTime" value="30" />
+    <property name="loginDelayBase" value="1" />
+  </bean>
+
+</beans>

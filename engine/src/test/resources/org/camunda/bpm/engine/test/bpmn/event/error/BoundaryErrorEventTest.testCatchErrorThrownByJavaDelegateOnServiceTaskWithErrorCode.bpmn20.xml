@@ -7,7 +7,7 @@
   <error id="error42" errorCode="42" />
   <error id="error23" errorCode="23" />
 
-  <process id="catchErrorThrownByJavaDelegateOnServiceTaskWithErrorCode">
+  <process id="catchErrorThrownByJavaDelegateOnServiceTaskWithErrorCode" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask" />

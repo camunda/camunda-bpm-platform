@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,20 +18,26 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class MeterLogEntity implements DbEntity, Serializable {
+public class MeterLogEntity implements DbEntity, HasDbReferences, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   protected String id;
 
   protected Date timestamp;
+  protected Long milliseconds;
 
   protected String name;
 
@@ -44,6 +54,7 @@ public class MeterLogEntity implements DbEntity, Serializable {
     this.reporter = reporter;
     this.value = value;
     this.timestamp = timestamp;
+    this.milliseconds = timestamp.getTime();
   }
 
   public MeterLogEntity() {
@@ -63,6 +74,14 @@ public class MeterLogEntity implements DbEntity, Serializable {
 
   public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public Long getMilliseconds() {
+    return milliseconds;
+  }
+
+  public void setMilliseconds(Long milliseconds) {
+    this.milliseconds = milliseconds;
   }
 
   public String getName() {
@@ -94,4 +113,15 @@ public class MeterLogEntity implements DbEntity, Serializable {
     return MeterLogEntity.class;
   }
 
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    return referenceIdAndClass;
+  }
 }

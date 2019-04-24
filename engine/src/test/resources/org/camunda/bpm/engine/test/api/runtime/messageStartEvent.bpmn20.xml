@@ -6,7 +6,7 @@
 
   <message id="startMessage" name="startMessage" />
 
-  <process id="process" name="The One Task Process with Message Start Event">
+  <process id="process" name="The One Task Process with Message Start Event" isExecutable="true">
     <documentation>This is a process for testing purposes</documentation>
   
     <startEvent id="theStart">

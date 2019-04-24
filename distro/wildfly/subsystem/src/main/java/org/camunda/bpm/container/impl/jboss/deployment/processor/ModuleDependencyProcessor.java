@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,31 +56,47 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   public static ModuleIdentifier MODULE_IDENTIFYER_SPIN = ModuleIdentifier.create("org.camunda.spin.camunda-spin-core");
   public static ModuleIdentifier MODULE_IDENTIFYER_CONNECT = ModuleIdentifier.create("org.camunda.connect.camunda-connect-core");
   public static ModuleIdentifier MODULE_IDENTIFYER_ENGINE_DMN = ModuleIdentifier.create("org.camunda.bpm.dmn.camunda-engine-dmn");
-  public static ModuleIdentifier MODULE_IDENTIFYER_SCRIPTENGINE_DMN = ModuleIdentifier.create("org.camunda.bpm.dmn.camunda-scriptengine-dmn");
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
 
-    if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
-      return;
-    }
+    if (deploymentUnit.getParent() == null) {
+      //The deployment unit has no parent so it is a simple war or an ear.
+      ModuleLoader moduleLoader = Module.getBootModuleLoader();
+      //If it is a simpleWar and marked with process application we have to add the dependency
+      boolean isProcessApplicationWarOrEar = ProcessApplicationAttachments.isProcessApplication(deploymentUnit);
 
-    ModuleLoader moduleLoader = Module.getBootModuleLoader();
-    DeploymentUnit parent = deploymentUnit.getParent() == null ? deploymentUnit : deploymentUnit.getParent();
-
-    if(parent != deploymentUnit) {
-      // add dependency to all submodules
-      AttachmentList<DeploymentUnit> subdeployments = parent.getAttachment(Attachments.SUB_DEPLOYMENTS);
-      for (DeploymentUnit subdeploymentUnit : subdeployments) {
-        final ModuleSpecification moduleSpecification = subdeploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
-        addSystemDependencies(moduleLoader, moduleSpecification);
+      AttachmentList<DeploymentUnit> subdeployments = deploymentUnit.getAttachment(Attachments.SUB_DEPLOYMENTS);
+      //Is the list of sub deployments empty the deployment unit is a war file.
+      //In cases of war files we have nothing todo.
+      if (subdeployments != null) {
+        //The deployment unit contains sub deployments which means the deployment unit is an ear.
+        //We have to check whether sub deployments are process applications or not.
+        boolean subDeploymentIsProcessApplication = false;
+        for (DeploymentUnit subDeploymentUnit : subdeployments) {
+          if (ProcessApplicationAttachments.isProcessApplication(subDeploymentUnit)) {
+            subDeploymentIsProcessApplication = true;
+            break;
+          }
+        }
+        //If one sub deployment is a process application then we add to all the dependency
+        //Also we have to add the dependency to the current deployment unit which is an ear
+        if (subDeploymentIsProcessApplication) {
+          for (DeploymentUnit subDeploymentUnit : subdeployments) {
+            final ModuleSpecification moduleSpecification = subDeploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
+            addSystemDependencies(moduleLoader, moduleSpecification);
+          }
+          //An ear is not marked as process application but also needs the dependency
+          isProcessApplicationWarOrEar = true;
+        }
       }
 
+      if (isProcessApplicationWarOrEar) {
+        final ModuleSpecification moduleSpecification = deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
+        addSystemDependencies(moduleLoader, moduleSpecification);
+      }
     }
-
-    final ModuleSpecification moduleSpecification = parent.getAttachment(Attachments.MODULE_SPECIFICATION);
-    addSystemDependencies(moduleLoader, moduleSpecification);
 
     // install the pa-module service
     ModuleIdentifier identifyer = deploymentUnit.getAttachment(Attachments.MODULE_IDENTIFIER);
@@ -102,7 +122,6 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_SPIN);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CONNECT);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_ENGINE_DMN);
-    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_SCRIPTENGINE_DMN);
   }
 
   private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency) {

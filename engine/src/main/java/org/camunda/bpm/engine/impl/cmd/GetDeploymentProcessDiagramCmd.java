@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,19 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 
@@ -35,7 +37,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static Logger log = Logger.getLogger(GetDeploymentProcessDiagramCmd.class.getName());
 
   protected String processDefinitionId;
 
@@ -52,14 +53,14 @@ public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Ser
             .getDeploymentCache()
             .findDeployedProcessDefinitionById(processDefinitionId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(processDefinition);
+    }
 
     final String deploymentId = processDefinition.getDeploymentId();
     final String resourceName = processDefinition.getDiagramResourceName();
 
     if (resourceName == null ) {
-      log.info("Resource name is null! No process diagram stream exists.");
       return null;
     } else {
 

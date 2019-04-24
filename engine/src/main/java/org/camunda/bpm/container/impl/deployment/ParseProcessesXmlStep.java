@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,13 +24,15 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 
 import static org.camunda.bpm.container.impl.deployment.Attachments.PROCESSES_XML_RESOURCES;
@@ -42,7 +48,7 @@ import static org.camunda.bpm.container.impl.deployment.Attachments.PROCESS_APPL
  */
 public class ParseProcessesXmlStep extends DeploymentOperationStep {
 
-  private static final String META_INF_PROCESSES_XML = "META-INF/processes.xml";
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   public String getName() {
     return "Parse processes.xml deployment descriptor files.";
@@ -68,19 +74,21 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
     // perform parsing
     for (URL url : processesXmlUrls) {
 
+      LOG.foundProcessesXmlFile(url.toString());
+
       if(isEmptyFile(url)) {
         parsedFiles.put(url, ProcessesXml.EMPTY_PROCESSES_XML);
-        LOGGER.info("Using default values for empty processes.xml file found at "+url.toString());
+        LOG.emptyProcessesXml();
 
       } else {
         parsedFiles.put(url, parseProcessesXml(url));
-        LOGGER.info("Found process application file at "+url.toString());
       }
     }
 
     if(parsedFiles.isEmpty()) {
-      LOGGER.info("No processes.xml file found in process application "+processApplication.getName());
+      LOG.noProcessesXmlForPa(processApplication.getName());
     }
+
     return parsedFiles;
   }
 
@@ -95,8 +103,9 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
       Enumeration<URL> processesXmlFileLocations = null;
       try {
         processesXmlFileLocations = processApplicationClassloader.getResources(deploymentDescriptor);
-      } catch (IOException e) {
-        throw new ProcessEngineException("IOException while reading "+deploymentDescriptor);
+      }
+      catch (IOException e) {
+        throw LOG.exceptionWhileReadingProcessesXml(deploymentDescriptor, e);
       }
 
       while (processesXmlFileLocations.hasMoreElements()) {
@@ -111,7 +120,7 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
   protected String[] getDeploymentDescriptorLocations(AbstractProcessApplication processApplication) {
     ProcessApplication annotation = processApplication.getClass().getAnnotation(ProcessApplication.class);
     if(annotation == null) {
-      return new String[] {META_INF_PROCESSES_XML};
+      return new String[] {ProcessApplication.DEFAULT_META_INF_PROCESSES_XML};
 
     } else {
       return annotation.deploymentDescriptors();
@@ -127,10 +136,11 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
       inputStream = url.openStream();
       return inputStream.available() == 0;
 
-    } catch (IOException e) {
-      throw new ProcessEngineException("Could not open stream for " + url, e);
-
-    } finally {
+    }
+    catch (IOException e) {
+      throw LOG.exceptionWhileReadingProcessesXml(url.toString(), e);
+    }
+    finally {
       IoUtil.closeSilently(inputStream);
 
     }

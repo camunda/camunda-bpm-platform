@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_oJv-0MkKEeKtHO-k06fNaA" targetNamespace="http://camunda.org/schema/1.0/bpmn">
+  <bpmn2:process id="failingProcessWithUserTask" name="Failing Process With UserTask" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:serviceTask id="theServiceTask" camunda:class="org.camunda.bpm.engine.test.api.mgmt.FailingDelegateWithFailParameter" camunda:async="true" name="Service Task">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="theServiceTask"/>
+    <bpmn2:userTask id="theUserTask" name="User Task">
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="theServiceTask" targetRef="theUserTask"/>
+    <bpmn2:endEvent id="EndEvent_1">
+      <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="theUserTask" targetRef="EndEvent_1"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Failing Process With UserTask">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="failingProcessWithUserTask">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_5" bpmnElement="StartEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="225.0" y="243.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_4" bpmnElement="theServiceTask">
+        <dc:Bounds height="80.0" width="100.0" x="311.0" y="221.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_5" targetElement="_BPMNShape_ServiceTask_4">
+        <di:waypoint xsi:type="dc:Point" x="261.0" y="261.0"/>
+        <di:waypoint xsi:type="dc:Point" x="311.0" y="261.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_3" bpmnElement="theUserTask">
+        <dc:Bounds height="80.0" width="100.0" x="461.0" y="221.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_4" targetElement="_BPMNShape_UserTask_3">
+        <di:waypoint xsi:type="dc:Point" x="411.0" y="261.0"/>
+        <di:waypoint xsi:type="dc:Point" x="461.0" y="261.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_5" bpmnElement="EndEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="611.0" y="243.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_UserTask_3" targetElement="_BPMNShape_EndEvent_5">
+        <di:waypoint xsi:type="dc:Point" x="561.0" y="261.0"/>
+        <di:waypoint xsi:type="dc:Point" x="611.0" y="261.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

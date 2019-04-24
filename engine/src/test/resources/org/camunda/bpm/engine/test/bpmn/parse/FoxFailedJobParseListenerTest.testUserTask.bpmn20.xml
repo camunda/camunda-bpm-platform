@@ -5,7 +5,7 @@
 	xmlns:fox="http://www.camunda.com/fox"
 	targetNamespace="Examples">
 
-	<process id="asyncUserTaskFailedJobRetryTimeCycle">
+	<process id="asyncUserTaskFailedJobRetryTimeCycle" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
@@ -21,7 +21,7 @@
 
 	</process>
 	
-	<process id="notAsyncUserTaskFailedJobRetryTimeCycle">
+	<process id="notAsyncUserTaskFailedJobRetryTimeCycle" isExecutable="true">
 
 		<startEvent id="start" />
 		<sequenceFlow id="flowTransition1" sourceRef="start" targetRef="notAsyncTask" />
@@ -33,7 +33,7 @@
 
 	</process>
 	
-		<process id="asyncUserTaskButWithoutFailedJobRetryTimeCycle">
+		<process id="asyncUserTaskButWithoutFailedJobRetryTimeCycle" isExecutable="true">
 
 		<startEvent id="start1" />
 		<sequenceFlow id="flowTransition11" sourceRef="start1" targetRef="asyncTaskWithoutFailedJobRetryTimeCycle" />

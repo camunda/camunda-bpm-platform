@@ -3,32 +3,32 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
-  
+
   <signal id="signal" name="Signal" />
 
-  <process id="intermediateSignalCatchJobPrioProcess" camunda:jobPriority="8">
-  
+  <process id="intermediateSignalCatchJobPrioProcess" camunda:jobPriority="8" isExecutable="true">
+
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="fork" />
     <parallelGateway id="fork" />
-    
+
     <sequenceFlow id="flow2" sourceRef="fork" targetRef="signal1" />
     <intermediateCatchEvent id="signal1">
-      <signalEventDefinition signalRef="signal" />      
+      <signalEventDefinition signalRef="signal" />
     </intermediateCatchEvent>
     <sequenceFlow id="flow3" sourceRef="signal1" targetRef="join" />
-    
+
     <sequenceFlow id="flow4" sourceRef="fork" targetRef="signal2" />
     <intermediateCatchEvent id="signal2" camunda:jobPriority="4" >
-      <signalEventDefinition signalRef="signal" />      
+      <signalEventDefinition signalRef="signal" />
     </intermediateCatchEvent>
     <sequenceFlow id="flow5" sourceRef="signal2" targetRef="join" />
-    
-    
+
+
     <parallelGateway id="join" />
     <sequenceFlow id="flow6" sourceRef="join" targetRef="end" />
     <endEvent id="end" />
-    
+
   </process>
 
 </definitions>

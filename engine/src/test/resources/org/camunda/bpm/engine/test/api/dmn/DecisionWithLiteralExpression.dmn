@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions"
+             name="Definitions"
+             namespace="http://camunda.org/schema/1.0/dmn">
+
+  <decision id="decision" name="Decision with Literal Expression">
+    <variable name="result" typeRef="string" />
+    <literalExpression>
+      <text>sum > 500 ? "ok" : "notok"</text>
+    </literalExpression>
+  </decision>
+
+</definitions>

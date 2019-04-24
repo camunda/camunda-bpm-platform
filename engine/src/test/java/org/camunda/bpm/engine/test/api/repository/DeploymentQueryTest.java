@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.repository;
 
 import java.util.Date;
@@ -22,6 +25,7 @@ import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 
 
 /**
@@ -31,7 +35,6 @@ import org.camunda.bpm.engine.repository.DeploymentQuery;
 public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
 
   private String deploymentOneId;
-
   private String deploymentTwoId;
 
   @Override
@@ -40,12 +43,13 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .createDeployment()
       .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
       .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
+      .source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE)
       .deploy()
       .getId();
 
     deploymentTwoId = repositoryService
       .createDeployment()
-      .name("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
+      .name("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml")
       .addClasspathResource("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
       .deploy()
       .getId();
@@ -91,7 +95,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByName() {
-    DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/camunda/bpm/engine/test/repository/two.bpmn20.xml");
+    DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml");
     assertNotNull(query.singleResult());
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
@@ -114,10 +118,10 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(2, query.list().size());
     assertEquals(2, query.count());
 
-    try {
-      query.singleResult();
-      fail();
-    } catch (ProcessEngineException e) {}
+    query = repositoryService.createDeploymentQuery().deploymentNameLike("%two\\_%");
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    assertEquals("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml", query.singleResult().getName());
   }
 
   public void testQueryByInvalidNameLike() {
@@ -168,6 +172,33 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testQueryBySource() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .deploymentSource(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  public void testQueryByNullSource() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .deploymentSource(null);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  public void testQueryByInvalidSource() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .deploymentSource("invalid");
+
+    assertEquals(0, query.list().size());
+    assertEquals(0, query.count());
+  }
+
   public void testQueryDeploymentBetween() throws Exception {
     Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
     Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
@@ -191,6 +222,13 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .deploymentBefore(earlier)
       .count();
     assertEquals(0, count);
+
+    count = repositoryService
+        .createDeploymentQuery()
+        .deploymentAfter(later)
+        .deploymentBefore(earlier)
+        .count();
+    assertEquals(0, count);
   }
 
   public void testVerifyDeploymentProperties() {
@@ -202,19 +240,22 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     Deployment deploymentOne = deployments.get(0);
     assertEquals("org/camunda/bpm/engine/test/repository/one.bpmn20.xml", deploymentOne.getName());
     assertEquals(deploymentOneId, deploymentOne.getId());
+    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE, deploymentOne.getSource());
+    assertNull(deploymentOne.getTenantId());
 
     Deployment deploymentTwo = deployments.get(1);
-    assertEquals("org/camunda/bpm/engine/test/repository/two.bpmn20.xml", deploymentTwo.getName());
+    assertEquals("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml", deploymentTwo.getName());
     assertEquals(deploymentTwoId, deploymentTwo.getId());
+    assertNull(deploymentTwo.getSource());
+    assertNull(deploymentTwo.getTenantId());
+  }
 
-    deployments = repositoryService.createDeploymentQuery()
-      .deploymentNameLike("%one%")
-       .orderByDeploymentName()
-      .asc()
-      .list();
-
-    assertEquals("org/camunda/bpm/engine/test/repository/one.bpmn20.xml", deployments.get(0).getName());
-    assertEquals(1, deployments.size());
+  public void testQuerySorting() {
+    assertEquals(2, repositoryService.createDeploymentQuery()
+        .orderByDeploymentName()
+        .asc()
+        .list()
+        .size());
 
     assertEquals(2, repositoryService.createDeploymentQuery()
       .orderByDeploymentId()
@@ -228,6 +269,11 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .list()
       .size());
 
+    assertEquals(2, repositoryService.createDeploymentQuery()
+      .orderByDeploymentTime()
+      .asc()
+      .list()
+      .size());
   }
 
 }

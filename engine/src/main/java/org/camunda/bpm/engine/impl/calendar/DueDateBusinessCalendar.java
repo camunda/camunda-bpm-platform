@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,26 +16,41 @@
  */
 package org.camunda.bpm.engine.impl.calendar;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.joda.time.format.ISOPeriodFormat;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISOPeriodFormat;
 
 
 public class DueDateBusinessCalendar implements BusinessCalendar {
 
+  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
+
   public static final String NAME = "dueDate";
 
   public Date resolveDuedate(String duedate) {
+    return resolveDuedate(duedate, null);
+  }
+  
+  public Date resolveDuedate(String duedate, Date startDate) {
     try {
       if (duedate.startsWith("P")){
-        return DateTimeUtil.now().plus(ISOPeriodFormat.standard().parsePeriod(duedate)).toDate();
+        DateTime start = null;
+        if (startDate == null) {
+          start = DateTimeUtil.now();
+        } else {
+          start = new DateTime(startDate); 
+        }
+        return start.plus(ISOPeriodFormat.standard().parsePeriod(duedate)).toDate();
       }
 
       return DateTimeUtil.parseDateTime(duedate).toDate();
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't resolve duedate: " + e.getMessage(), e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileResolvingDuedate(duedate, e);
     }
   }
 }

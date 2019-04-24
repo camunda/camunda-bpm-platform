@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,42 +16,64 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
-
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 /**
  * @author Tom Baeyens
  */
 public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
 
-  private static Logger log = Logger.getLogger(PvmAtomicOperationActivityExecute.class.getName());
+  private final static PvmLogger LOG = PvmLogger.PVM_LOGGER;
 
   public boolean isAsync(PvmExecutionImpl execution) {
     return false;
   }
 
   public void execute(PvmExecutionImpl execution) {
-    ActivityBehavior activityBehavior = getActivityBehavior(execution);
+    execution.activityInstanceStarted();
 
-    ActivityImpl activity = execution.getActivity();
-    log.fine(execution+" executes "+activity+": "+activityBehavior.getClass().getName());
+    execution.continueIfExecutionDoesNotAffectNextOperation(new Callback<PvmExecutionImpl, Void>() {
+      @Override
+      public Void callback(PvmExecutionImpl execution) {
+        if (execution.getActivity().isScope()) {
+          execution.dispatchEvent(null);
+        }
+        return null;
+      }
+    }, new Callback<PvmExecutionImpl, Void>() {
 
-    try {
-      activityBehavior.execute(execution);
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new PvmException("couldn't execute activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
-    }
+      @Override
+      public Void callback(PvmExecutionImpl execution) {
+
+        ActivityBehavior activityBehavior = getActivityBehavior(execution);
+
+        ActivityImpl activity = execution.getActivity();
+        LOG.debugExecutesActivity(execution, activity, activityBehavior.getClass().getName());
+
+        try {
+          activityBehavior.execute(execution);
+        } catch (RuntimeException e) {
+          throw e;
+        } catch (Exception e) {
+          throw new PvmException("couldn't execute activity <" + activity.getProperty("type") + " id=\"" + activity.getId() + "\" ...>: " + e.getMessage(), e);
+        }
+        return null;
+      }
+    }, execution);
   }
 
   public String getCanonicalName() {
     return "activity-execute";
+  }
+
+  public boolean isAsyncCapable() {
+    return false;
   }
 }

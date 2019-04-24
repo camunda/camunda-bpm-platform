@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,10 +20,10 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
@@ -73,8 +77,7 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
         throw new ProcessEngineException("The task cannot be deleted because is part of a running case instance");
       }
 
-      AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-      authorizationManager.checkDeleteTask(task);
+      checkDeleteTask(task, commandContext);
 
       String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
       task.delete(reason, cascade);
@@ -83,6 +86,12 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
         .getCommandContext()
         .getHistoricTaskInstanceManager()
         .deleteHistoricTaskInstanceById(taskId);
+    }
+  }
+
+  protected void checkDeleteTask(TaskEntity task,  CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteTask(task);
     }
   }
 }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,11 +29,13 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.hamcrest.CoreMatchers;
 
 /**
@@ -219,5 +226,134 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
         assertThat(activityInstance.getActivityName(), is("Outer User Task"));
       }
     }
+  }
+
+  @Deployment
+  public void testForkJoin() {
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
+    TaskQuery query = taskService
+                        .createTaskQuery()
+                        .processInstanceId(pi.getId())
+                        .orderByTaskName()
+                        .asc();
+
+    List<Task> tasks = query.list();
+    assertEquals(2, tasks.size());
+    // the tasks are ordered by name (see above)
+    Task task1 = tasks.get(0);
+    assertEquals("Receive Payment", task1.getName());
+    Task task2 = tasks.get(1);
+    assertEquals("Ship Order", task2.getName());
+
+    // Completing both tasks will join the concurrent executions
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    tasks = query.list();
+    assertEquals(1, tasks.size());
+    assertEquals("Archive Order", tasks.get(0).getName());
+  }
+
+  @Deployment
+  public void testUnbalancedForkJoin() {
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("UnbalancedForkJoin");
+    TaskQuery query = taskService.createTaskQuery()
+                                 .processInstanceId(pi.getId())
+                                 .orderByTaskName()
+                                 .asc();
+
+    List<Task> tasks = query.list();
+    assertEquals(3, tasks.size());
+    // the tasks are ordered by name (see above)
+    Task task1 = tasks.get(0);
+    assertEquals("Task 1", task1.getName());
+    Task task2 = tasks.get(1);
+    assertEquals("Task 2", task2.getName());
+
+    // Completing the first task should *not* trigger the join
+    taskService.complete(task1.getId());
+
+    // Completing the second task should trigger the first join
+    taskService.complete(task2.getId());
+
+    tasks = query.list();
+    Task task3 = tasks.get(0);
+    assertEquals(2, tasks.size());
+    assertEquals("Task 3", task3.getName());
+    Task task4 = tasks.get(1);
+    assertEquals("Task 4", task4.getName());
+
+    // Completing the remaing tasks should trigger the second join and end the process
+    taskService.complete(task3.getId());
+    taskService.complete(task4.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  public void testRemoveConcurrentExecutionLocalVariablesOnJoin() {
+    deployment(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .parallelGateway("fork")
+      .userTask("task1")
+      .parallelGateway("join")
+      .userTask("afterTask")
+      .endEvent()
+      .moveToNode("fork")
+      .userTask("task2")
+      .connectTo("join")
+      .done());
+
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      runtimeService.setVariableLocal(task.getExecutionId(), "var", "value");
+    }
+
+    // when
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment
+  public void testImplicitParallelGatewayAfterSignalBehavior() {
+    // given
+    Exception exceptionOccurred = null;
+    runtimeService.startProcessInstanceByKey("process");
+    Execution execution = runtimeService.createExecutionQuery()
+      .activityId("service")
+      .singleResult();
+
+    // when
+    try {
+      runtimeService.signal(execution.getId());
+    } catch (Exception e) {
+      exceptionOccurred = e;
+    }
+
+    // then
+    assertNull(exceptionOccurred);
+    assertEquals(3, taskService.createTaskQuery().count());
+  }
+
+  @Deployment
+  public void testExplicitParallelGatewayAfterSignalBehavior() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+    Execution execution = runtimeService.createExecutionQuery()
+      .activityId("service")
+      .singleResult();
+
+    // when
+    runtimeService.signal(execution.getId());
+
+    // then
+    assertEquals(3, taskService.createTaskQuery().count());
   }
 }

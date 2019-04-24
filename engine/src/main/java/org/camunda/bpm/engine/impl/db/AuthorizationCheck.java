@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +23,7 @@ import java.util.List;
 import org.camunda.bpm.engine.authorization.Permissions;
 
 /**
- * <p>Input for the authorization check alogrithm</p>
+ * <p>Input for the authorization check algorithm</p>
  *
  * @author Daniel Meyer
  *
@@ -29,11 +33,22 @@ public class AuthorizationCheck implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * If true authorization check is performed. This switch is
+   * If true authorization check is enabled. for This switch is
    * useful when implementing a query which may perform an authorization check
    * only under certain circumstances.
    */
   protected boolean isAuthorizationCheckEnabled = false;
+
+  /**
+   * If true authorization check is performed.
+   */
+  protected boolean shouldPerformAuthorizatioCheck = false;
+  
+  /**
+   * Indicates if the revoke authorization checks are enabled or not.
+   * The authorization checks without checking revoke permissions are much more faster.
+   */
+  protected boolean isRevokeAuthorizationCheckEnabled = false;
 
   /** the id of the user to check permissions for */
   protected String authUserId;
@@ -45,16 +60,47 @@ public class AuthorizationCheck implements Serializable {
    * can be found.*/
   protected int authDefaultPerm = Permissions.ALL.getValue();
 
-  protected List<PermissionCheck> permissionChecks = new ArrayList<PermissionCheck>();
+  protected CompositePermissionCheck permissionChecks = new CompositePermissionCheck();
 
+  public AuthorizationCheck() {
+  }
+
+  public AuthorizationCheck(String authUserId, List<String> authGroupIds, CompositePermissionCheck permissionCheck, boolean isRevokeAuthorizationCheckEnabled) {
+    this.authUserId = authUserId;
+    this.authGroupIds = authGroupIds;
+    this.permissionChecks = permissionCheck;
+    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;    
+  }
+  
   // getters / setters /////////////////////////////////////////
 
   public boolean isAuthorizationCheckEnabled() {
     return isAuthorizationCheckEnabled;
   }
 
+  public boolean getIsAuthorizationCheckEnabled() {
+    return isAuthorizationCheckEnabled;
+  }
+
   public void setAuthorizationCheckEnabled(boolean isAuthorizationCheckPerformed) {
     this.isAuthorizationCheckEnabled = isAuthorizationCheckPerformed;
+  }
+
+  public boolean shouldPerformAuthorizatioCheck() {
+    return shouldPerformAuthorizatioCheck;
+  }
+
+  /** is used by myBatis */
+  public boolean getShouldPerformAuthorizatioCheck() {
+    return isAuthorizationCheckEnabled && !isPermissionChecksEmpty();
+  }
+
+  public void setShouldPerformAuthorizatioCheck(boolean shouldPerformAuthorizatioCheck) {
+    this.shouldPerformAuthorizatioCheck = shouldPerformAuthorizatioCheck;
+  }
+
+  protected boolean isPermissionChecksEmpty() {
+    return permissionChecks.getAtomicChecks().isEmpty() && permissionChecks.getCompositeChecks().isEmpty();
   }
 
   public String getAuthUserId() {
@@ -83,16 +129,28 @@ public class AuthorizationCheck implements Serializable {
 
   // authorization check parameters
 
-  public List<PermissionCheck> getPermissionChecks() {
+  public CompositePermissionCheck getPermissionChecks() {
     return permissionChecks;
   }
 
-  public void setPermissionChecks(List<PermissionCheck> permissionChecks) {
-    this.permissionChecks = permissionChecks;
+  public void setAtomicPermissionChecks(List<PermissionCheck> permissionChecks) {
+    this.permissionChecks.setAtomicChecks(permissionChecks);
   }
 
-  public void addPermissionCheck(PermissionCheck permissionCheck) {
-    permissionChecks.add(permissionCheck);
+  public void addAtomicPermissionCheck(PermissionCheck permissionCheck) {
+    permissionChecks.addAtomicCheck(permissionCheck);
+  }
+
+  public void setPermissionChecks(CompositePermissionCheck permissionChecks) {
+    this.permissionChecks = permissionChecks;
+  }
+  
+  public boolean isRevokeAuthorizationCheckEnabled() {
+    return isRevokeAuthorizationCheckEnabled;
+  }
+
+  public void setRevokeAuthorizationCheckEnabled(boolean isRevokeAuthorizationCheckEnabled) {
+    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;
   }
 
 }

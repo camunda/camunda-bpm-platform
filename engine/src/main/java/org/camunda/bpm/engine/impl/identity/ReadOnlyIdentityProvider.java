@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +18,9 @@ package org.camunda.bpm.engine.impl.identity;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.NativeUserQuery;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -53,6 +60,12 @@ public interface ReadOnlyIdentityProvider extends Session {
   public UserQuery createUserQuery(CommandContext commandContext);
 
   /**
+   * Creates a {@link NativeUserQuery} that allows to select users with native queries.
+   * @return NativeUserQuery
+   */
+  public NativeUserQuery createNativeUserQuery();
+
+  /**
    * @return 'true' if the password matches the
    * @throws IdentityProviderException in case an error occurs
    */
@@ -77,5 +90,31 @@ public interface ReadOnlyIdentityProvider extends Session {
    * @throws IdentityProviderException in case an error occurs
    */
   public GroupQuery createGroupQuery(CommandContext commandContext);
+
+  // tenants //////////////////////////////////////
+
+  /**
+   * @return a {@link Tenant} object for the given id or null if no such tenant
+   *         exists.
+   * @throws IdentityProviderException
+   *           in case an error occurs
+   */
+  public Tenant findTenantById(String tenantId);
+
+  /**
+   * @return a {@link TenantQuery} object which can be used for querying for
+   *         tenants.
+   * @throws IdentityProviderException
+   *           in case an error occurs
+   */
+  public TenantQuery createTenantQuery();
+
+  /**
+   * @return a {@link TenantQuery} object which can be used for querying for
+   *         tenants and can be reused in the current command context.
+   * @throws IdentityProviderException
+   *           in case an error occurs
+   */
+  public TenantQuery createTenantQuery(CommandContext commandContext);
 
 }

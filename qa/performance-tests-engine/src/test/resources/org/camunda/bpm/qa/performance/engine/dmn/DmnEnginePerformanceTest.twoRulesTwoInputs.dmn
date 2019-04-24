@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" expressionLanguage="http://www.omg.org/spec/FEEL/20140401" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" typeLanguage="http://www.omg.org/spec/FEEL/20140401">
+  <decision id="twoRulesTwoInputs" name="Benchmark">
+    <decisionTable hitPolicy="COLLECT" id="decisionTable" preferredOrientation="Rule-as-Row">
+      <input id="input1" label="number of matched rules">
+        <inputExpression id="inputExpression1" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_1209k69" label="number of matched rules (2)">
+        <inputExpression id="LiteralExpression_18jyq49" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="rule matched?" name="" typeRef="string"/>
+      <rule id="rule_42c4243c-309b-4a8a-98d9-b620d28e7a1d">
+        <inputEntry id="inputEntry_7ac693ee-25e1-4ba7-9fc0-e00d9f02cd22">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_6feb69bb-173c-4f67-a1c8-6d873cccf837">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_112664b6-1166-4612-9350-61aac88d3f44">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_aa43a41d-37f0-48ba-b1be-c1bd5f1ebd23">
+        <inputEntry id="inputEntry_b6980459-99b3-47f5-b336-a894b19b23df">
+          <text>&gt; 0.5</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_94ae7a54-8fce-4e3e-8523-abf55656919d">
+          <text>&gt; 0.5</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4eab2eb0-2793-4958-9969-293e46afe96f">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

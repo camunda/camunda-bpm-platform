@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -122,6 +126,18 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
    */
   CaseDefinitionQuery caseDefinitionResourceNameLike(String resourceNameLike);
 
+  /** Only select case definitions with one of the given tenant ids. */
+  CaseDefinitionQuery tenantIdIn(String... tenantIds);
+
+  /** Only select case definitions which have no tenant id. */
+  CaseDefinitionQuery withoutTenantId();
+
+  /**
+   * Select case definitions which have no tenant id. Can be used in
+   * combination with {@link #tenantIdIn(String...)}.
+   */
+  CaseDefinitionQuery includeCaseDefinitionsWithoutTenantId();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the case definitions (needs to be followed by
@@ -147,5 +163,9 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
   /** Order by deployment id (needs to be followed by {@link #asc()}
    * or {@link #desc()}). */
   CaseDefinitionQuery orderByDeploymentId();
+
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of case instances without tenant id is database-specific. */
+  CaseDefinitionQuery orderByTenantId();
 
 }

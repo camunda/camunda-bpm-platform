@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="Examples">
+
+  <process isExecutable="true" id="versionTagProcess" name="versionTagProcess" camunda:versionTag="ver_tag_1">
+    <documentation>Desc one</documentation>
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
+    <endEvent id="end" />
+    
+  </process>
+
+</definitions>

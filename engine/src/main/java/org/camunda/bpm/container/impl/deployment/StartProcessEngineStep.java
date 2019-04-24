@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,10 +16,10 @@
  */
 package org.camunda.bpm.container.impl.deployment;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
@@ -25,13 +29,10 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -47,6 +48,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  *
  */
 public class StartProcessEngineStep extends DeploymentOperationStep {
+
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   /** the process engine Xml configuration passed in as a parameter to the operation step */
   protected final ProcessEngineXml processEngineXml;
@@ -85,8 +88,6 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     ProcessEngineConfigurationImpl configurationImpl = configuration;
     configurationImpl.setIdGenerator(new StrongUuidGenerator());
 
-    configureCustomRetryStrategy(configurationImpl);
-
     // set configuration values
     String name = processEngineXml.getName();
     configuration.setProcessEngineName(name);
@@ -96,6 +97,7 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
 
     // apply properties
     Map<String, String> properties = processEngineXml.getProperties();
+    setJobExecutorActivate(configuration, properties);
     PropertyHelper.applyProperties(configuration, properties);
 
     // instantiate plugins:
@@ -115,20 +117,14 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
 
   }
 
-  protected JmxManagedProcessEngineController createProcessEngineControllerInstance(ProcessEngineConfigurationImpl configuration) {
-    return new JmxManagedProcessEngineController(configuration);
+  protected void setJobExecutorActivate(ProcessEngineConfigurationImpl configuration, Map<String, String> properties) {
+    // override job executor auto activate: set to true in shared engine scenario
+    // if it is not specified (see #CAM-4817)
+    configuration.setJobExecutorActivate(true);
   }
 
-  protected void configureCustomRetryStrategy(ProcessEngineConfigurationImpl configurationImpl) {
-    // add support for custom Retry strategy
-    // TODO: decide whether this should be moved  to configuration or to plugin
-    List<BpmnParseListener> customPostBPMNParseListeners = configurationImpl.getCustomPostBPMNParseListeners();
-    if(customPostBPMNParseListeners==null) {
-      customPostBPMNParseListeners = new ArrayList<BpmnParseListener>();
-      configurationImpl.setCustomPostBPMNParseListeners(customPostBPMNParseListeners);
-    }
-    customPostBPMNParseListeners.add(new FoxFailedJobParseListener());
-    configurationImpl.setFailedJobCommandFactory(new FoxFailedJobCommandFactory());
+  protected JmxManagedProcessEngineController createProcessEngineControllerInstance(ProcessEngineConfigurationImpl configuration) {
+    return new JmxManagedProcessEngineController(configuration);
   }
 
   /**
@@ -159,14 +155,7 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
   }
 
   protected <T> T createInstance(Class<? extends T> clazz) {
-    try {
-      return clazz.newInstance();
-
-    } catch (InstantiationException e) {
-      throw new ProcessEngineException("Could not instantiate class", e);
-    } catch (IllegalAccessException e) {
-      throw new ProcessEngineException("IllegalAccessException while instantiating class", e);
-    }
+    return ReflectUtil.instantiate(clazz);
   }
 
   @SuppressWarnings("unchecked")
@@ -174,16 +163,16 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     try {
       if(customClassloader != null) {
         return (Class<? extends T>) customClassloader.loadClass(className);
-      } else {
+      }
+      else {
         return (Class<? extends T>) ReflectUtil.loadClass(className);
       }
-
-    } catch (ClassNotFoundException e) {
-      throw new ProcessEngineException("Could not load configuration class", e);
-
-    } catch (ClassCastException e) {
-      throw new ProcessEngineException("Custom class of wrong type. Must extend "+clazz.getName(), e);
-
+    }
+    catch (ClassNotFoundException e) {
+      throw LOG.camnnotLoadConfigurationClass(className, e);
+    }
+    catch (ClassCastException e) {
+      throw LOG.configurationClassHasWrongType(className, clazz, e);
     }
   }
 

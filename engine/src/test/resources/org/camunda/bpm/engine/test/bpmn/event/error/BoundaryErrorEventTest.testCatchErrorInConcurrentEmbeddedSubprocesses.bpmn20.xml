@@ -5,7 +5,7 @@
   <error id="error1" errorCode="1" />
   <error id="error2" errorCode="2" />
   
-	<process id="boundaryEventTestConcurrentSubprocesses">
+	<process id="boundaryEventTestConcurrentSubprocesses" isExecutable="true">
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow0" sourceRef="theStart" targetRef="outerSubProcess" />
 		

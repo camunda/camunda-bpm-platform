@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,6 +15,9 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.bpmn.gateway;
+
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,11 +28,14 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
  * @author Joram Barrez
@@ -483,4 +493,254 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNull(processInstance);
   }
+
+  /**
+   * The test process has an OR gateway where, the 'input' variable is used to
+   * select the expected outgoing sequence flow.
+   */
+  @Deployment
+  public void testDecisionFunctionality() {
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+
+    // Test with input == 1
+    variables.put("input", 1);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+    assertEquals(3, tasks.size());
+    Map<String, String> expectedMessages = new HashMap<String, String>();
+    expectedMessages.put(TASK1_NAME, TASK1_NAME);
+    expectedMessages.put(TASK2_NAME, TASK2_NAME);
+    expectedMessages.put(TASK3_NAME, TASK3_NAME);
+    for (Task task : tasks) {
+      expectedMessages.remove(task.getName());
+    }
+    assertEquals(0, expectedMessages.size());
+
+    // Test with input == 2
+    variables.put("input", 2);
+    pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
+    tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+    assertEquals(2, tasks.size());
+    expectedMessages = new HashMap<String, String>();
+    expectedMessages.put(TASK2_NAME, TASK2_NAME);
+    expectedMessages.put(TASK3_NAME, TASK3_NAME);
+    for (Task task : tasks) {
+      expectedMessages.remove(task.getName());
+    }
+    assertEquals(0, expectedMessages.size());
+
+    // Test with input == 3
+    variables.put("input", 3);
+    pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
+    tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+    assertEquals(1, tasks.size());
+    expectedMessages = new HashMap<String, String>();
+    expectedMessages.put(TASK3_NAME, TASK3_NAME);
+    for (Task task : tasks) {
+      expectedMessages.remove(task.getName());
+    }
+    assertEquals(0, expectedMessages.size());
+
+    // Test with input == 4
+    variables.put("input", 4);
+    try {
+      runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
+      fail();
+    } catch (ProcessEngineException e) {
+      // Exception is expected since no outgoing sequence flow matches
+    }
+
+  }
+
+  @Deployment
+  public void testJoinAfterSequentialMultiInstanceSubProcess() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    // when
+    Task task = query
+        .taskDefinitionKey("task")
+        .singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    assertNull(query.taskDefinitionKey("taskAfterJoin").singleResult());
+  }
+
+  @Deployment
+  public void testJoinAfterParallelMultiInstanceSubProcess() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    // when
+    Task task = query
+        .taskDefinitionKey("task")
+        .singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    assertNull(query.taskDefinitionKey("taskAfterJoin").singleResult());
+  }
+
+  @Deployment
+  public void testJoinAfterNestedScopes() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    // when
+    Task task = query
+        .taskDefinitionKey("task")
+        .singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    assertNull(query.taskDefinitionKey("taskAfterJoin").singleResult());
+  }
+
+  public void testTriggerGatewayWithEnoughArrivedTokens() {
+    deployment(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask("beforeTask")
+      .inclusiveGateway("gw")
+      .userTask("afterTask")
+      .endEvent()
+      .done());
+
+    // given
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
+      .startBeforeActivity("beforeTask")
+      .startBeforeActivity("beforeTask")
+      .execute();
+
+    Task task = taskService.createTaskQuery().list().get(0);
+
+    // when
+    taskService.complete(task.getId());
+
+    // then
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("beforeTask")
+        .activity("afterTask")
+      .done());
+  }
+
+  @Deployment
+  public void testLoopingInclusiveGateways() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .activity("task2")
+        .activity("inclusiveGw3")
+      .done());
+  }
+
+  public void testRemoveConcurrentExecutionLocalVariablesOnJoin() {
+    deployment(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .inclusiveGateway("fork")
+      .userTask("task1")
+      .inclusiveGateway("join")
+      .userTask("afterTask")
+      .endEvent()
+      .moveToNode("fork")
+      .userTask("task2")
+      .connectTo("join")
+      .done());
+
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      runtimeService.setVariableLocal(task.getExecutionId(), "var", "value");
+    }
+
+    // when
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment
+  public void testJoinAfterEventBasedGateway() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskQuery.singleResult();
+    taskService.complete(task.getId());
+
+    // assume
+    assertNull(taskQuery.singleResult());
+
+    // when
+    runtimeService.correlateMessage("foo");
+
+    // then
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
+  }
+
+  @Deployment
+  public void testJoinAfterEventBasedGatewayInSubProcess() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskQuery.singleResult();
+    taskService.complete(task.getId());
+
+    // assume
+    assertNull(taskQuery.singleResult());
+
+    // when
+    runtimeService.correlateMessage("foo");
+
+    // then
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
+  }
+
+  @Deployment
+  public void testJoinAfterEventBasedGatewayContainedInSubProcess() {
+    // given
+    TaskQuery taskQuery = taskService.createTaskQuery();
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskQuery.singleResult();
+    taskService.complete(task.getId());
+
+    // assume
+    assertNull(taskQuery.singleResult());
+
+    // when
+    runtimeService.correlateMessage("foo");
+
+    // then
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
+  }
+
 }

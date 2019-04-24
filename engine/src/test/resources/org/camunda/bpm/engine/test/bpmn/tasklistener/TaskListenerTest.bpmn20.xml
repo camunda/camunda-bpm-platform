@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskListenerExample" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	targetNamespace="Examples">
+
+  <message id="message1" name="message"/>
+	<process id="taskListenerProcess" name="Task  Listener Example" isExecutable="true">
+	
+		<startEvent id="theStart" />
+		
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task1" />
+
+		<userTask id="task1" name="Schedule meeting" >
+		  <documentation>
+		    Schedule a meeting with management.
+		  </documentation>
+		  <extensionElements>
+		    <camunda:taskListener event="create" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.TaskCreateListener" />
+		    <camunda:taskListener event="complete" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.TaskCompleteListener">
+		      <camunda:field name="greeter" stringValue="The Process" />
+          <camunda:field name="shortName" expression="${'Activiti'.substring(0,3)}" />
+		    </camunda:taskListener>
+        <camunda:taskListener event="delete" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.TaskDeleteListener" />
+		  </extensionElements>
+		</userTask>
+
+    <boundaryEvent id="messageBoundary" attachedToRef="task1">
+      <outgoing>flow2</outgoing>
+      <messageEventDefinition messageRef="message1"/>
+    </boundaryEvent>
+    <sequenceFlow id="flow4" sourceRef="task1" targetRef="theEnd2" />
+
+		<sequenceFlow id="flow2" sourceRef="task1" targetRef="task2" />
+		
+		<userTask id="task2" name="Write meeting notes" >
+      <documentation>
+        Write meeting notes after meeting with management.
+      </documentation>
+      <extensionElements>
+        <camunda:taskListener event="create" expression="${execution.setVariable('greeting2', task.name)}" />
+      </extensionElements>
+    </userTask>
+    
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+    <endEvent id="theEnd2" />
+
+	</process>
+
+</definitions>

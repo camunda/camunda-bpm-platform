@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,11 +32,10 @@ import org.camunda.bpm.engine.impl.cmmn.handler.MilestoneItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.impl.instance.Body;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
-import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
-import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
+import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
@@ -171,8 +174,7 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
     ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -191,8 +193,7 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
     PlanItemControl defaultControl = createElement(milestone, "ItemControl_1", DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 

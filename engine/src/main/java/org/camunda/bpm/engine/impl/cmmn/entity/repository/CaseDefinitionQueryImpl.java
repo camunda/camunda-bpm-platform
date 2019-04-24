@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +26,7 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 
@@ -47,11 +52,11 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   protected Integer version;
   protected boolean latest = false;
 
-  public CaseDefinitionQueryImpl() {
-  }
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+  protected boolean includeDefinitionsWithoutTenantId = false;
 
-  public CaseDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
+  public CaseDefinitionQueryImpl() {
   }
 
   public CaseDefinitionQueryImpl(CommandExecutor commandExecutor) {
@@ -115,7 +120,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   public CaseDefinitionQuery caseDefinitionVersion(Integer caseDefinitionVersion) {
     ensureNotNull(NotValidException.class, "version", caseDefinitionVersion);
-    ensurePositive(NotValidException.class, "version", caseDefinitionVersion);
+    ensurePositive(NotValidException.class, "version", caseDefinitionVersion.longValue());
     this.version = caseDefinitionVersion;
     return this;
   }
@@ -134,6 +139,24 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   public CaseDefinitionQuery caseDefinitionResourceNameLike(String resourceNameLike) {
     ensureNotNull(NotValidException.class, "resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
+    return this;
+  }
+
+  public CaseDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public CaseDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public CaseDefinitionQuery includeCaseDefinitionsWithoutTenantId() {
+    this.includeDefinitionsWithoutTenantId  = true;
     return this;
   }
 
@@ -167,8 +190,18 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     return this;
   }
 
+  public CaseDefinitionQuery orderByTenantId() {
+    return orderBy(CaseDefinitionQueryProperty.TENANT_ID);
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
+  }
+
   //results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -176,6 +209,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
       .findCaseDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<CaseDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
@@ -183,6 +217,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
       .findCaseDefinitionsByQueryCriteria(this, page);
   }
 
+  @Override
   public void checkQueryOk() {
     super.checkQueryOk();
 

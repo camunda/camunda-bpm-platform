@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,17 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.deployer;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
+import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-
-import java.util.List;
 
 /**
  * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the
@@ -34,31 +39,37 @@ import java.util.List;
  */
 public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntity> {
 
-  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn10.xml", "cmmn" };
+  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn10.xml", "cmmn" };
 
   protected ExpressionManager expressionManager;
   protected CmmnTransformer transformer;
 
+  @Override
   protected String[] getResourcesSuffixes() {
     return CMMN_RESOURCE_SUFFIXES;
   }
 
-  protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource) {
+  @Override
+  protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
     return transformer.createTransform().deployment(deployment).resource(resource).transform();
   }
 
+  @Override
   protected CaseDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
     return getCaseDefinitionManager().findCaseDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }
 
-  protected CaseDefinitionEntity findLatestDefinitionByKey(String definitionKey) {
-    return getCaseDefinitionManager().findLatestCaseDefinitionByKey(definitionKey);
+  @Override
+  protected CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
+    return getCaseDefinitionManager().findLatestCaseDefinitionByKeyAndTenantId(definitionKey, tenantId);
   }
 
+  @Override
   protected void persistDefinition(CaseDefinitionEntity definition) {
     getCaseDefinitionManager().insertCaseDefinition(definition);
   }
 
+  @Override
   protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, CaseDefinitionEntity definition) {
     deploymentCache.addCaseDefinition(definition);
   }

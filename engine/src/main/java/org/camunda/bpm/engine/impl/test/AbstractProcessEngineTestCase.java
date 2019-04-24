@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,20 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 
+import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -36,24 +41,18 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-import org.junit.Assert;
+import org.slf4j.Logger;
 
 import junit.framework.AssertionFailedError;
 
@@ -63,21 +62,18 @@ import junit.framework.AssertionFailedError;
  */
 public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
+  private final static Logger LOG = TestLogger.TEST_LOGGER.getLogger();
+
   static {
-    // this ensures that mybatis uses the jdk logging
-//    LogFactory.useJdkLogging();
-    // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
+    // this ensures that mybatis uses slf4j logging
+    LogFactory.useSlf4jLogging();
   }
 
-  private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY",
-    "ACT_RU_METER_LOG"
-  );
-
   protected ProcessEngine processEngine;
-  protected ThreadLogMode threadRenderingMode = DEFAULT_THREAD_LOG_MODE;
 
   protected String deploymentId;
+  protected Set<String> deploymentIds = new HashSet<String>();
+
   protected Throwable exception;
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
@@ -91,6 +87,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
   protected FilterService filterService;
+  protected ExternalTaskService externalTaskService;
+  protected DecisionService decisionService;
 
   protected abstract void initializeProcessEngine();
 
@@ -105,36 +103,74 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       initializeServices();
     }
 
-    log.severe(EMPTY_LINE);
-
     try {
 
-      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+      boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
+      // ignore test case when current history level is too low
+      if (hasRequiredHistoryLevel) {
 
-      super.runBare();
+        deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
 
-    }  catch (AssertionFailedError e) {
-      log.severe(EMPTY_LINE);
-      log.log(Level.SEVERE, "ASSERTION FAILED: "+e, e);
+        super.runBare();
+      }
+
+    }
+    catch (AssertionFailedError e) {
+      LOG.error("ASSERTION FAILED: " + e, e);
       exception = e;
       throw e;
 
-    } catch (Throwable e) {
-      log.severe(EMPTY_LINE);
-      log.log(Level.SEVERE, "EXCEPTION: "+e, e);
+    }
+    catch (Throwable e) {
+      LOG.error("EXCEPTION: " + e, e);
       exception = e;
       throw e;
 
-    } finally {
-      TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
+    }
+    finally {
+
       identityService.clearAuthentication();
-      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+      processEngineConfiguration.setTenantCheckEnabled(true);
+
+      deleteDeployments();
+
+      deleteHistoryCleanupJobs();
+
+      // only fail if no test failure was recorded
+      TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
+      TestHelper.resetIdGenerator(processEngineConfiguration);
       ClockUtil.reset();
 
-      // Can't do this in the teardown, as the teardown will be called as part of the super.runBare
+      // Can't do this in the teardown, as the teardown will be called as part
+      // of the super.runBare
       closeDownProcessEngine();
       clearServiceReferences();
     }
+  }
+
+  protected void deleteHistoryCleanupJobs() {
+    final List<Job> jobs = historyService.findHistoryCleanupJobs();
+    for (final Job job: jobs) {
+      processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+            commandContext.getJobManager().deleteJob((JobEntity) job);
+          return null;
+        }
+      });
+    }
+  }
+
+  protected void deleteDeployments() {
+    if(deploymentId != null) {
+      deploymentIds.add(deploymentId);
+    }
+
+    for(String deploymentId : deploymentIds) {
+      TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
+    }
+
+    deploymentId = null;
+    deploymentIds.clear();
   }
 
   protected void initializeServices() {
@@ -149,6 +185,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     authorizationService = processEngine.getAuthorizationService();
     caseService = processEngine.getCaseService();
     filterService = processEngine.getFilterService();
+    externalTaskService = processEngine.getExternalTaskService();
+    decisionService = processEngine.getDecisionService();
   }
 
   protected void clearServiceReferences() {
@@ -163,6 +201,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     authorizationService = null;
     caseService = null;
     filterService = null;
+    externalTaskService = null;
+    decisionService = null;
   }
 
   public void assertProcessEnded(final String processInstanceId) {
@@ -335,14 +375,6 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     return false;
   }
 
-  @Deprecated
-  private static class InteruptTask extends InterruptTask {
-    public InteruptTask(Thread thread) {
-      super(thread);
-    }
-  }
-
-
   private static class InterruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
@@ -388,15 +420,58 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
-  public void deployment(BpmnModelInstance... bpmnModelInstances) {
+  protected String deployment(BpmnModelInstance... bpmnModelInstances) {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
 
+    return deployment(deploymentBuilder, bpmnModelInstances);
+  }
+
+  protected String deployment(String... resources) {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
+
+    return deployment(deploymentBuilder, resources);
+  }
+
+  protected String deploymentForTenant(String tenantId, BpmnModelInstance... bpmnModelInstances) {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().tenantId(tenantId);
+
+    return deployment(deploymentBuilder, bpmnModelInstances);
+  }
+
+  protected String deploymentForTenant(String tenantId, String... resources) {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().tenantId(tenantId);
+
+    return deployment(deploymentBuilder, resources);
+  }
+
+  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
+    return deployment(repositoryService.createDeployment()
+        .tenantId(tenantId)
+        .addClasspathResource(classpathResource), modelInstance);
+  }
+
+  protected String deployment(DeploymentBuilder deploymentBuilder, BpmnModelInstance... bpmnModelInstances) {
     for (int i = 0; i < bpmnModelInstances.length; i++) {
       BpmnModelInstance bpmnModelInstance = bpmnModelInstances[i];
       deploymentBuilder.addModelInstance("testProcess-"+i+".bpmn", bpmnModelInstance);
     }
 
-    deploymentId = deploymentBuilder.deploy().getId();
+    return deploymentWithBuilder(deploymentBuilder);
+  }
+
+  protected String deployment(DeploymentBuilder deploymentBuilder, String... resources) {
+    for (int i = 0; i < resources.length; i++) {
+      deploymentBuilder.addClasspathResource(resources[i]);
+    }
+
+    return deploymentWithBuilder(deploymentBuilder);
+  }
+
+  protected String deploymentWithBuilder(DeploymentBuilder builder) {
+    deploymentId = builder.deploy().getId();
+    deploymentIds.add(deploymentId);
+
+    return deploymentId;
   }
 
 }

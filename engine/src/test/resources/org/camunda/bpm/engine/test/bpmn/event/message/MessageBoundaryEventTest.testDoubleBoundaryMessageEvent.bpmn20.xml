@@ -7,7 +7,7 @@
   <message id="messageId_1" name="messageName_1" />
   <message id="messageId_2" name="messageName_2" />
   
-  <process id="process">
+  <process id="process" isExecutable="true">
   
     <startEvent id="theStart" />
     

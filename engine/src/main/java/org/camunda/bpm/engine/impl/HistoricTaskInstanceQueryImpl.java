@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -19,11 +22,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 
 
@@ -37,6 +43,9 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected String processDefinitionKey;
   protected String processDefinitionName;
   protected String processInstanceId;
+  protected String processInstanceBusinessKey;
+  protected String[] processInstanceBusinessKeys;
+  protected String processInstanceBusinessKeyLike;
   protected String executionId;
   protected String[] activityInstanceIds;
   protected String taskId;
@@ -49,27 +58,41 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected String taskDeleteReasonLike;
   protected String taskOwner;
   protected String taskOwnerLike;
+  protected Boolean assigned;
+  protected Boolean unassigned;
   protected String taskAssignee;
   protected String taskAssigneeLike;
-  protected String taskDefinitionKey;
+  protected String[] taskDefinitionKeys;
+  protected String taskInvolvedUser;
+  protected String taskInvolvedGroup;
+  protected String taskHadCandidateUser;
+  protected String taskHadCandidateGroup;
+  protected Boolean withCandidateGroups;
+  protected Boolean withoutCandidateGroups;
   protected Integer taskPriority;
   protected boolean finished;
   protected boolean unfinished;
   protected boolean processFinished;
   protected boolean processUnfinished;
-  protected List<TaskQueryVariableValue> variables = new ArrayList<TaskQueryVariableValue>();
+  protected List<TaskQueryVariableValue> variables = new ArrayList<>();
   protected Date dueDate;
   protected Date dueAfter;
   protected Date dueBefore;
   protected Date followUpDate;
   protected Date followUpBefore;
-  protected Date followUpAfter;
 
+  protected Date followUpAfter;
+  protected String[] tenantIds;
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
   protected String caseDefinitionName;
   protected String caseInstanceId;
   protected String caseExecutionId;
+
+  protected Date finishedAfter;
+  protected Date finishedBefore;
+  protected Date startedAfter;
+  protected Date startedBefore;
 
   public HistoricTaskInstanceQueryImpl() {
   }
@@ -102,13 +125,31 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  public HistoricTaskInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey) {
+    this.processInstanceBusinessKey = processInstanceBusinessKey;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys) {
+    ensureNotNull("processInstanceBusinessKeys", (Object[]) processInstanceBusinessKeys);
+    this.processInstanceBusinessKeys = processInstanceBusinessKeys;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
+    this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
+    return this;
+  }
+
   public HistoricTaskInstanceQueryImpl executionId(String executionId) {
     this.executionId = executionId;
     return this;
   }
 
   public HistoricTaskInstanceQuery activityInstanceIdIn(String... activityInstanceIds) {
-    ensureNotNull("activityInstanceIds", activityInstanceIds);
+    ensureNotNull("activityInstanceIds", (Object[]) activityInstanceIds);
     this.activityInstanceIds = activityInstanceIds;
     return this;
   }
@@ -164,6 +205,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQueryImpl taskDeleteReasonLike(String taskDeleteReasonLike) {
     this.taskDeleteReasonLike = taskDeleteReasonLike;
+    return this;
+  }
+
+  public HistoricTaskInstanceQueryImpl taskAssigned() {
+    this.assigned = true;
+    return this;
+  }
+
+  public HistoricTaskInstanceQueryImpl taskUnassigned() {
+    this.unassigned = true;
     return this;
   }
 
@@ -232,8 +283,48 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueNotEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, true);
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery processVariableValueLike(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LIKE, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueLessThan(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false, true);
+    return this;
+  }
+
   public HistoricTaskInstanceQuery taskDefinitionKey(String taskDefinitionKey) {
-    this.taskDefinitionKey = taskDefinitionKey;
+    return taskDefinitionKeyIn(taskDefinitionKey);
+  }
+
+  public HistoricTaskInstanceQuery taskDefinitionKeyIn(String... taskDefinitionKeys) {
+    ensureNotNull(NotValidException.class, "taskDefinitionKeys", (Object[]) taskDefinitionKeys);
+    this.taskDefinitionKeys = taskDefinitionKeys;
     return this;
   }
 
@@ -247,6 +338,36 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  public HistoricTaskInstanceQuery taskInvolvedUser(String userId){
+    this.taskInvolvedUser = userId;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery taskInvolvedGroup(String groupId){
+    this.taskInvolvedGroup = groupId;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery taskHadCandidateUser(String userId){
+    this.taskHadCandidateUser = userId;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery taskHadCandidateGroup(String groupId){
+    this.taskHadCandidateGroup = groupId;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery withCandidateGroups() {
+    this.withCandidateGroups = true;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery withoutCandidateGroups() {
+    this.withoutCandidateGroups = true;
+    return this;
+  }
+
   public HistoricTaskInstanceQuery processUnfinished() {
     this.processUnfinished = true;
     return this;
@@ -257,6 +378,39 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     for(QueryVariableValue var : variables) {
       var.initialize(types);
     }
+  }
+
+  public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
+    ensureNotNull("name", name);
+    if(value == null || isBoolean(value)) {
+      // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
+      switch(operator) {
+        case GREATER_THAN:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'greater than' condition");
+        case LESS_THAN:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'less than' condition");
+        case GREATER_THAN_OR_EQUAL:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'greater than or equal' condition");
+        case LESS_THAN_OR_EQUAL:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
+        case LIKE:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+        default:
+          break;
+      }
+    }
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
+  }
+
+  protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
+    variables.add(taskQueryVariableValue);
+  }
+
+  private boolean isBoolean(Object value) {
+    if (value == null) {
+      return false;
+    }
+    return Boolean.class.isAssignableFrom(value.getClass()) || boolean.class.isAssignableFrom(value.getClass());
   }
 
   public HistoricTaskInstanceQuery taskDueDate(Date dueDate) {
@@ -287,6 +441,50 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   public HistoricTaskInstanceQuery taskFollowUpAfter(Date followUpAfter) {
     this.followUpAfter = followUpAfter;
     return this;
+  }
+
+  public HistoricTaskInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery finishedAfter(Date date) {
+    finished = true;
+    this.finishedAfter = date;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery finishedBefore(Date date) {
+    finished = true;
+    this.finishedBefore = date;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery startedAfter(Date date) {
+    this.startedAfter = date;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery startedBefore(Date date) {
+    this.startedBefore = date;
+    return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+      || (finished && unfinished)
+      ||(processFinished && processUnfinished)
+      || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
+      || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
+      || CompareUtil.areNotInAscendingOrder(dueAfter, dueDate, dueBefore)
+      || CompareUtil.areNotInAscendingOrder(followUpAfter, followUpDate, followUpBefore)
+      || CompareUtil.elementIsNotContainedInArray(processInstanceBusinessKey, processInstanceBusinessKeys);
   }
 
   // ordering /////////////////////////////////////////////////////////////////
@@ -391,10 +589,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  public HistoricTaskInstanceQuery orderByTenantId() {
+    return orderBy(HistoricTaskInstanceQueryProperty.TENANT_ID);
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getProcessInstanceBusinessKey() {
+    return processInstanceBusinessKey;
+  }
+
+  public String[] getProcessInstanceBusinessKeys() {
+    return processInstanceBusinessKeys;
+  }
+
+  public String getProcessInstanceBusinessKeyLike() {
+    return processInstanceBusinessKeyLike;
   }
 
   public String getExecutionId() {
@@ -407,6 +621,22 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public Boolean isAssigned() {
+    return assigned;
+  }
+
+  public Boolean isUnassigned() {
+    return unassigned;
+  }
+
+  public Boolean isWithCandidateGroups() {
+    return withCandidateGroups;
+  }
+
+  public Boolean isWithoutCandidateGroups() {
+    return withoutCandidateGroups;
   }
 
   public boolean isFinished() {
@@ -453,8 +683,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return taskId;
   }
 
-  public String getTaskDefinitionKey() {
-    return taskDefinitionKey;
+  public String[] getTaskDefinitionKeys() {
+    return taskDefinitionKeys;
   }
 
   public List<TaskQueryVariableValue> getVariables() {
@@ -493,4 +723,19 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return caseExecutionId;
   }
 
+  public Date getFinishedAfter() {
+    return finishedAfter;
+  }
+
+  public Date getFinishedBefore() {
+    return finishedBefore;
+  }
+
+  public Date getStartedAfter() {
+    return startedAfter;
+  }
+
+  public Date getStartedBefore() {
+    return startedBefore;
+  }
 }

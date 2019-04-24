@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.pvm.process;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -29,6 +33,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
+ * @author Christopher Zell
  */
 public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds {
 
@@ -137,6 +142,12 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
 
   public void setAsyncBefore(boolean isAsyncBefore) {
+    setAsyncBefore(isAsyncBefore, true);
+  }
+
+  public void setAsyncBefore(boolean isAsyncBefore, boolean exclusive) {
+    if (delegateAsyncBeforeUpdate != null)
+      delegateAsyncBeforeUpdate.updateAsyncBefore(isAsyncBefore, exclusive);
     this.isAsyncBefore = isAsyncBefore;
   }
 
@@ -145,6 +156,12 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
 
   public void setAsyncAfter(boolean isAsyncAfter) {
+    setAsyncAfter(isAsyncAfter, true);
+  }
+
+  public void setAsyncAfter(boolean isAsyncAfter, boolean exclusive) {
+    if (delegateAsyncAfterUpdate != null)
+      delegateAsyncAfterUpdate.updateAsyncAfter(isAsyncAfter, exclusive);
     this.isAsyncAfter = isAsyncAfter;
   }
 
@@ -161,7 +178,15 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
 
   public void setEventScope(ScopeImpl eventScope) {
+    if (this.eventScope != null) {
+      this.eventScope.eventActivities.remove(this);
+    }
+
     this.eventScope = eventScope;
+
+    if (eventScope != null) {
+      this.eventScope.eventActivities.add(this);
+    }
   }
 
   public PvmScope getLevelOfSubprocessScope() {
@@ -257,7 +282,62 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
 
   public boolean isTriggeredByEvent() {
-    Boolean isTriggeredByEvent = (Boolean) getProperty(BpmnParse.PROPERTYNAME_TRIGGERED_BY_EVENT);
+    Boolean isTriggeredByEvent = getProperties().get(BpmnProperties.TRIGGERED_BY_EVENT);
     return Boolean.TRUE.equals(isTriggeredByEvent);
+  }
+
+  //============================================================================
+  //===============================DELEGATES====================================
+  //============================================================================
+  /**
+   * The delegate for the async before attribute update.
+   */
+  protected AsyncBeforeUpdate delegateAsyncBeforeUpdate;
+  /**
+   * The delegate for the async after attribute update.
+   */
+  protected AsyncAfterUpdate delegateAsyncAfterUpdate;
+
+  public AsyncBeforeUpdate getDelegateAsyncBeforeUpdate() {
+    return delegateAsyncBeforeUpdate;
+  }
+
+  public void setDelegateAsyncBeforeUpdate(AsyncBeforeUpdate delegateAsyncBeforeUpdate) {
+    this.delegateAsyncBeforeUpdate = delegateAsyncBeforeUpdate;
+  }
+
+  public AsyncAfterUpdate getDelegateAsyncAfterUpdate() {
+    return delegateAsyncAfterUpdate;
+  }
+
+  public void setDelegateAsyncAfterUpdate(AsyncAfterUpdate delegateAsyncAfterUpdate) {
+    this.delegateAsyncAfterUpdate = delegateAsyncAfterUpdate;
+  }
+
+  /**
+   * Delegate interface for the asyncBefore property update.
+   */
+  public interface AsyncBeforeUpdate {
+    /**
+     * Method which is called if the asyncBefore property should be updated.
+     *
+     * @param asyncBefore the new value for the asyncBefore flag
+     * @param exclusive the exclusive flag
+     */
+    public void updateAsyncBefore(boolean asyncBefore, boolean exclusive);
+  }
+
+  /**
+   * Delegate interface for the asyncAfter property update
+   */
+  public interface AsyncAfterUpdate {
+
+    /**
+     * Method which is called if the asyncAfter property should be updated.
+     *
+     * @param asyncAfter the new value for the asyncBefore flag
+     * @param exclusive the exclusive flag
+     */
+    public void updateAsyncAfter(boolean asyncAfter, boolean exclusive);
   }
 }

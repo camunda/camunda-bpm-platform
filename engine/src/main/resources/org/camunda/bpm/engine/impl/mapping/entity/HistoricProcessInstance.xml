@@ -1,81 +1,137 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
 
+  <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CleanableHistoricProcessInstanceReportResultEntity">
+    <result property="cleanableProcessInstanceCount" column="CLEANABLE_" jdbcType="BIGINT" />
+    <result property="finishedProcessInstanceCount" column="FINISHED_" jdbcType="BIGINT" />
+    <result property="processDefinitionId" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR" />
+    <result property="processDefinitionVersion" column="VERSION_" jdbcType="VARCHAR" />
+    <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="BIGINT" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+  </resultMap>
+
   <!-- HISTORIC PROCESS INSTANCE INSERT -->
 
-  <insert id="insertHistoricProcessInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity">
-      insert into ${prefix}ACT_HI_PROCINST (
-        ID_,
-        PROC_INST_ID_,
-        BUSINESS_KEY_,
-        PROC_DEF_KEY_,
-        PROC_DEF_ID_,
-        START_TIME_,
-        END_TIME_,
-        DURATION_,
-        START_USER_ID_,
-        START_ACT_ID_,
-        END_ACT_ID_,
-        SUPER_PROCESS_INSTANCE_ID_,
-        SUPER_CASE_INSTANCE_ID_,
-        CASE_INST_ID_,
-        DELETE_REASON_
-      ) values (
-        #{id ,jdbcType=VARCHAR},
-        #{processInstanceId, jdbcType=VARCHAR},
-        #{businessKey, jdbcType=VARCHAR},
-        #{processDefinitionKey, jdbcType=VARCHAR},
-        #{processDefinitionId, jdbcType=VARCHAR},
-        #{startTime, jdbcType=TIMESTAMP},
-        #{endTime, jdbcType=TIMESTAMP},
-        #{durationInMillis ,jdbcType=BIGINT},
-        #{startUserId, jdbcType=VARCHAR},
-        #{startActivityId, jdbcType=VARCHAR},
-        #{endActivityId, jdbcType=VARCHAR},
-        #{superProcessInstanceId, jdbcType=VARCHAR},
-        #{superCaseInstanceId, jdbcType=VARCHAR},
-        #{caseInstanceId, jdbcType=VARCHAR},
-        #{deleteReason, jdbcType=VARCHAR}
-      )
+  <insert id="insertHistoricProcessInstanceEvent"
+          parameterType="org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity">
+    insert into ${prefix}ACT_HI_PROCINST (
+      ID_,
+      PROC_INST_ID_,
+      BUSINESS_KEY_,
+      PROC_DEF_KEY_,
+      PROC_DEF_ID_,
+      START_TIME_,
+      END_TIME_,
+      REMOVAL_TIME_,
+      DURATION_,
+      START_USER_ID_,
+      START_ACT_ID_,
+      END_ACT_ID_,
+      SUPER_PROCESS_INSTANCE_ID_,
+      ROOT_PROC_INST_ID_,
+      SUPER_CASE_INSTANCE_ID_,
+      CASE_INST_ID_,
+      DELETE_REASON_,
+      TENANT_ID_,
+      STATE_
+    ) values (
+      #{id ,jdbcType=VARCHAR},
+      #{processInstanceId, jdbcType=VARCHAR},
+      #{businessKey, jdbcType=VARCHAR},
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
+      #{startTime, jdbcType=TIMESTAMP},
+      #{endTime, jdbcType=TIMESTAMP},
+      #{removalTime, jdbcType=TIMESTAMP},
+      #{durationInMillis ,jdbcType=BIGINT},
+      #{startUserId, jdbcType=VARCHAR},
+      #{startActivityId, jdbcType=VARCHAR},
+      #{endActivityId, jdbcType=VARCHAR},
+      #{superProcessInstanceId, jdbcType=VARCHAR},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
+      #{superCaseInstanceId, jdbcType=VARCHAR},
+      #{caseInstanceId, jdbcType=VARCHAR},
+      #{deleteReason, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
+      #{state, jdbcType=VARCHAR}
+    )
   </insert>
 
   <!-- HISTORIC PROCESS INSTANCE UPDATE -->
 
-  <update id="updateHistoricProcessInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+  <update id="updateHistoricProcessInstanceEvent"
+          parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
     update ${prefix}ACT_HI_PROCINST set
-      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
+    PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+    PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+    BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+    END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
+    DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+    SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId, jdbcType=VARCHAR},
+    STATE_ = #{state, jdbcType=VARCHAR}
 
-      <if test="endTime!=null">
+    <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
-      </if>
+    </if>
+
+    <if test="removalTime!=null">
+      , REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    </if>
 
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricProcessInstanceEventsByRootProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_PROCINST set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricProcessInstanceByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_PROCINST
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <!-- HISTORIC PROCESS INSTANCE REMOVAL TIME SELECT -->
+
+  <select id="selectHistoricProcessInstanceForRemovalTimeBatch" parameterType="java.lang.String"
+          resultMap="historicProcessInstanceResultMap">
+    select START_TIME_, END_TIME_, PROC_DEF_ID_ from ${prefix}ACT_HI_PROCINST
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
 
-  <select id="selectHistoricProcessInstanceEvent" parameterType="java.lang.String" resultMap="historicProcessInstanceResultMap">
-    select HPI.START_TIME_ from ${prefix}ACT_HI_PROCINST HPI
+  <select id="selectHistoricProcessInstanceEvent" parameterType="java.lang.String"
+          resultMap="historicProcessInstanceResultMap">
+    select HPI.START_TIME_, HPI.REMOVAL_TIME_ from ${prefix}ACT_HI_PROCINST HPI
     where HPI.ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
@@ -85,24 +141,72 @@
     delete from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{processInstanceId}
   </delete>
 
+  <delete id="deleteHistoricProcessInstances">
+    delete
+    from ${prefix}ACT_HI_PROCINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'PROC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </delete>
+
+  <delete id="deleteHistoricProcessInstancesByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_PROCINST
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricProcessInstancesByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_PROCINST
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricProcessInstancesByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_PROCINST
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_PROCINST
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
+  </delete>
+
   <!-- HISTORIC PROCESS INSTANCE RESULT MAP -->
 
-  <resultMap id="historicProcessInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+  <resultMap id="historicProcessInstanceResultMap"
+             type="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR"/>
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR"/>
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
-    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
-    <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
-    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
-    <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
-    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
-    <result property="endActivityId" column="END_ACT_ID_" jdbcType="VARCHAR" />
-    <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
-    <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
-    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
-    <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionVersion" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT"/>
+    <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR"/>
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR"/>
+    <result property="endActivityId" column="END_ACT_ID_" jdbcType="VARCHAR"/>
+    <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="state" column="STATE_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
@@ -111,47 +215,84 @@
     select * from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{processInstanceId}
   </select>
 
-  <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId"
+            parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_HI_PROCINST
     where PROC_DEF_ID_ = #{parameter}
   </select>
 
-  <select id="selectHistoricProcessInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
-  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+  <select id="selectHistoricProcessInstancesByQueryCriteria"
+          parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl"
+          resultMap="historicProcessInstanceResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
 
-  <select id="selectHistoricProcessInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
+  <select id="selectHistoricProcessInstanceIdsByQueryCriteria"
+          parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl"
+          resultType="string">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.ID_
+    ${limitBetween}
+    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricProcessInstanceCountByQueryCriteria"
+          parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_PROCINST RES
-    <if test="processKeyNotIn != null || processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null">
-      inner join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
+
+    from (
+
+    SELECT SELF.*, DEF.NAME_, DEF.VERSION_
+    FROM ${prefix}ACT_HI_PROCINST SELF
+
+    LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
+    ON SELF.PROC_DEF_ID_ = DEF.ID_
+
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+        AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
     </if>
+
+
+    <if test="withIncidents || withRootIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null || incidentType != null">
+        inner join ${prefix}ACT_HI_INCIDENT INC on SELF.PROC_INST_ID_ = INC.PROC_INST_ID_
+    </if>
+
+    <if test="(executedActivityIds != null and executedActivityIds.length > 0) || (activeActivityIds != null and activeActivityIds.length > 0)">
+      LEFT JOIN ${prefix}ACT_HI_ACTINST HAI
+      ON HAI.PROC_INST_ID_ = SELF.ID_
+    </if>
+
     <where>
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        SELF.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
-        and RES.PROC_INST_ID_ in
+        and SELF.PROC_INST_ID_ in
         <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{item}
+            #{item, jdbcType=VARCHAR}
         </foreach>
       </if>
       <if test="caseInstanceId != null">
-        and RES.CASE_INST_ID_ = #{caseInstanceId}
+        and SELF.CASE_INST_ID_ = #{caseInstanceId}
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and SELF.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="processDefinitionKey != null">
         and DEF.KEY_ = #{processDefinitionKey}
@@ -160,110 +301,259 @@
         and DEF.NAME_ = #{processDefinitionName}
       </if>
       <if test="processDefinitionNameLike != null">
-        and DEF.NAME_ like #{processDefinitionNameLike}
+        and DEF.NAME_ like #{processDefinitionNameLike} ESCAPE ${escapeChar}
       </if>
       <if test="businessKey != null">
-        and RES.BUSINESS_KEY_ = #{businessKey}
+        and SELF.BUSINESS_KEY_ = #{businessKey}
       </if>
       <if test="businessKeyLike != null">
-        and RES.BUSINESS_KEY_ like #{businessKeyLike}
+        and SELF.BUSINESS_KEY_ like #{businessKeyLike} ESCAPE ${escapeChar}
       </if>
 
       <if test="startedBefore != null">
-        and RES.START_TIME_ &lt;= #{startedBefore}
+        and SELF.START_TIME_ &lt;= #{startedBefore}
       </if>
       <if test="startedAfter != null">
-        and RES.START_TIME_ &gt;= #{startedAfter}
+        and SELF.START_TIME_ &gt;= #{startedAfter}
       </if>
       <if test="finishedBefore != null">
-        and RES.END_TIME_ &lt;= #{finishedBefore}
+        and SELF.END_TIME_ &lt;= #{finishedBefore}
       </if>
       <if test="finishedAfter != null">
-        and RES.END_TIME_ &gt;= #{finishedAfter}
+        and SELF.END_TIME_ &gt;= #{finishedAfter}
       </if>
       <if test="processKeyNotIn != null">
         <foreach collection="processKeyNotIn" index="index" item="procDefKey">
-        and DEF.KEY_ not like #{procDefKey}
-      </foreach>
+          and DEF.KEY_ not like #{procDefKey} ESCAPE ${escapeChar}
+        </foreach>
       </if>
+      <if test="state != null">
+        and STATE_ = #{state}
+      </if>
+      
 
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="startDateOn">
-        and RES.START_TIME_ &gt;= #{startDateOnBegin}
-        and RES.START_TIME_ &lt;= #{startDateOnEnd}
+        and SELF.START_TIME_ &gt;= #{startDateOnBegin}
+        and SELF.START_TIME_ &lt;= #{startDateOnEnd}
       </if>
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="finishDateOn">
-        and RES.END_TIME_ &gt;= #{finishDateOnBegin}
-        and RES.END_TIME_ &lt;= #{finishDateOnEnd}
+        and SELF.END_TIME_ &gt;= #{finishDateOnBegin}
+        and SELF.END_TIME_ &lt;= #{finishDateOnEnd}
       </if>
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="finishDateBy">
-        and RES.END_TIME_ &lt;= #{finishDateBy}
+        and SELF.END_TIME_ &lt;= #{finishDateBy}
       </if>
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="startDateBy">
-        and RES.START_TIME_ &gt;= #{startDateBy}
+        and SELF.START_TIME_ &gt;= #{startDateBy}
       </if>
 
       <if test="unfinished">
-        and RES.END_TIME_ IS NULL
+        and SELF.END_TIME_ IS NULL
       </if>
       <if test="finished">
-        and RES.END_TIME_ is not NULL
+        and SELF.END_TIME_ is not NULL
       </if>
+
+      <if test="incidentType != null">
+        and INC.INCIDENT_TYPE_ = #{incidentType}
+      </if>
+      <if test="incidentMessage != null">
+        and INC.INCIDENT_MSG_ = #{incidentMessage}
+      </if>
+
+      <if test="incidentMessageLike != null">
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE ${escapeChar}
+      </if>
+
+      <if test="incidentStatus == 'open'">
+        and INC.END_TIME_ is null
+      </if>
+
+      <if test="incidentStatus == 'resolved'">
+        and INC.END_TIME_ is not null
+      </if>
+
+	  <if test="withRootIncidents">
+        and INC.ID_ = INC.ROOT_CAUSE_INCIDENT_ID_
+	  </if>
       <if test="startedBy != null">
-        and RES.START_USER_ID_ = #{startedBy}
+        and SELF.START_USER_ID_ = #{startedBy}
+      </if>
+
+      <if test="isRootProcessInstances">
+        and SELF.SUPER_PROCESS_INSTANCE_ID_ is null
       </if>
       <if test="superProcessInstanceId != null">
-        and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
+        and SELF.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
       </if>
       <if test="subProcessInstanceId != null">
-        and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+        and SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where
+        PROC_INST_ID_ = #{subProcessInstanceId})
       </if>
       <if test="superCaseInstanceId != null">
-        and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
+        and SELF.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
       </if>
       <if test="subCaseInstanceId != null">
-        and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
+        and SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where
+        CASE_INST_ID_ = #{subCaseInstanceId})
       </if>
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and EXISTS (
-          select
-            ID_
-          from
-            ${prefix}ACT_HI_VARINST
-          WHERE
-            NAME_= #{queryVariableValue.name}
-          AND PROC_INST_ID_ = RES.PROC_INST_ID_
+        select
+        ID_
+        from
+        ${prefix}ACT_HI_VARINST
+        WHERE
+        NAME_= #{queryVariableValue.name}
+        AND PROC_INST_ID_ = SELF.PROC_INST_ID_
 
         <bind name="varTypeField" value="'VAR_TYPE_'"/>
         <bind name="varPrefix" value="''"/>
         <if test="queryVariableValue.valueConditions != null">
-          and 
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+          and <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
         </if>
         )
       </foreach>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <if test="executedActivityAfter != null || executedActivityBefore != null">
+        AND EXISTS (
+          SELECT *
+          FROM ${prefix}ACT_HI_ACTINST
+          <where>
+            PROC_INST_ID_ = SELF.ID_
+            <if test="executedActivityAfter != null">
+              AND (START_TIME_ &gt;= #{executedActivityAfter} OR END_TIME_ &gt;= #{executedActivityAfter})
+            </if>
+            <if test="executedActivityBefore != null">
+              AND (START_TIME_ &lt;= #{executedActivityBefore} OR END_TIME_ &lt;= #{executedActivityBefore})
+            </if>
+          </where>
+          )
+      </if>
+
+      <if test="executedActivityIds != null and executedActivityIds.length > 0">
+        AND HAI.END_TIME_ IS NOT NULL
+        AND HAI.ACT_ID_ IN
+        <foreach item="activityId" index="index" collection="executedActivityIds" open="(" separator="," close=")">
+          #{activityId}
+        </foreach>
+      </if>
+
+      <if test="activeActivityIds != null and activeActivityIds.length > 0">
+        AND HAI.END_TIME_ IS NULL
+        AND HAI.ACT_ID_ IN
+        <foreach item="activityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
+          #{activityId}
+        </foreach>
+      </if>
+
+      <if test="executedJobAfter != null || executedJobBefore != null">
+        AND EXISTS (
+        SELECT *
+        FROM ${prefix}ACT_HI_JOB_LOG
+        <where>
+          PROCESS_INSTANCE_ID_ = SELF.ID_
+          <if test="executedJobAfter != null">
+            AND TIMESTAMP_ &gt;= #{executedJobAfter}
+          </if>
+          <if test="executedJobBefore != null">
+            AND TIMESTAMP_ &lt;= #{executedJobBefore}
+          </if>
+        </where>
+        )
+      </if>
+
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and SELF.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and SELF.TENANT_ID_ is null
+        </if>
+      </if>
+
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        and (
+        (SELF.PROC_DEF_KEY_ is not null
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+        ) or SELF.PROC_DEF_KEY_ is null
+        )
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
 
     </where>
+
+    ) RES
+
   </sql>
 
-  <select id="selectHistoricProcessInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
+  <select id="selectHistoricProcessInstanceByNativeQuery" parameterType="java.util.Map"
+          resultMap="historicProcessInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
-      ${limitBefore}
+        ${limitBefore}
     </if>
     ${sql}
     <if test="resultType == 'LIST_PAGE'">
-      ${limitAfter}
+        ${limitAfter}
     </if>
   </select>
 
-  <select id="selectHistoricProcessInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
+  <!-- Select ids for async history cleanup -->
+  <sql id="selectHistoricProcessInstanceIdsForCleanupSql">
+    <bind name="days" value="'pd.HISTORY_TTL_'"/>
+    <bind name="date" value="'pi.END_TIME_'"/>
+    <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    FROM ${prefix}ACT_HI_PROCINST pi, ${prefix}ACT_RE_PROCDEF pd
+    where
+        pi.PROC_DEF_ID_ = pd.ID_
+        AND not pi.END_TIME_ is NULL
+        AND not pd.HISTORY_TTL_ is NULL
+        AND ${dayComparator}
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <select id="selectHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.END_TIME_
+    <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </select>
+
+  <select id="selectHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_, pi.END_TIME_
+    <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </select>
+
+  <!-- DB2 or MSSQL -->
+  <select id="selectHistoricProcessInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map"
+          resultMap="historicProcessInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
-        ${limitBeforeNativeQuery}
+      ${limitBeforeNativeQuery}
     </if>
     ${sql}
     <if test="resultType == 'LIST_PAGE'">
@@ -274,4 +564,171 @@
   <select id="selectHistoricProcessInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
+
+  <!-- Select History Cleanup Report Entities -->
+  <select id="selectFinishedProcessInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultType="long">
+    SELECT COUNT(DISTINCT RES.ID_)
+    <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedProcessInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    SELECT ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFinishedProcessInstancesReportEntitiesSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectFinishedProcessInstancesReportEntitiesSql">
+    <bind name="days" value="'RES.HISTORY_TTL_'"/>
+    <bind name="date" value="'PI.END_TIME_'"/>
+
+    FROM (
+
+      SELECT RES.ID_,
+        RES.KEY_,
+        RES.NAME_,
+        RES.VERSION_,
+        RES.HISTORY_TTL_,
+        RES.TENANT_ID_,
+        F.FINISHED_,
+        <choose>
+          <when test="isHistoryCleanupStrategyRemovalTimeBased">
+            SUM(CASE WHEN PI.REMOVAL_TIME_ is not null and PI.REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_
+          </when>
+          <otherwise>
+            SUM(CASE WHEN RES.HISTORY_TTL_ is not null and PI.END_TIME_ is not null and (RES.HISTORY_TTL_ = 0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
+          </otherwise>
+        </choose>
+      FROM
+        (
+          SELECT DISTINCT RES.*
+          FROM ${prefix}ACT_RE_PROCDEF RES
+          <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+            AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
+          </if>
+          <where>
+
+            <if test="processDefinitionIdIn != null &amp;&amp; processDefinitionIdIn.length > 0">
+              RES.ID_ IN
+              <foreach item="processInstanceId" index="index" collection="processDefinitionIdIn" open="(" separator="," close=")">
+                  #{processInstanceId}
+              </foreach>
+            </if>
+
+            <if test="processDefinitionKeyIn != null &amp;&amp; processDefinitionKeyIn.length > 0">
+              and RES.KEY_ IN
+              <foreach item="processInstanceKey" index="index" collection="processDefinitionKeyIn" open="(" separator="," close=")">
+                  #{processInstanceKey}
+              </foreach>
+            </if>
+
+            <if test="isTenantIdSet">
+              <if test="tenantIdIn != null &amp;&amp; tenantIdIn.length > 0">
+                and RES.TENANT_ID_ in
+                <foreach item="tenantId" index="index" collection="tenantIdIn"
+                         open="(" separator="," close=")">
+                  #{tenantId}
+                </foreach>
+              </if>
+              <if test="tenantIdIn == null">
+                and RES.TENANT_ID_ is null
+              </if>
+            </if>
+
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+          </where>
+        ) RES
+        LEFT JOIN ${prefix}ACT_HI_PROCINST PI
+        ON PI.PROC_DEF_ID_ = RES.ID_
+        LEFT JOIN (
+          SELECT COUNT(PI.ID_) AS FINISHED_, PI.PROC_DEF_ID_
+          FROM ${prefix}ACT_HI_PROCINST PI
+          WHERE PI.END_TIME_ IS NOT NULL
+          GROUP BY PI.PROC_DEF_ID_
+          ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
+
+        GROUP BY RES.ID_,
+          RES.KEY_,
+          RES.NAME_,
+          RES.VERSION_,
+          RES.HISTORY_TTL_,
+          RES.TENANT_ID_,
+          F.FINISHED_
+
+    ) RES
+    <choose>
+      <when test="isCompact &amp;&amp; isHistoryCleanupStrategyRemovalTimeBased">
+        WHERE (RES.CLEANABLE_ > 0 OR FINISHED_ > 0)
+      </when>
+      <when test="isCompact &amp;&amp; !isHistoryCleanupStrategyRemovalTimeBased">
+        WHERE FINISHED_ > 0
+      </when>
+    </choose>
+
+  </sql>
+
+  <select id="selectCompletedHistoricProcessInstancePage" resultMap="historicProcessInstanceResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+
+    select RES.*
+    from (
+      ${optimizeLimitBeforeWithoutOffset}
+      SELECT ${limitBeforeWithoutOffset} SELF.*, DEF.NAME_, DEF.VERSION_
+      FROM ${prefix}ACT_HI_PROCINST SELF
+
+      LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
+      ON SELF.PROC_DEF_ID_ = DEF.ID_
+
+      <where>
+        <if test="parameter.finishedAfter != null">
+          and SELF.END_TIME_ &gt; #{parameter.finishedAfter}
+        </if>
+        <if test="test=parameter.finishedAt != null">
+          and SELF.END_TIME_ = #{parameter.finishedAt}
+        </if>
+        <if test="parameter.finishedAfter == null and parameter.finishedAt == null">
+          and SELF.END_TIME_ is not null
+        </if>
+      </where>
+
+      ORDER BY SELF.END_TIME_ ASC
+      ${optimizeLimitAfterWithoutOffset}
+    ) RES
+
+  </select>
+
+  <select id="selectRunningHistoricProcessInstancePage" resultMap="historicProcessInstanceResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+    select RES.*
+    from (
+      ${optimizeLimitBeforeWithoutOffset}
+      SELECT ${limitBeforeWithoutOffset} SELF.*, DEF.NAME_, DEF.VERSION_
+      FROM ${prefix}ACT_HI_PROCINST SELF
+
+      LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
+      ON SELF.PROC_DEF_ID_ = DEF.ID_
+
+      <where>
+        <if test="parameter.startedAfter != null">
+          and SELF.START_TIME_ &gt; #{parameter.startedAfter}
+        </if>
+        <if test="test=parameter.startedAt != null">
+          and SELF.START_TIME_ = #{parameter.startedAt}
+        </if>
+        and SELF.END_TIME_ is null
+      </where>
+
+      ORDER BY SELF.START_TIME_ ASC
+      ${optimizeLimitAfterWithoutOffset}
+
+    ) RES
+
+  </select>
+
 </mapper>

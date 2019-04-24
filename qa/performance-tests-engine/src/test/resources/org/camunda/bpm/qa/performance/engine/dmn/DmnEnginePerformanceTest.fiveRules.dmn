@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" expressionLanguage="http://www.omg.org/spec/FEEL/20140401" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" typeLanguage="http://www.omg.org/spec/FEEL/20140401">
+  <decision id="fiveRules" name="Benchmark">
+    <decisionTable hitPolicy="COLLECT" id="decisionTable" preferredOrientation="Rule-as-Row">
+      <input id="input1" label="number of matched rules">
+        <inputExpression id="inputExpression1" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="rule matched?" name="" typeRef="string"/>
+      <rule id="rule_02814c40-be4c-4179-a9b6-2d5817002e3c">
+        <inputEntry id="inputEntry_415e3476-dd12-4bcd-8bc0-24d55cd2d602">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_967ef84e-548e-470a-be1c-329a2048fc0e">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_84aca674-2983-4b26-9a7b-648e19657d21">
+        <inputEntry id="inputEntry_53ca1d68-86e9-4f8a-b3f5-d0ed99e7efde">
+          <text>&gt; 0.2</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_7966ef90-1c9d-48a7-b70b-f33c11f0e918">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_72367251-e7ca-4f3a-80a0-71d3f322eab9">
+        <inputEntry id="inputEntry_4c17f540-894e-457d-8d52-12c67ba75b19">
+          <text>&gt; 0.4</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4a19f9c5-27c5-4342-9a97-0218fe7e1270">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_8406d775-a2c3-405e-b57f-b14edb81f267">
+        <inputEntry id="inputEntry_ecdef565-7bc3-4c52-809e-9a7fbf391788">
+          <text>&gt; 0.6</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_0b5e8536-12a6-495e-949e-e5eece993937">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e2347d3e-b047-4535-8304-aeecba93d27b">
+        <inputEntry id="inputEntry_22116b67-013f-40d0-ba37-b42855ccf608">
+          <text>&gt; 0.8</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_353ea155-5cec-4b96-99ee-5102fb75e905">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

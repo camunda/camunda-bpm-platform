@@ -5,14 +5,14 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
-    <version>2.5</version>
+    <version>3.3</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-bom</artifactId>
-  <version>7.4.0-SNAPSHOT</version>
+  <version>7.11.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Bom</name>
   <url>http://camunda.org</url>
@@ -32,14 +32,14 @@
   </organization>
 
   <properties>
-    <version.mybatis>3.2.8</version.mybatis>
+    <version.mybatis>3.4.4</version.mybatis>
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.1.2</version.uuid-generator>
-    <version.camunda.commons>1.0.6</version.camunda.commons>
-    <version.camunda.connect>1.0.1</version.camunda.connect>
-    <version.camunda.spin>1.1.0</version.camunda.spin>
-    <version.camunda.template-engines>1.0.1</version.camunda.template-engines>
-    <version.camunda.ee.xslt-plugin>1.0.2</version.camunda.ee.xslt-plugin>
+    <version.camunda.commons>1.7.0</version.camunda.commons>
+    <version.camunda.connect>1.1.3</version.camunda.connect>
+    <version.camunda.spin>1.6.6</version.camunda.spin>
+    <version.camunda.template-engines>1.1.0</version.camunda.template-engines>
+    <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
   </properties>
 
   <dependencyManagement>
@@ -80,6 +80,11 @@
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-rest-jaxrs2</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -128,6 +133,29 @@
         <artifactId>camunda-engine-rest</artifactId>
         <version>${project.version}</version>
         <classifier>classes</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.webapp</groupId>
+        <artifactId>camunda-webapp-webjar</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.webapp</groupId>
+        <artifactId>camunda-webapp</artifactId>
+        <version>${project.version}</version>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.webapp</groupId>
+        <artifactId>camunda-webapp</artifactId>
+        <version>${project.version}</version>
+        <type>jar</type>
+        <classifier>classes</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.webapp</groupId>
+        <artifactId>camunda-webapp-webjar-ee</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <!-- dmn engine -->
@@ -201,4 +229,11 @@
     <system>Jira</system>
     <url>https://app.camunda.com/jira/browse/CAM/</url>
   </issueManagement>
+
+  <repositories>
+    <repository>
+      <id>fix-maven-snapshots-issue-with-nexus</id>
+      <url>allow-parent-pom-resolving-when-snapshot</url>
+    </repository>
+  </repositories>
 </project>

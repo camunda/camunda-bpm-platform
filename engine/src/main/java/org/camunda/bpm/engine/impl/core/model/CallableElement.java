@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +18,6 @@ package org.camunda.bpm.engine.impl.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
@@ -30,10 +33,12 @@ public class CallableElement extends BaseCallableElement {
   protected ParameterValueProvider businessKeyValueProvider;
   protected List<CallableElementParameter> inputs;
   protected List<CallableElementParameter> outputs;
+  protected List<CallableElementParameter> outputsLocal;
 
   public CallableElement() {
     this.inputs = new ArrayList<CallableElementParameter>();
     this.outputs = new ArrayList<CallableElementParameter>();
+    this.outputsLocal = new ArrayList<CallableElementParameter>();
   }
 
   // definitionKey ////////////////////////////////////////////////////////////////
@@ -91,17 +96,30 @@ public class CallableElement extends BaseCallableElement {
     return outputs;
   }
 
+  public List<CallableElementParameter> getOutputsLocal() {
+    return outputsLocal;
+  }
+
   public void addOutput(CallableElementParameter output) {
     outputs.add(output);
+  }
+
+  public void addOutputLocal(CallableElementParameter output) {
+    outputsLocal.add(output);
   }
 
   public void addOutputs(List<CallableElementParameter> outputs) {
     this.outputs.addAll(outputs);
   }
 
-  public VariableMap getOutputVariables(VariableScope variableScope) {
+  public VariableMap getOutputVariables(VariableScope calledElementScope) {
     List<CallableElementParameter> outputs = getOutputs();
-    return getVariables(outputs, variableScope);
+    return getVariables(outputs, calledElementScope);
+  }
+
+  public VariableMap getOutputVariablesLocal(VariableScope calledElementScope) {
+    List<CallableElementParameter> outputs = getOutputsLocal();
+    return getVariables(outputs, calledElementScope);
   }
 
   // variables //////////////////////////////////////////////////////////////////
@@ -110,17 +128,7 @@ public class CallableElement extends BaseCallableElement {
     VariableMap result = Variables.createVariables();
 
     for (CallableElementParameter param : params) {
-
-      if (param.isAllVariables()) {
-        Map<String, Object> allVariables = variableScope.getVariables();
-        result.putAll(allVariables);
-
-      } else {
-        String targetVariableName = param.getTarget();
-        Object value = param.getSource(variableScope);
-        result.put(targetVariableName, value);
-      }
-
+      param.applyTo(variableScope, result);
     }
 
     return result;

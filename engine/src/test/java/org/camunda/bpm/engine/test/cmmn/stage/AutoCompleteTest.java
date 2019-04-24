@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,12 +16,20 @@
  */
 package org.camunda.bpm.engine.test.cmmn.stage;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Roman Smirnov
@@ -132,9 +144,6 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
         .activityId("PI_Stage_1")
         .singleResult()
         .getId();
-
-    // when (1)
-    manualStart(stageId);
 
     // then (1)
     CaseExecution stage = executionQuery
@@ -253,7 +262,6 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_3")
         .singleResult()
         .getId();
-    manualStart(humanTask3Id);
 
     // when (1)
     complete(humanTask3Id);
@@ -269,7 +277,6 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_2")
         .singleResult()
         .getId();
-    manualStart(humanTask2Id);
 
     // when (2)
     complete(humanTask2Id);
@@ -335,6 +342,12 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
+    CaseExecution humanTask2 = executionQuery
+      .activityId("PI_HumanTask_2")
+      .singleResult();
+
+    manualStart(humanTask2.getId());
+ 
     // when
     complete(humanTask1Id);
 
@@ -370,6 +383,26 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     CaseInstance caseInstance = instanceQuery.singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isCompleted());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.cmmn",
+    "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.bpmn"
+  })
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testProcessTasksOnStage() {
+    // given
+
+    // when
+    createCaseInstanceByKey(CASE_DEFINITION_KEY);
+
+    List<HistoricCaseActivityInstance> historicCaseActivityInstances =
+      historyService.createHistoricCaseActivityInstanceQuery()
+      .caseActivityType("processTask")
+      .list();
+
+    // then
+    assertThat(historicCaseActivityInstances.size(), is(2));
   }
 
 }

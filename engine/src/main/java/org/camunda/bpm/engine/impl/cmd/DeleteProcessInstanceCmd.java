@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,57 +16,36 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
+import java.io.Serializable;
 
 
 /**
  * @author Joram Barrez
  */
-public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
+public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
-  protected String deleteReason;
-  protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
+  protected boolean skipSubprocesses;
 
-  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
+
+  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
+      boolean skipIoMappings, boolean skipSubprocesses, boolean failIfNotExists) {
     this.processInstanceId = processInstanceId;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
+    this.externallyTerminated = externallyTerminated;
+    this.skipIoMappings = skipIoMappings;
+    this.skipSubprocesses = skipSubprocesses;
+    this.failIfNotExists = failIfNotExists;
   }
 
   public Void execute(CommandContext commandContext) {
-    ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
-
-    // fetch process instance
-    ExecutionManager executionManager = commandContext.getExecutionManager();
-    ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
-    ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
-
-    // check authorization
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkDeleteProcessInstance(execution);
-
-    // delete process instance
-    commandContext
-      .getExecutionManager()
-      .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners);
-
-    // create user operation log
-    commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
-          null, null, PropertyChange.EMPTY_CHANGE);
+    deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
 
     return null;
   }

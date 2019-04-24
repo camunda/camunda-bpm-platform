@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,25 +19,23 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.impl.db.PermissionCheck;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
+import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
-import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author roman.smirnov
  */
 public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<VariableInstanceQuery, VariableInstance> implements VariableInstanceQuery, Serializable {
 
-  private final static Logger LOGGER = Logger.getLogger(VariableInstanceQuery.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
@@ -48,12 +50,10 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected String[] taskIds;
   protected String[] variableScopeIds;
   protected String[] activityInstanceIds;
+  protected String[] tenantIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
-
-  // its a workaround to check authorization for variable instances associated with a standalone tasks
-  protected List<PermissionCheck> taskPermissionChecks = new ArrayList<PermissionCheck>();
 
   public VariableInstanceQueryImpl() { }
 
@@ -127,6 +127,12 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     return this;
   }
 
+  public VariableInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   // ordering ////////////////////////////////////////////////////
 
   public VariableInstanceQuery orderByVariableName() {
@@ -144,8 +150,19 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     return this;
   }
 
+  public VariableInstanceQuery orderByTenantId() {
+    orderBy(VariableInstanceQueryProperty.TENANT_ID);
+    return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(variableName, variableNames);
+  }
+
   // results ////////////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -154,6 +171,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
       .findVariableInstanceCountByQueryCriteria(this);
   }
 
+  @Override
   public List<VariableInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -175,7 +193,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
         } catch(Exception t) {
           // do not fail if one of the variables fails to load
-          LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
+          LOG.exceptionWhileGettingValueForVariable(t);
         }
       }
 
@@ -186,7 +204,8 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   protected boolean shouldFetchValue(VariableInstanceEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
+    return isByteArrayFetchingEnabled
+        || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
   }
 
   // getters ////////////////////////////////////////////////////
@@ -234,19 +253,4 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
   }
-
-  // getter/setter for authorization check
-
-  public List<PermissionCheck> getTaskPermissionChecks() {
-    return taskPermissionChecks;
-  }
-
-  public void setTaskPermissionChecks(List<PermissionCheck> taskPermissionChecks) {
-    this.taskPermissionChecks = taskPermissionChecks;
-  }
-
-  public void addTaskPermissionCheck(PermissionCheck permissionCheck) {
-    taskPermissionChecks.add(permissionCheck);
-  }
-
 }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,11 +32,13 @@ public class CmmnSentryDeclaration implements Serializable {
 
   public static final String PLAN_ITEM_ON_PART = "planItemOnPart";
   public static final String IF_PART = "ifPart";
+  public static final String VARIABLE_ON_PART = "variableOnPart";
 
   protected String id;
 
   protected Map<String, List<CmmnOnPartDeclaration>> onPartMap = new HashMap<String, List<CmmnOnPartDeclaration>>();
   protected List<CmmnOnPartDeclaration> onParts = new ArrayList<CmmnOnPartDeclaration>();
+  protected List<CmmnVariableOnPartDeclaration> variableOnParts = new ArrayList<CmmnVariableOnPartDeclaration>();
 
   protected CmmnIfPartDeclaration ifPart;
 
@@ -99,6 +105,25 @@ public class CmmnSentryDeclaration implements Serializable {
     onPartDeclarations.add(onPart);
     onParts.add(onPart);
 
+  }
+
+  // variableOnParts
+  public void addVariableOnParts(CmmnVariableOnPartDeclaration variableOnPartDeclaration) {
+    variableOnParts.add(variableOnPartDeclaration);
+  }
+
+  public boolean hasVariableOnPart(String variableEventName, String variableName) {
+    for(CmmnVariableOnPartDeclaration variableOnPartDeclaration: variableOnParts) {
+      if(variableOnPartDeclaration.getVariableEvent().equals(variableEventName) &&
+         variableOnPartDeclaration.getVariableName().equals(variableName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public List<CmmnVariableOnPartDeclaration> getVariableOnParts() {
+    return variableOnParts;    
   }
 
   // ifPart //////////////////////////////////////////////////////////////////

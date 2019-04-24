@@ -6,7 +6,7 @@
 
 	<message id="alertMessage" name="alert" />
 
-	<process id="catchAlertMessage">
+	<process id="catchAlertMessage" isExecutable="true">
 
 		<startEvent id="start" />
 

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +18,7 @@ package org.camunda.bpm.engine.history;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.query.Query;
 
@@ -30,11 +35,22 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    * result set to all operations which were performed on the same Entity (ie. all Task Operations,
    * All IdentityLink Operations ...)
    *
-   * @see UserOperationLogEntry#ENTITY_TYPE_TASK
-   * @see UserOperationLogEntry#ENTITY_TYPE_IDENTITY_LINK
-   * @see UserOperationLogEntry#ENTITY_TYPE_ATTACHMENT
+   * @see EntityTypes#TASK
+   * @see EntityTypes#IDENTITY_LINK
+   * @see EntityTypes#ATTACHMENT
    */
   UserOperationLogQuery entityType(String entityType);
+
+  /**
+   * Query for operations on entities of a given type only. This allows you to restrict the
+   * result set to all operations which were performed on the same Entity (ie. all Task Operations,
+   * All IdentityLink Operations ...)
+   *
+   * @see EntityTypes#TASK
+   * @see EntityTypes#IDENTITY_LINK
+   * @see EntityTypes#ATTACHMENT
+   */
+  UserOperationLogQuery entityTypeIn(String... entityTypes);
 
   /**
    * Query for operations of a given type only. Types of operations depend on the entity on which the operation
@@ -42,6 +58,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    * Check the {@link UserOperationLogEntry} class for a list of constants of supported operations.
    */
   UserOperationLogQuery operationType(String operationType);
+
+  /** Query entries which are existing for the given deployment id. */
+  UserOperationLogQuery deploymentId(String deploymentId);
 
   /** Query entries which are existing for the given process definition id. */
   UserOperationLogQuery processDefinitionId(String processDefinitionId);
@@ -73,6 +92,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   /** Query entries which are existing for the job definition. */
   UserOperationLogQuery jobDefinitionId(String jobDefinitionId);
 
+  /** Query entries which are existing for the batch. */
+  UserOperationLogQuery batchId(String batchId);
+
   /** Query entries which are existing for the user. */
   UserOperationLogQuery userId(String userId);
 
@@ -82,9 +104,34 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    * which will be logged as separate {@link UserOperationLogEntry OperationLogEntries} with the same 'operationId'
    * */
   UserOperationLogQuery operationId(String operationId);
+  
+  /** Query entries which are existing for the external task. */
+  UserOperationLogQuery externalTaskId(String externalTaskId);
 
   /** Query entries that changed a property. */
   UserOperationLogQuery property(String property);
+  
+  /**
+   * Query for operations of the given category only. This allows you to restrict the
+   * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
+   * All Admin Operations ...)
+   *
+   * @see UserOperationLogEntry#CATEGORY_ADMIN
+   * @see UserOperationLogEntry#CATEGORY_OPERATOR
+   * @see UserOperationLogEntry#CATEGORY_TASK_WORKER
+   */
+  UserOperationLogQuery category(String category);
+  
+  /**
+   * Query for operations of given categories only. This allows you to restrict the
+   * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
+   * All Admin Operations ...)
+   *
+   * @see UserOperationLogEntry#CATEGORY_ADMIN
+   * @see UserOperationLogEntry#CATEGORY_OPERATOR
+   * @see UserOperationLogEntry#CATEGORY_TASK_WORKER
+   */
+  UserOperationLogQuery categoryIn(String... categories);
 
   /** Query entries after the time stamp. */
   UserOperationLogQuery afterTimestamp(Date after);
@@ -94,5 +141,4 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
 
   /** Order by time stamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
   UserOperationLogQuery orderByTimestamp();
-
 }

@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.standalone.deploy;
 
 import static org.camunda.bpm.engine.test.standalone.deploy.TestCmmnTransformListener.numberOfRegistered;
 
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -57,8 +61,9 @@ public class CmmnTransformListenerTest extends ResourceProcessEngineTestCase {
     assertEquals(3, numberOfRegistered(HumanTask.class));
     assertEquals(1, numberOfRegistered(ProcessTask.class));
     assertEquals(1, numberOfRegistered(CaseTask.class));
-    // 3x HumanTask, 1x ProcessTask, 1x CaseTask, 1x Task
-    assertEquals(6, numberOfRegistered(Task.class));
+    assertEquals(1, numberOfRegistered(DecisionTask.class));
+    // 3x HumanTask, 1x ProcessTask, 1x CaseTask, 1x DecisionTask, 1x Task
+    assertEquals(7, numberOfRegistered(Task.class));
     // 1x CasePlanModel, 1x Stage
     assertEquals(2, numberOfRegistered(Stage.class));
     assertEquals(1, numberOfRegistered(Milestone.class));
@@ -66,8 +71,8 @@ public class CmmnTransformListenerTest extends ResourceProcessEngineTestCase {
     assertEquals(0, numberOfRegistered(EventListener.class));
     assertEquals(3, numberOfRegistered(Sentry.class));
 
-    assertEquals(10, TestCmmnTransformListener.cmmnActivities.size());
-    assertEquals(22, TestCmmnTransformListener.modelElementInstances.size());
+    assertEquals(11, TestCmmnTransformListener.cmmnActivities.size());
+    assertEquals(24, TestCmmnTransformListener.modelElementInstances.size());
     assertEquals(3, TestCmmnTransformListener.sentryDeclarations.size());
   }
 

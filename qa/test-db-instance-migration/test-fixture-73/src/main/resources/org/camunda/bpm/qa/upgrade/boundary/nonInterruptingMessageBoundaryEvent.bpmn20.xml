@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  <message id="receiveTaskMessageId" name="ReceiveTaskMessage" />
+  <message id="boundaryMessageId" name="BoundaryEventMessage" />
+
+  <process id="NonInterruptingMessageBoundaryEventScenario" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="outerTask" />
+    <receiveTask id="outerTask" messageRef="receiveTaskMessageId" />
+    <sequenceFlow id="flow2" sourceRef="outerTask" targetRef="end" />
+    <endEvent id="end" />
+
+    <boundaryEvent id="messageBoundaryEvent" attachedToRef="outerTask" cancelActivity="false">
+      <messageEventDefinition messageRef="boundaryMessageId" />
+    </boundaryEvent>
+    <sequenceFlow id="flow3" sourceRef="messageBoundaryEvent" targetRef="afterBoundaryTask" />
+    <userTask id="afterBoundaryTask" />
+    <sequenceFlow id="flow4" sourceRef="afterBoundaryTask" targetRef="afterBoundaryEnd" />
+    <endEvent id="afterBoundaryEnd" />
+  </process>
+</definitions>

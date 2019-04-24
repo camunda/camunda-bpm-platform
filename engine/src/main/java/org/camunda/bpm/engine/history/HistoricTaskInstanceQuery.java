@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
@@ -31,6 +34,18 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /** Only select historic task instances for the given process instance. */
   HistoricTaskInstanceQuery processInstanceId(String processInstanceId);
+
+  /** Only select historic tasks for the given process instance business key */
+  HistoricTaskInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey);
+
+  /**
+   * Only select historic tasks for any of the given the given process instance business keys.
+   */
+  HistoricTaskInstanceQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys);
+
+  /** Only select historic tasks matching the given process instance business key.
+   *  The syntax is that of SQL: for example usage: nameLike(%camunda%)*/
+  HistoricTaskInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);
 
   /** Only select historic task instances for the given execution. */
   HistoricTaskInstanceQuery executionId(String executionId);
@@ -110,6 +125,12 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    */
   HistoricTaskInstanceQuery taskDefinitionKey(String taskDefinitionKey);
 
+  /**
+   * Only select historic task instances with one of the given task definition keys.
+   * @see Task#getTaskDefinitionKey()
+   */
+  HistoricTaskInstanceQuery taskDefinitionKeyIn(String... taskDefinitionKeys);
+
   /** Only select historic task instances with the given task delete reason. */
   HistoricTaskInstanceQuery taskDeleteReason(String taskDeleteReason);
 
@@ -119,13 +140,19 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    */
   HistoricTaskInstanceQuery taskDeleteReasonLike(String taskDeleteReasonLike);
 
+  /** Only select historic task instances with an assignee. */
+  HistoricTaskInstanceQuery taskAssigned();
+
+  /** Only select historic task instances without an assignee. */
+  HistoricTaskInstanceQuery taskUnassigned();
+
   /**
-   * Only select historic task instances which were last assigned to the given assignee.
+   * Only select historic task instances which were last taskAssigned to the given assignee.
    */
   HistoricTaskInstanceQuery taskAssignee(String taskAssignee);
 
   /**
-   * Only select historic task instances which were last assigned to an assignee like
+   * Only select historic task instances which were last taskAssigned to an assignee like
    * the given value.
    * The syntax that should be used is the same as in SQL, eg. %activiti%.
    */
@@ -170,6 +197,44 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery processUnfinished();
 
   /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links based on user id
+   *
+   * @since 7.5
+   */
+  HistoricTaskInstanceQuery taskInvolvedUser(String involvedUser);
+
+  /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links based on group id
+   *
+   * @since 7.5
+   */
+  HistoricTaskInstanceQuery taskInvolvedGroup(String involvedGroup);
+
+  /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links with the condition of user being a candidate
+   *
+   * @since 7.5
+   */
+  HistoricTaskInstanceQuery taskHadCandidateUser(String candidateUser);
+
+  /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links with the condition of group being a candidate
+   *
+   * @since 7.5
+   */
+  HistoricTaskInstanceQuery taskHadCandidateGroup(String candidateGroup);
+
+  /** Only select historic task instances which have a candidate group */
+  HistoricTaskInstanceQuery withCandidateGroups();
+
+  /** Only select historic task instances which have no candidate group */
+  HistoricTaskInstanceQuery withoutCandidateGroups();
+
+  /**
    * Only select historic task instances which have a local task variable with the
    * given name set to the given value. Make sure history-level is configured
    * >= AUDIT when this feature is used.
@@ -186,6 +251,45 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    * >= AUDIT when this feature is used.
    */
   HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which have a variable with the given name, but
+   * with a different value than the passed value.
+   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   */
+  HistoricTaskInstanceQuery processVariableValueNotEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and matching the given value.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)
+   * */
+  HistoricTaskInstanceQuery processVariableValueLike(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value greater than the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value greater than or equal to the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value less than the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueLessThan(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value less than or equal to the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue);
 
   /**
    * Only select select historic task instances with the given due date.
@@ -216,6 +320,35 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    * Only select select historic task instances which have a follow-up date after the given date.
    */
   HistoricTaskInstanceQuery taskFollowUpAfter(Date followUpDate);
+
+  /** Only select historic task instances with one of the given tenant ids. */
+  HistoricTaskInstanceQuery tenantIdIn(String... tenantIds);
+
+  /**
+   * Only select tasks where end time is after given date
+   */
+  HistoricTaskInstanceQuery finishedAfter(Date date);
+
+  /**
+   * Only select tasks where end time is before given date
+   */
+  HistoricTaskInstanceQuery finishedBefore(Date date);
+
+  /**
+   * Only select tasks where started after given date
+   */
+  HistoricTaskInstanceQuery startedAfter(Date date);
+
+  /**
+   * Only select tasks where started before given date
+   */
+  HistoricTaskInstanceQuery startedBefore(Date date);
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic task instances without tenant id is database-specific.
+   */
+  HistoricTaskInstanceQuery orderByTenantId();
 
   /** Order by task id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByTaskId();
@@ -279,4 +412,5 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /** Order by case execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByCaseExecutionId();
+
 }

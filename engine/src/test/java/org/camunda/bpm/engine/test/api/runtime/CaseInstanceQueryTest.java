@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +26,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -182,6 +187,25 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByCompleted() {
+
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+
+    repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn")
+        .deploy();
+
+    for (int i = 0; i < 4; i++) {
+      String id = caseService
+          .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+          .businessKey(String.valueOf(i))
+          .create()
+          .getId();
+
+      caseInstanceIds.add(id);
+    }
+
     List<CaseExecution> executions = caseService
       .createCaseExecutionQuery()
       .activityId("PI_HumanTask_1")
@@ -197,7 +221,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     query.completed();
 
-    verifyQueryResults(query, 5);
+    verifyQueryResults(query, 4);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/CaseInstanceQueryTest.testQueryByTerminated.cmmn"})
@@ -213,10 +237,6 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
         .caseInstanceId(caseInstanceId)
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
 
     caseService
       .withCaseExecution(caseExecutionId)
@@ -1460,14 +1480,6 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryBySubProcessInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
 
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(processTaskId);
-
     String subProcessInstanceId = runtimeService
         .createProcessInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId)
@@ -1503,14 +1515,6 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryBySuperCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
-    String caseTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_CaseTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(caseTaskId);
-
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId);
@@ -1537,14 +1541,6 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryBySubCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
-    String caseTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_CaseTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(caseTaskId);
-
     String subCaseInstanceId = caseService
         .createCaseInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId)
@@ -1570,6 +1566,34 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     try {
       query.subCaseInstanceId(null);
+      fail();
+    } catch (NotValidException e) {
+      // expected
+    }
+  }
+
+  public void testQueryByDeploymentId() {
+    String deploymentId = repositoryService
+        .createDeploymentQuery()
+        .singleResult()
+        .getId();
+
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .deploymentId(deploymentId);
+
+    verifyQueryResults(query, 5);
+  }
+
+  public void testQueryByInvalidDeploymentId() {
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .deploymentId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.deploymentId(null);
       fail();
     } catch (NotValidException e) {
       // expected

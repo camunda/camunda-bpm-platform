@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
 import java.util.List;
@@ -18,9 +21,10 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -45,6 +49,10 @@ public class AbstractCmmnTransformListener implements CmmnTransformListener {
   public void transformCase(Case element, CmmnCaseDefinition caseDefinition) {
   }
 
+  public void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity activity) {
+    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel, activity);
+  }
+
   public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity) {
   }
 
@@ -55,6 +63,9 @@ public class AbstractCmmnTransformListener implements CmmnTransformListener {
   }
 
   public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity) {
+  }
+
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity activity) {
   }
 
   public void transformTask(PlanItem planItem, Task task, CmmnActivity activity) {

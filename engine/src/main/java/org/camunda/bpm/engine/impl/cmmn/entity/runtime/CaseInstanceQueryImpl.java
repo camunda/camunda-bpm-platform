@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,22 +42,23 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   protected String businessKey;
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
+  protected String deploymentId;
   protected CaseExecutionState state;
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
 
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+
   // Not used by end-users, but needed for dynamic ibatis query
   protected Boolean required;
   protected Boolean repeatable;
   protected Boolean repetition;
 
-  public CaseInstanceQueryImpl() {
-  }
 
-  public CaseInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
+  public CaseInstanceQueryImpl() {
   }
 
   public CaseInstanceQueryImpl(CommandExecutor commandExecutor) {
@@ -84,6 +89,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     return this;
   }
 
+  public CaseInstanceQuery deploymentId(String deploymentId) {
+    ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
+    this.deploymentId = deploymentId;
+    return this;
+  }
+
   public CaseInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
     ensureNotNull(NotValidException.class, "superProcessInstanceId", superProcessInstanceId);
     this.superProcessInstanceId = superProcessInstanceId;
@@ -105,6 +116,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   public CaseInstanceQuery subCaseInstanceId(String subCaseInstanceId) {
     ensureNotNull(NotValidException.class, "subCaseInstanceId", subCaseInstanceId);
     this.subCaseInstanceId = subCaseInstanceId;
+    return this;
+  }
+
+  public CaseInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public CaseInstanceQuery withoutTenantId() {
+    tenantIds = null;
+    isTenantIdSet = true;
     return this;
   }
 
@@ -138,6 +162,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
   public CaseInstanceQuery orderByCaseDefinitionId() {
     orderBy(CaseInstanceQueryProperty.CASE_DEFINITION_ID);
+    return this;
+  }
+
+  public CaseInstanceQuery orderByTenantId() {
+    orderBy(CaseInstanceQueryProperty.TENANT_ID);
     return this;
   }
 
@@ -183,6 +212,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
   public String getCaseDefinitionKey() {
     return caseDefinitionKey;
+  }
+
+  public String getDeploymentId() {
+    return deploymentId;
   }
 
   public CaseExecutionState getState() {

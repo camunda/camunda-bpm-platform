@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,20 +16,17 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.identity.UserQuery;
-import org.camunda.bpm.engine.impl.AbstractQuery;
-import org.camunda.bpm.engine.impl.UserQueryImpl;
-import org.camunda.bpm.engine.impl.UserQueryProperty;
-import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
-import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -38,17 +39,27 @@ import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.SortControl;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Resources.GROUP;
-import static org.camunda.bpm.engine.authorization.Resources.USER;
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.NativeUserQuery;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.TenantQuery;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.UserQueryImpl;
+import org.camunda.bpm.engine.impl.UserQueryProperty;
+import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
+import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 
 /**
  * <p>LDAP {@link ReadOnlyIdentityProvider}.</p>
@@ -79,13 +90,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         initialContext.close();
       } catch (Exception e) {
         // ignore
-        LOG.log(Level.FINE, "exception while closing LDAP DIR CTX", e);
+        LdapPluginLogger.INSTANCE.exceptionWhenClosingLdapCOntext(e);
       }
     }
   }
 
   protected InitialLdapContext openContext(String userDn, String password) {
-    Hashtable<String, String> env = new Hashtable<String, String>();
+    Hashtable<String, String> env = new Hashtable<>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfiguration.getInitialContextFactory());
     env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
     env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
@@ -138,7 +149,12 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public UserQueryImpl createUserQuery(CommandContext commandContext) {
-    return new LdapUserQueryImpl(commandContext);
+    return new LdapUserQueryImpl();
+  }
+
+  @Override
+  public NativeUserQuery createNativeUserQuery() {
+    throw new BadUserRequestException("Native user queries are not supported for LDAP identity service provider.");
   }
 
   public long findUserCountByQueryCriteria(LdapUserQueryImpl query) {
@@ -153,7 +169,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       return findUsersByGroupId(query);
     } else {
       String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
-      return findUsersWithoutGroupId(query, userBaseDn);
+      return findUsersWithoutGroupId(query, userBaseDn, false);
     }
   }
 
@@ -167,7 +183,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     try {
       enumeration = initialContext.search(baseDn, groupSearchFilter, ldapConfiguration.getSearchControls());
 
-      List<String> groupMemberList = new ArrayList<String>();
+      List<String> groupMemberList = new ArrayList<>();
 
       // first find group
       while (enumeration.hasMoreElements()) {
@@ -177,22 +193,26 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
           NamingEnumeration<?> allMembers = memberAttribute.getAll();
 
           // iterate group members
-          while (allMembers.hasMoreElements() && groupMemberList.size() < query.getMaxResults()) {
+          while (allMembers.hasMoreElements()) {
             groupMemberList.add((String) allMembers.nextElement());
           }
         }
       }
 
-      List<User> userList = new ArrayList<User>();
+      List<User> userList = new ArrayList<>();
       String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
+      int memberCount = 0;
       for (String memberId : groupMemberList) {
-        if (ldapConfiguration.isUsePosixGroups()) {
-          query.userId(memberId);
+        if (userList.size() < query.getMaxResults() && memberCount >= query.getFirstResult()) {
+          if (ldapConfiguration.isUsePosixGroups()) {
+            query.userId(memberId);
+          }
+          List<User> users = ldapConfiguration.isUsePosixGroups() ? findUsersWithoutGroupId(query, userBaseDn, true) : findUsersWithoutGroupId(query, memberId, true);
+          if (users.size() > 0) {
+            userList.add(users.get(0));
+          }
         }
-        List<User> users = ldapConfiguration.isUsePosixGroups() ? findUsersWithoutGroupId(query, userBaseDn) : findUsersWithoutGroupId(query, memberId);
-        if (users.size() > 0) {
-          userList.add(users.get(0));
-        }
+        memberCount++;
       }
 
       return userList;
@@ -211,7 +231,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     }
   }
 
-  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn) {
+  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn, boolean ignorePagination) {
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -225,18 +245,50 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       // perform client-side paging
       int resultCount = 0;
-      List<User> userList = new ArrayList<User>();
-      while (enumeration.hasMoreElements() && userList.size() < query.getMaxResults()) {
+      List<User> userList = new ArrayList<>();
+
+      StringBuilder resultLogger = new StringBuilder();
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("LDAP user query results: [");
+      }
+
+      while (enumeration.hasMoreElements() && (userList.size() < query.getMaxResults() || ignorePagination)) {
         SearchResult result = enumeration.nextElement();
 
-        if(resultCount >= query.getFirstResult()) {
-          UserEntity user = transformUser(result);
-          if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
-            userList.add(user);
+        UserEntity user = transformUser(result);
+
+        String userId = user.getId();
+
+        if (userId == null)
+        {
+          LdapPluginLogger.INSTANCE.invalidLdapUserReturned(user, result);
+        }
+        else
+        {
+          if(isAuthenticatedUser(user) || isAuthorized(READ, USER, userId)) {
+
+            if(resultCount >= query.getFirstResult() || ignorePagination) {
+              if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+              {
+                resultLogger.append(user);
+                resultLogger.append(" based on ");
+                resultLogger.append(result);
+                resultLogger.append(", ");
+              }
+
+              userList.add(user);
+            }
+
+            resultCount ++;
           }
         }
+      }
 
-        resultCount ++;
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("]");
+        LdapPluginLogger.INSTANCE.userQueryResult(resultLogger.toString());
       }
 
       return userList;
@@ -355,7 +407,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public GroupQuery createGroupQuery(CommandContext commandContext) {
-    return new LdapGroupQuery(commandContext);
+    return new LdapGroupQuery();
   }
 
   public long findGroupCountByQueryCriteria(LdapGroupQuery ldapGroupQuery) {
@@ -366,7 +418,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   public List<Group> findGroupByQueryCriteria(LdapGroupQuery query) {
     ensureContextInitialized();
 
-    String groupBaseDn = composeDn(ldapConfiguration.getGroupSearchBase(),ldapConfiguration.getBaseDn());
+    String groupBaseDn = composeDn(ldapConfiguration.getGroupSearchBase(), ldapConfiguration.getBaseDn());
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -380,18 +432,50 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       // perform client-side paging
       int resultCount = 0;
-      List<Group> groupList = new ArrayList<Group>();
+      List<Group> groupList = new ArrayList<>();
+
+      StringBuilder resultLogger = new StringBuilder();
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("LDAP group query results: [");
+      }
+
       while (enumeration.hasMoreElements() && groupList.size() < query.getMaxResults()) {
         SearchResult result = enumeration.nextElement();
 
-        if(resultCount >= query.getFirstResult()) {
-          GroupEntity group = transformGroup(result);
-          if(isAuthorized(READ, GROUP, group.getId())) {
-            groupList.add(group);
+        GroupEntity group = transformGroup(result);
+
+        String groupId = group.getId();
+
+        if (groupId == null)
+        {
+          LdapPluginLogger.INSTANCE.invalidLdapGroupReturned(group, result);
+        }
+        else
+        {
+          if(isAuthorized(READ, GROUP, groupId)) {
+
+            if(resultCount >= query.getFirstResult()) {
+              if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+              {
+                resultLogger.append(group);
+                resultLogger.append(" based on ");
+                resultLogger.append(result);
+                resultLogger.append(", ");
+              }
+
+              groupList.add(group);
+            }
+
+            resultCount ++;
           }
         }
+      }
 
-        resultCount ++;
+      if (LdapPluginLogger.INSTANCE.isDebugEnabled())
+      {
+        resultLogger.append("]");
+        LdapPluginLogger.INSTANCE.groupQueryResult(resultLogger.toString());
       }
 
       return groupList;
@@ -421,6 +505,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     // add additional filters from query
     if(query.getId() != null) {
       addFilter(ldapConfiguration.getGroupIdAttribute(), query.getId(), search);
+    }
+    if(query.getIds() != null && query.getIds().length > 0) {
+      search.write("(|");
+      for (String id : query.getIds()) {
+        addFilter(ldapConfiguration.getGroupIdAttribute(), id, search);
+      }
+      search.write(")");
     }
     if(query.getName() != null) {
       addFilter(ldapConfiguration.getGroupNameAttribute(), query.getName(), search);
@@ -504,26 +595,27 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     return group;
   }
 
-  @SuppressWarnings("rawtypes")
-  protected void applyRequestControls(AbstractQuery query) {
+  protected void applyRequestControls(AbstractQuery<?, ?> query) {
 
     try {
-      List<Control> controls = new ArrayList<Control>();
+      List<Control> controls = new ArrayList<>();
 
-      String orderBy = query.getOrderBy();
+      List<QueryOrderingProperty> orderBy = query.getOrderingProperties();
       if(orderBy != null) {
-        orderBy = orderBy.substring(0, orderBy.length()-4);
-        if(UserQueryProperty.USER_ID.getName().equals(orderBy)) {
-          controls.add(new SortControl(ldapConfiguration.getUserIdAttribute(), Control.CRITICAL));
+        for (QueryOrderingProperty orderingProperty : orderBy) {
+          String propertyName = orderingProperty.getQueryProperty().getName();
+          if(UserQueryProperty.USER_ID.getName().equals(propertyName)) {
+            controls.add(new SortControl(ldapConfiguration.getUserIdAttribute(), Control.CRITICAL));
 
-        } else if(UserQueryProperty.EMAIL.getName().equals(orderBy)) {
-          controls.add(new SortControl(ldapConfiguration.getUserEmailAttribute(), Control.CRITICAL));
+          } else if(UserQueryProperty.EMAIL.getName().equals(propertyName)) {
+            controls.add(new SortControl(ldapConfiguration.getUserEmailAttribute(), Control.CRITICAL));
 
-        } else if(UserQueryProperty.FIRST_NAME.getName().equals(orderBy)) {
-          controls.add(new SortControl(ldapConfiguration.getUserFirstnameAttribute(), Control.CRITICAL));
+          } else if(UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
+            controls.add(new SortControl(ldapConfiguration.getUserFirstnameAttribute(), Control.CRITICAL));
 
-        } else if(UserQueryProperty.LAST_NAME.getName().equals(orderBy)) {
-          controls.add(new SortControl(ldapConfiguration.getUserLastnameAttribute(), Control.CRITICAL));
+          } else if(UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
+            controls.add(new SortControl(ldapConfiguration.getUserLastnameAttribute(), Control.CRITICAL));
+          }
         }
       }
 
@@ -564,11 +656,11 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     if(user.getId() == null) {
       return false;
     }
-    return user.getId().equals(org.camunda.bpm.engine.impl.context.Context.getCommandContext().getAuthenticatedUserId());
+    return user.getId().equalsIgnoreCase(org.camunda.bpm.engine.impl.context.Context.getCommandContext().getAuthenticatedUserId());
   }
 
   protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
-    return org.camunda.bpm.engine.impl.context.Context.getCommandContext()
+    return !ldapConfiguration.isAuthorizationCheckEnabled() || org.camunda.bpm.engine.impl.context.Context.getCommandContext()
       .getAuthorizationManager()
       .isAuthorized(permission, resource, resourceId);
   }
@@ -599,5 +691,21 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         }
     }
     return sb.toString();
+  }
+
+  @Override
+  public TenantQuery createTenantQuery() {
+    return new LdapTenantQuery(org.camunda.bpm.engine.impl.context.Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+  }
+
+  @Override
+  public TenantQuery createTenantQuery(CommandContext commandContext) {
+    return new LdapTenantQuery();
+  }
+
+  @Override
+  public Tenant findTenantById(String id) {
+    // since multi-tenancy is not supported for the LDAP plugin, always return null
+    return null;
   }
 }

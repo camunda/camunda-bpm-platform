@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.Calendar;
@@ -19,11 +22,10 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -184,6 +186,28 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     cleanDb();
   }
 
+  @Deployment
+  public void testMultipleEventSubscriptions() {
+    String message = "cancelation-requested";
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    assertTrue(areJobsAvailable());
+
+    long eventSubscriptionCount = runtimeService.createEventSubscriptionQuery().count();
+    assertEquals(2, eventSubscriptionCount);
+
+    EventSubscription messageEvent = runtimeService.createEventSubscriptionQuery().eventType("message").singleResult();
+    assertEquals(message, messageEvent.getEventName());
+
+    EventSubscription compensationEvent = runtimeService.createEventSubscriptionQuery().eventType("compensate").singleResult();
+    assertNull(compensationEvent.getEventName());
+
+    runtimeService.createMessageCorrelation(message).processInstanceId(processInstance.getId()).correlate();
+
+    assertProcessEnded(processInstance.getId());
+  }
+
 
   protected void createExampleEventSubscriptions() {
     processEngineConfiguration.getCommandExecutorTxRequired()
@@ -192,21 +216,21 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
         Calendar calendar = new GregorianCalendar();
 
 
-        MessageEventSubscriptionEntity messageEventSubscriptionEntity1 = new MessageEventSubscriptionEntity();
+        EventSubscriptionEntity messageEventSubscriptionEntity1 = new EventSubscriptionEntity(EventType.MESSAGE);
         messageEventSubscriptionEntity1.setEventName("messageName");
         messageEventSubscriptionEntity1.setActivityId("someActivity");
         calendar.set(2001, 1, 1);
         messageEventSubscriptionEntity1.setCreated(calendar.getTime());
         messageEventSubscriptionEntity1.insert();
 
-        MessageEventSubscriptionEntity messageEventSubscriptionEntity2 = new MessageEventSubscriptionEntity();
+        EventSubscriptionEntity messageEventSubscriptionEntity2 = new EventSubscriptionEntity(EventType.MESSAGE);
         messageEventSubscriptionEntity2.setEventName("messageName");
         messageEventSubscriptionEntity2.setActivityId("someActivity");
         calendar.set(2000, 1, 1);
         messageEventSubscriptionEntity2.setCreated(calendar.getTime());
         messageEventSubscriptionEntity2.insert();
 
-        SignalEventSubscriptionEntity signalEventSubscriptionEntity3 = new SignalEventSubscriptionEntity();
+        EventSubscriptionEntity signalEventSubscriptionEntity3 = new EventSubscriptionEntity(EventType.SIGNAL);
         signalEventSubscriptionEntity3.setEventName("messageName2");
         signalEventSubscriptionEntity3.setActivityId("someOtherActivity");
         calendar.set(2002, 1, 1);
@@ -222,7 +246,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.getCommandExecutorTxRequired()
     .execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        final List<EventSubscription> subscriptions = new EventSubscriptionQueryImpl(commandContext).list();
+        final List<EventSubscription> subscriptions = new EventSubscriptionQueryImpl().list();
         for (EventSubscription eventSubscriptionEntity : subscriptions) {
           ((EventSubscriptionEntity) eventSubscriptionEntity).delete();
         }

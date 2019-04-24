@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,23 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
-import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -34,28 +36,32 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVariableInstanceQuery, HistoricVariableInstance> implements
         HistoricVariableInstanceQuery {
 
-  private final static Logger LOGGER = Logger.getLogger(HistoricVariableInstanceQueryImpl.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   private static final long serialVersionUID = 1L;
+
   protected String variableId;
   protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String caseInstanceId;
   protected String variableName;
   protected String variableNameLike;
   protected QueryVariableValue queryVariableValue;
+  protected String[] variableTypes;
   protected String[] taskIds;
   protected String[] executionIds;
   protected String[] caseExecutionIds;
+  protected String[] caseActivityIds;
   protected String[] activityInstanceIds;
+  protected String[] tenantIds;
+  protected String[] processInstanceIds;
+  protected boolean includeDeleted = false;
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
 
   public HistoricVariableInstanceQueryImpl() {
-  }
-
-  public HistoricVariableInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
@@ -74,9 +80,41 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
+  public HistoricVariableInstanceQuery processDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefinitionId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery processDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
   public HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId) {
     ensureNotNull("caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
+  @Override
+  public HistoricVariableInstanceQuery variableTypeIn(String... variableTypes) {
+    ensureNotNull("Variable types", (Object[]) variableTypes);
+    this.variableTypes = lowerCase(variableTypes);
+    return this;
+  }
+
+  private String[] lowerCase(String... variableTypes) {
+    for (int i = 0; i < variableTypes.length; i++) {
+      variableTypes[i] = variableTypes[i].toLowerCase();
+    }
+    return variableTypes;
+  }
+
+  /** Only select historic process variables with the given process instance ids. */
+  public HistoricVariableInstanceQuery processInstanceIdIn(String... processInstanceIds) {
+    ensureNotNull("Process Instance Ids", (Object[]) processInstanceIds);
+    this.processInstanceIds = processInstanceIds;
     return this;
   }
 
@@ -95,6 +133,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public HistoricVariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds) {
     ensureNotNull("Case execution ids", (Object[]) caseExecutionIds);
     this.caseExecutionIds = caseExecutionIds;
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery caseActivityIdIn(String... caseActivityIds) {
+    ensureNotNull("Case activity ids", (Object[]) caseActivityIds);
+    this.caseActivityIds = caseActivityIds;
     return this;
   }
 
@@ -141,6 +185,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
+  public HistoricVariableInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -164,7 +214,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
           } catch(Exception t) {
             // do not fail if one of the variables fails to load
-            LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
+            LOG.exceptionWhileGettingValueForVariable(t);
           }
         }
 
@@ -175,7 +225,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected boolean shouldFetchValue(HistoricVariableInstanceEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
+    return isByteArrayFetchingEnabled
+        || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
   }
 
   // order by /////////////////////////////////////////////////////////////////
@@ -187,6 +238,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public HistoricVariableInstanceQuery orderByVariableName() {
     orderBy(HistoricVariableInstanceQueryProperty.VARIABLE_NAME);
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery orderByTenantId() {
+    orderBy(HistoricVariableInstanceQueryProperty.TENANT_ID);
     return this;
   }
 
@@ -204,6 +260,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return activityInstanceIds;
   }
 
+  public String[] getProcessInstanceIds() {
+    return processInstanceIds;
+  }
+
   public String[] getTaskIds() {
     return taskIds;
   }
@@ -214,6 +274,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public String[] getCaseExecutionIds() {
     return caseExecutionIds;
+  }
+
+  public String[] getCaseActivityIds() {
+    return caseActivityIds;
   }
 
   public String getVariableName() {
@@ -228,4 +292,17 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return queryVariableValue;
   }
 
+  @Override
+  public HistoricVariableInstanceQuery includeDeleted() {
+    includeDeleted = true;
+    return this;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
 }

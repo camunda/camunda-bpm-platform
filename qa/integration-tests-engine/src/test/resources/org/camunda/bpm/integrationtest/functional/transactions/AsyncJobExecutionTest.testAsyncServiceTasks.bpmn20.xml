@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="http://www.camunda.org/test">
-  <process id="configure-router" name="configure-router">
+  <process id="configure-router" name="configure-router" isExecutable="true">
     <documentation id="Documentation_1">Place documentation for the 'ConfigureRouter' process here.</documentation>
     <startEvent id="startevent1" name="Start">
       <extensionElements>
@@ -12,11 +12,11 @@
     <endEvent id="endevent2" name="End">
       <incoming>flow5</incoming>
     </endEvent>
-    <serviceTask id="scripttask1" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.UpdateRouterConfiguration" name="Update router configuration">
+    <serviceTask id="scripttask1" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.beans.UpdateRouterConfiguration" name="Update router configuration">
       <incoming>flow6</incoming>
       <outgoing>flow5</outgoing>
     </serviceTask>
-    <serviceTask id="scripttask2" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.GetVersionInfoDelegate" name="Get version info">
+    <serviceTask id="scripttask2" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.beans.GetVersionInfoDelegate" name="Get version info">
       <incoming>flow1</incoming>
       <outgoing>flow6</outgoing>
     </serviceTask>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +18,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.management.JobDefinition;
 
@@ -25,7 +33,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
  * @author Daniel Meyer
  *
  */
-public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEntity, Serializable {
+public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbReferences, DbEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -54,7 +62,9 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
   // job definition is active by default
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
-  protected Integer jobPriority;
+  protected Long jobPriority;
+
+  protected String tenantId;
 
   public JobDefinitionEntity() {
   }
@@ -74,6 +84,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     state.put("jobConfiguration", jobConfiguration);
     state.put("suspensionState", suspensionState);
     state.put("jobPriority", jobPriority);
+    state.put("tenantId", tenantId);
     return state;
   }
 
@@ -157,12 +168,31 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     this.suspensionState = state;
   }
 
-  public Integer getOverridingJobPriority() {
+  public Long getOverridingJobPriority() {
     return jobPriority;
   }
 
-  public void setJobPriority(Integer jobPriority) {
+  public void setJobPriority(Long jobPriority) {
     this.jobPriority = jobPriority;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    return referenceIdAndClass;
+  }
 }

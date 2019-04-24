@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
@@ -15,6 +32,7 @@
       JOB_CONFIGURATION_,
       JOB_PRIORITY_,
       SUSPENSION_STATE_,
+      TENANT_ID_,
       REV_
       )
     values (
@@ -24,8 +42,9 @@
       #{activityId, jdbcType=VARCHAR},
       #{jobType, jdbcType=VARCHAR},
       #{jobConfiguration, jdbcType=VARCHAR},
-      #{jobPriority, jdbcType=INTEGER},
+      #{jobPriority, jdbcType=BIGINT},
       #{suspensionState, jdbcType=INTEGER},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -40,25 +59,42 @@
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       JOB_TYPE_ = #{jobType, jdbcType=VARCHAR},
       JOB_CONFIGURATION_ = #{jobConfiguration, jdbcType=VARCHAR},
-      JOB_PRIORITY_ = #{jobPriority, jdbcType=INTEGER},
+      JOB_PRIORITY_ = #{jobPriority, jdbcType=BIGINT},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
-  <update id="updateJobDefinitionSuspensionStateByParameters" parameterType="java.util.Map">
+  <update id="updateJobDefinitionSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_JOBDEF set
-      REV_ = REV_ + 1,
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      REV_ = 1 + REV_ ,
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
-      <if test="jobDefinitionId != null">
-        ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
+      <if test="parameter.jobDefinitionId != null">
+        ID_ = #{parameter.jobDefinitionId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionId != null">
-        and PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      <if test="parameter.processDefinitionId != null">
+        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionKey != null">
-        and PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+      <if test="parameter.processDefinitionKey != null">
+        <if test="!parameter.isProcessDefinitionTenantIdSet">
+          and PROC_DEF_KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+        </if>
+        <if test="parameter.isProcessDefinitionTenantIdSet">
+          and PROC_DEF_ID_ IN (
+            SELECT ID_ 
+            FROM ${prefix}ACT_RE_PROCDEF PD
+            WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+            <if test="parameter.processDefinitionTenantId != null">
+              and PD.TENANT_ID_ = #{parameter.processDefinitionTenantId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.processDefinitionTenantId == null">
+              and PD.TENANT_ID_ is null
+            </if>
+          )
+        </if>
+        <bind name="columnPrefix" value="''"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
       </if>
     </where>
   </update>
@@ -90,8 +126,9 @@
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="jobType" column="JOB_TYPE_" jdbcType="VARCHAR" />
     <result property="jobConfiguration" column="JOB_CONFIGURATION_" jdbcType="VARCHAR" />
-    <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="INTEGER" />
+    <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="BIGINT" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- SELECTS -->
@@ -107,7 +144,7 @@
   <select id="selectJobDefinitionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobDefinitionQueryImpl" resultMap="jobDefinitionResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectJobDefinitionByQueryCriteriaSql"/>
     ${orderBy}
@@ -121,6 +158,16 @@
 
   <sql id="selectJobDefinitionByQueryCriteriaSql">
     from ${prefix}ACT_RU_JOBDEF RES
+    
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+      left join ${prefix}ACT_RE_PROCDEF PROCDEF
+      on RES.PROC_DEF_ID_ = PROCDEF.ID_           
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">    
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, PROCDEF.KEY_, '*'))      
+      </if>
+    </if>
+    
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -150,8 +197,25 @@
       <if test="withOverridingJobPriority != null &amp;&amp; withOverridingJobPriority">
         and RES.JOB_PRIORITY_ is not null
       </if>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and ( RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+          <if test="includeJobDefinitionsWithoutTenantId">
+            or RES.TENANT_ID_ is null 
+          </if>
+          )
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
+      </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>

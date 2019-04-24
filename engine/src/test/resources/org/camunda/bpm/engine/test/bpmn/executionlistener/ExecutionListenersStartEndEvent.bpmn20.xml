@@ -1,0 +1,51 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <signal id="alertSignal" name="alert" />
+  
+  <process id="executionListenersProcess" isExecutable="true">
+  
+    
+    <startEvent id="theStart" name="Start Event">
+      <extensionElements>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" event="end">
+          <camunda:field name="parameter" stringValue="Start Event Listener" />
+        </camunda:executionListener>
+      </extensionElements>
+    </startEvent>
+
+    <sequenceFlow sourceRef="theStart" targetRef="noneEvent" />    
+    
+    <intermediateThrowEvent  id="noneEvent" name="None Event">
+      <extensionElements>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" event="end">
+          <camunda:field name="parameter" stringValue="Intermediate Catch Event Listener" />
+        </camunda:executionListener>
+      </extensionElements>        
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="noneEvent" targetRef="signalEvent" />
+
+	<intermediateThrowEvent id="signalEvent" name="Signal Event" >
+        <extensionElements>
+          <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" event="start">
+            <camunda:field name="parameter" stringValue="Intermediate Throw Event Listener" />
+          </camunda:executionListener>
+        </extensionElements>        
+        <signalEventDefinition signalRef="alertSignal" />     
+	</intermediateThrowEvent>
+
+    <sequenceFlow sourceRef="signalEvent" targetRef="theEnd" />
+
+    <endEvent id="theEnd" name="End Event">
+      <extensionElements>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" event="start">
+          <camunda:field name="parameter" stringValue="End Event Listener" />
+        </camunda:executionListener>
+      </extensionElements>    
+    </endEvent>
+    
+  </process>
+</definitions>

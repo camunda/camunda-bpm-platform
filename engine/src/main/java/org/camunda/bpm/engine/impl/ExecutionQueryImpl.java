@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.camunda.bpm.engine.impl.event.EventType;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -35,38 +40,25 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String businessKey;
   protected String activityId;
   protected String executionId;
   protected String processInstanceId;
   protected List<EventSubscriptionQueryValue> eventSubscriptions;
-  protected boolean hasMessageEventSubscriptions;
   protected SuspensionState suspensionState;
   protected String incidentType;
   protected String incidentId;
   protected String incidentMessage;
   protected String incidentMessageLike;
 
-  // Not used by end-users, but needed for dynamic ibatis query
-  protected String superProcessInstanceId;
-  protected String subProcessInstanceId;
-  protected String superCaseInstanceId;
-  protected String subCaseInstanceId;
-  protected String caseInstanceId;
-  private String businessKey;
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
 
   public ExecutionQueryImpl() {
   }
 
-  public ExecutionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public ExecutionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
-  }
-
-  public boolean isProcessInstancesOnly() {
-    return false; // see dynamic query
   }
 
   public ExecutionQueryImpl processDefinitionId(String processDefinitionId) {
@@ -105,31 +97,31 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   public ExecutionQuery signalEventSubscription(String signalName) {
-    return eventSubscription("signal", signalName);
+    return eventSubscription(EventType.SIGNAL, signalName);
   }
 
   public ExecutionQuery signalEventSubscriptionName(String signalName) {
-    return eventSubscription("signal", signalName);
+    return eventSubscription(EventType.SIGNAL, signalName);
   }
 
   public ExecutionQuery messageEventSubscriptionName(String messageName) {
-    return eventSubscription("message", messageName);
+    return eventSubscription(EventType.MESSAGE, messageName);
   }
 
   public ExecutionQuery messageEventSubscription() {
-    return eventSubscription("message", null);
+    return eventSubscription(EventType.MESSAGE, null);
   }
 
-  public ExecutionQuery eventSubscription(String eventType, String eventName) {
+  public ExecutionQuery eventSubscription(EventType eventType, String eventName) {
     ensureNotNull("event type", eventType);
-    if (!"message".equals(eventType)) {
+    if (!EventType.MESSAGE.equals(eventType)) {
       // event name is optional for message events
       ensureNotNull("event name", eventName);
     }
     if(eventSubscriptions == null) {
       eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
     }
-    eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
+    eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType.name()));
     return this;
   }
 
@@ -177,6 +169,19 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
+  public ExecutionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public ExecutionQuery withoutTenantId() {
+    this.tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
   //ordering ////////////////////////////////////////////////////
 
   public ExecutionQueryImpl orderByProcessInstanceId() {
@@ -194,13 +199,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
-  public ExecutionQuery orderBySequenceCounter() {
-    orderBy(ExecutionQueryProperty.SEQUENCE_COUNTER);
+  public ExecutionQuery orderByTenantId() {
+    orderBy(ExecutionQueryProperty.TENANT_ID);
     return this;
   }
 
   //results ////////////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -209,6 +215,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
       .findExecutionCountByQueryCriteria(this);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<Execution> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
@@ -219,10 +226,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   //getters ////////////////////////////////////////////////////
-
-  public boolean getOnlyProcessInstances() {
-    return false;
-  }
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
@@ -250,22 +253,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
   public String getExecutionId() {
     return executionId;
-  }
-
-  public String getSuperProcessInstanceId() {
-    return superProcessInstanceId;
-  }
-
-  public String getSubProcessInstanceId() {
-    return subProcessInstanceId;
-  }
-
-  public String getSuperCaseInstanceId() {
-    return superCaseInstanceId;
-  }
-
-  public String getSubCaseInstanceId() {
-    return subCaseInstanceId;
   }
 
   public SuspensionState getSuspensionState() {

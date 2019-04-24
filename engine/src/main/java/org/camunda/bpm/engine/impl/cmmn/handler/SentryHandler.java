@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,8 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Logger;
+import java.util.List;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -21,16 +26,23 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnVariableOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.Query;
+import org.camunda.bpm.model.cmmn.VariableTransition;
 import org.camunda.bpm.model.cmmn.instance.CaseFileItemOnPart;
+import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.cmmn.instance.OnPart;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemOnPart;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
+import org.camunda.bpm.model.cmmn.instance.camunda.CamundaVariableOnPart;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
  * @author Roman Smirnov
@@ -45,8 +57,9 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     String id = element.getId();
     Collection<OnPart> onParts = element.getOnParts();
     IfPart ifPart = element.getIfPart();
+    List<CamundaVariableOnPart> variableOnParts = queryExtensionElementsByClass(element, CamundaVariableOnPart.class);
 
-    if (ifPart == null || ifPart.getConditions().isEmpty()) {
+    if ((ifPart == null || ifPart.getConditions().isEmpty()) && variableOnParts.isEmpty()) {
 
       if (onParts == null || onParts.isEmpty()) {
         LOG.ignoredSentryWithMissingCondition(id);
@@ -76,6 +89,9 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     // the ifPart will be initialized immediately
     initializeIfPart(ifPart, sentryDeclaration, context);
 
+    // the variableOnParts will be initialized immediately as it does not have any dependency
+    initializeVariableOnParts(element, sentryDeclaration, context, variableOnParts);
+    
     // ...whereas the onParts will be initialized later because the
     // the reference to the plan items (sourceRef) and the reference
     // to the sentry (sentryRef) cannot be set in this step. To set
@@ -160,11 +176,55 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
 
     ExpressionManager expressionManager = context.getExpressionManager();
     ConditionExpression condition = conditions.iterator().next();
-    Expression conditionExpression = expressionManager.createExpression(condition.getBody());
+    Expression conditionExpression = expressionManager.createExpression(condition.getText());
 
     CmmnIfPartDeclaration ifPartDeclaration = new CmmnIfPartDeclaration();
     ifPartDeclaration.setCondition(conditionExpression);
     sentryDeclaration.setIfPart(ifPartDeclaration);
   }
 
+  protected void initializeVariableOnParts(CmmnElement element, CmmnSentryDeclaration sentryDeclaration, 
+    CmmnHandlerContext context, List<CamundaVariableOnPart> variableOnParts) {
+    for(CamundaVariableOnPart variableOnPart: variableOnParts) {
+      initializeVariableOnPart(variableOnPart, sentryDeclaration, context);
+    }
+  }
+
+  protected void initializeVariableOnPart(CamundaVariableOnPart variableOnPart, CmmnSentryDeclaration sentryDeclaration, CmmnHandlerContext context) {
+    VariableTransition variableTransition;
+
+    try {
+      variableTransition = variableOnPart.getVariableEvent();
+    } catch(IllegalArgumentException illegalArgumentexception) {
+      throw LOG.nonMatchingVariableEvents(sentryDeclaration.getId());
+    } catch(NullPointerException nullPointerException) {
+      throw LOG.nonMatchingVariableEvents(sentryDeclaration.getId());
+    }
+
+    String variableName = variableOnPart.getVariableName();
+    String variableEventName = variableTransition.name();
+
+    if (variableName != null) {
+      if (!sentryDeclaration.hasVariableOnPart(variableEventName, variableName)) {
+        CmmnVariableOnPartDeclaration variableOnPartDeclaration = new CmmnVariableOnPartDeclaration();
+        variableOnPartDeclaration.setVariableEvent(variableEventName);
+        variableOnPartDeclaration.setVariableName(variableName);
+        sentryDeclaration.addVariableOnParts(variableOnPartDeclaration);
+      } 
+    } else {
+      throw LOG.emptyVariableName(sentryDeclaration.getId());
+    }
+  }
+
+  protected <V extends ModelElementInstance> List<V> queryExtensionElementsByClass(CmmnElement element, Class<V> cls) {
+    ExtensionElements extensionElements = element.getExtensionElements();
+
+    if (extensionElements != null) {
+      Query<ModelElementInstance> query = extensionElements.getElementsQuery();
+      return query.filterByType(cls).list();
+
+    } else {
+      return new ArrayList<V>();
+    }
+  }
 }

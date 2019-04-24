@@ -1,0 +1,39 @@
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+    <extensionElements>
+      <camunda:executionListener event="start">
+        <camunda:script scriptFormat="groovy" resource="org/camunda/bpm/engine/test/bpmn/executionlistener/executionListener.groovy"/>
+      </camunda:executionListener>
+      <camunda:executionListener event="end">
+        <camunda:script scriptFormat="groovy" resource="org/camunda/bpm/engine/test/bpmn/executionlistener/executionListener.groovy"/>
+      </camunda:executionListener>
+    </extensionElements>
+
+    <startEvent id="start">
+      <extensionElements>
+        <camunda:executionListener event="end">
+          <camunda:script scriptFormat="groovy" resource="classpath://org/camunda/bpm/engine/test/bpmn/executionlistener/executionListener.groovy"/>
+        </camunda:executionListener>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="flow" sourceRef="start" targetRef="end">
+      <extensionElements>
+        <camunda:executionListener>
+          <camunda:script scriptFormat="groovy" resource="deployment://org/camunda/bpm/engine/test/bpmn/executionlistener/executionListener.groovy"/>
+        </camunda:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <endEvent id="end">
+      <extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="groovy" resource="deployment://org/camunda/bpm/engine/test/bpmn/executionlistener/executionListener.groovy"/>
+        </camunda:executionListener>
+      </extensionElements>
+    </endEvent>
+  </process>
+</definitions>
+

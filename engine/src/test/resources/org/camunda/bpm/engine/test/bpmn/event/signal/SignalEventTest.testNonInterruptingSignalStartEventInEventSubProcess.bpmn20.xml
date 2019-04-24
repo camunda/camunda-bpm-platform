@@ -4,7 +4,7 @@
 
   <signal id="alertSignal" name="alert" />
 
-  <process id="nonInterruptingSignalStartEventInEventSubProcess">
+  <process id="nonInterruptingSignalStartEventInEventSubProcess" isExecutable="true">
 
     <startEvent id="startEvent" />
 

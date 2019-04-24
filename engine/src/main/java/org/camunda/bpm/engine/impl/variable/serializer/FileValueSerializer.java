@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +18,9 @@ package org.camunda.bpm.engine.impl.variable.serializer;
 
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.impl.core.variable.value.FileValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -67,7 +71,7 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
   public FileValue readValue(ValueFields valueFields, boolean deserializeValue) {
     FileValueBuilder builder = Variables.fileValue(valueFields.getTextValue());
     if (valueFields.getByteArrayValue() != null) {
-      builder.file(valueFields.getByteArrayValue().getBytes());
+      builder.file(valueFields.getByteArrayValue());
     }
     // to ensure the same array size all the time
     if (valueFields.getTextValue2() != null) {

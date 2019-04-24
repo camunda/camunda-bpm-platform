@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="methodExpressionProcess" name="Method Expression Process" isExecutable="true">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="servicetask1" />
+    <serviceTask id="servicetask1" name="ServiceTask 1" camunda:expression="${aString.substring(3,7)}" />    
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="servicetask2" />
+    <serviceTask id="servicetask2" name="ServiceTask 2" camunda:expression="${aString.toString()}" />    
+    <sequenceFlow id="flow3" sourceRef="servicetask2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

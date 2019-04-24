@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.form.handler;
 
 import java.util.ArrayList;
@@ -25,7 +28,6 @@ import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDataImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
@@ -33,8 +35,8 @@ import org.camunda.bpm.engine.impl.form.type.FormTypes;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -42,6 +44,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -52,7 +55,12 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class DefaultFormHandler implements FormHandler {
 
+  public static final String FORM_FIELD_ELEMENT = "formField";
+  public static final String FORM_PROPERTY_ELEMENT = "formProperty";
+  private static final String BUSINESS_KEY_ATTRIBUTE = "businessKey";
+
   protected String deploymentId;
+  protected String businessKeyFieldId;
 
   protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
 
@@ -79,13 +87,14 @@ public class DefaultFormHandler implements FormHandler {
   protected void parseFormData(BpmnParse bpmnParse, ExpressionManager expressionManager, Element extensionElement) {
     Element formData = extensionElement.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formData");
     if(formData != null) {
+      this.businessKeyFieldId = formData.attribute(BUSINESS_KEY_ATTRIBUTE);
       parseFormFields(formData, bpmnParse, expressionManager);
     }
   }
 
   protected void parseFormFields(Element formData, BpmnParse bpmnParse, ExpressionManager expressionManager) {
     // parse fields:
-    List<Element> formFields = formData.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formField");
+    List<Element> formFields = formData.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FORM_FIELD_ELEMENT);
     for (Element formField : formFields) {
       parseFormField(formField, bpmnParse, expressionManager);
     }
@@ -101,6 +110,10 @@ public class DefaultFormHandler implements FormHandler {
       bpmnParse.addError("attribute id must be set for FormFieldGroup and must have a non-empty value", formField);
     } else {
       formFieldHandler.setId(id);
+    }
+
+    if (id.equals(businessKeyFieldId)) {
+      formFieldHandler.setBusinessKey(true);
     }
 
     // parse name
@@ -189,7 +202,7 @@ public class DefaultFormHandler implements FormHandler {
   protected void parseFormProperties(BpmnParse bpmnParse, ExpressionManager expressionManager, Element extensionElement) {
     FormTypes formTypes = getFormTypes();
 
-    List<Element> formPropertyElements = extensionElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formProperty");
+    List<Element> formPropertyElements = extensionElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FORM_PROPERTY_ELEMENT);
     for (Element formPropertyElement : formPropertyElements) {
       FormPropertyHandler formPropertyHandler = new FormPropertyHandler();
 
@@ -268,6 +281,9 @@ public class DefaultFormHandler implements FormHandler {
   }
 
   public void submitFormVariables(VariableMap properties, VariableScope variableScope) {
+    boolean userOperationLogEnabled = Context.getCommandContext().isUserOperationLogEnabled();
+    Context.getCommandContext().enableUserOperationLog();
+
     VariableMap propertiesCopy = new VariableMapImpl(properties);
 
     // support legacy form properties
@@ -278,7 +294,9 @@ public class DefaultFormHandler implements FormHandler {
 
     // support form data:
     for (FormFieldHandler formFieldHandler : formFieldHandlers) {
-      formFieldHandler.handleSubmit(variableScope, propertiesCopy, properties);
+      if (!formFieldHandler.isBusinessKey()) {
+        formFieldHandler.handleSubmit(variableScope, propertiesCopy, properties);
+      }
     }
 
     // any variables passed in which are not handled by form-fields or form
@@ -288,6 +306,8 @@ public class DefaultFormHandler implements FormHandler {
     }
 
     fireFormPropertyHistoryEvents(properties, variableScope);
+
+    Context.getCommandContext().setLogUserOperationEnabled(userOperationLogEnabled);
   }
 
   protected void fireFormPropertyHistoryEvents(VariableMap properties, VariableScope variableScope) {
@@ -297,31 +317,36 @@ public class DefaultFormHandler implements FormHandler {
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.FORM_PROPERTY_UPDATE, variableScope)) {
 
       // fire history events
-      ExecutionEntity executionEntity = null;
-      String taskId = null;
+      final ExecutionEntity executionEntity;
+      final String taskId;
       if(variableScope instanceof ExecutionEntity) {
         executionEntity = (ExecutionEntity) variableScope;
+        taskId = null;
       }
       else if (variableScope instanceof TaskEntity) {
         TaskEntity task = (TaskEntity) variableScope;
         executionEntity = task.getExecution();
         taskId = task.getId();
+      } else {
+        executionEntity = null;
+        taskId = null;
       }
 
       if (executionEntity != null) {
-        final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-        final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
-
-        for (String variableName : properties.keySet()) {
-
-          TypedValue value = properties.getValueTyped(variableName);
+        for (final String variableName : properties.keySet()) {
+          final TypedValue value = properties.getValueTyped(variableName);
 
           // NOTE: SerializableValues are never stored as form properties
           if (!(value instanceof SerializableValue)
               && value.getValue() != null && value.getValue() instanceof String) {
-            String stringValue = (String) value.getValue();
-            HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt(executionEntity, variableName, stringValue, taskId);
-            eventHandler.handleEvent(evt);
+            final String stringValue = (String) value.getValue();
+            
+            HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+              @Override
+              public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+                return producer.createFormPropertyUpdateEvt(executionEntity, variableName, stringValue, taskId);
+              }
+            });
           }
         }
       }
@@ -345,5 +370,13 @@ public class DefaultFormHandler implements FormHandler {
 
   public void setFormPropertyHandlers(List<FormPropertyHandler> formPropertyHandlers) {
     this.formPropertyHandlers = formPropertyHandlers;
+  }
+
+  public String getBusinessKeyFieldId() {
+    return businessKeyFieldId;
+  }
+
+  public void setBusinessKeyFieldId(String businessKeyFieldId) {
+    this.businessKeyFieldId = businessKeyFieldId;
   }
 }

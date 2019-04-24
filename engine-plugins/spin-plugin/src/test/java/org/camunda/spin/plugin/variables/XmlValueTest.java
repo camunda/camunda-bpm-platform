@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,14 +20,23 @@ import static org.camunda.spin.DataFormats.xml;
 import static org.camunda.spin.plugin.variable.SpinValues.xmlValue;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.XML;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.plugin.variable.type.SpinValueType;
 import org.camunda.spin.plugin.variable.value.XmlValue;
 import org.camunda.spin.plugin.variable.value.builder.XmlValueBuilder;
 import org.camunda.spin.xml.SpinXmlElement;
@@ -178,4 +191,77 @@ public class XmlValueTest extends PluggableProcessEngineTestCase {
     assertEquals("task1", task.getTaskDefinitionKey());
   }
 
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testTransientXmlValueFluent() {
+    // given
+    XmlValue xmlValue = xmlValue(xmlString).setTransient(true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, xmlValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY, variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testTransientXmlValue() {
+    // given
+    XmlValue xmlValue = xmlValue(xmlString, true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, xmlValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY, variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+  }
+
+  public void testApplyValueInfoFromSerializedValue() {
+    // given
+    Map<String, Object> valueInfo = new HashMap<String, Object>();
+    valueInfo.put(ValueType.VALUE_INFO_TRANSIENT, true);
+
+    // when
+    XmlValue xmlValue = (XmlValue) SpinValueType.XML.createValueFromSerialized(xmlString, valueInfo);
+
+    // then
+    assertEquals(true, xmlValue.isTransient());
+    Map<String, Object> returnedValueInfo = SpinValueType.XML.getValueInfo(xmlValue);
+    assertEquals(true, returnedValueInfo.get(ValueType.VALUE_INFO_TRANSIENT));
+  }
+
+  public void testDeserializeTransientXmlValue() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+        .startEvent()
+        .exclusiveGateway("gtw")
+          .sequenceFlowId("flow1")
+          .condition("cond", "${XML(" + variableName + ").attr('attrName').value() == 'attrValue'}")
+          .userTask("userTask1")
+          .endEvent()
+        .moveToLastGateway()
+          .sequenceFlowId("flow2")
+          .userTask("userTask2")
+          .endEvent()
+        .done();
+
+    deployment(modelInstance);
+
+    XmlValue xmlValue = xmlValue(xmlString, true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, xmlValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey("foo", variables);
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("userTask1", task.getTaskDefinitionKey());
+  }
 }

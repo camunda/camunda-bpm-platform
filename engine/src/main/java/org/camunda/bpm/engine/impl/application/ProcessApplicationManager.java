@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,22 +22,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.application.impl.ProcessApplicationLogger;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
@@ -43,7 +45,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  */
 public class ProcessApplicationManager {
 
-  private Logger LOGGER = Logger.getLogger(ProcessApplicationManager.class.getName());
+  public final static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
   protected Map<String, DefaultProcessApplicationRegistration> registrationsByDeploymentId = new HashMap<String, DefaultProcessApplicationRegistration>();
 
@@ -65,9 +67,17 @@ public class ProcessApplicationManager {
     return registration;
   }
 
+  public synchronized void clearRegistrations() {
+    registrationsByDeploymentId.clear();
+  }
+
   public synchronized void unregisterProcessApplicationForDeployments(Set<String> deploymentIds, boolean removeProcessesFromCache) {
     removeJobExecutorRegistrations(deploymentIds);
     removeProcessApplicationRegistration(deploymentIds, removeProcessesFromCache);
+  }
+
+  public boolean hasRegistrations() {
+    return !registrationsByDeploymentId.isEmpty();
   }
 
   protected DefaultProcessApplicationRegistration createProcessApplicationRegistration(Set<String> deploymentsToRegister, ProcessApplicationReference reference) {
@@ -89,10 +99,11 @@ public class ProcessApplicationManager {
             .getDeploymentCache()
             .removeDeployment(deploymentId);
         }
-      } catch (Throwable t) {
-        LOGGER.log(Level.WARNING, "unregistering process application for deployment but could not remove process definitions from deployment cache. ", t);
-
-      } finally {
+      }
+      catch (Throwable t) {
+        LOG.couldNotRemoveDefinitionsFromCache(t);
+      }
+      finally {
         if(deploymentId != null) {
           registrationsByDeploymentId.remove(deploymentId);
         }
@@ -102,16 +113,18 @@ public class ProcessApplicationManager {
 
   protected void createJobExecutorRegistrations(Set<String> deploymentIds) {
     try {
+      final DeploymentFailListener deploymentFailListener = new DeploymentFailListener(deploymentIds,
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
       Context.getCommandContext()
         .getTransactionContext()
-        .addTransactionListener(TransactionState.ROLLED_BACK, new DeploymentFailListener(deploymentIds));
+        .addTransactionListener(TransactionState.ROLLED_BACK, deploymentFailListener);
 
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
       registeredDeployments.addAll(deploymentIds);
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("Could not register deployments with Job Executor.", e);
-
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileRegisteringDeploymentsWithJobExecutor(e);
     }
   }
 
@@ -120,15 +133,21 @@ public class ProcessApplicationManager {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
       registeredDeployments.removeAll(deploymentIds);
 
-    } catch (Exception e) {
-      LOGGER.log(Level.WARNING, "Could not unregister deployments with Job Executor.", e);
-
+    }
+    catch (Exception e) {
+      LOG.exceptionWhileUnregisteringDeploymentsWithJobExecutor(e);
     }
   }
 
   // logger ////////////////////////////////////////////////////////////////////////////
 
   protected void logRegistration(Set<String> deploymentIds, ProcessApplicationReference reference) {
+
+    if (!LOG.isInfoEnabled()) {
+      // building the log message is expensive (db queries) so we avoid it if we can
+      return;
+    }
+
     try {
       StringBuilder builder = new StringBuilder();
       builder.append("ProcessApplication '");
@@ -167,11 +186,11 @@ public class ProcessApplicationManager {
         logCaseDefinitionRegistrations(builder, caseDefinitions);
       }
 
-      LOGGER.info(builder.toString());
+      LOG.registrationSummary(builder.toString());
 
-    } catch(Throwable e) {
-      // ignore
-      LOGGER.log(Level.WARNING, "Exception while logging registration summary", e);
+    }
+    catch(Throwable e) {
+      LOG.exceptionWhileLoggingRegistrationSummary(e);
     }
   }
 
@@ -179,18 +198,15 @@ public class ProcessApplicationManager {
     CommandContext commandContext = Context.getCommandContext();
 
     // in case deployment was created by this command
-    List<ProcessDefinitionEntity> entities = deployment.getDeployedArtifacts(ProcessDefinitionEntity.class);
+    List<ProcessDefinition> entities = deployment.getDeployedProcessDefinitions();
 
     if (entities == null) {
       String deploymentId = deployment.getId();
-
-      // query db
-      return new ProcessDefinitionQueryImpl(commandContext)
-        .deploymentId(deploymentId)
-        .list();
+      ProcessDefinitionManager manager = commandContext.getProcessDefinitionManager();
+      return manager.findProcessDefinitionsByDeploymentId(deploymentId);
     }
 
-    return new ArrayList<ProcessDefinition>(entities);
+    return entities;
 
   }
 
@@ -198,18 +214,15 @@ public class ProcessApplicationManager {
     CommandContext commandContext = Context.getCommandContext();
 
     // in case deployment was created by this command
-    List<CaseDefinitionEntity> entities = deployment.getDeployedArtifacts(CaseDefinitionEntity.class);
+    List<CaseDefinition> entities = deployment.getDeployedCaseDefinitions();
 
     if (entities == null) {
       String deploymentId = deployment.getId();
-
-      // query db
-      return new CaseDefinitionQueryImpl(commandContext)
-        .deploymentId(deploymentId)
-        .list();
+      CaseDefinitionManager caseDefinitionManager = commandContext.getCaseDefinitionManager();
+      return caseDefinitionManager.findCaseDefinitionByDeploymentId(deploymentId);
     }
 
-    return new ArrayList<CaseDefinition>(entities);
+    return entities;
 
   }
 

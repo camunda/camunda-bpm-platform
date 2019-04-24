@@ -7,7 +7,7 @@
   
   <message id="newOrder" name="newOrderMessage" />
   
-  <process id="secondProcess">
+  <process id="secondProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     

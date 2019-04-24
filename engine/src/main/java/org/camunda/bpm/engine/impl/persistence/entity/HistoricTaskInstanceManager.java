@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +29,13 @@ import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
@@ -39,38 +46,58 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  */
 public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
-  public void deleteHistoricTaskInstancesByProcessInstanceId(String processInstanceId) {
-    deleteHistoricTaskInstances("processInstanceId", processInstanceId);
-  }
+  /**
+   * Deletes all data related with tasks, which belongs to specified process instance ids.
+   * @param processInstanceIds
+   * @param deleteVariableInstances when true, will also delete variable instances. Can be false when variable instances were deleted separately.
+   */
+  public void deleteHistoricTaskInstancesByProcessInstanceIds(List<String> processInstanceIds, boolean deleteVariableInstances) {
 
-  public void deleteHistoricTaskInstancesByCaseInstanceId(String caseInstanceId) {
-    deleteHistoricTaskInstances("caseInstanceId", caseInstanceId);
-  }
+    CommandContext commandContext = Context.getCommandContext();
 
-  public void deleteHistoricTaskInstancesByCaseDefinitionId(String caseDefinitionId) {
-    deleteHistoricTaskInstances("caseDefinitionId", caseDefinitionId);
-  }
-
-  @SuppressWarnings("unchecked")
-  protected void deleteHistoricTaskInstances(String key, String value) {
-    if (isHistoryEnabled()) {
-
-      Map<String, String> params = new HashMap<String, String>();
-      params.put(key, value);
-
-      List<String> taskInstanceIds = (List<String>) getDbEntityManager()
-          .selectList("selectHistoricTaskInstanceIdsByParameters", params);
-
-      for (String taskInstanceId : taskInstanceIds) {
-        deleteHistoricTaskInstanceById(taskInstanceId);
-      }
-
+    if (deleteVariableInstances) {
+      getHistoricVariableInstanceManager().deleteHistoricVariableInstancesByTaskProcessInstanceIds(processInstanceIds);
     }
+
+    getHistoricDetailManager()
+        .deleteHistoricDetailsByTaskProcessInstanceIds(processInstanceIds);
+
+    commandContext
+        .getCommentManager()
+        .deleteCommentsByTaskProcessInstanceIds(processInstanceIds);
+
+    getAttachmentManager()
+        .deleteAttachmentsByTaskProcessInstanceIds(processInstanceIds);
+
+    getHistoricIdentityLinkManager()
+        .deleteHistoricIdentityLinksLogByTaskProcessInstanceIds(processInstanceIds);
+
+    getDbEntityManager().deletePreserveOrder(HistoricTaskInstanceEntity.class, "deleteHistoricTaskInstanceByProcessInstanceIds", processInstanceIds);
+  }
+
+  public void deleteHistoricTaskInstancesByCaseInstanceIds(List<String> caseInstanceIds) {
+
+    CommandContext commandContext = Context.getCommandContext();
+
+    getHistoricDetailManager()
+        .deleteHistoricDetailsByTaskCaseInstanceIds(caseInstanceIds);
+
+    commandContext
+        .getCommentManager()
+        .deleteCommentsByTaskCaseInstanceIds(caseInstanceIds);
+
+    getAttachmentManager()
+        .deleteAttachmentsByTaskCaseInstanceIds(caseInstanceIds);
+
+    getHistoricIdentityLinkManager()
+        .deleteHistoricIdentityLinksLogByTaskCaseInstanceIds(caseInstanceIds);
+
+    getDbEntityManager().deletePreserveOrder(HistoricTaskInstanceEntity.class, "deleteHistoricTaskInstanceByCaseInstanceIds", caseInstanceIds);
   }
 
   public long findHistoricTaskInstanceCountByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
     if (isHistoryEnabled()) {
-      getAuthorizationManager().configureHistoricTaskInstanceQuery(historicTaskInstanceQuery);
+      configureQuery(historicTaskInstanceQuery);
       return (Long) getDbEntityManager().selectOne("selectHistoricTaskInstanceCountByQueryCriteria",historicTaskInstanceQuery);
     }
 
@@ -80,7 +107,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery, final Page page) {
     if (isHistoryEnabled()) {
-      getAuthorizationManager().configureHistoricTaskInstanceQuery(historicTaskInstanceQuery);
+      configureQuery(historicTaskInstanceQuery);
       return getDbEntityManager().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, page);
     }
 
@@ -120,8 +147,8 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
           .deleteAttachmentsByTaskId(taskId);
 
         commandContext
-          .getOperationLogManager()
-          .deleteOperationLogEntriesByTaskId(taskId);
+          .getHistoricIdentityLinkManager()
+          .deleteHistoricIdentityLinksLogByTaskId(taskId);
 
         getDbEntityManager().delete(historicTaskInstance);
       }
@@ -139,54 +166,92 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectHistoricTaskInstanceCountByNativeQuery", parameterMap);
   }
 
-  public void updateHistoricTaskInstance(TaskEntity taskEntity) {
+  public void updateHistoricTaskInstance(final TaskEntity taskEntity) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_UPDATE, taskEntity)) {
 
-      final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      HistoryEvent evt = eventProducer.createTaskInstanceUpdateEvt(taskEntity);
-      eventHandler.handleEvent(evt);
-
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createTaskInstanceUpdateEvt(taskEntity);
+        }
+      });
     }
   }
 
-  public void markTaskInstanceEnded(String taskId, String deleteReason) {
+  public void addRemovalTimeToTaskInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricTaskInstanceEventEntity.class, "updateHistoricTaskInstancesByRootProcessInstanceId", parameters);
+  }
+
+  public void addRemovalTimeToTaskInstancesByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricTaskInstanceEventEntity.class, "updateHistoricTaskInstancesByProcessInstanceId", parameters);
+  }
+
+  public void markTaskInstanceEnded(String taskId, final String deleteReason) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
-    TaskEntity taskEntity = Context.getCommandContext()
+    final TaskEntity taskEntity = Context.getCommandContext()
         .getDbEntityManager()
         .selectById(TaskEntity.class, taskId);
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_COMPLETE, taskEntity)) {
 
-      final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      HistoryEvent evt = eventProducer.createTaskInstanceCompleteEvt(taskEntity, deleteReason);
-
-      eventHandler.handleEvent(evt);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createTaskInstanceCompleteEvt(taskEntity, deleteReason);
+        }
+      });
     }
   }
 
 
-  public void createHistoricTask(TaskEntity task) {
+  public void createHistoricTask(final TaskEntity task) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_CREATE, task)) {
 
-      final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      HistoryEvent evt = eventProducer.createTaskInstanceCreateEvt(task);
-      eventHandler.handleEvent(evt);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createTaskInstanceCreateEvt(task);
+        }
+      });
 
     }
+  }
+
+  protected void configureQuery(final HistoricTaskInstanceQueryImpl query) {
+    getAuthorizationManager().configureHistoricTaskInstanceQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
+  public DbOperation deleteHistoricTaskInstancesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("removalTime", removalTime);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    parameters.put("batchSize", batchSize);
+
+    return getDbEntityManager()
+      .deletePreserveOrder(HistoricTaskInstanceEntity.class, "deleteHistoricTaskInstancesByRemovalTime",
+        new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }

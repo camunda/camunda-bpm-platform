@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, ersion 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,19 +18,23 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableInstance.SimpleVariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -45,8 +53,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
         PvmProcessInstance {
 
   private static final long serialVersionUID = 1L;
-
-  private static Logger log = Logger.getLogger(ExecutionImpl.class.getName());
 
   private static AtomicInteger idGenerator = new AtomicInteger();
 
@@ -76,7 +82,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // variables/////////////////////////////////////////////////////////////////
 
-  protected SimpleVariableStore variableStore = new SimpleVariableStore();
+  protected VariableStore<CoreVariableInstance> variableStore = new VariableStore<CoreVariableInstance>();
 
   // lifecycle methods ////////////////////////////////////////////////////////
 
@@ -102,6 +108,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     // make created execution start in same activity instance
     createdExecution.activityInstanceId = activityInstanceId;
 
+    // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
     if (initializeExecutionStartContext) {
       createdExecution.setStartContext(new ExecutionStartContext());
     } else if (startContext != null) {
@@ -287,8 +294,18 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // getters and setters //////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
+  protected VariableStore<CoreVariableInstance> getVariableStore() {
     return variableStore;
+  }
+
+  @Override
+  protected VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory() {
+    return (VariableInstanceFactory) SimpleVariableInstanceFactory.INSTANCE;
+  }
+
+  @Override
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
+    return Collections.emptyList();
   }
 
   public ExecutionImpl getReplacedBy() {
@@ -319,11 +336,19 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient ExecutionImpl");
   }
 
+  public ProcessEngine getProcessEngine() {
+    throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient ExecutionImpl");
+  }
+
   public void forceUpdate() {
     // nothing to do
   }
 
   public void fireHistoricProcessStartEvent() {
+    // do nothing
+  }
+
+  protected void removeVariablesLocalInternal(){
     // do nothing
   }
 

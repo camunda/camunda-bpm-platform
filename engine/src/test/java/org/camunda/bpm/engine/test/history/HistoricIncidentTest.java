@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +18,7 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -22,12 +27,14 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  *
  * @author Roman Smirnov
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
 
   private static String PROCESS_DEFINITION_KEY = "oneFailingServiceTaskProcess";
@@ -55,6 +62,7 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(incident.getCauseIncidentId(), historicIncident.getCauseIncidentId());
     assertEquals(incident.getRootCauseIncidentId(), historicIncident.getRootCauseIncidentId());
     assertEquals(incident.getConfiguration(), historicIncident.getConfiguration());
+    assertEquals(incident.getJobDefinitionId(), historicIncident.getJobDefinitionId());
 
     assertTrue(historicIncident.isOpen());
     assertFalse(historicIncident.isDeleted());

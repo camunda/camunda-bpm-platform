@@ -6,7 +6,7 @@
 
   <message id="message1" name="Message1"/>
 
-  <process id="concurrentSubProcess">
+  <process id="concurrentSubProcess" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
     <parallelGateway id="fork" />

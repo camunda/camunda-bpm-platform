@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   targetNamespace="Examples">
 
-  <process id="compensationProcess">
+  <process id="compensationProcess" isExecutable="true">
 
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />

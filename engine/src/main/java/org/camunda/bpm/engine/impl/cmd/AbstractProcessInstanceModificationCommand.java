@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
+import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -52,6 +56,10 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  public String getProcessInstanceId() {
+    return processInstanceId;
   }
 
   protected ActivityInstance findActivityInstance(ActivityInstance tree, String activityInstanceId) {
@@ -117,14 +125,9 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
       //     => the scope execution may have been replaced itself again with another concurrent execution (second hop)
       //   note that the scope execution may have a long "history" of replacements, but only the last replacement is relevant here
       if (cachedExecution != null) {
-        ExecutionEntity replacingExecution = cachedExecution.getReplacedBy();
+        ExecutionEntity replacingExecution = cachedExecution.resolveReplacedBy();
 
         if (replacingExecution != null) {
-          ExecutionEntity secondHopReplacingExecution = replacingExecution.getReplacedBy();
-          if (secondHopReplacingExecution != null) {
-            replacingExecution = secondHopReplacingExecution;
-          }
-
           match = replacingExecution.getId().equals(instance.getId());
         }
       }
@@ -146,7 +149,7 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
   }
 
   protected ExecutionEntity getScopeExecutionForActivityInstance(ExecutionEntity processInstance,
-      ActivityExecutionMapping mapping, ActivityInstance activityInstance) {
+      ActivityExecutionTreeMapping mapping, ActivityInstance activityInstance) {
     ensureNotNull("activityInstance", activityInstance);
 
     ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();

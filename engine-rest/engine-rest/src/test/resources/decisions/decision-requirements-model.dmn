@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="score"
+             name="Score"
+             namespace="Score-Example">
+  <decision id="one" name="One">
+    <informationRequirement>
+      <requiredDecision href="#two" />
+    </informationRequirement>
+    <decisionTable id="decisionTable">
+      <input id="clause1" label="Input">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>status</text>
+        </inputExpression>
+      </input>
+      <output id="clause2" label="Output" name="result" typeRef="string">
+      </output>
+      <rule id="rule1">
+        <inputEntry id="inputEntry1">
+          <text>a</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1">
+          <text>notok</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="two" name="Two">
+    <decisionTable id="twodecisionTable">
+      <input id="clause2" label="Input">
+        <inputExpression id="inputExpression2" typeRef="string">
+          <text>result</text>
+        </inputExpression>
+      </input>
+      <output id="clause2" label="status" name="status" typeRef="string">
+      </output>
+      <rule id="rule2">
+        <inputEntry id="inputEntry2">
+          <text>75</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2">
+          <text>a</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule3">
+        <inputEntry id="inputEntry3">
+          <text>50</text>
+        </inputEntry>
+        <outputEntry id="outputEntry3">
+          <text>b</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

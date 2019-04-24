@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,8 +15,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.cmd;
-
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -23,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
 /**
  * @author Roman Smirnov
@@ -45,11 +48,6 @@ public abstract class JobRetryCmd implements Command<Object> {
         .findJobById(jobId);
   }
 
-  protected void unlockJob(JobEntity job) {
-    job.setLockOwner(null);
-    job.setLockExpirationTime(null);
-  }
-
   protected void logException(JobEntity job) {
     if(exception != null) {
       job.setExceptionMessage(exception.getMessage());
@@ -64,7 +62,7 @@ public abstract class JobRetryCmd implements Command<Object> {
   }
 
   protected String getExceptionStacktrace() {
-    return getJobExceptionStacktrace(exception);
+    return ExceptionUtil.getExceptionStacktrace(exception);
   }
 
   protected boolean shouldDecrementRetriesFor(Throwable t) {

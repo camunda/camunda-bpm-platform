@@ -5,10 +5,12 @@
 
   <dependencies>
     <module name="javax.api"/>
+    <module name="org.joda.time" slot="2.1" />
 
     <module name="org.camunda.spin.camunda-spin-core" />
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
+    <module name="org.camunda.commons.camunda-commons-typed-values" />
 
     <module name="com.fasterxml.jackson.core.jackson-databind" />
     <module name="com.jayway.jsonpath.json-path" />

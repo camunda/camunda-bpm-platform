@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,14 +42,10 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   protected void creating(CmmnActivityExecution execution) {
     evaluateRequiredRule(execution);
-    evaluateRepetitionRule(execution);
   }
 
   public void created(CmmnActivityExecution execution) {
-    if (!execution.isCompleted() && !execution.isTerminated() && isAtLeastOneExitCriterionSatisfied(execution)) {
-      fireExitCriteria(execution);
-
-    } else if (execution.isAvailable() && isAtLeastOneEntryCriterionSatisfied(execution)) {
+    if (execution.isAvailable() && isAtLeastOneEntryCriterionSatisfied(execution)) {
       fireEntryCriteria(execution);
     }
   }
@@ -124,7 +124,6 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     String id = execution.getId();
 
     if (execution.isTerminated()) {
-      String message = "Case execution '"+id+"' is already terminated.";
       throw LOG.alreadyTerminatedException("exit", id);
     }
 
@@ -207,7 +206,6 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   public void fireEntryCriteria(CmmnActivityExecution execution) {
     boolean manualActivation = evaluateManualActivationRule(execution);
-
     if (manualActivation) {
       execution.enable();
 
@@ -219,15 +217,14 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   // manual activation rule //////////////////////////////////////////////
 
   protected boolean evaluateManualActivationRule(CmmnActivityExecution execution) {
+    boolean manualActivation = false;
     CmmnActivity activity = execution.getActivity();
-
     Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
     if (manualActivationRule != null) {
       CaseControlRule rule = (CaseControlRule) manualActivationRule;
-      return rule.evaluate(execution);
+      manualActivation = rule.evaluate(execution);
     }
-
-    return true;
+    return manualActivation;
   }
 
   // helper ///////////////////////////////////////////////////////////

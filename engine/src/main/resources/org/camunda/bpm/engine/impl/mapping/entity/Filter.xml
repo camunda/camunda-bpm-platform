@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
@@ -81,16 +84,16 @@
   <select id="selectFilter" parameterType="string" resultMap="filterResultMap">
     select * from ${prefix}ACT_RU_FILTER where ID_ = #{id, jdbcType=VARCHAR}
   </select>
-
+  
   <select id="selectFilter_postgres" parameterType="string" resultMap="filterResultMap_postgres">
     select * from ${prefix}ACT_RU_FILTER where ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
   <select id="selectFilterByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
-  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
-    ${limitBetweenClob}
+    select ${distinct} RES.*
+    ${limitBetween}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}
@@ -99,20 +102,46 @@
   <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
-    ${limitBetweenClob}
+    select ${distinct} RES.*
+    ${limitBetween}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}
   </select>
 
+  <select id="selectFilterByQueryCriteria_oracleDb2" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
+    <!--
+    SEE: https://app.camunda.com/jira/browse/CAM-6014
+     -->
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    SELECT RES.*, J.QUERY_, J.PROPERTIES_ FROM (
+      ${limitBefore}
+      select ${distinct} RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_
+      ${limitBetweenFilter}
+      <include refid="selectFilterByQueryCriteriaSql" />
+      ${orderBy}
+      ${limitAfter}
+    ) RES
+    INNER JOIN ${prefix}ACT_RU_FILTER J ON RES.ID_ = J.ID_
+    <if test="orderingProperties.size() > 0">
+      ORDER BY
+      <foreach item="orderingProperty" index="index" collection="orderingProperties" separator=",">
+        ${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperty, index)}
+      </foreach>
+    </if>
+  </select>
+
    <select id="selectFilterCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectFilterByQueryCriteriaSql" />
   </select>
 
   <sql id="selectFilterByQueryCriteriaSql">
+
     from ${prefix}ACT_RU_FILTER RES
+    
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
+    
     <where>
       <if test="filterId != null">
         RES.ID_ = #{filterId}
@@ -124,7 +153,7 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike} ESCAPE ${escapeChar}
       </if>
       <if test="owner != null">
         and RES.OWNER_ = #{owner}

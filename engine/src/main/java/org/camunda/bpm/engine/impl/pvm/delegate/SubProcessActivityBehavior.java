@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.pvm.delegate;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
@@ -29,11 +32,16 @@ public interface SubProcessActivityBehavior extends ActivityBehavior {
    * This should be called before the process instance is destroyed.
    *
    * @param targetExecution execution of the calling process instance to pass the variables to
-   * @param subProcessInstance process instance of the subprocess where the variables extract from
+   * @param calledElementInstance instance of the called element that serves as the variable source
    */
-  void passOutputVariablesFromSubprocess(VariableScope targetExecution, VariableScope subProcessInstance);
+  void passOutputVariables(ActivityExecution targetExecution, VariableScope calledElementInstance);
 
-  /** called after the process instance is destroyed for
-   * this activity to perform its outgoing control flow logic. */
+  /**
+   * Called after the process instance is destroyed for
+   * this activity to perform its outgoing control flow logic.
+   *
+   * @param execution
+   * @throws java.lang.Exception
+   */
   void completed(ActivityExecution execution) throws Exception;
 }

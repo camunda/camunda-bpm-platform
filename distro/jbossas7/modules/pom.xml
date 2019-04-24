@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -36,10 +36,6 @@
         <exclusion>
           <groupId>joda-time</groupId>
           <artifactId>joda-time</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -95,7 +91,8 @@
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-freemarker</artifactId>
     </dependency>
-    
+
+    <!-- exclude slf4j as it is part of jboss distro -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -165,6 +162,28 @@
                   </mapper>
                 </copy>
 
+                <delete dir="target/modules/org/camunda/commons" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.commons.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
+                <delete dir="target/modules/org/camunda/template-engines" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.template-engines.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.template-engines}.jar" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
                 <copy todir="target/modules" flatten="false">
                   <fileset dir="src/main/modules" />
                 </copy>
@@ -186,6 +205,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.camunda.template-engines@" value="${version.camunda.template-engines}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.mybatis@" value="${version.mybatis}">
                   <include name="**/module.xml" />
                 </replace>
 

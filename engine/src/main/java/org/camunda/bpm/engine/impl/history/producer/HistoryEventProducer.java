@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,15 +18,19 @@ package org.camunda.bpm.engine.impl.history.producer;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.task.IdentityLink;
 
 /**
  * <p>The producer for history events. The history event producer is
@@ -39,74 +47,106 @@ public interface HistoryEventProducer {
   // Process instances //////////////////////////////////////
 
   /**
-   * Creates the history event fired when an process instances is <strong>created</strong>.
+   * Creates the history event fired when a process instances is <strong>created</strong>.
    *
    * @param execution the current execution.
    * @return the history event
    */
-  public HistoryEvent createProcessInstanceStartEvt(DelegateExecution execution);
+  HistoryEvent createProcessInstanceStartEvt(DelegateExecution execution);
 
   /**
    * Creates the history event fired when a process instance is <strong>updated</strong>.
    *
-   * @param processExecution the current case execution
+   * @param execution the process instance
    * @return the created history event
    */
-  public HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution);
+  HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution);
 
   /**
-   * Creates the history event fired when a process instances is <strong>ended</strong>.
+   * Creates the history event fired when a process instance is <strong>migrated</strong>.
+   *
+   * @param execution the process instance
+   * @return the created history event
+   */
+  HistoryEvent createProcessInstanceMigrateEvt(DelegateExecution execution);
+
+  /**
+   * Creates the history event fired when a process instance is <strong>ended</strong>.
    *
    * @param execution the current execution.
    * @return the history event
    */
-  public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution);
+  HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution);
 
   // Activity instances /////////////////////////////////////
 
   /**
-   * Creates the history event fired when an activity instances is <strong>started</strong>.
+   * Creates the history event fired when an activity instance is <strong>started</strong>.
    *
    * @param execution the current execution.
    * @return the history event
    */
-  public HistoryEvent createActivityInstanceStartEvt(DelegateExecution execution);
+  HistoryEvent createActivityInstanceStartEvt(DelegateExecution execution);
 
   /**
-   * Creates the history event fired when an activity instances is <strong>updated</strong>.
+   * Creates the history event fired when an activity instance is <strong>updated</strong>.
+   *
+   * @param execution the current execution.
+   * @return the history event
+   */
+  HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution);
+
+  /**
+   * Creates the history event fired when an activity instance is <strong>updated</strong>.
    *
    * @param execution the current execution.
    * @param task the task association that is currently updated. (May be null in case there is not task associated.)
    * @return the history event
    */
-  public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task);
+  HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task);
 
   /**
-   * Creates the history event fired when an activity instances is <strong>ended</strong>.
+   * Creates the history event which is fired when an activity instance is migrated.
+   *
+   * @param actInstance the migrated activity instance which contains the new id's
+   * @return the created history event
+   */
+  HistoryEvent createActivityInstanceMigrateEvt(MigratingActivityInstance actInstance);
+
+  /**
+   * Creates the history event fired when an activity instance is <strong>ended</strong>.
    *
    * @param execution the current execution.
    * @return the history event
    */
-  public HistoryEvent createActivityInstanceEndEvt(DelegateExecution execution);
+  HistoryEvent createActivityInstanceEndEvt(DelegateExecution execution);
 
 
   // Task Instances /////////////////////////////////////////
 
   /**
-   * Creates the history event fired when a task instances is <strong>created</strong>.
+   * Creates the history event fired when a task instance is <strong>created</strong>.
    *
    * @param task the task
    * @return the history event
    */
-  public HistoryEvent createTaskInstanceCreateEvt(DelegateTask task);
+  HistoryEvent createTaskInstanceCreateEvt(DelegateTask task);
 
   /**
-   * Creates the history event fired when a task instances is <strong>updated</strong>.
+   * Creates the history event fired when a task instance is <strong>updated</strong>.
    *
    * @param task the task
    * @return the history event
    */
-  public HistoryEvent createTaskInstanceUpdateEvt(DelegateTask task);
+  HistoryEvent createTaskInstanceUpdateEvt(DelegateTask task);
+
+  /**
+   * Creates the history event fired when a task instance is <strong>migrated</strong>.
+   *
+   * @param task the task
+   * @return the history event
+   */
+  HistoryEvent createTaskInstanceMigrateEvt(DelegateTask task);
 
   /**
    * Creates the history event fired when a task instances is <strong>completed</strong>.
@@ -115,7 +155,7 @@ public interface HistoryEventProducer {
    * @param deleteReason
    * @return the history event
    */
-  public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason);
+  HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason);
 
   // User Operation Logs ///////////////////////////////
 
@@ -127,7 +167,7 @@ public interface HistoryEventProducer {
    * @param context the {@link UserOperationLogContext} providing the needed informations
    * @return a {@link List} of {@link HistoryEvent}s
    */
-  public List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context);
+  List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context);
 
   // HistoricVariableUpdateEventEntity //////////////////////
 
@@ -138,7 +178,7 @@ public interface HistoryEventProducer {
    * @param the scope to which the variable is linked
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
+  HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   /**
    * Creates the history event fired when a variable is <strong>updated</strong>.
@@ -147,7 +187,16 @@ public interface HistoryEventProducer {
    * @param the scope to which the variable is linked
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
+  HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
+
+  /**
+   * Creates the history event fired when a variable is <strong>migrated</strong>.
+   *
+   * @param variableInstance the runtime variable instance
+   * @param the scope to which the variable is linked
+   * @return the history event
+   */
+  HistoryEvent createHistoricVariableMigrateEvt(VariableInstanceEntity variableInstance);
 
   /**
    * Creates the history event fired when a variable is <strong>deleted</strong>.
@@ -156,7 +205,7 @@ public interface HistoryEventProducer {
    * @param variableScopeImpl
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
+  HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
 
   // Form properties //////////////////////////////////////////
 
@@ -169,15 +218,17 @@ public interface HistoryEventProducer {
    * @param taskId
    * @return the history event
    */
-  public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, String propertyValue, String taskId);
+  HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, String propertyValue, String taskId);
 
   // Incidents //////////////////////////////////////////
 
-  public HistoryEvent createHistoricIncidentCreateEvt(Incident incident);
+  HistoryEvent createHistoricIncidentCreateEvt(Incident incident);
 
-  public HistoryEvent createHistoricIncidentResolveEvt(Incident incident);
+  HistoryEvent createHistoricIncidentResolveEvt(Incident incident);
 
-  public HistoryEvent createHistoricIncidentDeleteEvt(Incident incident);
+  HistoryEvent createHistoricIncidentDeleteEvt(Incident incident);
+
+  HistoryEvent createHistoricIncidentMigrateEvt(Incident incident);
 
   // Job Log ///////////////////////////////////////////
 
@@ -186,27 +237,84 @@ public interface HistoryEventProducer {
    *
    * @since 7.3
    */
-  public HistoryEvent createHistoricJobLogCreateEvt(Job job);
+  HistoryEvent createHistoricJobLogCreateEvt(Job job);
 
   /**
    * Creates the history event fired when the execution of a job <strong>failed</strong>.
    *
    * @since 7.3
    */
-  public HistoryEvent createHistoricJobLogFailedEvt(Job job, Throwable exception);
+  HistoryEvent createHistoricJobLogFailedEvt(Job job, Throwable exception);
 
   /**
    * Creates the history event fired when the execution of a job was <strong>successful</strong>.
    *
    * @since 7.3
    */
-  public HistoryEvent createHistoricJobLogSuccessfulEvt(Job job);
+  HistoryEvent createHistoricJobLogSuccessfulEvt(Job job);
 
   /**
    * Creates the history event fired when the a job has been <strong>deleted</strong>.
    *
    * @since 7.3
    */
-  public HistoryEvent createHistoricJobLogDeleteEvt(Job job);
+  HistoryEvent createHistoricJobLogDeleteEvt(Job job);
+
+  /**
+   * Creates the history event fired when the a batch has been <strong>started</strong>.
+   *
+   * @since 7.5
+   */
+  HistoryEvent createBatchStartEvent(Batch batch);
+
+
+  /**
+   * Creates the history event fired when the a batch has been <strong>completed</strong>.
+   *
+   * @since 7.5
+   */
+  HistoryEvent createBatchEndEvent(Batch batch);
+
+  /**
+   * Fired when an identity link is added
+   * @param identitylink
+   * @return
+   */
+  HistoryEvent createHistoricIdentityLinkAddEvent(IdentityLink identitylink);
+
+  /**
+   * Fired when an identity links is deleted
+   * @param identityLink
+   * @return
+   */
+  HistoryEvent createHistoricIdentityLinkDeleteEvent(IdentityLink identityLink);
+
+  /**
+   * Creates the history event when an external task has been <strong>created</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogCreatedEvt(ExternalTask task);
+
+  /**
+   * Creates the history event when the execution of an external task has <strong>failed</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogFailedEvt(ExternalTask task);
+
+  /**
+   * Creates the history event when the execution of an external task was <strong>successful</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogSuccessfulEvt(ExternalTask task);
+
+  /**
+   * Creates the history event when an external task has been <strong>deleted</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogDeletedEvt(ExternalTask task);
 
 }

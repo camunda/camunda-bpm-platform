@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,8 +37,10 @@ public interface PvmAtomicOperation extends CoreAtomicOperation<PvmExecutionImpl
   PvmAtomicOperation ACTIVITY_START_CANCEL_SCOPE = new PvmAtomicOperationActivityStartCancelScope();
   PvmAtomicOperation ACTIVITY_START_INTERRUPT_SCOPE = new PvmAtomicOperationActivityStartInterruptEventScope();
   PvmAtomicOperation ACTIVITY_START_CREATE_SCOPE = new PvmAtomicOperationActivityStartCreateScope();
-  PvmAtomicOperation ACTIVITY_INIT_STACK = new PvmAtomicOperationActivityInitStack();
   PvmAtomicOperation ACTIVITY_INIT_STACK_NOTIFY_LISTENER_START = new PvmAtomicOperationActivityInitStackNotifyListenerStart();
+  PvmAtomicOperation ACTIVITY_INIT_STACK_NOTIFY_LISTENER_RETURN = new PvmAtomicOperationActivityInitStackNotifyListenerReturn();
+  PvmAtomicOperation ACTIVITY_INIT_STACK = new PvmAtomicOperationActivityInitStack(ACTIVITY_INIT_STACK_NOTIFY_LISTENER_START);
+  PvmAtomicOperation ACTIVITY_INIT_STACK_AND_RETURN = new PvmAtomicOperationActivityInitStack(ACTIVITY_INIT_STACK_NOTIFY_LISTENER_RETURN);
   PvmAtomicOperation ACTIVITY_EXECUTE = new PvmAtomicOperationActivityExecute();
   PvmAtomicOperation ACTIVITY_NOTIFY_LISTENER_END = new PvmAtomicOperationActivityNotifyListenerEnd();
   PvmAtomicOperation ACTIVITY_END = new PvmAtomicOperationActivityEnd();
@@ -51,4 +57,5 @@ public interface PvmAtomicOperation extends CoreAtomicOperation<PvmExecutionImpl
   PvmAtomicOperation DELETE_CASCADE = new PvmAtomicOperationDeleteCascade();
   PvmAtomicOperation DELETE_CASCADE_FIRE_ACTIVITY_END = new PvmAtomicOperationDeleteCascadeFireActivityEnd();
 
+  PvmAtomicOperation ACTIVITY_LEAVE = new PvmAtomicOperationActivityLeave();
 }

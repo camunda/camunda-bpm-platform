@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
+  xmlns:tns="Examples">
+  <message id="messageId" name="Message" />
+  <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
+
+  <process id="NestedInterruptingErrorEventSubprocessScenario" isExecutable="true">
+    <startEvent id="outerStart" />
+    <sequenceFlow sourceRef="outerStart" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+      <!-- main flow -->
+      <startEvent id="innerStart" />
+      <sequenceFlow sourceRef="innerStart" targetRef="innerTask" />
+      <userTask id="innerTask" />
+      <sequenceFlow sourceRef="innerTask" targetRef="innerEnd" />
+      <endEvent id="innerEnd" />
+
+      <!-- subprocess (second task may optionally throw BPMN error) -->
+      <subProcess id="innerEventSubProcess" triggeredByEvent="true">
+        <startEvent id="innerEventProcessStart" isInterrupting="false">
+          <messageEventDefinition messageRef="messageId" />
+        </startEvent>
+        <sequenceFlow sourceRef="innerEventProcessStart" targetRef="innerEventSubProcessTask" />
+        <userTask id="innerEventSubProcessTask" />
+        <sequenceFlow sourceRef="innerEventSubProcessTask" targetRef="throwErrorServiceTask" />
+        <serviceTask id="throwErrorServiceTask" camunda:class="org.camunda.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate" />
+        <sequenceFlow sourceRef="throwErrorServiceTask" targetRef="innerEventSubProcessEnd" />
+        <endEvent id="innerEventSubProcessEnd" />
+      </subProcess>
+    </subProcess>
+
+    <sequenceFlow sourceRef="subProcess" targetRef="outerEnd" />
+    <endEvent id="outerEnd" />
+
+    <!-- Event subprocess catching the error -->
+    <subProcess id="outerEventSubProcess" triggeredByEvent="true">
+      <startEvent id="outerEventProcessStart" isInterrupting="true">
+        <errorEventDefinition errorRef="errorId"/>
+      </startEvent>
+      <sequenceFlow sourceRef="outerEventProcessStart" targetRef="outerEventSubProcessTask" />
+      <userTask id="outerEventSubProcessTask" />
+      <sequenceFlow sourceRef="outerEventSubProcessTask" targetRef="outerEventSubProcessEnd" />
+      <endEvent id="outerEventSubProcessEnd" />
+    </subProcess>
+  </process>
+</definitions>

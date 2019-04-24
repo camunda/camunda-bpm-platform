@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,11 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import java.util.Collection;
+
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingUserTaskInstance;
+import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 
@@ -26,7 +38,7 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
  * @author Joram Barrez
  * @author Roman Smirnov
  */
-public class UserTaskActivityBehavior extends TaskActivityBehavior {
+public class UserTaskActivityBehavior extends TaskActivityBehavior implements MigrationObserverBehavior {
 
   protected TaskDecorator taskDecorator;
 
@@ -39,7 +51,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
     this.taskDecorator = taskDecorator;
   }
 
-  public void execute(ActivityExecution execution) throws Exception {
+  @Override
+  public void performExecution(ActivityExecution execution) throws Exception {
     TaskEntity task = TaskEntity.createAndInsert(execution);
 
     taskDecorator.decorate(task, execution);
@@ -54,6 +67,33 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
     leave(execution);
+  }
+
+  // migration
+
+  @Override
+  public void migrateScope(ActivityExecution scopeExecution) {
+  }
+
+  @Override
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+    ExecutionEntity execution = migratingInstance.resolveRepresentativeExecution();
+
+    for (TaskEntity task : execution.getTasks()) {
+      migratingInstance.addMigratingDependentInstance(new MigratingUserTaskInstance(task, migratingInstance));
+      parseContext.consume(task);
+
+      Collection<VariableInstanceEntity> variables = task.getVariablesInternal();
+
+      if (variables != null) {
+        for (VariableInstanceEntity variable : variables) {
+          // we don't need to represent task variables in the migrating instance structure because
+          // they are migrated by the MigratingTaskInstance as well
+          parseContext.consume(variable);
+        }
+      }
+    }
+
   }
 
   // getters

@@ -5,7 +5,7 @@
   targetNamespace="Examples"
   xmlns:tns="Examples">
 
-  <process id="process">
+  <process id="process" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />

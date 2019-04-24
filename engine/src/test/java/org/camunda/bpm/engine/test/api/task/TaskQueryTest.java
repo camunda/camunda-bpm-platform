@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,8 +31,10 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPri
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +54,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -65,6 +70,8 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Joram Barrez
@@ -80,6 +87,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   // max value
   protected static final double MAX_DOUBLE_VALUE = 10E+124;
 
+  @Override
   public void setUp() throws Exception {
 
     identityService.saveUser(identityService.newUser("kermit"));
@@ -96,6 +104,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     taskIds = generateTestTasks();
   }
 
+  @Override
   public void tearDown() throws Exception {
     identityService.deleteGroup("accountancy");
     identityService.deleteGroup("management");
@@ -174,7 +183,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByNameLike() {
-    TaskQuery query = taskService.createTaskQuery().taskNameLike("gonzo%");
+    TaskQuery query = taskService.createTaskQuery().taskNameLike("gonzo\\_%");
     assertNotNull(query.singleResult());
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
@@ -217,8 +226,53 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+
+  /**
+   * CAM-6363
+   *
+   * Verify that search by name returns case insensitive results
+   */
+  public void testTaskQueryLookupByNameCaseInsensitive() {
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskName("testTask");
+
+
+    List<Task> tasks = query.list();
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(6));
+
+    query = taskService.createTaskQuery();
+    query.taskName("TeStTaSk");
+
+    tasks = query.list();
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(6));
+  }
+
+  /**
+   * CAM-6165
+   *
+   * Verify that search by name like returns case insensitive results
+   */
+  public void testTaskQueryLookupByNameLikeCaseInsensitive() {
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskNameLike("%task%");
+
+
+    List<Task> tasks = query.list();
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(10));
+
+    query = taskService.createTaskQuery();
+    query.taskNameLike("%Task%");
+
+    tasks = query.list();
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(10));
+  }
+
   public void testQueryByDescriptionLike() {
-    TaskQuery query = taskService.createTaskQuery().taskDescriptionLike("%gonzo%");
+    TaskQuery query = taskService.createTaskQuery().taskDescriptionLike("%gonzo\\_%");
     assertNotNull(query.singleResult());
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
@@ -264,6 +318,18 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     query = taskService.createTaskQuery().taskMaxPriority(3);
     assertEquals(6, query.list().size());
+
+    query = taskService.createTaskQuery().taskMinPriority(50).taskMaxPriority(10);
+    assertEquals(0, query.list().size());
+
+    query = taskService.createTaskQuery().taskPriority(30).taskMaxPriority(10);
+    assertEquals(0, query.list().size());
+
+    query = taskService.createTaskQuery().taskMinPriority(30).taskPriority(10);
+    assertEquals(0, query.list().size());
+
+    query = taskService.createTaskQuery().taskMinPriority(30).taskPriority(20).taskMaxPriority(10);
+    assertEquals(0, query.list().size());
   }
 
   public void testQueryByInvalidPriority() {
@@ -276,7 +342,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByAssignee() {
-    TaskQuery query = taskService.createTaskQuery().taskAssignee("gonzo");
+    TaskQuery query = taskService.createTaskQuery().taskAssignee("gonzo_");
     assertEquals(1, query.count());
     assertEquals(1, query.list().size());
     assertNotNull(query.singleResult());
@@ -288,7 +354,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByAssigneeLike() {
-    TaskQuery query = taskService.createTaskQuery().taskAssigneeLike("gonz%");
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeLike("gonz%\\_");
     assertEquals(1, query.count());
     assertEquals(1, query.list().size());
     assertNotNull(query.singleResult());
@@ -314,6 +380,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(10, query.list().size());
   }
 
+  public void testQueryByAssigned() {
+    TaskQuery query = taskService.createTaskQuery().taskAssigned();
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+  }
+
   public void testQueryByCandidateUser() {
     // kermit is candidate for 12 tasks, two of them are already assigned
     TaskQuery query = taskService.createTaskQuery().taskCandidateUser("kermit");
@@ -331,7 +403,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(12, query.count());
     assertEquals(12, query.list().size());
 
-    // fozzie is candidate for 3 tasks, one of them is already assigned
+    // fozzie is candidate for one task and her groups are candidate for 2 tasks, one of them is already assigned
     query = taskService.createTaskQuery().taskCandidateUser("fozzie");
     assertEquals(2, query.count());
     assertEquals(2, query.list().size());
@@ -413,6 +485,26 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.list().size());
   }
 
+  public void testQueryWithCandidateGroups() {
+    // test withCandidateGroups
+    TaskQuery query = taskService.createTaskQuery().withCandidateGroups();
+    assertEquals(4, query.count());
+    assertEquals(4, query.list().size());
+
+    assertEquals(5, query.includeAssignedTasks().count());
+    assertEquals(5, query.includeAssignedTasks().list().size());
+  }
+
+  public void testQueryWithoutCandidateGroups() {
+    // test withoutCandidateGroups
+    TaskQuery query = taskService.createTaskQuery().withoutCandidateGroups();
+    assertEquals(6, query.count());
+    assertEquals(6, query.list().size());
+
+    assertEquals(7, query.includeAssignedTasks().count());
+    assertEquals(7, query.includeAssignedTasks().list().size());
+  }
+
   public void testQueryByNullCandidateGroup() {
     try {
       taskService.createTaskQuery().taskCandidateGroup(null).list();
@@ -451,6 +543,60 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(5, query.list().size());
   }
 
+  public void testQueryByCandidateGroupInAndCandidateGroup() {
+    List<String> groups = Arrays.asList("management", "accountancy");
+    String candidateGroup = "management";
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup);
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    try {
+      query.singleResult();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup).includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+    // Unexisting groups or groups that don't have candidate tasks shouldn't influence other results
+    groups = Arrays.asList("management", "accountancy", "sales", "unexising");
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup);
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    try {
+      query.singleResult();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup).includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+    // sales group is candidate for no tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup("sales");
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup("sales").includeAssignedTasks();
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
+  public void testQueryByCandidateGroupInAndCandidateGroupNotIntersected() {
+    List<String> groups = Arrays.asList("accountancy");
+    String candidateGroup = "management";
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup);
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
   public void testQueryByNullCandidateGroupIn() {
     try {
       taskService.createTaskQuery().taskCandidateGroupIn(null).list();
@@ -477,7 +623,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
 
-    String taskId= taskService.createTaskQuery().taskAssignee("gonzo").singleResult().getId();
+    String taskId= taskService.createTaskQuery().taskAssignee("gonzo_").singleResult().getId();
     taskService.delegateTask(taskId, "kermit");
 
     query = taskService.createTaskQuery().taskDelegationState(null);
@@ -546,18 +692,37 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.list().size());
   }
 
+  public void testCreateTimeCombinations() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+
+    // Exact matching of createTime, should result in 6 tasks
+    Date createTime = sdf.parse("01/01/2001 01:01:01.000");
+
+    Date oneHourAgo = new Date(createTime.getTime() - 60 * 60 * 1000);
+    Date oneHourLater = new Date(createTime.getTime() + 60 * 60 * 1000);
+
+    assertEquals(6, taskService.createTaskQuery()
+        .taskCreatedAfter(oneHourAgo).taskCreatedOn(createTime).taskCreatedBefore(oneHourLater).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .taskCreatedAfter(oneHourLater).taskCreatedOn(createTime).taskCreatedBefore(oneHourAgo).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .taskCreatedAfter(oneHourLater).taskCreatedOn(createTime).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .taskCreatedOn(createTime).taskCreatedBefore(oneHourAgo).count());
+  }
+
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
   public void testTaskDefinitionKey() throws Exception {
 
     // Start process instance, 2 tasks will be available
     runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
 
-    // 1 task should exist with key "taskKey1"
-    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("taskKey1").list();
+    // 1 task should exist with key "taskKey_1"
+    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey("taskKey_1").list();
     assertNotNull(tasks);
     assertEquals(1, tasks.size());
 
-    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey_1", tasks.get(0).getTaskDefinitionKey());
 
     // No task should be found with unexisting key
     Long count = taskService.createTaskQuery().taskDefinitionKey("unexistingKey").count();
@@ -570,27 +735,27 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // Start process instance, 2 tasks will be available
     runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
 
-    // Ends with matching, TaskKey1 and TaskKey123 match
-    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKeyLike("taskKey1%").orderByTaskName().asc().list();
+    // Ends with matching, TaskKey_1 and TaskKey_123 match
+    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKeyLike("taskKey\\_1%").orderByTaskName().asc().list();
     assertNotNull(tasks);
     assertEquals(2, tasks.size());
 
-    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
-    assertEquals("taskKey123", tasks.get(1).getTaskDefinitionKey());
+    assertEquals("taskKey_1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey_123", tasks.get(1).getTaskDefinitionKey());
 
-    // Starts with matching, TaskKey123 matches
-    tasks = taskService.createTaskQuery().taskDefinitionKeyLike("%123").orderByTaskName().asc().list();
+    // Starts with matching, TaskKey_123 matches
+    tasks = taskService.createTaskQuery().taskDefinitionKeyLike("%\\_123").orderByTaskName().asc().list();
     assertNotNull(tasks);
     assertEquals(1, tasks.size());
 
-    assertEquals("taskKey123", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey_123", tasks.get(0).getTaskDefinitionKey());
 
-    // Contains matching, TaskKey123 matches
-    tasks = taskService.createTaskQuery().taskDefinitionKeyLike("%Key12%").orderByTaskName().asc().list();
+    // Contains matching, TaskKey_123 matches
+    tasks = taskService.createTaskQuery().taskDefinitionKeyLike("%Key\\_12%").orderByTaskName().asc().list();
     assertNotNull(tasks);
     assertEquals(1, tasks.size());
 
-    assertEquals("taskKey123", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey_123", tasks.get(0).getTaskDefinitionKey());
 
 
     // No task should be found with unexisting key
@@ -605,31 +770,51 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("taskDefinitionKeyProcess");
 
     // 1 Task should be found with TaskKey1
-    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey1").list();
+    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey_1").list();
     assertNotNull(tasks);
     assertEquals(1, tasks.size());
 
-    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey_1", tasks.get(0).getTaskDefinitionKey());
 
-    // 2 Tasks should be found with TaskKey1 and TaskKey123
-    tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey1", "taskKey123").orderByTaskName().asc().list();
+    // 2 Tasks should be found with TaskKey_1 and TaskKey_123
+    tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey_1", "taskKey_123").orderByTaskName().asc().list();
     assertNotNull(tasks);
     assertEquals(2, tasks.size());
 
-    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
-    assertEquals("taskKey123", tasks.get(1).getTaskDefinitionKey());
+    assertEquals("taskKey_1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey_123", tasks.get(1).getTaskDefinitionKey());
 
     // 2 Tasks should be found with TaskKey1, TaskKey123 and UnexistingKey
-    tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey1", "taskKey123", "unexistingKey").orderByTaskName().asc().list();
+    tasks = taskService.createTaskQuery().taskDefinitionKeyIn("taskKey_1", "taskKey_123", "unexistingKey").orderByTaskName().asc().list();
     assertNotNull(tasks);
     assertEquals(2, tasks.size());
 
-    assertEquals("taskKey1", tasks.get(0).getTaskDefinitionKey());
-    assertEquals("taskKey123", tasks.get(1).getTaskDefinitionKey());
+    assertEquals("taskKey_1", tasks.get(0).getTaskDefinitionKey());
+    assertEquals("taskKey_123", tasks.get(1).getTaskDefinitionKey());
 
     // No task should be found with UnexistingKey
     Long count = taskService.createTaskQuery().taskDefinitionKeyIn("unexistingKey").count();
     assertEquals(0L, count.longValue());
+
+    count = taskService.createTaskQuery().taskDefinitionKey("unexistingKey").taskDefinitionKeyIn("taskKey1").count();
+    assertEquals(0l, count.longValue());
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableNameEqualsIgnoreCase() throws Exception {
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    taskService.setVariableLocal(task.getId(), variableName, variableValue);
+    
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().taskVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
   }
 
   @Deployment
@@ -679,7 +864,57 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals("integerVar", 999).count());
     assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals("stringVar", "999").count());
     assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals("booleanVar", false).count());
+  }
 
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
+  public void testTaskVariableValueEqualsIgnoreCase() throws Exception {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+
+    taskService.setVariableLocal(task.getId(), variableName, variableValue);
+
+    // query for existing variable should return one result
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValue).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName, variableValue.toLowerCase()).count());
+    
+    // query for non existing variable should return zero results
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
+    
+    // query for existing variable with different value should return zero results
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName, "nonExistentValue").count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName, "nonExistentValue".toLowerCase()).count());
+    
+    // query for case-insensitive variable value should only return a result when case-insensitive search is used
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValue.toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName, variableValue.toLowerCase()).count());
+    
+    // query for case-insensitive variable with not equals operator should only return a result when case-sensitive search is used
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName, variableValue.toLowerCase()).matchVariableValuesIgnoreCase().count());
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableValueNameEqualsIgnoreCase() throws Exception {
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    taskService.setVariableLocal(task.getId(), variableName, variableValue);
+
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().matchVariableValuesIgnoreCase().taskVariableValueEquals(variableName.toLowerCase(), variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().taskVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
@@ -703,6 +938,36 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVal").count());
     assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("nonExistingVar", "string%").count());
+
+    // test with null value
+    try {
+      taskService.createTaskQuery().taskVariableValueLike("stringVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
+  public void testTaskVariableValueLikeIgnoreCase() throws Exception {
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "stringValue");
+    
+    taskService.setVariablesLocal(task.getId(), variables);
+    
+    assertEquals(0, taskService.createTaskQuery().taskVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngValue".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngVal%".toLowerCase()).count());
+
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "stringVar%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngVar".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "%ngVar%".toLowerCase()).count());
+
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("stringVar", "stringVal".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().taskVariableValueLike("nonExistingVar", "stringVal%".toLowerCase()).count());
 
     // test with null value
     try {
@@ -831,10 +1096,10 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     Date date = Calendar.getInstance().getTime();
     variables.put("dateVar", date);
     variables.put("nullVar", null);
-
+    
     // Start process-instance with all types of variables
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-
+    
     // Test query matches
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("longVar", 928374L).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("shortVar",  (short) 123).count());
@@ -843,7 +1108,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("booleanVar", true).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("dateVar", date).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueEquals("nullVar", null).count());
-
+    
     // Test query for other values on existing variables
     assertEquals(0, taskService.createTaskQuery().processVariableValueEquals("longVar", 999L).count());
     assertEquals(0, taskService.createTaskQuery().processVariableValueEquals("shortVar",  (short) 999).count());
@@ -854,7 +1119,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     otherDate.add(Calendar.YEAR, 1);
     assertEquals(0, taskService.createTaskQuery().processVariableValueEquals("dateVar", otherDate.getTime()).count());
     assertEquals(0, taskService.createTaskQuery().processVariableValueEquals("nullVar", "999").count());
-
+    
     // Test querying for task variables don't match the process-variables
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("longVar", 928374L).count());
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("shortVar",  (short) 123).count());
@@ -863,31 +1128,78 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("booleanVar", true).count());
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("dateVar", date).count());
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("nullVar", null).count());
-
+    
     // Test querying for task variables not equals
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals("longVar", 999L).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals("shortVar",  (short) 999).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals("integerVar", 999).count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals("stringVar", "999").count());
     assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals("booleanVar", false).count());
-
-    // and query for the existing variable with NOT shoudl result in nothing found:
+    
+    // and query for the existing variable with NOT should result in nothing found:
     assertEquals(0, taskService.createTaskQuery().processVariableValueNotEquals("longVar", 928374L).count());
-
+    
     // Test combination of task-variable and process-variable
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     taskService.setVariableLocal(task.getId(), "taskVar", "theValue");
     taskService.setVariableLocal(task.getId(), "longVar", 928374L);
-
+    
     assertEquals(1, taskService.createTaskQuery()
-            .processVariableValueEquals("longVar", 928374L)
-            .taskVariableValueEquals("taskVar", "theValue")
-            .count());
-
+        .processVariableValueEquals("longVar", 928374L)
+        .taskVariableValueEquals("taskVar", "theValue")
+        .count());
+    
     assertEquals(1, taskService.createTaskQuery()
-            .processVariableValueEquals("longVar", 928374L)
-            .taskVariableValueEquals("longVar", 928374L)
-            .count());
+        .processVariableValueEquals("longVar", 928374L)
+        .taskVariableValueEquals("longVar", 928374L)
+        .count());
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableNameEqualsIgnoreCase() throws Exception {
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(variableName, variableValue);
+    
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().processVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().processVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testTaskVariableValueEquals.bpmn20.xml")
+  public void testProcessVariableValueEqualsIgnoreCase() throws Exception {
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(variableName, variableValue);
+    
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    
+    // query for existing variable should return one result
+    assertEquals(1, taskService.createTaskQuery().processVariableValueEquals(variableName, variableValue).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals(variableName, variableValue.toLowerCase()).count());
+    
+    // query for non existing variable should return zero results
+    assertEquals(0, taskService.createTaskQuery().processVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals("nonExistentVariable", variableValue.toLowerCase()).count());
+    
+    // query for existing variable with different value should return zero results
+    assertEquals(0, taskService.createTaskQuery().processVariableValueEquals(variableName, "nonExistentValue").count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals(variableName, "nonExistentValue".toLowerCase()).count());
+    
+    // query for case-insensitive variable value should only return a result when case-insensitive search is used
+    assertEquals(0, taskService.createTaskQuery().processVariableValueEquals(variableName, variableValue.toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueEquals(variableName, variableValue.toLowerCase()).count());
+    
+    // query for case-insensitive variable with not equals operator should only return a result when case-sensitive search is used
+    assertEquals(1, taskService.createTaskQuery().processVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotEquals(variableName, variableValue.toLowerCase()).count());
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
@@ -911,6 +1223,32 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // test with null value
     try {
       taskService.createTaskQuery().processVariableValueLike("stringVar", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+  }
+  
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
+  public void testProcessVariableValueLikeIgnoreCase() throws Exception {
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "stringValue");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    
+    assertEquals(0, taskService.createTaskQuery().processVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngValue".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngVal%".toLowerCase()).count());
+    
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "stringVar%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngVar".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "%ngVar%".toLowerCase()).count());
+    
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", "stringVal".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("nonExistingVar", "stringVal%".toLowerCase()).count());
+    
+    // test with null value
+    try {
+      taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueLike("stringVar", null).count();
       fail("expected exception");
     } catch (final ProcessEngineException e) {/*OK*/}
   }
@@ -1222,9 +1560,9 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     for (Task task : tasks) {
       keysFound.add(task.getTaskDefinitionKey());
     }
-    assertTrue(keysFound.contains("taskKey123"));
+    assertTrue(keysFound.contains("taskKey_123"));
     assertTrue(keysFound.contains("theTask"));
-    assertTrue(keysFound.contains("taskKey1"));
+    assertTrue(keysFound.contains("taskKey_1"));
 
     // 1 Tasks should be found with oneTaskProcess,and NonExistingKey
     tasks = taskService.createTaskQuery().processDefinitionKeyIn("oneTaskProcess", "NonExistingKey").orderByTaskName().asc().list();
@@ -1236,13 +1574,17 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // No task should be found with NonExistingKey
     Long count = taskService.createTaskQuery().processDefinitionKeyIn("NonExistingKey").count();
     assertEquals(0L, count.longValue());
+
+    count = taskService.createTaskQuery()
+        .processDefinitionKeyIn("oneTaskProcess").processDefinitionKey("NonExistingKey").count();
+    assertEquals(0L, count.longValue());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testProcessDefinitionName() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    List<Task> tasks = taskService.createTaskQuery().processDefinitionName("The One Task Process").list();
+    List<Task> tasks = taskService.createTaskQuery().processDefinitionName("The%One%Task%Process").list();
     assertEquals(1, tasks.size());
     assertEquals(processInstance.getId(), tasks.get(0).getProcessInstanceId());
 
@@ -1253,7 +1595,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testProcessDefinitionNameLike() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    List<Task> tasks = taskService.createTaskQuery().processDefinitionNameLike("The One Task%").list();
+    List<Task> tasks = taskService.createTaskQuery().processDefinitionNameLike("The\\%One\\%Task%").list();
     assertEquals(1, tasks.size());
     assertEquals(processInstance.getId(), tasks.get(0).getProcessInstanceId());
 
@@ -1265,7 +1607,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testProcessInstanceBusinessKey() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
 
-    assertEquals(1, taskService.createTaskQuery().processDefinitionName("The One Task Process").processInstanceBusinessKey("BUSINESS-KEY-1").list().size());
+    assertEquals(1, taskService.createTaskQuery().processDefinitionName("The%One%Task%Process").processInstanceBusinessKey("BUSINESS-KEY-1").list().size());
     assertEquals(1, taskService.createTaskQuery().processInstanceBusinessKey("BUSINESS-KEY-1").list().size());
     assertEquals(0, taskService.createTaskQuery().processInstanceBusinessKey("NON-EXISTING").count());
   }
@@ -1300,13 +1642,17 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(tasks);
     assertEquals("theTask", task.getTaskDefinitionKey());
+
+    long count = taskService.createTaskQuery().processInstanceBusinessKeyIn("BUSINESS-KEY-1").processInstanceBusinessKey("NON-EXISTING-KEY")
+        .count();
+    assertEquals(0l, count);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testProcessInstanceBusinessKeyLike() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
 
-    assertEquals(1, taskService.createTaskQuery().processDefinitionName("The One Task Process").processInstanceBusinessKey("BUSINESS-KEY-1").list().size());
+    assertEquals(1, taskService.createTaskQuery().processDefinitionName("The%One%Task%Process").processInstanceBusinessKey("BUSINESS-KEY-1").list().size());
     assertEquals(1, taskService.createTaskQuery().processInstanceBusinessKeyLike("BUSINESS-KEY%").list().size());
     assertEquals(0, taskService.createTaskQuery().processInstanceBusinessKeyLike("BUSINESS-KEY").count());
     assertEquals(0, taskService.createTaskQuery().processInstanceBusinessKeyLike("BUZINESS-KEY%").count());
@@ -1399,6 +1745,29 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testTaskDueDateCombinations() throws ParseException {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // Set due-date on task
+    Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 01:12:13");
+    task.setDueDate(dueDate);
+    taskService.saveTask(task);
+
+    Date oneHourAgo = new Date(dueDate.getTime() - 60 * 60 * 1000);
+    Date oneHourLater = new Date(dueDate.getTime() + 60 * 60 * 1000);
+
+    assertEquals(1, taskService.createTaskQuery()
+        .dueAfter(oneHourAgo).dueDate(dueDate).dueBefore(oneHourLater).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .dueAfter(oneHourLater).dueDate(dueDate).dueBefore(oneHourAgo).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .dueAfter(oneHourLater).dueDate(dueDate).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .dueDate(dueDate).dueBefore(oneHourAgo).count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testFollowUpDate() throws Exception {
     Calendar otherDate = Calendar.getInstance();
 
@@ -1439,12 +1808,34 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testFollowUpDateCombinations() throws ParseException {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // Set follow-up date on task
+    Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 01:12:13");
+    task.setFollowUpDate(dueDate);
+    taskService.saveTask(task);
+
+    Date oneHourAgo = new Date(dueDate.getTime() - 60 * 60 * 1000);
+    Date oneHourLater = new Date(dueDate.getTime() + 60 * 60 * 1000);
+
+    assertEquals(1, taskService.createTaskQuery()
+        .followUpAfter(oneHourAgo).followUpDate(dueDate).followUpBefore(oneHourLater).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .followUpAfter(oneHourLater).followUpDate(dueDate).followUpBefore(oneHourAgo).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .followUpAfter(oneHourLater).followUpDate(dueDate).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .followUpDate(dueDate).followUpBefore(oneHourAgo).count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testQueryByActivityInstanceId() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) processInstance;
-    String activityInstanceId = execution.getActivityInstanceId();
+    String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     assertEquals(1, taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId).list().size());
   }
@@ -1453,15 +1844,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByMultipleActivityInstanceIds() throws Exception {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance1 instanceof ExecutionEntity);
-    ExecutionEntity execution1 = (ExecutionEntity) processInstance1;
-    String activityInstanceId1 = execution1.getActivityInstanceId();
+    String activityInstanceId1 = runtimeService.getActivityInstance(processInstance1.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance2 instanceof ExecutionEntity);
-    ExecutionEntity execution2 = (ExecutionEntity) processInstance2;
-    String activityInstanceId2 = execution2.getActivityInstanceId();
+    String activityInstanceId2 = runtimeService.getActivityInstance(processInstance2.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     List<Task> result1 = taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId1).list();
     assertEquals(1, result1.size());
@@ -1592,7 +1981,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     List<String> taskNames = getTaskNamesFromTasks(tasks);
     assertEquals("accountancy description", taskNames.get(0));
     assertEquals("accountancy description", taskNames.get(1));
-    assertEquals("gonzoTask", taskNames.get(2));
+    assertEquals("gonzo_Task", taskNames.get(2));
     assertEquals("managementAndAccountancyTask", taskNames.get(3));
     assertEquals("managementTask", taskNames.get(4));
     assertEquals("managementTask", taskNames.get(5));
@@ -1620,7 +2009,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("managementTask", taskNames.get(6));
     assertEquals("managementTask", taskNames.get(7));
     assertEquals("managementAndAccountancyTask", taskNames.get(8));
-    assertEquals("gonzoTask", taskNames.get(9));
+    assertEquals("gonzo_Task", taskNames.get(9));
     assertEquals("accountancy description", taskNames.get(10));
     assertEquals("accountancy description", taskNames.get(11));
   }
@@ -1634,32 +2023,34 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNativeQuery() {
-    assertEquals("ACT_RU_TASK", managementService.getTableName(Task.class));
-    assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    assertEquals(tablePrefix + "ACT_RU_TASK", managementService.getTableName(Task.class));
+    assertEquals(tablePrefix + "ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
     assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class)).list().size());
     assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class)).count());
 
-    assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM ACT_RU_TASK T1, ACT_RU_TASK T2").count());
+    assertEquals(144, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + tablePrefix + "ACT_RU_TASK T1, " + tablePrefix + "ACT_RU_TASK T2").count());
 
     // join task and variable instances
     assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T1, "+managementService.getTableName(VariableInstanceEntity.class)+" V1 WHERE V1.TASK_ID_ = T1.ID_").count());
     List<Task> tasks = taskService.createNativeTaskQuery().sql("SELECT T1.* FROM " + managementService.getTableName(Task.class) + " T1, "+managementService.getTableName(VariableInstanceEntity.class)+" V1 WHERE V1.TASK_ID_ = T1.ID_").list();
     assertEquals(1, tasks.size());
-    assertEquals("gonzoTask", tasks.get(0).getName());
+    assertEquals("gonzo_Task", tasks.get(0).getName());
 
     // select with distinct
-    assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM ACT_RU_TASK T1").list().size());
+    assertEquals(12, taskService.createNativeTaskQuery().sql("SELECT DISTINCT T1.* FROM " + tablePrefix + "ACT_RU_TASK T1").list().size());
 
-    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").count());
-    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = 'gonzoTask'").list().size());
+    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = 'gonzo_Task'").count());
+    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = 'gonzo_Task'").list().size());
 
     // use parameters
-    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask").count());
+    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzo_Task").count());
   }
 
   public void testNativeQueryPaging() {
-    assertEquals("ACT_RU_TASK", managementService.getTableName(Task.class));
-    assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    assertEquals(tablePrefix + "ACT_RU_TASK", managementService.getTableName(Task.class));
+    assertEquals(tablePrefix + "ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
     assertEquals(5, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class)).listPage(0, 5).size());
     assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class)).listPage(10, 12).size());
   }
@@ -1671,8 +2062,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     caseService
       .withCaseDefinition(caseDefinitionId)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1706,8 +2095,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     caseService
       .withCaseDefinitionByKey(caseDefinitionKey)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1744,8 +2131,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseDefinitionName(caseDefinitionName);
@@ -1768,16 +2153,15 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn", "org/camunda/bpm/engine/test/api/repository/three_.cmmn"})
   public void testQueryByCaseDefinitionNameLike() {
-    String caseDefinitionId = getCaseDefinitionId();
+    List<String> caseDefinitionIds = getCaseDefinitionIds();
 
-    caseService
-      .withCaseDefinition(caseDefinitionId)
-      .create();
-
-    startDefaultCaseExecutionManually();
-
+    for (String caseDefinitionId : caseDefinitionIds) {
+      caseService
+          .withCaseDefinition(caseDefinitionId)
+          .create();
+    }
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseDefinitionNameLike("One T%");
@@ -1787,6 +2171,9 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
 
     query.caseDefinitionNameLike("%Task%");
+    verifyQueryResults(query, 1);
+
+    query.caseDefinitionNameLike("%z\\_");
     verifyQueryResults(query, 1);
   }
 
@@ -1814,8 +2201,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .create()
       .getId();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceId(caseInstanceId);
@@ -1840,11 +2225,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .activityId("PI_ProcessTask_1")
         .singleResult()
         .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
 
@@ -1893,8 +2273,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .businessKey(businessKey)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceBusinessKey(businessKey);
@@ -1921,21 +2299,22 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByCaseInstanceBusinessKeyLike() {
     String caseDefinitionId = getCaseDefinitionId();
 
-    String businessKey = "aBusinessKey";
+    String businessKey = "aBusiness_Key";
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .businessKey(businessKey)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceBusinessKeyLike("aBus%");
     verifyQueryResults(query, 1);
 
-    query.caseInstanceBusinessKeyLike("%sinessKey");
+    query.caseInstanceBusinessKeyLike("%siness\\_Key");
+    verifyQueryResults(query, 1);
+
+    query.caseInstanceBusinessKeyLike("%sines%");
     verifyQueryResults(query, 1);
 
     query.caseInstanceBusinessKeyLike("%sines%");
@@ -1957,7 +2336,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
   public void testQueryByCaseExecutionId() {
     String caseDefinitionId = getCaseDefinitionId();
 
@@ -1998,8 +2377,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aNullValue", null)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueEquals("aNullValue", null);
@@ -2016,12 +2393,62 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aStringValue", "abc")
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueEquals("aStringValue", "abc");
 
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testCaseInstanceVariableNameEqualsIgnoreCase() throws Exception {
+    String caseDefinitionId = getCaseDefinitionId();
+
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+
+    caseService.withCaseDefinition(caseDefinitionId).setVariable(variableName, variableValue).create();
+
+    // query for case-insensitive variable name should only return a result if case-insensitive search is used
+    assertEquals(1, taskService.createTaskQuery().matchVariableNamesIgnoreCase().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+    assertEquals(0, taskService.createTaskQuery().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValue).count());
+
+    // query should treat all variables case-insensitively, even when flag is set after variable
+    assertEquals(1, taskService.createTaskQuery().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValue).matchVariableNamesIgnoreCase().count());
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueEqualsIgnoreCase() {
+    String caseDefinitionId = getCaseDefinitionId();
+    
+    String variableName = "someVariable";
+    String variableValue = "someCamelCaseValue";
+    
+    caseService
+    .withCaseDefinition(caseDefinitionId)
+    .setVariable(variableName, variableValue)
+    .create();
+    
+    TaskQuery query;
+    
+    // query for case-insensitive variable value should only return a result when case-insensitive search is used
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals(variableName, variableValue.toLowerCase());
+    verifyQueryResults(query, 1);
+    query = taskService.createTaskQuery().caseInstanceVariableValueEquals(variableName, variableValue.toLowerCase());
+    verifyQueryResults(query, 0);
+    
+    // query for non existing variable should return zero results
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals("nonExistingVariable", variableValue.toLowerCase());
+    verifyQueryResults(query, 0);
+    
+    // query for existing variable with different value should return zero results
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueEquals(variableName, "nonExistentValue".toLowerCase());
+    verifyQueryResults(query, 0);
+    
+    // query for case-insensitive variable with not equals operator should only return a result when case-sensitive search is used
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotEquals(variableName, variableValue.toLowerCase());
+    verifyQueryResults(query, 0);
+    query = taskService.createTaskQuery().caseInstanceVariableValueNotEquals(variableName, variableValue.toLowerCase());
     verifyQueryResults(query, 1);
   }
 
@@ -2033,8 +2460,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2052,8 +2477,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueEquals("aShortValue", (short) 123);
@@ -2070,8 +2493,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("anIntegerValue", 456)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueEquals("anIntegerValue", 456);
@@ -2087,8 +2508,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2108,8 +2527,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueEquals("aDateValue", now);
@@ -2125,8 +2542,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2145,8 +2560,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2169,8 +2582,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2203,7 +2614,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   protected void startDefaultCaseWithVariable(Object variableValue, String variableName) {
     String caseDefinitionId = getCaseDefinitionId();
     createCaseWithVariable(caseDefinitionId, variableValue, variableName);
-    startDefaultCaseExecutionManually();
   }
 
   /**
@@ -2215,6 +2625,18 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
     return caseDefinitionId;
+  }
+
+  /**
+   * @return the case definition ids
+   */
+  protected List<String> getCaseDefinitionIds() {
+    List<String> caseDefinitionIds = new ArrayList<String>();
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
+    for (CaseDefinition caseDefinition: caseDefinitions) {
+      caseDefinitionIds.add(caseDefinition.getId());
+    }
+    return caseDefinitionIds;
   }
 
   protected void createCaseWithVariable(String caseDefinitionId, Object variableValue, String variableName) {
@@ -2233,8 +2655,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aStringValue", "abc")
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueNotEquals("aStringValue", "abd");
@@ -2250,8 +2670,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2269,8 +2687,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueNotEquals("aShortValue", (short) 124);
@@ -2287,8 +2703,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("anIntegerValue", 456)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueNotEquals("anIntegerValue", 457);
@@ -2304,8 +2718,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2325,8 +2737,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     Date before = new Date(now.getTime() - 100000);
 
     TaskQuery query = taskService.createTaskQuery();
@@ -2344,8 +2754,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2410,8 +2818,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2431,8 +2837,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2449,8 +2853,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2470,8 +2872,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aStringValue", "abc")
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueGreaterThan("aStringValue", "ab");
@@ -2488,8 +2888,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2509,8 +2907,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueGreaterThan("aShortValue", (short) 122);
@@ -2528,8 +2924,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("anIntegerValue", 456)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueGreaterThan("anIntegerValue", 455);
@@ -2546,8 +2940,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2568,8 +2960,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     Date before = new Date(now.getTime() - 100000);
@@ -2589,8 +2979,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueGreaterThan("aDoubleValue", 1.4);
@@ -2609,8 +2997,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2634,8 +3020,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2644,12 +3028,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})
   public void testQueryByFileCaseInstanceVariableValueGreaterThan() {
     FileValue fileValue = createDefaultFileValue();
     String variableName = "aFileValue";
 
     startDefaultCaseWithVariable(fileValue, variableName);
+    startDefaultCaseExecutionManually();
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2669,8 +3054,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aNullValue", null)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2688,8 +3071,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2714,8 +3095,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aBooleanValue", true)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2733,8 +3112,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2759,8 +3136,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("anIntegerValue", 456)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueGreaterThanOrEquals("anIntegerValue", 455);
@@ -2783,8 +3158,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2811,8 +3184,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     Date before = new Date(now.getTime() - 100000);
@@ -2837,8 +3208,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2865,8 +3234,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2888,8 +3255,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2924,8 +3289,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aNullValue", null)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -2944,8 +3307,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aStringValue", "abc")
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueLessThan("aStringValue", "abd");
@@ -2962,8 +3323,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2983,8 +3342,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueLessThan("aShortValue", (short) 124);
@@ -3002,8 +3359,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("anIntegerValue", 456)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueLessThan("anIntegerValue", 457);
@@ -3020,8 +3375,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3042,8 +3395,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     Date after = new Date(now.getTime() + 100000);
@@ -3063,8 +3414,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueLessThan("aDoubleValue", 1.6);
@@ -3083,8 +3432,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aByteArrayValue", bytes)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3107,8 +3454,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3142,8 +3487,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aNullValue", null)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -3161,8 +3504,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3187,8 +3528,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aBooleanValue", true)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -3206,8 +3545,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3232,8 +3569,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("anIntegerValue", 456)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueLessThanOrEquals("anIntegerValue", 457);
@@ -3256,8 +3591,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3284,8 +3617,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     Date after = new Date(now.getTime() + 100000);
@@ -3310,8 +3641,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3338,8 +3667,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -3361,8 +3688,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aSerializableValue", serializable)
       .create();
-
-    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3396,8 +3721,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aNullValue", null)
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     try {
@@ -3416,8 +3739,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aStringValue", "abc")
       .create();
 
-    startDefaultCaseExecutionManually();
-
     TaskQuery query = taskService.createTaskQuery();
 
     query.caseInstanceVariableValueLike("aStringValue", "ab%");
@@ -3434,6 +3755,26 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     query.caseInstanceVariableValueLike("aStringValue", "%b%");
 
+    verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueLikeIgnoreCase() {
+    String caseDefinitionId = getCaseDefinitionId();
+    
+    caseService
+    .withCaseDefinition(caseDefinitionId)
+    .setVariable("aStringVariable", "aStringValue")
+    .create();
+    
+    TaskQuery query = taskService.createTaskQuery();
+    
+    query.caseInstanceVariableValueLike("aStringVariable", "aString%".toLowerCase());
+    
+    verifyQueryResults(query, 0);
+    
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueLike("aStringVariable", "aString%".toLowerCase());
+    
     verifyQueryResults(query, 1);
   }
 
@@ -3580,16 +3921,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     CaseInstance instance3 = caseService.createCaseInstanceByKey("oneTaskCase",
         Collections.<String, Object>singletonMap("var", "bValue"));
 
-    List<CaseExecution> caseExecutions = caseService.createCaseExecutionQuery()
-      .activityId("PI_HumanTask_1")
-      .list();
-
-    for (CaseExecution caseExecution : caseExecutions) {
-      caseService
-        .withCaseExecution(caseExecution.getId())
-        .manualStart();
-    }
-
     // when I make a task query with ascending variable ordering by tasks variables
     List<Task> tasks = taskService.createTaskQuery()
       .caseDefinitionKey("oneTaskCase")
@@ -3604,7 +3935,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(instance1.getId(), tasks.get(2).getCaseInstanceId());
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn")
   public void testQueryResultOrderingByCaseExecutionVariables() {
     // given three tasks with String case instance variables
     CaseInstance instance1 = caseService.createCaseInstanceByKey("oneTaskCase",
@@ -4329,6 +4660,104 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(taskDefinitionKey, key[0]);
   }
 
+  public void testQueryWithCandidateUsers() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+        .camundaCandidateUsers("anna")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .withCandidateUsers()
+        .list();
+    assertEquals(1, tasks.size());
+  }
+
+  public void testQueryWithoutCandidateUsers() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+        .camundaCandidateGroups("sales")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .withoutCandidateUsers()
+        .list();
+    assertEquals(1, tasks.size());
+  }
+
+  public void testQueryAssignedTasksWithCandidateUsers() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+        .camundaCandidateGroups("sales")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    try{
+      taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .includeAssignedTasks()
+        .withCandidateUsers()
+        .list();
+       fail("exception expected");
+    } catch (ProcessEngineException e) {}
+  }
+
+
+  public void testQueryAssignedTasksWithoutCandidateUsers() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+        .camundaCandidateGroups("sales")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    try{
+       taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .includeAssignedTasks()
+        .withoutCandidateUsers()
+        .list();
+       fail("exception expected");
+    } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByNameNotEqual() {
+    TaskQuery query = taskService.createTaskQuery().taskNameNotEqual("gonzo_Task");
+    assertEquals(11, query.list().size());
+  }
+
+  public void testQueryByNameNotLike() {
+    TaskQuery query = taskService.createTaskQuery().taskNameNotLike("management%");
+    assertEquals(9, query.list().size());
+    assertEquals(9, query.count());
+
+    query = taskService.createTaskQuery().taskNameNotLike("gonzo\\_%");
+    assertEquals(11, query.list().size());
+    assertEquals(11, query.count());
+  }
+
   /**
    * Generates some test tasks.
    * - 6 tasks where kermit is a candidate
@@ -4356,11 +4785,11 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     ClockUtil.setCurrentTime(sdf.parse("02/02/2002 02:02:02.000"));
     // 1 task for gonzo
     Task task = taskService.newTask();
-    task.setName("gonzoTask");
-    task.setDescription("gonzo description");
+    task.setName("gonzo_Task");
+    task.setDescription("gonzo_description");
     task.setPriority(4);
     taskService.saveTask(task);
-    taskService.setAssignee(task.getId(), "gonzo");
+    taskService.setAssignee(task.getId(), "gonzo_");
     taskService.setVariable(task.getId(), "testVar", "someVariable");
     taskService.addCandidateUser(task.getId(), "kermit");
     taskService.addCandidateUser(task.getId(), "gonzo");
@@ -4400,4 +4829,5 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     return ids;
   }
+
 }

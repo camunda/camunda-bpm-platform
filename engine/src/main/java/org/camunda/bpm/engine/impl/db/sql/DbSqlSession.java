@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.db.sql;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -31,10 +34,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.executor.BatchResult;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.WrongDbException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
@@ -82,6 +86,11 @@ public class DbSqlSession extends AbstractPersistenceSession {
     this.connectionMetadataDefaultSchema = schema;
   }
 
+  @Override
+  public List<BatchResult> flushOperations() {
+    return sqlSession.flushStatements();
+  }
+
   // select ////////////////////////////////////////////
 
   public List<?> selectList(String statement, Object parameter){
@@ -119,12 +128,17 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // Id using the DbIdGenerator while performing a deployment.
     if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
-      sqlSession.update(mappedStatement, parameter);
+      if (!Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+        sqlSession.update(mappedStatement, parameter);
+      } else {
+        sqlSession.selectList(mappedStatement, parameter);
+      }
     }
   }
 
   // insert //////////////////////////////////////////
 
+  @Override
   protected void insertEntity(DbEntityOperation operation) {
 
     final DbEntity dbEntity = operation.getEntity();
@@ -158,6 +172,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   // delete ///////////////////////////////////////////
 
+  @Override
   protected void deleteEntity(DbEntityOperation operation) {
 
     final DbEntity dbEntity = operation.getEntity();
@@ -170,6 +185,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
     // execute the delete
     int nrOfRowsDeleted = executeDelete(deleteStatement, dbEntity);
+    operation.setRowsAffected(nrOfRowsDeleted);
 
     // It only makes sense to check for optimistic locking exceptions for objects that actually have a revision
     if (dbEntity instanceof HasDbRevision && nrOfRowsDeleted == 0) {
@@ -191,17 +207,20 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // nothing to do
   }
 
+  @Override
   protected void deleteBulk(DbBulkOperation operation) {
     String statement = operation.getStatement();
     Object parameter = operation.getParameter();
 
     LOG.executeDatabaseBulkOperation("DELETE", statement, parameter);
 
-    executeDelete(statement, parameter);
+    int rowsAffected = executeDelete(statement, parameter);
+    operation.setRowsAffected(rowsAffected);
   }
 
   // update ////////////////////////////////////////
 
+  @Override
   protected void updateEntity(DbEntityOperation operation) {
 
     final DbEntity dbEntity = operation.getEntity();
@@ -211,18 +230,23 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
     LOG.executeDatabaseOperation("UPDATE", dbEntity);
 
-    // execute update
-    int numOfRowsUpdated = executeUpdate(updateStatement, dbEntity);
+    if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+      // execute update
+      executeUpdate(updateStatement, dbEntity);
+    } else {
+      // execute update
+      int numOfRowsUpdated = executeUpdate(updateStatement, dbEntity);
 
-    if (dbEntity instanceof HasDbRevision) {
-      if(numOfRowsUpdated != 1) {
-        // failed with optimistic locking
-        operation.setFailed(true);
-        return;
-      } else {
-        // increment revision of our copy
-        HasDbRevision versionedObject = (HasDbRevision) dbEntity;
-        versionedObject.setRevision(versionedObject.getRevisionNext());
+      if (dbEntity instanceof HasDbRevision) {
+        if (numOfRowsUpdated != 1) {
+          // failed with optimistic locking
+          operation.setFailed(true);
+          return;
+        } else {
+          // increment revision of our copy
+          HasDbRevision versionedObject = (HasDbRevision) dbEntity;
+          versionedObject.setRevision(versionedObject.getRevisionNext());
+        }
       }
     }
 
@@ -230,15 +254,29 @@ public class DbSqlSession extends AbstractPersistenceSession {
     entityUpdated(dbEntity);
   }
 
-  protected int executeUpdate(String updateStatement, Object parameter) {
+  @Override
+  public int executeUpdate(String updateStatement, Object parameter) {
     updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
     return sqlSession.update(updateStatement, parameter);
+  }
+
+  @Override
+  public int executeNonEmptyUpdateStmt(String updateStmt, Object parameter) {
+    updateStmt = dbSqlSessionFactory.mapStatement(updateStmt);
+
+    //if mapped statement is empty, which can happens for some databases, we have no need to execute it
+    MappedStatement mappedStatement = sqlSession.getConfiguration().getMappedStatement(updateStmt);
+    if (mappedStatement.getBoundSql(parameter).getSql().isEmpty())
+      return 0;
+
+    return sqlSession.update(updateStmt, parameter);
   }
 
   protected void entityUpdated(final DbEntity entity) {
     // nothing to do
   }
 
+  @Override
   protected void updateBulk(DbBulkOperation operation) {
     String statement = operation.getStatement();
     Object parameter = operation.getParameter();
@@ -275,7 +313,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
         throw LOG.wrongDbVersionException(ProcessEngine.VERSION, dbVersion);
       }
 
-      List<String> missingComponents = new ArrayList<String>();
+      List<String> missingComponents = new ArrayList<>();
       if (!isEngineTablePresent()) {
         missingComponents.add("engine");
       }
@@ -309,57 +347,81 @@ public class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
+  @Override
   protected String getDbVersion() {
     String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 
+  @Override
   protected void dbSchemaCreateIdentity() {
     executeMandatorySchemaResource("create", "identity");
   }
 
+  @Override
   protected void dbSchemaCreateHistory() {
     executeMandatorySchemaResource("create", "history");
   }
 
+  @Override
   protected void dbSchemaCreateEngine() {
     executeMandatorySchemaResource("create", "engine");
   }
 
+  @Override
   protected void dbSchemaCreateCmmn() {
     executeMandatorySchemaResource("create", "case.engine");
   }
 
+  @Override
   protected void dbSchemaCreateCmmnHistory() {
     executeMandatorySchemaResource("create", "case.history");
   }
 
+  @Override
   protected void dbSchemaCreateDmn() {
     executeMandatorySchemaResource("create", "decision.engine");
   }
 
+
+  @Override
+  protected void dbSchemaCreateDmnHistory() {
+    executeMandatorySchemaResource("create", "decision.history");
+  }
+
+  @Override
   protected void dbSchemaDropIdentity() {
     executeMandatorySchemaResource("drop", "identity");
   }
 
+  @Override
   protected void dbSchemaDropHistory() {
     executeMandatorySchemaResource("drop", "history");
   }
 
+  @Override
   protected void dbSchemaDropEngine() {
     executeMandatorySchemaResource("drop", "engine");
   }
 
+  @Override
   protected void dbSchemaDropCmmn() {
     executeMandatorySchemaResource("drop", "case.engine");
   }
 
+  @Override
   protected void dbSchemaDropCmmnHistory() {
     executeMandatorySchemaResource("drop", "case.history");
   }
 
+  @Override
   protected void dbSchemaDropDmn() {
     executeMandatorySchemaResource("drop", "decision.engine");
+  }
+
+  @Override
+  protected void dbSchemaDropDmnHistory() {
+    executeMandatorySchemaResource("drop", "decision.history");
   }
 
   public void executeMandatorySchemaResource(String operation, String component) {
@@ -368,26 +430,37 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   public static String[] JDBC_METADATA_TABLE_TYPES = {"TABLE"};
 
+  @Override
   public boolean isEngineTablePresent(){
     return isTablePresent("ACT_RU_EXECUTION");
   }
+  @Override
   public boolean isHistoryTablePresent(){
     return isTablePresent("ACT_HI_PROCINST");
   }
+  @Override
   public boolean isIdentityTablePresent(){
     return isTablePresent("ACT_ID_USER");
   }
 
+  @Override
   public boolean isCmmnTablePresent() {
     return isTablePresent("ACT_RE_CASE_DEF");
   }
 
+  @Override
   public boolean isCmmnHistoryTablePresent() {
     return isTablePresent("ACT_HI_CASEINST");
   }
 
+  @Override
   public boolean isDmnTablePresent() {
     return isTablePresent("ACT_RE_DECISION_DEF");
+  }
+
+  @Override
+  public boolean isDmnHistoryTablePresent() {
+    return isTablePresent("ACT_HI_DECINST");
   }
 
   public boolean isTablePresent(String tableName) {
@@ -413,7 +486,9 @@ public class DbSqlSession extends AbstractPersistenceSession {
         tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, JDBC_METADATA_TABLE_TYPES);
         return tables.next();
       } finally {
-        tables.close();
+        if (tables != null) {
+          tables.close();
+        }
       }
 
     } catch (Exception e) {
@@ -421,8 +496,9 @@ public class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
+  @Override
   public List<String> getTableNamesPresent() {
-    List<String> tableNames = new ArrayList<String>();
+    List<String> tableNames = new ArrayList<>();
 
     try {
       ResultSet tablesRs = null;
@@ -432,24 +508,28 @@ public class DbSqlSession extends AbstractPersistenceSession {
           tableNames = getTablesPresentInOracleDatabase();
         } else {
           Connection connection = getSqlSession().getConnection();
-          DatabaseMetaData databaseMetaData = connection.getMetaData();
 
           String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
-          String tableNameFilter = databaseTablePrefix+"ACT_%";
+          String schema = getDbSqlSessionFactory().getDatabaseSchema();
+          String tableNameFilter = prependDatabaseTablePrefix("ACT_%");
 
+          // for postgres we have to use lower case
           if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
-            tableNameFilter = databaseTablePrefix+"act_%";
+            schema = schema == null ? schema : schema.toLowerCase();
+            tableNameFilter = tableNameFilter.toLowerCase();
           }
-          tablesRs = databaseMetaData.getTables(null, null, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
 
+          DatabaseMetaData databaseMetaData = connection.getMetaData();
+          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
           while (tablesRs.next()) {
             String tableName = tablesRs.getString("TABLE_NAME");
+            if (!databaseTablePrefix.isEmpty()) {
+              tableName = databaseTablePrefix + tableName;
+            }
             tableName = tableName.toUpperCase();
             tableNames.add(tableName);
-
           }
           LOG.fetchDatabaseTables("jdbc metadata", tableNames);
-
         }
       } catch (SQLException se) {
         throw se;
@@ -466,7 +546,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected List<String> getTablesPresentInOracleDatabase() throws SQLException {
-    List<String> tableNames = new ArrayList<String>();
+    List<String> tableNames = new ArrayList<>();
     Connection connection = null;
     PreparedStatement prepStat = null;
     ResultSet tablesRs = null;
@@ -502,7 +582,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
 
-  protected String prependDatabaseTablePrefix(String tableName) {
+  public String prependDatabaseTablePrefix(String tableName) {
     String prefixWithoutSchema = dbSqlSessionFactory.getDatabaseTablePrefix();
     String schema = dbSqlSessionFactory.getDatabaseSchema();
     if (prefixWithoutSchema == null) {
@@ -566,7 +646,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
       BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
       String line = readNextTrimmedLine(reader);
 
-      List<String> logLines = new ArrayList<String>();
+      List<String> logLines = new ArrayList<>();
 
       while (line != null) {
         if (line.startsWith("# ")) {
@@ -599,7 +679,8 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
         line = readNextTrimmedLine(reader);
       }
-      LOG.performedDatabaseOperation(operation, component, resourceName, logLines);
+      LOG.performingDatabaseOperation(operation, component, resourceName);
+      LOG.executingDDL(logLines);
 
       if (exception != null) {
         throw exception;
@@ -635,12 +716,12 @@ public class DbSqlSession extends AbstractPersistenceSession {
       }
 
       // Message returned from MySQL and Oracle
-      if (((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
+      if ((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
         return true;
       }
 
       // Message returned from Postgres
-      if (((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1)) && (exceptionMessage.indexOf("does not exist") != -1)) {
+      if ((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("does not exist") != -1)) {
         return true;
       }
     }

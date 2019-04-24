@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,6 +41,7 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcess.bpmn20.xml";
   protected static final String INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingEventSubProcessInsideSubProcess.bpmn20.xml";
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcessInsideSubProcess.bpmn20.xml";
+  protected static final String CANCEL_AND_RESTART = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationEventSubProcessTest.testCancelAndRestart.bpmn20.xml";
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS)
   public void testStartBeforeTaskInsideEventSubProcess() {
@@ -803,6 +808,28 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertEquals(timerJob.getId(), remainingTimerJob.getId());
     assertEquals(timerJob.getDuedate(), remainingTimerJob.getDuedate());
 
+  }
+
+
+  @Deployment(resources = CANCEL_AND_RESTART)
+  public void testProcessInstanceModificationInEventSubProcessCancellationAndRestart() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ProcessWithEventSubProcess");
+
+    // assume
+    Task task = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .taskDefinitionKey("UserTaskEventSubProcess")
+        .singleResult();
+    assertNotNull(task);
+
+    // when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .cancelAllForActivity("UserTaskEventSubProcess")
+      .startAfterActivity("UserTaskEventSubProcess")
+      .execute();
+
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
 
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,13 +17,17 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+
+import static org.camunda.bpm.engine.impl.util.EncryptionUtil.saltPassword;
 
 
 /**
@@ -36,6 +44,9 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   protected String email;
   protected String password;
   protected String newPassword;
+  protected String salt;
+  protected Date lockExpirationTime;
+  protected int attempts;
 
   public UserEntity() {
   }
@@ -50,6 +61,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
     persistentState.put("lastName", lastName);
     persistentState.put("email", email);
     persistentState.put("password", password);
+    persistentState.put("salt", salt);
     return persistentState;
   }
 
@@ -87,12 +99,21 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   public void setPassword(String password) {
     this.newPassword = password;
   }
+
+  public String getSalt() {
+    return this.salt;
+  }
+  public void setSalt(String salt) {
+    this.salt = salt;
+  }
+
   /**
    * Special setter for MyBatis.
    */
   public void setDbPassword(String password) {
     this.password = password;
   }
+
   public int getRevision() {
     return revision;
   }
@@ -100,20 +121,53 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
     this.revision = revision;
   }
 
+  public Date getLockExpirationTime() {
+    return lockExpirationTime;
+  }
+
+  public void setLockExpirationTime(Date lockExpirationTime) {
+    this.lockExpirationTime = lockExpirationTime;
+  }
+
+  public int getAttempts() {
+    return attempts;
+  }
+
+  public void setAttempts(int attempts) {
+    this.attempts = attempts;
+  }
+
   public void encryptPassword() {
     if (newPassword != null) {
-      setDbPassword(encryptPassword(newPassword));
+      salt = generateSalt();
+      setDbPassword(encryptPassword(newPassword, salt));
     }
   }
 
-  protected String encryptPassword(String password) {
+  protected String encryptPassword(String password, String salt) {
     if (password == null) {
       return null;
     } else {
+      String saltedPassword = saltPassword(password, salt);
       return Context.getProcessEngineConfiguration()
-        .getPasswordEncryptor()
-        .encrypt(password);
+        .getPasswordManager()
+        .encrypt(saltedPassword);
     }
+  }
+
+  protected String generateSalt() {
+    return Context.getProcessEngineConfiguration()
+      .getSaltGenerator()
+      .generateSalt();
+  }
+  
+
+  public boolean checkPasswordAgainstPolicy() {
+    PasswordPolicyResult result = Context.getProcessEngineConfiguration()
+      .getIdentityService()
+      .checkPasswordAgainstPolicy(newPassword);
+
+    return result.isValid();
   }
 
   public String toString() {
@@ -124,7 +178,9 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
            + ", lastName=" + lastName
            + ", email=" + email
            + ", password=" + password
+           + ", salt=" + salt
+           + ", lockExpirationTime=" + lockExpirationTime
+           + ", attempts=" + attempts
            + "]";
   }
-
 }

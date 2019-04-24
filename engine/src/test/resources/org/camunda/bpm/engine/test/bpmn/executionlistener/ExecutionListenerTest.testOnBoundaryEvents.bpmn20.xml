@@ -1,0 +1,53 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start" targetRef="task1" />
+
+    <userTask id="task1" />
+
+    <sequenceFlow sourceRef="task1" targetRef="end1" />
+
+    <endEvent id="end1" />
+
+    <boundaryEvent id="timer1" attachedToRef="task1">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener">
+          <camunda:field name="parameter" stringValue="start boundary listener" />
+        </camunda:executionListener>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeDuration>PT5M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="timer1" targetRef="task2" />
+
+    <userTask id="task2" />
+
+    <sequenceFlow sourceRef="task2" targetRef="end2" />
+
+    <endEvent id="end2" />
+
+    <boundaryEvent id="timer2" attachedToRef="task2">
+      <extensionElements>
+        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener">
+          <camunda:field name="parameter" stringValue="end boundary listener" />
+        </camunda:executionListener>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeDuration>PT5M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="timer2" targetRef="end3" />
+
+    <endEvent id="end3" />
+
+  </process>
+</definitions>

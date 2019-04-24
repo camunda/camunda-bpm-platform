@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -444,6 +448,45 @@ public interface CaseService {
    */
   void closeCaseInstance(String caseExecutionId);
 
+  /**
+   * <p>Terminates the case execution identified by the given id.
+   * Performs the transition from <code>ACTIVE</code> to state <code>TERMINATED</code>
+   * if the case execution belongs to a case model or a task or a stage.
+   * Performs the transition from <code>AVAILABLE</code> to state <code>TERMINATED</code> if the case
+   * execution belongs to a milestone.</p>
+   *
+   * @param caseExecutionId the id of the case execution to be terminated
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void terminateCaseExecution(String caseExecutionId);
+
+  /**
+  *
+  * <p>Terminates the case execution identified by the given id.
+  * Performs the transition from <code>ACTIVE</code> to state <code>TERMINATED</code>
+  * if the case execution belongs to either a case model or a task or a stage.
+  * Performs the transition from <code>AVAILABLE</code> to state <code>TERMINATED</code> if the case
+  * execution belongs to a milestone.</p>
+  *
+  *
+  * @param caseExecutionId the id of the case execution to terminate
+  * @param variables variables to be set on the case execution
+  *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void terminateCaseExecution(String caseExecutionId, Map<String, Object> variables);
+
   // fluent API ////////////////////////////////////////////////////////////
 
   /**
@@ -849,5 +892,4 @@ public interface CaseService {
    * @throws NotValidException when the given variable name is null
    */
   void removeVariableLocal(String caseExecutionId, String variableName);
-
 }

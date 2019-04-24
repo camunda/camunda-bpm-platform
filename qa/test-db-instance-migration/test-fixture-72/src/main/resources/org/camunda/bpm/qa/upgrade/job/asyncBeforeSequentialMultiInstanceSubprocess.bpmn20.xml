@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
+  xmlns:tns="Examples">
+  <message id="boundaryMessageId" name="BoundaryEventMessage" />
+  <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
+  
+  <process id="AsyncBeforeSequentialMultiInstanceSubprocess" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="miSubProcess" />
+
+    <subProcess id="miSubProcess" camunda:asyncBefore="true">
+      <multiInstanceLoopCharacteristics isSequential="true">
+        <loopCardinality>3</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="subProcessStart" />
+      <sequenceFlow sourceRef="subProcessStart" targetRef="subProcessTask" />
+      <userTask id="subProcessTask" />
+      <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+    </subProcess>
+    
+    <sequenceFlow sourceRef="miSubProcess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+</definitions>

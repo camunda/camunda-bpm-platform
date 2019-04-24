@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,16 +17,20 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -40,6 +48,8 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
   protected boolean isInterruptingTimer; // For boundary timers
   protected String eventScopeActivityId = null;
   protected Boolean isParallelMultiInstance;
+
+  protected String rawJobHandlerConfiguration;
 
   public TimerDeclarationImpl(Expression expression, TimerDeclarationType type, String jobHandlerType) {
     super(jobHandlerType);
@@ -77,14 +87,34 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     return timer;
   }
 
-  protected void postInitialize(ExecutionEntity context, TimerEntity job) {
+  public void setRawJobHandlerConfiguration(String rawJobHandlerConfiguration) {
+    this.rawJobHandlerConfiguration = rawJobHandlerConfiguration;
+  }
+
+  public void updateJob(TimerEntity timer) {
+    initializeConfiguration(timer.getExecution(), timer);
+  }
+
+  protected void initializeConfiguration(ExecutionEntity context, TimerEntity job) {
+    String dueDateString = resolveAndSetDuedate(context, job, false);
+
+    if (type == TimerDeclarationType.CYCLE && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
+
+      // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
+      if (!isInterruptingTimer) {
+        String prepared = prepareRepeat(dueDateString);
+        job.setRepeat(prepared);
+      }
+    }
+  }
+
+  public String resolveAndSetDuedate(ExecutionEntity context, TimerEntity job, boolean creationDateBased) {
     BusinessCalendar businessCalendar = Context
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
         .getBusinessCalendar(type.calendarName);
 
     if (description==null) {
-      // Prevent NPE from happening in the next line
       throw new ProcessEngineException("Timer '"+context.getActivityId()+"' was not configured with a valid duration/time");
     }
 
@@ -110,19 +140,22 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     }
 
     if (duedate==null) {
-      duedate = businessCalendar.resolveDuedate(dueDateString);
+      if (creationDateBased) {
+        if (job.getCreateTime() == null) {
+          throw new ProcessEngineException("Timer '"+context.getActivityId()+"' has no creation time and cannot be recalculated based on creation date. Either recalculate on your own or trigger recalculation with creationDateBased set to false.");
+        }
+        duedate = businessCalendar.resolveDuedate(dueDateString, job.getCreateTime());
+      } else {
+        duedate = businessCalendar.resolveDuedate(dueDateString);
+      }
     }
 
     job.setDuedate(duedate);
+    return dueDateString;
+  }
 
-    if (type == TimerDeclarationType.CYCLE && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
-
-      // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
-      if (!isInterruptingTimer) {
-        String prepared = prepareRepeat(dueDateString);
-        job.setRepeat(prepared);
-      }
-    }
+  protected void postInitialize(ExecutionEntity execution, TimerEntity timer) {
+    initializeConfiguration(execution, timer);
   }
 
   protected String prepareRepeat(String dueDate) {
@@ -163,6 +196,25 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
 
   protected ExecutionEntity resolveExecution(ExecutionEntity context) {
     return context;
+  }
+
+  @Override
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(ExecutionEntity context) {
+    return resolveJobHandler().newConfiguration(rawJobHandlerConfiguration);
+  }
+
+  public static Map<String, TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {
+    if (scope == null) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, TimerDeclarationImpl> result = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
+    if (result != null) {
+      return result;
+    }
+    else {
+      return Collections.emptyMap();
+    }
   }
 
 }

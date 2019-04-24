@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <message id="messageId" name="Message" />
+  <process id="process" isExecutable="true">
+
+    <startEvent id="start" />
+    <sequenceFlow sourceRef="start" targetRef="fork" />
+
+    <parallelGateway id="fork" />
+
+    <sequenceFlow id="flow1" sourceRef="fork" targetRef="task1" />
+    <userTask id="task1" />
+    <sequenceFlow sourceRef="task1" targetRef="join" />
+
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="task2" />
+    <userTask id="task2" />
+    <sequenceFlow sourceRef="task2" targetRef="join" />
+
+    <parallelGateway id="join" />
+    
+    <sequenceFlow sourceRef="join" targetRef="task3" />
+    <userTask id="task3" />
+    <sequenceFlow sourceRef="task3" targetRef="end3" />
+    <endEvent id="end3" />
+
+    <!-- boundary event -->
+    <boundaryEvent id="messageBoundary" attachedToRef="task1" cancelActivity="false">
+      <messageEventDefinition messageRef="messageId" />
+    </boundaryEvent>
+    <sequenceFlow sourceRef="messageBoundary" targetRef="task4" />
+    <userTask id="task4" />
+  </process>
+
+</definitions>

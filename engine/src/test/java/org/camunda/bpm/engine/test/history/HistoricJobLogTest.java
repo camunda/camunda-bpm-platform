@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import java.util.Date;
-
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
@@ -30,18 +33,42 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.JobExceptionUtil;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
+import org.junit.Before;
+
+import java.math.BigInteger;
+import java.util.Date;
+import java.util.Random;
 
 /**
  * @author Roman Smirnov
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
+
+  private boolean defaultEnsureJobDueDateSet;
+
+  @Before
+  public void storeEngineSettings() {
+    defaultEnsureJobDueDateSet = processEngineConfiguration.isEnsureJobDueDateNotNull();
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(defaultEnsureJobDueDateSet);
+    ClockUtil.reset();
+  }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
   public void testCreateHistoricJobLogProperties() {
@@ -207,6 +234,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
   public void testAsyncBeforeJobHandlerType() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(false);
+
     runtimeService.startProcessInstanceByKey("process");
 
     Job job = managementService
@@ -229,7 +258,35 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  public void testAsyncBeforeJobHandlerTypeDueDateSet() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(true);
+    Date testDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService
+      .createJobQuery()
+      .singleResult();
+
+    HistoricJobLog historicJob = historyService
+      .createHistoricJobLogQuery()
+      .jobId(job.getId())
+      .singleResult();
+
+    assertNotNull(historicJob);
+
+    assertEquals(testDate, historicJob.getJobDueDate());
+
+    assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
+    assertEquals("serviceTask", historicJob.getActivityId());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
   public void testAsyncAfterJobHandlerType() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(false);
+
     runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
 
     Job job = managementService
@@ -252,6 +309,40 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertNotNull(historicJob);
 
     assertNull(historicJob.getJobDueDate());
+
+    assertEquals(anotherJob.getJobDefinitionId(), historicJob.getJobDefinitionId());
+    assertEquals("serviceTask", historicJob.getActivityId());
+    assertEquals(AsyncContinuationJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertEquals(MessageJobDeclaration.ASYNC_AFTER, historicJob.getJobDefinitionConfiguration());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  public void testAsyncAfterJobHandlerTypeDueDateSet() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(true);
+    Date testDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+
+    Job job = managementService
+      .createJobQuery()
+      .singleResult();
+
+    managementService.executeJob(job.getId());
+
+    Job anotherJob = managementService
+      .createJobQuery()
+      .singleResult();
+
+    assertFalse(job.getId().equals(anotherJob.getId()));
+
+    HistoricJobLog historicJob = historyService
+      .createHistoricJobLogQuery()
+      .jobId(anotherJob.getId())
+      .singleResult();
+
+    assertNotNull(historicJob);
+
+    assertEquals(testDate, historicJob.getJobDueDate());
 
     assertEquals(anotherJob.getJobDefinitionId(), historicJob.getJobDefinitionId());
     assertEquals("serviceTask", historicJob.getActivityId());
@@ -373,6 +464,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml"
   })
   public void testCatchingSignalEventJobHandlerType() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(false);
+
     runtimeService.startProcessInstanceByKey("catchSignal");
     runtimeService.startProcessInstanceByKey("throwSignal");
 
@@ -388,6 +481,37 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertNotNull(historicJob);
 
     assertNull(historicJob.getJobDueDate());
+
+    assertEquals(job.getId(), historicJob.getJobId());
+    assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
+    assertEquals("signalEvent", historicJob.getActivityId());
+    assertEquals(ProcessEventJobHandler.TYPE, historicJob.getJobDefinitionType());
+    assertNull(historicJob.getJobDefinitionConfiguration());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testCatchingSignalEvent.bpmn20.xml",
+    "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml"
+  })
+  public void testCatchingSignalEventJobHandlerTypeDueDateSet() {
+    processEngineConfiguration.setEnsureJobDueDateNotNull(true);
+    Date testDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    Job job = managementService
+      .createJobQuery()
+      .singleResult();
+
+    HistoricJobLog historicJob = historyService
+      .createHistoricJobLogQuery()
+      .jobId(job.getId())
+      .singleResult();
+
+    assertNotNull(historicJob);
+
+    assertEquals(testDate, historicJob.getJobDueDate());
 
     assertEquals(job.getId(), historicJob.getJobId());
     assertEquals(job.getJobDefinitionId(), historicJob.getJobDefinitionId());
@@ -1107,6 +1231,43 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertTextPresent(ThrowExceptionWithoutMessageDelegate.class.getName(), stacktrace);
   }
 
+  @Deployment
+  public void testThrowExceptionMessageTruncation() {
+    // given
+    String exceptionMessage = randomString(10000);
+    ThrowExceptionWithOverlongMessageDelegate delegate =
+        new ThrowExceptionWithOverlongMessageDelegate(exceptionMessage);
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("delegate", delegate));
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when
+    try {
+      managementService.executeJob(job.getId());
+      fail();
+    } catch (Exception e) {
+      // expected
+    }
+
+    // then
+    HistoricJobLog failedHistoricJobLog = historyService
+        .createHistoricJobLogQuery()
+        .failureLog()
+        .singleResult();
+
+    assertNotNull(failedHistoricJobLog);
+    assertEquals(exceptionMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH),
+        failedHistoricJobLog.getJobExceptionMessage());
+  }
+
+  /**
+   * returns a random of the given size using characters [0-1]
+   */
+  protected static String randomString(int numCharacters) {
+    return new BigInteger(numCharacters, new Random()).toString(2);
+  }
+
+
   public void testDeleteByteArray() {
     final String processDefinitionId = "myProcessDefition";
 
@@ -1123,7 +1284,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
 
           byte[] aByteValue = StringUtil.toByteArray("abc");
-          ByteArrayEntity byteArray = JobExceptionUtil.createJobExceptionByteArray(aByteValue);
+          ByteArrayEntity byteArray = ExceptionUtil.createJobExceptionByteArray(aByteValue, ResourceTypes.HISTORY);
           log.setExceptionByteArrayId(byteArray.getId());
 
           commandContext

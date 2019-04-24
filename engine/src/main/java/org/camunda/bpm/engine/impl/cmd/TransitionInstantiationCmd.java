@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +29,10 @@ public class TransitionInstantiationCmd extends AbstractInstantiationCmd {
 
   protected String transitionId;
 
+  public TransitionInstantiationCmd(String transitionId) {
+    this(null, transitionId);
+  }
+
   public TransitionInstantiationCmd(String processInstanceId, String transitionId) {
     this(processInstanceId, transitionId, null);
   }
@@ -35,20 +43,24 @@ public class TransitionInstantiationCmd extends AbstractInstantiationCmd {
     this.transitionId = transitionId;
   }
 
+  @Override
   protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
     TransitionImpl transition = processDefinition.findTransition(transitionId);
     return transition.getSource().getFlowScope();
   }
 
+  @Override
   protected CoreModelElement getTargetElement(ProcessDefinitionImpl processDefinition) {
     TransitionImpl transition = processDefinition.findTransition(transitionId);
     return transition;
   }
 
-  protected String getTargetElementId() {
+  @Override
+  public String getTargetElementId() {
     return transitionId;
   }
 
+  @Override
   protected String describe() {
     StringBuilder sb = new StringBuilder();
     sb.append("Start transition '");

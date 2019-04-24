@@ -1,6 +1,9 @@
 /*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.spin.plugin.variables;
 
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
@@ -29,12 +31,16 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilder;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.spin.DataFormats;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -534,4 +540,41 @@ public class JsonSerializationTest extends PluggableProcessEngineTestCase {
     assertTrue(list.get(0) instanceof JsonSerializable);
     assertEquals(UpdateValueDelegate.STRING_PROPERTY, list.get(0).getStringProperty());
   }
+
+  public void testTransientJsonValue() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+        .startEvent()
+        .exclusiveGateway("gtw")
+          .sequenceFlowId("flow1")
+          .condition("cond", "${x.stringProperty == \"bar\"}")
+          .userTask("userTask1")
+          .endEvent()
+        .moveToLastGateway()
+          .sequenceFlowId("flow2")
+          .userTask("userTask2")
+          .endEvent()
+        .done();
+
+    deployment(modelInstance);
+
+    JsonSerializable bean = new JsonSerializable("bar", 42, true);
+    ObjectValue jsonValue = serializedObjectValue(bean.toExpectedJsonString(), true)
+        .serializationDataFormat(JSON_FORMAT_NAME)
+        .objectTypeName(JsonSerializable.class.getName())
+        .create();
+    VariableMap variables = Variables.createVariables().putValueTyped("x", jsonValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey("foo", variables);
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("userTask1", task.getTaskDefinitionKey());
+  }
+
 }

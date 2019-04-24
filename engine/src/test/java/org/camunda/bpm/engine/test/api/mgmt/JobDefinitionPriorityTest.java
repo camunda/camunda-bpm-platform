@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +33,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
 
-  protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
+  protected static final long EXPECTED_DEFAULT_PRIORITY = 0;
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
   public void testSetJobDefinitionPriority() {
@@ -48,7 +52,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(42, (int) updatedDefinition.getOverridingJobPriority());
+    assertEquals(42, (long) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has not changed
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -80,7 +84,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(52, (int) updatedDefinition.getOverridingJobPriority());
+    assertEquals(52, (long) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has changed as well
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -112,7 +116,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(62, (int) updatedDefinition.getOverridingJobPriority());
+    assertEquals(62, (long) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority is still the value as given in the BPMN XML
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -145,7 +149,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(72, (int) updatedDefinition.getOverridingJobPriority());
+    assertEquals(72, (long) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has changed as well
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -164,7 +168,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml")
   public void testRedeployOverridesSetJobDefinitionPriority() {
     // given a process instance with a job with default priority and a corresponding job definition
-    ProcessInstance instance = runtimeService.createProcessInstanceByKey("jobPrioProcess")
+    runtimeService.createProcessInstanceByKey("jobPrioProcess")
       .startBeforeActivity("task2")
       .execute();
 
@@ -178,7 +182,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(72, (int) updatedDefinition.getOverridingJobPriority());
+    assertEquals(72, (long) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has changed as well
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -317,15 +321,15 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
   public void testSetJobDefinitionPriorityToExtremeValues() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
-    // it is possible to set the max integer value
-    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), Integer.MAX_VALUE);
+    // it is possible to set the max long value
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), Long.MAX_VALUE);
     jobDefinition = managementService.createJobDefinitionQuery().singleResult();
-    assertEquals(Integer.MAX_VALUE, (int) jobDefinition.getOverridingJobPriority());
+    assertEquals(Long.MAX_VALUE, (long) jobDefinition.getOverridingJobPriority());
 
-    // it is possible to set the min integer value
-    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), Integer.MIN_VALUE + 1);
+    // it is possible to set the min long value
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), Long.MIN_VALUE + 1); // +1 for informix
     jobDefinition = managementService.createJobDefinitionQuery().singleResult();
-    assertEquals(Integer.MIN_VALUE + 1, (int) jobDefinition.getOverridingJobPriority());
+    assertEquals(Long.MIN_VALUE + 1, (long) jobDefinition.getOverridingJobPriority());
   }
 
   protected Job getJobThatIsNot(Job other) {

@@ -1,9 +1,13 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,9 +21,10 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -45,6 +50,12 @@ public interface CmmnTransformListener {
 
   void transformCase(Case element, CmmnCaseDefinition caseDefinition);
 
+  /**
+   * @deprecated use {@link #transformCasePlanModel(org.camunda.bpm.model.cmmn.instance.CasePlanModel, CmmnActivity)}
+   */
+  @Deprecated
+  void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity caseActivity);
+
   void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity caseActivity);
 
   void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity caseActivity);
@@ -52,6 +63,8 @@ public interface CmmnTransformListener {
   void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity caseActivity);
 
   void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity caseActivity);
+
+  void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity caseActivity);
 
   void transformTask(PlanItem planItem, Task task, CmmnActivity caseActivity);
 

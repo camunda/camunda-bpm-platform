@@ -7,16 +7,61 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <properties>
     <cargo.timeout>120000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
-    <version.chromedriver>2.14</version.chromedriver>
+    <version.chromedriver>2.27</version.chromedriver>
+
+    <!-- Needs to be updated after a new WildFly release (check support on Codehaus Cargo first) -->
+    <cargo.wildfly.container.id>wildfly15x</cargo.wildfly.container.id>
+
+    <redirect.test.output>true</redirect.test.output>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-bom</artifactId>
+        <version>${version.shrinkwrap.resolvers}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.arquillian}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+    <!-- set shrinkwrap artifacts -->
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <version>${version.shrinkwrap.resolvers}</version>
+      <scope>test</scope>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-servlet</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
@@ -60,7 +105,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.3.6</version>
+      <version>4.5.7</version>
       <scope>test</scope>
     </dependency>
 
@@ -109,13 +154,12 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
-      <scope>test</scope>
+      <version>${project.version}</version>
       <type>jar</type>
       <classifier>classes</classifier>
-      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
-
 
   <profiles>
     <profile>
@@ -142,6 +186,7 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
+          <classifier>jbossas7</classifier>
           <scope>test</scope>
           <type>war</type>
           <version>${project.version}</version>
@@ -150,6 +195,34 @@
 
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>1.3.1</version>
+            <executions>
+              <execution>
+                <id>enforce-java</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireJavaVersion>
+                      <version>[1.6,1.8)</version>
+                      <message>
+                        *************************************************
+                        *                                               *
+                        * You must use JDK 6/7 to run JBoss AS 7.2.0!!! *
+                        *                                               *
+                        *************************************************
+                      </message>
+                    </requireJavaVersion>
+                  </rules>
+                  <failFast>true</failFast>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
@@ -192,6 +265,7 @@
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
+                  <classifier>jbossas7</classifier>
                   <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
@@ -217,7 +291,6 @@
                   </properties>
                 </deployable>
               </deployables>
-              <wait>false</wait>
             </configuration>
           </plugin>
           <plugin>
@@ -227,6 +300,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>wildfly</id>
       <properties>
@@ -251,12 +325,12 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
+          <version>${project.version}</version>
+          <classifier>wildfly</classifier>
           <scope>test</scope>
           <type>war</type>
-          <version>${project.version}</version>
         </dependency>
       </dependencies>
-
       <build>
         <plugins>
           <plugin>
@@ -282,7 +356,7 @@
               <!-- Container configuration -->
               <container>
                 <type>installed</type>
-                <containerId>wildfly8x</containerId>
+                <containerId>${cargo.wildfly.container.id}</containerId>
                 <append>false</append>
                 <home>${jboss.runtime}</home>
                 <timeout>${cargo.timeout}</timeout>
@@ -290,7 +364,6 @@
               <configuration>
                 <type>standalone</type>
                 <home>${project.build.directory}/config-wildfly</home>
-
                 <properties>
                   <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
                   <cargo.jboss.ajp.port>${jboss.ajp.port}</cargo.jboss.ajp.port>
@@ -298,14 +371,19 @@
               </configuration>
               <deployables>
                 <deployable>
+                  <groupId>org.camunda.bpm.example</groupId>
+                  <artifactId>camunda-example-invoice</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/user/demo/profile</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
+                </deployable>
+                <deployable>
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
+                  <classifier>wildfly</classifier>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
-                  <properties>
-                    <context>engine-rest</context>
-                  </properties>
                 </deployable>
                 <deployable>
                   <groupId>org.camunda.bpm.webapp</groupId>
@@ -313,157 +391,13 @@
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/camunda</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
-                  <properties>
-                    <context>camunda</context>
-                  </properties>
-                </deployable>
-                <deployable>
-                  <groupId>org.camunda.bpm.example</groupId>
-                  <artifactId>camunda-example-invoice</artifactId>
-                  <type>war</type>
-                  <properties>
-                    <context>invoice</context>
-                  </properties>
                 </deployable>
               </deployables>
-              <wait>false</wait>
             </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>glassfish</id>
-      <properties>
-        <glassfish.runtime>${basedir}/${glassfish.runtime.location}</glassfish.runtime>
-        <http.port>${glassfish.http.port}</http.port>
-      </properties>
-
-      <dependencies>
-        <dependency>
-          <!-- make sure it comes after the test runtime in the build -->
-          <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-glassfish-runtime</artifactId>
-          <version>${project.version}</version>
-          <type>pom</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.camunda.bpm.webapp</groupId>
-          <artifactId>camunda-webapp-glassfish</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-          <scope>test</scope>
-        </dependency>
-
-        <dependency>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine-rest</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-          <scope>test</scope>
-        </dependency>
-
-      </dependencies>
-
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-resources-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>copy-resources</id>
-                <phase>test-compile</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.build.directory}/glassfish3/glassfish/domains</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>src/main/domains</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>start-container</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>start</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>stop-container</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <!-- Container configuration -->
-              <container>
-                <type>installed</type>
-                <containerId>glassfish3x</containerId>
-                <append>false</append>
-                <home>${glassfish.runtime}</home>
-                <timeout>${cargo.timeout}</timeout>
-              </container>
-              <configuration>
-                <type>existing</type>
-                <home>${glassfish.runtime}/glassfish/domains</home>
-                <properties>
-                  <cargo.servlet.port>${http.port}</cargo.servlet.port>
-                  <cargo.glassfish.admin.port>${glassfish.admin.port}</cargo.glassfish.admin.port>
-                  <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
-                  <cargo.remote.username>admin</cargo.remote.username>
-                  <cargo.remote.password />
-                </properties>
-              </configuration>
-              <deployables>
-                <deployable>
-                  <groupId>org.camunda.bpm</groupId>
-                  <artifactId>camunda-engine-rest</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${http.port}/engine-rest/engine/default/process-definition</pingURL>
-                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
-                  <properties>
-                    <context>engine-rest</context>
-                  </properties>
-                </deployable>
-                <deployable>
-                  <groupId>org.camunda.bpm.webapp</groupId>
-                  <artifactId>camunda-webapp-glassfish</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${http.port}/camunda</pingURL>
-                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
-                  <properties>
-                    <context>camunda</context>
-                  </properties>
-                </deployable>
-                <deployable>
-                  <groupId>org.camunda.bpm.example</groupId>
-                  <artifactId>camunda-example-invoice</artifactId>
-                  <type>war</type>
-                  <properties>
-                    <context>invoice</context>
-                  </properties>
-                </deployable>
-              </deployables>
-              <wait>false</wait>
-            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -569,7 +503,6 @@
                   </properties>
                 </deployable>
               </deployables>
-              <wait>false</wait>
             </configuration>
           </plugin>
         </plugins>
@@ -652,6 +585,7 @@
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.case.engine.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.engine.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.identity.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.decision.history.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.case.history.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.history.sql</srcFile>
                   </srcFiles>
@@ -778,6 +712,51 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>embedded-engine-rest</id>
+      <!-- Works only on Wildfly -->
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly.arquillian</groupId>
+          <artifactId>wildfly-arquillian-container-managed</artifactId>
+          <version>1.1.0.Beta1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>false</skipTests>
+              <includes>
+                <include>**/EmbeddedEngineRest_WILDFLY.*</include>
+              </includes>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
+              <systemPropertyVariables>
+                <projectversion>${project.parent.version}</projectversion>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
@@ -802,9 +781,6 @@
             </goals>
             <configuration>
               <forceCreation>true</forceCreation>
-            <!--  <includes>
-                <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
-              </includes> -->
             </configuration>
           </execution>
         </executions>
@@ -813,7 +789,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-            <skipTests>true</skipTests>
+          <skipTests>true</skipTests>
         </configuration>
       </plugin>
     </plugins>
@@ -855,4 +831,18 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>oss-snapshots</id>
+      <name>Sonatype Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

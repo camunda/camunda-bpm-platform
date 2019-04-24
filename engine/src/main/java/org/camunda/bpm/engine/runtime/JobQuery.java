@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.runtime;
 
 import java.util.Date;
@@ -71,36 +74,46 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs where the duedate is lower then the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateLowerThen(Date date);
 
   /** Only select jobs where the duedate is lower then or equals the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateLowerThenOrEquals(Date date);
 
   /** Only select jobs where the duedate is higher then the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateHigherThen(Date date);
 
   /** Only select jobs where the duedate is higher then or equals the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateHigherThenOrEquals(Date date);
+
+  /** Only select jobs created before the given date. */
+  JobQuery createdBefore(Date date);
+
+  /** Only select jobs created after the given date. */
+  JobQuery createdAfter(Date date);
 
   /**
    * Only select jobs with a priority that is higher than or equal to the given priority.
    *
    * @since 7.4
    */
-  JobQuery priorityHigherThanOrEquals(int priority);
+  JobQuery priorityHigherThanOrEquals(long priority);
 
   /**
    * Only select jobs with a priority that is lower than or equal to the given priority.
    *
    * @since 7.4
    */
-  JobQuery priorityLowerThanOrEquals(int priority);
+  JobQuery priorityLowerThanOrEquals(long priority);
 
   /** Only select jobs that failed due to an exception. */
   JobQuery withException();
@@ -116,6 +129,18 @@ public interface JobQuery extends Query<JobQuery, Job> {
 
   /** Only select jobs that are suspended. */
   JobQuery suspended();
+
+  /** Only select jobs that belong to one of the given tenant ids. */
+  JobQuery tenantIdIn(String... tenantIds);
+
+  /** Only select jobs which have no tenant id. */
+  JobQuery withoutTenantId();
+
+  /**
+   * Select jobs which have no tenant id. Can be used in combination
+   * with {@link #tenantIdIn(String...)}.
+   */
+  JobQuery includeJobsWithoutTenantId();
 
   //sorting //////////////////////////////////////////
 
@@ -147,5 +172,10 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByExecutionId();
 
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of job without tenant id is database-specific.
+   */
+  JobQuery orderByTenantId();
 
 }

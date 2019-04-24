@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -18,14 +21,13 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 
@@ -40,17 +42,23 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
 
   protected final String executionId;
   protected final Map<String, Object> processVariables;
+  protected final Map<String, Object> processVariablesLocal;
   protected final String messageName;
   protected boolean exclusive = false;
 
   public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
+    this(messageName, executionId, processVariables, null);
+  }
+
+  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal) {
     this.executionId = executionId;
     this.messageName = messageName;
     this.processVariables = processVariables;
+    this.processVariablesLocal = processVariablesLocal;
   }
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, boolean exclusive) {
-    this(messageName, executionId, processVariables);
+  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal, boolean exclusive) {
+    this(messageName, executionId, processVariables, processVariablesLocal);
     this.exclusive = exclusive;
   }
 
@@ -62,10 +70,10 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
     List<EventSubscriptionEntity> eventSubscriptions = null;
     if (messageName != null) {
       eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByNameAndExecution(
-          MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId, exclusive);
+              EventType.MESSAGE.name(), messageName, executionId, exclusive);
     } else {
       eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByExecutionAndType(
-          executionId, MessageEventHandler.EVENT_HANDLER_TYPE, exclusive);
+          executionId, EventType.MESSAGE.name(), exclusive);
     }
 
     ensureNotEmpty("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'", "eventSubscriptions", eventSubscriptions);
@@ -76,15 +84,11 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
 
     // check authorization
     String processInstanceId = eventSubscriptionEntity.getProcessInstanceId();
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
-
-    HashMap<String, Object> payload = null;
-    if (processVariables != null) {
-      payload = new HashMap<String, Object>(processVariables);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstanceById(processInstanceId);
     }
 
-    eventSubscriptionEntity.eventReceived(payload, false);
+    eventSubscriptionEntity.eventReceived(processVariables, processVariablesLocal, null, false);
 
     return null;
   }

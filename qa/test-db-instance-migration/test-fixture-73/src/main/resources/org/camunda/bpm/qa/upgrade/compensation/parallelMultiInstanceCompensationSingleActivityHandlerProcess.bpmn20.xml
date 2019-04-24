@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="ParallelMultiInstanceCompensationSingleActivityHandlerScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="userTask" />
+    <userTask id="userTask">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>3</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+
+    <!-- compensation -->
+    <boundaryEvent id="compensateBoundaryEvent" attachedToRef="userTask">
+      <compensateEventDefinition />
+    </boundaryEvent>
+    <userTask id="undoTask" isForCompensation="true"/>
+
+    <sequenceFlow sourceRef="userTask" targetRef="beforeCompensate" />
+    <userTask id="beforeCompensate" />
+    <sequenceFlow sourceRef="beforeCompensate" targetRef="throwCompensate" />
+    
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="afterCompensate" />
+    <userTask id="afterCompensate" />
+    <sequenceFlow sourceRef="afterCompensate" targetRef="end" />
+    <endEvent id="end" />
+    
+    <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoTask" />
+  </process>
+</definitions>

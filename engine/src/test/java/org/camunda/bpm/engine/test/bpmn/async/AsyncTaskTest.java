@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +21,9 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -30,7 +36,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -629,7 +636,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
    * CAM-3707
    */
   @Deployment
-  public void FAILING_testDeleteShouldNotInvokeListeners() {
+  public void testDeleteShouldNotInvokeListeners() {
     RecorderExecutionListener.clear();
 
     // given
@@ -648,10 +655,36 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   /**
+   * CAM-3707
+   */
+  @Deployment
+  public void testDeleteInScopeShouldNotInvokeListeners() {
+    RecorderExecutionListener.clear();
+
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncListenerSubProcess",
+        Variables.createVariables().putValue("listener", new RecorderExecutionListener()));
+    assertEquals(1, managementService.createJobQuery().count());
+
+    // when deleting the process instance
+    runtimeService.deleteProcessInstance(instance.getId(), "");
+
+    // then the async task end listener has not been executed but the listeners of the sub
+    // process and the process
+
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+    assertEquals(2, recordedEvents.size());
+    assertEquals("subProcess", recordedEvents.get(0).getActivityId());
+    assertNull(recordedEvents.get(1).getActivityId()); // process instance end event has no activity id
+
+    RecorderExecutionListener.clear();
+  }
+
+  /**
    * CAM-3708
    */
   @Deployment
-  public void FAILING_testDeleteShouldNotInvokeOutputMapping() {
+  public void testDeleteShouldNotInvokeOutputMapping() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncOutputMapping");
     assertEquals(1, managementService.createJobQuery().count());
@@ -667,4 +700,132 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  /**
+   * CAM-3708
+   */
+  @Deployment
+  public void testDeleteInScopeShouldNotInvokeOutputMapping() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncOutputMappingSubProcess");
+    assertEquals(1, managementService.createJobQuery().count());
+
+    // when
+    runtimeService.deleteProcessInstance(instance.getId(), "");
+
+    // then
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+      // the output mapping of the task has not been executed because the
+      // activity was not active yet
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery().variableName("taskOutputMappingExecuted").count());
+
+      // but the containing sub process output mapping was executed
+      assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("subProcessOutputMappingExecuted").count());
+    }
+  }
+
+  public void testDeployAndRemoveAsyncActivity() {
+    Set<String> deployments = new HashSet<String>();
+
+    try {
+      // given a deployment that contains a process called "process" with an async task "task"
+      org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v1.bpmn20.xml")
+          .deploy();
+      deployments.add(deployment1.getId());
+
+      // when redeploying the process where that task is not contained anymore
+      org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v2.bpmn20.xml")
+          .deploy();
+      deployments.add(deployment2.getId());
+
+      // and clearing the deployment cache (note that the equivalent of this in a real-world
+      // scenario would be making the deployment with a different engine
+      processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
+
+      // then it should be possible to load the latest process definition
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+      assertNotNull(processInstance);
+
+    } finally {
+      for (String deploymentId : deployments) {
+        repositoryService.deleteDeployment(deploymentId, true);
+      }
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/async/processWithGatewayAndTwoEndEvents.bpmn20.xml"})
+  public void testGatewayWithTwoEndEventsLastJobReAssignedToParentExe() {
+    String processKey = repositoryService.createProcessDefinitionQuery().singleResult().getKey();
+    String processInstanceId = runtimeService.startProcessInstanceByKey(processKey).getId();
+
+    List<Job> jobList = managementService.createJobQuery().processInstanceId(processInstanceId).list();
+
+    // There should be two jobs
+    assertNotNull(jobList);
+    assertEquals(2, jobList.size());
+
+    managementService.executeJob(jobList.get(0).getId());
+
+    // There should be only one job left
+    jobList = managementService.createJobQuery().list();
+    assertEquals(1, jobList.size());
+
+    // There should only be 1 execution left - the root execution
+    assertEquals(1, runtimeService.createExecutionQuery().list().size());
+
+    // root execution should be attached to the last job
+    assertEquals(processInstanceId, jobList.get(0).getExecutionId());
+
+    managementService.executeJob(jobList.get(0).getId());
+
+    // There should be no more jobs
+    jobList = managementService.createJobQuery().list();
+    assertEquals(0, jobList.size());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/async/processGatewayAndTwoEndEventsPlusTimer.bpmn20.xml"})
+  public void testGatewayWithTwoEndEventsLastTimerReAssignedToParentExe() {
+    String processKey = repositoryService.createProcessDefinitionQuery().singleResult().getKey();
+    String processInstanceId = runtimeService.startProcessInstanceByKey(processKey).getId();
+
+    List<Job> jobList = managementService.createJobQuery().processInstanceId(processInstanceId).list();
+
+    // There should be two jobs
+    assertNotNull(jobList);
+    assertEquals(2, jobList.size());
+
+    // execute timer first
+    String timerId = managementService.createJobQuery().timers().singleResult().getId();
+    managementService.executeJob(timerId);
+
+    // There should be only one job left
+    jobList = managementService.createJobQuery().list();
+    assertEquals(1, jobList.size());
+
+    // There should only be 1 execution left - the root execution
+    assertEquals(1, runtimeService.createExecutionQuery().list().size());
+
+    // root execution should be attached to the last job
+    assertEquals(processInstanceId, jobList.get(0).getExecutionId());
+
+    // execute service task
+    managementService.executeJob(jobList.get(0).getId());
+
+    // There should be no more jobs
+    jobList = managementService.createJobQuery().list();
+    assertEquals(0, jobList.size());
+  }
+
+  @Deployment
+  public void FAILING_testLongProcessDefinitionKey() {
+    String key = "myrealrealrealrealrealrealrealrealrealrealreallongprocessdefinitionkeyawesome";
+    String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
+
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+
+    assertEquals(key, job.getProcessDefinitionKey());
+  }
 }

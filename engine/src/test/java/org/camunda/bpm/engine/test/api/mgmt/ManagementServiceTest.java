@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,41 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.mgmt;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
+import org.camunda.bpm.engine.management.TablePage;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Assert;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 
 /**
@@ -95,22 +103,22 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundry
     // timer event which we will execute manual for testing purposes.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
 
     try {
       managementService.executeJob(timerJob.getId());
       fail("RuntimeException from within the script task expected");
-    } catch(RuntimeException re) {
+    } catch (RuntimeException re) {
       assertTextPresent("This is an exception thrown from scriptTask", re.getMessage());
     }
 
     // Fetch the task to see that the exception that occurred is persisted
     timerJob = managementService.createJobQuery()
-    .processInstanceId(processInstance.getId())
-    .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     Assert.assertNotNull(timerJob);
     Assert.assertNotNull(timerJob.getExceptionMessage());
@@ -147,8 +155,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertEquals(JobEntity.DEFAULT_RETRIES, timerJob.getRetries());
@@ -156,9 +164,79 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobRetries(timerJob.getId(), 5);
 
     timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
     assertEquals(5, timerJob.getRetries());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobsRetries() {
+    //given
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+    List<String> allJobIds = getAllJobIds();
+
+    //when
+    managementService.setJobRetries(allJobIds, 5);
+
+    //then
+    assertRetries(allJobIds, 5);
+  }
+
+  public void testSetJobsRetriesWithNull() {
+    try {
+      //when
+      managementService.setJobRetries((List<String>) null, 5);
+      fail("exception expected");
+      //then
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobsRetriesWithNegativeRetries() {
+    try {
+      //when
+      managementService.setJobRetries(Arrays.asList(new String[]{"aFake"}), -1);
+      fail("exception expected");
+      //then
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobsRetriesWithFake() {
+    //given
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<String> allJobIds = getAllJobIds();
+    allJobIds.add("aFake");
+    try {
+      //when
+      managementService.setJobRetries(allJobIds, 5);
+      fail("exception expected");
+      //then
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+
+    assertRetries(getAllJobIds(), JobEntity.DEFAULT_RETRIES);
+  }
+
+  protected void assertRetries(List<String> allJobIds, int i) {
+    for (String id : allJobIds) {
+      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+    }
+  }
+
+  protected List<String> getAllJobIds() {
+    ArrayList<String> result = new ArrayList<String>();
+    for (Job job : managementService.createJobQuery().list()) {
+      result.add(job.getId());
+    }
+    return result;
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
@@ -172,8 +250,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertEquals(JobEntity.DEFAULT_RETRIES, timerJob.getRetries());
@@ -181,8 +259,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobRetries(timerJob.getId(), 0);
 
     timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
     assertEquals(0, timerJob.getRetries());
 
     assertEquals(1, runtimeService.createIncidentQuery().count());
@@ -209,7 +287,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
   public void testSetJobRetriesJobIdNull() {
     try {
-      managementService.setJobRetries(null, 5);
+      managementService.setJobRetries((String) null, 5);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException re) {
       assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
@@ -326,13 +404,12 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(3, job.getRetries());
 
     deleteJobAndIncidents(job);
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   protected void createJob(final int retries, final String owner, final Date lockExpirationTime) {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
+      @Override
       public Void execute(CommandContext commandContext) {
         JobManager jobManager = commandContext.getJobManager();
         MessageEntity job = new MessageEntity();
@@ -355,6 +432,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // and an inconsistent job that is never again picked up by a job executor
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
+      @Override
       public Void execute(CommandContext commandContext) {
         JobManager jobManager = commandContext.getJobManager();
         MessageEntity job = new MessageEntity();
@@ -385,10 +463,11 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   protected void deleteJobAndIncidents(final Job job) {
     final List<HistoricIncident> incidents =
         historyService.createHistoricIncidentQuery()
-        .incidentType(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE).list();
+            .incidentType(Incident.FAILED_JOB_HANDLER_TYPE).list();
 
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
+      @Override
       public Void execute(CommandContext commandContext) {
         ((JobEntity) job).delete();
 
@@ -422,7 +501,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml"})
   public void testDeleteJobDeletion() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnTask");
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -434,7 +513,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertNull("There should be no job now. It was deleted", timerJob);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml"})
   public void testDeleteJobThatWasAlreadyAcquired() {
     ClockUtil.setCurrentTime(new Date());
 
@@ -446,7 +525,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
     // Acquire job by running the acquire command manually
     ProcessEngineImpl processEngineImpl = (ProcessEngineImpl) processEngine;
-    AcquireJobsCmd acquireJobsCmd = new AcquireJobsCmd(processEngineImpl.getProcessEngineConfiguration().getJobExecutor());
+    JobExecutor jobExecutor = processEngineImpl.getProcessEngineConfiguration().getJobExecutor();
+    AcquireJobsCmd acquireJobsCmd = new AcquireJobsCmd(jobExecutor);
     CommandExecutor commandExecutor = processEngineImpl.getProcessEngineConfiguration().getCommandExecutorTxRequired();
     commandExecutor.execute(acquireJobsCmd);
 
@@ -469,8 +549,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertNotNull(timerJob.getDuedate());
@@ -481,13 +561,13 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobDuedate(timerJob.getId(), cal.getTime());
 
     Job newTimerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     // normalize date for mysql dropping fractional seconds in time values
     int SECOND = 1000;
     assertEquals((cal.getTime().getTime() / SECOND) * SECOND,
-                 (newTimerJob.getDuedate().getTime() / SECOND) * SECOND);
+        (newTimerJob.getDuedate().getTime() / SECOND) * SECOND);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
@@ -497,8 +577,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertNotNull(timerJob.getDuedate());
@@ -506,8 +586,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobDuedate(timerJob.getId(), null);
 
     timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNull(timerJob.getDuedate());
   }
@@ -540,13 +620,23 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTaskProcess.bpmn20.xml")
+  public void testSetJobDuedateNonTimerJob(){
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Job job = managementService.createJobQuery().processDefinitionKey("oneTaskProcess").singleResult();
+    assertNotNull(job);
+    managementService.setJobDuedate(job.getId(), new Date());
+    job = managementService.createJobQuery().processDefinitionKey("oneTaskProcess").singleResult();
+    assertNotNull(job.getDuedate());
+  }
+
   public void testGetProperties() {
     Map<String, String> properties = managementService.getProperties();
     assertNotNull(properties);
     assertFalse(properties.isEmpty());
   }
 
-  public void  testSetProperty() {
+  public void testSetProperty() {
     final String name = "testProp";
     final String value = "testValue";
     managementService.setProperty(name, value);
@@ -559,7 +649,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.deleteProperty(name);
   }
 
-  public void  testDeleteProperty() {
+  public void testDeleteProperty() {
     final String name = "testProp";
     final String value = "testValue";
     managementService.setProperty(name, value);
@@ -575,7 +665,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  public void  testDeleteNonexistingProperty() {
+  public void testDeleteNonexistingProperty() {
 
     managementService.deleteProperty("non existing");
 
@@ -590,9 +680,9 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   public void testSetJobPriority() {
     // given
     runtimeService
-      .createProcessInstanceByKey("asyncTaskProcess")
-      .startBeforeActivity("task")
-      .execute();
+        .createProcessInstanceByKey("asyncTaskProcess")
+        .startBeforeActivity("task")
+        .execute();
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -602,7 +692,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // then
     job = managementService.createJobQuery().singleResult();
 
-    assertEquals(42, (int) job.getPriority());
+    assertEquals(42, job.getPriority());
   }
 
   public void testSetJobPriorityForNonExistingJob() {
@@ -623,8 +713,121 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected void cleanOpLog(String jobId) {
-    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().jobId(jobId).singleResult();
-    historyService.deleteUserOperationLogEntry(entry.getId());
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  public void testSetJobPriorityToExtremeValues() {
+    runtimeService
+        .createProcessInstanceByKey("asyncTaskProcess")
+        .startBeforeActivity("task")
+        .execute();
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // it is possible to set the max integer value
+    managementService.setJobPriority(job.getId(), Long.MAX_VALUE);
+    job = managementService.createJobQuery().singleResult();
+    assertEquals(Long.MAX_VALUE, job.getPriority());
+
+    // it is possible to set the min integer value
+    managementService.setJobPriority(job.getId(), Long.MIN_VALUE + 1); // +1 for informix
+    job = managementService.createJobQuery().singleResult();
+    assertEquals(Long.MIN_VALUE + 1, job.getPriority());
   }
+
+  public void testGetTableMetaData() {
+
+    TableMetaData tableMetaData = managementService.getTableMetaData("ACT_RU_TASK");
+    assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
+    assertEquals(21, tableMetaData.getColumnNames().size());
+
+    int assigneeIndex = tableMetaData.getColumnNames().indexOf("ASSIGNEE_");
+    int createTimeIndex = tableMetaData.getColumnNames().indexOf("CREATE_TIME_");
+
+    assertTrue(assigneeIndex >= 0);
+    assertTrue(createTimeIndex >= 0);
+
+    assertOneOf(new String[]{"VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR"}, tableMetaData.getColumnTypes().get(assigneeIndex));
+    assertOneOf(new String[]{"TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2"}, tableMetaData.getColumnTypes().get(createTimeIndex));
+  }
+
+  private void assertOneOf(String[] possibleValues, String currentValue) {
+    for (String value : possibleValues) {
+      if (currentValue.equals(value)) {
+        return;
+      }
+    }
+    fail("Value '" + currentValue + "' should be one of: " + Arrays.deepToString(possibleValues));
+  }
+
+  public void testGetTablePage() {
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    List<String> taskIds = generateDummyTasks(20);
+
+    TablePage tablePage = managementService.createTablePageQuery()
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .listPage(0, 5);
+
+    assertEquals(0, tablePage.getFirstResult());
+    assertEquals(5, tablePage.getSize());
+    assertEquals(5, tablePage.getRows().size());
+    assertEquals(20, tablePage.getTotal());
+
+    tablePage = managementService.createTablePageQuery()
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .listPage(14, 10);
+
+    assertEquals(14, tablePage.getFirstResult());
+    assertEquals(6, tablePage.getSize());
+    assertEquals(6, tablePage.getRows().size());
+    assertEquals(20, tablePage.getTotal());
+
+    taskService.deleteTasks(taskIds, true);
+  }
+
+  public void testGetSortedTablePage() {
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    List<String> taskIds = generateDummyTasks(15);
+
+    // With an ascending sort
+    TablePage tablePage = managementService.createTablePageQuery()
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .orderAsc("NAME_")
+        .listPage(1, 7);
+    String[] expectedTaskNames = new String[]{"B", "C", "D", "E", "F", "G", "H"};
+    verifyTaskNames(expectedTaskNames, tablePage.getRows());
+
+    // With a descending sort
+    tablePage = managementService.createTablePageQuery()
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .orderDesc("NAME_")
+        .listPage(6, 8);
+    expectedTaskNames = new String[]{"I", "H", "G", "F", "E", "D", "C", "B"};
+    verifyTaskNames(expectedTaskNames, tablePage.getRows());
+
+    taskService.deleteTasks(taskIds, true);
+  }
+
+  private void verifyTaskNames(String[] expectedTaskNames, List<Map<String, Object>> rowData) {
+    assertEquals(expectedTaskNames.length, rowData.size());
+    String columnKey = "NAME_";
+
+    for (int i = 0; i < expectedTaskNames.length; i++) {
+      Object o = rowData.get(i).get(columnKey);
+      if (o == null) {
+        o = rowData.get(i).get(columnKey.toLowerCase());
+      }
+      assertEquals(expectedTaskNames[i], o);
+    }
+  }
+
+  private List<String> generateDummyTasks(int nrOfTasks) {
+    ArrayList<String> taskIds = new ArrayList<String>();
+    for (int i = 0; i < nrOfTasks; i++) {
+      Task task = taskService.newTask();
+      task.setName(((char) ('A' + i)) + "");
+      taskService.saveTask(task);
+      taskIds.add(task.getId());
+    }
+    return taskIds;
+  }
+
 }

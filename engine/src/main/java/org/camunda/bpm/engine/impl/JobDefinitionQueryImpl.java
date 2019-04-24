@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,15 +16,16 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author roman.smirnov
@@ -38,11 +43,11 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   protected SuspensionState suspensionState;
   protected Boolean withOverridingJobPriority;
 
-  public JobDefinitionQueryImpl() {
-  }
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+  protected boolean includeJobDefinitionsWithoutTenantId = false;
 
-  public JobDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
+  public JobDefinitionQueryImpl() {
   }
 
   public JobDefinitionQueryImpl(CommandExecutor commandExecutor) {
@@ -56,7 +61,7 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   }
 
   public JobDefinitionQuery activityIdIn(String... activityIds) {
-    ensureNotNull("Activity ids", activityIds);
+    ensureNotNull("Activity ids", (Object[]) activityIds);
     this.activityIds = activityIds;
     return this;
   }
@@ -100,6 +105,24 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
     return this;
   }
 
+  public JobDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public JobDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public JobDefinitionQuery includeJobDefinitionsWithoutTenantId() {
+    this.includeJobDefinitionsWithoutTenantId = true;
+    return this;
+  }
+
   // order by ///////////////////////////////////////////
 
   public JobDefinitionQuery orderByJobDefinitionId() {
@@ -126,8 +149,13 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
     return orderBy(JobDefinitionQueryProperty.JOB_CONFIGURATION);
   }
 
+  public JobDefinitionQuery orderByTenantId() {
+    return orderBy(JobDefinitionQueryProperty.TENANT_ID);
+  }
+
   // results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -135,6 +163,7 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
       .findJobDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<JobDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext

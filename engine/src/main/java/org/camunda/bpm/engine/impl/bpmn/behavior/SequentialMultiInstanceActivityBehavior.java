@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,6 +15,9 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -29,11 +36,10 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
 
-    setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
-    setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
+    prepareScope(execution, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, 1);
 
-    ActivityImpl innerActivity = getInnerActivity(execution);
+    ActivityImpl innerActivity = getInnerActivity(execution.getActivity());
     performInstance(execution, innerActivity, 0);
   }
 
@@ -48,7 +54,7 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
       leave(scopeExecution);
     }
     else {
-      PvmActivity innerActivity = getInnerActivity(scopeExecution);
+      PvmActivity innerActivity = getInnerActivity(scopeExecution.getActivity());
       performInstance(scopeExecution, innerActivity, loopCounter);
     }
   }
@@ -57,21 +63,52 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
     // cannot happen
   }
 
-  public ActivityExecution initializeScope(ActivityExecution scopeExecution) {
-    setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, 1);
+  protected void prepareScope(ActivityExecution scopeExecution, int totalNumberOfInstances) {
+    setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, totalNumberOfInstances);
     setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
-    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
-    setLoopVariable(scopeExecution, LOOP_COUNTER, 0);
+  }
+
+  public List<ActivityExecution> initializeScope(ActivityExecution scopeExecution, int nrOfInstances) {
+    if (nrOfInstances > 1) {
+      LOG.unsupportedConcurrencyException(scopeExecution.toString(), this.getClass().getSimpleName());
+    }
+
+    List<ActivityExecution> executions = new ArrayList<ActivityExecution>();
+
+    prepareScope(scopeExecution, nrOfInstances);
+    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
+
+    if (nrOfInstances > 0) {
+      setLoopVariable(scopeExecution, LOOP_COUNTER, 0);
+      executions.add(scopeExecution);
+    }
+
+    return executions;
+  }
+
+  @Override
+  public ActivityExecution createInnerInstance(ActivityExecution scopeExecution) {
+
+    if (hasLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) && getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) > 0) {
+      throw LOG.unsupportedConcurrencyException(scopeExecution.toString(), this.getClass().getSimpleName());
+    }
+    else {
+      int nrOfInstances = getLoopVariable(scopeExecution, NUMBER_OF_INSTANCES);
+
+      setLoopVariable(scopeExecution, LOOP_COUNTER, nrOfInstances);
+      setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, nrOfInstances + 1);
+      setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
+    }
 
     return scopeExecution;
   }
 
-  public void concurrentExecutionCreated(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
-    throw LOG.unsupportedConcurrencyException(scopeExecution.toString(), this.getClass().getSimpleName());
-  }
+  @Override
+  public void destroyInnerInstance(ActivityExecution scopeExecution) {
+    removeLoopVariable(scopeExecution, LOOP_COUNTER);
 
-  public void concurrentExecutionDeleted(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
-    throw LOG.unsupportedConcurrencyException(scopeExecution.toString(), this.getClass().getSimpleName());
+    int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES);
+    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances - 1);
   }
 
 }

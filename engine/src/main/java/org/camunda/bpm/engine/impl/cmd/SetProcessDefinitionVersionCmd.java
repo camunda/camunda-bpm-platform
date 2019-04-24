@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -18,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +32,12 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
@@ -83,7 +87,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
   public SetProcessDefinitionVersionCmd(String processInstanceId, Integer processDefinitionVersion) {
     ensureNotEmpty("The process instance id is mandatory", "processInstanceId", processInstanceId);
     ensureNotNull("The process definition version is mandatory", "processDefinitionVersion", processDefinitionVersion);
-    ensurePositive("The process definition version must be positive", "processDefinitionVersion", processDefinitionVersion);
+    ensurePositive("The process definition version must be positive", "processDefinitionVersion", processDefinitionVersion.longValue());
     this.processInstanceId = processInstanceId;
     this.processDefinitionVersion = processDefinitionVersion;
   }
@@ -94,7 +98,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     // check that the new process definition is just another version of the same
     // process definition that the process instance is using
     ExecutionManager executionManager = commandContext.getExecutionManager();
-    ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);
+    final ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);
     if (processInstance == null) {
       throw new ProcessEngineException("No process instance found for id = '" + processInstanceId + "'.");
     } else if (!processInstance.isProcessInstanceExecution()) {
@@ -116,23 +120,23 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     }
 
     ProcessDefinitionEntity newProcessDefinition = deploymentCache
-      .findDeployedProcessDefinitionByKeyAndVersion(currentProcessDefinition.getKey(), processDefinitionVersion);
+      .findDeployedProcessDefinitionByKeyVersionAndTenantId(currentProcessDefinition.getKey(), processDefinitionVersion, currentProcessDefinition.getTenantId());
 
     validateAndSwitchVersionOfExecution(commandContext, processInstance, newProcessDefinition);
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
-      HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      // publish event for historic process instance
-      HistoryEvent event = eventFactory.createProcessInstanceUpdateEvt(processInstance);
-      eventHandler.handleEvent(event);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createProcessInstanceUpdateEvt(processInstance);
+        }
+      });
     }
 
     // switch all sub-executions of the process instance to the new process definition version
     List<ExecutionEntity> childExecutions = executionManager
-      .findChildExecutionsByProcessInstanceId(processInstanceId);
+      .findExecutionsByProcessInstanceId(processInstanceId);
     for (ExecutionEntity executionEntity : childExecutions) {
       validateAndSwitchVersionOfExecution(commandContext, executionEntity, newProcessDefinition);
     }
@@ -157,7 +161,12 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
     // add an entry to the op log
     PropertyChange change = new PropertyChange("processDefinitionVersion", currentProcessDefinition.getVersion(), processDefinitionVersion);
-    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, processInstanceId, null, null, change);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE,
+        processInstanceId,
+        null,
+        null,
+        Collections.singletonList(change));
 
     return null;
   }

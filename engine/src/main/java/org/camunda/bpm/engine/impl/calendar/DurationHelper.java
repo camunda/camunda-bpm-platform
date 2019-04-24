@@ -1,9 +1,12 @@
 /*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.calendar;
 
 import java.util.ArrayList;
@@ -24,13 +26,16 @@ import java.util.List;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 
 /**
  * helper class for parsing ISO8601 duration format (also recurring) and computing next timer date
  */
 public class DurationHelper {
+
+  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   Date start;
 
@@ -45,6 +50,10 @@ public class DurationHelper {
   DatatypeFactory datatypeFactory;
 
   public DurationHelper(String expressions) throws Exception {
+    this(expressions, null);
+  }
+  
+  public DurationHelper(String expressions, Date startDate) throws Exception {
     List<String> expression = new ArrayList<String>();
     if(expressions != null) {
       expression = Arrays.asList(expressions.split("/"));
@@ -52,7 +61,7 @@ public class DurationHelper {
     datatypeFactory = DatatypeFactory.newInstance();
 
     if (expression.size() > 3 || expression.isEmpty()) {
-      throw new ProcessEngineException("Cannot parse duration");
+      throw LOG.cannotParseDuration(expressions);
     }
     if (expression.get(0).startsWith("R")) {
       isRepeat = true;
@@ -73,14 +82,17 @@ public class DurationHelper {
       }
     }
     if (start == null && end == null) {
-      start = ClockUtil.getCurrentTime();
+      start = startDate == null ? ClockUtil.getCurrentTime() : startDate;
     }
-
   }
 
   public Date getDateAfter() {
+    return getDateAfter(null);
+  }
+  
+  public Date getDateAfter(Date date) {
     if (isRepeat) {
-      return getDateAfterRepeat(ClockUtil.getCurrentTime());
+      return getDateAfterRepeat(date == null ? ClockUtil.getCurrentTime() : date);
     }
     //TODO: is this correct?
     if (end != null) {
@@ -91,6 +103,10 @@ public class DurationHelper {
 
   public int getTimes() {
     return times;
+  }
+
+  public boolean isRepeat() {
+    return isRepeat;
   }
 
   private Date getDateAfterRepeat(Date date) {

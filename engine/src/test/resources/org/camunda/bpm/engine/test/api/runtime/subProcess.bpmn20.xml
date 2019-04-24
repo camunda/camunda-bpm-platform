@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
   
-  <process id="simpleSubProcess">
+  <process id="simpleSubProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     

@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,21 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.history;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -36,11 +28,18 @@ import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.variable.Variables;
+
+import java.util.*;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Sebastian Menski
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
@@ -55,7 +54,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstance.getCaseDefinitionId(), historicInstance.getCaseDefinitionId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
   public void testCaseInstanceStates() {
     String caseInstanceId = createCaseInstance().getId();
 
@@ -102,7 +101,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(0, historicQuery().notClosed());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
   public void testHistoricCaseInstanceDates() {
     // create test dates
     long duration = 72 * 3600 * 1000;
@@ -143,11 +142,15 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(0, historicQuery().createdBefore(beforeCreate));
     assertCount(1, historicQuery().createdBefore(closed));
 
+    assertCount(0, historicQuery().createdBefore(beforeCreate).createdAfter(closed));
+
     assertCount(1, historicQuery().closedAfter(created));
     assertCount(0, historicQuery().closedAfter(afterClose));
 
     assertCount(0, historicQuery().closedBefore(created));
     assertCount(1, historicQuery().closedBefore(afterClose));
+
+    assertCount(0, historicQuery().closedBefore(created).closedAfter(afterClose));
 
     assertCount(1, historicQuery().closedBefore(afterClose).closedAfter(created));
   }
@@ -172,9 +175,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   })
   public void testSuperCaseInstance() {
     String caseInstanceId  = createCaseInstanceByKey("oneCaseTaskCase").getId();
-    String caseTaskId = queryCaseExecutionByActivityId("PI_CaseTask_1").getId();
-
-    manualStart(caseTaskId);
+    queryCaseExecutionByActivityId("PI_CaseTask_1").getId();
 
     HistoricCaseInstance historicCaseInstance = historicQuery()
       .superCaseInstanceId(caseInstanceId)
@@ -193,11 +194,13 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
-    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn",
+    "org/camunda/bpm/engine/test/api/repository/three_.cmmn"
   })
   public void testHistoricCaseInstanceQuery() {
     CaseInstance oneTaskCase = createCaseInstanceByKey("oneTaskCase", "oneBusiness");
     CaseInstance twoTaskCase = createCaseInstanceByKey("twoTaskCase", "twoBusiness");
+    createCaseInstanceByKey("xyz_", "xyz_");
 
     assertCount(1, historicQuery().caseInstanceId(oneTaskCase.getId()));
     assertCount(1, historicQuery().caseInstanceId(twoTaskCase.getId()));
@@ -209,14 +212,17 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     caseInstanceIds.add("unknown2");
 
     assertCount(2, historicQuery().caseInstanceIds(caseInstanceIds));
+    assertCount(0, historicQuery().caseInstanceIds(caseInstanceIds).caseInstanceId("someOtherId"));
 
     assertCount(1, historicQuery().caseDefinitionId(oneTaskCase.getCaseDefinitionId()));
 
     assertCount(1, historicQuery().caseDefinitionKey("oneTaskCase"));
 
-    assertCount(2, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("unknown")));
-    assertCount(1, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")));
-    assertCount(0, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase", "twoTaskCase")));
+    assertCount(3, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("unknown")));
+    assertCount(2, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")));
+    assertCount(1, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase", "twoTaskCase")));
+    assertCount(0, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")).caseDefinitionKey("oneTaskCase"));
+
 
     try {
       // oracle handles empty string like null which seems to lead to undefined behavior of the LIKE comparison
@@ -233,12 +239,14 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(2, historicQuery().caseDefinitionNameLike("%T%"));
     assertCount(1, historicQuery().caseDefinitionNameLike("One%"));
     assertCount(0, historicQuery().caseDefinitionNameLike("%Process%"));
+    assertCount(1, historicQuery().caseDefinitionNameLike("%z\\_"));
 
     assertCount(1, historicQuery().caseInstanceBusinessKey("oneBusiness"));
 
     assertCount(2, historicQuery().caseInstanceBusinessKeyLike("%Business"));
     assertCount(1, historicQuery().caseInstanceBusinessKeyLike("one%"));
     assertCount(0, historicQuery().caseInstanceBusinessKeyLike("%unknown%"));
+    assertCount(1, historicQuery().caseInstanceBusinessKeyLike("%z\\_"));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
@@ -506,9 +514,10 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     createCaseInstance();
     createCaseInstance();
 
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     String tableName = managementService.getTableName(HistoricCaseInstance.class);
 
-    assertEquals("ACT_HI_CASEINST", tableName);
+    assertEquals(tablePrefix + "ACT_HI_CASEINST", tableName);
     assertEquals(tableName, managementService.getTableName(HistoricCaseInstanceEntity.class));
 
     assertEquals(4, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).list().size());
@@ -538,7 +547,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertEquals(2, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).listPage(2, 2).size());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
   public void testDeleteHistoricCaseInstance() {
     CaseInstance caseInstance = createCaseInstance();
 
@@ -603,14 +612,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testQueryBySubProcessInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
 
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(processTaskId);
-
     String subProcessInstanceId = runtimeService
         .createProcessInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId)
@@ -652,14 +653,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testQueryBySuperCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
-    String caseTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_CaseTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(caseTaskId);
-
     HistoricCaseInstanceQuery query = historyService
         .createHistoricCaseInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId);
@@ -694,14 +687,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testQueryBySubCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
-    String caseTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_CaseTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(caseTaskId);
-
     String subCaseInstanceId = caseService
         .createCaseInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId)
@@ -733,6 +718,108 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testQueryByCaseActivityId() {
+
+    // given
+    createCaseInstanceByKey("oneTaskCase");
+
+    // when
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
+      .caseActivityIdIn("PI_HumanTask_1");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testQueryByCaseActivityIds() {
+
+    // given
+    createCaseInstanceByKey("oneCaseTaskCase");
+
+    // when
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
+      .caseActivityIdIn("PI_HumanTask_1", "PI_CaseTask_1");
+
+    // then
+    assertEquals(2, query.list().size());
+    assertEquals(2, query.count());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+  })
+  public void testDistinctQueryByCaseActivityIds() {
+
+    // given
+    createCaseInstanceByKey("twoTaskCase");
+
+    // when
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
+      .caseActivityIdIn("PI_HumanTask_1", "PI_HumanTask_2");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  public void testQueryByNonExistingCaseActivityId() {
+    HistoricCaseInstanceQuery query = historyService
+        .createHistoricCaseInstanceQuery()
+        .caseActivityIdIn("nonExisting");
+
+    assertEquals(0, query.count());
+  }
+
+  public void testFailQueryByCaseActivityIdNull() {
+    try {
+      historyService.createHistoricCaseInstanceQuery()
+        .caseActivityIdIn((String) null);
+
+      fail("expected exception");
+    } catch (NullValueException e) {
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testRetrieveCaseDefinitionKey() {
+
+    // given
+    String id = createCaseInstance("oneTaskCase").getId();
+
+    // when
+    HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery()
+        .caseInstanceId(id)
+        .singleResult();
+
+    // then
+    assertEquals("oneTaskCase", caseInstance.getCaseDefinitionKey());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testRetrieveCaseDefinitionName() {
+
+    // given
+    String id = createCaseInstance("oneTaskCase").getId();
+
+    // when
+    HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery()
+        .caseInstanceId(id)
+        .singleResult();
+
+    // then
+    assertEquals("One Task Case", caseInstance.getCaseDefinitionName());
+
   }
 
   protected HistoricCaseInstance queryHistoricCaseInstance(String caseInstanceId) {

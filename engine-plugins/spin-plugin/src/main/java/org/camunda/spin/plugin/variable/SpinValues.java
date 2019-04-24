@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,19 +30,34 @@ import org.camunda.spin.xml.SpinXmlElement;
 public class SpinValues {
 
   public static JsonValueBuilder jsonValue(SpinJsonNode value) {
-    return new JsonValueBuilderImpl(value);
+    return jsonValue(value, false);
   }
 
   public static JsonValueBuilder jsonValue(String value) {
-    return new JsonValueBuilderImpl(value);
+    return jsonValue(value, false);
+  }
+
+  public static JsonValueBuilder jsonValue(SpinJsonNode value, boolean isTransient) {
+    return (JsonValueBuilder) new JsonValueBuilderImpl(value).setTransient(isTransient);
+  }
+
+  public static JsonValueBuilder jsonValue(String value, boolean isTransient) {
+    return (JsonValueBuilder) new JsonValueBuilderImpl(value).setTransient(isTransient);
   }
 
   public static XmlValueBuilder xmlValue(SpinXmlElement value) {
-    return new XmlValueBuilderImpl(value);
+    return xmlValue(value, false);
   }
 
   public static XmlValueBuilder xmlValue(String value) {
-    return new XmlValueBuilderImpl(value);
+    return xmlValue(value, false);
   }
 
+  public static XmlValueBuilder xmlValue(SpinXmlElement value, boolean isTransient) {
+    return (XmlValueBuilder) new XmlValueBuilderImpl(value).setTransient(isTransient);
+  }
+
+  public static XmlValueBuilder xmlValue(String value, boolean isTransient) {
+    return (XmlValueBuilder) new XmlValueBuilderImpl(value).setTransient(isTransient);
+  }
 }

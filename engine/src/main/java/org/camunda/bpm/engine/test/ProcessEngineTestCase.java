@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test;
 
 import java.io.FileNotFoundException;
 import java.util.Date;
-
-import junit.framework.TestCase;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -33,6 +34,8 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.test.ProcessEngineAssert;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+
+import junit.framework.TestCase;
 
 
 /** Convenience for ProcessEngine and services initialization in the form of a JUnit base class.
@@ -82,6 +85,8 @@ public class ProcessEngineTestCase extends TestCase {
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
 
+  protected boolean skipTest = false;
+
   /** uses 'camunda.cfg.xml' as it's configuration resource */
   public ProcessEngineTestCase() {
   }
@@ -99,7 +104,20 @@ public class ProcessEngineTestCase extends TestCase {
       initializeServices();
     }
 
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+    boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
+    // ignore test case when current history level is too low
+    skipTest = !hasRequiredHistoryLevel;
+
+    if (!skipTest) {
+      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+    }
+  }
+
+  @Override
+  protected void runTest() throws Throwable {
+    if (!skipTest) {
+      super.runTest();
+    }
   }
 
   protected void initializeProcessEngine() {

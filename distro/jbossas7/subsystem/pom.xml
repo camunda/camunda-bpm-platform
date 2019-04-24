@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>
     <artifactId>camunda-jboss</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
   
   <dependencyManagement>
@@ -45,10 +45,10 @@
   <dependencies>
       
     <dependency>
-    	<groupId>org.jboss.as</groupId>
-    	<artifactId>jboss-as-threads</artifactId>
-    	<version>${version.jboss.as}</version>
-    	<scope>provided</scope>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-threads</artifactId>
+      <version>${version.jboss.as}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

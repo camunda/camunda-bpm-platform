@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:camunda="http://camunda.org/schema/1.0/cmmn" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <cmmn:case id="Case_1">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+      <cmmn:planItem id="HumanTask_1" name="HumanTask 1" definitionRef="HumanTask_1cnsc8s">
+        <cmmn:entryCriterion id="Sentry_1" sentryRef="Sentry_0qdg8rb" />
+      </cmmn:planItem>
+      <cmmn:planItem id="HumanTask_2" name="HumanTask 2" definitionRef="HumanTask_0cqwfs9">
+        <cmmn:entryCriterion id="Sentry_2" sentryRef="Sentry_1qtpzq0" />
+      </cmmn:planItem>
+      <cmmn:sentry id="Sentry_0qdg8rb" >
+       <cmmn:extensionElements>
+          <camunda:variableOnPart variableName = "variable_1">
+            <camunda:variableEvent>create</camunda:variableEvent>
+          </camunda:variableOnPart>
+        </cmmn:extensionElements>
+      </cmmn:sentry>  
+      <cmmn:sentry id="Sentry_1qtpzq0" >
+        <cmmn:extensionElements>
+          <camunda:variableOnPart variableName = "variable_2">
+            <camunda:variableEvent>create</camunda:variableEvent>
+          </camunda:variableOnPart>
+        </cmmn:extensionElements>
+      </cmmn:sentry>  
+      <cmmn:humanTask id="HumanTask_1cnsc8s" name="HumanTask1" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
+      <cmmn:humanTask id="HumanTask_0cqwfs9" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_1">
+        <dc:Bounds x="114" y="63" width="534" height="389" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0p9icc4_di" cmmnElementRef="HumanTask_1">
+        <dc:Bounds x="203" y="150" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0l4sfw2_di" cmmnElementRef="HumanTask_2">
+        <dc:Bounds x="411" y="150" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_060dju6_di" cmmnElementRef="Sentry_1">
+        <dc:Bounds x="193" y="178" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_0weok78_di" cmmnElementRef="Sentry_2">
+        <dc:Bounds x="401" y="174" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,15 +17,10 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
-
-import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
@@ -137,46 +136,12 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
     Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
   }
 
-  @Test
-  @OperateOnDeployment("dummy-client")
-  public void testGracefulDegradationOnMissingClassJava() {
-    // given
-    byte[] serializedPriorityBean = readByteArrayFromClasspath(PRIORITY_BEAN_INSTANCE_FILE);
-    String encodedPriorityBean = StringUtil.fromBytes(Base64.encodeBase64(serializedPriorityBean), processEngine);
-
-    Map<String, Object> variables = Variables.createVariables().putValue(
-        "priorityBean",
-        Variables.serializedObjectValue(encodedPriorityBean)
-          .serializationDataFormat(SerializationDataFormats.JAVA)
-          .objectTypeName(VARIABLE_CLASS_NAME)
-          .create());
-
-    // when
-    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
-
-    // then the job was created successfully and has the default priority although
-    // the bean could not be resolved due to a missing class
-    Job job = managementService.createJobQuery().singleResult();
-    Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
-  }
-
   protected static byte[] serializeJavaObjectValue(Serializable object) {
 
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       new ObjectOutputStream(baos).writeObject(object);
       return baos.toByteArray();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  protected static byte[] readByteArrayFromClasspath(String path) {
-    try {
-      InputStream inStream = JobPrioritizationFailureTest.class.getClassLoader().getResourceAsStream(path);
-      byte[] serializedValue = IoUtil.readInputStream(inStream, "");
-      inStream.close();
-      return serializedValue;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

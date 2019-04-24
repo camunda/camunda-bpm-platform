@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+
+  <!-- INSERT -->
+
+  <insert id="insertHistoricBatch" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+    insert into ${prefix}ACT_HI_BATCH
+    (
+      ID_,
+      TYPE_,
+      TOTAL_JOBS_,
+      JOBS_PER_SEED_,
+      INVOCATIONS_PER_JOB_,
+      SEED_JOB_DEF_ID_,
+      MONITOR_JOB_DEF_ID_,
+      BATCH_JOB_DEF_ID_,
+      TENANT_ID_,
+      CREATE_USER_ID_,
+      START_TIME_,
+      END_TIME_,
+      REMOVAL_TIME_
+    )
+    values
+    (
+      #{id ,jdbcType=VARCHAR},
+      #{type, jdbcType=VARCHAR},
+      #{totalJobs, jdbcType=INTEGER},
+      #{batchJobsPerSeed, jdbcType=INTEGER},
+      #{invocationsPerBatchJob, jdbcType=INTEGER},
+      #{seedJobDefinitionId, jdbcType=VARCHAR},
+      #{monitorJobDefinitionId, jdbcType=VARCHAR},
+      #{batchJobDefinitionId, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
+      #{createUserId, jdbcType=VARCHAR},
+      #{startTime, jdbcType=TIMESTAMP},
+      #{endTime, jdbcType=TIMESTAMP},
+      #{removalTime, jdbcType=TIMESTAMP}
+    )
+  </insert>
+
+  <!-- RESULTMAP -->
+
+  <resultMap id="historicBatchResultMap" type="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="totalJobs" column="TOTAL_JOBS_" jdbcType="INTEGER" />
+    <result property="batchJobsPerSeed" column="JOBS_PER_SEED_" jdbcType="INTEGER" />
+    <result property="invocationsPerBatchJob" column="INVOCATIONS_PER_JOB_" jdbcType="INTEGER" />
+    <result property="seedJobDefinitionId" column="SEED_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="monitorJobDefinitionId" column="MONITOR_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="batchJobDefinitionId" column="BATCH_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CleanableHistoricBatchesReportResultEntity">
+    <result property="cleanableBatchesCount" column="CLEANABLE_" jdbcType="BIGINT" />
+    <result property="finishedBatchesCount" column="FINISHED_" jdbcType="BIGINT" />
+    <result property="batchType" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="BIGINT" />
+  </resultMap>
+
+  <!-- DELETE -->
+
+  <delete id="deleteHistoricBatch" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+    delete from ${prefix}ACT_HI_BATCH where ID_ = #{id}
+  </delete>
+
+  <delete id="deleteHistoricBatchById" parameterType="string">
+    delete from ${prefix}ACT_HI_BATCH where ID_ = #{parameter}
+  </delete>
+
+  <delete id="deleteHistoricBatchByIds" parameterType="string">
+    delete
+    from ${prefix}ACT_HI_BATCH
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </delete>
+
+  <delete id="deleteHistoricBatchesByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_BATCH
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricBatchesByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_BATCH
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricBatchesByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_BATCH
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_BATCH
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
+  </delete>
+
+  <!-- UPDATE -->
+  <update id="updateHistoricBatch" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+    update ${prefix}ACT_HI_BATCH
+    <set>
+      <if test="endTime != null">
+        END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="removalTime != null">
+        REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      </if>
+    </set>
+    where ID_= #{id, jdbcType=VARCHAR}
+  </update>
+
+  <!-- SELECT -->
+  <select id="selectHistoricBatch" parameterType="string" resultMap="historicBatchResultMap">
+    select * from ${prefix}ACT_HI_BATCH where ID_ = #{id}
+  </select>
+
+  <select id="selectHistoricBatchesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl" resultMap="historicBatchResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectHistoricBatchesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricBatchCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectHistoricBatchesByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectHistoricBatchesByQueryCriteriaSql">
+    from ${prefix}ACT_HI_BATCH RES
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" />
+
+    <where>
+      <if test="batchId != null">
+        RES.ID_ = #{batchId}
+      </if>
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
+      </if>
+      <if test="completed != null &amp;&amp; completed">
+        and RES.END_TIME_ is not null
+      </if>
+      <if test="completed != null &amp;&amp; !completed">
+        and RES.END_TIME_ is null
+      </if>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+    </where>
+  </sql>
+
+  <select id="selectHistoricBatchByJobId" parameterType="string" resultMap="historicBatchResultMap">
+    select ID_, REMOVAL_TIME_ from ${prefix}ACT_HI_BATCH
+      where ID_ in (SELECT HB.ID_ from ${prefix}ACT_RU_JOB J
+        inner join ${prefix}ACT_HI_BATCH HB
+        on J.JOB_DEF_ID_ in
+          (HB.SEED_JOB_DEF_ID_,
+           HB.MONITOR_JOB_DEF_ID_,
+           HB.BATCH_JOB_DEF_ID_)
+        where J.ID_ = #{jobId})
+  </select>
+
+  <!-- Select ids for async history cleanup -->
+
+  <select id="selectHistoricBatchIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    <include refid="selectHistoricBatchIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricBatchIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    <include refid="selectHistoricBatchIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectHistoricBatchIdsForCleanupSql">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    <bind name="date" value="'RES.END_TIME_'"/>
+    <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    ${limitBefore}
+    SELECT RES.ID_, RES.END_TIME_
+    ${limitBetween}
+    FROM ${prefix}ACT_HI_BATCH RES
+    WHERE
+    <foreach index="key" item="value" collection="parameter.map" open="(" separator="OR" close=")">
+      <bind name="days" value="'#{value, jdbcType=INTEGER}'"/>
+      RES.TYPE_ = #{key} and ${dayComparator}
+    </foreach>
+    AND RES.END_TIME_ is not null
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <!-- Select History Cleanup Report Entities -->
+  <select id="selectFinishedBatchesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultType="long">
+    SELECT COUNT(DISTINCT RES.TYPE_)
+    <include refid="selectFinishedBatchesReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedBatchesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    SELECT ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFinishedBatchesReportEntitiesSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectFinishedBatchesReportEntitiesSql">
+    <bind name="date" value="'RES.END_TIME_'" />
+    <bind name="days" value="'HISTORY_TTL_'"/>
+    FROM (
+      SELECT RES.TYPE_,
+             C.HISTORY_TTL_,
+             <choose>
+               <when test="isHistoryCleanupStrategyRemovalTimeBased">
+                 SUM(CASE WHEN REMOVAL_TIME_ is not null and REMOVAL_TIME_ &lt;= #{currentTimestamp} THEN 1 ELSE 0 END) AS CLEANABLE_,
+               </when>
+               <otherwise>
+                 SUM(CASE WHEN HISTORY_TTL_ is not null and (HISTORY_TTL_ = 0 OR ${dayComparator}) and END_TIME_ is not null THEN 1 ELSE 0 END) AS CLEANABLE_,
+               </otherwise>
+             </choose>
+             F.FINISHED_
+        FROM ${prefix}ACT_HI_BATCH RES
+        LEFT JOIN (
+          <foreach index="key" item="value" collection="parameter" separator="UNION">
+            select ${constant.varchar.cast} as TYPE_, ${value} as HISTORY_TTL_
+            ${dbSpecificDummyTable}
+          </foreach>
+        ) C ON C.TYPE_ = RES.TYPE_
+      LEFT JOIN (
+        SELECT COUNT(TYPE_) AS FINISHED_, TYPE_
+        FROM ${prefix}ACT_HI_BATCH RES
+        WHERE END_TIME_ is not null
+        GROUP BY TYPE_
+      ) F ON F.TYPE_ = RES.TYPE_
+      GROUP BY RES.TYPE_,
+      HISTORY_TTL_,
+      F.FINISHED_
+    ) RES
+  </sql>
+
+  <select id="selectOnlyFinishedBatchesReportEntities" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy" />
+    ${limitBefore}
+    SELECT FINISHED_, TYPE_
+    ${limitBetween}
+    <include refid="selectOnlyFinishedBatchesReportEntitiesSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectOnlyFinishedBatchesReportEntitiesCount" resultType="long">
+    SELECT COUNT(DISTINCT RES.TYPE_)
+    <include refid="selectOnlyFinishedBatchesReportEntitiesSql" />
+  </select>
+
+  <sql id="selectOnlyFinishedBatchesReportEntitiesSql">
+    FROM (
+      SELECT COUNT(*) AS FINISHED_, TYPE_
+      FROM ${prefix}ACT_HI_BATCH RES
+      WHERE END_TIME_ is not null
+      GROUP BY TYPE_
+    ) RES
+  </sql>
+
+</mapper>

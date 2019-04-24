@@ -1,0 +1,111 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa.upgrade</groupId>
+    <artifactId>camunda-qa-db-rolling-update</artifactId>
+    <version>7.11.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>camunda-qa-db-create-old-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA - upgrade - rolling update - create old engine</name>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>7.10.0</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine</artifactId>
+        <version>7.10.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-xml-model</artifactId>
+        <version>7.10.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-bpmn-model</artifactId>
+        <version>7.10.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-cmmn-model</artifactId>
+        <version>7.10.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-dmn-model</artifactId>
+        <version>7.10.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa.upgrade</groupId>
+      <artifactId>camunda-qa-db-rolling-update-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>rolling-update</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+              <cleanupDaemonThreads>false</cleanupDaemonThreads>
+              <includeProjectDependencies>true</includeProjectDependencies>
+              <includePluginDependencies>false</includePluginDependencies>
+              <classpathScope>test</classpathScope>
+            </configuration>
+            <executions>
+              <execution>
+                <id>create-test-fixture</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+                <configuration>
+                  <mainClass>org.camunda.bpm.qa.rolling.update.CreateOldEngineMain</mainClass>
+                  <includePluginDependencies>false</includePluginDependencies>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

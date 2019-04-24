@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +18,7 @@ package org.camunda.bpm.engine.impl.repository;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -38,6 +43,7 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   public ProcessApplicationDeploymentBuilderImpl(RepositoryServiceImpl repositoryService, ProcessApplicationReference reference) {
     super(repositoryService);
     this.processApplicationReference = reference;
+    source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
   }
 
   public ProcessApplicationDeploymentBuilder resumePreviousVersions() {
@@ -93,6 +99,21 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
+  public ProcessApplicationDeploymentBuilderImpl tenantId(String tenantId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.tenantId(tenantId);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl nameFromDeployment(String deploymentId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.nameFromDeployment(deploymentId);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl source(String source) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.source(source);
+  }
+
+  @Override
   public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering() {
     return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering();
   }
@@ -100,6 +121,31 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   @Override
   public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering(boolean deployChangedOnly) {
     return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(deployChangedOnly);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResources(String deploymentId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResources(deploymentId);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceById(String deploymentId, String resourceId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceById(deploymentId, resourceId);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesById(String deploymentId, List<String> resourceIds) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesById(deploymentId, resourceIds);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceByName(String deploymentId, String resourceName) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceByName(deploymentId, resourceName);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesByName(String deploymentId, List<String> resourceNames) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesByName(deploymentId, resourceNames);
   }
 
   // getters / setters ///////////////////////////////////////////////

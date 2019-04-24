@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +17,8 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
@@ -24,6 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.RepeatingFailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 
 
 /**
@@ -57,29 +64,35 @@ public class TimerEntity extends JobEntity {
     deploymentId = te.deploymentId;
     processDefinitionId = te.processDefinitionId;
     processDefinitionKey = te.processDefinitionKey;
+    tenantId = te.tenantId;
+    priority = te.priority;
   }
 
+  @Override
   protected void preExecute(CommandContext commandContext) {
-    if (repeat != null && !TimerEventJobHandler.isFollowUpJobCreated(getJobHandlerConfiguration())) {
-      // this timer is a repeating timer and
-      // a follow up timer job has not been scheduled yet
+    if (getJobHandler() instanceof TimerEventJobHandler) {
+      TimerJobConfiguration configuration = (TimerJobConfiguration) getJobHandlerConfiguration();
+      if (repeat != null && !configuration.isFollowUpJobCreated()) {
+        // this timer is a repeating timer and
+        // a follow up timer job has not been scheduled yet
 
-      Date newDueDate = calculateRepeat();
+        Date newDueDate = calculateRepeat();
 
-      if (newDueDate != null) {
-        // the listener is added to the transaction as SYNC on ROLLABCK,
-        // when it is necessary to schedule a new timer job invocation.
-        // If the transaction does not rollback, it is ignored.
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-        RepeatingFailedJobListener listener = createRepeatingFailedJobListener(commandExecutor);
+        if (newDueDate != null) {
+          // the listener is added to the transaction as SYNC on ROLLABCK,
+          // when it is necessary to schedule a new timer job invocation.
+          // If the transaction does not rollback, it is ignored.
+          ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+          CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+          RepeatingFailedJobListener listener = createRepeatingFailedJobListener(commandExecutor);
 
-        commandContext.getTransactionContext().addTransactionListener(
-            TransactionState.ROLLED_BACK,
-            listener);
+          commandContext.getTransactionContext().addTransactionListener(
+              TransactionState.ROLLED_BACK,
+              listener);
 
-        // create a new timer job
-        createNewTimerJob(newDueDate);
+          // create a new timer job
+          createNewTimerJob(newDueDate);
+        }
       }
     }
   }
@@ -114,8 +127,17 @@ public class TimerEntity extends JobEntity {
     this.repeat = repeat;
   }
 
+  @Override
   public String getType() {
     return TYPE;
+  }
+
+  @Override
+  public Object getPersistentState() {
+    Map<String, Object> persistentState = (HashMap) super.getPersistentState();
+    persistentState.put("repeat", repeat);
+
+    return persistentState;
   }
 
   @Override

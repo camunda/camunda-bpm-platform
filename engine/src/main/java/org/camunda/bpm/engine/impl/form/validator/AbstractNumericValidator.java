@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,8 +15,6 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.form.validator;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * @author Daniel Meyer
@@ -36,7 +38,7 @@ public abstract class AbstractNumericValidator implements FormFieldValidator {
       try {
         configuration = Double.parseDouble(configurationString);
       } catch( NumberFormatException e) {
-        throw new ProcessEngineException("Cannot validate Double value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Double.");
+        throw new FormFieldConfigurationException(configurationString, "Cannot validate Double value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Double.");
       }
       return validate((Double) submittedValue, configuration);
     }
@@ -48,7 +50,7 @@ public abstract class AbstractNumericValidator implements FormFieldValidator {
       try {
         configuration = Float.parseFloat(configurationString);
       } catch( NumberFormatException e) {
-        throw new ProcessEngineException("Cannot validate Float value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Float.");
+        throw new FormFieldConfigurationException(configurationString, "Cannot validate Float value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Float.");
       }
       return validate((Float) submittedValue, configuration);
     }
@@ -60,7 +62,7 @@ public abstract class AbstractNumericValidator implements FormFieldValidator {
       try {
         configuration = Long.parseLong(configurationString);
       } catch(NumberFormatException e) {
-        throw new ProcessEngineException("Cannot validate Long value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Long.");
+        throw new FormFieldConfigurationException(configurationString, "Cannot validate Long value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Long.");
       }
       return validate((Long) submittedValue, configuration);
     }
@@ -72,7 +74,7 @@ public abstract class AbstractNumericValidator implements FormFieldValidator {
       try {
         configuration = Integer.parseInt(configurationString);
       } catch( NumberFormatException e) {
-        throw new ProcessEngineException("Cannot validate Integer value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Integer.");
+        throw new FormFieldConfigurationException(configurationString, "Cannot validate Integer value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Integer.");
       }
       return validate((Integer) submittedValue, configuration);
     }
@@ -84,12 +86,12 @@ public abstract class AbstractNumericValidator implements FormFieldValidator {
       try {
         configuration = Short.parseShort(configurationString);
       } catch( NumberFormatException e) {
-        throw new ProcessEngineException("Cannot validate Short value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Short.");
+        throw new FormFieldConfigurationException(configurationString, "Cannot validate Short value "+submittedValue +": configuration "+configurationString+" cannot be parsed as Short.");
       }
       return validate((Short) submittedValue, configuration);
     }
 
-    throw new ProcessEngineException("Numeric validator "+getClass().getSimpleName()+" cannot be used on non-numeric value "+submittedValue);
+    throw new FormFieldValidationException("Numeric validator "+getClass().getSimpleName()+" cannot be used on non-numeric value "+submittedValue);
   }
 
   protected boolean isNullValid() {

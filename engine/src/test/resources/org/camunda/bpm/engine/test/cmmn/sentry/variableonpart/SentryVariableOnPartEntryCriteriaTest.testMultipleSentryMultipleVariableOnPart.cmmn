@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"  xmlns:camunda="http://camunda.org/schema/1.0/cmmn" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <cmmn:case id="Case_1">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+      <cmmn:planItem id="HumanTask_1" name="HumanTask1" definitionRef="HumanTask_1c0ossk" />
+      <cmmn:planItem id="HumanTask_2" name="HumanTask 2" definitionRef="HumanTask_06yd3re">
+        <cmmn:entryCriterion id="Sentry_1" sentryRef="Sentry1" />
+        <cmmn:entryCriterion id="Sentry_2" sentryRef="Sentry2" />
+      </cmmn:planItem>
+      <cmmn:sentry id="Sentry1" >
+         <cmmn:extensionElements>
+          <camunda:variableOnPart variableName = "value">
+            <camunda:variableEvent>create</camunda:variableEvent>
+          </camunda:variableOnPart>
+         </cmmn:extensionElements>
+         <cmmn:ifPart id="IfPart_1nmig4f">
+          <cmmn:condition id="Expression_07rm1vz"><![CDATA[${value > 100}]]></cmmn:condition>
+         </cmmn:ifPart>
+      </cmmn:sentry>
+      <cmmn:sentry id="Sentry2">
+        <cmmn:extensionElements>
+          <camunda:variableOnPart variableName = "value">
+            <camunda:variableEvent>create</camunda:variableEvent>
+          </camunda:variableOnPart>
+        </cmmn:extensionElements>
+        <cmmn:planItemOnPart id="PlanItemOnPart_0226u2d" sourceRef="HumanTask_1">        <cmmn:standardEvent>complete</cmmn:standardEvent>
+      </cmmn:planItemOnPart>
+      </cmmn:sentry>
+      <cmmn:humanTask id="HumanTask_1c0ossk" name="HumanTask_1" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
+      <cmmn:humanTask id="HumanTask_06yd3re" name="HumanTask2" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_1">
+        <dc:Bounds x="114" y="63" width="534" height="389" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0bmtlb0_di" cmmnElementRef="HumanTask_1">
+        <dc:Bounds x="175" y="127" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_0m336qp_di" cmmnElementRef="Sentry_1">
+        <dc:Bounds x="400" y="189" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1f71gcn_di" cmmnElementRef="HumanTask_2">
+        <dc:Bounds x="410" y="159" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_0n3aqu3_di" cmmnElementRef="Sentry_2">
+        <dc:Bounds x="450" y="225" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="PlanItemOnPart_0226u2d_di" cmmnElementRef="PlanItemOnPart_0226u2d" targetCMMNElementRef="Sentry_2" isStandardEventVisible="true">
+        <di:waypoint xsi:type="dc:Point" x="225" y="207" />
+        <di:waypoint xsi:type="dc:Point" x="225" y="301" />
+        <di:waypoint xsi:type="dc:Point" x="460" y="301" />
+        <di:waypoint xsi:type="dc:Point" x="460" y="253" />
+        <cmmndi:CMMNLabel>
+          <dc:Bounds x="284" y="278" width="90" height="20" />
+        </cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

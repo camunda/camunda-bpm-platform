@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
@@ -18,15 +18,17 @@
   <properties>
 
     <!-- database driver versions -->
-    <version.h2>1.3.168</version.h2>
+    <version.h2>1.4.190</version.h2>
     <version.oracle-12>12.1.0.2</version.oracle-12>
     <version.oracle-11>11.2.0.4</version.oracle-11>
     <version.oracle-10>10.2.0.5</version.oracle-10>
     <version.oracle>${version.oracle-11}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
+    <version.mariadb.galera>1.6.3</version.mariadb.galera>
     <version.mysql>5.1.21</version.mysql>
     <version.sqlserver.oss>1.3.1</version.sqlserver.oss>
     <version.sqlserver>4.0</version.sqlserver>
+    <version.db2-11.1>11.1.1.1</version.db2-11.1>
     <version.db2-10.5>10.5.0.5</version.db2-10.5>
     <version.db2-10.1>10.1.0.4</version.db2-10.1>
     <version.db2-9.7>9.7</version.db2-9.7>
@@ -34,7 +36,7 @@
     <version.postgresql>9.3-1102-jdbc4</version.postgresql>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.3.0</camunda.version.old>
+    <camunda.version.old>7.10.0</camunda.version.old>
   </properties>
 
   <dependencyManagement>
@@ -153,8 +155,6 @@
         <database.type>db2</database.type>
         <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
         <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>
-        <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.DB2Dialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -166,10 +166,9 @@
       </dependencies>
     </profile>
     <profile>
-      <id>db2-xa</id>
+      <id>db2-111</id>
       <properties>
-        <database.datasource.class>com.ibm.db2.jcc.DB2XADataSource</database.datasource.class>
-        <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
+        <version.db2>${version.db2-11.1}</version.db2>
       </properties>
     </profile>
     <profile>
@@ -197,7 +196,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <database.url>jdbc:h2:mem:camunda;DB_CLOSE_DELAY=1000;MVCC=true;LOCK_TIMEOUT=10000</database.url>
+        <database.url>jdbc:h2:mem:camunda;DB_CLOSE_DELAY=1000;MVCC=true;LOCK_TIMEOUT=10000;MV_STORE=false</database.url>
         <database.driver>org.h2.Driver</database.driver>
         <database.username>sa</database.username>
         <database.password />
@@ -221,7 +220,7 @@
         <database.password>sa</database.password>
         <database.port>18080</database.port>
         <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
-        <database.url>jdbc:h2:${database.host}${database.name};MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port};LOCK_TIMEOUT=10000</database.url>
+        <database.url>jdbc:h2:${database.host}${database.name};MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port};LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;MV_STORE=false</database.url>
 
         <database.type>h2</database.type>
         <database.driver>org.h2.Driver</database.driver>
@@ -241,11 +240,9 @@
     <profile>
       <id>mariadb</id>
       <properties>
-        <database.type>mysql</database.type>
+        <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <jboss.datasource.filename>mariadb-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -257,10 +254,9 @@
       </dependencies>
     </profile>
     <profile>
-      <id>mariadb-xa</id>
+      <id>mariadb-galera</id>
       <properties>
-        <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <jboss.datasource.filename>mariadb-xa-ds.xml</jboss.datasource.filename>
+        <version.mariadb>${version.mariadb.galera}</version.mariadb>
       </properties>
     </profile>
 
@@ -270,8 +266,6 @@
         <database.type>mysql</database.type>
         <database.driver>com.mysql.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
-        <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -282,13 +276,6 @@
         </dependency>
       </dependencies>
     </profile>
-    <profile>
-      <id>mysql-xa</id>
-      <properties>
-        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</database.datasource.class>
-        <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
-      </properties>
-    </profile>
 
     <profile>
       <id>oracle</id>
@@ -296,21 +283,10 @@
         <database.type>oracle</database.type>
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
-        <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle-xa</id>
-      <properties>
-        <database.datasource.class>oracle.jdbc.xa.client.OracleXADataSource</database.datasource.class>
-        <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
       <id>oracle-10</id>
-      <properties>
-        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
-      </properties>
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
@@ -323,7 +299,6 @@
       <id>oracle-11</id>
       <properties>
         <version.oracle>${version.oracle-11}</version.oracle>
-        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -337,7 +312,6 @@
       <id>oracle-12</id>
       <properties>
         <version.oracle>${version.oracle-12}</version.oracle>
-        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -380,8 +354,6 @@
         <database.type>mssql</database.type>
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
-        <jboss.datasource.filename>sqlserver-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.SQLServer2008Dialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -391,13 +363,6 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-    </profile>
-    <profile>
-      <id>sqlserver-xa</id>
-      <properties>
-        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
-        <jboss.datasource.filename>sqlserver-xa-ds.xml</jboss.datasource.filename>
-      </properties>
     </profile>
   </profiles>
 

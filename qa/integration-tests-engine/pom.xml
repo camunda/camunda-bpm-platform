@@ -7,16 +7,58 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <!-- Needs to be updated after a new WildFly release -->
+    <wildfly.container.adapter.groupId>org.wildfly.arquillian</wildfly.container.adapter.groupId>
+    <wildfly.container.adapter.version>2.2.0.Final</wildfly.container.adapter.version>
+
+    <redirect.test.output>true</redirect.test.output>
+  </properties>
+
+  <!-- import shrinkwrap and arquillian bom for artifact versions,
+  	DO NOT CHANGE ordering, because we want shrinkwrap versions to be newer -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-bom</artifactId>
+        <version>${version.shrinkwrap.resolvers}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.arquillian}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+  	<!-- set shrinkwrap artifacts -->
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
       <version>${version.shrinkwrap.resolvers}</version>
       <scope>test</scope>
       <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-servlet</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -39,13 +81,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <version>${version.arquillian}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm.javaee</groupId>
       <artifactId>camunda-ejb-client</artifactId>
       <scope>provided</scope>
@@ -63,6 +98,7 @@
       </exclusions>
     </dependency>
 
+    <!-- camunda -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
@@ -75,8 +111,16 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.camunda.bpm.dmn</groupId>
-          <artifactId>camunda-scriptengine-juel</artifactId>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-spi</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-impl</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -99,10 +143,40 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-joda</artifactId>
+      <version>2.9.8</version>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
     </dependency>
 
+    <!-- explicit Spring dependencies for applications
+      that pack camunda-engine-spring -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
@@ -113,6 +187,7 @@
       <groupId>org.jboss.weld.servlet</groupId>
       <artifactId>weld-servlet</artifactId>
       <version>1.1.10.Final</version>
+      <scope>test</scope>
     </dependency>
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
@@ -157,6 +232,11 @@
             </goals>
             <configuration>
               <forceCreation>true</forceCreation>
+              <excludes>
+                <exclude>org/camunda/bpm/integrationtest/util/TestConstants*</exclude>
+                <exclude>org/camunda/bpm/integrationtest/util/TestContainer*</exclude>
+                <exclude>org/camunda/bpm/integrationtest/util/TestProcessApplication*</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>
@@ -168,9 +248,6 @@
 
     <profile>
       <id>jboss</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
@@ -186,12 +263,6 @@
           <version>${version.jboss.as}</version>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
-          <scope>test</scope>
-        </dependency>
       </dependencies>
       <build>
         <testResources>
@@ -201,6 +272,34 @@
           </testResource>
         </testResources>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.0.0-M1</version>
+            <executions>
+              <execution>
+                <id>enforce-java</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireJavaVersion>
+                      <version>[1.6,1.8)</version>
+                      <message>
+                        *************************************************
+                        *                                               *
+                        * You must use JDK 6/7 to run JBoss AS 7.2.0!!! *
+                        *                                               *
+                        *************************************************
+                      </message>
+                    </requireJavaVersion>
+                  </rules>
+                  <failFast>true</failFast>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
@@ -236,16 +335,16 @@
               <excludes>
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <exclude>**_OTHERS.java</exclude>
+                <exclude>**/*_OTHERS.java</exclude>
                 <exclude>**/SpringPAExpressionResolvingTest.java</exclude>
                 <exclude>**/SpringServletPALifecycleTest.java</exclude>
-                <exclude>**/ManagedDomainTestCase_JBOSS.java</exclude>
+                <exclude>**/TestManagedDomain_JBOSS.java</exclude>
                 <!-- CAM-1778 -->
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -267,12 +366,6 @@
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-domain-managed</artifactId>
           <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -317,9 +410,9 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/ManagedDomainTestCase_JBOSS.java</include>
+                <include>**/TestManagedDomain_JBOSS.java</include>
               </includes>
-             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+             <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -361,11 +454,12 @@
                 <excludes>**/jboss/**</excludes>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
                 <excludes>**/SpringServletPALifecycleTest.java</excludes>
+                <exclude>**/BusinessRuleTaskVersionTagTest.java</exclude>
                 <!-- CAM-1778 -->
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -374,29 +468,7 @@
 
     <profile>
       <id>wildfly</id>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
       <dependencies>
-        <!-- redefine the dependencies so we get the correct version specified above -->
-        <dependency>
-          <groupId>org.jboss.arquillian.junit</groupId>
-          <artifactId>arquillian-junit-container</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
@@ -406,9 +478,9 @@
           <type>pom</type>
         </dependency>
         <dependency>
-          <groupId>org.wildfly</groupId>
+          <groupId>${wildfly.container.adapter.groupId}</groupId>
           <artifactId>wildfly-arquillian-container-managed</artifactId>
-          <version>${version.wildfly}</version>
+          <version>${wildfly.container.adapter.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -459,16 +531,16 @@
               <excludes>
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <exclude>**_OTHERS.java</exclude>
+                <exclude>**/*_OTHERS.java</exclude>
                 <exclude>**/SpringPAExpressionResolvingTest.java</exclude>
                 <exclude>**/SpringServletPALifecycleTest.java</exclude>
-                <exclude>**/ManagedDomainTestCase_JBOSS.java</exclude>
+                <exclude>**/TestManagedDomain_JBOSS.java</exclude>
                 <!-- CAM-1778 -->
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -477,31 +549,7 @@
 
     <profile>
       <id>wildfly-domain</id>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
       <dependencies>
-        <!-- redefine the dependencies so we get the correct version specified above -->
-        <dependency>
-          <groupId>org.jboss.arquillian.junit</groupId>
-          <artifactId>arquillian-junit-container</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
-
-
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
@@ -511,9 +559,9 @@
           <type>pom</type>
         </dependency>
         <dependency>
-          <groupId>org.wildfly</groupId>
+          <groupId>${wildfly.container.adapter.groupId}</groupId>
           <artifactId>wildfly-arquillian-container-domain-managed</artifactId>
-          <version>${version.wildfly}</version>
+          <version>${wildfly.container.adapter.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -558,9 +606,9 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/ManagedDomainTestCase_JBOSS.java</include>
+                <include>**/TestManagedDomain_JBOSS.java</include>
               </includes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -602,233 +650,13 @@
                 <excludes>**/jboss/**</excludes>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
                 <excludes>**/SpringServletPALifecycleTest.java</excludes>
+                <exclude>**/BusinessRuleTaskVersionTagTest.java</exclude>
                 <!-- CAM-1778 -->
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>glassfish</id>
-      <dependencies>
-        <dependency>
-          <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-glassfish-runtime</artifactId>
-          <version>${project.version}</version>
-          <scope>provided</scope>
-          <type>pom</type>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.container</groupId>
-          <artifactId>arquillian-glassfish-managed-3.1</artifactId>
-          <version>1.0.0.CR4</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-glassfish</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <!-- HEMERA-2454 -->
-                <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
-                <!-- NOT Implemented -->
-                <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <!-- NOT Implemented -->
-                <exclude>**/ejb/local/*</exclude>
-                <!-- HEMERA -->
-                <excludes>**/TestFoxPlatformClientAsEjbModule**</excludes>
-                <!-- not supported by arquillian connector -->
-                <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
-                <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
-                <exclude>**/TestProcessEnginesXmlFails.java</exclude>
-                <exclude>**/*_JBOSS.java</exclude>
-                <exclude>**/jar/**</exclude>
-              </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unpack-sql-scripts</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.camunda.bpm</groupId>
-                      <artifactId>camunda-engine</artifactId>
-                      <outputDirectory>${project.build.directory}/sql-scripts/engine</outputDirectory>
-                      <overWrite>true</overWrite>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>sql-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>create-db</id>
-                <phase>process-test-sources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- create the DB -->
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.engine.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.case.engine.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.decision.engine.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.identity.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.history.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.case.history.sql</srcFile>
-                  </srcFiles>
-                  <autocommit>true</autocommit>
-                  <onError>continue</onError>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources-glassfish-h2</directory>
-            <filtering>true</filtering>
-      			<includes>
-      			  <include>**/*.xml</include>
-      			</includes>
-          </testResource>
-        </testResources>
-      </build>
-    </profile>
-
-    <profile>
-      <id>glassfish-servlet</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-glassfish-servlet</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <!-- skip EE integration tests -->
-                <exclude>**/cdi/**</exclude>
-                <exclude>**/ejb/**</exclude>
-                <exclude>**/context/**</exclude>
-                <exclude>**/jar/**</exclude>
-                <exclude>**/*_JBOSS.java</exclude>
-              </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unpack-sql-scripts</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.camunda.bpm</groupId>
-                      <artifactId>camunda-engine</artifactId>
-                      <outputDirectory>${project.build.directory}/sql-scripts/engine</outputDirectory>
-                      <overWrite>true</overWrite>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>sql-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>create-db</id>
-                <phase>process-test-sources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- create the DB -->
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.engine.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.case.engine.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.decision.engine.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.identity.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.history.sql</srcFile>
-                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/create/activiti.${database.type}.create.case.history.sql</srcFile>
-                  </srcFiles>
-                  <autocommit>true</autocommit>
-                  <onError>continue</onError>
-                </configuration>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
@@ -838,14 +666,6 @@
       <id>tomcat</id>
       <dependencyManagement>
         <dependencies>
-          <dependency>
-            <groupId>org.jboss.shrinkwrap.resolver</groupId>
-            <artifactId>shrinkwrap-resolver-bom</artifactId>
-            <version>${version.shrinkwrap.resolvers}</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-
           <dependency>
             <groupId>org.jboss.bom</groupId>
             <artifactId>jboss-javaee-6.0-with-tools</artifactId>
@@ -866,24 +686,11 @@
         </dependency>
 
         <dependency>
-          <groupId>org.jboss.arquillian.junit</groupId>
-          <artifactId>arquillian-junit-container</artifactId>
-          <scope>test</scope>
-        </dependency>
-
-        <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-tomcat-managed-7</artifactId>
           <version>1.0.0.CR5</version>
           <scope>test</scope>
         </dependency>
-
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
-
       </dependencies>
       <build>
         <testResources>
@@ -933,8 +740,12 @@
 
                 <exclude>**/*_JBOSS.java</exclude>
                 <exclude>**/EjbPALifecycleCallbacksTest.java</exclude>
+
+                <exclude>**/PythonPaClassImportTest.java</exclude>
+
+                <exclude>**/MigrationContextSwitchBeansTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -953,12 +764,6 @@
           <version>${version.jboss.as}</version>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
-          <scope>test</scope>
-        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -967,7 +772,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skipTests>true</skipTests>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
           <plugin>
@@ -1019,7 +824,7 @@
               <systemPropertyVariables>
                 <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -1078,6 +883,7 @@
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.case.engine.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.engine.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.identity.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.decision.history.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.case.history.sql</srcFile>
                     <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.history.sql</srcFile>
                   </srcFiles>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.db.sql;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,16 +40,25 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final String H2 = "h2";
   public static final String MYSQL = "mysql";
   public static final String POSTGRES = "postgres";
+  public static final String MARIADB = "mariadb";
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String,String>>();
 
   public static final Map<String, String> databaseSpecificLimitBeforeStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitAfterStatements = new HashMap<String, String>();
+  //limit statements that can be used to select first N rows without OFFSET
+  public static final Map<String, String> databaseSpecificLimitBeforeWithoutOffsetStatements = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificLimitAfterWithoutOffsetStatements = new HashMap<String, String>();
   // limitAfter statements that can be used with subqueries
   public static final Map<String, String> databaseSpecificInnerLimitAfterStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<String, String>();
-  // DB2 restricts 'select distinct' queries to not contain CLOB columns
-  public static final Map<String, String> databaseSpecificLimitBetweenClobStatements = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificLimitBetweenFilterStatements = new HashMap<String, String>();
+
+  public static final Map<String, String> optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements = new HashMap<String, String>();
+  public static final Map<String, String> optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements = new HashMap<String, String>();
+
+  public static final Map<String, String> databaseSpecificEscapeChar = new HashMap<String, String>();
+
   public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
 
@@ -53,85 +66,193 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificDatepart1 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDatepart2 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDatepart3 = new HashMap<String, String>();
+
   public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
+
+  public static final Map<String, String> databaseSpecificIfNull = new HashMap<String, String>();
 
   public static final Map<String, String> databaseSpecificTrueConstant = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificFalseConstant = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificDistinct = new HashMap<String, String>();
+
   public static final Map<String, Map<String, String>> dbSpecificConstants = new HashMap<String, Map<String, String>>();
+
+  public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<String, String>();
+
+  public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<String, String>();
 
   static {
 
-    String defaultOrderBy = " order by ${orderBy} ";
+    String defaultOrderBy = "order by ${internalOrderBy}";
+
+    String defaultEscapeChar = "'\\'";
 
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");
+    optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(H2, "");
     databaseSpecificLimitAfterStatements.put(H2, "LIMIT #{maxResults} OFFSET #{firstResult}");
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(H2, "LIMIT #{maxResults}");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(H2, "");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(H2, "LIMIT #{maxResults}");
     databaseSpecificInnerLimitAfterStatements.put(H2, databaseSpecificLimitAfterStatements.get(H2));
     databaseSpecificLimitBetweenStatements.put(H2, "");
-    databaseSpecificLimitBetweenClobStatements.put(H2, databaseSpecificLimitBetweenStatements.get(H2));
+    databaseSpecificLimitBetweenFilterStatements.put(H2, "");
     databaseSpecificOrderByStatements.put(H2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(H2, "");
+    databaseSpecificDistinct.put(H2, "distinct");
+
+    databaseSpecificEscapeChar.put(H2, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(H2, "BITAND(");
     databaseSpecificBitAnd2.put(H2, ",");
     databaseSpecificBitAnd3.put(H2, ")");
+    databaseSpecificDatepart1.put(H2, "");
+    databaseSpecificDatepart2.put(H2, "(");
+    databaseSpecificDatepart3.put(H2, ")");
+
     databaseSpecificDummyTable.put(H2, "");
     databaseSpecificTrueConstant.put(H2, "1");
     databaseSpecificFalseConstant.put(H2, "0");
+    databaseSpecificIfNull.put(H2, "IFNULL");
 
+    databaseSpecificDaysComparator.put(H2, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
+
+    databaseSpecificCollationForCaseSensitivity.put(H2, "");
+    
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
-    constants.put("constant.for.update", "for update");
+    constants.put("constant_for_update", "for update");
+    constants.put("constant.datepart.quarter", "QUARTER");
+    constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
+    constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "'${key}'");
+    constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(H2, constants);
 
-	  //mysql specific
-    databaseSpecificLimitBeforeStatements.put(MYSQL, "");
-    databaseSpecificLimitAfterStatements.put(MYSQL, "LIMIT #{maxResults} OFFSET #{firstResult}");
-    databaseSpecificInnerLimitAfterStatements.put(MYSQL, databaseSpecificLimitAfterStatements.get(MYSQL));
-    databaseSpecificLimitBetweenStatements.put(MYSQL, "");
-    databaseSpecificLimitBetweenClobStatements.put(MYSQL, databaseSpecificLimitBetweenStatements.get(MYSQL));
-    databaseSpecificOrderByStatements.put(MYSQL, defaultOrderBy);
-    databaseSpecificLimitBeforeNativeQueryStatements.put(MYSQL, "");
+    // mysql specific
+    // use the same specific for mariadb since it based on mysql and work with the exactly same statements
+    for(String mysqlLikeDatabase : Arrays.asList(MYSQL, MARIADB)) {
 
-    databaseSpecificBitAnd1.put(MYSQL, "");
-    databaseSpecificBitAnd2.put(MYSQL, " & ");
-    databaseSpecificBitAnd3.put(MYSQL, "");
-    databaseSpecificDummyTable.put(MYSQL, "");
-    databaseSpecificTrueConstant.put(MYSQL, "1");
-    databaseSpecificFalseConstant.put(MYSQL, "0");
-    addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
-    addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
-    addDatabaseSpecificStatement(MYSQL, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
-    addDatabaseSpecificStatement(MYSQL, "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
+      databaseSpecificLimitBeforeStatements.put(mysqlLikeDatabase, "");
+      optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificLimitAfterStatements.put(mysqlLikeDatabase, "LIMIT #{maxResults} OFFSET #{firstResult}");
+      optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(mysqlLikeDatabase, "LIMIT #{maxResults}");
+      databaseSpecificLimitBeforeWithoutOffsetStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificLimitAfterWithoutOffsetStatements.put(mysqlLikeDatabase, "LIMIT #{maxResults}");
+      databaseSpecificInnerLimitAfterStatements.put(mysqlLikeDatabase, databaseSpecificLimitAfterStatements.get(mysqlLikeDatabase));
+      databaseSpecificLimitBetweenStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificLimitBetweenFilterStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificOrderByStatements.put(mysqlLikeDatabase, defaultOrderBy);
+      databaseSpecificLimitBeforeNativeQueryStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificDistinct.put(mysqlLikeDatabase, "distinct");
 
-    constants = new HashMap<String, String>();
-    constants.put("constant.event", "'event'");
-    constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
-    constants.put("constant.for.update", "for update");
-    dbSpecificConstants.put(MYSQL, constants);
+      databaseSpecificEscapeChar.put(mysqlLikeDatabase, "'\\\\'");
 
-    //postgres specific
+      databaseSpecificBitAnd1.put(mysqlLikeDatabase, "");
+      databaseSpecificBitAnd2.put(mysqlLikeDatabase, " & ");
+      databaseSpecificBitAnd3.put(mysqlLikeDatabase, "");
+      databaseSpecificDatepart1.put(mysqlLikeDatabase, "");
+      databaseSpecificDatepart2.put(mysqlLikeDatabase, "(");
+      databaseSpecificDatepart3.put(mysqlLikeDatabase, ")");
+
+      databaseSpecificDummyTable.put(mysqlLikeDatabase, "");
+      databaseSpecificTrueConstant.put(mysqlLikeDatabase, "1");
+      databaseSpecificFalseConstant.put(mysqlLikeDatabase, "0");
+      databaseSpecificIfNull.put(mysqlLikeDatabase, "IFNULL");
+
+      databaseSpecificDaysComparator.put(mysqlLikeDatabase, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
+
+      databaseSpecificCollationForCaseSensitivity.put(mysqlLikeDatabase, "");
+
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
+
+      // related to CAM-8064
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteExceptionByteArraysByIds", "deleteExceptionByteArraysByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteErrorDetailsByteArraysByIds", "deleteErrorDetailsByteArraysByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDetailsByIds", "deleteHistoricDetailsByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDetailByteArraysByIds", "deleteHistoricDetailByteArraysByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIdentityLinksByTaskProcessInstanceIds", "deleteHistoricIdentityLinksByTaskProcessInstanceIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIdentityLinksByTaskCaseInstanceIds", "deleteHistoricIdentityLinksByTaskCaseInstanceIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds", "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds", "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricVariableInstanceByIds", "deleteHistoricVariableInstanceByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricVariableInstanceByteArraysByIds", "deleteHistoricVariableInstanceByteArraysByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteCommentsByIds", "deleteCommentsByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteAttachmentByteArraysByIds", "deleteAttachmentByteArraysByIds_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteAttachmentByIds", "deleteAttachmentByIds_mysql");
+
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "deleteHistoricIncidentsByBatchIds", "deleteHistoricIncidentsByBatchIds_mysql");
+
+      // related to CAM-9505
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateUserOperationLogByRootProcessInstanceId", "updateUserOperationLogByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateExternalTaskLogByRootProcessInstanceId", "updateExternalTaskLogByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByRootProcessInstanceId", "updateHistoricIncidentsByRootProcessInstanceId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByBatchId", "updateHistoricIncidentsByBatchId_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByRootProcessInstanceId", "updateIdentityLinkLogByRootProcessInstanceId_mysql");
+
+      constants = new HashMap<String, String>();
+      constants.put("constant.event", "'event'");
+      constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
+      constants.put("constant_for_update", "for update");
+      constants.put("constant.datepart.quarter", "QUARTER");
+      constants.put("constant.datepart.month", "MONTH");
+      constants.put("constant.datepart.minute", "MINUTE");
+      constants.put("constant.null.startTime", "null START_TIME_");
+      constants.put("constant.varchar.cast", "'${key}'");
+      constants.put("constant.null.reporter", "NULL AS REPORTER_");
+      dbSpecificConstants.put(mysqlLikeDatabase, constants);
+    }
+
+    // postgres specific
     databaseSpecificLimitBeforeStatements.put(POSTGRES, "");
+    optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(POSTGRES, "");
     databaseSpecificLimitAfterStatements.put(POSTGRES, "LIMIT #{maxResults} OFFSET #{firstResult}");
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(POSTGRES, "LIMIT #{maxResults}");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(POSTGRES, "");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(POSTGRES, "LIMIT #{maxResults}");
     databaseSpecificInnerLimitAfterStatements.put(POSTGRES, databaseSpecificLimitAfterStatements.get(POSTGRES));
     databaseSpecificLimitBetweenStatements.put(POSTGRES, "");
-    databaseSpecificLimitBetweenClobStatements.put(POSTGRES, databaseSpecificLimitBetweenStatements.get(POSTGRES));
+    databaseSpecificLimitBetweenFilterStatements.put(POSTGRES, "");
     databaseSpecificOrderByStatements.put(POSTGRES, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(POSTGRES, "");
+    databaseSpecificDistinct.put(POSTGRES, "distinct");
+
+    databaseSpecificEscapeChar.put(POSTGRES, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(POSTGRES, "");
     databaseSpecificBitAnd2.put(POSTGRES, " & ");
     databaseSpecificBitAnd3.put(POSTGRES, "");
+    databaseSpecificDatepart1.put(POSTGRES, "extract(");
+    databaseSpecificDatepart2.put(POSTGRES, " from ");
+    databaseSpecificDatepart3.put(POSTGRES, ")");
+
     databaseSpecificDummyTable.put(POSTGRES, "");
     databaseSpecificTrueConstant.put(POSTGRES, "true");
     databaseSpecificFalseConstant.put(POSTGRES, "false");
+    databaseSpecificIfNull.put(POSTGRES, "COALESCE");
+
+    databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
+
+    databaseSpecificCollationForCaseSensitivity.put(POSTGRES, "");
+
     addDatabaseSpecificStatement(POSTGRES, "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectByteArray", "selectByteArray_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectByteArrays", "selectByteArrays_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceName", "selectResourceByDeploymentIdAndResourceName_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceNames", "selectResourceByDeploymentIdAndResourceNames_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceId", "selectResourceByDeploymentIdAndResourceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceIds", "selectResourceByDeploymentIdAndResourceIds_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourcesByDeploymentId", "selectResourcesByDeploymentId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectLatestResourcesByDeploymentName", "selectLatestResourcesByDeploymentName_postgres");
     addDatabaseSpecificStatement(POSTGRES, "insertIdentityInfo", "insertIdentityInfo_postgres");
@@ -145,97 +266,243 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectCommentByTaskIdAndCommentId", "selectCommentByTaskIdAndCommentId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectHistoricVariableInstanceByQueryCriteria", "selectHistoricVariableInstanceByQueryCriteria_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectFilter", "selectFilter_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectFilter", "selectFilter_postgres");
+
+    addDatabaseSpecificStatement(POSTGRES, "deleteAttachmentsByRemovalTime", "deleteAttachmentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteCommentsByRemovalTime", "deleteCommentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricActivityInstancesByRemovalTime", "deleteHistoricActivityInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDecisionInputInstancesByRemovalTime", "deleteHistoricDecisionInputInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDecisionInstancesByRemovalTime", "deleteHistoricDecisionInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDecisionOutputInstancesByRemovalTime", "deleteHistoricDecisionOutputInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricDetailsByRemovalTime", "deleteHistoricDetailsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteExternalTaskLogByRemovalTime", "deleteExternalTaskLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricIdentityLinkLogByRemovalTime", "deleteHistoricIdentityLinkLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricIncidentsByRemovalTime", "deleteHistoricIncidentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteJobLogByRemovalTime", "deleteJobLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricProcessInstancesByRemovalTime", "deleteHistoricProcessInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricTaskInstancesByRemovalTime", "deleteHistoricTaskInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricVariableInstancesByRemovalTime", "deleteHistoricVariableInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteUserOperationLogByRemovalTime", "deleteUserOperationLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_postgres_or_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
-    constants.put("constant.for.update", "for update");
+    constants.put("constant_for_update", "for update");
+    constants.put("constant.datepart.quarter", "QUARTER");
+    constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
+    constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
+    constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR) AS REPORTER_");
     dbSpecificConstants.put(POSTGRES, constants);
 
     // oracle
     databaseSpecificLimitBeforeStatements.put(ORACLE, "select * from ( select a.*, ROWNUM rnum from (");
+    optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(ORACLE, "select * from ( select a.*, ROWNUM rnum from (");
     databaseSpecificLimitAfterStatements.put(ORACLE, "  ) a where ROWNUM < #{lastRow}) where rnum  >= #{firstRow}");
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(ORACLE, "  ) a where ROWNUM <= #{maxResults})");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(ORACLE, "");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(ORACLE, "AND ROWNUM <= #{maxResults}");
     databaseSpecificInnerLimitAfterStatements.put(ORACLE, databaseSpecificLimitAfterStatements.get(ORACLE));
     databaseSpecificLimitBetweenStatements.put(ORACLE, "");
-    databaseSpecificLimitBetweenClobStatements.put(ORACLE, databaseSpecificLimitBetweenStatements.get(ORACLE));
+    databaseSpecificLimitBetweenFilterStatements.put(ORACLE, "");
     databaseSpecificOrderByStatements.put(ORACLE, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(ORACLE, "");
+    databaseSpecificDistinct.put(ORACLE, "distinct");
+
+    databaseSpecificEscapeChar.put(ORACLE, defaultEscapeChar);
 
     databaseSpecificDummyTable.put(ORACLE, "FROM DUAL");
     databaseSpecificBitAnd1.put(ORACLE, "BITAND(");
     databaseSpecificBitAnd2.put(ORACLE, ",");
     databaseSpecificBitAnd3.put(ORACLE, ")");
+    databaseSpecificDatepart1.put(ORACLE, "to_number(to_char(");
+    databaseSpecificDatepart2.put(ORACLE, ",");
+    databaseSpecificDatepart3.put(ORACLE, "))");
+
     databaseSpecificTrueConstant.put(ORACLE, "1");
     databaseSpecificFalseConstant.put(ORACLE, "0");
+    databaseSpecificIfNull.put(ORACLE, "NVL");
+
+    databaseSpecificDaysComparator.put(ORACLE, "${date} <= #{currentTimestamp} - ${days}");
+
+    databaseSpecificCollationForCaseSensitivity.put(ORACLE, "");
+
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceCountByTaskNameReport", "selectHistoricTaskInstanceCountByTaskNameReport_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_oracleDb2");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceIdsForCleanup", "selectHistoricProcessInstanceIdsForCleanup_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricDecisionInstanceIdsForCleanup", "selectHistoricDecisionInstanceIdsForCleanup_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricBatchIdsForCleanup", "selectHistoricBatchIdsForCleanup_oracle");
+
+    addDatabaseSpecificStatement(ORACLE, "deleteAttachmentsByRemovalTime", "deleteAttachmentsByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteCommentsByRemovalTime", "deleteCommentsByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricActivityInstancesByRemovalTime", "deleteHistoricActivityInstancesByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricDecisionInputInstancesByRemovalTime", "deleteHistoricDecisionInputInstancesByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricDecisionInstancesByRemovalTime", "deleteHistoricDecisionInstancesByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricDecisionOutputInstancesByRemovalTime", "deleteHistoricDecisionOutputInstancesByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricDetailsByRemovalTime", "deleteHistoricDetailsByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteExternalTaskLogByRemovalTime", "deleteExternalTaskLogByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricIdentityLinkLogByRemovalTime", "deleteHistoricIdentityLinkLogByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricIncidentsByRemovalTime", "deleteHistoricIncidentsByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteJobLogByRemovalTime", "deleteJobLogByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricProcessInstancesByRemovalTime", "deleteHistoricProcessInstancesByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricTaskInstancesByRemovalTime", "deleteHistoricTaskInstancesByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricVariableInstancesByRemovalTime", "deleteHistoricVariableInstancesByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteUserOperationLogByRemovalTime", "deleteUserOperationLogByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_oracle");
+    addDatabaseSpecificStatement(ORACLE, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_oracle");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
-    constants.put("constant.for.update", "for update");
+    constants.put("constant_for_update", "for update");
+    constants.put("constant.datepart.quarter", "'Q'");
+    constants.put("constant.datepart.month", "'MM'");
+    constants.put("constant.datepart.minute", "'MI'");
+    constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "'${key}'");
+    constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(ORACLE, constants);
 
     // db2
     databaseSpecificLimitBeforeStatements.put(DB2, "SELECT SUB.* FROM (");
+    optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(DB2, "");
     databaseSpecificInnerLimitAfterStatements.put(DB2, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
     databaseSpecificLimitAfterStatements.put(DB2, databaseSpecificInnerLimitAfterStatements.get(DB2) + " ORDER BY SUB.rnk");
-    databaseSpecificLimitBetweenStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
-    databaseSpecificLimitBetweenClobStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select RES.* ");
-    databaseSpecificOrderByStatements.put(DB2, "");
-    databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(DB2, "FETCH FIRST ${maxResults} ROWS ONLY");
+    databaseSpecificLimitBetweenStatements.put(DB2, ", row_number() over (ORDER BY ${internalOrderBy}) rnk FROM ( select distinct RES.* ");
+    databaseSpecificLimitBetweenFilterStatements.put(DB2, ", row_number() over (ORDER BY ${internalOrderBy}) rnk FROM ( select distinct RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_ ");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(DB2, "");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(DB2, "FETCH FIRST ${maxResults} ROWS ONLY");
+    databaseSpecificOrderByStatements.put(DB2, defaultOrderBy);
+    databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
+    databaseSpecificDistinct.put(DB2, "");
+
+    databaseSpecificEscapeChar.put(DB2, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(DB2, "BITAND(");
-    databaseSpecificBitAnd2.put(DB2, ",");
-    databaseSpecificBitAnd3.put(DB2, ")");
+    databaseSpecificBitAnd2.put(DB2, ", CAST(");
+    databaseSpecificBitAnd3.put(DB2, " AS Integer))");
+    databaseSpecificDatepart1.put(DB2, "");
+    databaseSpecificDatepart2.put(DB2, "(");
+    databaseSpecificDatepart3.put(DB2, ")");
+
     databaseSpecificDummyTable.put(DB2, "FROM SYSIBM.SYSDUMMY1");
     databaseSpecificTrueConstant.put(DB2, "1");
     databaseSpecificFalseConstant.put(DB2, "0");
+    databaseSpecificIfNull.put(DB2, "NVL");
+
+    databaseSpecificDaysComparator.put(DB2, "${date} + ${days} DAYS <= #{currentTimestamp}");
+
+    databaseSpecificCollationForCaseSensitivity.put(DB2, "");
+
+    addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricCaseActivityInstanceByNativeQuery", "selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricCaseInstanceByNativeQuery", "selectHistoricCaseInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(DB2, "selectHistoricVariableInstanceByNativeQuery", "selectHistoricVariableInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(DB2, "selectUserByNativeQuery", "selectUserByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(DB2, "selectHistoricDecisionInstancesByNativeQuery", "selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(DB2, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_oracleDb2");
+
+    addDatabaseSpecificStatement(DB2, "deleteAttachmentsByRemovalTime", "deleteAttachmentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteCommentsByRemovalTime", "deleteCommentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricActivityInstancesByRemovalTime", "deleteHistoricActivityInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricDecisionInputInstancesByRemovalTime", "deleteHistoricDecisionInputInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricDecisionInstancesByRemovalTime", "deleteHistoricDecisionInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricDecisionOutputInstancesByRemovalTime", "deleteHistoricDecisionOutputInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricDetailsByRemovalTime", "deleteHistoricDetailsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteExternalTaskLogByRemovalTime", "deleteExternalTaskLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricIdentityLinkLogByRemovalTime", "deleteHistoricIdentityLinkLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricIncidentsByRemovalTime", "deleteHistoricIncidentsByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteJobLogByRemovalTime", "deleteJobLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricProcessInstancesByRemovalTime", "deleteHistoricProcessInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricTaskInstancesByRemovalTime", "deleteHistoricTaskInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricVariableInstancesByRemovalTime", "deleteHistoricVariableInstancesByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteUserOperationLogByRemovalTime", "deleteUserOperationLogByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_postgres_or_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "CAST(CONCAT(CONCAT(COALESCE(NEW_VALUE_,''), '_|_'), COALESCE(PROPERTY_,'')) as varchar(255))");
-    constants.put("constant.for.update", "for read only with rs use and keep update locks");
+    constants.put("constant_for_update", "for read only with rs use and keep update locks");
+    constants.put("constant.datepart.quarter", "QUARTER");
+    constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
+    constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
+    constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
+    constants.put("constant.null.reporter", "CAST(NULL AS VARCHAR(255)) AS REPORTER_");
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
-
     databaseSpecificLimitBeforeStatements.put(MSSQL, "SELECT SUB.* FROM (");
+    optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(MSSQL, "");
     databaseSpecificInnerLimitAfterStatements.put(MSSQL, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
     databaseSpecificLimitAfterStatements.put(MSSQL, databaseSpecificInnerLimitAfterStatements.get(MSSQL) + " ORDER BY SUB.rnk");
-    databaseSpecificLimitBetweenStatements.put(MSSQL, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
-    databaseSpecificLimitBetweenClobStatements.put(MSSQL, databaseSpecificLimitBetweenStatements.get(MSSQL));
+    optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements.put(MSSQL, "");
+    databaseSpecificLimitBetweenStatements.put(MSSQL, ", row_number() over (ORDER BY ${internalOrderBy}) rnk FROM ( select distinct RES.* ");
+    databaseSpecificLimitBetweenFilterStatements.put(MSSQL, "");
+    databaseSpecificLimitBeforeWithoutOffsetStatements.put(MSSQL, "TOP (#{maxResults})");
+    databaseSpecificLimitAfterWithoutOffsetStatements.put(MSSQL, "");
     databaseSpecificOrderByStatements.put(MSSQL, "");
-    databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
+    databaseSpecificDistinct.put(MSSQL, "");
+
+    databaseSpecificEscapeChar.put(MSSQL, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(MSSQL, "");
     databaseSpecificBitAnd2.put(MSSQL, " &");
     databaseSpecificBitAnd3.put(MSSQL, "");
+    databaseSpecificDatepart1.put(MSSQL, "datepart(");
+    databaseSpecificDatepart2.put(MSSQL, ",");
+    databaseSpecificDatepart3.put(MSSQL, ")");
+
     databaseSpecificDummyTable.put(MSSQL, "");
     databaseSpecificTrueConstant.put(MSSQL, "1");
     databaseSpecificFalseConstant.put(MSSQL, "0");
+    databaseSpecificIfNull.put(MSSQL, "ISNULL");
+
+    databaseSpecificDaysComparator.put(MSSQL, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
+
+    databaseSpecificCollationForCaseSensitivity.put(MSSQL, "COLLATE Latin1_General_CS_AS");
+
+    addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricCaseActivityInstanceByNativeQuery", "selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricCaseInstanceByNativeQuery", "selectHistoricCaseInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(MSSQL, "selectHistoricVariableInstanceByNativeQuery", "selectHistoricVariableInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(MSSQL, "selectUserByNativeQuery", "selectUserByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "lockDeploymentLockProperty", "lockDeploymentLockProperty_mssql");
+    addDatabaseSpecificStatement(MSSQL, "lockHistoryCleanupJobLockProperty", "lockHistoryCleanupJobLockProperty_mssql");
+    addDatabaseSpecificStatement(MSSQL, "lockStartupLockProperty", "lockStartupLockProperty_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectEventSubscriptionsByNameAndExecution", "selectEventSubscriptionsByNameAndExecution_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectEventSubscriptionsByExecutionAndType", "selectEventSubscriptionsByExecutionAndType_mssql");
+    addDatabaseSpecificStatement(MSSQL, "selectHistoricDecisionInstancesByNativeQuery", "selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ + '_|_' + PROPERTY_");
+    constants.put("constant.datepart.quarter", "QUARTER");
+    constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
+    constants.put("constant.null.startTime", "CAST(NULL AS datetime2) AS START_TIME_");
+    constants.put("constant.varchar.cast", "'${key}'");
+    constants.put("constant.null.reporter", "NULL AS REPORTER_");
     dbSpecificConstants.put(MSSQL, constants);
   }
 

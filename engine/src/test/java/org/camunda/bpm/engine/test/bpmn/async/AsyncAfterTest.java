@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +34,10 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.bpmn.event.error.ThrowBpmnErrorDelegate;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 
 /**
  * @author Daniel Meyer
@@ -551,20 +559,20 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     assertEquals(2, taskService.createTaskQuery().count());
   }
-  
+
   @Deployment
   public void testAsyncAfterParallelMultiInstanceWithServiceTask() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-    
+
     // listeners and behavior should be invoked by now
     assertListenerStartInvoked(pi);
     assertBehaviorInvoked(pi, 5);
     assertListenerEndInvoked(pi);
-    
+
     // the process should wait *after* execute all service tasks
     executeAvailableJobs(1);
-    
+
     assertProcessEnded(pi.getId());
   }
 
@@ -572,7 +580,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
   public void testAsyncAfterServiceWrappedInParallelMultiInstance(){
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-    
+
     // listeners and behavior should be invoked by now
     assertListenerStartInvoked(pi);
     assertBehaviorInvoked(pi, 5);
@@ -585,30 +593,30 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(pi.getId());
   }
-  
+
   @Deployment
   public void testAsyncAfterServiceWrappedInSequentialMultiInstance(){
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-    
+
     // listeners and behavior should be invoked by now
     assertListenerStartInvoked(pi);
     assertBehaviorInvoked(pi, 1);
     assertListenerEndInvoked(pi);
 
-    // the process should wait *after* execute each service task step-by-step 
+    // the process should wait *after* execute each service task step-by-step
     assertEquals(1L, managementService.createJobQuery().count());
     // execute all jobs - one for each service task wrapped in the multi-instance body
     executeAvailableJobs(5);
-    
+
     // behavior should be invoked for each service task
     assertBehaviorInvoked(pi, 5);
-    
+
     // the process should wait on user task after execute all service tasks
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     taskService.complete(task.getId());
-    
+
     assertProcessEnded(pi.getId());
   }
 
@@ -639,12 +647,86 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     // the process should stay in the user task
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
-  }  
+  }
+
+  @Deployment
+  public void testAsyncAfterBoundaryEvent() {
+    // given process instance
+    runtimeService.startProcessInstanceByKey("Process");
+
+    // assume
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    // when we trigger the event
+    runtimeService.correlateMessage("foo");
+
+    // then
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    task = taskService.createTaskQuery().singleResult();
+    assertNull(task);
+  }
+
+  @Deployment
+  public void testAsyncBeforeBoundaryEvent() {
+    // given process instance
+    runtimeService.startProcessInstanceByKey("Process");
+
+    // assume
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    // when we trigger the event
+    runtimeService.correlateMessage("foo");
+
+    // then
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+
+    task = taskService.createTaskQuery().singleResult();
+    assertNull(task);
+  }
+
+  public void testAsyncAfterErrorEvent() {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask("servTask")
+        .camundaClass(ThrowBpmnErrorDelegate.class)
+      .boundaryEvent()
+        .camundaAsyncAfter(true)
+        .camundaFailedJobRetryTimeCycle("R10/PT10S")
+        .errorEventDefinition()
+        .errorEventDefinitionDone()
+      .serviceTask()
+        .camundaClass("foo")
+      .endEvent()
+      .moveToActivity("servTask")
+      .endEvent().done();
+    deployment(instance);
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery().singleResult();
+
+   // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(9, job.getRetries());
+  }
 
   protected Job fetchFirstJobByHandlerConfiguration(List<Job> jobs, String configuration) {
     for (Job job : jobs) {
       JobEntity jobEntity = (JobEntity) job;
-      String jobConfig = jobEntity.getJobHandlerConfiguration();
+      String jobConfig = jobEntity.getJobHandlerConfigurationRaw();
       if (configuration.equals(jobConfig)) {
         return job;
       }
@@ -668,7 +750,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
   protected void assertBehaviorInvoked(Execution e) {
     assertTrue((Boolean) runtimeService.getVariable(e.getId(), "behaviorInvoked"));
   }
-  
+
   private void assertBehaviorInvoked(ProcessInstance pi, int times) {
     Long behaviorInvoked = (Long) runtimeService.getVariable(pi.getId(), "behaviorInvoked");
     assertNotNull("behavior was not invoked", behaviorInvoked);

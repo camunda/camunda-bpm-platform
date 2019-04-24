@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <signal id="abort" name="abort" />
+
+  <process id="process" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="signal" />
+    <intermediateCatchEvent id="signal">
+      <signalEventDefinition signalRef="abort" />
+    </intermediateCatchEvent>
+    <sequenceFlow sourceRef="signal" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

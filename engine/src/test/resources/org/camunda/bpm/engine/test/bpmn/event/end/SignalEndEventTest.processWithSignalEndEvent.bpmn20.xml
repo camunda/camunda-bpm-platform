@@ -6,7 +6,7 @@
   
   <signal id="mySignal" name="alert" />
 
-  <process id="processWithSignalEndEvent">
+  <process id="processWithSignalEndEvent" isExecutable="true">
 
     <startEvent id="start" />
 

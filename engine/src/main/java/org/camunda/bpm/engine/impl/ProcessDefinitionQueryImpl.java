@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,15 +24,21 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
+import org.camunda.bpm.engine.impl.db.PermissionCheck;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Documentation;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
 
 /**
@@ -52,6 +59,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String nameLike;
   protected String deploymentId;
   protected String key;
+  protected String[] keys;
   protected String keyLike;
   protected String resourceName;
   protected String resourceNameLike;
@@ -68,11 +76,20 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String eventSubscriptionName;
   protected String eventSubscriptionType;
 
-  public ProcessDefinitionQueryImpl() {
-  }
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+  protected boolean includeDefinitionsWithoutTenantId = false;
 
-  public ProcessDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
+  protected String versionTag;
+  protected String versionTagLike;
+
+  protected boolean isStartableInTasklist = false;
+  protected boolean isNotStartableInTasklist = false;
+  protected boolean startablePermissionCheck = false;
+  // for internal use
+  protected List<PermissionCheck> processDefinitionCreatePermissionChecks = new ArrayList<PermissionCheck>();
+
+  public ProcessDefinitionQueryImpl() {
   }
 
   public ProcessDefinitionQueryImpl(CommandExecutor commandExecutor) {
@@ -125,6 +142,12 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
+  public ProcessDefinitionQueryImpl processDefinitionKeysIn(String... keys) {
+    ensureNotNull("keys", (Object[]) keys);
+    this.keys = keys;
+    return this;
+  }
+
   public ProcessDefinitionQueryImpl processDefinitionKeyLike(String keyLike) {
     ensureNotNull("keyLike", keyLike);
     this.keyLike = keyLike;
@@ -144,7 +167,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public ProcessDefinitionQueryImpl processDefinitionVersion(Integer version) {
-    ensurePositive("version", version);
+    ensureNotNull("version", version);
+    ensurePositive("version", version.longValue());
     this.version = version;
     return this;
   }
@@ -165,11 +189,11 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public ProcessDefinitionQuery messageEventSubscription(String messageName) {
-    return eventSubscription("message", messageName);
+    return eventSubscription(EventType.MESSAGE, messageName);
   }
 
   public ProcessDefinitionQuery messageEventSubscriptionName(String messageName) {
-    return eventSubscription("message", messageName);
+    return eventSubscription(EventType.MESSAGE, messageName);
   }
 
   public ProcessDefinitionQuery processDefinitionStarter(String procDefId) {
@@ -177,10 +201,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
-  public ProcessDefinitionQuery eventSubscription(String eventType, String eventName) {
+  public ProcessDefinitionQuery eventSubscription(EventType eventType, String eventName) {
     ensureNotNull("event type", eventType);
     ensureNotNull("event name", eventName);
-    this.eventSubscriptionType = eventType;
+    this.eventSubscriptionType = eventType.name();
     this.eventSubscriptionName = eventName;
     return this;
   }
@@ -206,6 +230,58 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery incidentMessageLike(String incidentMessageLike) {
     ensureNotNull("incident messageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
+    return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
+  }
+
+  public ProcessDefinitionQueryImpl tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public ProcessDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public ProcessDefinitionQuery includeProcessDefinitionsWithoutTenantId() {
+    this.includeDefinitionsWithoutTenantId  = true;
+    return this;
+  }
+
+  public ProcessDefinitionQuery versionTag(String versionTag) {
+    ensureNotNull("versionTag", versionTag);
+    this.versionTag = versionTag;
+
+    return this;
+  }
+
+  public ProcessDefinitionQuery versionTagLike(String versionTagLike) {
+    ensureNotNull("versionTagLike", versionTagLike);
+    this.versionTagLike = versionTagLike;
+
+    return this;
+  }
+
+  public ProcessDefinitionQuery startableInTasklist() {
+    this.isStartableInTasklist = true;
+    return this;
+  }
+
+  public ProcessDefinitionQuery notStartableInTasklist() {
+    this.isNotStartableInTasklist = true;
+    return this;
+  }
+
+  public ProcessDefinitionQuery startablePermissionCheck() {
+    this.startablePermissionCheck = true;
     return this;
   }
 
@@ -235,8 +311,17 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return orderBy(ProcessDefinitionQueryProperty.PROCESS_DEFINITION_NAME);
   }
 
+  public ProcessDefinitionQuery orderByTenantId() {
+    return orderBy(ProcessDefinitionQueryProperty.TENANT_ID);
+  }
+
+  public ProcessDefinitionQuery orderByVersionTag() {
+    return orderBy(ProcessDefinitionQueryProperty.VERSION_TAG);
+  }
+
   //results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -244,20 +329,31 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
       .findProcessDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<ProcessDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     List<ProcessDefinition> list = commandContext
       .getProcessDefinitionManager()
       .findProcessDefinitionsByQueryCriteria(this, page);
 
+    boolean shouldQueryAddBpmnModelInstancesToCache =
+        commandContext.getProcessEngineConfiguration().getEnableFetchProcessDefinitionDescription();
+    if(shouldQueryAddBpmnModelInstancesToCache) {
+      addProcessDefinitionToCacheAndRetrieveDocumentation(list);
+    }
+
+    return list;
+  }
+
+  protected void addProcessDefinitionToCacheAndRetrieveDocumentation(List<ProcessDefinition> list) {
     for (ProcessDefinition processDefinition : list) {
 
       BpmnModelInstance bpmnModelInstance = Context.getProcessEngineConfiguration()
-              .getDeploymentCache()
-              .findBpmnModelInstanceForProcessDefinition((ProcessDefinitionEntity) processDefinition);
+          .getDeploymentCache()
+          .findBpmnModelInstanceForProcessDefinition((ProcessDefinitionEntity) processDefinition);
 
       ModelElementInstance processElement = bpmnModelInstance.getModelElementById(processDefinition.getKey());
-      if(processElement != null) {
+      if (processElement != null) {
         Collection<Documentation> documentations = processElement.getChildElementsByType(Documentation.class);
         List<String> docStrings = new ArrayList<String>();
         for (Documentation documentation : documentations) {
@@ -269,10 +365,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
       }
 
     }
-
-    return list;
   }
 
+  @Override
   public void checkQueryOk() {
     super.checkQueryOk();
 
@@ -343,6 +438,34 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   public String getIncidentMessageLike() {
     return incidentMessageLike;
+  }
+
+  public String getVersionTag() {
+    return versionTag;
+  }
+
+  public boolean isStartableInTasklist() {
+    return isStartableInTasklist;
+  }
+
+  public boolean isNotStartableInTasklist() {
+    return isNotStartableInTasklist;
+  }
+
+  public boolean isStartablePermissionCheck() {
+    return startablePermissionCheck;
+  }
+
+  public void setProcessDefinitionCreatePermissionChecks(List<PermissionCheck> processDefinitionCreatePermissionChecks) {
+    this.processDefinitionCreatePermissionChecks = processDefinitionCreatePermissionChecks;
+  }
+
+  public List<PermissionCheck> getProcessDefinitionCreatePermissionChecks() {
+    return processDefinitionCreatePermissionChecks;
+  }
+
+  public void addProcessDefinitionCreatePermissionCheck(CompositePermissionCheck processDefinitionCreatePermissionCheck) {
+    processDefinitionCreatePermissionChecks.addAll(processDefinitionCreatePermissionCheck.getAllPermissionChecks());
   }
 
   public ProcessDefinitionQueryImpl startableByUser(String userId) {

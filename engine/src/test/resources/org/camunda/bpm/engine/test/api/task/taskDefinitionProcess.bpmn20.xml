@@ -4,20 +4,20 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
-  <process id="taskDefinitionKeyProcess">
+  <process id="taskDefinitionKeyProcess" isExecutable="true">
   
     <startEvent id="start"/>
     
     <sequenceFlow id="flow1" sourceRef="start" targetRef="fork" />
     
     <parallelGateway id="fork" />
-    <sequenceFlow sourceRef="fork" targetRef="taskKey1" />
-    <sequenceFlow sourceRef="fork" targetRef="taskKey123" />
+    <sequenceFlow sourceRef="fork" targetRef="taskKey_1" />
+    <sequenceFlow sourceRef="fork" targetRef="taskKey_123" />
 
-    <userTask id="taskKey1" name="Task A"/>
-    <userTask id="taskKey123" name="Task B"/>
-    <sequenceFlow id="joinFlow1" sourceRef="taskKey1" targetRef="join" />
-    <sequenceFlow id="joinFlow2" sourceRef="taskKey123" targetRef="join" />
+    <userTask id="taskKey_1" name="Task A"/>
+    <userTask id="taskKey_123" name="Task B"/>
+    <sequenceFlow id="joinFlow1" sourceRef="taskKey_1" targetRef="join" />
+    <sequenceFlow id="joinFlow2" sourceRef="taskKey_123" targetRef="join" />
     
     
     <parallelGateway id="join" />

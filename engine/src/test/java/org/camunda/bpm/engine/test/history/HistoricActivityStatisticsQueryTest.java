@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,21 +16,30 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.junit.Ignore;
 
 /**
  *
  * @author Roman Smirnov
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineTestCase {
+
+  private SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
   @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testNoRunningProcessInstances() {
@@ -567,6 +580,148 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(2, task.getInstances());
     assertEquals(2, task.getCanceled());
     assertEquals(4, task.getFinished());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryByCanceledAndFinishedByPeriods() throws ParseException {
+    try {
+
+      //start two process instances
+      ClockUtil.setCurrentTime(sdf.parse("15.01.2016 12:00:00"));
+      startProcesses(2);
+
+      // cancel running process instances
+      ClockUtil.setCurrentTime(sdf.parse("15.02.2016 12:00:00"));
+      List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+      for (ProcessInstance processInstance : processInstances) {
+        runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+      }
+
+      //start two process instances
+      ClockUtil.setCurrentTime(sdf.parse("01.02.2016 12:00:00"));
+      startProcesses(2);
+
+      // complete running tasks
+      ClockUtil.setCurrentTime(sdf.parse("25.02.2016 12:00:00"));
+      List<Task> tasks = taskService.createTaskQuery().list();
+      for (Task task : tasks) {
+        taskService.complete(task.getId());
+      }
+
+      //starte two more process instances
+      ClockUtil.setCurrentTime(sdf.parse("15.03.2016 12:00:00"));
+      startProcesses(2);
+
+      //NOW
+      ClockUtil.setCurrentTime(sdf.parse("25.03.2016 12:00:00"));
+
+      String processDefinitionId = getProcessDefinitionId();
+      //check January by started dates
+      HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .startedAfter(sdf.parse("01.01.2016 00:00:00")).startedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
+      List<HistoricActivityStatistics> statistics = query.list();
+
+      assertEquals(2, query.count());
+      assertEquals(2, statistics.size());
+
+      // start
+      assertActivityStatistics(statistics.get(0), "start", 0, 0, 2);
+
+      // task
+      assertActivityStatistics(statistics.get(1), "task", 0, 2, 2);
+
+      //check January by finished dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .finishedAfter(sdf.parse("01.01.2016 00:00:00")).finishedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(0, query.count());
+      assertEquals(0, statistics.size());
+
+      //check February by started dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .startedAfter(sdf.parse("01.02.2016 00:00:00")).startedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(3, query.count());
+      assertEquals(3, statistics.size());
+
+      // end
+      assertActivityStatistics(statistics.get(0), "end", 0, 0, 2);
+
+      // start
+      assertActivityStatistics(statistics.get(1), "start", 0, 0, 2);
+
+      // task
+      assertActivityStatistics(statistics.get(2), "task", 0, 0, 2);
+
+      //check February by finished dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .finishedAfter(sdf.parse("01.02.2016 00:00:00")).finishedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(3, query.count());
+      assertEquals(3, statistics.size());
+
+      // end
+      assertActivityStatistics(statistics.get(0), "end", 0, 0, 2);
+
+      // start
+      assertActivityStatistics(statistics.get(1), "start", 0, 0, 4);
+
+      // task
+      assertActivityStatistics(statistics.get(2), "task", 0, 2, 4);
+
+      //check March by started dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .startedAfter(sdf.parse("01.03.2016 00:00:00")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(2, query.count());
+      assertEquals(2, statistics.size());
+
+      // start
+      assertActivityStatistics(statistics.get(0), "start", 0, 0, 2);
+
+      // task
+      assertActivityStatistics(statistics.get(1), "task", 2, 0, 0);
+
+      //check March by finished dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .finishedAfter(sdf.parse("01.03.2016 00:00:00")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(0, query.count());
+      assertEquals(0, statistics.size());
+
+      //check whole period by started date
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .startedAfter(sdf.parse("01.01.2016 00:00:00")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(3, query.count());
+      assertEquals(3, statistics.size());
+
+      // end
+      assertActivityStatistics(statistics.get(0), "end", 0, 0, 2);
+
+      // start
+      assertActivityStatistics(statistics.get(1), "start", 0, 0, 6);
+
+      // task
+      assertActivityStatistics(statistics.get(2), "task", 2, 2, 4);
+
+    } finally {
+      ClockUtil.reset();
+    }
+
+  }
+
+  protected void assertActivityStatistics(HistoricActivityStatistics activity, String activityName, long instances, long canceled, long finished) {
+    assertEquals(activityName, activity.getId());
+    assertEquals(instances, activity.getInstances());
+    assertEquals(canceled, activity.getCanceled());
+    assertEquals(finished, activity.getFinished());
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")

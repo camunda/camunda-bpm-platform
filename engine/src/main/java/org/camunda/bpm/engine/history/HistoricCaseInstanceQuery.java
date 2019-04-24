@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
@@ -67,6 +70,12 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
    */
   HistoricCaseInstanceQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
 
+  /**
+   * <p>Only selects historic case instances with historic case activity instances
+   * in at least one of the given case activity ids.</p>
+   */
+  HistoricCaseInstanceQuery caseActivityIdIn(String... caseActivityIds);
+
   /** Only select historic case instances that were created before the given date. */
   HistoricCaseInstanceQuery createdBefore(Date date);
 
@@ -103,6 +112,12 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
    * such case instance that can be the result of this query.
    */
   HistoricCaseInstanceQuery subProcessInstanceId(String subProcessInstanceId);
+
+  /** Only select historic case instances with one of the given tenant ids. */
+  HistoricCaseInstanceQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic case instances which have no tenant id. */
+  HistoricCaseInstanceQuery withoutTenantId();
 
   /** Only select historic case instances which are active */
   HistoricCaseInstanceQuery active();
@@ -207,5 +222,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
 
   /** Order by the duration of the case instance (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseInstanceQuery orderByCaseInstanceDuration();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic case instances without tenant id is database-specific.
+   */
+  HistoricCaseInstanceQuery orderByTenantId();
 
 }

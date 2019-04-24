@@ -1,5 +1,22 @@
+--
+-- Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+-- under one or more contributor license agreements. See the NOTICE file
+-- distributed with this work for additional information regarding copyright
+-- ownership. Camunda licenses this file to you under the Apache License,
+-- Version 2.0; you may not use this file except in compliance with the
+-- License. You may obtain a copy of the License at
+--
+--     http://www.apache.org/licenses/LICENSE-2.0
+--
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
+--
+
 /** 03.08.2012 */
-/** NOTE: Need to change the "CALL SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS('TABLE', '<SCHEMA>', NULL);"-Statement - replace <SCHEMA> in Line 67 */ 
+/** NOTE: Need to change the "CALL SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS('TABLE', '<SCHEMA>', NULL);"-Statement - replace <SCHEMA> in Line 67 */
 alter table ACT_RU_EXECUTION add CACHED_ENT_STATE_ integer;
 update ACT_RU_EXECUTION set CACHED_ENT_STATE_ = 7;
 
@@ -11,10 +28,10 @@ create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 alter table ACT_RE_PROCDEF
     alter column KEY_ set not null;
 
-alter table ACT_RE_PROCDEF 
+alter table ACT_RE_PROCDEF
     alter column VERSION_ set not null;
 
-    
+
 create table ACT_HI_PROCVARIABLE (
     ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
@@ -66,17 +83,17 @@ where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
 CALL SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS('TABLE', '<SCHEMA>', NULL);
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCDEF 
-    foreign key (PROC_DEF_ID_) 
+    add constraint ACT_FK_EXE_PROCDEF
+    foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF (ID_);
-	
-alter table ACT_RE_PROCDEF 
+
+alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_);
 
 alter table ACT_RU_IDENTITYLINK
-    add constraint ACT_FK_ATHRZ_PROCEDEF 
-    foreign key (PROC_DEF_ID_) 
+    add constraint ACT_FK_ATHRZ_PROCEDEF
+    foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF (ID_);
 
 alter table ACT_HI_DETAIL

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.history;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -68,7 +70,7 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /**
    * Only select historic process instances which had a business key like the given value.
    *
-   * @param processInstanceBusinessKey The string can include the wildcard character '%' to express
+   * @param processInstanceBusinessKeyLike The string can include the wildcard character '%' to express
    *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
    */
   HistoricProcessInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike);
@@ -78,6 +80,52 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /** Only select historic process instance that are not yet finished. */
   HistoricProcessInstanceQuery unfinished();
+
+  /**
+   * Only select historic process instances with incidents
+   *
+   * @return HistoricProcessInstanceQuery
+   */
+  HistoricProcessInstanceQuery withIncidents();
+
+  /**
+   * Only select historic process instances with root incidents
+   *
+   * @return HistoricProcessInstanceQuery
+   */
+  HistoricProcessInstanceQuery withRootIncidents();
+
+  /** Only select historic process instances with incident status either 'open' or 'resolved'.
+   * To get all process instances with incidents, use {@link HistoricProcessInstanceQuery#withIncidents()}.
+   *
+   * @param status indicates the incident status, which is either 'open' or 'resolved'
+   * @return {@link HistoricProcessInstanceQuery}
+   */
+  HistoricProcessInstanceQuery incidentStatus(String status);
+
+  /**
+   * Only selects process instances with the given incident type.
+   */
+  HistoricProcessInstanceQuery incidentType(String incidentType);
+
+  /**
+   * Only select historic process instances with the given incident message.
+   *
+   * @param incidentMessage Incidents Message for which the historic process instances should be selected
+   *
+   * @return HistoricProcessInstanceQuery
+   */
+  HistoricProcessInstanceQuery incidentMessage(String incidentMessage);
+
+  /**
+   * Only select historic process instances which had an incident message like the given value.
+   *
+   * @param incidentMessageLike The string can include the wildcard character '%' to express
+   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   *
+   * @return HistoricProcessInstanceQuery
+   */
+  HistoricProcessInstanceQuery incidentMessageLike(String incidentMessageLike);
 
   /** Only select historic process instances which are associated with the given case instance id. */
   HistoricProcessInstanceQuery caseInstanceId(String caseInstanceId);
@@ -168,6 +216,15 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Order by the process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricProcessInstanceQuery orderByProcessDefinitionId();
 
+  /** Order by the process definition key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricProcessInstanceQuery orderByProcessDefinitionKey();
+
+  /** Order by the process definition name (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricProcessInstanceQuery orderByProcessDefinitionName();
+
+  /** Order by the process definition version (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricProcessInstanceQuery orderByProcessDefinitionVersion();
+
   /** Order by the business key (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey();
 
@@ -179,6 +236,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /** Order by the duration of the process instance (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricProcessInstanceQuery orderByProcessInstanceDuration();
+
+  /** Only select historic process instances that are top level process instances. */
+  HistoricProcessInstanceQuery rootProcessInstances();
 
   /** Only select historic process instances started by the given process
    * instance. {@link ProcessInstance) ids and {@link HistoricProcessInstance}
@@ -205,24 +265,70 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    */
   HistoricProcessInstanceQuery subCaseInstanceId(String subCaseInstanceId);
 
-  // below is deprecated and should be removed in 5.12
+  /** Only select historic process instances with one of the given tenant ids. */
+  HistoricProcessInstanceQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic process instances which have no tenant id. */
+  HistoricProcessInstanceQuery withoutTenantId();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic process instances without tenant id is database-specific.
+   */
+  HistoricProcessInstanceQuery orderByTenantId();
 
   /** Only select historic process instances that were started as of the provided
    * date. (Date will be adjusted to reflect midnight)
-   * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+   * @deprecated use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery startDateBy(Date date);
 
   /** Only select historic process instances that were started on the provided date.
-   * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+   * @deprecated use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery startDateOn(Date date);
 
   /** Only select historic process instances that were finished as of the
    * provided date. (Date will be adjusted to reflect one second before midnight)
-   * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+   * @deprecated use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery finishDateBy(Date date);
 
   /** Only select historic process instances that were finished on provided date.
-   * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+   * @deprecated use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery finishDateOn(Date date);
 
+  /** Only select historic process instances that executed an activity after the given date. */
+  HistoricProcessInstanceQuery executedActivityAfter(Date date);
+
+  /** Only select historic process instances that executed an activity before the given date. */
+  HistoricProcessInstanceQuery executedActivityBefore(Date date);
+
+  /** Only select historic process instances that executed activities with given ids. */
+  HistoricProcessInstanceQuery executedActivityIdIn(String... ids);
+
+  /** Only select historic process instances that have active activities with given ids. */
+  HistoricProcessInstanceQuery activeActivityIdIn(String... ids);
+
+  /** Only select historic process instances that executed an job after the given date. */
+  HistoricProcessInstanceQuery executedJobAfter(Date date);
+
+  /** Only select historic process instances that executed an job before the given date. */
+  HistoricProcessInstanceQuery executedJobBefore(Date date);
+
+  /** Only select historic process instances that are active. */
+  HistoricProcessInstanceQuery active();
+
+  /** Only select historic process instances that are suspended. */
+  HistoricProcessInstanceQuery suspended();
+
+  /** Only select historic process instances that are completed. */
+  HistoricProcessInstanceQuery completed();
+
+  /** Only select historic process instances that are externallyTerminated. */
+  HistoricProcessInstanceQuery externallyTerminated();
+
+  /** Only select historic process instances that are internallyTerminated. */
+  HistoricProcessInstanceQuery internallyTerminated();
 }

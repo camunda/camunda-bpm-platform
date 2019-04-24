@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="task" />
+
+    <userTask id="task" />
+
+    <sequenceFlow sourceRef="task" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+    <subProcess id="subProcess" triggeredByEvent="true">
+
+      <startEvent id="eventProcessStart" isInterrupting="true">
+        <extensionElements>
+          <fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
+        </extensionElements>
+        <timerEventDefinition>
+          <timeDuration>PT1H</timeDuration>
+        </timerEventDefinition>
+      </startEvent>
+
+      <sequenceFlow sourceRef="eventProcessStart" targetRef="scriptTask" />
+
+      <scriptTask id="scriptTask" scriptFormat="groovy">
+        <script>
+          throw new RuntimeException("This is an exception thrown from scriptTask")
+        </script>
+      </scriptTask>
+
+      <sequenceFlow sourceRef="scriptTask" targetRef="eventSubProcessEnd" />
+
+      <endEvent id="eventSubProcessEnd" />
+
+    </subProcess>
+
+  </process>
+	
+</definitions>

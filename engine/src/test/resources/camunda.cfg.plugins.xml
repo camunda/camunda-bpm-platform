@@ -29,13 +29,7 @@
     <property name="mailServerPort" value="${mail.server.port}" />
     <property name="history" value="${history.level}" />
 
-    <property name="customPostBPMNParseListeners">
-      <list>
-        <bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
-      </list>
-    </property>
-
-    <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
+    <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
@@ -47,8 +41,6 @@
     </property>
 
   </bean>
-
-  <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
 
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->
 

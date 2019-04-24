@@ -3,7 +3,7 @@
   <bpmn2:collaboration id="Collaboration_1" name="Collaboration">
     <bpmn2:participant id="Participant_1" name="Pool" processRef="Process_1"/>
   </bpmn2:collaboration>
-  <bpmn2:process id="Process_1" name="Default Initiating Process">
+  <bpmn2:process id="Process_1" name="Default Initiating Process" isExecutable="true">
     <bpmn2:startEvent id="StartEvent_1">
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
     </bpmn2:startEvent>

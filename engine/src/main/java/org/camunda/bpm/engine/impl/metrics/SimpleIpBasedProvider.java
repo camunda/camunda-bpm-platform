@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,10 +17,9 @@
 package org.camunda.bpm.engine.impl.metrics;
 
 import java.net.InetAddress;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * @author Thorben Lindhauer
@@ -24,17 +27,16 @@ import org.camunda.bpm.engine.ProcessEngine;
  */
 public class SimpleIpBasedProvider implements MetricsReporterIdProvider {
 
-  private static Logger log = Logger.getLogger(SimpleIpBasedProvider.class.getName());
+  private final static MetricsLogger LOG = ProcessEngineLogger.METRICS_LOGGER;
 
   public String provideId(ProcessEngine processEngine) {
     String localIp = "";
     try {
       localIp = InetAddress.getLocalHost().getHostAddress();
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       // do not throw an exception; failure to determine an IP should not prevent from using the engine
-      if (log.isLoggable(Level.WARNING)) {
-        log.log(Level.WARNING, "Could not determine local IP address for generating an engine id", e);
-      }
+      LOG.couldNotDetermineIp(e);
     }
 
     return createId(localIp, processEngine.getName());

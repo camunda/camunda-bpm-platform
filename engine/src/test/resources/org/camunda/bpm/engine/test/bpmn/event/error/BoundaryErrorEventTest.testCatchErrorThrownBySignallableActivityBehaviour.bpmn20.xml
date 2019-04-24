@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <error id="myError" errorCode="23"/>
+  <error id="myException" errorCode="org.camunda.bpm.engine.test.bpmn.event.error.MyBusinessException" />
+  
+  <process id="catchErrorThrownBySignallableActivityBehaviour" isExecutable="true">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask" />
+    
+    <serviceTask id="serviceTask" camunda:class="org.camunda.bpm.engine.test.bpmn.event.error.ThrowBpmnErrorSignallableActivityBehaviour" />
+    
+    <boundaryEvent id="catchError" attachedToRef="serviceTask">
+      <errorEventDefinition errorRef="myError"/>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow3" sourceRef="catchError" targetRef="escalatedTask" />
+    
+    <userTask id="escalatedTask" name="Escalated Task" />
+    
+    <sequenceFlow id="flow5" sourceRef="serviceTask" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

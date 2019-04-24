@@ -16,6 +16,7 @@
       <property name="databaseSchemaUpdate">true</property>
       <property name="authorizationEnabled">true</property>
       <property name="jobExecutorDeploymentAware">true</property>
+      <property name="historyCleanupBatchWindowStartTime">00:01</property>
     </properties>
 
     <plugins>
@@ -23,7 +24,7 @@
       <plugin>
         <class>org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin</class>
       </plugin>
-      
+
       <!-- plugin enabling integration of camunda Spin -->
       <plugin>
         <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
@@ -37,7 +38,7 @@
     <!-- LDAP CONFIGURATION -->
     <!-- Uncomment this section in order to enable LDAP support for this process engine -->
     <!-- Adjust configuration, see ( http://docs.camunda.org/latest/guides/user-guide/#process-engine-identity-service-the-ldap-identity-service ) -->
-    <!-- 
+    <!--
       <plugin>
         <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
         <properties>
@@ -64,14 +65,15 @@
           <property name="groupNameAttribute">cn</property>
 
           <property name="groupMemberAttribute">member</property>
+          <property name="sortControlSupported">false</property>
 
         </properties>
-      </plugin> 
+      </plugin>
       -->
 
       <!-- LDAP CONFIGURATION -->
       <!-- The following plugin allows you to grant administrator authorizations to an existing LDAP user -->
-      <!-- 
+      <!--
       <plugin>
         <class>org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin</class>
         <properties>
@@ -80,7 +82,7 @@
       </plugin>
       -->
 
-    </plugins> 
+    </plugins>
 
 
   </process-engine>

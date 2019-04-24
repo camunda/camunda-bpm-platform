@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,6 +16,7 @@
  */
 package org.camunda.bpm.qa.performance.engine.sqlstatementlog;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +25,12 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.qa.performance.engine.util.DelegatingSqlSession;
+import org.camunda.bpm.qa.performance.engine.util.JsonUtil;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.SerializationConfig.Feature;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * <p>This SqlSession wraps an actual SqlSession and logs executed sql statements. (Calls to the
@@ -45,7 +56,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     int result = super.delete(statement);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.DELETE, statement, duration);
+    logStatement(SqlStatementType.DELETE, null, statement, duration);
     return result;
   }
 
@@ -56,7 +67,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     int result = super.delete(statement, parameter);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.DELETE, statement, duration);
+    logStatement(SqlStatementType.DELETE, parameter, statement, duration);
     return result;
   }
 
@@ -67,7 +78,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     int result = super.insert(statement);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.INSERT, statement, duration);
+    logStatement(SqlStatementType.INSERT, null, statement, duration);
     return result;
   }
 
@@ -78,7 +89,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     int result = super.insert(statement, paremeter);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.INSERT, statement, duration);
+    logStatement(SqlStatementType.INSERT, paremeter, statement, duration);
     return result;
   }
 
@@ -89,7 +100,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     int result = super.update(statement);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.UPDATE, statement, duration);
+    logStatement(SqlStatementType.UPDATE, null, statement, duration);
     return result;
   }
 
@@ -100,7 +111,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     int result = super.update(statement, parameter);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.UPDATE, statement, duration);
+    logStatement(SqlStatementType.UPDATE, parameter, statement, duration);
     return result;
   }
 
@@ -111,7 +122,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     super.select(statement, parameter, handler);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT, statement, duration);
+    logStatement(SqlStatementType.SELECT, parameter, statement, duration);
   }
 
   @Override
@@ -121,7 +132,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     super.select(statement, parameter, rowBounds, handler);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT, statement, duration);
+    logStatement(SqlStatementType.SELECT, parameter, statement, duration);
   }
 
   @Override
@@ -131,7 +142,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     super.select(statement, handler);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT, statement, duration);
+    logStatement(SqlStatementType.SELECT, null, statement, duration);
   }
 
   @Override
@@ -141,7 +152,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     List<E> result = super.selectList(statement);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_LIST, statement, duration);
+    logStatement(SqlStatementType.SELECT_LIST, null, statement, duration);
 
     return result;
   }
@@ -153,7 +164,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     List<E> result = super.selectList(statement, parameter);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_LIST, statement, duration);
+    logStatement(SqlStatementType.SELECT_LIST, parameter, statement, duration);
 
     return result;
   }
@@ -165,7 +176,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     List<E> result = super.selectList(statement, parameter, rowBounds);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_LIST, statement, duration);
+    logStatement(SqlStatementType.SELECT_LIST, parameter, statement, duration);
 
     return result;
   }
@@ -177,7 +188,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     Map<K, V> result = super.selectMap(statement, parameter, mapKey);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_MAP, statement, duration);
+    logStatement(SqlStatementType.SELECT_MAP, parameter, statement, duration);
 
     return result;
   }
@@ -189,7 +200,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     Map<K, V> result = super.selectMap(statement, parameter, mapKey, rowBounds);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_MAP, statement, duration);
+    logStatement(SqlStatementType.SELECT_MAP, parameter, statement, duration);
 
     return result;
   }
@@ -201,7 +212,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     Map<K, V> result = super.selectMap(statement, mapKey);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_MAP, statement, duration);
+    logStatement(SqlStatementType.SELECT_MAP, mapKey, statement, duration);
 
     return result;
   }
@@ -213,7 +224,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     T result = super.selectOne(statement);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_MAP, statement, duration);
+    logStatement(SqlStatementType.SELECT_MAP, null, statement, duration);
 
     return result;
   }
@@ -225,17 +236,17 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     T result = super.selectOne(statement, parameter);
 
     long duration = System.currentTimeMillis() - start;
-    logStatement(SqlStatementType.SELECT_MAP, statement, duration);
+    logStatement(SqlStatementType.SELECT_MAP, parameter, statement, duration);
 
     return result;
   }
 
   // logging ////////////////////////////////////////////////
 
-  protected void logStatement(SqlStatementType type, String statement, long duration) {
+  protected void logStatement(SqlStatementType type, Object parameters, String statement, long duration) {
     List<SqlStatementLog> log = threadStatementLog.get();
     if(log != null) {
-      log.add(new SqlStatementLog(type, statement, duration));
+      log.add(new SqlStatementLog(type, parameters, statement, duration));
     }
   }
 
@@ -268,10 +279,17 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     /** the duration the statement took to execute in Milliseconds */
     protected long durationMs;
 
-    public SqlStatementLog(SqlStatementType type, String statement, long duration) {
+    protected String statementParameters;
+
+    public SqlStatementLog(SqlStatementType type, Object parameters, String statement, long duration) {
       statementType = type;
       this.statement = statement;
       this.durationMs = duration;
+      try {
+        statementParameters = JsonUtil.getMapper().writeValueAsString(parameters).replaceAll("\"", "'");
+      } catch (Exception e) {
+//        e.printStackTrace();
+      }
     }
 
     public String getStatement() {
@@ -284,6 +302,10 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
 
     public long getDurationMs() {
       return durationMs;
+    }
+
+    public String getStatementParameters() {
+      return statementParameters;
     }
 
   }

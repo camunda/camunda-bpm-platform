@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+   xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+   xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+   xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+   xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <cmmn:case id="Case_1">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+      <cmmn:planItem id="HumanTask_1" name="HumanTask1" definitionRef="HumanTask_1m45ynk">
+        <cmmn:entryCriterion id="Sentry_1" sentryRef="Sentry1" />
+      </cmmn:planItem>
+      <cmmn:sentry id="Sentry1" >
+        <cmmn:extensionElements>
+          <camunda:variableOnPart variableName = "variable_1">
+            <camunda:variableEvent>update</camunda:variableEvent>
+          </camunda:variableOnPart>
+        </cmmn:extensionElements>
+      </cmmn:sentry>  
+      <cmmn:humanTask id="HumanTask_1m45ynk" name="HumanTask_1" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_1">
+        <dc:Bounds x="114" y="63" width="534" height="389" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1cxe0u4_di" cmmnElementRef="HumanTask_1">
+        <dc:Bounds x="321" y="147" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_19waueg_di" cmmnElementRef="Sentry_1">
+        <dc:Bounds x="311" y="180" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

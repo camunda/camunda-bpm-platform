@@ -1,0 +1,374 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.11.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>camunda-qa-old-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA - test new schema with old engine</name>
+
+  <properties>
+    <camunda.old.engine.version>7.10.0</camunda.old.engine.version>
+  </properties>
+
+  <build>
+    <testSourceDirectory>${project.build.directory}/engine-test-sources</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>${project.build.directory}/engine-test-sources</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+          <exclude>camunda.cfg.xml</exclude>
+        </excludes>
+      </testResource>
+      <testResource>
+        <directory>config</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>mysql</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <excludes combine.children="append">
+                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>mariadb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <excludes combine.children="append">
+                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>old-engine</id>
+
+      <dependencyManagement>
+        <dependencies>     
+          <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-bom</artifactId>
+            <version>7.10.0</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+          <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-engine</artifactId>
+            <version>7.10.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.camunda.bpm.model</groupId>
+            <artifactId>camunda-xml-model</artifactId>
+            <version>7.10.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.camunda.bpm.model</groupId>
+            <artifactId>camunda-bpmn-model</artifactId>
+            <version>7.10.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.camunda.bpm.model</groupId>
+            <artifactId>camunda-cmmn-model</artifactId>
+            <version>7.10.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.camunda.bpm.model</groupId>
+            <artifactId>camunda-dmn-model</artifactId>
+            <version>7.10.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.4.4</version>
+          </dependency>
+		  <!-- legacy dependency which was provided by the parent pom up to 7.10.x -->
+          <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+          </dependency>
+         </dependencies>
+      </dependencyManagement>
+
+      <dependencies>
+       <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-library</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-test</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.apache.openjpa</groupId>
+          <artifactId>openjpa</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.subethamail</groupId>
+          <artifactId>subethasmtp-wiser</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.python</groupId>
+          <artifactId>jython</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jruby</groupId>
+          <artifactId>jruby-complete</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+
+
+        <dependency>
+          <groupId>org.camunda.bpm.distro</groupId>
+          <artifactId>camunda-sql-scripts</artifactId>
+          <version>${project.version}</version>
+          <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>7.10.0</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <!--UNPACKING-->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+
+            <executions>
+              <!--UNPACK OLD TEST SUITE-->
+              <execution>
+                <id>unpack-engine-tests</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine</artifactId>
+                      <version>${camunda.old.engine.version}</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+
+              <!--UNPACK NEW SQL SCRIPTS-->
+              <execution>
+                <id>unpack-new-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>${project.version}</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+
+          </plugin>
+
+          <!--SQL EXECUTION-->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <executions>
+
+              <!--DROP DB IF PRESENT-->
+              <execution>
+                <id>drop-db-if-present</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+
+              <!--CREATE NEW SCHEMA-->
+              <execution>
+                <id>create-new-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_identity_${project.version}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+
+              <!--DROP DB AFTER TEST-->
+              <execution>
+                <id>drop-db</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+
+                <exclude>**/ClassPathScannerTest.java</exclude>
+                <exclude>**/MultipleClasspathRootsClassPathScannerTest.java</exclude>
+
+                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                <!--Exclude test class, because 4 tests fail and are removed on later patch versions -->
+                <exclude>**/MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest.java</exclude>
+
+                <!-- commons-email 1.5 update -->
+                <exclude>**/AsyncEmailTaskTest.java</exclude>
+                <exclude>**/EmailSendTaskTest.java</exclude>
+                <exclude>**/EmailServiceTaskTest.java</exclude>
+                
+                <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+
+                <exclude>**/ManagementServiceTableCountTest.java</exclude>
+              </excludes>
+              <testFailureIgnore>false</testFailureIgnore>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

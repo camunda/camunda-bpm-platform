@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <message id="message" name="Message" />
+  <process id="boundaryExternalTaskProcess" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="externalTask" />
+    <serviceTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic" />
+    <sequenceFlow id="flow2" sourceRef="externalTask" targetRef="end1" />
+    <endEvent id="end1" />
+    
+    <!-- boundary event -->
+    <boundaryEvent id="boundaryEvent" attachedToRef="externalTask" cancelActivity="true">
+      <messageEventDefinition messageRef="message" />
+    </boundaryEvent>
+    <sequenceFlow id="flow3" sourceRef="boundaryEvent" targetRef="afterBoundaryTask" />
+    <userTask id="afterBoundaryTask" />
+    <sequenceFlow id="flow4" sourceRef="afterBoundaryTask" targetRef="end2" />
+    <endEvent id="end2" />
+  </process>
+</definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,20 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
+import org.camunda.bpm.engine.impl.CleanableHistoricCaseInstanceReportImpl;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 
 /**
@@ -51,43 +60,29 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
       List<String> historicCaseInstanceIds = getDbEntityManager()
         .selectList("selectHistoricCaseInstanceIdsByCaseDefinitionId", caseDefinitionId);
 
-      for (String historicCaseInstanceId: historicCaseInstanceIds) {
-        deleteHistoricCaseInstanceById(historicCaseInstanceId);
+      if (historicCaseInstanceIds != null && !historicCaseInstanceIds.isEmpty()) {
+        deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
       }
     }
   }
 
-  public void deleteHistoricCaseInstanceById(String historicCaseInstanceId) {
+  public void deleteHistoricCaseInstancesByIds(List<String> historicCaseInstanceIds) {
     if (isHistoryEnabled()) {
-      CommandContext commandContext = Context.getCommandContext();
+      getHistoricDetailManager().deleteHistoricDetailsByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricDetailManager()
-        .deleteHistoricDetailsByCaseInstanceId(historicCaseInstanceId);
+      getHistoricVariableInstanceManager().deleteHistoricVariableInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricVariableInstanceManager()
-        .deleteHistoricVariableInstanceByCaseInstanceId(historicCaseInstanceId);
+      getHistoricCaseActivityInstanceManager().deleteHistoricCaseActivityInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricCaseActivityInstanceManager()
-        .deleteHistoricCaseActivityInstancesByCaseInstanceId(historicCaseInstanceId);
+      getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstancesByCaseInstanceId(historicCaseInstanceId);
-
-      commandContext
-          .getOperationLogManager()
-          .deleteOperationLogEntriesByCaseInstanceId(historicCaseInstanceId);
-
-      commandContext.getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstance", historicCaseInstanceId);
-
+      getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstancesByIds", historicCaseInstanceIds);
     }
   }
 
   public long findHistoricCaseInstanceCountByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
     if (isHistoryEnabled()) {
+      configureHistoricCaseInstanceQuery(historicCaseInstanceQuery);
       return (Long) getDbEntityManager().selectOne("selectHistoricCaseInstanceCountByQueryCriteria", historicCaseInstanceQuery);
     }
     return 0;
@@ -96,6 +91,7 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricCaseInstance> findHistoricCaseInstancesByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery, Page page) {
     if (isHistoryEnabled()) {
+      configureHistoricCaseInstanceQuery(historicCaseInstanceQuery);
       return getDbEntityManager().selectList("selectHistoricCaseInstancesByQueryCriteria", historicCaseInstanceQuery, page);
     }
     return Collections.EMPTY_LIST;
@@ -108,6 +104,35 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
 
   public long findHistoricCaseInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
     return (Long) getDbEntityManager().selectOne("selectHistoricCaseInstanceCountByNativeQuery", parameterMap);
+  }
+
+  protected void configureHistoricCaseInstanceQuery(HistoricCaseInstanceQueryImpl query) {
+    getTenantManager().configureQuery(query);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> findHistoricCaseInstanceIdsForCleanup(int batchSize, int minuteFrom, int minuteTo) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("currentTimestamp", ClockUtil.getCurrentTime());
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(parameters, 0, batchSize);
+    return getDbEntityManager().selectList("selectHistoricCaseInstanceIdsForCleanup", parameterObject);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<CleanableHistoricCaseInstanceReportResult> findCleanableHistoricCaseInstancesReportByCriteria(CleanableHistoricCaseInstanceReportImpl query, Page page) {
+    query.setCurrentTimestamp(ClockUtil.getCurrentTime());
+    getTenantManager().configureQuery(query);
+    return getDbEntityManager().selectList("selectFinishedCaseInstancesReportEntities", query, page);
+  }
+
+  public long findCleanableHistoricCaseInstancesReportCountByCriteria(CleanableHistoricCaseInstanceReportImpl query) {
+    query.setCurrentTimestamp(ClockUtil.getCurrentTime());
+    getTenantManager().configureQuery(query);
+    return (Long) getDbEntityManager().selectOne("selectFinishedCaseInstancesReportEntitiesCount", query);
   }
 
 }

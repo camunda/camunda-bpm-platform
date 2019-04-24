@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
 
 <mapper namespace="org.camunda.bpm.engine.history.HistoricActivityStatistics">
@@ -14,13 +31,23 @@
     <result property="completeScope" column="COMPLETE_SCOPE_COUNT_" jdbcType="INTEGER" />
   </resultMap>
 
+  <resultMap id="historicCaseActivityStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityStatisticsImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="available" column="AVAILABLE_" jdbcType="INTEGER" />
+    <result property="enabled" column="ENABLED_" jdbcType="INTEGER" />
+    <result property="disabled" column="DISABLED_" jdbcType="INTEGER" />
+    <result property="active" column="ACTIVE_" jdbcType="INTEGER" />
+    <result property="terminated" column="TERMINATED_" jdbcType="INTEGER" />
+    <result property="completed" column="COMPLETED_" jdbcType="INTEGER" />
+  </resultMap>
+
   <!-- HistoricActivity statistics -->
 
   <select id ="selectHistoricActivityStatistics" resultMap="historicActivityStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
     ${orderBy}
@@ -29,97 +56,93 @@
 
   <select id ="selectHistoricActivityStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricActivityStatisticsByQueryCriteriaSql">
     from (
-      select ACTIVITY.ACT_ID_ as ID_
-      , INSTANCE_COUNT_
-      <if test="includeFinished">
-      , FINISHED_COUNT_
-      </if>
-      <if test="includeCanceled">
-      , CANCELED_COUNT_
-      </if>
-      <if test="includeCompleteScope">
-      , COMPLETE_SCOPE_COUNT_
-      </if>
-
-      from
-
-        (
-          select distinct ACT_ID_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and (END_TIME_ is null
+          select ACT.ACT_ID_ as ID_,
+          sum(CASE WHEN ACT.END_TIME_ is NULL THEN 1 ELSE 0 END) as INSTANCE_COUNT_
           <if test="includeFinished">
-          or END_TIME_ is not null
+          , sum(CASE WHEN ACT.END_TIME_ is not NULL THEN 1 ELSE 0 END)  as FINISHED_COUNT_
           </if>
           <if test="includeCanceled">
-          or ACT_INST_STATE_ = 2
+          , sum(CASE WHEN ACT.ACT_INST_STATE_ = 2 THEN 1 ELSE 0 END)  as CANCELED_COUNT_
           </if>
           <if test="includeCompleteScope">
-          or ACT_INST_STATE_ = 1
+          , sum(CASE WHEN ACT.ACT_INST_STATE_ = 1 THEN 1 ELSE 0 END)  as COMPLETE_SCOPE_COUNT_
           </if>
-          )
 
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+          from ${prefix}ACT_HI_ACTINST ACT
+          INNER JOIN ${prefix}ACT_HI_PROCINST PI
+          ON ACT.PROC_INST_ID_ = PI.ID_
 
-        ) ACTIVITY
+          where ACT.PROC_DEF_ID_ = #{processDefinitionId}
+            <if test="!includeFinished">
+            and (
+              ACT.END_TIME_ is null
+            <if test="includeCanceled">
+            or ACT.ACT_INST_STATE_ = 2
+            </if>
+            <if test="includeCompleteScope">
+            or ACT.ACT_INST_STATE_ = 1
+            </if>
+            )
+            </if>
 
-        left outer join
+            <if test="startedBefore != null">
+            and PI.START_TIME_ &lt;= #{startedBefore}
+            </if>
+            <if test="startedAfter != null">
+            and PI.START_TIME_ &gt;= #{startedAfter}
+            </if>
+            <if test="finishedBefore != null">
+            and PI.END_TIME_ &lt;= #{finishedBefore}
+            </if>
+            <if test="finishedAfter != null">
+            and PI.END_TIME_ &gt;= #{finishedAfter}
+            </if>
+          GROUP BY ACT_ID_
 
-        (
-          select ACT_ID_, count(ACT_ID_) as INSTANCE_COUNT_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and END_TIME_ is null
-          group by ACT_ID_
-        ) INSTANCE
-        on INSTANCE.ACT_ID_ = ACTIVITY.ACT_ID_
+        ) RES
+  </sql>
 
-        <if test="includeFinished">
-        left outer join
+  <!-- HistoricCaseActivity statistics -->
 
-        (
-          select ACT_ID_, count(ACT_ID_) as FINISHED_COUNT_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and END_TIME_ is not null
-          group by ACT_ID_
-        ) FINISHED
-        on FINISHED.ACT_ID_ = ACTIVITY.ACT_ID_
-        </if>
+  <select id ="selectHistoricCaseActivityStatistics" resultMap="historicCaseActivityStatisticsResultMap" 
+    parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.*
+    ${limitBetween}
+    <include refid="selectHistoricCaseActivityStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
 
-        <if test="includeCanceled">
-        left outer join
+  <select id ="selectHistoricCaseActivityStatisticsCount" resultType="long" 
+    parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl">
+    select count(distinct RES.ID_)
+    <include refid="selectHistoricCaseActivityStatisticsByQueryCriteriaSql"/>
+  </select>
 
-        (
-          select ACT_ID_, count(ACT_ID_) as CANCELED_COUNT_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and ACT_INST_STATE_ = 2
-          group by ACT_ID_
-        ) CANCELED
-        on CANCELED.ACT_ID_ = ACTIVITY.ACT_ID_
-        </if>
-
-        <if test="includeCompleteScope">
-        left outer join
-
-        (
-          select ACT_ID_, count(ACT_ID_) as COMPLETE_SCOPE_COUNT_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and ACT_INST_STATE_ = 1
-          group by ACT_ID_
-        ) COMPLETE
-        on COMPLETE.ACT_ID_ = ACTIVITY.ACT_ID_
-        </if>
-
-      ) RES
+  <sql id="selectHistoricCaseActivityStatisticsByQueryCriteriaSql">
+    from (
+      select
+        HCAI.CASE_ACT_ID_ as ID_
+      , count( CASE WHEN HCAI.STATE_ = 1 THEN 1 ELSE null END ) as AVAILABLE_
+      , count( CASE WHEN HCAI.STATE_ = 2 THEN 1 ELSE null END ) as ENABLED_
+      , count( CASE WHEN HCAI.STATE_ = 3 THEN 1 ELSE null END ) as DISABLED_
+      , count( CASE WHEN HCAI.STATE_ = 4 THEN 1 ELSE null END ) as ACTIVE_
+      , count( CASE WHEN HCAI.STATE_ = 6 THEN 1 ELSE null END ) as TERMINATED_
+      , count( CASE WHEN HCAI.STATE_ = 7 THEN 1 ELSE null END ) as COMPLETED_
+      from
+        ${prefix}ACT_HI_CASEACTINST HCAI
+      where
+        HCAI.CASE_DEF_ID_ = #{caseDefinitionId}
+      group by HCAI.CASE_ACT_ID_
+    ) RES
   </sql>
 
 </mapper>

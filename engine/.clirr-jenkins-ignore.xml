@@ -18,4 +18,9 @@
     <differenceType>8001</differenceType>
     <className>org/camunda/bpm/engine/history/UserOperationLogContext</className>
   </difference>
+  <!-- package moved into typed-values module of camunda-commons project -->
+  <difference>
+    <differenceType>8001</differenceType>
+    <className>org/camunda/bpm/engine/variable/**/*</className>
+  </difference>
 </differences>

@@ -7,14 +7,20 @@ The integration testsuites are located under `qa/`. There you'll find a folder n
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
 We have different maven profiles for selecting
-* *Runtime containers & environments*: jboss, glassfish, tomcat, wildfly
+* *Runtime containers & environments*: jboss, tomcat, wildfly
 * *The testsuite*: engine-integration, webapps-integration
-* *The database*: h2,h2-xa,db2,db2-xa,sqlserver,sqlserver-xa,oracle,oracle-xa,postgresql,postgresql-xa,mysql,mysql-xa (XA is only supprted on JBoss & Glassfish ATM)
+* *The database*: h2,h2-xa,postgresql,postgresql-xa (XA is only supported on JBoss / Wildfly atm)
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
 ```
 mvn clean install -Pengine-integration,jboss,h2
+```
+
+Here's another example for using wildfly as the runtime container:
+
+```
+mvn clean install -Pengine-integration,wildfly,h2
 ```
 
 If you want to test against an XA database, just add the corresponding XA database profile to the mvn cmdline above. Example:
@@ -26,10 +32,9 @@ mvn clean install -Pengine-integration,jboss,postgresql,postgresql-xa
 You can select multiple testsuites but only a single database and a single runtime container. This is valid:
 
 ```
-mvn clean install -Pengine-integration,webapps-integration,tomcat,db2
+mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
 ```
 
 There is a special profile for JBoss Application Server:
 
 * Domain mode: `mvn clean install -Pengine-integration,h2,jboss-domain`
-

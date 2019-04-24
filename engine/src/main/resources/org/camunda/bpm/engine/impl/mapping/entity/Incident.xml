@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
@@ -13,7 +30,21 @@
   <!-- INCIDENT INSERT -->
 
   <insert id="insertIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
-    insert into ${prefix}ACT_RU_INCIDENT (ID_, INCIDENT_TIMESTAMP_, INCIDENT_MSG_, INCIDENT_TYPE_, EXECUTION_ID_, ACTIVITY_ID_, PROC_INST_ID_, PROC_DEF_ID_, CAUSE_INCIDENT_ID_, ROOT_CAUSE_INCIDENT_ID_, CONFIGURATION_, REV_)
+    insert into ${prefix}ACT_RU_INCIDENT (
+      ID_, 
+      INCIDENT_TIMESTAMP_, 
+      INCIDENT_MSG_, 
+      INCIDENT_TYPE_, 
+      EXECUTION_ID_, 
+      ACTIVITY_ID_, 
+      PROC_INST_ID_, 
+      PROC_DEF_ID_, 
+      CAUSE_INCIDENT_ID_, 
+      ROOT_CAUSE_INCIDENT_ID_, 
+      CONFIGURATION_, 
+      TENANT_ID_,
+      JOB_DEF_ID_,
+      REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{incidentTimestamp, jdbcType=TIMESTAMP},
@@ -26,6 +57,8 @@
       #{causeIncidentId ,jdbcType=VARCHAR},
       #{rootCauseIncidentId ,jdbcType=VARCHAR},
       #{configuration, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
+      #{jobDefinitionId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -44,11 +77,16 @@
     <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
   
-  <!-- INCIDENT SELECT -->  
+  <!-- INCIDENT SELECT -->
 
+  <select id="selectIncident" parameterType="string" resultMap="incidentResultMap">
+    select * from ${prefix}ACT_RU_INCIDENT where ID_ = #{id}
+  </select>
   <select id="selectIncidentsByExecutionId" parameterType="string" resultMap="incidentResultMap">
     select *
     from ${prefix}ACT_RU_INCIDENT I
@@ -73,7 +111,7 @@
   <select id="selectIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultMap="incidentResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectIncidentByQueryCriteriaSql"/>
     ${orderBy}
@@ -88,7 +126,7 @@
   <sql id="selectIncidentByQueryCriteriaSql">
     from ${prefix}ACT_RU_INCIDENT RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
@@ -124,8 +162,23 @@
       <if test="configuration != null">
         and RES.CONFIGURATION_ = #{configuration}
       </if>
+      
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
+      <if test="jobDefinitionIds != null &amp;&amp; jobDefinitionIds.length > 0">
+        and RES.JOB_DEF_ID_ in
+        <foreach item="jobDefinitionId" index="index" collection="jobDefinitionIds"
+                 open="(" separator="," close=")">
+          #{jobDefinitionId}
+        </foreach>
+      </if>
 
-      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         AND
           ( CASE
 
@@ -133,12 +186,19 @@
               <!-- incident exists in context of a process instance -->
               RES.PROC_DEF_ID_ is not null
             THEN
-              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+              (
+              <bind name="authUserId" value="authCheck.authUserId" />
+              <bind name="authGroupIds" value="authCheck.authGroupIds" />
+              <bind name="permissionChecks" value="authCheck.permissionChecks" />
+              <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
 
             ELSE
               1
           END ) = 1
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>
@@ -148,7 +208,9 @@
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
     </set>
     <where>
       ID_ = #{id, jdbcType=VARCHAR}

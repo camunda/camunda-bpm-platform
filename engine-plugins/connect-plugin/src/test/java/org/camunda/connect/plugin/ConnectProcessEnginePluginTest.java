@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.connect.plugin;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -23,7 +26,9 @@ import java.util.Map;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -111,6 +116,19 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     VariableInstance out = runtimeService.createVariableInstanceQuery().variableName("out").singleResult();
     assertNotNull(out);
     assertEquals(3 * x, out.getValue());
+  }
+
+
+  @Deployment
+  public void testConnectorWithSetVariableInOutputMapping() {
+    // given process with set variable on connector in output mapping
+
+    // when start process
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // then variable x is set and no exception is thrown
+    VariableInstance out = runtimeService.createVariableInstanceQuery().variableName("x").singleResult();
+    assertEquals(1, out.getValue());
   }
 
   @Deployment(resources="org/camunda/connect/plugin/ConnectProcessEnginePluginTest.testConnectorWithThrownExceptionInScriptInputOutputMapping.bpmn")
@@ -209,6 +227,25 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     }
   }
 
+  @Deployment(resources="org/camunda/connect/plugin/ConnectProcessEnginePluginTest.testConnectorBpmnErrorThrownInScriptResourceNoAsyncAfterJobIsCreated.bpmn")
+  public void testConnectorBpmnErrorThrownInScriptResourceNoAsyncAfterJobIsCreated() {
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("throwInMapping", "in");
+    variables.put("exception", new BpmnError("error"));
+
+    // when
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    // then
+    // we will only reach the user task if the BPMNError from the script was handled by the boundary event
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("User Task"));
+
+    // no job is created
+    assertThat(Long.valueOf(managementService.createJobQuery().count()), is(0l));
+  }
+
   @Deployment
   public void testFollowingExceptionIsNotHandledByConnector(){
     try {
@@ -216,6 +253,73 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     } catch(RuntimeException re){
       assertThat(re.getMessage(), containsString("Invalid format"));
     }
+  }
+  
+  @Deployment
+  public void testSendTaskWithConnector() {
+    String outputParamValue = "someSendTaskOutputValue";
+    String inputVariableValue = "someSendTaskInputVariableValue";
+
+    TestConnector.responseParameters.put("someOutputParameter", outputParamValue);
+
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("someInputVariable", inputVariableValue);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("process_sending_with_connector", vars);
+
+    // validate input parameter
+    assertNotNull(TestConnector.requestParameters.get("reqParam1"));
+    assertEquals(inputVariableValue, TestConnector.requestParameters.get("reqParam1"));
+
+    // validate connector output
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("out1").singleResult();
+    assertNotNull(variable);
+    assertEquals(outputParamValue, variable.getValue());
+  }
+  
+  @Deployment
+  public void testIntermediateMessageThrowEventWithConnector() {
+    String outputParamValue = "someMessageThrowOutputValue";
+    String inputVariableValue = "someMessageThrowInputVariableValue";
+
+    TestConnector.responseParameters.put("someOutputParameter", outputParamValue);
+
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("someInputVariable", inputVariableValue);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("process_sending_with_connector", vars);
+
+    // validate input parameter
+    assertNotNull(TestConnector.requestParameters.get("reqParam1"));
+    assertEquals(inputVariableValue, TestConnector.requestParameters.get("reqParam1"));
+
+    // validate connector output
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("out1").singleResult();
+    assertNotNull(variable);
+    assertEquals(outputParamValue, variable.getValue());
+}
+
+  @Deployment
+  public void testMessageEndEventWithConnector() {
+    String outputParamValue = "someMessageEndOutputValue";
+    String inputVariableValue = "someMessageEndInputVariableValue";
+
+    TestConnector.responseParameters.put("someOutputParameter", outputParamValue);
+
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("someInputVariable", inputVariableValue);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("process_sending_with_connector", vars);
+    assertProcessEnded(processInstance.getId());
+
+    // validate input parameter
+    assertNotNull(TestConnector.requestParameters.get("reqParam1"));
+    assertEquals(inputVariableValue, TestConnector.requestParameters.get("reqParam1"));
+
+    // validate connector output
+    HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("out1").singleResult();
+    assertNotNull(variable);
+    assertEquals(outputParamValue, variable.getValue());
   }
 
 }

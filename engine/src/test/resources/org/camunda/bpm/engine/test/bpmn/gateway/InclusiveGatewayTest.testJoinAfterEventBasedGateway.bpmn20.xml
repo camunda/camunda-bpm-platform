@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="split" />
+
+    <inclusiveGateway id="split" />
+
+    <sequenceFlow sourceRef="split" targetRef="theTask">
+      <conditionExpression xsi:type="tFormalExpression">${true}</conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow sourceRef="split" targetRef="eventBasedGateway">
+      <conditionExpression xsi:type="tFormalExpression">${true}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="theTask" />
+
+    <eventBasedGateway id="eventBasedGateway" />
+
+    <sequenceFlow sourceRef="eventBasedGateway" targetRef="catch1" />
+
+    <intermediateCatchEvent id="catch1">
+      <messageEventDefinition messageRef="message1" />
+    </intermediateCatchEvent>
+
+    <sequenceFlow sourceRef="eventBasedGateway" targetRef="catch2" />
+
+    <intermediateCatchEvent id="catch2">
+      <messageEventDefinition messageRef="message2" />
+    </intermediateCatchEvent>
+
+    <sequenceFlow sourceRef="catch1" targetRef="exclusiveGateway" />
+    <sequenceFlow sourceRef="catch2" targetRef="exclusiveGateway" />
+
+    <exclusiveGateway id="exclusiveGateway" />
+
+    <sequenceFlow sourceRef="theTask" targetRef="join" />
+    <sequenceFlow sourceRef="exclusiveGateway" targetRef="join" />
+
+    <inclusiveGateway id="join" />
+
+    <sequenceFlow sourceRef="join" targetRef="taskAfterJoin" />
+
+    <userTask id="taskAfterJoin" />
+
+    <sequenceFlow sourceRef="taskAfterJoin" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+  <message id="message1" name="foo" />
+  <message id="message2" name="bar" />
+
+</definitions>

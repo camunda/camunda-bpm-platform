@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,25 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
-import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
+import org.camunda.bpm.engine.impl.el.Expression;
+import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author Daniel Meyer
@@ -39,24 +43,50 @@ public class EventSubscriptionDeclaration implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected final String eventName;
-  protected final String eventType;
+  protected final EventType eventType;
+  protected final Expression eventName;
+  protected final CallableElement eventPayload;
 
   protected boolean async;
   protected String activityId = null;
   protected String eventScopeActivityId = null;
   protected boolean isStartEvent;
-  protected Boolean isParallelMultiInstance = null;
 
   protected EventSubscriptionJobDeclaration jobDeclaration = null;
 
-  public EventSubscriptionDeclaration(String eventName, String eventType) {
-    this.eventName = eventName;
+  public EventSubscriptionDeclaration(Expression eventExpression, EventType eventType) {
+    this.eventName = eventExpression;
     this.eventType = eventType;
+    this.eventPayload = null;
   }
 
-  public String getEventName() {
-    return eventName;
+  public EventSubscriptionDeclaration(Expression eventExpression, EventType eventType, CallableElement eventPayload) {
+    this.eventType = eventType;
+    this.eventName = eventExpression;
+    this.eventPayload = eventPayload;
+  }
+
+  public static Map<String, EventSubscriptionDeclaration> getDeclarationsForScope(PvmScope scope) {
+    if (scope == null) {
+      return Collections.emptyMap();
+    }
+
+    return scope.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
+  }
+
+  /**
+   * Returns the name of the event without evaluating the possible expression that it might contain.
+   */
+  public String getUnresolvedEventName() {
+      return eventName.getExpressionText();
+  }
+
+  public boolean hasEventName() {
+    return !( eventName == null || "".equalsIgnoreCase(getUnresolvedEventName().trim()) );
+  }
+
+  public boolean isEventNameLiteralText() {
+    return eventName.isLiteralText();
   }
 
   public boolean isAsync() {
@@ -67,20 +97,20 @@ public class EventSubscriptionDeclaration implements Serializable {
     this.async = async;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
-  }
-
   public String getActivityId() {
     return activityId;
   }
 
-  public void setEventScopeActivityId(String eventScopeActivityId) {
-    this.eventScopeActivityId = eventScopeActivityId;
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
   }
 
   public String getEventScopeActivityId() {
     return eventScopeActivityId;
+  }
+
+  public void setEventScopeActivityId(String eventScopeActivityId) {
+    this.eventScopeActivityId = eventScopeActivityId;
   }
 
   public boolean isStartEvent() {
@@ -92,36 +122,37 @@ public class EventSubscriptionDeclaration implements Serializable {
   }
 
   public String getEventType() {
-    return eventType;
+    return eventType.name();
+  }
+
+  public CallableElement getEventPayload() {
+    return eventPayload;
   }
 
   public void setJobDeclaration(EventSubscriptionJobDeclaration jobDeclaration) {
     this.jobDeclaration = jobDeclaration;
   }
 
-  public EventSubscriptionEntity createSubscription(ExecutionEntity execution) {
-    if (isStartEvent()) {
-      return null;
-    } else {
-      return createEventSubscription(execution);
-    }
+  public EventSubscriptionEntity createSubscriptionForStartEvent(ProcessDefinitionEntity processDefinition) {
+    EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(eventType);
+
+    VariableScope scopeForExpression = StartProcessVariableScope.getSharedInstance();
+    String eventName = resolveExpressionOfEventName(scopeForExpression);
+    eventSubscriptionEntity.setEventName(eventName);
+    eventSubscriptionEntity.setActivityId(activityId);
+    eventSubscriptionEntity.setConfiguration(processDefinition.getId());
+    eventSubscriptionEntity.setTenantId(processDefinition.getTenantId());
+
+    return eventSubscriptionEntity;
   }
 
   /**
    * Creates and inserts a subscription entity depending on the message type of this declaration.
-   * @param execution
-   * @return subscription entity
    */
-  private EventSubscriptionEntity createEventSubscription(ExecutionEntity execution) {
-    EventSubscriptionEntity eventSubscriptionEntity = null;
-    if (eventType.equals(MessageEventHandler.EVENT_HANDLER_TYPE)) {
-      eventSubscriptionEntity = new MessageEventSubscriptionEntity(execution);
-    } else if (eventType.equals(SignalEventHandler.EVENT_HANDLER_TYPE)) {
-      eventSubscriptionEntity = new SignalEventSubscriptionEntity(execution);
-    } else {
-      throw new ProcessEngineException("Found event definition of unknown type: " + eventType);
-    }
+  public EventSubscriptionEntity createSubscriptionForExecution(ExecutionEntity execution) {
+    EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(execution, eventType);
 
+    String eventName = resolveExpressionOfEventName(execution);
     eventSubscriptionEntity.setEventName(eventName);
     if (activityId != null) {
       ActivityImpl activity = execution.getProcessDefinition().findActivity(activityId);
@@ -134,14 +165,25 @@ public class EventSubscriptionDeclaration implements Serializable {
     return eventSubscriptionEntity;
   }
 
-  @SuppressWarnings("unchecked")
-  public static List<EventSubscriptionDeclaration> getDeclarationsForScope(PvmScope scope) {
-    Object result = scope.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if (result != null) {
-      return (List<EventSubscriptionDeclaration>) result;
+  /**
+   * Resolves the event name within the given scope.
+   */
+  public String resolveExpressionOfEventName(VariableScope scope) {
+    if (isExpressionAvailable()) {
+      return (String) eventName.getValue(scope);
     } else {
-      return Collections.emptyList();
+      return null;
     }
+  }
+
+  protected boolean isExpressionAvailable() {
+    return eventName != null;
+  }
+
+  public void updateSubscription(EventSubscriptionEntity eventSubscription) {
+    String eventName = resolveExpressionOfEventName(eventSubscription.getExecution());
+    eventSubscription.setEventName(eventName);
+    eventSubscription.setActivityId(activityId);
   }
 
 }

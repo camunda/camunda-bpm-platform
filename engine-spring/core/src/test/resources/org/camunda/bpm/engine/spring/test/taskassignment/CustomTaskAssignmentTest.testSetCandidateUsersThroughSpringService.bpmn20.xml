@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="candidateUsersThroughSpringService" isExecutable="true">
+  
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
+    
+    <userTask id="task" name="Schedule meeting" camunda:candidateUsers="${fakeLdapService.findAllSales()}"/>
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="end" />
+    
+    <endEvent id="end" />
+    
+  </process>
+
+</definitions>

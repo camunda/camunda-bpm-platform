@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cfg.standalone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
@@ -30,7 +35,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  */
 public class StandaloneTransactionContext implements TransactionContext {
 
-  private static Logger log = Logger.getLogger(StandaloneTransactionContext.class.getName());
+  private final static TransactionLogger LOG = ProcessEngineLogger.TX_LOGGER;
+
   protected CommandContext commandContext;
   protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners = null;
   private TransactionState lastTransactionState;
@@ -52,11 +58,16 @@ public class StandaloneTransactionContext implements TransactionContext {
   }
 
   public void commit() {
-    log.fine("firing event committing...");
+    LOG.debugTransactionOperation("firing event committing...");
+
     fireTransactionEvent(TransactionState.COMMITTING);
-    log.fine("committing the persistence session...");
+
+    LOG.debugTransactionOperation("committing the persistence session...");
+
     getPersistenceProvider().commit();
-    log.fine("firing event committed...");
+
+    LOG.debugTransactionOperation("firing event committed...");
+
     fireTransactionEvent(TransactionState.COMMITTED);
   }
 
@@ -85,24 +96,26 @@ public class StandaloneTransactionContext implements TransactionContext {
   public void rollback() {
     try {
       try {
-        log.fine("firing event rolling back...");
+        LOG.debugTransactionOperation("firing event rollback...");
         fireTransactionEvent(TransactionState.ROLLINGBACK);
 
-      } catch (Throwable exception) {
-        log.info("Exception during transaction: " + exception.getMessage());
+      }
+      catch (Throwable exception) {
+        LOG.exceptionWhileFiringEvent(TransactionState.ROLLINGBACK, exception);
         Context.getCommandInvocationContext().trySetThrowable(exception);
-      } finally {
-        log.fine("rolling back persistence session...");
+      }
+      finally {
+        LOG.debugTransactionOperation("rolling back the persistence session...");
         getPersistenceProvider().rollback();
       }
 
-    } catch (Throwable exception) {
-
-      log.info("Exception during transaction: " + exception.getMessage());
+    }
+    catch (Throwable exception) {
+      LOG.exceptionWhileFiringEvent(TransactionState.ROLLINGBACK, exception);
       Context.getCommandInvocationContext().trySetThrowable(exception);
-
-    } finally {
-      log.fine("firing event rolled back...");
+    }
+    finally {
+      LOG.debugFiringEventRolledBack();
       fireTransactionEvent(TransactionState.ROLLED_BACK);
     }
   }

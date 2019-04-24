@@ -1,5 +1,18 @@
-/**
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
@@ -16,6 +29,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
  * @author Tom Baeyens
@@ -26,11 +40,13 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
   protected TweetExceptionHandler tweetExceptionHandler = new TweetExceptionHandler();
   protected TweetNestedCommandExceptionHandler nestedCommandExceptionHandler = new TweetNestedCommandExceptionHandler();
 
+  @Override
   public void setUp() throws Exception {
     processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
     processEngineConfiguration.getJobHandlers().put(nestedCommandExceptionHandler.getType(), nestedCommandExceptionHandler);
   }
 
+  @Override
   public void tearDown() throws Exception {
     processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
     processEngineConfiguration.getJobHandlers().remove(nestedCommandExceptionHandler.getType());
@@ -137,6 +153,39 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     assertNotNull(job);
     // but has no more retires
     assertEquals(0, job.getRetries());
+  }
+
+  public void testFailingTransactionListener() {
+
+    deployment(Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .serviceTask()
+          .camundaClass(FailingTransactionListenerDelegate.class.getName())
+          .camundaAsyncBefore()
+        .endEvent()
+        .done());
+
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // there should be 1 job created:
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    // with 3 retries
+    assertEquals(3, job.getRetries());
+
+    // if we execute the job
+    waitForJobExecutorToProcessAllJobs(6000);
+
+    // the job is still present
+    job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    // but has no more retires
+    assertEquals(0, job.getRetries());
+    assertEquals("exception in transaction listener", job.getExceptionMessage());
+
+    String stacktrace = managementService.getJobExceptionStacktrace(job.getId());
+    assertNotNull(stacktrace);
+    assertTrue("unexpected stacktrace, was <" + stacktrace + ">", stacktrace.contains("java.lang.RuntimeException: exception in transaction listener"));
   }
 
   protected void createJob(final String handlerType) {

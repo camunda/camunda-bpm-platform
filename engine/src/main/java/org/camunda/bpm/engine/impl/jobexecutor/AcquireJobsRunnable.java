@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,25 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
+ * @author Thorben Lindhauer
  *
- * @author Daniel Meyer
  */
-public class AcquireJobsRunnable implements Runnable {
+public abstract class AcquireJobsRunnable implements Runnable {
 
-  private static Logger log = Logger.getLogger(AcquireJobsRunnable.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected final JobExecutor jobExecutor;
 
@@ -39,99 +34,30 @@ public class AcquireJobsRunnable implements Runnable {
   protected final Object MONITOR = new Object();
   protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
-  protected long millisToWait = 0;
-  protected float waitIncreaseFactor = 2;
-  protected long maxWait = 60 * 1000;
-
   public AcquireJobsRunnable(JobExecutor jobExecutor) {
     this.jobExecutor = jobExecutor;
   }
 
-  public synchronized void run() {
-    if (log.isLoggable(Level.INFO)) {
-      log.info(jobExecutor.getName() + " starting to acquire jobs");
+  protected void suspendAcquisition(long millis) {
+    if (millis <= 0) {
+      return;
     }
 
-    ProcessEngineImpl processEngine = jobExecutor.getProcessEngines().get(0);
-
-    final CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-
-    while (!isInterrupted) {
-      int maxJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();
-
-      try {
-        jobExecutor.logAcquisitionAttempt(processEngine);
-        AcquiredJobs acquiredJobs = commandExecutor.execute(jobExecutor.getAcquireJobsCmd());
-
-        jobExecutor.logAcquiredJobs(processEngine, acquiredJobs.size());
-        jobExecutor.logAcquisitionFailureJobs(processEngine, acquiredJobs.getNumberOfJobsFailedToLock());
-
-        for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
-          jobExecutor.executeJobs(jobIds, processEngine);
-        }
-
-        // if all jobs were executed
-        millisToWait = jobExecutor.getWaitTimeInMillis();
-        // add number of jobs which we attempted to acquire but could not obtain a lock for -> do not wait if we could not acquire jobs.
-        int jobsAcquired = acquiredJobs.getJobIdBatches().size() + acquiredJobs.getNumberOfJobsFailedToLock();
-        if (jobsAcquired < maxJobsPerAcquisition) {
-
-          isJobAdded = false;
-
-          // check if the next timer should fire before the normal sleep time is over
-          Date duedate = new Date(ClockUtil.getCurrentTime().getTime() + millisToWait);
-          List<TimerEntity> nextTimers = commandExecutor.execute(new GetUnlockedTimersByDuedateCmd(duedate, new Page(0, 1)));
-
-          if (!nextTimers.isEmpty()) {
-          long millisTillNextTimer = nextTimers.get(0).getDuedate().getTime() - ClockUtil.getCurrentTime().getTime();
-            if (millisTillNextTimer < millisToWait) {
-              millisToWait = millisTillNextTimer;
-            }
-          }
-
-        } else {
-          millisToWait = 0;
-        }
-
-      } catch (Exception e) {
-        if (log.isLoggable(Level.SEVERE)) {
-          log.log(Level.SEVERE, "exception during job acquisition: " + e.getMessage(), e);
-        }
-        millisToWait *= waitIncreaseFactor;
-        if (millisToWait > maxWait) {
-          millisToWait = maxWait;
-        } else if (millisToWait==0) {
-          millisToWait = jobExecutor.getWaitTimeInMillis();
+    try {
+      LOG.debugJobAcquisitionThreadSleeping(millis);
+      synchronized (MONITOR) {
+        if(!isInterrupted) {
+          isWaiting.set(true);
+          MONITOR.wait(millis);
         }
       }
-
-      if ((millisToWait > 0) && (!isJobAdded)) {
-        try {
-          if (log.isLoggable(Level.FINE)) {
-            log.fine("job acquisition thread sleeping for " + millisToWait + " millis");
-          }
-          synchronized (MONITOR) {
-            if(!isInterrupted) {
-              isWaiting.set(true);
-              MONITOR.wait(millisToWait);
-            }
-          }
-
-          if (log.isLoggable(Level.FINE)) {
-            log.fine("job acquisition thread woke up");
-          }
-        } catch (InterruptedException e) {
-          if (log.isLoggable(Level.FINE)) {
-            log.fine("job acquisition wait interrupted");
-          }
-        } finally {
-          isWaiting.set(false);
-        }
-      }
+      LOG.jobExecutorThreadWokeUp();
     }
-
-    if (log.isLoggable(Level.INFO)) {
-      log.info(jobExecutor.getName() + " stopped job acquisition");
+    catch (InterruptedException e) {
+      LOG.jobExecutionWaitInterrupted();
+    }
+    finally {
+      isWaiting.set(false);
     }
   }
 
@@ -139,9 +65,9 @@ public class AcquireJobsRunnable implements Runnable {
     synchronized (MONITOR) {
       isInterrupted = true;
       if(isWaiting.compareAndSet(true, false)) {
-          MONITOR.notifyAll();
-        }
+        MONITOR.notifyAll();
       }
+    }
   }
 
   public void jobWasAdded() {
@@ -155,29 +81,11 @@ public class AcquireJobsRunnable implements Runnable {
     }
   }
 
-
-  public long getMillisToWait() {
-    return millisToWait;
+  protected void clearJobAddedNotification() {
+    isJobAdded = false;
   }
 
-  public void setMillisToWait(long millisToWait) {
-    this.millisToWait = millisToWait;
+  public boolean isJobAdded() {
+    return isJobAdded;
   }
-
-  public float getWaitIncreaseFactor() {
-    return waitIncreaseFactor;
-  }
-
-  public void setWaitIncreaseFactor(float waitIncreaseFactor) {
-    this.waitIncreaseFactor = waitIncreaseFactor;
-  }
-
-  public long getMaxWait() {
-    return maxWait;
-  }
-
-  public void setMaxWait(long maxWait) {
-    this.maxWait = maxWait;
-  }
-
 }

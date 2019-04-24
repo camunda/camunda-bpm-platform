@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+
+<definitions id="_81291489-586f-4b00-b7c4-1ef8f7523c29"
+                  targetNamespace="Examples"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <case id="loanApplication" name="Loan Application Case">
+
+    <casePlanModel name="Loan Application" id="CasePlanModel_1">
+
+      <planItem definitionRef="Stage_1" id="PI_Stage_1"/>
+      <planItem definitionRef="HumanTask_6" id="PI_HumanTask_6"/>
+
+      <humanTask name="Capture Applicant Data" id="HumanTask_1"/>
+      <humanTask name="Obtain Schufa-Information" id="HumanTask_2"/>
+      <humanTask name="Obtain Credit-worthiness" id="HumanTask_3"/>
+      <humanTask name="Review Documents" id="HumanTask_4"/>
+      <humanTask name="Request Missing Documents" id="HumanTask_5"/>
+      <humanTask name="Decide About Loan Application" id="HumanTask_6"/>
+
+      <stage name="Obtain Customer Data" id="Stage_1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+
+        <planItem definitionRef="HumanTask_1" id="PI_HumanTask_1"/>
+        <planItem definitionRef="HumanTask_2" id="PI_HumanTask_2"/>
+        <planItem definitionRef="HumanTask_3" id="PI_HumanTask_3"/>
+        <planItem definitionRef="HumanTask_4" id="PI_HumanTask_4"/>
+        <planItem definitionRef="HumanTask_5" id="PI_HumanTask_5"/>
+      </stage>
+
+    </casePlanModel>
+
+  </case>
+</definitions>

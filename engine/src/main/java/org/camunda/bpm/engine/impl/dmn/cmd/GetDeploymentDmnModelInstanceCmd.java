@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,15 +19,17 @@ package org.camunda.bpm.engine.impl.dmn.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.exception.dmn.DmnModelInstanceNotFoundException;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
- * Gives access to a deployed DMN model instance which can be accessed by
- * the DMN model API.
+ * Gives access to a deployed DMN model instance which can be accessed by the
+ * DMN model API.
  */
 public class GetDeploymentDmnModelInstanceCmd implements Command<DmnModelInstance> {
 
@@ -34,14 +40,20 @@ public class GetDeploymentDmnModelInstanceCmd implements Command<DmnModelInstanc
   }
 
   public DmnModelInstance execute(CommandContext commandContext) {
-    ensureNotNull("caseDefinitionId", decisionDefinitionId);
+    ensureNotNull("decisionDefinitionId", decisionDefinitionId);
 
-    DmnModelInstance modelInstance = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDmnModelInstanceForDecisionDefinition(decisionDefinitionId);
+    DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
 
-    ensureNotNull(DmnModelInstanceNotFoundException.class, "No DMN model instance found for decision definition id " + decisionDefinitionId, "modelInstance", modelInstance);
+    DecisionDefinitionEntity decisionDefinition = deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadDecisionDefinition(decisionDefinition);
+    }
+
+    DmnModelInstance modelInstance = deploymentCache.findDmnModelInstanceForDecisionDefinition(decisionDefinitionId);
+
+    ensureNotNull(DmnModelInstanceNotFoundException.class, "No DMN model instance found for decision definition id " + decisionDefinitionId, "modelInstance",
+        modelInstance);
     return modelInstance;
   }
 

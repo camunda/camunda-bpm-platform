@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +17,10 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.repository.ResourceType;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
 /**
@@ -31,8 +37,24 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
   protected String name;
   protected byte[] bytes;
   protected String deploymentId;
+  protected String tenantId;
+  protected Integer type;
+  protected Date createTime;
+  protected String rootProcessInstanceId;
+  protected Date removalTime;
 
   public ByteArrayEntity() {
+  }
+
+  public ByteArrayEntity(String name, byte[] bytes, ResourceType type, String rootProcessInstanceId, Date removalTime) {
+    this(name, bytes, type);
+    this.rootProcessInstanceId = rootProcessInstanceId;
+    this.removalTime = removalTime;
+  }
+
+  public ByteArrayEntity(String name, byte[] bytes, ResourceType type) {
+    this(name, bytes);
+    this.type = type.getValue();
   }
 
   public ByteArrayEntity(String name, byte[] bytes) {
@@ -40,8 +62,9 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
     this.bytes = bytes;
   }
 
-  public ByteArrayEntity(byte[] bytes) {
+  public ByteArrayEntity(byte[] bytes, ResourceType type) {
     this.bytes = bytes;
+    this.type = type.getValue();
   }
 
   public byte[] getBytes() {
@@ -94,6 +117,46 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
     this.revision = revision;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  public Integer getType() {
+    return type;
+  }
+
+  public void setType(Integer type) {
+    this.type = type;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
+  public String getRootProcessInstanceId() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
+  }
+
+  public Date getRemovalTime() {
+    return removalTime;
+  }
+
+  public void setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -101,6 +164,11 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
            + ", revision=" + revision
            + ", name=" + name
            + ", deploymentId=" + deploymentId
+           + ", tenantId=" + tenantId
+           + ", type=" + type
+           + ", createTime=" + createTime
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
+           + ", removalTime=" + removalTime
            + "]";
   }
 

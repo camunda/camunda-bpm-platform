@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.context;
 
 import java.util.Stack;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -37,8 +39,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * @author Thorben Lindhauer
  */
 public class Context {
-
-  private final static Logger LOGGER = Logger.getLogger(Context.class.getName());
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
   protected static ThreadLocal<Stack<CommandInvocationContext>> commandInvocationContextThreadLocal = new ThreadLocal<Stack<CommandInvocationContext>>();
@@ -121,7 +121,6 @@ public class Context {
     }
   }
 
-
   public static void setExecutionContext(ExecutionEntity execution) {
     getStack(executionContextStackThreadLocal).push(new BpmnExecutionContext(execution));
   }
@@ -176,21 +175,24 @@ public class Context {
   }
 
   /**
-   * @param callback
-   * @param processApplicationReference
+   * Use {@link #executeWithinProcessApplication(Callable, ProcessApplicationReference, InvocationContext)}
+   * instead if an {@link InvocationContext} is available.
    */
   public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference) {
+    return executeWithinProcessApplication(callback, processApplicationReference, null);
+  }
+
+  public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference, InvocationContext invocationContext) {
     String paName = processApplicationReference.getName();
     try {
       ProcessApplicationInterface processApplication = processApplicationReference.getProcessApplication();
       setCurrentProcessApplication(processApplicationReference);
 
       try {
-        LOGGER.log(Level.FINE, "[PA-CONTEXT] Switch to {0}", paName);
         // wrap callback
         ProcessApplicationClassloaderInterceptor<T> wrappedCallback = new ProcessApplicationClassloaderInterceptor<T>(callback);
         // execute wrapped callback
-        return processApplication.execute(wrappedCallback);
+        return processApplication.execute(wrappedCallback, invocationContext);
 
       } catch (Exception e) {
 
@@ -202,7 +204,6 @@ public class Context {
         }
 
       } finally {
-        LOGGER.log(Level.FINE, "[PA-CONTEXT] Return from {0}", paName);
         removeCurrentProcessApplication();
       }
 

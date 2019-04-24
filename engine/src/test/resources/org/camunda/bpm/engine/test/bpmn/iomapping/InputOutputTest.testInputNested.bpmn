@@ -15,6 +15,7 @@
                   <camunda:value>${ 'b' }</camunda:value>
                 </camunda:list>
               </camunda:entry>
+              <camunda:entry key="${exprKey}">stringValueWithExprKey</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
           <camunda:inputParameter name="var2">stringConstantValue</camunda:inputParameter>

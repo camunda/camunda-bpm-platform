@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="Examples">
+  <case id="case" name="Case">
+
+    <casePlanModel id="CasePlanModel_1">
+
+      <planItem id="AVAILABLE" definitionRef="HumanTask_1">
+        <entryCriterion sentryRef="Sentry_1" />
+      </planItem>
+      <planItem id="ENABLED" definitionRef="HumanTask_2" />
+      <planItem id="DISABLED" definitionRef="HumanTask_3" />
+      <planItem id="ACTIVE" definitionRef="HumanTask_4" />
+      <planItem id="COMPLETED" definitionRef="HumanTask_5" />
+      <planItem id="TERMINATED" definitionRef="HumanTask_6" />
+
+      <sentry id="Sentry_1">
+        <planItemOnPart sourceRef="ACTIVE">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+
+      <humanTask id="HumanTask_1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
+      <humanTask id="HumanTask_2">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
+      <humanTask id="HumanTask_3">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
+      <humanTask id="HumanTask_4" />
+      <humanTask id="HumanTask_5" />
+      <humanTask id="HumanTask_6" />
+
+    </casePlanModel>
+  </case>
+
+</definitions>

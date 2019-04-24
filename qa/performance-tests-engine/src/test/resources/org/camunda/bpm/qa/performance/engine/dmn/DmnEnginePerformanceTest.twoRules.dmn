@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" expressionLanguage="http://www.omg.org/spec/FEEL/20140401" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" typeLanguage="http://www.omg.org/spec/FEEL/20140401">
+  <decision id="twoRules" name="Benchmark">
+    <decisionTable hitPolicy="COLLECT" id="decisionTable" preferredOrientation="Rule-as-Row">
+      <input id="input1" label="number of matched rules">
+        <inputExpression id="inputExpression1" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="rule matched?" name="" typeRef="string"/>
+      <rule id="rule_41d5dced-8eda-433a-8a97-5e77d3504cfa">
+        <inputEntry id="inputEntry_7a0fcdb1-449c-4d71-8cb4-3e04cafba5f7">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_b7b117d4-37c1-465e-b4c2-98eb4ab13f19">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_6c75ea4b-2782-460a-8528-27577fc2c43e">
+        <inputEntry id="inputEntry_4895e5ac-bcc5-47d7-94a4-389a3bd36d4c">
+          <text>&gt; 0.5</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_ba914683-9b96-4a14-be3c-4cc3a4386396">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

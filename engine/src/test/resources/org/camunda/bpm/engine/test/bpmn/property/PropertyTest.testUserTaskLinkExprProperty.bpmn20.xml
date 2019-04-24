@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/BPMN20-extensions"
   targetNamespace="Examples">
   
-  <process id="testUserTaskLinkExprProperty">
+  <process id="testUserTaskLinkExprProperty" isExecutable="true">
   
     <startEvent id="theStart" />
     

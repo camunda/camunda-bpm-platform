@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,6 +79,21 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
+  public void testFilterByJobPriorityLowerThanOrEqualsAndHigherThanOrEqual() {
+    // given five jobs with priorities from 1 to 5
+    List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
+
+    for (int i = 0; i < 5; i++) {
+      instances.add(runtimeService.startProcessInstanceByKey("jobPrioExpressionProcess",
+          Variables.createVariables().putValue("priority", i)));
+    }
+
+    // when making a job query and filtering by disjunctive job priority
+    // then the no jobs are returned
+    assertEquals(0, managementService.createJobQuery().priorityLowerThanOrEquals(2).priorityHigherThanOrEquals(3).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
   public void testFilterByJobPriorityHigherThanOrEquals() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
@@ -86,7 +105,7 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
 
     // when making a job query and filtering by job priority
     // then the correct jobs are returned
-    List<Job> jobs = managementService.createJobQuery().priorityHigherThanOrEquals(2).list();
+    List<Job> jobs = managementService.createJobQuery().priorityHigherThanOrEquals(2L).list();
     assertEquals(3, jobs.size());
 
     Set<String> processInstanceIds = new HashSet<String>();
@@ -112,8 +131,8 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
 
     // when making a job query and filtering by job priority
     // then the correct job is returned
-    Job job = managementService.createJobQuery().priorityHigherThanOrEquals(2)
-        .priorityLowerThanOrEquals(2).singleResult();
+    Job job = managementService.createJobQuery().priorityHigherThanOrEquals(2L)
+        .priorityLowerThanOrEquals(2L).singleResult();
     assertNotNull(job);
     assertEquals(2, job.getPriority());
     assertEquals(instances.get(2).getId(), job.getProcessInstanceId());

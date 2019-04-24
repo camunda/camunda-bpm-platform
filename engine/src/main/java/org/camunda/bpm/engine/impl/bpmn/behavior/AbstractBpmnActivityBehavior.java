@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
@@ -24,19 +27,21 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.ErrorEventDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
 import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 
 /**
@@ -57,7 +62,8 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
    * called.
    */
   @Override
-  protected void leave(ActivityExecution execution) {
+  public void doLeave(ActivityExecution execution) {
+
     PvmActivity currentActivity = execution.getActivity();
     ActivityImpl compensationHandler = ((ActivityImpl) currentActivity).findCompensationHandler();
 
@@ -65,7 +71,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     if(compensationHandler != null && !isCompensationEventSubprocess(compensationHandler)) {
       createCompensateEventSubscription(execution, compensationHandler);
     }
-    super.leave(execution);
+    super.doLeave(execution);
   }
 
   protected boolean isCompensationEventSubprocess(ActivityImpl activity) {
@@ -77,14 +83,15 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     PvmActivity currentActivity = execution.getActivity();
     ActivityExecution scopeExecution = execution.findExecutionForFlowScope(currentActivity.getFlowScope());
 
-    CompensateEventSubscriptionEntity.createAndInsert((ExecutionEntity) scopeExecution, compensationHandler);
+    EventSubscriptionEntity.createAndInsert((ExecutionEntity) scopeExecution, EventType.COMPENSATE, compensationHandler);
   }
 
   protected void propagateExceptionAsError(Exception exception, ActivityExecution execution) throws Exception {
     if (isProcessEngineExceptionWithoutCause(exception) || isTransactionNotActive()) {
       throw exception;
-    } else {
-      propagateError(null, exception, execution);
+    }
+    else {
+      propagateError(null, exception.getMessage(),exception, execution);
     }
   }
 
@@ -107,14 +114,16 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
         try {
           propagateException(execution, ex);
-        } catch (ErrorPropagationException e) {
+        }
+        catch (ErrorPropagationException e) {
           LOG.errorPropagationException(activityInstanceId, e.getCause());
           // re-throw the original exception so that it is logged
           // and set as cause of the failure
           throw ex;
         }
 
-      } else {
+      }
+      else {
         throw ex;
       }
     }
@@ -162,14 +171,14 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   protected void propagateBpmnError(BpmnError error, ActivityExecution execution) throws Exception {
-    propagateError(error.getErrorCode(), null, execution);
+    propagateError(error.getErrorCode(), error.getMessage(), null, execution);
   }
 
-  protected void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
+  protected void propagateError(String errorCode, String errorMessage, Exception origException, ActivityExecution execution) throws Exception {
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
 
-    final ErrorDeclarationForProcessInstanceFinder errorDeclarationFinder = new ErrorDeclarationForProcessInstanceFinder(origException, errorCode);
+    final ErrorDeclarationForProcessInstanceFinder errorDeclarationFinder = new ErrorDeclarationForProcessInstanceFinder(origException, errorCode, execution.getActivity());
     ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(execution);
 
     walker.addScopePreVisitor(errorDeclarationFinder);
@@ -179,7 +188,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     try {
 
-      walker.walkUntil(new WalkCondition<ActivityExecutionTuple>() {
+      walker.walkUntil(new ReferenceWalker.WalkCondition<ActivityExecutionTuple>() {
 
         @Override
         public boolean isFulfilled(ActivityExecutionTuple element) {
@@ -198,8 +207,12 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     if (errorHandlingActivity == null) {
       if (origException == null) {
 
-        LOG.missingBoundaryCatchEvent(execution.getActivity().getId(), errorCode);
-        execution.end(true);
+        if (Context.getCommandContext().getProcessEngineConfiguration().isEnableExceptionsAfterUnhandledBpmnError()) {
+          throw LOG.missingBoundaryCatchEventError(execution.getActivity().getId(), errorCode);
+        } else {
+          LOG.missingBoundaryCatchEvent(execution.getActivity().getId(), errorCode);
+          execution.end(true);
+        }
       } else {
         // throw original exception
         throw origException;
@@ -210,8 +223,11 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       ErrorEventDefinition errorDefinition = errorDeclarationFinder.getErrorEventDefinition();
       PvmExecutionImpl errorHandlingExecution = activityExecutionMappingCollector.getExecutionForScope(errorHandlingActivity.getEventScope());
 
-      if(errorDefinition.getErrorCodeVariable() != null){
+      if(errorDefinition.getErrorCodeVariable() != null) {
         errorHandlingExecution.setVariable(errorDefinition.getErrorCodeVariable(), errorCode);
+      }
+      if(errorDefinition.getErrorMessageVariable() != null) {
+        errorHandlingExecution.setVariable(errorDefinition.getErrorMessageVariable(), errorMessage);
       }
       errorHandlingExecution.executeActivity(errorHandlingActivity);
     }
@@ -250,24 +266,32 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     protected String errorCode;
     protected PvmActivity errorHandlerActivity;
     protected ErrorEventDefinition errorEventDefinition;
+    protected PvmActivity currentActivity;
 
-    public ErrorDeclarationForProcessInstanceFinder(Exception exception, String errorCode) {
+    public ErrorDeclarationForProcessInstanceFinder(Exception exception, String errorCode, PvmActivity currentActivity) {
       this.exception = exception;
       this.errorCode = errorCode;
+      this.currentActivity = currentActivity;
     }
 
     @Override
     public void visit(PvmScope scope) {
       List<ErrorEventDefinition> errorEventDefinitions = scope.getProperties().get(BpmnProperties.ERROR_EVENT_DEFINITIONS);
       for (ErrorEventDefinition errorEventDefinition : errorEventDefinitions) {
-        if ((exception != null && errorEventDefinition.catchesException(exception)) || (exception == null && errorEventDefinition.catchesError(errorCode))) {
+        PvmActivity activityHandler = scope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
+        if ((!isReThrowingErrorEventSubprocess(activityHandler)) && ((exception != null && errorEventDefinition.catchesException(exception))
+          || (exception == null && errorEventDefinition.catchesError(errorCode)))) {
 
-          errorHandlerActivity = scope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
+          errorHandlerActivity = activityHandler;
           this.errorEventDefinition = errorEventDefinition;
-
           break;
         }
       }
+    }
+
+    protected boolean isReThrowingErrorEventSubprocess(PvmActivity activityHandler) {
+      ScopeImpl activityHandlerScope = (ScopeImpl)activityHandler;
+      return activityHandlerScope.isAncestorFlowScopeOf((ScopeImpl)currentActivity);
     }
 
     public PvmActivity getErrorHandlerActivity() {

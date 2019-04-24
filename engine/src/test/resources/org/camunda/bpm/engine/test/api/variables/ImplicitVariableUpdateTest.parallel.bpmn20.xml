@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="serviceTaskProcess" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+    <serviceTask id="task" camunda:delegateExpression="${delegate}"/>
+    
+    <!-- parallel gateway -->
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="fork"/>
+    <parallelGateway id="fork" />
+    
+    <!-- followed by a user task and end event -->
+    <sequenceFlow id="flow3" sourceRef="fork" targetRef="userTask1" />
+    <userTask id="userTask1" />
+    <sequenceFlow id="flow4" sourceRef="userTask1" targetRef="end1" />
+    <endEvent id="end1" />
+    
+    <!-- and another user task and end event -->
+    <sequenceFlow id="flow5" sourceRef="fork" targetRef="userTask2" />
+    <userTask id="userTask2" />
+    <sequenceFlow id="flow6" sourceRef="userTask2" targetRef="end2" />
+    <endEvent id="end2" />
+    
+  </process>
+
+</definitions>

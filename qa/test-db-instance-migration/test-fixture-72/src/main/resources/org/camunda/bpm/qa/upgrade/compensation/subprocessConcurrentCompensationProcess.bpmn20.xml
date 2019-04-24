@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="SubprocessConcurrentCompensationScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="subProcess" />
+    <subProcess id="subProcess">
+      <startEvent id="subProcessStart" />
+      <sequenceFlow sourceRef="subProcessStart" targetRef="userTask1" />
+      <userTask id="userTask1"/>
+      <sequenceFlow sourceRef="userTask1" targetRef="userTask2" />
+      <userTask id="userTask2"/>
+      <sequenceFlow sourceRef="userTask2" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+  
+      <!-- compensation 1 -->
+      <boundaryEvent id="compensateBoundaryEvent1" attachedToRef="userTask1">
+        <compensateEventDefinition />
+      </boundaryEvent>
+      <userTask id="undoTask1" isForCompensation="true"/>
+      
+      <!-- compensation 2 -->
+      <boundaryEvent id="compensateBoundaryEvent2" attachedToRef="userTask2">
+        <compensateEventDefinition />
+      </boundaryEvent>
+      <userTask id="undoTask2" isForCompensation="true"/>
+    
+      <association associationDirection="One" sourceRef="compensateBoundaryEvent1" targetRef="undoTask1" />
+      <association associationDirection="One" sourceRef="compensateBoundaryEvent2" targetRef="undoTask2" />
+    </subProcess>
+
+    <sequenceFlow sourceRef="subProcess" targetRef="beforeCompensate" />
+    <userTask id="beforeCompensate" />
+    <sequenceFlow sourceRef="beforeCompensate" targetRef="throwCompensate" />
+    
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="afterCompensate" />
+    <userTask id="afterCompensate" />
+    <sequenceFlow sourceRef="afterCompensate" targetRef="end" />
+    <endEvent id="end" />
+    
+  </process>
+</definitions>

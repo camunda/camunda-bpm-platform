@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,11 +55,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     // then
 
     // there exists a process instance
@@ -91,14 +90,8 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testCallProcessAsExpressionStartsWithDollar() {
     // given
     // a deployed case definition
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE, Variables.createVariables().putValue("process", "oneTaskProcess")).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable("process", "oneTaskProcess")
-      .manualStart();
 
     // then
 
@@ -134,14 +127,8 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testCallProcessAsExpressionStartsWithHash() {
     // given
     // a deployed case definition
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE, Variables.createVariables().putValue("process", "oneTaskProcess")).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable("process", "oneTaskProcess")
-      .manualStart();
 
     // then
 
@@ -194,11 +181,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
       .latestVersion()
       .singleResult()
       .getId();
-
-    // when:
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
 
@@ -259,11 +241,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
       .deploymentId(firstDeploymentId)
       .singleResult()
       .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
 
@@ -326,11 +303,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
       .singleResult()
       .getId();
 
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     // then
 
     // there exists a process instance
@@ -384,7 +356,8 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
 
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
 
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE,
+        Variables.createVariables().putValue("myVersion", 2)).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // latest process definition
@@ -393,12 +366,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
       .deploymentId(secondDeploymentId)
       .singleResult()
       .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable("myVersion", 2)
-      .manualStart();
 
     // then
 
@@ -453,7 +420,8 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
 
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
 
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE,
+        Variables.createVariables().putValue("myVersion", 2)).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     // latest process definition
@@ -462,12 +430,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
       .deploymentId(secondDeploymentId)
       .singleResult()
       .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable("myVersion", 2)
-      .manualStart();
 
     // then
 
@@ -510,11 +472,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String businessKey = "myBusinessKey";
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE, businessKey).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
 
@@ -599,16 +556,13 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     })
   public void testInputSource() {
     // given
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE,
+        Variables.createVariables()
+            .putValue("aVariable", "abc")
+            .putValue("anotherVariable", 999)
+            .putValue("aThirdVariable", "def"))
+        .getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable("aVariable", "abc")
-      .setVariable("anotherVariable", 999)
-      .setVariable("aThirdVariable", "def")
-      .manualStart();
 
     // then
 
@@ -710,11 +664,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     // then
 
     // there exists a process instance
@@ -755,15 +704,10 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     })
   public void testInputSourceExpression() {
     // given
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE,
+        Variables.createVariables().putValue("aVariable", "abc")
+    .putValue("anotherVariable", 999)).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable("aVariable", "abc")
-      .setVariable("anotherVariable", 999)
-      .manualStart();
 
     // then
 
@@ -808,15 +752,9 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     })
   public void testInputAll() {
     // given
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE,
+        Variables.createVariables().putValue("aVariable", "abc").putValue("anotherVariable", 999)).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable("aVariable", "abc")
-      .setVariable("anotherVariable", 999)
-      .manualStart();
 
     // then
 
@@ -853,6 +791,34 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
 
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputAllLocal.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testInputAllLocal() {
+    // given
+    createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
+
+    // when
+    caseService
+      .withCaseExecution(caseTaskId)
+      .setVariable("aVariable", "abc")
+      .setVariableLocal("aLocalVariable", "def")
+      .manualStart();
+
+    // then only the local variable is mapped to the sub process instance
+    ProcessInstance subProcessInstance = queryProcessInstance();
+
+    List<VariableInstance> variables = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(subProcessInstance.getId())
+        .list();
+
+    assertEquals(1, variables.size());
+    assertEquals("aLocalVariable", variables.get(0).getName());
   }
 
 
@@ -911,7 +877,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCaseWithManualActivation.cmmn"
     })
   public void testProcessNotFound() {
     // given
@@ -940,11 +906,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testCompleteSimpleProcess() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     Task task = queryTask();
 
@@ -976,11 +937,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testOutputSource() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1032,11 +988,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testOutputSourceDifferentTarget() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1087,11 +1038,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testOutputSourceNullValue() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1135,11 +1081,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testOutputSourceExpression() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1192,10 +1133,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     String processInstanceId = queryProcessInstance().getId();
 
     String taskId = queryTask().getId();
@@ -1247,10 +1184,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     String processInstanceId = queryProcessInstance().getId();
 
     String taskId = queryTask().getId();
@@ -1294,7 +1227,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputAll.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputAllWithManualActivation.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
   public void testOutputVariablesShouldNotExistAnymore() {
@@ -1351,8 +1284,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     caseService
       .withCaseExecution(processTaskId)
       .setVariable("aVariable", "xyz")
-      .setVariable("anotherVariable", 123)
-      .manualStart();
+      .setVariable("anotherVariable", 123);
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1396,25 +1328,24 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputOutputAll.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
   public void testInputOutputAllTypedVariables() {
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
     String variableName = "aVariable";
     String variableName2 = "anotherVariable";
     String variableName3 = "theThirdVariable";
     TypedValue variableValue = Variables.stringValue("abc");
     TypedValue variableValue2 = Variables.longValue(null);
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable(variableName, variableValue)
-      .setVariable(variableName2, variableValue2)
-      .manualStart();
+
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE,
+        Variables.createVariables()
+        .putValue(variableName, variableValue)
+        .putValue(variableName2, variableValue2))
+        .getId();
+    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1422,7 +1353,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertThat(value, is(variableValue));
     value = runtimeService.getVariableTyped(processInstanceId, variableName2);
     assertThat(value, is(variableValue2));
-    
+
     String taskId = queryTask().getId();
 
     TypedValue variableValue3 = Variables.integerValue(1);
@@ -1442,30 +1373,27 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testVariablesRoundtrip.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
   public void testInputOutputLimitedTypedVariables() {
-    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
     String variableName = "aVariable";
     String variableName2 = "anotherVariable";
     TypedValue caseVariableValue = Variables.stringValue("abc");
     TypedValue caseVariableValue2 = Variables.integerValue(null);
-    caseService
-      .withCaseExecution(processTaskId)
-      .setVariable(variableName, caseVariableValue)
-      .setVariable(variableName2, caseVariableValue2)
-      .manualStart();
+
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE,
+        Variables.createVariables().putValue(variableName, caseVariableValue)
+        .putValue(variableName2, caseVariableValue2)).getId();
 
     String processInstanceId = queryProcessInstance().getId();
     TypedValue value = runtimeService.getVariableTyped(processInstanceId, variableName);
     assertThat(value, is(caseVariableValue));
     value = runtimeService.getVariableTyped(processInstanceId, variableName2);
     assertThat(value, is(caseVariableValue2));
-    
+
 
     TypedValue processVariableValue = Variables.stringValue("cba");
     TypedValue processVariableValue2 = Variables.booleanValue(null);
@@ -1487,7 +1415,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
@@ -1496,10 +1424,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     try {
       // when
@@ -1531,10 +1455,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1568,10 +1488,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     // when
     // terminate process task
     terminate(processTaskId);
@@ -1601,11 +1517,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testTerminateSubProcessInstance() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1641,10 +1552,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     // when
     // suspend process task
     suspend(processTaskId);
@@ -1677,10 +1584,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     String processInstanceId = queryProcessInstance().getId();
 
@@ -1719,10 +1622,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     suspend(processTaskId);
 
     CaseExecution processTask = queryCaseExecutionByActivityId(PROCESS_TASK);
@@ -1759,12 +1658,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testNonBlockingProcessTask() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
     ProcessInstance processInstance = queryProcessInstance();
@@ -1800,12 +1693,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testProcessInstanceCompletesInOneGo() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
     ProcessInstance processInstance = queryProcessInstance();
@@ -1833,12 +1720,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
   public void testNonBlockingProcessTaskAndProcessInstanceCompletesInOneGo() {
     // given
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
     ProcessInstance processInstance = queryProcessInstance();
@@ -1868,11 +1749,6 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
@@ -1887,7 +1763,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCaseWithManualActivation.cmmn"})
   public void testActivityType() {
     // given
     createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
@@ -1898,15 +1774,11 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     // then
     assertEquals("processTask", processTask.getActivityType());
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputAll.cmmn",
       "org/camunda/bpm/engine/test/cmmn/processtask/subProcessWithError.bpmn"})
   public void testOutputWhenErrorOccurs() {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
     Task task = queryTask();
     assertThat(task.getName(), is("SubTask"));
     String variableName = "foo";
@@ -1918,22 +1790,18 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertThat(variable, is(notNullValue()));
     assertThat(variable, is(variableValue));
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputAll.cmmn",
   "org/camunda/bpm/engine/test/cmmn/processtask/subProcessWithThrownError.bpmn"})
   public void testOutputWhenThrownBpmnErrorOccurs() {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
-    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
     Task task = queryTask();
     assertThat(task.getName(), is("SubTask"));
     String variableName = "foo";
     Object variableValue = "bar";
     runtimeService.setVariable(task.getProcessInstanceId(), variableName, variableValue);
     taskService.complete(task.getId());
-    
+
     Object variable = caseService.getVariable(caseInstanceId, variableName);
     assertThat(variable, is(notNullValue()));
     assertThat(variable, is(variableValue));

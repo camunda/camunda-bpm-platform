@@ -31,7 +31,6 @@
         <database.name>process-engine</database.name>
         <database.username>sa</database.username>
         <database.password>sa</database.password>
-        <database.url>jdbc:h2:${database.host}${database.name};MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port}</database.url>
       </properties>
     </profile>
     <profile>

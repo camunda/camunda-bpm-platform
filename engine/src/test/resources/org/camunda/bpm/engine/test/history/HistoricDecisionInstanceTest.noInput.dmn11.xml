@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="testDecision" name="">
+    <decisionTable id="decisionTable">
+      <output id="output1" label="Result" name="result" typeRef="string" />
+      <rule id="row-624115199-1">
+        <outputEntry id="LiteralExpression_090256m">        <text></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -150,6 +154,12 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       }
       deploymentBuilder.name(deploymentName);
 
+      // set the tenant id for the deployment
+      String tenantId = processArchive.getTenantId();
+      if(tenantId != null && !tenantId.isEmpty()) {
+        deploymentBuilder.tenantId(tenantId);
+      }
+
       // add deployment resources
       for (Entry<String, byte[]> resource : deploymentMap.entrySet()) {
         deploymentBuilder.addInputStream(resource.getKey(), new ByteArrayInputStream(resource.getValue()));
@@ -201,11 +211,11 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       throw new IllegalArgumentException(b.toString());
     }
   }
-  
+
   protected boolean isValidValueForResumePreviousBy(String resumePreviousBy) {
     return resumePreviousBy.equals(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME) || resumePreviousBy.equals(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY);
   }
-  
+
   /**
    * @param deploymentMap2
    * @param deploymentName

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  <message id="messageId1" name="EventSubProcessMessage" />
+  <message id="messageId2" name="BoundaryEventMessage" />
+  
+  <process id="InterruptingEventSubProcessNestedCompensationScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="outerTask" />
+    <userTask id="outerTask"/>
+    
+    <sequenceFlow sourceRef="outerTask" targetRef="end" />
+    <endEvent id="end" />
+    
+    <!-- event subprocess -->
+    <subProcess triggeredByEvent="true" id="eventSubProcess">
+      <startEvent id="eventSubProcessStart" isInterrupting="true">
+        <messageEventDefinition messageRef="messageId1" />
+      </startEvent>
+      
+      <sequenceFlow sourceRef="eventSubProcessStart" targetRef="innerSubProcess" />
+      
+      <subProcess id="innerSubProcess" >
+        <startEvent id="innerSubProcessStart"/>
+
+        <sequenceFlow sourceRef="innerSubProcessStart" targetRef="innerSubProcessTask" />
+        <userTask id="innerSubProcessTask" />
+        
+        <!-- compensation boundary event -->
+        <boundaryEvent id="compensateBoundaryEvent" attachedToRef="innerSubProcessTask">
+          <compensateEventDefinition />
+        </boundaryEvent>
+        <userTask id="undoTask" isForCompensation="true"/>
+        
+        <sequenceFlow sourceRef="innerSubProcessTask" targetRef="throwCompensate" />
+        <intermediateThrowEvent id="throwCompensate">
+          <compensateEventDefinition />
+        </intermediateThrowEvent>
+        
+        <sequenceFlow sourceRef="throwCompensate" targetRef="afterCompensate" />
+        <userTask id="afterCompensate" />
+        
+        <sequenceFlow sourceRef="afterCompensate" targetRef="innerSubProcessEnd" />
+        <endEvent id="innerSubProcessEnd" />
+        <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoTask" />
+      </subProcess>
+      
+      <sequenceFlow sourceRef="innerSubProcess" targetRef="eventSubProcessEnd" />
+      <endEvent id="eventSubProcessEnd" />
+      
+      <!-- boundary event on innerSubProcess -->
+      <boundaryEvent id="messageBoundaryEvent" attachedToRef="innerSubProcess" cancelActivity="true">
+        <messageEventDefinition messageRef="messageId2" />
+      </boundaryEvent>
+      <userTask id="afterBoundaryTask" />
+      <sequenceFlow sourceRef="afterBoundaryTask" targetRef="afterBoundaryEnd" />
+      <endEvent id="afterBoundaryEnd" />
+      
+    </subProcess>
+    
+  </process>
+</definitions>

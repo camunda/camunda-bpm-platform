@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,23 +16,65 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
  * @author Thorben Lindhauer
  *
  */
 public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
+
+  @Override
+  public void tearDown() throws Exception {
+    ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+
+        List<HistoricJobLog> jobLogs = processEngine.getHistoryService().createHistoricJobLogQuery().list();
+        for (HistoricJobLog jobLog : jobLogs) {
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogById(jobLog.getId());
+        }
+
+        return null;
+      }
+    });
+
+    assertEquals(0, processEngine.getHistoryService().createHistoricJobLogQuery().list().size());
+
+    super.tearDown();
+  }
+
+  @Override
+  protected void runTest() throws Throwable {
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if (DbSqlSessionFactory.H2.equals(databaseType) && getName().equals("testConcurrentExclusiveCorrelation")) {
+      // skip test method - if database is H2
+    } else {
+      // invoke the test method
+      super.runTest();
+    }
+  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   public void testConcurrentCorrelationFailsWithOptimisticLockingException() {
@@ -316,10 +362,176 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(thread1.getException() instanceof OptimisticLockingException);
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.eventSubprocess.bpmn")
+  public void testEventSubprocess() {
+    InvocationLogListener.reset();
+
+    // given a process instance
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // and two threads correlating in parallel
+    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("incoming", false));
+    thread1.reportInterrupts();
+    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("incoming", false));
+    thread2.reportInterrupts();
+
+    // both threads open a transaction and wait before correlating the message
+    thread1.waitForSync();
+    thread2.waitForSync();
+
+    // both threads correlate
+    thread1.makeContinue();
+    thread2.makeContinue();
+
+    thread1.waitForSync();
+    thread2.waitForSync();
+
+    // the first thread ends its transaction
+    thread1.waitUntilDone();
+    assertNull(thread1.getException());
+
+    // the second thread ends its transaction and fails with optimistic locking exception
+    thread2.waitUntilDone();
+    assertTrue(thread2.getException() != null);
+    assertTrue(thread2.getException() instanceof OptimisticLockingException);
+  }
+
+  @Deployment
+  public void testConcurrentMessageCorrelationAndTreeCompaction() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    // trigger non-interrupting boundary event and wait before flush
+    ThreadControl correlateThread = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", false));
+    correlateThread.reportInterrupts();
+
+    // stop correlation right before the flush
+    correlateThread.waitForSync();
+    correlateThread.makeContinueAndWaitForSync();
+
+    // trigger tree compaction
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    // flush correlation
+    correlateThread.waitUntilDone();
+
+    // the correlation should not have succeeded
+    Throwable exception = correlateThread.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.testConcurrentMessageCorrelationAndTreeCompaction.bpmn20.xml")
+  public void testConcurrentTreeCompactionAndMessageCorrelation() {
+    runtimeService.startProcessInstanceByKey("process");
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    // trigger tree compaction and wait before flush
+    ThreadControl taskCompletionThread = executeControllableCommand(new ControllableCompleteTaskCommand(tasks));
+    taskCompletionThread.reportInterrupts();
+
+    // stop task completion right before flush
+    taskCompletionThread.waitForSync();
+
+    // perform message correlation to non-interrupting boundary event
+    // (i.e. adds another concurrent execution to the scope execution)
+    runtimeService.correlateMessage("Message");
+
+    // flush task completion and tree compaction
+    taskCompletionThread.waitUntilDone();
+
+    // then it should not have succeeded
+    Throwable exception = taskCompletionThread.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
+  }
+
+  @Deployment
+  public void testConcurrentMessageCorrelationTwiceAndTreeCompaction() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    // trigger non-interrupting boundary event 1 that ends in a none end event immediately
+    runtimeService.correlateMessage("Message2");
+
+    // trigger non-interrupting boundary event 2 and wait before flush
+    ThreadControl correlateThread = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message1", false));
+    correlateThread.reportInterrupts();
+
+    // stop correlation right before the flush
+    correlateThread.waitForSync();
+    correlateThread.makeContinueAndWaitForSync();
+
+    // trigger tree compaction
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    // flush correlation
+    correlateThread.waitUntilDone();
+
+    // the correlation should not have succeeded
+    Throwable exception = correlateThread.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
+  }
+
+  @Deployment
+  public void testConcurrentEndExecutionListener() {
+    InvocationLogListener.reset();
+
+    // given a process instance
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    List<Execution> tasks = runtimeService.createExecutionQuery().messageEventSubscriptionName("Message").list();
+    // two tasks waiting for the message
+    assertEquals(2, tasks.size());
+
+    // start first thread and wait in the second execution end listener
+    ThreadControl thread1 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(0).getId(), "Message", true));
+    thread1.reportInterrupts();
+    thread1.waitForSync();
+
+    // the counting execution listener was executed on task 1
+    assertEquals(1, InvocationLogListener.getInvocations());
+
+    // start second thread and complete the task
+    ThreadControl thread2 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(1).getId(), "Message", false));
+    thread2.waitForSync();
+    thread2.waitUntilDone();
+
+    // the counting execution listener was executed on task 1 and 2
+    assertEquals(2, InvocationLogListener.getInvocations());
+
+    // continue with thread 1
+    thread1.makeContinueAndWaitForSync();
+
+    // the counting execution listener was not executed again
+    assertEquals(2, InvocationLogListener.getInvocations());
+
+    // try to complete thread 1
+    thread1.waitUntilDone();
+
+    // thread 1 was rolled back with an optimistic locking exception
+    Throwable exception = thread1.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
+
+    // the execution listener was not executed again
+    assertEquals(2, InvocationLogListener.getInvocations());
+  }
+
   public static class InvocationLogListener implements JavaDelegate {
 
     protected static AtomicInteger invocations = new AtomicInteger(0);
 
+    @Override
     public void execute(DelegateExecution execution) throws Exception {
       invocations.incrementAndGet();
     }
@@ -330,6 +542,23 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
     public static int getInvocations() {
       return invocations.get();
+    }
+  }
+
+  public static class WaitingListener implements ExecutionListener {
+
+    protected static ThreadControl monitor;
+
+    public void notify(DelegateExecution execution) throws Exception {
+      if (WaitingListener.monitor != null) {
+        ThreadControl localMonitor = WaitingListener.monitor;
+        WaitingListener.monitor = null;
+        localMonitor.sync();
+      }
+    }
+
+    public static void setMonitor(ThreadControl monitor) {
+      WaitingListener.monitor = monitor;
     }
   }
 
@@ -349,6 +578,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
       this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
       monitor.sync();  // thread will block here until makeContinue() is called form main thread
@@ -371,4 +601,55 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     }
 
   }
+
+  protected static class ControllableMessageEventReceivedCommand extends ControllableCommand<Void> {
+
+    protected final String executionId;
+    protected final String messageName;
+    protected final boolean shouldWaitInListener;
+
+    public ControllableMessageEventReceivedCommand(String executionId, String messageName, boolean shouldWaitInListener) {
+      this.executionId = executionId;
+      this.messageName = messageName;
+      this.shouldWaitInListener = shouldWaitInListener;
+    }
+
+    public Void execute(CommandContext commandContext) {
+
+      if (shouldWaitInListener) {
+        WaitingListener.setMonitor(monitor);
+      }
+
+      MessageEventReceivedCmd receivedCmd = new MessageEventReceivedCmd(messageName, executionId, null);
+
+      receivedCmd.execute(commandContext);
+
+      monitor.sync();
+
+      return null;
+    }
+  }
+
+  public static class ControllableCompleteTaskCommand extends ControllableCommand<Void> {
+
+    protected List<Task> tasks;
+
+    public ControllableCompleteTaskCommand(List<Task> tasks) {
+      this.tasks = tasks;
+    }
+
+    public Void execute(CommandContext commandContext) {
+
+      for (Task task : tasks) {
+        CompleteTaskCmd completeTaskCmd = new CompleteTaskCmd(task.getId(), null);
+        completeTaskCmd.execute(commandContext);
+      }
+
+      monitor.sync();
+
+      return null;
+    }
+
+  }
+
 }

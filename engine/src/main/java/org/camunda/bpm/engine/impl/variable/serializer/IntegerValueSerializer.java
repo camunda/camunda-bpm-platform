@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,8 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 
@@ -28,7 +32,7 @@ public class IntegerValueSerializer extends PrimitiveValueSerializer<IntegerValu
   }
 
   public IntegerValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.integerValue((Integer) untypedValue.getValue());
+    return Variables.integerValue((Integer) untypedValue.getValue(), untypedValue.isTransient());
   }
 
   public void writeValue(IntegerValue variableValue, ValueFields valueFields) {
@@ -48,7 +52,7 @@ public class IntegerValueSerializer extends PrimitiveValueSerializer<IntegerValu
     Integer intValue = null;
 
     if(valueFields.getLongValue() != null) {
-      intValue = new Integer(valueFields.getLongValue().intValue());
+      intValue = Integer.valueOf(valueFields.getLongValue().intValue());
     }
 
     return Variables.integerValue(intValue);

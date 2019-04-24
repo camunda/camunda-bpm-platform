@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.multiinstance;
 
 import static org.camunda.bpm.engine.test.bpmn.event.error.ThrowErrorDelegate.leaveExecution;
@@ -397,6 +400,22 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void FAILING_testParallelUserTasksBasedOnCollectionExpression() {
+    DelegateEvent.clearEvents();
+
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("myBean", new DelegateBean()));
+
+    List<DelegateEvent> recordedEvents = DelegateEvent.getEvents();
+    assertEquals(2, recordedEvents.size());
+
+    assertEquals("miTasks#multiInstanceBody", recordedEvents.get(0).getCurrentActivityId());
+    assertEquals("miTasks#multiInstanceBody", recordedEvents.get(1).getCurrentActivityId()); // or miTasks
+
+    DelegateEvent.clearEvents();
+  }
+
+  @Deployment
   public void testParallelUserTasksCustomExtensions() {
     Map<String, Object> vars = new HashMap<String, Object>();
     List<String> assigneeList = Arrays.asList("kermit", "gonzo", "fozzie");
@@ -445,6 +464,17 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     Execution waitStateExecution = runtimeService.createExecutionQuery().singleResult();
     int sum = (Integer) runtimeService.getVariable(waitStateExecution.getId(), "sum");
     assertEquals(10, sum);
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml")
+  public void testSequentialScriptTasksNoStackOverflow() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("sum", 0);
+    vars.put("nrOfLoops", 200);
+    runtimeService.startProcessInstanceByKey("miSequentialScriptTask", vars);
+    Execution waitStateExecution = runtimeService.createExecutionQuery().singleResult();
+    int sum = (Integer) runtimeService.getVariable(waitStateExecution.getId(), "sum");
+    assertEquals(19900, sum);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml"})

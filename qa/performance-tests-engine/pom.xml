@@ -7,11 +7,15 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.3.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <properties>
+    <test.includes />
+    <!-- without a special test profile we don't want to exclude anything, this expressions should never match -->
+    <test.excludes>$.</test.excludes>
     <historyLevel>full</historyLevel>
+    <jdbcBatchProcessing>true</jdbcBatchProcessing>
   </properties>
 
   <dependencies>
@@ -46,6 +50,11 @@
       <artifactId>java-uuid-generator</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
   </dependencies>
 
   <profiles>
@@ -65,6 +74,19 @@
               <skipTests>true</skipTests>
             </configuration>
           </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>2.4.3</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -77,9 +99,10 @@
         <!-- default values for properties -->
         <numberOfThreads>2</numberOfThreads>
         <numberOfRuns>100</numberOfRuns>
-        <testWatchers></testWatchers>
-        <processEnginePlugins></processEnginePlugins>
-        <watchActivities></watchActivities>
+        <testWatchers />
+        <processEnginePlugins />
+        <watchActivities />
+        <test.excludes>query</test.excludes>
       </properties>
 
       <build>
@@ -95,8 +118,16 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <runOrder>alphabetical</runOrder>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <argLine>-Xmx512m</argLine>
+              <argLine>-Xmx1024m</argLine>
+              <includes>
+                 <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+              </includes>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+                <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
+              </excludes>
             </configuration>
           </plugin>
 
@@ -115,7 +146,78 @@
                     <echo message="Generating reports" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
-                        <include name="**/*.png"/>
+                        <include name="**/*.png" />
+                      </fileset>
+                    </copy>
+                    <java classname="org.camunda.bpm.qa.performance.engine.benchmark.BenchmarkReport" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+
+      </build>
+
+    </profile>
+
+
+    <!-- the benchmark performs multiple runs of the same process on multiple threads. -->
+    <profile>
+      <id>single-run</id>
+
+      <properties>
+        <!-- default values for properties -->
+        <numberOfThreads>1</numberOfThreads>
+        <numberOfRuns>1</numberOfRuns>
+        <testWatchers />
+        <processEnginePlugins />
+        <watchActivities />
+        <test.excludes>query</test.excludes>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx1024m</argLine>
+              <includes>
+                 <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+              </includes>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+                <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Generating reports" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png" />
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.benchmark.BenchmarkReport" classpathref="maven.test.classpath" />
@@ -140,7 +242,8 @@
         <numberOfRuns>1</numberOfRuns>
         <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
         <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin</processEnginePlugins>
-        <watchActivities></watchActivities>
+        <watchActivities />
+        <test.excludes>query</test.excludes>
       </properties>
 
       <build>
@@ -157,7 +260,14 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <argLine>-Xmx512m</argLine>
+              <argLine>-Xmx1024m</argLine>
+              <includes>
+                 <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+              </includes>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+                <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
+              </excludes>
             </configuration>
           </plugin>
           <plugin>
@@ -175,7 +285,126 @@
                     <echo message="Generating reports in ${basedir}/target/reports/" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
-                        <include name="**/*.png"/>
+                        <include name="**/*.png" />
+                      </fileset>
+                    </copy>
+                    <java classname="org.camunda.bpm.qa.performance.engine.sqlstatementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+
+    </profile>
+
+    <profile>
+      <id>generate-load</id>
+
+      <properties>
+        <loadGenerator.numberOfIterations>10000</loadGenerator.numberOfIterations>
+        <loadGenerator.colorOutput>false</loadGenerator.colorOutput>
+        <testWatchers />
+        <processEnginePlugins />
+        <watchActivities />
+        <skip.tests>true</skip.tests>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>generate load</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Generating load" />
+                    <java classname="org.camunda.bpm.qa.performance.engine.query.DefaultLoadGenerator" classpathref="maven.test.classpath" failonerror="true" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>${skip.tests}</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <profile>
+      <id>query-perf-test</id>
+
+      <properties>
+        <numberOfThreads>1</numberOfThreads>
+        <numberOfRuns>1</numberOfRuns>
+        <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
+        <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin</processEnginePlugins>
+        <watchActivities />
+        <test.includes>query</test.includes>
+        <skip.tests>false</skip.tests>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx1024m</argLine>
+              <includes>
+                 <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+              </includes>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+                <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Generating reports in ${basedir}/target/reports/" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png" />
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.sqlstatementlog.SqlStatementLogReport" classpathref="maven.test.classpath" />
@@ -198,9 +427,9 @@
         <!-- default values for properties -->
         <numberOfThreads>1</numberOfThreads>
         <numberOfRuns>100</numberOfRuns>
-        <testWatchers></testWatchers>
-        <processEnginePlugins></processEnginePlugins>
-        <watchActivities></watchActivities>
+        <testWatchers />
+        <processEnginePlugins />
+        <watchActivities />
       </properties>
 
       <build>
@@ -217,7 +446,14 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <argLine>-Xmx512m</argLine>
+              <argLine>-Xmx1024m</argLine>
+              <includes>
+                 <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+              </includes>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+                <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
+              </excludes>
             </configuration>
           </plugin>
 
@@ -236,7 +472,7 @@
                     <echo message="Generating reports" />
                     <copy todir="${basedir}/target/reports/images" flatten="true">
                       <fileset dir="${basedir}/src/test/resources">
-                        <include name="**/*.png"/>
+                        <include name="**/*.png" />
                       </fileset>
                     </copy>
                     <java classname="org.camunda.bpm.qa.performance.engine.framework.activitylog.ActivityCountReporter" classpathref="maven.test.classpath" />
@@ -265,6 +501,7 @@
       </properties>
     </profile>
 
+
     <profile>
       <id>history-level-none</id>
       <properties>
@@ -277,6 +514,27 @@
       <properties>
         <historyLevel>full</historyLevel>
       </properties>
+    </profile>
+
+    <profile>
+      <id>cfgJdbcBatchProcessingOff</id>
+      <properties>
+        <jdbcBatchProcessing>false</jdbcBatchProcessing>
+      </properties>
+    </profile>
+
+    <!-- test profiles -->
+    <profile>
+     <id>testBpmn</id>
+     <properties>
+      <test.includes>bpmn</test.includes>
+     </properties>
+    </profile>
+    <profile>
+     <id>testDmn</id>
+     <properties>
+      <test.includes>dmn</test.includes>
+     </properties>
     </profile>
 
   </profiles>

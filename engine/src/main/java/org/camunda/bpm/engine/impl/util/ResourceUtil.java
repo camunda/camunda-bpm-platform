@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.util;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
@@ -24,6 +28,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
  * @author Sebastian Menski
  */
 public final class ResourceUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   /**
    * Parse a camunda:resource attribute and loads the resource depending on the url scheme.
@@ -70,7 +76,7 @@ public final class ResourceUtil {
       return new String(resourceBytes, Charset.forName("UTF-8"));
     }
     else {
-      throw new NotFoundException("Unable to find resource with name " + resourcePath);
+      throw LOG.cannotFindResource(resourcePath);
     }
   }
 

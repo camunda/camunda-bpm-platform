@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +21,12 @@ import java.util.HashMap;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CmmnModelElementInstance;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
@@ -57,6 +62,10 @@ public abstract class CmmnElementHandlerTest {
 
     ExpressionManager expressionManager = new ExpressionManager();
     context.setExpressionManager(expressionManager);
+
+    DeploymentEntity deployment = new DeploymentEntity();
+    deployment.setId("foo");
+    context.setDeployment(deployment);
   }
 
   protected <T extends CmmnModelElementInstance> T createElement(CmmnModelElementInstance parentElement, Class<T> elementClass) {

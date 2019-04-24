@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +17,6 @@
 package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.runtime.JobQuery;
 
 /**
  * @author Roman Smirnov
@@ -57,13 +60,16 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only select historic job log entries with the deployment id. */
   HistoricJobLogQuery deploymentId(String deploymentId);
 
+  /** Only select historic job log entries that belong to one of the given tenant ids. */
+  HistoricJobLogQuery tenantIdIn(String... tenantIds);
+
   /**
    * Only select log entries where the job had a priority higher than or
    * equal to the given priority.
    *
    * @since 7.4
    */
-  HistoricJobLogQuery jobPriorityHigherThanOrEquals(int priority);
+  HistoricJobLogQuery jobPriorityHigherThanOrEquals(long priority);
 
   /**
    * Only select log entries where the job had a priority lower than or
@@ -71,7 +77,7 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
    *
    * @since 7.4
    */
-  HistoricJobLogQuery jobPriorityLowerThanOrEquals(int priority);
+  HistoricJobLogQuery jobPriorityLowerThanOrEquals(long priority);
 
   /** Only select created historic job log entries. */
   HistoricJobLogQuery creationLog();
@@ -143,5 +149,11 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
    * @since 7.3
    */
   HistoricJobLogQuery orderPartiallyByOccurrence();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of job log entries without tenant id is database-specific.
+   */
+  HistoricJobLogQuery orderByTenantId();
 
 }

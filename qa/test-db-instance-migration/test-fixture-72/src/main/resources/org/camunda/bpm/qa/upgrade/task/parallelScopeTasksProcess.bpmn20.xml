@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="ParallelScopeTasksScenario.plain" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="fork" />
+    <parallelGateway id="fork" />
+    
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="task1" />
+    <userTask id="task1" />
+    <sequenceFlow id="flow3" sourceRef="task1" targetRef="join" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="task2" />
+    <userTask id="task2" />
+    <sequenceFlow id="flow5" sourceRef="task2" targetRef="join" />
+    
+    <parallelGateway id="join" />
+    <sequenceFlow id="flow6" sourceRef="join" targetRef="end" />
+    <endEvent id="end" />
+    
+    <!-- boundary event 1 -->
+    <boundaryEvent id="boundaryTimer1" cancelActivity="true" attachedToRef="task1">
+      <timerEventDefinition>
+        <timeDuration>P10D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow7" sourceRef="boundaryTimer1" targetRef="boundaryEnd1" />
+    <endEvent id="boundaryEnd1" />
+    
+    <!-- boundary event 2 -->
+    <boundaryEvent id="boundaryTimer2" cancelActivity="true" attachedToRef="task2">
+      <timerEventDefinition>
+        <timeDuration>P10D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow8" sourceRef="boundaryTimer2" targetRef="boundaryEnd2" />
+    <endEvent id="boundaryEnd2" />
+  </process>
+</definitions>

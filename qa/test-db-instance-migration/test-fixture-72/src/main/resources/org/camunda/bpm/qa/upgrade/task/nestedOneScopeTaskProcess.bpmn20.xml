@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="OneScopeTaskScenario.nested" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="subProcess" />
+    
+    <subProcess id="subProcess">
+      <startEvent id="subProcessStart" />
+      <sequenceFlow id="flow2" sourceRef="subProcessStart" targetRef="task" />
+      <userTask id="task" />
+      <sequenceFlow id="flow3" sourceRef="task" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+      
+      <!-- boundary event -->
+      <boundaryEvent id="boundaryTimer" cancelActivity="true" attachedToRef="task">
+        <timerEventDefinition>
+          <timeDuration>P10D</timeDuration>
+        </timerEventDefinition>
+      </boundaryEvent>
+      <sequenceFlow id="flow4" sourceRef="boundaryTimer" targetRef="boundaryEnd" />
+      <endEvent id="boundaryEnd" />
+    </subProcess>
+    
+    <sequenceFlow id="flow5" sourceRef="subProcess" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

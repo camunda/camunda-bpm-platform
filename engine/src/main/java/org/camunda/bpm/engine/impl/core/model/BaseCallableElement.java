@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.core.model;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -22,12 +25,15 @@ public class BaseCallableElement {
   protected ParameterValueProvider definitionKeyValueProvider;
   protected CallableElementBinding binding;
   protected ParameterValueProvider versionValueProvider;
+  protected ParameterValueProvider versionTagValueProvider;
+  protected ParameterValueProvider tenantIdProvider;
   protected String deploymentId;
 
   public enum CallableElementBinding {
     LATEST("latest"),
     DEPLOYMENT("deployment"),
-    VERSION("version");
+    VERSION("version"),
+    VERSION_TAG("versionTag");
 
     private String value;
 
@@ -81,6 +87,11 @@ public class BaseCallableElement {
     return CallableElementBinding.VERSION.equals(binding);
   }
 
+  public boolean isVersionTagBinding() {
+    CallableElementBinding binding = getBinding();
+    return CallableElementBinding.VERSION_TAG.equals(binding);
+  }
+
   public Integer getVersion(VariableScope variableScope) {
     Object result = versionValueProvider.getValue(variableScope);
 
@@ -105,12 +116,47 @@ public class BaseCallableElement {
     this.versionValueProvider = version;
   }
 
+  public String getVersionTag(VariableScope variableScope) {
+    Object result = versionTagValueProvider.getValue(variableScope);
+
+    if (result != null) {
+      if (result instanceof String) {
+        return (String) result;
+      } else {
+        throw new ProcessEngineException("It is not possible to transform '"+result+"' into a string.");
+      }
+    }
+
+    return null;
+  }
+
+
+  public ParameterValueProvider getVersionTagValueProvider() {
+    return versionTagValueProvider;
+  }
+
+  public void setVersionTagValueProvider(ParameterValueProvider version) {
+    this.versionTagValueProvider = version;
+  }
+
+  public void setTenantIdProvider(ParameterValueProvider tenantIdProvider) {
+    this.tenantIdProvider = tenantIdProvider;
+  }
+
   public String getDeploymentId() {
     return deploymentId;
   }
 
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
+  }
+
+  public String getDefinitionTenantId(VariableScope variableScope) {
+    return (String) tenantIdProvider.getValue(variableScope);
+  }
+
+  public ParameterValueProvider getTenantIdProvider() {
+    return tenantIdProvider;
   }
 
 }

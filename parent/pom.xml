@@ -4,12 +4,13 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-bom</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
     <relativePath>../bom</relativePath>
   </parent>
 
   <artifactId>camunda-parent</artifactId>
   <name>camunda BPM - Parent Pom</name>
+  <inceptionYear>2013</inceptionYear>
   <packaging>pom</packaging>
 
   <description>
@@ -17,36 +18,44 @@
   </description>
 
   <properties>
-    <version.spring.framework>3.1.2.RELEASE</version.spring.framework>
-    <version.cxf>2.6.1</version.cxf>
-    <version.junit>4.11</version.junit>
-    <version.assertj>1.5.0</version.assertj>
+    <version.spring.framework.standalone.webapps>4.3.23.RELEASE</version.spring.framework.standalone.webapps>
+    <version.spring.framework>3.2.18.RELEASE</version.spring.framework>
+    <version.cxf>3.0.3</version.cxf>
+    <version.junit>4.12</version.junit>
+    <version.assertj>2.9.1</version.assertj>
     <version.logback>1.1.2</version.logback>
+    <version.slf4j>1.7.7</version.slf4j>
     <version.resteasy>2.3.5.Final</version.resteasy>
+    <version.resteasy3>3.0.12.Final</version.resteasy3>
+    <version.jersey2>2.25.1</version.jersey2>
+    <version.gson>2.8.5</version.gson>
+    <version.openjpa>1.2.2</version.openjpa>
 
     <version.commonj>1.1.0</version.commonj>
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.wildfly>8.2.0.Final</version.wildfly>
-    <version.glassfish>3.1.2</version.glassfish>
-    <version.tomcat>8.0.24</version.tomcat>
+    <version.wildfly8>8.2.1.Final</version.wildfly8>
+    <version.wildfly>16.0.0.Final</version.wildfly>
+    <version.wildfly.core>8.0.0.Final</version.wildfly.core>
 
-    <version.arquillian>1.0.0.Final</version.arquillian>
-    <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
-    <version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
+    <version.glassfish>3.1.2</version.glassfish>
+    <version.tomcat>9.0.12</version.tomcat>
+
+    <version.arquillian>1.1.10.Final</version.arquillian>
+    <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
     <version.selenium>2.45.0</version.selenium>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
-    <version.java.wildfly>1.7</version.java.wildfly>
-
+    <version.java.wildfly>1.8</version.java.wildfly>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
     <camunda.osgi.import.camunda.spin.version>version="[$(version;==;${camunda.spin.version.clean}),$(version;=+;${camunda.spin.version.clean}))"</camunda.osgi.import.camunda.spin.version>
     <camunda.osgi.import.camunda.connect.version>version="[$(version;==;${camunda.connect.version.clean}),$(version;=+;${camunda.connect.version.clean}))"</camunda.osgi.import.camunda.connect.version>
+    <camunda.osgi.import.camunda.commons.version>version="[$(version;==;${camunda.commons.version.clean}),$(version;=+;${camunda.commons.version.clean}))"</camunda.osgi.import.camunda.commons.version>
     <camunda.osgi.import.camunda.version>version="[$(version;==;${camunda.osgi.version.clean}),$(version;=+;${camunda.osgi.version.clean}))"</camunda.osgi.import.camunda.version>
     <camunda.osgi.import.strict.version>version="[$(version;===;${camunda.osgi.version.clean}),$(version;==+;${camunda.osgi.version.clean}))"</camunda.osgi.import.strict.version>
     <camunda.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</camunda.osgi.import.default.version>
@@ -84,6 +93,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>${version.gson}</version>
+      </dependency>
+      <dependency>
         <groupId>cglib</groupId>
         <artifactId>cglib</artifactId>
         <version>2.2.2</version>
@@ -99,10 +113,10 @@
         <artifactId>commons-logging</artifactId>
         <version>1.1.1</version>
       </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.4</version>
+	  <dependency>
+        <groupId>org.apache.commons</groupId>
+		<artifactId>commons-lang3</artifactId>
+		<version>3.8.1</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -112,23 +126,23 @@
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.2.2</version>
+        <version>1.3.3</version>
       </dependency>
 
       <dependency>
         <groupId>javax.xml.bind</groupId>
         <artifactId>jaxb-api</artifactId>
-        <version>2.2.1</version>
+        <version>2.2.3</version>
       </dependency>
       <dependency>
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-impl</artifactId>
-        <version>2.1.7</version>
+        <version>2.2.4</version>
       </dependency>
       <dependency>
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-xjc</artifactId>
-        <version>2.1.7</version>
+        <version>2.2.4</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -162,6 +176,16 @@
         <version>${version.logback}</version>
       </dependency>
       <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
         <version>1.7.1</version>
@@ -171,29 +195,9 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-email</artifactId>
-        <version>1.2</version>
+        <version>1.5</version>
       </dependency>
         <!-- Web service -->
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        <version>${version.cxf}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-transports-http</artifactId>
-        <version>${version.cxf}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        <version>${version.cxf}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-bindings-soap</artifactId>
-        <version>${version.cxf}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
         <artifactId>geronimo-jta_1.1_spec</artifactId>
@@ -207,13 +211,13 @@
       <dependency>
         <groupId>org.apache.openjpa</groupId>
         <artifactId>openjpa</artifactId>
-        <version>1.2.2</version>
+        <version>${version.openjpa}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>2.3.0</version>
+        <version>2.4.13</version>
       </dependency>
       <dependency>
         <groupId>org.json</groupId>
@@ -227,14 +231,6 @@
         <version>1.3</version>
       </dependency>
 
-      <dependency>
-        <!-- required for building with JDK 5 -->
-        <groupId>org.livetribe</groupId>
-        <artifactId>livetribe-jsr223</artifactId>
-        <version>2.0.6</version>
-        <type>jar</type>
-        <scope>compile</scope>
-      </dependency>
       <dependency>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-module-cxf</artifactId>
@@ -272,7 +268,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-jdk14</artifactId>
-        <version>1.7.5</version>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -369,6 +365,12 @@
         <version>1.0.2.Final</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.jboss.spec.javax.ws.rs</groupId>
+        <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
+        <version>1.0.1.Final</version>
+      </dependency>
+
       <!-- licensing dependencies -->
       <dependency>
         <groupId>org.bouncycastle</groupId>
@@ -396,10 +398,17 @@
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
         <version>${version.resteasy}</version>
+        <!-- The exclusion is there because we don't need the Resteasy client
+          API in the Rest API test suite and assembly; in case you need to remove
+          the exclusion here, please make sure to add it in the REST API projects -->
         <exclusions>
           <exclusion>
             <artifactId>httpclient</artifactId>
             <groupId>org.apache.httpcomponents</groupId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -419,7 +428,7 @@
       <dependency>
         <groupId>org.apache.directory.server</groupId>
         <artifactId>apacheds-all</artifactId>
-        <version>1.5.5</version>
+        <version>2.0.0-M23</version>
       </dependency>
 
       <dependency>
@@ -431,7 +440,7 @@
       <dependency>
         <groupId>org.jruby</groupId>
         <artifactId>jruby-complete</artifactId>
-        <version>1.7.12</version>
+        <version>9.1.17.0</version>
       </dependency>
 
       <dependency>
@@ -451,12 +460,13 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.16</version>
+          <version>2.22.0</version>
           <configuration>
+            <runOrder>hourly</runOrder>
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-XX:MaxPermSize=128m</argLine>
+            <argLine>-XX:MaxPermSize=160m -Xmx968m -Duser.language=en -Duser.region=US</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -539,13 +549,14 @@
             <camunda.osgi.version.clean>${project.version}</camunda.osgi.version.clean>
             <camunda.connect.version.clean>${version.camunda.connect}</camunda.connect.version.clean>
             <camunda.spin.version.clean>${version.camunda.spin}</camunda.spin.version.clean>
+            <camunda.commons.version.clean>${version.camunda.commons}</camunda.commons.version.clean>
            </versions>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.4.5</version>
+          <version>1.7.2</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>
@@ -556,6 +567,9 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>sql-maven-plugin</artifactId>
           <version>1.5</version>
+          <configuration>
+            <keepFormat>true</keepFormat>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -567,9 +581,33 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>1.4.0</version>
         </plugin>
+        
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <failOnError>false</failOnError>
+            <additionalparam>-Xdoclint:none</additionalparam>
+            <quiet>true</quiet>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>license-header-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <repositories>
     <repository>
@@ -600,3 +638,5 @@
   <url>http://www.camunda.org</url>
 
 </project>
+
+

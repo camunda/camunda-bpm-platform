@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -25,6 +28,7 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.task.Task;
@@ -80,9 +84,7 @@ public class TaskManager extends AbstractManager {
         ((TaskEntity) subTask).delete(deleteReason, cascade, skipCustomListeners);
       }
 
-      commandContext
-        .getIdentityLinkManager()
-        .deleteIdentityLinksByTaskId(taskId);
+      task.deleteIdentityLinks(false);
 
       commandContext
         .getVariableInstanceManager()
@@ -138,12 +140,12 @@ public class TaskManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
-    configureAuthorizationCheck(taskQuery);
+    configureQuery(taskQuery);
     return getDbEntityManager().selectList("selectTaskByQueryCriteria", taskQuery);
   }
 
   public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
-    configureAuthorizationCheck(taskQuery);
+    configureQuery(taskQuery);
     return (Long) getDbEntityManager().selectOne("selectTaskCountByQueryCriteria", taskQuery);
   }
 
@@ -165,28 +167,38 @@ public class TaskManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
+  }
+
+  public void updateTaskSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", true);
+    parameters.put("processDefinitionTenantId", processDefinitionTenantId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateTaskSuspensionStateByCaseExecutionId(String caseExecutionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseExecutionId", caseExecutionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
 
   }
 
@@ -200,8 +212,13 @@ public class TaskManager extends AbstractManager {
     }
   }
 
-  protected void configureAuthorizationCheck(TaskQueryImpl query) {
+  protected void configureQuery(TaskQueryImpl query) {
     getAuthorizationManager().configureTaskQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
   }
 
 }

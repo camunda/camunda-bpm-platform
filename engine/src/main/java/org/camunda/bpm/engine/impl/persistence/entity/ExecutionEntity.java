@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,22 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -33,18 +43,20 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
+import org.camunda.bpm.engine.impl.core.variable.scope.*;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.AtomicOperationInvocation;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
@@ -54,18 +66,24 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
+import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
+import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -76,7 +94,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Daniel Meyer
  * @author Falko Menge
  */
-public class ExecutionEntity extends PvmExecutionImpl implements Execution, ProcessInstance, DbEntity, HasDbRevision, HasDbReferences {
+public class ExecutionEntity extends PvmExecutionImpl implements Execution, ProcessInstance, DbEntity, HasDbRevision, HasDbReferences, VariablesProvider<VariableInstanceEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -90,6 +108,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public static final int VARIABLES_STATE_BIT = 5;
   public static final int SUB_PROCESS_INSTANCE_STATE_BIT = 6;
   public static final int SUB_CASE_INSTANCE_STATE_BIT = 7;
+  public static final int EXTERNAL_TASKS_BIT = 8;
 
   // current position /////////////////////////////////////////////////////////
 
@@ -136,10 +155,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected transient List<EventSubscriptionEntity> eventSubscriptions;
   protected transient List<JobEntity> jobs;
   protected transient List<TaskEntity> tasks;
+  protected transient List<ExternalTaskEntity> externalTasks;
   protected transient List<IncidentEntity> incidents;
   protected int cachedEntityState;
 
-  protected transient ExecutionEntityVariableStore variableStore = new ExecutionEntityVariableStore(this);
+  @SuppressWarnings("unchecked")
+  protected transient VariableStore<VariableInstanceEntity> variableStore =
+      new VariableStore<>(this, new ExecutionEntityReferencer(this));
+
 
   // replaced by //////////////////////////////////////////////////////////////
 
@@ -190,22 +213,38 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * persisted reference to the super execution of this execution
    *
    * @See {@link #getSuperExecution()}
-   * @see #setSuperExecution(ExecutionEntity)
+   * @see <code>setSuperExecution(ExecutionEntity)</code>
    */
   protected String superExecutionId;
+
+  /**
+   * persisted reference to the root process instance.
+   *
+   * @see #getRootProcessInstanceId()
+   */
+  protected String rootProcessInstanceId;
 
   /**
    * persisted reference to the super case execution of this execution
    *
    * @See {@link #getSuperCaseExecution()}
-   * @see #setSuperCaseExecution(ExecutionEntity)
+   * @see <code>setSuperCaseExecution(ExecutionEntity)</code>
    */
   protected String superCaseExecutionId;
 
-  public ExecutionEntity() {
+  /**
+   * Contains observers which are observe the execution.
+   * @since 7.6
+   */
+  protected transient List<ExecutionObserver> executionObservers = new ArrayList<>();
 
+  protected transient List<VariableInstanceLifecycleListener<VariableInstanceEntity>> registeredVariableListeners
+    = new ArrayList<>();
+
+  public ExecutionEntity() {
   }
 
+  @Override
   public ExecutionEntity createExecution() {
     return createExecution(false);
   }
@@ -214,6 +253,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * creates a new execution. properties processDefinition, processInstance and
    * activity will be initialized.
    */
+  @Override
   public ExecutionEntity createExecution(boolean initializeExecutionStartContext) {
     // create the new child execution
     ExecutionEntity createdExecution = createNewExecution();
@@ -228,10 +268,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     createdExecution.setProcessDefinition(getProcessDefinition());
     createdExecution.setProcessInstance(getProcessInstance());
     createdExecution.setActivity(getActivity());
+    createdExecution.setSuspensionState(getSuspensionState());
 
     // make created execution start in same activity instance
     createdExecution.activityInstanceId = activityInstanceId;
 
+    // inherit the tenant id from parent execution
+    if(tenantId != null) {
+      createdExecution.setTenantId(tenantId);
+    }
+
+    // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
     if (initializeExecutionStartContext) {
       createdExecution.setStartContext(new ExecutionStartContext());
     } else if (startContext != null) {
@@ -249,10 +296,21 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   // sub process instance
   // /////////////////////////////////////////////////////////////
 
+  @Override
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
     shouldQueryForSubprocessInstance = true;
 
     ExecutionEntity subProcessInstance = (ExecutionEntity) super.createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
+
+    // inherit the tenant-id from the process definition
+    String tenantId = ((ProcessDefinitionEntity) processDefinition).getTenantId();
+    if (tenantId != null) {
+      subProcessInstance.setTenantId(tenantId);
+    }
+    else {
+      // if process definition has no tenant id, inherit this process instance's tenant id
+      subProcessInstance.setTenantId(this.tenantId);
+    }
 
     fireHistoricActivityInstanceUpdate();
 
@@ -267,18 +325,31 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return newExecution;
   }
 
+  @Override
   protected PvmExecutionImpl newExecution() {
     return createNewExecution();
   }
 
   // sub case instance ////////////////////////////////////////////////////////
 
+  @Override
   public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition) {
     return createSubCaseInstance(caseDefinition, null);
   }
 
+  @Override
   public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
     CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+
+    // inherit the tenant-id from the case definition
+    String tenantId = ((CaseDefinitionEntity) caseDefinition).getTenantId();
+    if (tenantId != null) {
+      subCaseInstance.setTenantId(tenantId);
+    }
+    else {
+      // if case definition has no tenant id, inherit this process instance's tenant id
+      subCaseInstance.setTenantId(this.tenantId);
+    }
 
     // manage bidirectional super-process-sub-case-instances relation
     subCaseInstance.setSuperExecution(this);
@@ -295,19 +366,20 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE, this)) {
-
-      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
       // publish update event for current activity instance (containing the id
       // of the sub process/case)
-      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this, null);
-      eventHandler.handleEvent(haie);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createActivityInstanceUpdateEvt(ExecutionEntity.this);
+        }
+      });
     }
   }
 
   // scopes ///////////////////////////////////////////////////////////////////
 
+  @Override
   @SuppressWarnings("unchecked")
   public void initialize() {
     LOG.initializeExecution(this);
@@ -331,38 +403,85 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // create event subscriptions for the current scope
-    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(scope)) {
-      declaration.createSubscription(this);
+    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(scope).values()) {
+      if(!declaration.isStartEvent()) {
+        declaration.createSubscriptionForExecution(this);
+      }
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public void initializeTimerDeclarations() {
     LOG.initializeTimerDeclaration(this);
     ScopeImpl scope = getScopeActivity();
-    List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
-    if (timerDeclarations != null) {
-      for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
-        timerDeclaration.createTimerInstance(this);
-      }
+    Collection<TimerDeclarationImpl> timerDeclarations = TimerDeclarationImpl.getDeclarationsForScope(scope).values();
+    for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
+      timerDeclaration.createTimerInstance(this);
     }
   }
 
   protected static void initializeAssociations(ExecutionEntity execution) {
     // initialize the lists of referenced objects (prevents db queries)
-    execution.executions = new ArrayList<ExecutionEntity>();
-    execution.variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
-    execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
-    execution.jobs = new ArrayList<JobEntity>();
-    execution.tasks = new ArrayList<TaskEntity>();
-    execution.incidents = new ArrayList<IncidentEntity>();
+    execution.executions = new ArrayList<>();
+    execution.variableStore.setVariablesProvider(VariableCollectionProvider.<VariableInstanceEntity>emptyVariables());
+    execution.variableStore.forceInitialization();
+    execution.eventSubscriptions = new ArrayList<>();
+    execution.jobs = new ArrayList<>();
+    execution.tasks = new ArrayList<>();
+    execution.externalTasks = new ArrayList<>();
+    execution.incidents = new ArrayList<>();
 
     // Cached entity-state initialized to null, all bits are zero, indicating NO
     // entities present
     execution.cachedEntityState = 0;
   }
 
+  @Override
+  public void start(Map<String, Object> variables) {
+    if (getSuperExecution() == null) {
+      setRootProcessInstanceId(processInstanceId);
+    } else {
+      ExecutionEntity superExecution = getSuperExecution();
+      setRootProcessInstanceId(superExecution.getRootProcessInstanceId());
+    }
+
+    // determine tenant Id if null
+    provideTenantId(variables);
+    super.start(variables);
+  }
+
+  @Override
+  public void startWithoutExecuting(Map<String, Object> variables) {
+    setRootProcessInstanceId(getProcessInstanceId());
+    provideTenantId(variables);
+    super.startWithoutExecuting(variables);
+  }
+
+  protected void provideTenantId(Map<String, Object> variables) {
+    if (tenantId == null) {
+      TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+
+      if (tenantIdProvider != null) {
+        VariableMap variableMap = Variables.fromMap(variables);
+        ProcessDefinition processDefinition = getProcessDefinition();
+
+        TenantIdProviderProcessInstanceContext ctx;
+        if (superExecutionId != null) {
+          ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperExecution());
+        } else if (superCaseExecutionId != null) {
+          ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperCaseExecution());
+        } else {
+          ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap);
+        }
+
+        tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
+      }
+    }
+  }
+
   public void startWithFormProperties(VariableMap properties) {
+    setRootProcessInstanceId(getProcessInstanceId());
+    provideTenantId(properties);
     if (isProcessInstanceExecution()) {
       ActivityImpl initial = processDefinition.getInitial();
       ProcessInstanceStartContext processInstanceStartContext = getProcessInstanceStartContext();
@@ -377,9 +496,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       initializeTimerDeclarations();
       fireHistoricProcessStartEvent();
     }
+
     performOperation(PvmAtomicOperation.PROCESS_START);
   }
 
+  @Override
   public void fireHistoricProcessStartEvent() {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     HistoryLevel historyLevel = configuration.getHistoryLevel();
@@ -387,12 +508,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // ParseListener
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_START, processInstance)) {
 
-      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      // publish event for historic process instance start
-      HistoryEvent pise = eventFactory.createProcessInstanceStartEvt(processInstance);
-      eventHandler.handleEvent(pise);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createProcessInstanceStartEvt(processInstance);
+        }
+      });
     }
   }
 
@@ -400,8 +521,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * Method used for destroying a scope in a way that the execution can be
    * removed afterwards.
    */
+  @Override
   public void destroy() {
-    super.destroy();
+
     ensureParentInitialized();
 
     // execute Output Mappings (if they exist).
@@ -411,15 +533,32 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     clearExecution();
+
+    super.destroy();
+
     removeEventSubscriptionsExceptCompensation();
   }
 
-  protected void clearExecution() {
-    // delete all the variable instances
-    variableStore.removeVariablesWithoutFiringEvents();
-
+  public void removeAllTasks() {
     // delete all the tasks
     removeTasks(null);
+
+    // delete external tasks
+    removeExternalTasks();
+  }
+
+  protected void clearExecution() {
+    //call the onRemove method of the execution observers
+    //so they can do some clean up before
+    for (ExecutionObserver observer : executionObservers) {
+      observer.onClear(this);
+    }
+
+    // delete all the tasks and external tasks
+    removeAllTasks();
+
+    // delete all the variable instances
+    removeVariablesLocalInternal();
 
     // remove all jobs
     removeJobs();
@@ -428,6 +567,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     removeIncidents();
   }
 
+  public void removeVariablesLocalInternal() {
+    for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
+      invokeVariableLifecycleListenersDelete(
+          variableInstance,
+          this,
+          Collections.singletonList(getVariablePersistenceListener()));
+      removeVariableInternal(variableInstance);
+    }
+  }
+
+  @Override
   public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
 
     // remove Jobs
@@ -458,6 +608,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // methods that translate to operations /////////////////////////////////////
 
+  @Override
   @SuppressWarnings("deprecation")
   public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
     if (operation instanceof AtomicOperation) {
@@ -467,6 +618,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   @SuppressWarnings("deprecation")
   public <T extends CoreExecution> void performOperationSync(CoreAtomicOperation<T> operation) {
     if (operation instanceof AtomicOperation) {
@@ -485,7 +637,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     Context
-      .getCommandContext()
+      .getCommandInvocationContext()
       .performOperation(executionOperation, this, async);
   }
 
@@ -495,7 +647,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       ensureNotSuspended();
     }
 
-    Context.getCommandContext().performOperation(executionOperation, this);
+    Context.getCommandInvocationContext().performOperation(executionOperation, this);
   }
 
   protected void ensureNotSuspended() {
@@ -506,7 +658,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @SuppressWarnings("deprecation")
   protected boolean requiresUnsuspendedExecution(AtomicOperation executionOperation) {
-    if (executionOperation != PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END && executionOperation != PvmAtomicOperation.TRANSITION_DESTROY_SCOPE
+    if (executionOperation != PvmAtomicOperation.TRANSITION_DESTROY_SCOPE
         && executionOperation != PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE && executionOperation != PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END
         && executionOperation != PvmAtomicOperation.TRANSITION_CREATE_SCOPE && executionOperation != PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_START
         && executionOperation != PvmAtomicOperation.DELETE_CASCADE && executionOperation != PvmAtomicOperation.DELETE_CASCADE_FIRE_ACTIVITY_END) {
@@ -516,8 +668,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return false;
   }
 
-  @SuppressWarnings({"unchecked", "deprecation"})
-  public void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
+  @SuppressWarnings({"unchecked"})
+  public void scheduleAtomicOperationAsync(AtomicOperationInvocation executionOperationInvocation) {
 
     MessageJobDeclaration messageJobDeclaration = null;
 
@@ -525,7 +677,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
         .getProperty(BpmnParse.PROPERTYNAME_MESSAGE_JOB_DECLARATION);
     if (messageJobDeclarations != null) {
       for (MessageJobDeclaration declaration : messageJobDeclarations) {
-        if (declaration.isApplicableForOperation(executionOperation)) {
+        if (declaration.isApplicableForOperation(executionOperationInvocation.getOperation())) {
           messageJobDeclaration = declaration;
           break;
         }
@@ -533,9 +685,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     if (messageJobDeclaration != null) {
-      MessageEntity message = messageJobDeclaration.createJobInstance(this);
-      messageJobDeclaration.setJobHandlerConfiguration(message, this, executionOperation);
-
+      MessageEntity message = messageJobDeclaration.createJobInstance(executionOperationInvocation);
       Context.getCommandContext().getJobManager().send(message);
 
     } else {
@@ -543,23 +693,35 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   public boolean isActive(String activityId) {
     return findExecution(activityId) != null;
   }
 
+  @Override
   public void inactivate() {
     this.isActive = false;
   }
 
   // executions ///////////////////////////////////////////////////////////////
 
+  public void addExecutionObserver(ExecutionObserver observer) {
+    executionObservers.add(observer);
+  }
+
+  public void removeExecutionObserver(ExecutionObserver observer) {
+    executionObservers.remove(observer);
+  }
+
+  @Override
   public List<ExecutionEntity> getExecutions() {
     ensureExecutionsInitialized();
     return executions;
   }
 
+  @Override
   public List<ExecutionEntity> getExecutionsAsCopy() {
-    return new ArrayList<ExecutionEntity>(getExecutions());
+    return new ArrayList<>(getExecutions());
   }
 
   protected void ensureExecutionsInitialized() {
@@ -587,6 +749,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // bussiness key ////////////////////////////////////////////////////////////
 
+  @Override
   public String getProcessBusinessKey() {
     return getProcessInstance().getBusinessKey();
   }
@@ -594,9 +757,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   // process definition ///////////////////////////////////////////////////////
 
   /** ensures initialization and returns the process definition. */
-  public ProcessDefinitionImpl getProcessDefinition() {
+  @Override
+  public ProcessDefinitionEntity getProcessDefinition() {
     ensureProcessDefinitionInitialized();
-    return processDefinition;
+    return (ProcessDefinitionEntity) processDefinition;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {
@@ -619,14 +783,22 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   public void setProcessDefinition(ProcessDefinitionImpl processDefinition) {
     this.processDefinition = processDefinition;
-    this.processDefinitionId = processDefinition.getId();
+    if (processDefinition != null) {
+      this.processDefinitionId = processDefinition.getId();
+    }
+    else {
+      this.processDefinitionId = null;
+    }
+
   }
 
   // process instance /////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the process instance. */
+  @Override
   public ExecutionEntity getProcessInstance() {
     ensureProcessInstanceInitialized();
     return processInstance;
@@ -645,6 +817,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   public void setProcessInstance(PvmExecutionImpl processInstance) {
     this.processInstance = (ExecutionEntity) processInstance;
     if (processInstance != null) {
@@ -652,6 +825,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   public boolean isProcessInstanceExecution() {
     return parentId == null;
   }
@@ -659,11 +833,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   // activity /////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the activity */
+  @Override
   public ActivityImpl getActivity() {
     ensureActivityInitialized();
     return super.getActivity();
   }
 
+  @Override
   public String getActivityId() {
     return activityId;
   }
@@ -691,6 +867,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   /**
    * generates an activity instance id
    */
+  @Override
   protected String generateActivityInstanceId(String activityId) {
 
     if (activityId.equals(processDefinitionId)) {
@@ -712,6 +889,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   // parent ///////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the parent */
+  @Override
   public ExecutionEntity getParent() {
     ensureParentInitialized();
     return parent;
@@ -728,6 +906,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   public void setParentExecution(PvmExecutionImpl parent) {
     this.parent = (ExecutionEntity) parent;
 
@@ -744,19 +923,24 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return superExecutionId;
   }
 
+  @Override
   public ExecutionEntity getSuperExecution() {
     ensureSuperExecutionInitialized();
     return superExecution;
   }
 
+  @Override
   public void setSuperExecution(PvmExecutionImpl superExecution) {
-    this.superExecution = (ExecutionEntity) superExecution;
-    if (superExecution != null) {
-      superExecution.setSubProcessInstance(null);
+    if (this.superExecutionId != null) {
+      ensureSuperExecutionInitialized();
+      this.superExecution.setSubProcessInstance(null);
     }
+
+    this.superExecution = (ExecutionEntity) superExecution;
 
     if (superExecution != null) {
       this.superExecutionId = superExecution.getId();
+      this.superExecution.setSubProcessInstance(this);
     } else {
       this.superExecutionId = null;
     }
@@ -768,11 +952,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   public ExecutionEntity getSubProcessInstance() {
     ensureSubProcessInstanceInitialized();
     return subProcessInstance;
   }
 
+  @Override
   public void setSubProcessInstance(PvmExecutionImpl subProcessInstance) {
     shouldQueryForSubprocessInstance = subProcessInstance != null;
     this.subProcessInstance = (ExecutionEntity) subProcessInstance;
@@ -794,11 +980,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     this.superCaseExecutionId = superCaseExecutionId;
   }
 
+  @Override
   public CaseExecutionEntity getSuperCaseExecution() {
     ensureSuperCaseExecutionInitialized();
     return superCaseExecution;
   }
 
+  @Override
   public void setSuperCaseExecution(CmmnExecution superCaseExecution) {
     this.superCaseExecution = (CaseExecutionEntity) superCaseExecution;
 
@@ -819,12 +1007,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // sub case execution //////////////////////////////////////////////////////
 
+  @Override
   public CaseExecutionEntity getSubCaseInstance() {
     ensureSubCaseInstanceInitialized();
     return subCaseInstance;
 
   }
 
+  @Override
   public void setSubCaseInstance(CmmnExecution subCaseInstance) {
     shouldQueryForSubCaseInstance = subCaseInstance != null;
     this.subCaseInstance = (CaseExecutionEntity) subCaseInstance;
@@ -838,6 +1028,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // customized persistence behavior /////////////////////////////////////////
 
+  @Override
   public void remove() {
     super.remove();
 
@@ -857,7 +1048,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // remove event subscriptions which are not compensate event subscriptions
     List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptions();
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
-      if (!CompensationEventHandler.EVENT_HANDLER_TYPE.equals(eventSubscriptionEntity.getEventType())) {
+      if (!EventType.COMPENSATE.name().equals(eventSubscriptionEntity.getEventType())) {
         eventSubscriptionEntity.delete();
       }
     }
@@ -893,7 +1084,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  private void removeTasks(String reason) {
+  protected void removeTasks(String reason) {
     if (reason == null) {
       reason = TaskEntity.DELETE_REASON_DELETED;
     }
@@ -912,25 +1103,47 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  protected void removeExternalTasks() {
+    for (ExternalTaskEntity externalTask : getExternalTasks()) {
+      externalTask.delete();
+    }
+  }
+
+  @Override
   public ExecutionEntity getReplacedBy() {
     return (ExecutionEntity) replacedBy;
   }
 
+  @Override
+  public ExecutionEntity resolveReplacedBy() {
+    return (ExecutionEntity) super.resolveReplacedBy();
+  }
+
+  @Override
   public void replace(PvmExecutionImpl execution) {
     ExecutionEntity replacedExecution = (ExecutionEntity) execution;
 
+    setListenerIndex(replacedExecution.getListenerIndex());
+    replacedExecution.setListenerIndex(0);
+
     // update the related tasks
     replacedExecution.moveTasksTo(this);
+
+    replacedExecution.moveExternalTasksTo(this);
 
     // update those jobs that are directly related to the argument execution's
     // current activity
     replacedExecution.moveActivityLocalJobsTo(this);
 
-    // only move variables when compacting the tree, but not when expanding
-    // this behavior should be changed when fixing CAM-3941
-    if (replacedExecution.getParent() == this) {
-      // update the related process variables
-      replacedExecution.moveVariablesTo(this);
+    if (!replacedExecution.isEnded()) {
+      // on compaction, move all variables
+      if (replacedExecution.getParent() == this) {
+        replacedExecution.moveVariablesTo(this);
+      }
+      // on expansion, move only concurrent local variables
+      else {
+        replacedExecution.moveConcurrentLocalVariablesTo(this);
+      }
     }
 
     // note: this method not move any event subscriptions since concurrent
@@ -942,16 +1155,20 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     super.replace(replacedExecution);
   }
 
-  protected void moveTasksTo(ExecutionEntity other) {
-    CommandContext commandContext = Context.getCommandContext();
+  @Override
+  public void onConcurrentExpand(PvmExecutionImpl scopeExecution) {
+    ExecutionEntity scopeExecutionEntity = (ExecutionEntity) scopeExecution;
+    scopeExecutionEntity.moveConcurrentLocalVariablesTo(this);
+    super.onConcurrentExpand(scopeExecutionEntity);
+  }
 
+  protected void moveTasksTo(ExecutionEntity other) {
     // update the related tasks
     for (TaskEntity task : getTasksInternal()) {
-      task.setExecutionId(other.getId());
       task.setExecution(other);
 
       // update the related local task variables
-      List<VariableInstanceEntity> variables = commandContext.getVariableInstanceManager().findVariableInstancesByTaskId(task.getId());
+      Collection<VariableInstanceEntity> variables = task.getVariablesInternal();
 
       for (VariableInstanceEntity variable : variables) {
         variable.setExecution(other);
@@ -960,6 +1177,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       other.addTask(task);
     }
     getTasksInternal().clear();
+  }
+
+  protected void moveExternalTasksTo(ExecutionEntity other) {
+    for (ExternalTaskEntity externalTask : getExternalTasksInternal()) {
+      externalTask.setExecutionId(other.getId());
+      externalTask.setExecution(other);
+
+      other.addExternalTask(externalTask);
+    }
+
+    getExternalTasksInternal().clear();
   }
 
   protected void moveActivityLocalJobsTo(ExecutionEntity other) {
@@ -975,53 +1203,99 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   protected void moveVariablesTo(ExecutionEntity other) {
-    variableStore.ensureVariableInstancesInitialized();
-    for (CoreVariableInstance variable : variableStore.getVariableInstances().values()) {
-      ((VariableInstanceEntity) variable).setExecutionId(other.getId());
+    List<VariableInstanceEntity> variables = variableStore.getVariables();
+    variableStore.removeVariables();
+
+    for (VariableInstanceEntity variable : variables) {
+      moveVariableTo(variable, other);
+    }
+  }
+
+  protected void moveVariableTo(VariableInstanceEntity variable, ExecutionEntity other) {
+    if (other.variableStore.containsKey(variable.getName())) {
+      CoreVariableInstance existingInstance = other.variableStore.getVariable(variable.getName());
+      existingInstance.setValue(variable.getTypedValue(false));
+      invokeVariableLifecycleListenersUpdate(existingInstance, this);
+      invokeVariableLifecycleListenersDelete(
+          variable,
+          this,
+          Collections.singletonList(getVariablePersistenceListener()));
+    }
+    else {
+      other.variableStore.addVariable(variable);
+    }
+  }
+
+  protected void moveConcurrentLocalVariablesTo(ExecutionEntity other) {
+    List<VariableInstanceEntity> variables = variableStore.getVariables();
+
+    for (VariableInstanceEntity variable : variables) {
+      if (variable.isConcurrentLocal()) {
+        moveVariableTo(variable, other);
+      }
     }
   }
 
   // variables ////////////////////////////////////////////////////////////////
 
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    variableInstance.setProcessInstanceId(processInstanceId);
-    variableInstance.setExecutionId(id);
-
-    variableInstance.setConcurrentLocal(!isScope || isExecutingScopeLeafActivity());
+  public void addVariableListener(VariableInstanceLifecycleListener<VariableInstanceEntity> listener) {
+    registeredVariableListeners.add(listener);
   }
 
-  protected boolean isExecutingScopeLeafActivity() {
+  public void removeVariableListener(VariableInstanceLifecycleListener<VariableInstanceEntity> listener) {
+    registeredVariableListeners.remove(listener);
+  }
+
+  public boolean isExecutingScopeLeafActivity() {
     return isActive && getActivity() != null && getActivity().isScope() && activityInstanceId != null
         && !(getActivity().getActivityBehavior() instanceof CompositeActivityBehavior);
   }
 
-  protected List<VariableInstanceEntity> loadVariableInstances() {
+  @Override
+  public Collection<VariableInstanceEntity> provideVariables() {
     return Context.getCommandContext().getVariableInstanceManager().findVariableInstancesByExecutionId(id);
   }
 
+  public Collection<VariableInstanceEntity> provideVariables(Collection<String> variableNames) {
+    return Context.getCommandContext().getVariableInstanceManager().findVariableInstancesByExecutionIdAndVariableNames(id, variableNames);
+  }
+
   protected boolean isAutoFireHistoryEvents() {
-    // as long as the process instance is starting (ie. before activity instance
-    // of
-    // the selected initial (start event) is created), the variable scope should
-    // not
-    // automatic fire history events for variable updates.
+    // as long as the process instance is starting (i.e. before activity instance
+    // of the selected initial (start event) is created), the variable scope should
+    // not automatic fire history events for variable updates.
 
     // firing the events is triggered by the processInstanceStart context after
-    // the initial activity
-    // has been initialized. The effect is that the activity instance id of the
-    // historic variable instances
-    // will be the activity instance id of the start event.
+    // the initial activity has been initialized. The effect is that the activity instance id of the
+    // historic variable instances will be the activity instance id of the start event.
 
-    return startContext == null || (startContext != null && !startContext.isDelayFireHistoricVariableEvents());
+    // if a variable is updated while the process instance is starting then the
+    // update history event is lost and the updated value is handled as initial value.
+
+    ActivityImpl currentActivity = getActivity();
+
+    return (startContext == null || !startContext.isDelayFireHistoricVariableEvents())
+      && (currentActivity == null || isActivityNoStartEvent(currentActivity)
+      || isStartEventInValidStateOrNotAsync(currentActivity));
+  }
+
+  protected boolean isActivityNoStartEvent(ActivityImpl currentActivity) {
+    return !(currentActivity.getActivityBehavior() instanceof NoneStartEventActivityBehavior);
+  }
+
+  protected boolean isStartEventInValidStateOrNotAsync(ActivityImpl currentActivity) {
+    return getActivityInstanceState() != ActivityInstanceState.DEFAULT.getStateCode()
+      || !currentActivity.isAsyncBefore();
   }
 
   public void fireHistoricVariableInstanceCreateEvents() {
     // this method is called by the start context and batch-fires create events
     // for all variable instances
-    Map<String, CoreVariableInstance> variableInstances = variableStore.getVariableInstances();
+    List<VariableInstanceEntity> variableInstances = variableStore.getVariables();
+    VariableInstanceHistoryListener historyListener = new VariableInstanceHistoryListener();
     if (variableInstances != null) {
-      for (Entry<String, CoreVariableInstance> variable : variableInstances.entrySet()) {
-        variableStore.fireHistoricVariableInstanceCreate((VariableInstanceEntity) variable.getValue(), this);
+      for (VariableInstanceEntity variable : variableInstances) {
+        historyListener.onCreate(variable, this);
       }
     }
   }
@@ -1046,7 +1320,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected void ensureExecutionTreeInitialized() {
     List<ExecutionEntity> executions = Context.getCommandContext()
       .getExecutionManager()
-      .findChildExecutionsByProcessInstanceId(processInstanceId);
+      .findExecutionsByProcessInstanceId(processInstanceId);
 
     ExecutionEntity processInstance = isProcessInstanceExecution() ? this : null;
 
@@ -1058,12 +1332,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
     }
 
-    processInstance.restoreProcessInstance(executions, null, null);
+    processInstance.restoreProcessInstance(executions, null, null, null, null, null, null);
   }
 
   /**
    * Restores a complete process instance tree including referenced entities.
-   * Note: currently only the restoring of variables and event subscriptions is supported.
    *
    * @param executions
    *   the list of all executions that are part of this process instance.
@@ -1074,39 +1347,57 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * @param variables
    *   the list of all variables that are linked to executions which are part of this process instance
    *   If null, variables are not initialized and are lazy loaded on demand
+   * @param jobs
+   * @param tasks
+   * @param incidents
    */
   public void restoreProcessInstance(Collection<ExecutionEntity> executions,
       Collection<EventSubscriptionEntity> eventSubscriptions,
-      Collection<VariableInstanceEntity> variables) {
+      Collection<VariableInstanceEntity> variables,
+      Collection<TaskEntity> tasks,
+      Collection<JobEntity> jobs,
+      Collection<IncidentEntity> incidents,
+      Collection<ExternalTaskEntity> externalTasks) {
 
     if(!isProcessInstanceExecution()) {
       throw LOG.restoreProcessInstanceException(this);
     }
 
     // index executions by id
-    Map<String, ExecutionEntity> executionsMap = new HashMap<String, ExecutionEntity>();
+    Map<String, ExecutionEntity> executionsMap = new HashMap<>();
     for (ExecutionEntity execution : executions) {
       executionsMap.put(execution.getId(), execution);
+    }
+
+    Map<String, List<VariableInstanceEntity>> variablesByScope = new HashMap<>();
+    if(variables != null) {
+      for (VariableInstanceEntity variable : variables) {
+        CollectionUtil.addToMapOfLists(variablesByScope, variable.getVariableScopeId(), variable);
+      }
     }
 
     // restore execution tree
     for (ExecutionEntity execution : executions) {
       if (execution.executions == null) {
-        execution.executions = new ArrayList<ExecutionEntity>();
+        execution.executions = new ArrayList<>();
       }
       if(execution.eventSubscriptions == null && eventSubscriptions != null) {
-        execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
+        execution.eventSubscriptions = new ArrayList<>();
       }
-      if(variableStore.getVariableInstancesDirect() == null && variables != null) {
-        variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
+      if(variables != null) {
+        execution.variableStore.setVariablesProvider(
+            new VariableCollectionProvider<>(variablesByScope.get(execution.id)));
       }
       String parentId = execution.getParentId();
       ExecutionEntity parent = executionsMap.get(parentId);
       if (!execution.isProcessInstanceExecution()) {
+        if (parent == null) {
+          throw LOG.resolveParentOfExecutionFailedException(parentId, execution.getId());
+        }
         execution.processInstance = this;
         execution.parent = parent;
         if (parent.executions == null) {
-          parent.executions = new ArrayList<ExecutionEntity>();
+          parent.executions = new ArrayList<>();
         }
         parent.executions.add(execution);
       } else {
@@ -1127,10 +1418,38 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
     }
 
-    if(variables != null) {
-      for (VariableInstanceEntity variable : variables) {
-        ExecutionEntity executionEntity = executionsMap.get(variable.getExecutionId());
-        executionEntity.getVariableStore().getVariableInstances().put(variable.getName(), variable);
+    if (jobs != null) {
+      for (JobEntity job : jobs) {
+        ExecutionEntity execution = executionsMap.get(job.getExecutionId());
+        job.setExecution(execution);
+      }
+    }
+
+    if (tasks != null) {
+      for (TaskEntity task : tasks) {
+        ExecutionEntity execution = executionsMap.get(task.getExecutionId());
+        task.setExecution(execution);
+        execution.addTask(task);
+
+        if(variables != null) {
+          task.variableStore.setVariablesProvider(new VariableCollectionProvider<>(variablesByScope.get(task.id)));
+        }
+      }
+    }
+
+
+    if (incidents != null) {
+      for (IncidentEntity incident : incidents) {
+        ExecutionEntity execution = executionsMap.get(incident.getExecutionId());
+        incident.setExecution(execution);
+      }
+    }
+
+    if (externalTasks != null) {
+      for (ExternalTaskEntity externalTask : externalTasks) {
+        ExecutionEntity execution = executionsMap.get(externalTask.getExecutionId());
+        externalTask.setExecution(execution);
+        execution.addExternalTask(externalTask);
       }
     }
   }
@@ -1139,7 +1458,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   // persistent state /////////////////////////////////////////////////////////
 
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
+    Map<String, Object> persistentState = new HashMap<>();
     persistentState.put("processDefinitionId", this.processDefinitionId);
     persistentState.put("businessKey", businessKey);
     persistentState.put("activityId", this.activityId);
@@ -1162,6 +1481,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     Context.getCommandContext().getExecutionManager().insertExecution(this);
   }
 
+  @Override
   public void deleteCascade2(String deleteReason) {
     this.deleteReason = deleteReason;
     this.deleteRoot = true;
@@ -1178,6 +1498,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // toString /////////////////////////////////////////////////////////////////
 
+  @Override
   public String toString() {
     if (isProcessInstanceExecution()) {
       return "ProcessInstance[" + getToStringIdentity() + "]";
@@ -1186,6 +1507,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  @Override
   protected String getToStringIdentity() {
     return id;
   }
@@ -1198,29 +1520,28 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   public List<EventSubscriptionEntity> getEventSubscriptions() {
-    return new ArrayList<EventSubscriptionEntity>(getEventSubscriptionsInternal());
+    return new ArrayList<>(getEventSubscriptionsInternal());
   }
 
-  public List<CompensateEventSubscriptionEntity> getCompensateEventSubscriptions() {
+  public List<EventSubscriptionEntity> getCompensateEventSubscriptions() {
     List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptionsInternal();
-    List<CompensateEventSubscriptionEntity> result = new ArrayList<CompensateEventSubscriptionEntity>(eventSubscriptions.size());
+    List<EventSubscriptionEntity> result = new ArrayList<>(eventSubscriptions.size());
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
-      if (eventSubscriptionEntity instanceof CompensateEventSubscriptionEntity) {
-        result.add((CompensateEventSubscriptionEntity) eventSubscriptionEntity);
+      if (eventSubscriptionEntity.isSubscriptionForEventType(EventType.COMPENSATE)) {
+        result.add(eventSubscriptionEntity);
       }
     }
     return result;
   }
 
-  public List<CompensateEventSubscriptionEntity> getCompensateEventSubscriptions(String activityId) {
+  public List<EventSubscriptionEntity> getCompensateEventSubscriptions(String activityId) {
     List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptionsInternal();
-    List<CompensateEventSubscriptionEntity> result = new ArrayList<CompensateEventSubscriptionEntity>(eventSubscriptions.size());
+    List<EventSubscriptionEntity> result = new ArrayList<>(eventSubscriptions.size());
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
-      if (eventSubscriptionEntity instanceof CompensateEventSubscriptionEntity) {
-        if (activityId.equals(eventSubscriptionEntity.getActivityId())) {
-          result.add((CompensateEventSubscriptionEntity) eventSubscriptionEntity);
+      if (eventSubscriptionEntity.isSubscriptionForEventType(EventType.COMPENSATE)
+              && activityId.equals(eventSubscriptionEntity.getActivityId())) {
+          result.add(eventSubscriptionEntity);
         }
-      }
     }
     return result;
   }
@@ -1257,7 +1578,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   public List<JobEntity> getJobs() {
-    return new ArrayList<JobEntity>(getJobsInternal());
+    return new ArrayList<>(getJobsInternal());
   }
 
   public void addJob(JobEntity jobEntity) {
@@ -1286,7 +1607,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   public List<IncidentEntity> getIncidents() {
-    return new ArrayList<IncidentEntity>(getIncidentsInternal());
+    return new ArrayList<>(getIncidentsInternal());
   }
 
   public void addIncident(IncidentEntity incident) {
@@ -1312,10 +1633,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   // referenced task entities
   // ///////////////////////////////////////////////////
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void ensureTasksInitialized() {
     if (tasks == null) {
-      tasks = (List) Context.getCommandContext().getTaskManager().findTasksByExecutionId(id);
+      tasks = Context.getCommandContext().getTaskManager().findTasksByExecutionId(id);
     }
   }
 
@@ -1325,7 +1645,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   public List<TaskEntity> getTasks() {
-    return new ArrayList<TaskEntity>(getTasksInternal());
+    return new ArrayList<>(getTasksInternal());
   }
 
   public void addTask(TaskEntity taskEntity) {
@@ -1339,11 +1659,120 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     getTasksInternal().remove(task);
   }
 
+  // external tasks
+
+  protected void ensureExternalTasksInitialized() {
+    if (externalTasks == null) {
+      externalTasks = Context.getCommandContext().getExternalTaskManager().findExternalTasksByExecutionId(id);
+    }
+  }
+
+  protected List<ExternalTaskEntity> getExternalTasksInternal() {
+    ensureExternalTasksInitialized();
+    return externalTasks;
+  }
+
+  public void addExternalTask(ExternalTaskEntity externalTask) {
+    getExternalTasksInternal().add(externalTask);
+  }
+
+  public void removeExternalTask(ExternalTaskEntity externalTask) {
+    getExternalTasksInternal().remove(externalTask);
+  }
+
+  public List<ExternalTaskEntity> getExternalTasks() {
+    return new ArrayList<>(getExternalTasksInternal());
+  }
+
   // variables /////////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
-    return variableStore;
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected VariableStore<CoreVariableInstance> getVariableStore() {
+    return (VariableStore) variableStore;
   }
+
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory() {
+    return (VariableInstanceFactory) VariableInstanceEntityFactory.INSTANCE;
+  }
+
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
+
+    List<VariableInstanceLifecycleListener<CoreVariableInstance>> listeners = new ArrayList<>();
+
+    listeners.add(getVariablePersistenceListener());
+    listeners.add((VariableInstanceLifecycleListener) new VariableInstanceConcurrentLocalInitializer(this));
+    listeners.add((VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE);
+
+    if (isAutoFireHistoryEvents()) {
+      listeners.add((VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE);
+    }
+
+    listeners.add((VariableInstanceLifecycleListener) new VariableListenerInvocationListener(this));
+
+    listeners.addAll((List) registeredVariableListeners);
+
+    return listeners;
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public VariableInstanceLifecycleListener<CoreVariableInstance> getVariablePersistenceListener() {
+    return (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE;
+  }
+
+  public Collection<VariableInstanceEntity> getVariablesInternal() {
+    return variableStore.getVariables();
+  }
+
+  public void removeVariableInternal(VariableInstanceEntity variable) {
+    if (variableStore.containsValue(variable)) {
+      variableStore.removeVariable(variable.getName());
+    }
+  }
+
+  public void addVariableInternal(VariableInstanceEntity variable) {
+    if (variableStore.containsKey(variable.getName())) {
+      VariableInstanceEntity existingVariable = variableStore.getVariable(variable.getName());
+      existingVariable.setValue(variable.getTypedValue());
+      variable.delete();
+    }
+    else {
+      variableStore.addVariable(variable);
+    }
+  }
+
+  public void handleConditionalEventOnVariableChange(VariableEvent variableEvent) {
+    List<EventSubscriptionEntity> subScriptions = getEventSubscriptions();
+    for (EventSubscriptionEntity subscription : subScriptions) {
+      if (EventType.CONDITONAL.name().equals(subscription.getEventType())) {
+        subscription.processEventSync(variableEvent);
+      }
+    }
+  }
+
+  @Override
+  public void dispatchEvent(VariableEvent variableEvent) {
+    final List<ExecutionEntity> execs = new ArrayList<>();
+    new ExecutionTopDownWalker(this).addPreVisitor(new TreeVisitor<ExecutionEntity>() {
+      @Override
+      public void visit(ExecutionEntity obj) {
+        if (!obj.getEventSubscriptions().isEmpty() &&
+
+          (obj.isInState(ActivityInstanceState.DEFAULT) || (!obj.getActivity().isScope()))) { // state is default or tree is compacted
+          execs.add(obj);
+        }
+      }
+    }).walkUntil();
+    for (ExecutionEntity execution : execs) {
+      execution.handleConditionalEventOnVariableChange(variableEvent);
+    }
+  }
+
+
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -1354,19 +1783,23 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // empty, preventing
     // additional queries that end up in an empty list anyway
     if (jobs == null && !BitMaskUtil.isBitOn(cachedEntityState, JOBS_STATE_BIT)) {
-      jobs = new ArrayList<JobEntity>();
+      jobs = new ArrayList<>();
     }
     if (tasks == null && !BitMaskUtil.isBitOn(cachedEntityState, TASKS_STATE_BIT)) {
-      tasks = new ArrayList<TaskEntity>();
+      tasks = new ArrayList<>();
     }
     if (eventSubscriptions == null && !BitMaskUtil.isBitOn(cachedEntityState, EVENT_SUBSCRIPTIONS_STATE_BIT)) {
-      eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
+      eventSubscriptions = new ArrayList<>();
     }
     if (incidents == null && !BitMaskUtil.isBitOn(cachedEntityState, INCIDENT_STATE_BIT)) {
-      incidents = new ArrayList<IncidentEntity>();
+      incidents = new ArrayList<>();
     }
-    if (variableStore.getVariableInstancesWithoutInitialization() == null && !BitMaskUtil.isBitOn(cachedEntityState, VARIABLES_STATE_BIT)) {
-      variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
+    if (!variableStore.isInitialized() && !BitMaskUtil.isBitOn(cachedEntityState, VARIABLES_STATE_BIT)) {
+      variableStore.setVariablesProvider(VariableCollectionProvider.<VariableInstanceEntity>emptyVariables());
+      variableStore.forceInitialization();
+    }
+    if (externalTasks == null && !BitMaskUtil.isBitOn(cachedEntityState, EXTERNAL_TASKS_BIT)) {
+      externalTasks = new ArrayList<>();
     }
     shouldQueryForSubprocessInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT);
     shouldQueryForSubCaseInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_CASE_INSTANCE_STATE_BIT);
@@ -1374,7 +1807,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public int getCachedEntityState() {
     cachedEntityState = 0;
-    Map<String, VariableInstanceEntity> variableInstances = variableStore.getVariableInstancesWithoutInitialization();
 
     // Only mark a flag as false when the list is not-null and empty. If null,
     // we can't be sure there are no entries in it since
@@ -1383,15 +1815,33 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, EVENT_SUBSCRIPTIONS_STATE_BIT, (eventSubscriptions == null || eventSubscriptions.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, JOBS_STATE_BIT, (jobs == null || jobs.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, INCIDENT_STATE_BIT, (incidents == null || incidents.size() > 0));
-    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, VARIABLES_STATE_BIT, (variableInstances == null || variableInstances.size() > 0));
+    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, VARIABLES_STATE_BIT, (!variableStore.isInitialized() || !variableStore.isEmpty()));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT, shouldQueryForSubprocessInstance);
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, SUB_CASE_INSTANCE_STATE_BIT, shouldQueryForSubCaseInstance);
+    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, EXTERNAL_TASKS_BIT, (externalTasks == null || externalTasks.size() > 0));
 
     return cachedEntityState;
   }
 
   public int getCachedEntityStateRaw() {
     return cachedEntityState;
+  }
+
+  public String getRootProcessInstanceId() {
+    if (isProcessInstanceExecution()) {
+      return rootProcessInstanceId;
+    } else {
+      ExecutionEntity processInstance = getProcessInstance();
+      return processInstance.rootProcessInstanceId;
+    }
+  }
+
+  public String getRootProcessInstanceIdRaw() {
+    return rootProcessInstanceId;
+  }
+
+  public void setRootProcessInstanceId(String rootProcessInstanceId) {
+    this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
   public String getProcessInstanceId() {
@@ -1402,6 +1852,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     this.processInstanceId = processInstanceId;
   }
 
+  @Override
   public String getParentId() {
     return parentId;
   }
@@ -1426,24 +1877,38 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     this.superExecutionId = superExecutionId;
   }
 
-  public boolean hasReferenceTo(DbEntity entity) {
-    if (entity instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) entity;
-      String otherId = executionEntity.getId();
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referenceIds = new HashSet<>();
 
-      // parentId
-      if (parentId != null && parentId.equals(otherId)) {
-        return true;
-      }
-
-      // superExecutionId
-      if (superExecutionId != null && superExecutionId.equals(otherId)) {
-        return true;
-      }
-
+    if (superExecutionId != null) {
+      referenceIds.add(superExecutionId);
+    }
+    if (parentId != null) {
+      referenceIds.add(parentId);
     }
 
-    return false;
+    return referenceIds;
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
+
+    if (superExecutionId != null) {
+      referenceIdAndClass.put(this.superExecutionId, ExecutionEntity.class);
+    }
+    if (parentId != null) {
+      referenceIdAndClass.put(this.parentId, ExecutionEntity.class);
+    }
+    if (processInstanceId != null) {
+      referenceIdAndClass.put(this.processInstanceId, ExecutionEntity.class);
+    }
+    if (processDefinitionId != null) {
+      referenceIdAndClass.put(this.processDefinitionId, ProcessDefinitionEntity.class);
+    }
+
+    return referenceIdAndClass;
   }
 
   public int getSuspensionState() {
@@ -1458,6 +1923,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
 
+  @Override
   public ProcessInstanceStartContext getProcessInstanceStartContext() {
     if (isProcessInstanceExecution()) {
       if (startContext == null) {
@@ -1470,10 +1936,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return super.getProcessInstanceStartContext();
   }
 
+  @Override
   public String getCurrentActivityId() {
     return activityId;
   }
 
+  @Override
   public String getCurrentActivityName() {
     return activityName;
   }
@@ -1517,5 +1985,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 
-
+  @Override
+  public ProcessEngine getProcessEngine() {
+    return Context.getProcessEngineConfiguration().getProcessEngine();
+  }
 }

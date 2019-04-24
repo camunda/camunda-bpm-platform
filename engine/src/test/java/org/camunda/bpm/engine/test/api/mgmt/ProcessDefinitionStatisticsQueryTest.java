@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import static org.hamcrest.CoreMatchers.containsString;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Test;
@@ -78,7 +82,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals(1, definitionResult.getIncidentStatistics().size());
 
     IncidentStatistics incidentStatistics = definitionResult.getIncidentStatistics().get(0);
-    Assert.assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    Assert.assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistics.getIncidentType());
     Assert.assertEquals(1, incidentStatistics.getIncidentCount());
   }
 
@@ -108,7 +112,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals(1, definitionResult.getIncidentStatistics().size());
 
     IncidentStatistics incidentStatistics = definitionResult.getIncidentStatistics().get(0);
-    Assert.assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    Assert.assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistics.getIncidentType());
     Assert.assertEquals(1, incidentStatistics.getIncidentCount());
   }
 
@@ -165,7 +169,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals(1, definitionResult.getIncidentStatistics().size());
 
     IncidentStatistics incidentStatistics = definitionResult.getIncidentStatistics().get(0);
-    Assert.assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    Assert.assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistics.getIncidentType());
     Assert.assertEquals(1, incidentStatistics.getIncidentCount());
   }
 
@@ -354,7 +358,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
     IncidentStatistics incident = incidentStatistics.get(0);
 
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount());
 
     definitionResult = statistics.get(1);
@@ -367,7 +371,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
     incident = incidentStatistics.get(0);
 
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
@@ -483,7 +487,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals(1, callExampleSubProcessStaticstics.getIncidentStatistics().size());
 
     IncidentStatistics incidentStatistics = callExampleSubProcessStaticstics.getIncidentStatistics().get(0);
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistics.getIncidentType());
     assertEquals(1, incidentStatistics.getIncidentCount());
 
     // "called" process definition
@@ -494,7 +498,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals(1, exampleSubProcessStaticstics.getIncidentStatistics().size());
 
     incidentStatistics = exampleSubProcessStaticstics.getIncidentStatistics().get(0);
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistics.getIncidentType());
     assertEquals(1, incidentStatistics.getIncidentCount());
   }
 
@@ -523,7 +527,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
@@ -534,7 +538,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     List<ProcessDefinitionStatistics> statistics =
         managementService
         .createProcessDefinitionStatisticsQuery()
-        .includeIncidentsForType(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
+        .includeIncidentsForType(Incident.FAILED_JOB_HANDLER_TYPE)
         .list();
 
     assertEquals(1, statistics.size());
@@ -551,7 +555,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
@@ -603,7 +607,81 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
+  public void testIncludeRootIncidentsOnly() {
+    runtimeService.startProcessInstanceByKey("callExampleSubProcess");
+
+    executeAvailableJobs();
+
+    List<ProcessDefinitionStatistics> statistics =
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeRootIncidents()
+        .list();
+
+    // two process definitions
+    assertEquals(2, statistics.size());
+
+    for (ProcessDefinitionStatistics definitionResult : statistics) {
+
+      if (definitionResult.getKey().equals("callExampleSubProcess")) {
+        // there is no root incidents
+        assertTrue(definitionResult.getIncidentStatistics().isEmpty());
+
+      } else if (definitionResult.getKey().equals("ExampleProcess")) {
+        // there is one root incident
+        assertFalse(definitionResult.getIncidentStatistics().isEmpty());
+        assertEquals(1, definitionResult.getIncidentStatistics().size());
+        assertEquals(1, definitionResult.getIncidentStatistics().get(0).getIncidentCount());
+
+      } else {
+        // fail if the process definition key does not match
+        fail();
+      }
+    }
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
+  public void testIncludeRootIncidentsFails() {
+    runtimeService.startProcessInstanceByKey("callExampleSubProcess");
+
+    executeAvailableJobs();
+
+    try {
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidents()
+        .includeRootIncidents()
+        .list();
+    } catch (ProcessEngineException e) {
+      Assert.assertThat(e.getMessage(), containsString("It is not possible to use includeIncident() and includeRootIncidents() to execute one query"));
+    }
+  }
+
+  public void testProcessDefinitionStatisticsProperties() {
+    String resourceName = "org/camunda/bpm/engine/test/api/mgmt/ProcessDefinitionStatisticsQueryTest.testProcessDefinitionStatisticsProperties.bpmn20.xml";
+    String deploymentId = deploymentForTenant("tenant1", resourceName);
+
+    ProcessDefinitionStatistics processDefinitionStatistics = managementService.createProcessDefinitionStatisticsQuery().singleResult();
+
+    assertEquals("testProcess", processDefinitionStatistics.getKey());
+    assertEquals("process name", processDefinitionStatistics.getName());
+    assertEquals("Examples", processDefinitionStatistics.getCategory());
+    assertEquals(null, processDefinitionStatistics.getDescription()); // it is not parsed for the statistics query
+    assertEquals("tenant1", processDefinitionStatistics.getTenantId());
+    assertEquals("v0.1.0", processDefinitionStatistics.getVersionTag());
+    assertEquals(deploymentId, processDefinitionStatistics.getDeploymentId());
+    assertEquals(resourceName, processDefinitionStatistics.getResourceName());
+    assertEquals(null, processDefinitionStatistics.getDiagramResourceName());
+    assertEquals(1, processDefinitionStatistics.getVersion());
+    assertEquals(0, processDefinitionStatistics.getInstances());
+    assertEquals(0, processDefinitionStatistics.getFailedJobs());
+    assertTrue(processDefinitionStatistics.getIncidentStatistics().isEmpty());
   }
 
 }

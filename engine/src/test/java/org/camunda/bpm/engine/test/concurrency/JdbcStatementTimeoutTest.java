@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.List;
@@ -20,11 +23,13 @@ import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
  *  @author Philipp Ossler
@@ -38,6 +43,19 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
   private ThreadControl thread2;
+
+  @Override
+  protected void runTest() throws Throwable {
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if ((DbSqlSessionFactory.DB2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType))
+      && processEngine.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+      // skip test method - if database is DB2 and MariaDB and Batch mode on
+    } else {
+      // invoke the test method
+      super.runTest();
+    }
+  }
 
   @Override
   protected void initializeProcessEngine() {
@@ -79,10 +97,10 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
   @Override
   protected void tearDown() throws Exception {
-
-    thread1.waitUntilDone();
-
-    deleteJobEntities();
+    if (thread1 != null) {
+      thread1.waitUntilDone();
+      deleteJobEntities();
+    }
   }
 
   private void createJobEntity() {

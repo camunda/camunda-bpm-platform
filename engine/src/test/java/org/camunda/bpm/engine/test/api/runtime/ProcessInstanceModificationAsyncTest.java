@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,8 +35,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
-import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -82,6 +86,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     assertThat(updatedTree).hasStructure(
       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
         .activity("task1")
+        .transition("task2")
       .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
@@ -463,11 +468,8 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     assertProcessEnded(processInstanceId);
   }
 
-  /**
-   * TODO: re-add when CAM-3707 and CAM-3708 are fixed
-   */
   @Deployment(resources = NESTED_ASYNC_BEFORE_IO_LISTENER_PROCESS)
-  public void FAILING_testCancelTransitionInstanceShouldNotInvokeIoMappingAndListenersOfTargetActivity() {
+  public void testCancelTransitionInstanceShouldNotInvokeIoMappingAndListenersOfTargetActivity() {
     RecorderExecutionListener.clear();
 
     // given a process instance with an async task in a subprocess

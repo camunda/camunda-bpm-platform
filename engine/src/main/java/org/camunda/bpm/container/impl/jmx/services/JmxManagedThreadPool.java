@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +19,11 @@ package org.camunda.bpm.container.impl.jmx.services;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.spi.PlatformService;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.threading.se.SeExecutorService;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * @author Daniel Meyer
@@ -28,7 +31,7 @@ import org.camunda.bpm.container.impl.threading.se.SeExecutorService;
  */
 public class JmxManagedThreadPool extends SeExecutorService implements JmxManagedThreadPoolMBean, PlatformService<JmxManagedThreadPool> {
 
-  private Logger LOGGER = Logger.getLogger(JmxManagedThreadPool.class.getName());
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   protected final BlockingQueue<Runnable> threadPoolQueue;
 
@@ -52,11 +55,11 @@ public class JmxManagedThreadPool extends SeExecutorService implements JmxManage
     // Waits for 1 minute to finish all currently executing jobs
     try {
       if(!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
-        LOGGER.log(Level.WARNING, "Timeout during shutdown of managed thread pool. "
-                + "The current running tasks could not end within 60 seconds after shutdown operation.");
+        LOG.timeoutDuringShutdownOfThreadPool(60, TimeUnit.SECONDS);
       }
-    } catch (InterruptedException e) {
-      LOGGER.log(Level.WARNING, "Interrupted while shutting down the thread pool. ", e);
+    }
+    catch (InterruptedException e) {
+      LOG.interruptedWhileShuttingDownThreadPool(e);
     }
 
   }

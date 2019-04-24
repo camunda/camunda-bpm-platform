@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
@@ -28,6 +31,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances with the given id (primary key within history tables). */
   HistoricCaseActivityInstanceQuery caseActivityInstanceId(String caseActivityInstanceId);
 
+  /** Only select historic case activity instances with one of the given case activity instance ids. */
+  HistoricCaseActivityInstanceQuery caseActivityInstanceIdIn(String... caseActivityInstanceIds);
+
   /** Only select historic case activity instances for the given case execution */
   HistoricCaseActivityInstanceQuery caseExecutionId(String caseExecutionId);
 
@@ -39,6 +45,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
 
   /** Only select historic case activity instances for the given case activity (id from CMMN 1.0 XML) */
   HistoricCaseActivityInstanceQuery caseActivityId(String caseActivityId);
+
+  /** Only select historic case activity instances with one of the given case activity ids. */
+  HistoricCaseActivityInstanceQuery caseActivityIdIn(String... caseActivityIds);
 
   /** Only select historic case activity instances for activities with the given name */
   HistoricCaseActivityInstanceQuery caseActivityName(String caseActivityName);
@@ -60,12 +69,6 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
 
   /** Only select historic case activity instances which are required. */
   HistoricCaseActivityInstanceQuery required();
-
-  /** Only select historic case activity instances which are repeatable. */
-  HistoricCaseActivityInstanceQuery repeatable();
-
-  /** Only select historic case activity instances which are repetitions. */
-  HistoricCaseActivityInstanceQuery repetition();
 
   /** Only select historic case activity instances which are already ended (ie. completed or terminated). */
   HistoricCaseActivityInstanceQuery ended();
@@ -90,6 +93,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
 
   /** Only select historic case activity instances which are terminated */
   HistoricCaseActivityInstanceQuery terminated();
+
+  /** Only select historic case activity instances with one of the given tenant ids. */
+  HistoricCaseActivityInstanceQuery tenantIdIn(String... tenantIds);
 
   // ordering /////////////////////////////////////////////////////////////////
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -121,5 +127,11 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
 
   /** Order by caseDefinitionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseActivityInstanceQuery orderByCaseDefinitionId();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic case activity instances without tenant id is database-specific.
+   */
+  HistoricCaseActivityInstanceQuery orderByTenantId();
 
 }

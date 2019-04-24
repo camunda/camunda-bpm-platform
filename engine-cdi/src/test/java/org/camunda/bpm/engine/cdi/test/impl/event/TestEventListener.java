@@ -1,9 +1,13 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +24,13 @@ import javax.enterprise.event.Observes;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @ApplicationScoped
 public class TestEventListener {
-  
+
   public void reset() {
     startActivityService1 = 0;
     endActivityService1 = 0;
@@ -39,9 +45,11 @@ public class TestEventListener {
   }
 
   private final Set<BusinessProcessEvent> eventsReceivedByKey = new HashSet<BusinessProcessEvent>();
-  
+
   // receives all events related to "process1"
   public void onProcessEventByKey(@Observes @BusinessProcessDefinition("process1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent);
+    assertEquals("process1", businessProcessEvent.getProcessDefinition().getKey());
     eventsReceivedByKey.add(businessProcessEvent);
   }
 
@@ -49,46 +57,62 @@ public class TestEventListener {
     return eventsReceivedByKey;
   }
 
-  
+
   // ---------------------------------------------------------
-  
+
   private final Set<BusinessProcessEvent> eventsReceived = new HashSet<BusinessProcessEvent>();
-  
+
   // receives all events
   public void onProcessEvent(@Observes BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent);
     eventsReceived.add(businessProcessEvent);
   }
 
   public Set<BusinessProcessEvent> getEventsReceived() {
     return eventsReceived;
   }
-  
+
   // ---------------------------------------------------------
-  
+
   private int startActivityService1 = 0;
   private int endActivityService1 = 0;
   private int takeTransition1 = 0;
-    
-  public void onStartActivityService1(@Observes @StartActivity("service1") BusinessProcessEvent businessProcessEvent) {    
+
+  public void onStartActivityService1(@Observes @StartActivity("service1") BusinessProcessEvent businessProcessEvent) {
+    assertEquals("service1", businessProcessEvent.getActivityId());
+    assertNotNull(businessProcessEvent);
+    assertNull(businessProcessEvent.getTask());
+    assertNull(businessProcessEvent.getTaskId());
+    assertNull(businessProcessEvent.getTaskDefinitionKey());
     startActivityService1 += 1;
   }
 
   public void onEndActivityService1(@Observes @EndActivity("service1") BusinessProcessEvent businessProcessEvent) {
+    assertEquals("service1", businessProcessEvent.getActivityId());
+    assertNotNull(businessProcessEvent);
+    assertNull(businessProcessEvent.getTask());
+    assertNull(businessProcessEvent.getTaskId());
+    assertNull(businessProcessEvent.getTaskDefinitionKey());
     endActivityService1 += 1;
   }
 
   public void takeTransition1(@Observes @TakeTransition("t1") BusinessProcessEvent businessProcessEvent) {
+    assertEquals("t1", businessProcessEvent.getTransitionName());
+    assertNotNull(businessProcessEvent);
+    assertNull(businessProcessEvent.getTask());
+    assertNull(businessProcessEvent.getTaskId());
+    assertNull(businessProcessEvent.getTaskDefinitionKey());
     takeTransition1 += 1;
   }
-    
+
   public int getEndActivityService1() {
     return endActivityService1;
   }
-    
+
   public int getStartActivityService1() {
     return startActivityService1;
   }
-    
+
   public int getTakeTransition1() {
     return takeTransition1;
   }
@@ -102,22 +126,34 @@ public class TestEventListener {
   private int deleteTaskUser1 = 0;
 
   public void onCreateTask(@Observes @CreateTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent);
     assertNotNull(businessProcessEvent.getTask());
+    assertNotNull(businessProcessEvent.getTaskId());
+    assertEquals("user1", businessProcessEvent.getTaskDefinitionKey());
     createTaskUser1++;
   }
 
   public void onAssignTask(@Observes @AssignTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent);
     assertNotNull(businessProcessEvent.getTask());
+    assertNotNull(businessProcessEvent.getTaskId());
+    assertEquals("user1", businessProcessEvent.getTaskDefinitionKey());
     assignTaskUser1++;
   }
 
   public void onCompleteTask(@Observes @CompleteTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent);
     assertNotNull(businessProcessEvent.getTask());
+    assertNotNull(businessProcessEvent.getTaskId());
+    assertEquals("user1", businessProcessEvent.getTaskDefinitionKey());
     completeTaskUser1++;
   }
 
   public void onDeleteTask(@Observes @DeleteTask("user1") BusinessProcessEvent businessProcessEvent) {
+    assertNotNull(businessProcessEvent);
     assertNotNull(businessProcessEvent.getTask());
+    assertNotNull(businessProcessEvent.getTaskId());
+    assertEquals("user1", businessProcessEvent.getTaskDefinitionKey());
     deleteTaskUser1++;
   }
 
@@ -136,4 +172,5 @@ public class TestEventListener {
   public int getDeleteTaskUser1() {
     return deleteTaskUser1;
   }
+
 }

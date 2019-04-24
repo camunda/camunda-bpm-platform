@@ -11,14 +11,14 @@
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
             <camunda:inputParameter name="url">http://camunda.org</camunda:inputParameter>
             <camunda:inputParameter name="headers">
-              <map>
-                <entry key="Content-Type">
+              <camunda:map>
+                <camunda:entry key="Content-Type">
                   text/plain
-                </entry>
-                <entry key="SOAPAction">
+                </camunda:entry>
+                <camunda:entry key="SOAPAction">
                   doIt
-                </entry>
-              </map>
+                </camunda:entry>
+              </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="payload">Hello world!</camunda:inputParameter>
             <camunda:outputParameter name="payload">${payload}</camunda:outputParameter>

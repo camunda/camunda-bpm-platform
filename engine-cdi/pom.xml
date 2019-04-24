@@ -10,7 +10,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <profiles>
@@ -67,11 +67,6 @@
           <artifactId>weld-api</artifactId>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-simple</artifactId>
-          <scope>test</scope>
-        </dependency>
       </dependencies>
 
       <dependencyManagement>
@@ -79,7 +74,7 @@
           <dependency>
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-core-bom</artifactId>
-            <version>1.1.5.Final</version>
+            <version>1.1.11.Final</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
@@ -144,6 +139,21 @@
           <groupId>org.apache.xalan</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

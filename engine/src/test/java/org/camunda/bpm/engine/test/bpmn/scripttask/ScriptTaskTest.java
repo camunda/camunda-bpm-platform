@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +30,9 @@ import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -405,6 +411,15 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("bar", variableValue);
   }
 
+  public void testJuelCapitalizedExpression() {
+    deployProcess(JUEL.toUpperCase(), "${execution.setVariable('foo', 'bar')}");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
   public void testSourceAsExpressionAsVariable() {
     deployProcess(PYTHON, "${scriptSource}");
 
@@ -618,6 +633,54 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
       fail("Shouldn't have received NullValueException");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Invalid format"));
+    }
+  }
+
+  @org.camunda.bpm.engine.test.Deployment
+  public void testSetScriptResultToProcessVariable() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("echo", "hello");
+    variables.put("existingProcessVariableName", "one");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptResultToProcessVariable", variables);
+
+    assertEquals("hello", runtimeService.getVariable(pi.getId(), "existingProcessVariableName"));
+    assertEquals(pi.getId(), runtimeService.getVariable(pi.getId(), "newProcessVariableName"));
+  }
+
+  @org.camunda.bpm.engine.test.Deployment
+  public void testGroovyScriptExecution() {
+    try {
+
+      processEngineConfiguration.setAutoStoreScriptVariables(true);
+      int[] inputArray = new int[] {1, 2, 3, 4, 5};
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution", CollectionUtil.singletonMap("inputArray", inputArray));
+
+      Integer result = (Integer) runtimeService.getVariable(pi.getId(), "sum");
+      assertEquals(15, result.intValue());
+
+    } finally {
+      processEngineConfiguration.setAutoStoreScriptVariables(false);
+    }
+  }
+
+  @org.camunda.bpm.engine.test.Deployment
+  public void testGroovySetVariableThroughExecutionInScript() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptVariableThroughExecution");
+
+    // Since 'def' is used, the 'scriptVar' will be script local
+    // and not automatically stored as a process variable.
+    assertNull(runtimeService.getVariable(pi.getId(), "scriptVar"));
+    assertEquals("test123", runtimeService.getVariable(pi.getId(), "myVar"));
+  }
+
+  @org.camunda.bpm.engine.test.Deployment
+  public void testScriptEvaluationException() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("Process_1").singleResult();
+    try {
+      runtimeService.startProcessInstanceByKey("Process_1");
+    } catch (ScriptEvaluationException e) {
+      assertTextPresent("Unable to evaluate script while executing activity 'Failing' in the process definition with id '" + processDefinition.getId() + "'", e.getMessage());
     }
   }
 }

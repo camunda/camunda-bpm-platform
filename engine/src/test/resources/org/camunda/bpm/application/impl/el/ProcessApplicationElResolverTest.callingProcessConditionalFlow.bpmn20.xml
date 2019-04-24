@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="Examples">
+
+  <process id="callingProcessConditionalFlow" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
+
+    <callActivity id="callSubProcess" calledElement="calledProcess" />
+
+    <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="afterCallActivityTask">
+      <conditionExpression xsi:type="tFormalExpression">${shouldTakeFlow}</conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="afterCallActivityTask" />
+
+    <sequenceFlow id="flow4" sourceRef="afterCallActivityTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

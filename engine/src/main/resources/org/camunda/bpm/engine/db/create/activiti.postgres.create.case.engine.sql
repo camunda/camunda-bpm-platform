@@ -1,3 +1,20 @@
+--
+-- Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+-- under one or more contributor license agreements. See the NOTICE file
+-- distributed with this work for additional information regarding copyright
+-- ownership. Camunda licenses this file to you under the Apache License,
+-- Version 2.0; you may not use this file except in compliance with the License.
+-- You may obtain a copy of the License at
+--
+--     http://www.apache.org/licenses/LICENSE-2.0
+--
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
+--
+
 -- create case definition table --
 
 create table ACT_RE_CASE_DEF (
@@ -10,6 +27,8 @@ create table ACT_RE_CASE_DEF (
     DEPLOYMENT_ID_ varchar(64),
     RESOURCE_NAME_ varchar(4000),
     DGRM_RESOURCE_NAME_ varchar(4000),
+    TENANT_ID_ varchar(64),
+    HISTORY_TTL_ integer,
     primary key (ID_)
 );
 
@@ -28,8 +47,7 @@ create table ACT_RU_CASE_EXECUTION (
     PREV_STATE_ integer,
     CURRENT_STATE_ integer,
     REQUIRED_ boolean,
-    REPEATABLE_ boolean,
-    REPETITION_ boolean,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -45,14 +63,12 @@ create table ACT_RU_CASE_SENTRY_PART (
     SOURCE_CASE_EXEC_ID_ varchar(64),
     STANDARD_EVENT_ varchar(255),
     SOURCE_ varchar(255),
+    VARIABLE_EVENT_ varchar(255),
+    VARIABLE_NAME_ varchar(255),
     SATISFIED_ boolean,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
-
--- create unique constraint on ACT_RE_CASE_DEF --
-alter table ACT_RE_CASE_DEF
-    add constraint ACT_UNIQ_CASE_DEF
-    unique (KEY_,VERSION_);
 
 -- create index on business key --
 create index ACT_IDX_CASE_EXEC_BUSKEY on ACT_RU_CASE_EXECUTION(BUSINESS_KEY_);
@@ -114,3 +130,6 @@ alter table ACT_RU_CASE_SENTRY_PART
     add constraint ACT_FK_CASE_SENTRY_CASE_EXEC
     foreign key (CASE_EXEC_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
+
+create index ACT_IDX_CASE_DEF_TENANT_ID on ACT_RE_CASE_DEF(TENANT_ID_);
+create index ACT_IDX_CASE_EXEC_TENANT_ID on ACT_RU_CASE_EXECUTION(TENANT_ID_);

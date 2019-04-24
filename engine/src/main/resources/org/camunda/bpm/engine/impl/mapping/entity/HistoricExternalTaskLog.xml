@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity">
+
+  <!-- INSERT -->
+
+  <insert id="insertHistoricExternalTaskLog" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity">
+    insert into ${prefix}ACT_HI_EXT_TASK_LOG (
+      ID_,
+      TIMESTAMP_,
+      EXT_TASK_ID_,
+      RETRIES_,
+      TOPIC_NAME_,
+      WORKER_ID_,
+      PRIORITY_,
+      ERROR_MSG_,
+      ERROR_DETAILS_ID_,
+      ACT_ID_,
+      ACT_INST_ID_,
+      EXECUTION_ID_,
+      ROOT_PROC_INST_ID_,
+      PROC_INST_ID_,
+      PROC_DEF_ID_,
+      PROC_DEF_KEY_,
+      TENANT_ID_,
+      STATE_,
+      REMOVAL_TIME_
+    )
+    values (#{id, jdbcType=VARCHAR},
+      #{timestamp, jdbcType=TIMESTAMP},
+      #{externalTaskId, jdbcType=VARCHAR},
+      #{retries, jdbcType=INTEGER},
+      #{topicName, jdbcType=VARCHAR},
+      #{workerId, jdbcType=VARCHAR},
+      #{priority, jdbcType=BIGINT},
+      #{errorMessage, jdbcType=VARCHAR},
+      #{errorDetailsByteArrayId, jdbcType=VARCHAR},
+      #{activityId, jdbcType=VARCHAR},
+      #{activityInstanceId, jdbcType=VARCHAR},
+      #{executionId, jdbcType=VARCHAR},
+      #{rootProcessInstanceId, jdbcType=VARCHAR},
+      #{processInstanceId, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
+      #{state, jdbcType=INTEGER},
+      #{removalTime, jdbcType=TIMESTAMP}
+    )
+  </insert>
+
+  <!-- UPDATE -->
+
+  <update id="updateExternalTaskLogByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_EXT_TASK_LOG set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateExternalTaskLogByRootProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_EXT_TASK_LOG set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      TIMESTAMP_ = TIMESTAMP_
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateExternalTaskLogByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_EXT_TASK_LOG
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <!-- DELETE -->
+
+  <delete id="deleteHistoricExternalTaskLogByProcessInstanceIds">
+    delete
+    from ${prefix}ACT_HI_EXT_TASK_LOG
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'PROC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <delete id="deleteExternalTaskLogByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_EXT_TASK_LOG
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteExternalTaskLogByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_EXT_TASK_LOG
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteExternalTaskLogByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_EXT_TASK_LOG
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_EXT_TASK_LOG
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
+  </delete>
+
+  <!-- BYTE ARRAY DELETE -->
+
+  <delete id="deleteErrorDetailsByteArraysByIds">
+    delete
+    from
+      ${prefix}ACT_GE_BYTEARRAY
+    <where>
+      ID_ in (
+        select E.ERROR_DETAILS_ID_
+        from ${prefix}ACT_HI_EXT_TASK_LOG E
+        <where>
+          <include refid="selectErrorDetailsByteArrayIds"/>
+        </where>
+      )
+    </where>
+  </delete>
+
+  <delete id="deleteErrorDetailsByteArraysByIds_mysql">
+    delete B
+    from
+      ${prefix}ACT_GE_BYTEARRAY B
+    inner join ${prefix}ACT_HI_EXT_TASK_LOG E
+      on B.ID_ = E.ERROR_DETAILS_ID_
+    <include refid="selectErrorDetailsByteArrayIds"/>
+  </delete>
+
+  <!-- RESULT MAP -->
+
+  <resultMap id="historicExternalTaskLogMap" type="org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="externalTaskId" column="EXT_TASK_ID_" jdbcType="VARCHAR" />
+    <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
+    <result property="topicName" column="TOPIC_NAME_" jdbcType="VARCHAR" />
+    <result property="workerId" column="WORKER_ID_" jdbcType="VARCHAR" />
+    <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
+    <result property="errorMessage" column="ERROR_MSG_" jdbcType="VARCHAR" />
+    <result property="errorDetailsByteArrayId" column="ERROR_DETAILS_ID_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="state" column="STATE_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <sql id="selectErrorDetailsByteArrayIds">
+    and E.ERROR_DETAILS_ID_ is not null
+    <if test="id != null">
+      and E.ID_ = #{id, jdbcType=VARCHAR}
+    </if>
+    <if test="externalTaskId != null">
+      and E.RES.EXT_TASK_ID_ = #{externalTaskId, jdbcType=VARCHAR}
+    </if>
+    <if test="topicName != null">
+      and E.RES.TOPIC_NAME_ = #{topicName, jdbcType=VARCHAR}
+    </if>
+    <if test="workerId != null">
+      and E.RES.WORKER_ID_ = #{workerId, jdbcType=VARCHAR}
+    </if>
+    <if test="executionId != null">
+      and E.EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+    </if>
+    <if test="processInstanceId != null">
+      and E.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    </if>
+    <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
+      and
+        <bind name="listOfIds" value="processInstanceIdIn"/>
+        <bind name="fieldName" value="'E.PROC_INST_ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedArray"/>
+    </if>
+    <if test="processDefinitionId != null">
+      and E.PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+    </if>
+    <if test="processDefinitionKey != null">
+      and E.PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+    </if>
+  </sql>
+
+  <!-- SELECT -->
+
+  <select id="selectHistoricExternalTaskLog" resultMap="historicExternalTaskLogMap">
+    select * from ${prefix}ACT_HI_EXT_TASK_LOG where ID_ = #{id}
+  </select>
+
+  <select id="selectHistoricExternalTaskLogByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricExternalTaskLogQueryImpl" resultMap="historicExternalTaskLogMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectHistoricExternalTaskLogByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricExternalTaskLogCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricExternalTaskLogQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectHistoricExternalTaskLogByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectHistoricExternalTaskLogByQueryCriteriaSql">
+    FROM ${prefix}ACT_HI_EXT_TASK_LOG RES
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+    </if>
+
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="externalTaskId != null">
+        and RES.EXT_TASK_ID_ = #{externalTaskId}
+      </if>
+      <if test="errorMessage != null">
+        and RES.ERROR_MSG_ = #{errorMessage}
+      </if>
+      <if test="topicName != null">
+        and RES.TOPIC_NAME_ = #{topicName}
+      </if>
+      <if test="workerId != null">
+        and RES.WORKER_ID_ = #{workerId}
+      </if>
+      <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+        and RES.ACT_ID_ in
+        <foreach item="item" index="index" collection="activityIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
+        and RES.ACT_INST_ID_ in
+        <foreach item="item" index="index" collection="activityInstanceIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="executionIds != null &amp;&amp; executionIds.length > 0">
+        and RES.EXECUTION_ID_ in
+        <foreach item="item" index="index" collection="executionIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
+      </if>
+      <if test="priorityHigherThanOrEqual != null">
+        and RES.PRIORITY_ &gt;= #{priorityHigherThanOrEqual}
+      </if>
+      <if test="priorityLowerThanOrEqual != null">
+        and RES.PRIORITY_ &lt;= #{priorityLowerThanOrEqual}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
+      <if test="state != null">
+        and RES.STATE_ = #{state.stateCode}
+      </if>
+
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+      </if>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck"/>
+
+    </where>
+  </sql>
+
+
+
+</mapper>

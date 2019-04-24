@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="urn:maven:assembly:1.1.2">
+  
+  <id>tomcat</id>
+  
+  <formats>
+    <format>war</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>     
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <scope>provided</scope>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
+        <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
+        <include>org.jboss.resteasy:async-http-servlet-3.0:jar:*</include>
+        <include>org.jboss.resteasy:jaxrs-api:jar:*</include>
+      </includes>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest:war:*</include>        
+      </includes>
+      <unpack>true</unpack>   
+      <unpackOptions>
+        <excludes>
+          <exclude>**/web.xml</exclude> 
+          <exclude>**/camunda-engine-rest-core-*</exclude>        
+        </excludes>
+      </unpackOptions>   
+    </dependencySet>    
+  </dependencySets>
+  
+  <fileSets>
+    <fileSet>
+      <directory>src/main/runtime/tomcat/webapp</directory>
+      <outputDirectory>/</outputDirectory>      
+    </fileSet>     
+  </fileSets>
+  
+</assembly>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
-                  xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
                   xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
@@ -16,9 +16,7 @@
         </extensionElements>
         <defaultControl>
           <manualActivationRule>
-            <condition>
-              <body>${false}</body>
-            </condition>
+            <condition>${false}</condition>
           </manualActivationRule>
         </defaultControl>
       </humanTask>

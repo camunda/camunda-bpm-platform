@@ -7,7 +7,7 @@
 
 	<signal id="signal" name="abort" />
 
-	<process id="signalEventWithFailedJobRetryTimeCycle">
+	<process id="signalEventWithFailedJobRetryTimeCycle" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="signalWithFailedJobRetryTimeCycle" />

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theService" />
+
+    <serviceTask id="theService" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theService" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+
+      <startEvent id="innerStart" />
+
+      <sequenceFlow sourceRef="innerStart" targetRef="innerService1" />
+
+      <serviceTask id="innerService1" camunda:expression="${true}" />
+
+      <sequenceFlow sourceRef="innerService1" targetRef="fork" />
+
+      <parallelGateway id="fork" />
+
+      <sequenceFlow sourceRef="fork" targetRef="innerService2" />
+      <serviceTask id="innerService2" camunda:expression="${true}" />
+      <sequenceFlow sourceRef="innerService2" targetRef="innerService3" />
+      <serviceTask id="innerService3" camunda:expression="${true}" />
+      <sequenceFlow sourceRef="innerService3" targetRef="innerEnd1" />
+      <endEvent id="innerEnd1">
+        <extensionElements>
+          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.standalone.entity.ExecutionOrderListener" />
+        </extensionElements>
+      </endEvent>
+
+      <sequenceFlow sourceRef="fork" targetRef="innerService4" />
+      <serviceTask id="innerService4" camunda:expression="${true}" />
+      <sequenceFlow sourceRef="innerService4" targetRef="innerService5" />
+      <serviceTask id="innerService5" camunda:expression="${true}" />
+      <sequenceFlow sourceRef="innerService5" targetRef="innerService6" />
+      <serviceTask id="innerService6" camunda:expression="${true}" />
+      <sequenceFlow sourceRef="innerService6" targetRef="innerEnd2" />
+      <endEvent id="innerEnd2">
+        <extensionElements>
+          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.standalone.entity.ExecutionOrderListener" />
+        </extensionElements>
+      </endEvent>
+
+    </subProcess>
+
+    <sequenceFlow sourceRef="subProcess" targetRef="theService1" />
+
+    <serviceTask id="theService1" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.standalone.entity.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow sourceRef="theService1" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,12 +24,11 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
+import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -38,10 +41,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.tree.ActivityStackCollector;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
  * @author Thorben Lindhauer
@@ -86,6 +90,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
 
   public Void execute(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+
     final ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
 
     CoreModelElement elementToInstantiate = getTargetElement(processDefinition);
@@ -96,7 +101,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         elementToInstantiate);
 
     // rebuild the mapping because the execution tree changes with every iteration
-    final ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
+    final ActivityExecutionTreeMapping mapping = new ActivityExecutionTreeMapping(commandContext, processInstanceId);
 
     // before instantiating an activity, two things have to be determined:
     //
@@ -126,7 +131,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     // if no explicit ancestor activity instance is set
     if (ancestorActivityInstanceId == null) {
       // walk until a scope is reached for which executions exist
-      walker.walkWhile(new WalkCondition<ScopeImpl>() {
+      walker.walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
         public boolean isFulfilled(ScopeImpl element) {
           return !mapping.getExecutions(element).isEmpty() || element == processDefinition;
         }
@@ -159,7 +164,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       final PvmScope ancestorScope = getScopeForActivityInstance(processDefinition, ancestorInstance);
 
       // walk until the scope of the ancestor scope execution is reached
-      walker.walkWhile(new WalkCondition<ScopeImpl>() {
+      walker.walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
         public boolean isFulfilled(ScopeImpl element) {
           return (
               mapping.getExecutions(element).contains(ancestorScopeExecution)
@@ -214,10 +219,10 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         // we have to distinguish between instantiation of the start event and any other activity.
         // instantiation of the start event means interrupting behavior; instantiation
         // of any other task means no interruption.
-        PvmActivity initialActivity = (PvmActivity) topMostActivity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
+        PvmActivity initialActivity = topMostActivity.getProperties().get(BpmnProperties.INITIAL_ACTIVITY);
         PvmActivity secondTopMostActivity = null;
         if (activitiesToInstantiate.size() > 1) {
-          secondTopMostActivity = (PvmActivity) activitiesToInstantiate.get(1);
+          secondTopMostActivity = activitiesToInstantiate.get(1);
         }
         else if (ActivityImpl.class.isAssignableFrom(elementToInstantiate.getClass())) {
           secondTopMostActivity = (PvmActivity) elementToInstantiate;
@@ -289,15 +294,10 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
    */
   protected boolean supportsConcurrentChildInstantiation(ScopeImpl flowScope) {
     CoreActivityBehavior<?> behavior = flowScope.getActivityBehavior();
-    if (behavior != null) {
-      return !(behavior instanceof SequentialMultiInstanceActivityBehavior);
-    }
-    else {
-      return true;
-    }
+    return behavior == null || !(behavior instanceof SequentialMultiInstanceActivityBehavior);
   }
 
-  protected ExecutionEntity getSingleExecutionForScope(ActivityExecutionMapping mapping, ScopeImpl scope) {
+  protected ExecutionEntity getSingleExecutionForScope(ActivityExecutionTreeMapping mapping, ScopeImpl scope) {
     Set<ExecutionEntity> executions = mapping.getExecutions(scope);
 
     if (!executions.isEmpty()) {

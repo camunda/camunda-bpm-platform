@@ -1,97 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Welcome to the Camunda BPM platform</title>
-    
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="author" content="camunda.org community" />
-    
-    <link rel="shortcut icon" href="assets/img/favicon.ico" />
-    
-    <!-- loads all stylesheets -->
-    <link href="assets/css/app.css" rel="stylesheet" />
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" />
+<html lang=en>
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=X-UA-Compatible content="IE=edge">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <meta name="author" content="camunda.org community" />
 
-    <!-- For IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-     
-    <base app-base="." />
-  </head>
-  <body ng-controller="DefaultController" >
-    <div class="wrapper wrapper-dark">
-      <div class="clearer"> </div>
-        <div class="container" >
-          <div class="center center-custom"> 
-            <i class="camunda-icon"></i><p> <h1>Camunda BPM platform</h1></p>
-            <p>
-              <strong>Congratulations!</strong> you have successfully installed the Camunda BPM platform.<br />
-              Read our <strong><a href="http://docs.camunda.org/latest/guides/getting-started-guides/" target="_blank">Getting Started Tutorials</a></strong> 
-              or jump right into our <strong><a href="/camunda-invoice/" target="_blank">Invoice Example</a></strong>.<br />
-              You can use the following credentials for all applications:
-            </p>
-            <h3>
-              User: <strong>demo</strong><br />
-              Password: <strong>demo</strong>
-            </h3>
+  <title>Welcome to the Camunda BPM Platform</title>
+
+  <base app-base="." />
+
+
+  <link rel="stylesheet" href="./assets/css/styles.min.css">
+  <link rel="stylesheet" href="./assets/css/welcome.css">
+  <link rel="shortcut icon" href="assets/img/favicon.ico" />
+</head>
+<body class="dashboard">
+  <header class="cam-brand-header">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-8">
+          <a class="navbar-brand" href="./index.html" title="Camunda BPM platform">
+            <span class="brand-logo"></span>
+            <span class="brand-name">Camunda BPM Platform</span>
+          </a>
+        </div>
+        <div class="col-xs-4 text-right">
+          <a class="btn btn-sm btn-primary"
+             href="https://camunda.com/bpm/enterprise/">Enterprise Support</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container page-body">
+    <div class="row">
+      <section class="webapps col-xs-12">
+        <div class="inner">
+          <header>
+            <h1 class="section-title">Webapps</h1>
+          </header>
+
+          <div class="section-body">
+            <a class="screenshot webapp-screenshot webapp-welcome"
+               href="/camunda/app/welcome/default/#">
+              <img alt="Screenshot of the Welcome webapp"
+                   src="./assets/img/apps-welcome.png" />
+              <div class="hover-text">
+                <span>Welcome</span>
+              </div>
+            </a>
+
+            <a class="screenshot webapp-screenshot webapp-admin"
+               href="/camunda/app/admin/default/#">
+              <img alt="Screenshot of the Admin webapp"
+                   src="./assets/img/apps-admin.png" />
+              <div class="hover-text">
+                <span>Admin</span>
+              </div>
+            </a>
+
+            <a class="screenshot webapp-screenshot webapp-tasklist"
+               href="/camunda/app/tasklist/default/#">
+              <img alt="Screenshot of the Tasklist webapp"
+                   src="./assets/img/apps-tasklist.png" />
+              <div class="hover-text">
+                <span>Tasklist</span>
+              </div>
+            </a>
+
+            <a class="screenshot webapp-screenshot webapp-cockpit"
+               href="/camunda/app/cockpit/default/#">
+              <img alt="Screenshot of the Cockpit webapp"
+                   src="./assets/img/apps-cockpit-dashboard.png" />
+              <div class="hover-text">
+                <span>Cockpit</span>
+              </div>
+            </a>
           </div>
-          <div class="welcome-container">
-            <div class="row">
-              <div class="span4 center">
-                <a href="/camunda/app/tasklist" target="_blank">
-                  <img src="assets/img/tasklist.png" class="preview">
-                </a>
-              </div>
-              <div class="span4 center">
-                <a href="/camunda/app/cockpit" target="_blank">
-                  <img src="assets/img/cockpit.png" class="preview">
-                </a>
-              </div>
-              <div class="span4 center">
-                <a href="/camunda/app/admin" target="_blank">
-                  <img src="assets/img/admin.png" class="preview">
-                </a>
-              </div>
-            </div>
-            <div class="row row-white">
-              <div class="span4 center">
-                <h2>Camunda Tasklist</h2>
-                <p>
-                  Human Workflow Management.
-                </p>
-                <p>
-                  <a href="/camunda/app/tasklist" class="btn" target="_blank">Open Tasklist &gt;&gt;</a>
-                </p>
-              </div>
-              <div class="span4 center">
-                <h2>Camunda Cockpit</h2>                
-                <p>
-                  Operations &amp; Monitoring.
-                </p>
-                <p>
-                  <a href="/camunda/app/cockpit" class="btn" target="_blank">Open Cockpit &gt;&gt;</a>
-                </p>                
-              </div>
-              <div class="span4 center">
-                <h2>Camunda Admin</h2>                
-                <p>
-                  User Management.
-                </p>
-                <p>
-                  <a href="/camunda/app/admin" class="btn" target="_blank">Open Admin &gt;&gt;</a>
-                </p>               
-              </div>
-            </div>
+
+          <div class="section-actions text-right">
+            Login: demo / demo
+            <a class="btn btn-primary"
+               href="/camunda/app/welcome/default/#">Go to the Webapps</a>
           </div>
         </div>
-      <div class="push-down"> </div> 
+      </section>
     </div>
-    <!-- footer -->
-    <footer class="footer">
-    </footer>
-  </body>
-</html>
 
+    <div class="row">
+      <section class="invoice col-xs-12 col-md-6">
+        <div class="inner">
+          <header>
+            <h1 class="section-title">Invoice Example</h1>
+          </header>
+
+          <div class="section-body row">
+            <div class="col-xs-12">
+              <p>
+                This example allows you to walk through the features of camundaBPM guided by a simple invoice process.
+              </p>
+
+              <p>
+                Get started with the example by logging into the <a target="_blank" href="/camunda/app/tasklist/">camunda Tasklist</a> using the credentials <code>demo:demo</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="section-actions text-right">
+            <a class="btn btn-default"
+               href="./invoice.html">Read the Details</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="col-xs-6">
+        <div class="inner">
+          <header>
+            <h1 class="section-title">Modeler</h1>
+          </header>
+
+          <div class="section-body">
+            <a class="screenshot app-screenshot app-modeler"
+               href="https://camunda.org/features/modeler/">
+              <img alt="Screenshot of the Modeler"
+                   src="./assets/img/modeler.png" />
+            </a>
+
+            <!-- <p>
+              Camunda Modeler is a desktop application for editing BPMN process diagrams and DMN decision tables. It is very easy to use, which means that business analysts can use it as well as developers, working on the same diagrams.
+            </p> -->
+          </div>
+
+          <div class="section-actions text-right">
+            <a class="btn btn-default"
+               href="https://camunda.org/features/modeler/">Download the Modeler</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="row">
+      <section class="col-xs-12 col-md-6">
+        <div class="inner">
+          <header>
+            <h1 class="section-title">Documentation</h1>
+          </header>
+
+          <div class="section-body">
+            <a class="screenshot"
+               href="https://docs.camunda.org">
+              <img alt="Screenshot of the documentation"
+                   src="./assets/img/documentation.png" />
+            </a>
+          </div>
+
+          <div class="section-actions text-right">
+            <a class="btn btn-default"
+               href="https://docs.camunda.org">Read the Docs</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="col-xs-12 col-md-6">
+        <div class="inner">
+          <header>
+            <h1 class="section-title">Forum</h1>
+          </header>
+
+          <div class="section-body">
+            <a class="screenshot"
+               href="https://forum.camunda.org">
+              <img alt="Screenshot of the forum"
+                   src="./assets/img/forum.png" />
+            </a>
+          </div>
+
+          <div class="section-actions text-right">
+            <a class="btn btn-default"
+               href="https://forum.camunda.org">Visit the Forum</a>
+            <a class="btn btn-primary"
+               href="https://camunda.com/bpm/enterprise/">Enterprise Support</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="cam-brand-footer">
+  </footer>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" expressionLanguage="http://www.omg.org/spec/FEEL/20140401" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" typeLanguage="http://www.omg.org/spec/FEEL/20140401">
+  <decision id="tenRulesTwoInputs" name="Benchmark">
+    <decisionTable hitPolicy="COLLECT" id="decisionTable" preferredOrientation="Rule-as-Row">
+      <input id="input1" label="number of matched rules">
+        <inputExpression id="inputExpression1" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_1209k69" label="number of matched rules (2)">
+        <inputExpression id="LiteralExpression_18jyq49" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="rule matched?" name="" typeRef="string"/>
+      <rule id="rule_d3f1b921-4e9d-40c9-8ade-adb8985f2b67">
+        <inputEntry id="inputEntry_2a9c8201-22ee-4f9a-8496-76f65f0f562a">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_48bfd813-c596-4784-a28a-8111070423a7">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_bea6d1d0-82ce-4536-a870-973dd0e6e510">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3a3d9cb2-0d58-4e0b-ab24-4acebf748a7e">
+        <inputEntry id="inputEntry_16e6fbc0-63a3-4e3d-828e-f9a604c6dc87">
+          <text>&gt; 0.1</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_0966e6ee-10a2-459f-9f55-d529470b0511">
+          <text>&gt; 0.1</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_94e337e4-9023-40f3-88bf-733d4d3e7dcf">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_ebec60b7-0ca7-4d96-977b-e743263a8f17">
+        <inputEntry id="inputEntry_1c056e19-20c7-4c2f-ba40-5fd30a44f2fd">
+          <text>&gt; 0.2</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e413c9aa-9187-43a8-96e7-59e3720fa882">
+          <text>&gt; 0.2</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_99ff1050-3fb3-4e43-8168-9d76e0fd6962">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_b94b52eb-b269-4751-8ff5-298e65e20be9">
+        <inputEntry id="inputEntry_79349959-19f4-4a75-ad92-5d6b25d66aeb">
+          <text>&gt; 0.3</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_dcc345d1-a01c-4a57-8645-6b670a8993d5">
+          <text>&gt; 0.3</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_c00c4451-c39c-4ea7-a779-74b51ab3a5cb">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_64410834-4e4b-4ec0-8f8a-0a93520c9760">
+        <inputEntry id="inputEntry_976732ca-af54-465b-b248-ec2db70d5450">
+          <text>&gt; 0.4</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_d46548de-ab9a-4d25-9b88-b2b69269b64a">
+          <text>&gt; 0.4</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_feb28e32-5bf2-4246-93c6-79a8f430c201">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_8056915a-7782-421f-8563-b2bfb52a38e5">
+        <inputEntry id="inputEntry_f3fab664-5391-43a3-a4a1-aaf327f81e3f">
+          <text>&gt; 0.5</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_90f36317-5a21-4417-963f-928ce1fdcd4d">
+          <text>&gt; 0.5</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_868f8bed-7af7-4e48-9b43-306b571f2249">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_d84893b6-c486-4f96-97f0-97e5a1742730">
+        <inputEntry id="inputEntry_ddf846fa-0b6e-4fe9-936f-39256606b2f3">
+          <text>&gt; 0.6</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1bec4a8d-93fa-457b-b9a1-0a5ee2cfe710">
+          <text>&gt; 0.6</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_52375eb2-11ec-47da-a2f0-f4d26e532193">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_f81efdf5-6321-4bd0-8627-76c3edb0b329">
+        <inputEntry id="inputEntry_a85f9863-f818-4790-9afe-a2bc5b336a79">
+          <text>&gt; 0.7</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_536c6410-1203-4aab-9e9e-1f77eded57aa">
+          <text>&gt; 0.7</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_a1b1f795-f58b-46a3-abe0-da174a5aaa5c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_4426ee36-44c7-4bd7-87ce-bf59e591a041">
+        <inputEntry id="inputEntry_cac0ef23-a818-4aa6-a6d9-ab23897db4bf">
+          <text>&gt; 0.8</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_05ce35da-7120-4b45-ac53-e74f8111df50">
+          <text>&gt; 0.8</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_e3dd7920-f339-4ede-ac42-09f03002fe9c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3d9574d7-4d7a-4ebc-b32a-5f9d35eb2fc7">
+        <inputEntry id="inputEntry_635d7bf4-4605-473f-a2ac-c4d896121b7c">
+          <text>&gt; 0.9</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_6b138731-7cdd-4a2c-8338-13b527ef64b4">
+          <text>&gt; 0.9</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_bbe687de-a581-441c-9734-d39750987168">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

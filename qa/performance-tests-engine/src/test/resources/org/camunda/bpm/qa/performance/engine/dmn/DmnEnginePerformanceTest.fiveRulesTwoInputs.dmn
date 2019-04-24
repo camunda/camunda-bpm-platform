@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" expressionLanguage="http://www.omg.org/spec/FEEL/20140401" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" typeLanguage="http://www.omg.org/spec/FEEL/20140401">
+  <decision id="fiveRulesTwoInputs" name="Benchmark">
+    <decisionTable hitPolicy="COLLECT" id="decisionTable" preferredOrientation="Rule-as-Row">
+      <input id="input1" label="number of matched rules">
+        <inputExpression id="inputExpression1" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_1209k69" label="number of matched rules (2)">
+        <inputExpression id="LiteralExpression_18jyq49" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="rule matched?" name="" typeRef="string"/>
+      <rule id="rule_8c227ecf-80d9-461d-b556-9d5533ae8c53">
+        <inputEntry id="inputEntry_c8e6d056-edb6-40a6-8801-f941f6029120">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_78998c51-6fa4-420c-9df6-aa53ea3f38f2">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_091cf5b3-c329-4417-a6b9-9998a8aa1176">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_4507802c-78d1-4727-b3a8-f2f4c73b4303">
+        <inputEntry id="inputEntry_5909d7d4-08ec-4c0b-923c-12d048f4eee9">
+          <text>&gt; 0.2</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_96a6f99d-7bff-406c-a7ed-4b2656264ea8">
+          <text>&gt; 0.2</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_cde8d56c-a079-4b6d-ba61-b72aca402037">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e7aff4a1-42bc-4734-930b-e9067967b038">
+        <inputEntry id="inputEntry_d57ad72f-f978-4219-b5f7-7caad7b631f4">
+          <text>&gt; 0.4</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_ea993710-83fe-4764-9b37-b3f67a0f2847">
+          <text>&gt; 0.4</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_ec418ed6-6ee6-4a5c-b962-28efd3b60ed4">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_4bd0d88b-2d4e-4249-8369-3097b05dcd58">
+        <inputEntry id="inputEntry_a29e41ca-7c1b-467a-ae1b-9b5b748b00a4">
+          <text>&gt; 0.6</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_57abcea6-ac5b-4057-a318-72447047e71d">
+          <text>&gt; 0.6</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_132ad3ed-68d1-41b9-b6b5-466be51ea67b">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_96400e31-552d-41ec-846e-6a5aff2c79e7">
+        <inputEntry id="inputEntry_6c6c83fa-efd1-4291-8f75-e473082a7e32">
+          <text>&gt; 0.8</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_0a8cc205-5724-4954-829a-5acc13a82955">
+          <text>&gt; 0.8</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_5941a07e-6149-4baa-b18e-f7ce14dcec18">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

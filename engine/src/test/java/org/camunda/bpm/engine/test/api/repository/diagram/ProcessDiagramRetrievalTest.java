@@ -1,22 +1,39 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.repository.diagram;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.apache.commons.io.FileUtils;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.repository.DiagramLayout;
+import org.camunda.bpm.engine.repository.DiagramNode;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -35,22 +52,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.repository.DiagramLayout;
-import org.camunda.bpm.engine.repository.DiagramNode;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -79,7 +84,7 @@ public class ProcessDiagramRetrievalTest {
   private static final boolean OVERWRITE_EXPECTED_HTML_FILES = false;
   
   @Rule
-  public ProcessEngineRule activitiRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   /**
    * Provides a list of parameters for
@@ -121,7 +126,7 @@ public class ProcessDiagramRetrievalTest {
 
   @Before
   public void setup() {
-    repositoryService = activitiRule.getRepositoryService();
+    repositoryService = engineRule.getRepositoryService();
     deploymentId = repositoryService.createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/api/repository/diagram/" + xmlFileName)
       .addClasspathResource("org/camunda/bpm/engine/test/api/repository/diagram/" + imageFileName)
@@ -150,7 +155,6 @@ public class ProcessDiagramRetrievalTest {
       // and are therefore ignored by the engine
     }
   }
-      
 
   /**
    * Tests {@link RepositoryService#getProcessDiagram(String)}.
@@ -164,6 +168,25 @@ public class ProcessDiagramRetrievalTest {
 //      writeToFile(repositoryService.getProcessDiagram(processDefinition.getId()),
 //              new File("src/test/resources/org/camunda/bpm/engine/test/api/repository/diagram/" + imageFileName + ".actual.png"));
       assertTrue(isEqual(expectedStream, actualStream));
+    } else {
+      // some test diagrams do not contain executable processes
+      // and are therefore ignored by the engine
+    }
+  }
+
+  @Test
+  public void testGetProcessDiagramAfterCacheWasCleaned() {
+    if (1 == processDefinitionQuery.count()) {
+      engineRule.getProcessEngineConfiguration().getDeploymentCache().discardProcessDefinitionCache();
+      // given
+      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+      // when
+      InputStream stream = repositoryService.getProcessDiagram(processDefinition.getId());
+
+      // then
+      assertNotNull(processDefinition.getDiagramResourceName());
+      assertNotNull(stream);
     } else {
       // some test diagrams do not contain executable processes
       // and are therefore ignored by the engine
@@ -184,11 +207,21 @@ public class ProcessDiagramRetrievalTest {
     } else {
       // some test diagrams do not contain executable processes
       // and are therefore ignored by the engine
-      InputStream bpmnXmlStream = new FileInputStream("src/test/resources/org/camunda/bpm/engine/test/api/repository/diagram/" + xmlFileName);
-      InputStream imageStream = new FileInputStream("src/test/resources/org/camunda/bpm/engine/test/api/repository/diagram/" + imageFileName);
+      final InputStream bpmnXmlStream = new FileInputStream("src/test/resources/org/camunda/bpm/engine/test/api/repository/diagram/" + xmlFileName);
+      final InputStream imageStream = new FileInputStream("src/test/resources/org/camunda/bpm/engine/test/api/repository/diagram/" + imageFileName);
+
       assertNotNull(bpmnXmlStream);
       assertNotNull(imageStream);
-      processDiagramLayout = new ProcessDiagramLayoutFactory().getProcessDiagramLayout(bpmnXmlStream, imageStream);
+
+      // we need to run this in the ProcessEngine context
+      processDiagramLayout = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired()
+        .execute(new Command<DiagramLayout>() {
+          @Override
+          public DiagramLayout execute(CommandContext commandContext) {
+            return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(bpmnXmlStream, imageStream);
+          }
+        });
     }
     assertLayoutCorrect(processDiagramLayout);
   }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="testDecision" name="sample decision">
+    <decisionTable id="table" hitPolicy="COLLECT" aggregation="SUM">
+      <input id="in1" label="input1">
+        <inputExpression id="inputExpression1">
+          <text>${input1}</text>
+        </inputExpression>
+      </input>
+      <output id="out1" label="output1" name="result1" >
+      </output>
+      <rule id="rule1">
+        <inputEntry>
+          <text/>
+        </inputEntry>
+        <outputEntry id="output1">
+          <text>1</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule2">
+        <inputEntry>
+          <text/>
+        </inputEntry>
+        <outputEntry id="output2">
+          <text>2</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
+

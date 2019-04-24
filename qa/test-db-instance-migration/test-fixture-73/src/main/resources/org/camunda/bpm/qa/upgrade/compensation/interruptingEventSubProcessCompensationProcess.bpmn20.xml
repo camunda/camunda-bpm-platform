@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  <message id="messageId" name="EventSubProcessMessage" />
+  
+  <process id="InterruptingEventSubProcessCompensationScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="outerTask" />
+    <userTask id="outerTask"/>
+    
+    <sequenceFlow sourceRef="outerTask" targetRef="end" />
+    <endEvent id="end" />
+    
+    <!-- event subprocess -->
+    <subProcess triggeredByEvent="true" id="eventSubProcess">
+      <startEvent id="eventSubProcessStart" isInterrupting="true">
+        <messageEventDefinition messageRef="messageId" />
+      </startEvent>
+      
+      <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
+      <userTask id="eventSubProcessTask" />
+      
+      <!-- compensation boundary event -->
+      <boundaryEvent id="compensateBoundaryEvent" attachedToRef="eventSubProcessTask">
+        <compensateEventDefinition />
+      </boundaryEvent>
+      <userTask id="undoTask" isForCompensation="true"/>
+      
+      <sequenceFlow sourceRef="eventSubProcessTask" targetRef="throwCompensate" />
+      <intermediateThrowEvent id="throwCompensate">
+        <compensateEventDefinition />
+      </intermediateThrowEvent>
+      
+      <sequenceFlow sourceRef="throwCompensate" targetRef="afterCompensate" />
+      <userTask id="afterCompensate" />
+      <sequenceFlow sourceRef="afterCompensate" targetRef="eventSubProcessEnd" />
+      <endEvent id="eventSubProcessEnd" />
+      
+      <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoTask" />
+    </subProcess>
+    
+  </process>
+</definitions>

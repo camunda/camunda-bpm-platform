@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,24 +16,60 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
+public class DecisionDefinitionQueryTest {
 
-  protected String getResourceOnePath() {
-    return "org/camunda/bpm/engine/test/repository/one.dmn";
+  protected static final String DMN_ONE_RESOURCE = "org/camunda/bpm/engine/test/repository/one.dmn";
+  protected static final String DMN_TWO_RESOURCE = "org/camunda/bpm/engine/test/repository/two.dmn";
+  protected static final String DMN_THREE_RESOURCE = "org/camunda/bpm/engine/test/api/repository/three_.dmn";
+
+  protected static final String DRD_SCORE_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
+  protected static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected RepositoryService repositoryService;
+
+  protected String decisionRequirementsDefinitionId;
+  protected String firstDeploymentId;
+  protected String secondDeploymentId;
+  protected String thirdDeploymentId;
+
+  @Before
+  public void init() {
+    repositoryService = engineRule.getRepositoryService();
+
+    firstDeploymentId = testRule.deploy(DMN_ONE_RESOURCE, DMN_TWO_RESOURCE).getId();
+    secondDeploymentId = testRule.deploy(DMN_ONE_RESOURCE).getId();
+    thirdDeploymentId = testRule.deploy(DMN_THREE_RESOURCE).getId();
   }
 
-  protected String getResourceTwoPath() {
-    return "org/camunda/bpm/engine/test/repository/two.dmn";
-  }
-
-  public void testDecisionDefinitionProperties() {
+  @Test
+  public void decisionDefinitionProperties() {
     List<DecisionDefinition> decisionDefinitions = repositoryService
       .createDecisionDefinitionQuery()
       .orderByDecisionDefinitionName().asc()
@@ -45,7 +85,7 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertEquals("Examples", decisionDefinition.getCategory());
     assertEquals(1, decisionDefinition.getVersion());
     assertEquals("org/camunda/bpm/engine/test/repository/one.dmn", decisionDefinition.getResourceName());
-    assertEquals(deploymentOneId, decisionDefinition.getDeploymentId());
+    assertEquals(firstDeploymentId, decisionDefinition.getDeploymentId());
 
     decisionDefinition = decisionDefinitions.get(1);
     assertEquals("one", decisionDefinition.getKey());
@@ -54,7 +94,7 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertEquals("Examples", decisionDefinition.getCategory());
     assertEquals(2, decisionDefinition.getVersion());
     assertEquals("org/camunda/bpm/engine/test/repository/one.dmn", decisionDefinition.getResourceName());
-    assertEquals(deploymentTwoId, decisionDefinition.getDeploymentId());
+    assertEquals(secondDeploymentId, decisionDefinition.getDeploymentId());
 
     decisionDefinition = decisionDefinitions.get(2);
     assertEquals("two", decisionDefinition.getKey());
@@ -63,10 +103,11 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertEquals("Examples2", decisionDefinition.getCategory());
     assertEquals(1, decisionDefinition.getVersion());
     assertEquals("org/camunda/bpm/engine/test/repository/two.dmn", decisionDefinition.getResourceName());
-    assertEquals(deploymentOneId, decisionDefinition.getDeploymentId());
+    assertEquals(firstDeploymentId, decisionDefinition.getDeploymentId());
   }
 
-  public void testQueryByDecisionDefinitionIds() {
+  @Test
+	public void queryByDecisionDefinitionIds() {
     // empty list
     assertTrue(repositoryService.createDecisionDefinitionQuery().decisionDefinitionIdIn("a", "b").list().isEmpty());
 
@@ -89,16 +130,18 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByDeploymentId() {
+  @Test
+	public void queryByDeploymentId() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
-      .deploymentId(deploymentOneId);
+      .deploymentId(firstDeploymentId);
 
     verifyQueryResults(query, 2);
   }
 
-  public void testQueryByInvalidDeploymentId() {
+  @Test
+	public void queryByInvalidDeploymentId() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
    query
@@ -114,7 +157,8 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByName() {
+  @Test
+	public void queryByName() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -128,7 +172,8 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 2);
   }
 
-  public void testQueryByInvalidName() {
+  @Test
+	public void queryByInvalidName() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -144,16 +189,22 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByNameLike() {
+  @Test
+	public void queryByNameLike() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .decisionDefinitionNameLike("%w%");
 
     verifyQueryResults(query, 1);
+
+    query.decisionDefinitionNameLike("%z\\_");
+
+    verifyQueryResults(query, 1);
   }
 
-  public void testQueryByInvalidNameLike() {
+  @Test
+	public void queryByInvalidNameLike() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -169,7 +220,39 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByKey() {
+  @Test
+  public void queryByResourceNameLike() {
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    query
+        .decisionDefinitionResourceNameLike("%ree%");
+
+    verifyQueryResults(query, 1);
+
+    query.decisionDefinitionResourceNameLike("%ee\\_%");
+
+    verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void queryByInvalidNResourceNameLike() {
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    query
+        .decisionDefinitionResourceNameLike("%invalid%");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.decisionDefinitionNameLike(null);
+      fail();
+    } catch (NotValidException e) {
+      // Expected exception
+    }
+  }
+
+  @Test
+	public void queryByKey() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     // decision one
@@ -185,7 +268,8 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
-  public void testQueryByInvalidKey() {
+  @Test
+	public void queryByInvalidKey() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -201,16 +285,22 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByKeyLike() {
+  @Test
+	public void queryByKeyLike() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .decisionDefinitionKeyLike("%o%");
 
     verifyQueryResults(query, 3);
+
+    query.decisionDefinitionKeyLike("%z\\_");
+
+    verifyQueryResults(query, 1);
   }
 
-  public void testQueryByInvalidKeyLike() {
+  @Test
+	public void queryByInvalidKeyLike() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -226,7 +316,8 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByCategory() {
+  @Test
+	public void queryByCategory() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -235,7 +326,8 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 2);
   }
 
-  public void testQueryByInvalidCategory() {
+  @Test
+	public void queryByInvalidCategory() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -251,7 +343,8 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByCategoryLike() {
+  @Test
+	public void queryByCategoryLike() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -263,9 +356,15 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
       .decisionDefinitionCategoryLike("%amples2");
 
     verifyQueryResults(query, 1);
+
+    query
+        .decisionDefinitionCategoryLike("%z\\_");
+
+    verifyQueryResults(query, 1);
   }
 
-  public void testQueryByInvalidCategoryLike() {
+  @Test
+	public void queryByInvalidCategoryLike() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -281,7 +380,8 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByVersion() {
+  @Test
+	public void queryByVersion() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -292,10 +392,11 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     query
       .decisionDefinitionVersion(1);
 
-    verifyQueryResults(query, 2);
+    verifyQueryResults(query, 3);
   }
 
-  public void testQueryByInvalidVersion() {
+  @Test
+	public void queryByInvalidVersion() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
@@ -318,13 +419,14 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQueryByLatest() {
+  @Test
+	public void queryByLatest() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .latestVersion();
 
-    verifyQueryResults(query, 2);
+    verifyQueryResults(query, 3);
 
     query
       .decisionDefinitionKey("one")
@@ -391,35 +493,74 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     }
   }
 
-  public void testQuerySorting() {
+  @Test
+  public void queryByDecisionRequirementsDefinitionId() {
+    testRule.deploy(DRD_DISH_RESOURCE, DRD_SCORE_RESOURCE);
+
+    List<DecisionRequirementsDefinition> drds = repositoryService.createDecisionRequirementsDefinitionQuery()
+        .orderByDecisionRequirementsDefinitionName().asc().list();
+
+    String dishDrdId = drds.get(0).getId();
+    String scoreDrdId = drds.get(1).getId();
+
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    verifyQueryResults(query.decisionRequirementsDefinitionId("non existing"), 0);
+    verifyQueryResults(query.decisionRequirementsDefinitionId(dishDrdId), 3);
+    verifyQueryResults(query.decisionRequirementsDefinitionId(scoreDrdId), 2);
+  }
+
+  @Test
+  public void queryByDecisionRequirementsDefinitionKey() {
+    testRule.deploy(DRD_DISH_RESOURCE, DRD_SCORE_RESOURCE);
+
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    verifyQueryResults(query.decisionRequirementsDefinitionKey("non existing"), 0);
+    verifyQueryResults(query.decisionRequirementsDefinitionKey("dish"), 3);
+    verifyQueryResults(query.decisionRequirementsDefinitionKey("score"), 2);
+  }
+
+  @Test
+  public void queryByWithoutDecisionRequirementsDefinition() {
+    testRule.deploy(DRD_DISH_RESOURCE, DRD_SCORE_RESOURCE);
+
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    verifyQueryResults(query, 9);
+    verifyQueryResults(query.withoutDecisionRequirementsDefinition(), 4);
+  }
+
+  @Test
+	public void querySorting() {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     // asc
     query
       .orderByDecisionDefinitionId()
       .asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .orderByDeploymentId()
       .asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .orderByDecisionDefinitionKey()
       .asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .orderByDecisionDefinitionVersion()
       .asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     // desc
 
@@ -428,28 +569,28 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     query
       .orderByDecisionDefinitionId()
       .desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .orderByDeploymentId()
       .desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .orderByDecisionDefinitionKey()
       .desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createDecisionDefinitionQuery();
 
     query
       .orderByDecisionDefinitionVersion()
       .desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createDecisionDefinitionQuery();
 
@@ -461,7 +602,7 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
       .desc();
 
     List<DecisionDefinition> decisionDefinitions = query.list();
-    assertEquals(3, decisionDefinitions.size());
+    assertEquals(4, decisionDefinitions.size());
 
     assertEquals("one", decisionDefinitions.get(0).getKey());
     assertEquals(2, decisionDefinitions.get(0).getVersion());
@@ -471,4 +612,51 @@ public class DecisionDefinitionQueryTest extends AbstractDefinitionQueryTest {
     assertEquals(1, decisionDefinitions.get(2).getVersion());
   }
 
+
+  protected void verifyQueryResults(DecisionDefinitionQuery query, int expectedCount) {
+    assertEquals(expectedCount, query.count());
+    assertEquals(expectedCount, query.list().size());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
+    "org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
+  @Test
+  public void testQueryOrderByVersionTag() {
+    List<DecisionDefinition> decisionDefinitionList = repositoryService
+      .createDecisionDefinitionQuery()
+      .versionTagLike("1%")
+      .orderByVersionTag()
+      .asc()
+      .list();
+
+    assertEquals("1.1.0", decisionDefinitionList.get(1).getVersionTag());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
+    "org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
+  @Test
+  public void testQueryByVersionTag() {
+    DecisionDefinition decisionDefinition = repositoryService
+      .createDecisionDefinitionQuery()
+      .versionTag("1.0.0")
+      .singleResult();
+
+    assertEquals("versionTag", decisionDefinition.getKey());
+    assertEquals("1.0.0", decisionDefinition.getVersionTag());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
+    "org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
+  @Test
+  public void testQueryByVersionTagLike() {
+    List<DecisionDefinition> decisionDefinitionList = repositoryService
+    .createDecisionDefinitionQuery()
+    .versionTagLike("1%")
+    .list();
+
+    assertEquals(2, decisionDefinitionList.size());
+  }
 }

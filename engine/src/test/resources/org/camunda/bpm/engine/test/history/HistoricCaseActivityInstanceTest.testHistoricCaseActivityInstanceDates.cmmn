@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <definitions name="Test Case"
-                xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
                 xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 targetNamespace="Examples">
 
   <case id="testCase" name="Test Case">
 
-    <casePlanModel>
+    <casePlanModel id="CasePlanModel_1">
 
       <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
       <planItem id="PI_HumanTask_2" definitionRef="HumanTask_2" />
       <planItem id="PI_HumanTask_3" definitionRef="HumanTask_3" />
-      <planItem id="PI_Milestone_1" definitionRef="Milestone" entryCriteriaRefs="Sentry_1" />
-      <planItem id="PI_Milestone_2" definitionRef="Milestone" entryCriteriaRefs="Sentry_2" />
-      <planItem id="PI_Milestone_3" definitionRef="Milestone" entryCriteriaRefs="Sentry_3" />
+      <planItem id="PI_Milestone_1" definitionRef="Milestone">
+        <entryCriterion sentryRef="Sentry_1" />
+      </planItem>
+      <planItem id="PI_Milestone_2" definitionRef="Milestone">
+        <entryCriterion sentryRef="Sentry_2" />
+      </planItem>
+      <planItem id="PI_Milestone_3" definitionRef="Milestone">
+        <entryCriterion sentryRef="Sentry_3" />
+      </planItem>
 
       <sentry id="Sentry_1">
         <planItemOnPart sourceRef="PI_HumanTask_1">
@@ -36,7 +42,13 @@
 
       <humanTask id="HumanTask_1" />
       <humanTask id="HumanTask_2" />
-      <humanTask id="HumanTask_3" />
+      <humanTask id="HumanTask_3" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
       <milestone id="Milestone" />
 

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +23,7 @@ import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.deployment.scanning.spi.ProcessApplicationScanner;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
-import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
+import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 
 public class ProcessApplicationScanningUtil {
 
@@ -56,8 +60,8 @@ public class ProcessApplicationScanningUtil {
       // check if we must use JBoss VFS
       classLoader.loadClass("org.jboss.vfs.VFS");
       scanner = new VfsProcessApplicationScanner();
-
-    } catch (Throwable t) {
+    }
+    catch (Throwable t) {
       scanner = new ClassPathProcessApplicationScanner();
     }
 
@@ -68,7 +72,7 @@ public class ProcessApplicationScanningUtil {
   public static boolean isDeployable(String filename) {
     return hasSuffix(filename, BpmnDeployer.BPMN_RESOURCE_SUFFIXES)
       || hasSuffix(filename, CmmnDeployer.CMMN_RESOURCE_SUFFIXES)
-      || hasSuffix(filename, DmnDeployer.DMN_RESOURCE_SUFFIXES);
+      || hasSuffix(filename, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
   }
 
   public static boolean isDeployable(String filename, String[] additionalResourceSuffixes) {
@@ -94,7 +98,7 @@ public class ProcessApplicationScanningUtil {
     // case resources
     boolean isCmmnDiagram = checkDiagram(fileName, modelFileName, CmmnDeployer.DIAGRAM_SUFFIXES, CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
     // decision resources
-    boolean isDmnDiagram = checkDiagram(fileName, modelFileName, DmnDeployer.DIAGRAM_SUFFIXES, DmnDeployer.DMN_RESOURCE_SUFFIXES);
+    boolean isDmnDiagram = checkDiagram(fileName, modelFileName, DecisionDefinitionDeployer.DIAGRAM_SUFFIXES, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
 
     return isBpmnDiagram || isCmmnDiagram || isDmnDiagram;
   }

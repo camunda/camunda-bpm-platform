@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ReportResultEntity">
+
+  <resultMap id="durationReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DurationReportResultEntity">
+    <result property="minimum" column="MIN_" jdbcType="BIGINT" />
+    <result property="maximum" column="MAX_" jdbcType="BIGINT" />
+    <result property="average" column="AVG_" jdbcType="BIGINT" />
+    <result property="period" column="PERIOD_" jdbcType="VARCHAR" />
+    <result property="periodUnit" column="PERIOD_UNIT_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="selectHistoricProcessInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
+    SELECT
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
+    FROM
+      (
+        SELECT
+          ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}HPI.START_TIME_${datepart3} AS PERIOD_, HPI.DURATION_
+          <include refid="selectHistoricProcessInstancesByCriteria"/>
+       ) RES
+    GROUP BY
+      PERIOD_ 
+  </select>
+
+  <select id="selectHistoricProcessInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
+    SELECT
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
+    FROM
+      (
+        SELECT
+          ${datepart1}HPI.START_TIME_${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3} AS PERIOD_, HPI.DURATION_
+          <include refid="selectHistoricProcessInstancesByCriteria"/>
+       ) RES
+    GROUP BY
+      PERIOD_ 
+  </select>
+
+  <sql id="selectHistoricProcessInstancesByCriteria">
+    FROM
+      ${prefix}ACT_HI_PROCINST HPI
+    <where>
+        END_TIME_ IS NOT NULL
+      <if test="processDefinitionIdIn != null and processDefinitionIdIn.length > 0">
+        AND PROC_DEF_ID_ IN
+        <foreach item="item" index="index" collection="processDefinitionIdIn" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processDefinitionKeyIn != null and processDefinitionKeyIn.length > 0">
+        AND PROC_DEF_KEY_ IN
+        <foreach item="item" index="index" collection="processDefinitionKeyIn" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="startedBefore != null">
+        AND START_TIME_ &lt;= #{startedBefore}
+      </if>
+      <if test="startedAfter != null">
+        AND START_TIME_ &gt;= #{startedAfter}
+      </if>
+
+      <bind name="columnPrefix" value="'HPI.'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+
+    </where>
+  </sql>
+
+</mapper>

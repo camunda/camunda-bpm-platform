@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+	targetNamespace="Examples">
+
+	<signal id="alertSignal" name="alert" />
+
+	<process id="signalBoundaryProcess" isExecutable="true">
+
+		<startEvent id="start" />
+
+		<sequenceFlow sourceRef="start" targetRef="task" />
+
+		<userTask id="task" />
+
+		<sequenceFlow sourceRef="task" targetRef="end1" />
+
+		<endEvent id="end1" />
+
+		<boundaryEvent id="boundary" attachedToRef="task" cancelActivity="true">
+      <signalEventDefinition signalRef="alertSignal"/>
+  	</boundaryEvent>
+
+    <sequenceFlow sourceRef="boundary" targetRef="taskAfterBoundaryEvent" />
+
+    <userTask id="taskAfterBoundaryEvent" />
+
+		<sequenceFlow sourceRef="taskAfterBoundaryEvent" targetRef="end2" />
+
+    <endEvent id="end2" />
+
+	</process>
+
+</definitions>

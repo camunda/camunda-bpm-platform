@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+
+  <!-- INSERT -->
+
+  <insert id="insertTenant" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    insert into ${prefix}ACT_ID_TENANT (ID_, NAME_, REV_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{name ,jdbcType=VARCHAR},
+      1
+    )
+  </insert>
+
+  <!-- UPDATE -->
+  
+  <update id="updateTenant" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    update ${prefix}ACT_ID_TENANT set
+      REV_ = #{revisionNext ,jdbcType=INTEGER},
+      NAME_ = #{name ,jdbcType=VARCHAR}
+    where ID_ = #{id}
+       and REV_ = #{revision}
+  </update>
+  
+  <!-- DELETE -->
+
+  <delete id="deleteTenant" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    delete from ${prefix}ACT_ID_TENANT where ID_ = #{id} and REV_ = #{revision} 
+  </delete>
+
+  <!-- RESULTMAP -->
+
+  <resultMap id="tenantResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- SELECT -->
+
+  <select id="selectTenant" parameterType="string" resultMap="tenantResultMap">
+    select * from ${prefix}ACT_ID_TENANT where ID_ = #{id}
+  </select>
+  
+  <select id="selectTenantByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TenantQueryImpl" resultMap="tenantResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.* 
+    ${limitBetween}
+    <include refid="selectTenantByQueryCriteriaSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+   <select id="selectTenantCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TenantQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectTenantByQueryCriteriaSql" />
+  </select>
+  
+  <sql id="selectTenantByQueryCriteriaSql">
+
+    from ${prefix}ACT_ID_TENANT RES
+    <if test="userId != null || groupId != null">
+      inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.TENANT_ID_
+    </if>
+   <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
+
+   <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.length > 0">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike} ESCAPE ${escapeChar}
+      </if>      
+      <if test="userId != null">
+        and (TM.USER_ID_ = #{userId}
+        <if test="includingGroups">
+          or TM.GROUP_ID_ in (
+            select M.GROUP_ID_
+            from ${prefix}ACT_ID_MEMBERSHIP M
+            where M.USER_ID_ = #{userId}
+          )
+        </if>
+        )
+      </if>
+      <if test="groupId != null">
+        and TM.GROUP_ID_ = #{groupId}
+      </if>
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+    </where>
+  </sql> 
+  
+  <!-- Tenant Check which can be included by other queries -->
+
+  <sql id="queryTenantCheck">
+    <bind name="columnPrefix" value="'RES.'"/>
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+  </sql>
+
+  <sql id="queryTenantCheckWithSelfPrefix">
+    <bind name="columnPrefix" value="'SELF.'"/>
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+  </sql>
+
+  <sql id="queryTenantCheckWithPrefix">
+    <if test="tenantCheck.isTenantCheckEnabled">
+    
+      and (${columnPrefix}TENANT_ID_ is null
+      <if test="tenantCheck.authTenantIds != null &amp;&amp; !tenantCheck.authTenantIds.isEmpty">
+          or ${columnPrefix}TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantCheck.authTenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+      </if>
+      )
+    </if>
+
+  </sql>
+</mapper>

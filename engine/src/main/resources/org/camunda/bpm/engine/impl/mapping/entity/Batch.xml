@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.batch.BatchEntity">
+
+  <!-- INSERT -->
+
+  <insert id="insertBatch" parameterType="org.camunda.bpm.engine.impl.batch.BatchEntity">
+    insert into ${prefix}ACT_RU_BATCH
+    (
+      ID_,
+      TYPE_,
+      TOTAL_JOBS_,
+      JOBS_CREATED_,
+      JOBS_PER_SEED_,
+      INVOCATIONS_PER_JOB_,
+      SEED_JOB_DEF_ID_,
+      MONITOR_JOB_DEF_ID_,
+      BATCH_JOB_DEF_ID_,
+      CONFIGURATION_,
+      TENANT_ID_,
+      CREATE_USER_ID_,
+      SUSPENSION_STATE_,
+      REV_
+    )
+    values
+    (
+      #{id ,jdbcType=VARCHAR},
+      #{type, jdbcType=VARCHAR},
+      #{totalJobs, jdbcType=INTEGER},
+      #{jobsCreated, jdbcType=INTEGER},
+      #{batchJobsPerSeed, jdbcType=INTEGER},
+      #{invocationsPerBatchJob, jdbcType=INTEGER},
+      #{seedJobDefinitionId, jdbcType=VARCHAR},
+      #{monitorJobDefinitionId, jdbcType=VARCHAR},
+      #{batchJobDefinitionId, jdbcType=VARCHAR},
+      #{configuration ,jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
+      #{createUserId, jdbcType=VARCHAR},
+      #{suspensionState, jdbcType=INTEGER},
+      1
+    )
+  </insert>
+
+  <!-- RESULTMAP -->
+
+  <resultMap id="batchResultMap" type="org.camunda.bpm.engine.impl.batch.BatchEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="totalJobs" column="TOTAL_JOBS_" jdbcType="INTEGER" />
+    <result property="jobsCreated" column="JOBS_CREATED_" jdbcType="INTEGER" />
+    <result property="batchJobsPerSeed" column="JOBS_PER_SEED_" jdbcType="INTEGER" />
+    <result property="invocationsPerBatchJob" column="INVOCATIONS_PER_JOB_" jdbcType="INTEGER" />
+    <result property="seedJobDefinitionId" column="SEED_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="monitorJobDefinitionId" column="MONITOR_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="batchJobDefinitionId" column="BATCH_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
+  </resultMap>
+
+  <!-- UPDATE -->
+  <update id="updateBatch" parameterType="org.camunda.bpm.engine.impl.batch.BatchEntity">
+    update ${prefix}ACT_RU_BATCH
+    set
+      JOBS_CREATED_ = #{jobsCreated, jdbcType=INTEGER},
+      REV_ = #{revisionNext, jdbcType=INTEGER}
+    where
+      ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <update id="updateBatchSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    update ${prefix}ACT_RU_BATCH set
+      REV_ = 1 + REV_ ,
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
+    <where>
+      <if test="parameter.batchId != null">
+        ID_ = #{parameter.batchId, jdbcType=VARCHAR}
+      </if>
+    </where>
+  </update>
+
+  <!-- DELETE -->
+
+  <delete id="deleteBatch" parameterType="org.camunda.bpm.engine.impl.batch.BatchEntity">
+    delete from ${prefix}ACT_RU_BATCH where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+
+  <!-- SELECT -->
+  <select id="selectBatch" parameterType="string" resultMap="batchResultMap">
+    select * from ${prefix}ACT_RU_BATCH where ID_ = #{id}
+  </select>
+
+  <select id="selectBatchesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.BatchQueryImpl" resultMap="batchResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectBatchesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectBatchCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.BatchQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectBatchesByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectBatchesByQueryCriteriaSql">
+    from ${prefix}ACT_RU_BATCH RES
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" />
+
+    <where>
+      <if test="batchId != null">
+        RES.ID_ = #{batchId}
+      </if>
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
+      </if>
+      <if test="isTenantIdSet">
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="tenantIds == null">
+          and RES.TENANT_ID_ is null
+        </if>
+      </if>
+      <if test="suspensionState != null">
+        and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+    </where>
+  </sql>
+
+</mapper>

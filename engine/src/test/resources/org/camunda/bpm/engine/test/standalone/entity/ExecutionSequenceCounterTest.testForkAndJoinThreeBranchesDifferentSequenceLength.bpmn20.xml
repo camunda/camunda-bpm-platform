@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theService" />
+
+    <serviceTask id="theService" camunda:expression="${true}" />
+
+    <sequenceFlow sourceRef="theService" targetRef="fork" />
+
+    <parallelGateway id="fork" />
+
+    <sequenceFlow sourceRef="fork" targetRef="theService1" />
+    <serviceTask id="theService1" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService1" targetRef="theService2" />
+    <serviceTask id="theService2" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService2" targetRef="theService3" />
+    <serviceTask id="theService3" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService3" targetRef="join" />
+
+    <sequenceFlow sourceRef="fork" targetRef="theService4" />
+    <serviceTask id="theService4" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService4" targetRef="join" />
+
+    <sequenceFlow sourceRef="fork" targetRef="theService5" />
+    <serviceTask id="theService5" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService5" targetRef="theService6" />
+    <serviceTask id="theService6" camunda:expression="${true}" />
+    <sequenceFlow sourceRef="theService6" targetRef="join" />
+
+    <parallelGateway id="join">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.standalone.entity.ExecutionOrderListener" />
+      </extensionElements>
+    </parallelGateway>
+
+    <sequenceFlow sourceRef="join" targetRef="theService7" />
+
+    <serviceTask id="theService7" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.standalone.entity.ExecutionOrderListener" />
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow sourceRef="theService7" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

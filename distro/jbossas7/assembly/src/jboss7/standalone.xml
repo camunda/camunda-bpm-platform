@@ -56,6 +56,7 @@
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:1.2">
             <console-handler name="CONSOLE">
+                <filter value='not(match("JBAS011006"))' />
                 <level name="INFO"/>
                 <formatter>
                     <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
@@ -108,11 +109,12 @@
                 <datasource jta="true" jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-java-context="true" use-ccm="true">
                     <connection-url>jdbc:h2:./camunda-h2-dbs/process-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
+                    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <security>
                         <user-name>sa</user-name>
                         <password>sa</password>
-                    </security>                   
-                </datasource>               
+                    </security>
+                </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
@@ -299,6 +301,7 @@
                         <property name="isAutoSchemaUpdate">true</property>
                         <property name="authorizationEnabled">true</property>
                         <property name="jobExecutorDeploymentAware">true</property>
+                        <property name="historyCleanupBatchWindowStartTime">00:01</property>
                     </properties>
                     <plugins>
 
@@ -306,7 +309,7 @@
                       <plugin>
                         <class>org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin</class>
                       </plugin>
-                      
+
                       <!-- plugin enabling integration of camunda Spin -->
                       <plugin>
                         <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
@@ -320,41 +323,42 @@
                     <!-- LDAP CONFIGURATION -->
                     <!-- Uncomment this section in order to enable LDAP support for this process engine -->
                     <!-- Adjust configuration, see ( http://docs.camunda.org/latest/guides/user-guide/#process-engine-identity-service-the-ldap-identity-service ) -->
-                    <!-- 
+                    <!--
                       <plugin>
                         <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
                         <properties>
-                
+
                           <property name="serverUrl">ldaps://localhost:4334/</property>
                           <property name="acceptUntrustedCertificates">false</property>
                           <property name="managerDn">uid=jonny,ou=office-berlin,o=camunda,c=org</property>
                           <property name="managerPassword">s3cr3t</property>
-                
+
                           <property name="baseDn">o=camunda,c=org</property>
-                
+
                           <property name="userSearchBase">ou=employees</property>
                           <property name="userSearchFilter">(objectclass=person)</property>
-                
+
                           <property name="userIdAttribute">uid</property>
                           <property name="userFirstnameAttribute">cn</property>
                           <property name="userLastnameAttribute">sn</property>
                           <property name="userEmailAttribute">mail</property>
                           <property name="userPasswordAttribute">userpassword</property>
-                
+
                           <property name="groupSearchBase">ou=roles</property>
                           <property name="groupSearchFilter">(objectclass=groupOfNames)</property>
                           <property name="groupIdAttribute">cn</property>
                           <property name="groupNameAttribute">cn</property>
-                
+
                           <property name="groupMemberAttribute">member</property>
-                
+                          <property name="sortControlSupported">false</property>
+
                         </properties>
-                      </plugin> 
+                      </plugin>
                       -->
-                
+
                       <!-- LDAP CONFIGURATION -->
                       <!-- The following plugin allows you to grant administrator authorizations to an existing LDAP user -->
-                      <!-- 
+                      <!--
                       <plugin>
                         <class>org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin</class>
                         <properties>
@@ -391,7 +395,7 @@
         <interface name="unsecure">
             <!--
               ~  Used for IIOP sockets in the standard configuration.
-              ~                  To secure JacORB you need to setup SSL 
+              ~                  To secure JacORB you need to setup SSL
               -->
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>

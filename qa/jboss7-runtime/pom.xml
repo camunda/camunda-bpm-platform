@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -31,31 +31,6 @@
       we deploy all and only activate one with a *-ds.xml database deployment
     -->
     <dependency>
-      <groupId>org.mariadb.jdbc</groupId>
-      <artifactId>mariadb-java-client</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.ibm.db2.jcc</groupId>
-      <artifactId>db2jcc4</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>sqljdbc4</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
@@ -72,12 +47,19 @@
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.bpm.qa</groupId>
+      <artifactId>camunda-qa-ensure-clean-db</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
     <resources>
       <resource>
-        <directory>src/main/standalone</directory>
+        <directory>src/main/common/standalone</directory>
         <filtering>true</filtering>
         <includes>
           <include>configuration/standalone.xml</include>
@@ -85,11 +67,11 @@
         </includes>
       </resource>
       <resource>
-        <directory>src/main/modules</directory>
+        <directory>src/main/common/modules</directory>
         <filtering>true</filtering>
       </resource>
       <resource>
-        <directory>src/main/domain</directory>
+        <directory>src/main/common/domain</directory>
         <filtering>true</filtering>
         <includes>
           <include>configuration/domain.xml</include>
@@ -199,7 +181,7 @@
                 <configuration>
                   <target unless="maven.test.skip">
                     <copy todir="${jboss.runtime.location}/modules" overwrite="true">
-                      <fileset dir="src/main/modules" />
+                      <fileset dir="src/main/common/modules" />
                     </copy>
 
                   </target>
@@ -223,13 +205,8 @@
                     <replace dir="${jboss.runtime.location}/modules">
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
-                      <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
-                      <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
-                      <replacefilter token="@version.mysql@" value="${version.mysql}" />
-                      <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
-                      <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
 
                   </target>
@@ -308,7 +285,7 @@
                 <configuration>
                   <target unless="maven.test.skip">
                     <copy todir="${jboss.runtime.location}/modules" overwrite="true">
-                      <fileset dir="src/main/modules" />
+                      <fileset dir="src/main/common/modules" />
                     </copy>
 
                   </target>
@@ -332,13 +309,8 @@
                     <replace dir="${jboss.runtime.location}/modules">
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
-                      <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
-                      <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
-                      <replacefilter token="@version.mysql@" value="${version.mysql}" />
-                      <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
-                      <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
 
                   </target>
@@ -366,37 +338,6 @@
                 <configuration>
                   <overwrite>true</overwrite>
                   <outputDirectory>${jboss.runtime.location}/domain</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>install-test-runtime</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>assemble</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <descriptors>
-                    <descriptor>assembly.xml</descriptor>
-                  </descriptors>
-                  <finalName>camunda-qa-jboss-runtime-${project.version}</finalName>
-                  <appendAssemblyId>false</appendAssemblyId>
-                  <outputDirectory>target/</outputDirectory>
-                  <workDirectory>target/assembly/work</workDirectory>
-                  <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
               </execution>
             </executions>

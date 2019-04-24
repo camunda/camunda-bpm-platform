@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +34,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
@@ -38,6 +43,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil;
 import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.NullTolerantComparator;
@@ -47,6 +53,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -373,7 +380,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     // then the creation logs can be filtered by priority of the jobs
     // (1) lower than or equal a priority
     List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityLowerThanOrEquals(2)
+        .jobPriorityLowerThanOrEquals(2L)
         .orderByJobPriority()
         .asc()
         .list();
@@ -385,7 +392,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
     // (2) higher than or equal a given priorty
     jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityHigherThanOrEquals(3)
+        .jobPriorityHigherThanOrEquals(3L)
         .orderByJobPriority()
         .asc()
         .list();
@@ -397,8 +404,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
     // (3) lower and higher than or equal
     jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityHigherThanOrEquals(1)
-        .jobPriorityLowerThanOrEquals(3)
+        .jobPriorityHigherThanOrEquals(1L)
+        .jobPriorityLowerThanOrEquals(3L)
         .orderByJobPriority()
         .asc()
         .list();
@@ -407,6 +414,15 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     for (HistoricJobLog log : jobLogs) {
       assertTrue(log.getJobPriority() >= 1 && log.getJobPriority() <= 3);
     }
+
+    // (4) lower and higher than or equal are disjunctive
+    jobLogs = historyService.createHistoricJobLogQuery()
+        .jobPriorityHigherThanOrEquals(3)
+        .jobPriorityLowerThanOrEquals(1)
+        .orderByJobPriority()
+        .asc()
+        .list();
+    assertEquals(0, jobLogs.size());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})

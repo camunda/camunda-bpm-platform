@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +18,6 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -25,16 +26,14 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 public class TimerCatchIntermediateEventJobHandler extends TimerEventJobHandler {
 
-  private static Logger log = Logger.getLogger(TimerCatchIntermediateEventJobHandler.class.getName());
-
   public static final String TYPE = "timer-intermediate-transition";
 
   public String getType() {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    String activityId = getKey(configuration);
+  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+    String activityId = configuration.getTimerElementKey();
     ActivityImpl intermediateEventActivity = execution.getProcessDefinition().findActivity(activityId);
 
     ensureNotNull("Error while firing timer: intermediate event activity " + configuration + " not found", "intermediateEventActivity", intermediateEventActivity);
@@ -49,11 +48,11 @@ public class TimerCatchIntermediateEventJobHandler extends TimerEventJobHandler 
         execution.executeEventHandlerActivity(intermediateEventActivity);
       }
 
-    } catch (RuntimeException e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
+    }
+    catch (RuntimeException e) {
       throw e;
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
+    }
+    catch (Exception e) {
       throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
     }
   }

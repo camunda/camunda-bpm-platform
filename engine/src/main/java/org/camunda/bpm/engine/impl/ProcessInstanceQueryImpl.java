@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -20,6 +23,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -37,14 +41,17 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessInstanceQuery, ProcessInstance> implements ProcessInstanceQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected String executionId;
+  protected String processInstanceId;
   protected String businessKey;
+  protected String businessKeyLike;
   protected String processDefinitionId;
   protected Set<String> processInstanceIds;
   protected String processDefinitionKey;
+  protected String deploymentId;
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   protected SuspensionState suspensionState;
+  protected boolean hasIncident;
   protected String incidentType;
   protected String incidentId;
   protected String incidentMessage;
@@ -52,16 +59,15 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String caseInstanceId;
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
+  protected String[] activityIds;
+  protected boolean isRootProcessInstances;
+  protected boolean isLeafProcessInstances;
 
-  // Unused, see dynamic query
-  protected String activityId;
-  protected List<EventSubscriptionQueryValue> eventSubscriptions;
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+  protected boolean isProcessDefinitionWithoutTenantId = false;
 
   public ProcessInstanceQueryImpl() {
-  }
-
-  public ProcessInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public ProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
@@ -70,7 +76,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQueryImpl processInstanceId(String processInstanceId) {
     ensureNotNull("Process instance id", processInstanceId);
-    this.executionId = processInstanceId;
+    this.processInstanceId = processInstanceId;
     return this;
   }
 
@@ -93,6 +99,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike) {
+    this.businessKeyLike = businessKeyLike;
+    return this;
+  }
+
   public ProcessInstanceQueryImpl processDefinitionId(String processDefinitionId) {
     ensureNotNull("Process definition id", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
@@ -105,7 +116,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery deploymentId(String deploymentId) {
+    ensureNotNull("Deployment id", deploymentId);
+    this.deploymentId = deploymentId;
+    return this;
+  }
+
   public ProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
+    if (isRootProcessInstances) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+    }
     this.superProcessInstanceId = superProcessInstanceId;
     return this;
   }
@@ -150,6 +170,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery orderByTenantId() {
+    orderBy(ProcessInstanceQueryProperty.TENANT_ID);
+    return this;
+  }
+
+  public ProcessInstanceQuery orderByBusinessKey() {
+    orderBy(ProcessInstanceQueryProperty.BUSINESS_KEY);
+    return this;
+  }
+
   public ProcessInstanceQuery active() {
     this.suspensionState = SuspensionState.ACTIVE;
     return this;
@@ -157,6 +187,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery suspended() {
     this.suspensionState = SuspensionState.SUSPENDED;
+    return this;
+  }
+
+  public ProcessInstanceQuery hasIncident() {
+    this.hasIncident = true;
     return this;
   }
 
@@ -184,8 +219,49 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public ProcessInstanceQuery withoutTenantId() {
+    tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public ProcessInstanceQuery activityIdIn(String... activityIds) {
+    ensureNotNull("activity ids", (Object[]) activityIds);
+    this.activityIds = activityIds;
+    return this;
+  }
+
+  public ProcessInstanceQuery rootProcessInstances() {
+    if (superProcessInstanceId != null) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+    }
+    isRootProcessInstances = true;
+    return this;
+  }
+  
+  public ProcessInstanceQuery leafProcessInstances() {
+    if(subProcessInstanceId != null) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both leafProcessInstances and subProcessInstanceId");
+    }
+    isLeafProcessInstances = true;
+    return this;
+  }
+
+  public ProcessInstanceQuery processDefinitionWithoutTenantId() {
+    isProcessDefinitionWithoutTenantId = true;
+    return this;
+  }
+
   //results /////////////////////////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -194,22 +270,27 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       .findProcessInstanceCountByQueryCriteria(this);
   }
 
+  @Override
   public List<ProcessInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
     return commandContext
       .getExecutionManager()
-      .findProcessInstanceByQueryCriteria(this, page);
+      .findProcessInstancesByQueryCriteria(this, page);
+  }
+
+  public List<String> executeIdsList(CommandContext commandContext) {
+    checkQueryOk();
+    ensureVariablesInitialized();
+    return commandContext
+      .getExecutionManager()
+      .findProcessInstancesIdsByQueryCriteria(this);
   }
 
   //getters /////////////////////////////////////////////////////////////////
 
-  public boolean getOnlyProcessInstances() {
-    return true; // See dynamic query in runtime.mapping.xml
-  }
-
   public String getProcessInstanceId() {
-    return executionId;
+    return processInstanceId;
   }
 
   public Set<String> getProcessInstanceIds() {
@@ -220,6 +301,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return businessKey;
   }
 
+  public String getBusinessKeyLike() {
+    return businessKeyLike;
+  }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -228,8 +313,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return processDefinitionKey;
   }
 
-  public String getActivityId() {
-    return null; // Unused, see dynamic query
+  public String getDeploymentId() {
+    return deploymentId;
   }
 
   public String getSuperProcessInstanceId() {
@@ -248,12 +333,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     this.suspensionState = suspensionState;
   }
 
-  public List<EventSubscriptionQueryValue> getEventSubscriptions() {
-    return eventSubscriptions;
-  }
-
-  public void setEventSubscriptions(List<EventSubscriptionQueryValue> eventSubscriptions) {
-    this.eventSubscriptions = eventSubscriptions;
+  public boolean isHasIncident() {
+    return hasIncident;
   }
 
   public String getIncidentId() {
@@ -284,4 +365,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return subCaseInstanceId;
   }
 
+  public boolean isRootProcessInstances() {
+    return isRootProcessInstances;
+  }
+
+  public boolean isProcessDefinitionWithoutTenantId() {
+    return isProcessDefinitionWithoutTenantId;
+  }
 }

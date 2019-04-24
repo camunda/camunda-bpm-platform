@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -119,7 +123,7 @@ public interface Task {
 	Date getFollowUpDate();
 
 	/** Change follow-up date of the task. */
-	void setFollowUpDate(Date dueDate);
+	void setFollowUpDate(Date followUpDate);
 
 	/** delegates this task to the given user and sets the {@link #getDelegationState() delegationState} to {@link DelegationState#PENDING}.
 	 * If no owner is set on the task, the owner is set to the current assignee of the task. */
@@ -145,4 +149,23 @@ public interface Task {
    * @throws BadUserRequestException in case the form key is not initialized.
    */
   String getFormKey();
+
+  /**
+   * Returns the task's tenant id or null in case this task does not belong to a tenant.
+   *
+   * @return the task's tenant id or null
+   *
+   * @since 7.5
+   */
+  String getTenantId();
+
+  /**
+   * Sets the tenant id for this task.
+   *
+   * @param tenantId the tenant id to set
+   *
+   * @since 7.5
+   */
+  void setTenantId(String tenantId);
+
 }

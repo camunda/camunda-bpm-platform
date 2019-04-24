@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +22,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -28,6 +33,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQuery, UserOperationLogEntry> implements UserOperationLogQuery {
 
   private static final long serialVersionUID = 1L;
+  protected String deploymentId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
@@ -38,19 +44,31 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected String taskId;
   protected String jobId;
   protected String jobDefinitionId;
+  protected String batchId;
   protected String userId;
   protected String operationId;
+  protected String externalTaskId;
   protected String operationType;
   protected String property;
   protected String entityType;
+  protected String category;
   protected Date timestampAfter;
   protected Date timestampBefore;
+
+  protected String[] entityTypes;
+  protected String[] categories;
 
   public UserOperationLogQueryImpl() {
   }
 
   public UserOperationLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public UserOperationLogQuery deploymentId(String deploymentId) {
+    ensureNotNull("deploymentId", deploymentId);
+    this.deploymentId = deploymentId;
+    return this;
   }
 
   public UserOperationLogQuery processDefinitionId(String processDefinitionId) {
@@ -114,6 +132,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     return this;
   }
 
+  public UserOperationLogQuery batchId(String batchId) {
+    ensureNotNull("batchId", batchId);
+    this.batchId = batchId;
+    return this;
+  }
+
   public UserOperationLogQuery userId(String userId) {
     ensureNotNull("userId", userId);
     this.userId = userId;
@@ -123,6 +147,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   public UserOperationLogQuery operationId(String operationId) {
     ensureNotNull("operationId", operationId);
     this.operationId = operationId;
+    return this;
+  }
+  
+  public UserOperationLogQuery externalTaskId(String externalTaskId) {
+    ensureNotNull("externalTaskId", externalTaskId);
+    this.externalTaskId = externalTaskId;
     return this;
   }
 
@@ -141,6 +171,24 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   public UserOperationLogQuery entityType(String entityType) {
     ensureNotNull("entityType", entityType);
     this.entityType = entityType;
+    return this;
+  }
+
+  public UserOperationLogQuery entityTypeIn(String... entityTypes) {
+    ensureNotNull("entity types", (Object[]) entityTypes);
+    this.entityTypes = entityTypes;
+    return this;
+  }
+  
+  public UserOperationLogQuery category(String category) {
+    ensureNotNull("category", category);
+    this.category = category;
+    return this;
+  }
+  
+  public UserOperationLogQuery categoryIn(String... categories) {
+    ensureNotNull("categories", (Object[]) categories);
+    this.categories = categories;
     return this;
   }
 
@@ -170,5 +218,10 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     return commandContext
         .getOperationLogManager()
         .findOperationLogEntriesByQueryCriteria(this, page);
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.areNotInAscendingOrder(timestampAfter, timestampBefore);
   }
 }

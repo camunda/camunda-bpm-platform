@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.Escalation;
 import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -25,8 +29,8 @@ import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
 import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 /**
  * The activity behavior for an intermediate throwing escalation event and an escalation end event.
@@ -54,7 +58,7 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     walker.addExecutionPreVisitor(activityExecutionMappingCollector);
     walker.addExecutionPreVisitor(new OutputVariablesPropagator());
 
-    walker.walkUntil(new WalkCondition<ActivityExecutionTuple>() {
+    walker.walkUntil(new ReferenceWalker.WalkCondition<ActivityExecutionTuple>() {
 
       @Override
       public boolean isFulfilled(ActivityExecutionTuple element) {
@@ -96,26 +100,11 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
   protected void leaveExecution(ActivityExecution execution, final PvmActivity currentActivity, EscalationEventDefinition escalationEventDefinition) {
 
-    if (escalationEventDefinition != null && isEscalationEventSubprocessOnTheSameScope(escalationEventDefinition.getEscalationHandler(), currentActivity)) {
-      ActivityExecution childExecution = getChildExecutionForActivity(execution, currentActivity);
-      leave(childExecution);
-    } else {
+    // execution tree could have been expanded by triggering a non-interrupting event
+    ExecutionEntity replacingExecution = ((ExecutionEntity) execution).getReplacedBy();
 
-      leave(execution);
-    }
-  }
-
-  protected boolean isEscalationEventSubprocessOnTheSameScope(PvmActivity escalationHandler, final PvmActivity activity) {
-    return escalationHandler.isSubProcessScope() && escalationHandler.getFlowScope().equals(activity.getFlowScope());
-  }
-
-  protected ActivityExecution getChildExecutionForActivity(ActivityExecution execution, final PvmActivity activity) {
-    for (ActivityExecution childExecution : execution.getExecutions()) {
-      if (activity.equals(childExecution.getActivity())) {
-        return childExecution;
-      }
-    }
-    return null;
+    ExecutionEntity leavingExecution = (ExecutionEntity) (replacingExecution != null ? replacingExecution : execution);
+    leave(leavingExecution);
   }
 
   protected class EscalationEventDefinitionFinder implements TreeVisitor<PvmScope> {

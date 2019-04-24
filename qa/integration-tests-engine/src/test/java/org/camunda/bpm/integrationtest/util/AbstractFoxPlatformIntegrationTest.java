@@ -1,11 +1,12 @@
-/**
- * Copyright (C) 2011, 2012 camunda services GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,23 +16,9 @@
  */
 package org.camunda.bpm.integrationtest.util;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.engine.CaseService;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -41,6 +28,11 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Logger;
 
 
 public abstract class AbstractFoxPlatformIntegrationTest {
@@ -59,6 +51,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   protected CaseService caseService;
+  protected DecisionService decisionService;
 
   public static WebArchive initWebArchiveDeployment(String name, String processesXmlPath) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
@@ -66,7 +59,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsLibraries(DeploymentHelper.getEngineCdi())
               .addAsResource(processesXmlPath, "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
-              .addClass(TestContainer.class);
+              .addClass(TestConstants.class);
 
     TestContainer.addContainerSpecificResources(archive);
 
@@ -96,6 +89,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
     caseService = processEngine.getCaseService();
+    decisionService = processEngine.getDecisionService();
   }
 
   public void waitForJobExecutorToProcessAllJobs() {
@@ -129,7 +123,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
         timer.cancel();
       }
       if (areJobsAvailable) {
-        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded (still " + numberOfJobsAvailable() + " jobs available)");
+        throw new RuntimeException("time limit of " + maxMillisToWait + " was exceeded (still " + numberOfJobsAvailable() + " jobs available)");
       }
 
     } finally {

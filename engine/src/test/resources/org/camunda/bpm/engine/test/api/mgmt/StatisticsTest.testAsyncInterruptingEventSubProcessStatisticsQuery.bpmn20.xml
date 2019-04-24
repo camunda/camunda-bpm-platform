@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="Examples">
+             
+  <message id="Message_1" name="Message"/>
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart"/>
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task"/>
+    <!-- it is important for this task to be a scope such that the process instance
+       is not active when the event subprocess is triggered -->
+    <userTask id="task">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="inVar">${true}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="end"/>
+    <endEvent id="end"/>
+    
+    <subProcess id="eventSubprocess" triggeredByEvent="true" camunda:asyncBefore="true">
+      <startEvent id="subEventStart" isInterrupting="true">
+        <messageEventDefinition id="_MessageEventDefinition_4" messageRef="Message_1"/>
+      </startEvent>
+      <sequenceFlow id="SequenceFlow_5" sourceRef="subEventStart" targetRef="subProcessTask"/>
+      <userTask id="subProcessTask" />
+      <sequenceFlow id="SequenceFlow_6" sourceRef="subProcessTask" targetRef="subEventEnd"/>
+      <endEvent id="subEventEnd" />
+    </subProcess>
+  </process>
+
+</definitions>

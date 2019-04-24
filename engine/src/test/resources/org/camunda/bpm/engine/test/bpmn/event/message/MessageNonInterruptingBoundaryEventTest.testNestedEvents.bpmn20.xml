@@ -9,7 +9,7 @@
   <message id="secondMessageId" name="secondMessage" />
   <message id="thirdMessageId" name="thirdMessage" />
 
-  <process id="process">
+  <process id="process" isExecutable="true">
 
     <startEvent id="theStart" />
 

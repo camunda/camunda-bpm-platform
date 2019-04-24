@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.identity;
 
 import java.util.List;
@@ -26,10 +29,11 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  */
 public class GroupQueryTest extends PluggableProcessEngineTestCase {
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
 
-    createGroup("muppets", "Muppet show characters", "user");
+    createGroup("muppets", "Muppet show characters_", "user");
     createGroup("frogs", "Famous frogs", "user");
     createGroup("mammals", "Famous mammals from eighties", "user");
     createGroup("admin", "Administrators", "security");
@@ -37,6 +41,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     identityService.saveUser(identityService.newUser("kermit"));
     identityService.saveUser(identityService.newUser("fozzie"));
     identityService.saveUser(identityService.newUser("mispiggy"));
+
+    identityService.saveTenant(identityService.newTenant("tenant"));
 
     identityService.createMembership("kermit", "muppets");
     identityService.createMembership("fozzie", "muppets");
@@ -48,6 +54,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     identityService.createMembership("mispiggy", "mammals");
 
     identityService.createMembership("kermit", "admin");
+
+    identityService.createTenantGroupMembership("tenant", "frogs");
 
   }
 
@@ -69,6 +77,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup("mammals");
     identityService.deleteGroup("frogs");
     identityService.deleteGroup("admin");
+
+    identityService.deleteTenant("tenant");
 
     super.tearDown();
   }
@@ -115,7 +125,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByName() {
-    GroupQuery query = identityService.createGroupQuery().groupName("Muppet show characters");
+    GroupQuery query = identityService.createGroupQuery().groupName("Muppet show characters_");
     verifyQueryResults(query, 1);
 
     query = identityService.createGroupQuery().groupName("Famous frogs");
@@ -140,6 +150,9 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 2);
 
     query = identityService.createGroupQuery().groupNameLike("%show%");
+    verifyQueryResults(query, 1);
+
+    query = identityService.createGroupQuery().groupNameLike("%ters\\_");
     verifyQueryResults(query, 1);
   }
 
@@ -200,6 +213,17 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
       identityService.createGroupQuery().groupMember(null).list();
       fail();
     } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByMemberOfTenant() {
+    GroupQuery query = identityService.createGroupQuery().memberOfTenant("nonExisting");
+    verifyQueryResults(query, 0);
+
+    query = identityService.createGroupQuery().memberOfTenant("tenant");
+    verifyQueryResults(query, 1);
+
+    Group group = query.singleResult();
+    assertEquals("frogs", group.getId());
   }
 
   public void testQuerySorting() {

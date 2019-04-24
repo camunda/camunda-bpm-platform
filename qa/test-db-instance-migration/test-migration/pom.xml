@@ -1,0 +1,198 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa.upgrade</groupId>
+    <artifactId>camunda-qa-db-instance-migration</artifactId>
+    <version>7.11.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>camunda-qa-upgrade-test-migration</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA - upgrade - instance migration - test</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-spin</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa.upgrade</groupId>
+      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>unpack-current-sql-scripts</id>
+              <phase>generate-test-resources</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.camunda.bpm.distro</groupId>
+                    <artifactId>camunda-sql-scripts</artifactId>
+                    <version>${project.version}</version>
+                    <type>test-jar</type>
+                    <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                    <overWrite>true</overWrite>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>instance-migration</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+
+          <!-- provide sql scripts -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+              <cleanupDaemonThreads>false</cleanupDaemonThreads>
+              <includeProjectDependencies>true</includeProjectDependencies>
+              <includePluginDependencies>false</includePluginDependencies>
+              <classpathScope>test</classpathScope>
+            </configuration>
+            <executions>
+              <execution>
+                <id>drop-upgraded-db</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <mainClass>org.camunda.bpm.qa.upgrade.UpgradedDBDropper</mainClass>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>clean-new-db</id>
+      <build>
+        <plugins>
+          <!-- provide sql scripts -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>drop-db-if-present</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- try dropping the DB if it exists. -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+
+</project>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,27 +16,31 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.task.Attachment;
-import org.camunda.bpm.engine.task.Event;
-import org.camunda.bpm.engine.task.Task;
+import static org.camunda.bpm.engine.task.Event.ACTION_ADD_ATTACHMENT;
+import static org.camunda.bpm.engine.task.Event.ACTION_ADD_GROUP_LINK;
+import static org.camunda.bpm.engine.task.Event.ACTION_ADD_USER_LINK;
+import static org.camunda.bpm.engine.task.Event.ACTION_DELETE_ATTACHMENT;
+import static org.camunda.bpm.engine.task.Event.ACTION_DELETE_GROUP_LINK;
+import static org.camunda.bpm.engine.task.Event.ACTION_DELETE_USER_LINK;
+import static org.camunda.bpm.engine.task.IdentityLinkType.CANDIDATE;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.camunda.bpm.engine.task.Event.*;
-import static org.camunda.bpm.engine.task.IdentityLinkType.CANDIDATE;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.task.Attachment;
+import org.camunda.bpm.engine.task.Event;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.history.useroperationlog.AbstractUserOperationLogTest;
 
 /**
  * @author Daniel Meyer
  */
-
 @SuppressWarnings("deprecation")
-public class TaskEventsTest extends PluggableProcessEngineTestCase {
+public class TaskEventsTest extends AbstractUserOperationLogTest {
 
   static String JONNY = "jonny";
   static String ACCOUNTING = "accounting";
@@ -44,23 +52,17 @@ public class TaskEventsTest extends PluggableProcessEngineTestCase {
   private Task task;
 
   @Override
-  protected void setUp() throws Exception {
+  public void setUp() throws Exception {
     task = taskService.newTask();
     taskService.saveTask(task);
+    super.setUp();
   }
 
   @Override
   protected void tearDown() throws Exception {
+    super.tearDown();
     // delete task
-    taskService.deleteTask(task.getId());
-
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        // delete task comments
-        commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(task.getId());
-        return null;
-      }
-    });
+    taskService.deleteTask(task.getId(), true);
   }
 
   public void testAddUserLinkEvents() {

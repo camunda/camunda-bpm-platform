@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="SingleActivityConcurrentCompensationScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="userTask" />
+    <userTask id="userTask"/>
+
+    <!-- compensation -->
+    <boundaryEvent id="compensateBoundaryEvent" attachedToRef="userTask">
+      <compensateEventDefinition />
+    </boundaryEvent>
+    <userTask id="undoTask" isForCompensation="true"/>
+    
+    <sequenceFlow sourceRef="userTask" targetRef="fork" />
+    <parallelGateway id="fork" />
+
+    <!-- compensation throw event wrapped in two user tasks -->
+    <sequenceFlow sourceRef="fork" targetRef="beforeCompensate" />
+    <userTask id="beforeCompensate" />
+    <sequenceFlow sourceRef="beforeCompensate" targetRef="throwCompensate" />
+    
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="afterCompensate" />
+    <userTask id="afterCompensate" />
+    <sequenceFlow sourceRef="afterCompensate" targetRef="join" />
+    
+    <!-- a simple concurrent task -->
+    <sequenceFlow sourceRef="fork" targetRef="concurrentTask" />
+    <userTask id="concurrentTask" />
+    <sequenceFlow sourceRef="concurrentTask" targetRef="join" />
+    
+    <parallelGateway id="join" />
+    <sequenceFlow sourceRef="join" targetRef="end" />
+    <endEvent id="end" />
+    
+    <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoTask" />
+  </process>
+</definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,6 +15,7 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.history.event;
+
 
 /**
  * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>
@@ -38,11 +43,16 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   /** the reason why this process instance was cancelled (deleted) */
   protected String deleteReason;
 
-  /** id of the activity which started the process instance */
+  /** id of the activity which ended the process instance */
   protected String endActivityId;
 
-  /** id of the activity which ended the process instance */
+  /** id of the activity which started the process instance */
   protected String startActivityId;
+
+  /** id of the tenant which belongs to the process instance  */
+  protected String tenantId;
+
+  protected String state;
 
   // getters / setters ////////////////////////////////////////
 
@@ -102,17 +112,35 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
     this.deleteReason = deleteReason;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  public String getState() {
+    return state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
            + "[businessKey=" + businessKey
            + ", startUserId=" + startUserId
            + ", superProcessInstanceId=" + superProcessInstanceId
+           + ", rootProcessInstanceId=" + rootProcessInstanceId
            + ", superCaseInstanceId=" + superCaseInstanceId
            + ", deleteReason=" + deleteReason
            + ", durationInMillis=" + durationInMillis
            + ", startTime=" + startTime
            + ", endTime=" + endTime
+           + ", removalTime=" + removalTime
            + ", endActivityId=" + endActivityId
            + ", startActivityId=" + startActivityId
            + ", id=" + id
@@ -120,6 +148,7 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
+           + ", tenantId=" + tenantId
            + "]";
   }
 

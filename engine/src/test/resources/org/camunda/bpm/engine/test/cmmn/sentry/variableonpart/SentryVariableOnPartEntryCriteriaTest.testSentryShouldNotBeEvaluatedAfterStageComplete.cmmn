@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:camunda="http://camunda.org/schema/1.0/cmmn" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <cmmn:case id="Case_1">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+      <cmmn:planItem id="Stage_1" name="Stage 1" definitionRef="Stage_19enwws" />
+      <cmmn:stage id="Stage_19enwws" name="Stage1">
+        <cmmn:planItem id="HumanTask_2" name="HumanTask 2" definitionRef="HumanTask_102vwtl">
+          <cmmn:entryCriterion id="Sentry_Entry" sentryRef="SentryEntry1" />
+          <cmmn:exitCriterion id="Sentry_Exit" sentryRef="SentryExit1" />
+        </cmmn:planItem>
+        <cmmn:sentry id="SentryEntry1">
+         <cmmn:extensionElements>
+            <camunda:variableOnPart variableName = "value">
+              <camunda:variableEvent>create</camunda:variableEvent>
+             </camunda:variableOnPart>
+          </cmmn:extensionElements>
+          <cmmn:ifPart id="IfPart_09io99f">
+            <cmmn:condition id="Expression_0xb2jmp"><![CDATA[${value > 100}]]></cmmn:condition>
+          </cmmn:ifPart>
+        </cmmn:sentry>
+        <cmmn:sentry id="SentryExit1">
+          <cmmn:extensionElements>
+            <camunda:variableOnPart variableName = "variable_1">
+              <camunda:variableEvent>create</camunda:variableEvent>
+             </camunda:variableOnPart>
+          </cmmn:extensionElements>
+        </cmmn:sentry>
+        <cmmn:humanTask id="HumanTask_1nrtw8s" name="HumanTask1" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
+        <cmmn:humanTask id="HumanTask_102vwtl" name="HumanTask2" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
+      </cmmn:stage>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+ </cmmn:definitions>

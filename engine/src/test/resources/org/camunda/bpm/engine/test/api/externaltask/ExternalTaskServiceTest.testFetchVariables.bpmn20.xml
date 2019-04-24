@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="subProcessExternalTask" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="subProcessVar">${44}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+
+      <startEvent id="subProcessStart" />
+      <sequenceFlow id="flow2" sourceRef="subProcessStart" targetRef="externalTask" />
+      <serviceTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic">
+        <extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="taskVar">${45}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </extensionElements>
+      </serviceTask>
+      <sequenceFlow id="flow3" sourceRef="externalTask" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+    </subProcess>
+
+    <sequenceFlow id="flow4" sourceRef="subProcess" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<definitions id="definitions"
+             targetNamespace="http://camunda.org/schema/1.0/bpmn20" 
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn">
+  
+  <process id="noStartOrTaskForm" isExecutable="true">
+  
+    <startEvent id="request" />
+      
+    <sequenceFlow id="flow1" sourceRef="request" targetRef="approve" />
+    
+    <userTask id="approve" />
+
+    <sequenceFlow id="flow2" sourceRef="approve" targetRef="end" />
+      
+    <endEvent id="end" />
+      
+  </process>
+  
+</definitions>

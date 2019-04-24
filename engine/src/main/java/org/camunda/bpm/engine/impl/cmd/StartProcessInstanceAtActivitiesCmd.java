@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,37 +16,40 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+
+import java.util.Collections;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInstance> {
+public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInstanceWithVariables> {
 
-  private static final Logger LOG = Logger.getLogger(StartProcessInstanceAtActivitiesCmd.class.getName());
-  protected static final String INSTRUCTION_LOG_FORMAT = "Starting process instance '%s': Instruction %s: %s";
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected ProcessInstantiationBuilderImpl instantiationBuilder;
 
@@ -50,28 +57,13 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     this.instantiationBuilder = instantiationBuilder;
   }
 
-  public ProcessInstance execute(CommandContext commandContext) {
-    String processDefinitionId = instantiationBuilder.getProcessDefinitionId();
-    String processDefinitionKey = instantiationBuilder.getProcessDefinitionKey();
+  public ProcessInstanceWithVariables execute(CommandContext commandContext) {
 
-    DeploymentCache deploymentCache = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache();
-    // Find the process definition
-    ProcessDefinitionEntity processDefinition = null;
-    if (processDefinitionId!=null) {
-      processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
-    } else if(processDefinitionKey != null) {
-      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-      ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
-    } else {
-      throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
+    ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateProcessInstance(processDefinition);
     }
-
-    // check authorization
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCreateProcessInstance(processDefinition);
 
     ProcessInstanceModificationBuilderImpl modificationBuilder = instantiationBuilder.getModificationBuilder();
     ensureNotEmpty("At least one instantiation instruction required (e.g. by invoking startBefore(..), startAfter(..) or startTransition(..))",
@@ -82,14 +74,17 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
 
     ExecutionEntity processInstance = processDefinition
         .createProcessInstance(instantiationBuilder.getBusinessKey(), instantiationBuilder.getCaseInstanceId(), initialActivity);
+
+    if (instantiationBuilder.getTenantId() != null) {
+      processInstance.setTenantId(instantiationBuilder.getTenantId());
+    }
+
     processInstance.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
-    processInstance.startWithoutExecuting();
+    VariableMap variables = modificationBuilder.getProcessVariables();
 
-    processInstance.setActivity(null);
-    processInstance.setActivityInstanceId(processInstance.getId());
+    final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
 
-    // set variables
-    processInstance.setVariables(modificationBuilder.getProcessVariables());
+    processInstance.startWithoutExecuting(variables);
 
     // prevent ending of the process instance between instructions
     processInstance.setPreserveScope(true);
@@ -99,7 +94,7 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
 
     for (int i = 0; i < instructions.size(); i++) {
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
-      logInstruction(processInstance.getId(), i, instruction);
+      LOG.debugStartingInstruction(processInstance.getId(), i, instruction.describe());
 
       instruction.setProcessInstanceId(processInstance.getId());
       instruction.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
@@ -113,8 +108,16 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
       processInstance.propagateEnd();
     }
 
-    return processInstance;
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        processInstance.getId(),
+        processInstance.getProcessDefinitionId(),
+        processInstance.getProcessDefinition().getKey(),
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+
+    return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());
   }
+
 
   /**
    * get the activity that is started by the first instruction, if exists;
@@ -143,10 +146,6 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     }
 
     return null;
-  }
-
-  protected void logInstruction(String processInstanceId, int index, AbstractProcessInstanceModificationCommand instruction) {
-    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index + 1, instruction.describe()));
   }
 
 }

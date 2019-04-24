@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,21 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
 
 /**
@@ -32,7 +35,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
  */
 public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, HistoricDetail> implements HistoricDetailQuery {
 
-  private final static Logger LOGGER = Logger.getLogger(HistoricDetailQueryImpl.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   private static final long serialVersionUID = 1L;
   protected String detailId;
@@ -45,16 +48,19 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String activityInstanceId;
   protected String type;
   protected String variableInstanceId;
+  protected String[] variableTypes;
+  protected String[] tenantIds;
+  protected String[] processInstanceIds;
+  protected String userOperationId;
+  protected Long sequenceCounter;
+  protected Date occurredBefore;
+  protected Date occurredAfter;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
 
   public HistoricDetailQueryImpl() {
-  }
-
-  public HistoricDetailQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public HistoricDetailQueryImpl(CommandExecutor commandExecutor) {
@@ -71,6 +77,19 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     ensureNotNull("variableInstanceId", variableInstanceId);
     this.variableInstanceId = variableInstanceId;
     return this;
+  }
+
+  public HistoricDetailQuery variableTypeIn(String... variableTypes) {
+    ensureNotNull("Variable types", (Object[]) variableTypes);
+    this.variableTypes = lowerCase(variableTypes);
+    return this;
+  }
+
+  private String[] lowerCase(String... variableTypes) {
+    for (int i = 0; i < variableTypes.length; i++) {
+      variableTypes[i] = variableTypes[i].toLowerCase();
+    }
+    return variableTypes;
   }
 
   public HistoricDetailQuery processInstanceId(String processInstanceId) {
@@ -125,8 +144,43 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  public HistoricDetailQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
+  public HistoricDetailQuery processInstanceIdIn(String... processInstanceIds) {
+    ensureNotNull("Process Instance Ids", (Object[]) processInstanceIds);
+    this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
+  public HistoricDetailQuery userOperationId(String userOperationId) {
+    ensureNotNull("userOperationId", userOperationId);
+    this.userOperationId = userOperationId;
+    return this;
+  }
+
+  public HistoricDetailQueryImpl sequenceCounter(long sequenceCounter) {
+    this.sequenceCounter = sequenceCounter;
+    return this;
+  }
+
   public HistoricDetailQuery excludeTaskDetails() {
     this.excludeTaskRelated = true;
+    return this;
+  }
+
+  public HistoricDetailQuery occurredBefore(Date date) {
+    ensureNotNull("occurred before", date);
+    occurredBefore = date;
+    return this;
+  }
+
+  public HistoricDetailQuery occurredAfter(Date date) {
+    ensureNotNull("occurred after", date);
+    occurredAfter = date;
     return this;
   }
 
@@ -162,7 +216,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
             } catch(Exception t) {
               // do not fail if one of the variables fails to load
-              LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
+              LOG.exceptionWhileGettingValueForVariable(t);
             }
           }
 
@@ -174,7 +228,8 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   protected boolean shouldFetchValue(HistoricDetailVariableInstanceUpdateEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
+    return isByteArrayFetchingEnabled
+        || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
   }
 
   // order by /////////////////////////////////////////////////////////////////
@@ -214,6 +269,10 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  public HistoricDetailQuery orderByTenantId() {
+    return orderBy(HistoricDetailQueryProperty.TENANT_ID);
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {
@@ -250,5 +309,17 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public String getDetailId() {
     return detailId;
+  }
+
+  public String[] getProcessInstanceIds() {
+    return processInstanceIds;
+  }
+
+  public Date getOccurredBefore() {
+    return occurredBefore;
+  }
+
+  public Date getOccurredAfter() {
+    return occurredAfter;
   }
 }

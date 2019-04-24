@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.task;
 
 import java.util.ArrayList;
@@ -22,11 +25,16 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -34,13 +42,17 @@ import org.junit.Before;
 /**
  * @author Sebastian Menski
  */
-public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
+public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
   protected Task task;
   protected User user;
   protected User anotherUser;
   protected User userWithoutGroups;
   protected Group group1;
+
+  public TaskQueryExpressionTest() {
+    super("org/camunda/bpm/engine/test/api/task/task-query-expression-test.camunda.cfg.xml");
+  }
 
   @Before
   public void setUp() {
@@ -287,6 +299,48 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
     assertCount(taskQuery().followUpAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
+  public void testQueryByProcessInstanceBusinessKeyExpression() {
+    // given
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKey", aBusinessKey);
+
+    createBusinessKeyDeployment(aBusinessKey);
+
+    // when
+    TaskQuery taskQuery = taskQuery()
+      .processInstanceBusinessKeyExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    // then
+    assertCount(taskQuery, 1);
+  }
+
+  public void testQueryByProcessInstanceBusinessKeyLikeExpression() {
+    // given
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKeyLike", "%" + aBusinessKey.substring(5));
+
+    createBusinessKeyDeployment(aBusinessKey);
+
+    // when
+    TaskQuery taskQuery = taskQuery()
+      .processInstanceBusinessKeyLikeExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    // then
+    assertCount(taskQuery, 1);
+  }
+
+  protected void createBusinessKeyDeployment(String aBusinessKey) {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("aProcessDefinition")
+      .startEvent()
+        .userTask()
+      .endEvent()
+      .done();
+
+    deployment(modelInstance);
+
+    runtimeService.startProcessInstanceByKey("aProcessDefinition", aBusinessKey);
+  }
+
   public void testExpressionOverrideQuery() {
     String queryString = "query";
     String expressionString = "expression";
@@ -388,7 +442,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
       .taskAssigneeLikeExpression(testStringExpression)
       .taskAssigneeLike(queryString)
       .taskOwnerExpression(expressionString)
-      .taskOwnerExpression(queryString)
+      .taskOwner(queryString)
       .taskInvolvedUserExpression(expressionString)
       .taskInvolvedUser(queryString)
       .taskCreatedBeforeExpression(testDateExpression)
@@ -461,8 +515,52 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskQuery.getCandidateGroups().size());
   }
 
+  public void testQueryOr() {
+    // given
+    Date date = DateTimeUtil.now().plusDays(2).toDate();
+
+    Task task1 = taskService.newTask();
+    task1.setFollowUpDate(date);
+    task1.setOwner("Luke Optim");
+    task1.setName("taskForOr");
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setDueDate(date);
+    task2.setName("taskForOr");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setAssignee("John Munda");
+    task3.setDueDate(date);
+    task3.setName("taskForOr");
+    taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setName("taskForOr");
+    taskService.saveTask(task4);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .taskName("taskForOr")
+      .or()
+        .followUpAfterExpression("${ now() }")
+        .taskAssigneeLikeExpression("${ 'John%' }")
+      .endOr()
+      .or()
+        .taskOwnerExpression("${ 'Luke Optim' }")
+        .dueAfterExpression("${ now() }")
+      .endOr()
+      .list();
+
+    // then
+    assertEquals(2, tasks.size());
+  }
+
   @After
   public void tearDown() {
+    Mocks.reset();
+
     for (Group group : identityService.createGroupQuery().list()) {
       identityService.deleteGroup(group.getId());
     }
@@ -470,7 +568,9 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
       identityService.deleteUser(user.getId());
     }
     for (Task task : taskService.createTaskQuery().list()) {
-      taskService.deleteTask(task.getId(), true);
+      if (task.getProcessInstanceId() == null) {
+        taskService.deleteTask(task.getId(), true);
+      }
     }
 
     identityService.clearAuthentication();

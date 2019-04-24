@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
@@ -26,6 +29,7 @@
         PARENT_ACT_INST_ID_,
         PROC_DEF_KEY_,
         PROC_DEF_ID_,
+        ROOT_PROC_INST_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
         ACT_ID_,
@@ -39,12 +43,15 @@
         END_TIME_,
         DURATION_,
         ACT_INST_STATE_,
-        SEQUENCE_COUNTER_
+        SEQUENCE_COUNTER_,
+        TENANT_ID_,
+        REMOVAL_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{parentActivityInstanceId ,jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
+        #{rootProcessInstanceId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
         #{activityId ,jdbcType=VARCHAR},
@@ -58,7 +65,9 @@
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis ,jdbcType=BIGINT},
         #{activityInstanceState,jdbcType=INTEGER},
-        #{sequenceCounter,jdbcType=BIGINT}
+        #{sequenceCounter,jdbcType=BIGINT},
+        #{tenantId, jdbcType=VARCHAR},
+        #{removalTime, jdbcType=TIMESTAMP}
       )
   </insert>
 
@@ -68,7 +77,13 @@
     UPDATE
         ${prefix}ACT_HI_ACTINST
     SET
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+      ACT_NAME_ = #{activityName, jdbcType=VARCHAR},
+      ACT_TYPE_ = #{activityType, jdbcType=VARCHAR},
+      PARENT_ACT_INST_ID_ = #{parentActivityInstanceId, jdbcType=VARCHAR}
       <if test="eventType == 'update'">
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR}
         , TASK_ID_ = #{taskId, jdbcType=VARCHAR}
@@ -82,6 +97,21 @@
       ID_ = #{id, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricActivityInstancesByRootProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_ACTINST set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricActivityInstancesByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_ACTINST
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
 
   <select id="selectHistoricActivityInstanceEvent" parameterType="java.lang.String" resultMap="historicActivityInstanceResultMap">
@@ -91,8 +121,58 @@
 
   <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
 
-  <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
-    delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
+  <delete id="deleteHistoricActivityInstancesByProcessInstanceIds">
+    delete from ${prefix}ACT_HI_ACTINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'PROC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <delete id="deleteHistoricActivityInstancesByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_ACTINST
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricActivityInstancesByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_ACTINST
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricActivityInstancesByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete from ${prefix}ACT_HI_ACTINST
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_ACTINST
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
   </delete>
 
   <!-- HISTORIC ACTIVITY INSTANCE RESULT MAP -->
@@ -102,6 +182,7 @@
     <result property="parentActivityInstanceId" column="PARENT_ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
@@ -116,6 +197,8 @@
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="activityInstanceState" column="ACT_INST_STATE_" jdbcType="INTEGER" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
@@ -127,7 +210,11 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select
+    <if test="authCheck.shouldPerformAuthorizatioCheck">
+    ${distinct}
+    </if>
+    RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -135,12 +222,22 @@
   </select>
 
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(
+    <if test="authCheck.shouldPerformAuthorizatioCheck">
+    distinct
+    </if>
+    RES.ID_)
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_ACTINST RES
+    FROM ${prefix}ACT_HI_ACTINST RES
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+    </if>
+
     <where>
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId}
@@ -169,8 +266,7 @@
       <if test="unfinished">
         and RES.END_TIME_ is null
       </if>
-      <if test="finished">
-       and RES.END_TIME_ is not null
+      <if test="finished">and RES.END_TIME_ is not null
       </if>
       <if test="startedBefore != null">
         and RES.START_TIME_ &lt;= #{startedBefore}
@@ -187,8 +283,18 @@
       <if test="activityInstanceState != null">
         and RES.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
       </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+      </if>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck"/>
 
     </where>
   </sql>
@@ -216,4 +322,46 @@
   <select id="selectHistoricActivityInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
+
+  <select id="selectCompletedHistoricActivityPage" resultMap="historicActivityInstanceResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_ACTINST RES
+
+    <where>
+      <if test="parameter.finishedAfter != null">
+        and RES.END_TIME_ &gt; #{parameter.finishedAfter}
+      </if>
+      <if test="parameter.finishedAt != null">
+        and RES.END_TIME_ = #{parameter.finishedAt}
+      </if>
+      <if test="parameter.finishedAfter == null and parameter.finishedAt == null">
+        and RES.END_TIME_ is not null
+      </if>
+    </where>
+
+    ORDER BY RES.END_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
+  <select id="selectRunningHistoricActivityPage" resultMap="historicActivityInstanceResultMap"
+          parameterType="java.util.Map">
+    <bind name="maxResults" value="parameter.maxResults"/>
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_ACTINST RES
+
+    <where>
+      <if test="parameter.startedAfter != null">
+        and RES.START_TIME_ &gt; #{parameter.startedAfter}
+      </if>
+      <if test="parameter.startedAt != null">
+        and RES.START_TIME_ = #{parameter.startedAt}
+      </if>
+      and RES.END_TIME_ is null
+    </where>
+
+    ORDER BY RES.START_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
 </mapper>

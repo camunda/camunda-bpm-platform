@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,28 +20,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.management.JobDefinition;
 
 
 /**
@@ -48,45 +38,51 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  */
 public class EntityTypeComparatorForModifications implements Comparator<Class<?>> {
 
-  protected static Map<Class<?>, Integer> typeOrder = new HashMap<Class<?>, Integer>();
+  public static final Map<Class<?>, Integer> TYPE_ORDER = new HashMap<Class<?>, Integer>();
 
   static {
 
     // 1
-    typeOrder.put(IncidentEntity.class, 1);
-    typeOrder.put(VariableInstanceEntity.class, 1);
-    typeOrder.put(IdentityLinkEntity.class, 1);
+    TYPE_ORDER.put(IncidentEntity.class, 1);
+    TYPE_ORDER.put(VariableInstanceEntity.class, 1);
+    TYPE_ORDER.put(IdentityLinkEntity.class, 1);
 
-    typeOrder.put(EventSubscriptionEntity.class, 1);
-    typeOrder.put(MessageEventSubscriptionEntity.class, 1);
-    typeOrder.put(CompensateEventSubscriptionEntity.class, 1);
-    typeOrder.put(SignalEventSubscriptionEntity.class, 1);
+    TYPE_ORDER.put(EventSubscriptionEntity.class, 1);
 
-    typeOrder.put(JobEntity.class, 1);
-    typeOrder.put(MessageEntity.class, 1);
-    typeOrder.put(TimerEntity.class, 1);
+    TYPE_ORDER.put(JobEntity.class, 1);
+    TYPE_ORDER.put(MessageEntity.class, 1);
+    TYPE_ORDER.put(TimerEntity.class, 1);
+    TYPE_ORDER.put(EverLivingJobEntity.class, 1);
 
-    typeOrder.put(MembershipEntity.class, 1);
+    TYPE_ORDER.put(MembershipEntity.class, 1);
+    TYPE_ORDER.put(TenantMembershipEntity.class, 1);
 
-    typeOrder.put(CaseSentryPartEntity.class, 1);
+    TYPE_ORDER.put(CaseSentryPartEntity.class, 1);
+
+    TYPE_ORDER.put(ExternalTaskEntity.class, 1);
+    TYPE_ORDER.put(Batch.class, 1);
 
     // 2
-    typeOrder.put(GroupEntity.class, 2);
-    typeOrder.put(UserEntity.class, 2);
-    typeOrder.put(ByteArrayEntity.class, 2);
-    typeOrder.put(TaskEntity.class, 2);
+    TYPE_ORDER.put(TenantEntity.class, 2);
+    TYPE_ORDER.put(GroupEntity.class, 2);
+    TYPE_ORDER.put(UserEntity.class, 2);
+    TYPE_ORDER.put(ByteArrayEntity.class, 2);
+    TYPE_ORDER.put(TaskEntity.class, 2);
+    TYPE_ORDER.put(JobDefinition.class, 2);
 
     // 3
-    typeOrder.put(ExecutionEntity.class, 3);
-    typeOrder.put(CaseExecutionEntity.class, 3);
+    TYPE_ORDER.put(ExecutionEntity.class, 3);
+    TYPE_ORDER.put(CaseExecutionEntity.class, 3);
 
     // 4
-    typeOrder.put(ProcessDefinitionEntity.class, 4);
-    typeOrder.put(CaseDefinitionEntity.class, 4);
-    typeOrder.put(ResourceEntity.class, 4);
+    TYPE_ORDER.put(ProcessDefinitionEntity.class, 4);
+    TYPE_ORDER.put(CaseDefinitionEntity.class, 4);
+    TYPE_ORDER.put(DecisionDefinitionEntity.class, 4);
+    TYPE_ORDER.put(DecisionRequirementsDefinitionEntity.class, 4);
+    TYPE_ORDER.put(ResourceEntity.class, 4);
 
     // 5
-    typeOrder.put(DeploymentEntity.class, 5);
+    TYPE_ORDER.put(DeploymentEntity.class, 5);
 
   }
 
@@ -96,8 +92,8 @@ public class EntityTypeComparatorForModifications implements Comparator<Class<?>
       return 0;
     }
 
-    Integer firstIndex = typeOrder.get(firstEntityType);
-    Integer secondIndex = typeOrder.get(secondEntityType);
+    Integer firstIndex = TYPE_ORDER.get(firstEntityType);
+    Integer secondIndex = TYPE_ORDER.get(secondEntityType);
 
     // unknown type happens before / after everything else
     if(firstIndex == null) {

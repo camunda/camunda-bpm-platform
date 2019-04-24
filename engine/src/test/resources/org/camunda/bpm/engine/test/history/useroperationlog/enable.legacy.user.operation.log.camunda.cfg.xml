@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  
+    <property name="processEngineName" value="LegacyUserOperationLogTest-engine" />
+  
+    <property name="jdbcUrl" value="jdbc:h2:mem:LegacyUserOperationLogTest;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+  
+    <!-- Database configurations -->
+    <property name="history" value="full" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+    
+    <!-- enable user operation log legacy behavior -->
+    <property name="restrictUserOperationLogToAuthenticatedUsers" value="false" />
+    
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+    
+    
+  </bean>
+
+</beans>

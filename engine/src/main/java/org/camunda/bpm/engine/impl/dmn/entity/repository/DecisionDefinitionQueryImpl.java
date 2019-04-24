@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,11 +47,18 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected Integer version;
   protected boolean latest = false;
 
-  public DecisionDefinitionQueryImpl() {
-  }
+  protected String decisionRequirementsDefinitionId;
+  protected String decisionRequirementsDefinitionKey;
+  protected boolean withoutDecisionRequirementsDefinition = false;
 
-  public DecisionDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+  protected boolean includeDefinitionsWithoutTenantId = false;
+
+  protected String versionTag;
+  protected String versionTagLike;
+
+  public DecisionDefinitionQueryImpl() {
   }
 
   public DecisionDefinitionQueryImpl(CommandExecutor commandExecutor) {
@@ -111,7 +122,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   public DecisionDefinitionQuery decisionDefinitionVersion(Integer decisionDefinitionVersion) {
     ensureNotNull(NotValidException.class, "version", decisionDefinitionVersion);
-    ensurePositive(NotValidException.class, "version", decisionDefinitionVersion);
+    ensurePositive(NotValidException.class, "version", decisionDefinitionVersion.longValue());
     this.version = decisionDefinitionVersion;
     return this;
   }
@@ -130,6 +141,55 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   public DecisionDefinitionQuery decisionDefinitionResourceNameLike(String resourceNameLike) {
     ensureNotNull(NotValidException.class, "resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
+    return this;
+  }
+
+  public DecisionDefinitionQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionId", decisionRequirementsDefinitionId);
+    this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
+    return this;
+  }
+
+  public DecisionDefinitionQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionKey", decisionRequirementsDefinitionKey);
+    this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
+    return this;
+  }
+
+  @Override
+  public DecisionDefinitionQuery versionTag(String versionTag) {
+    ensureNotNull(NotValidException.class, "versionTag", versionTag);
+    this.versionTag = versionTag;
+    return this;
+  }
+
+  @Override
+  public DecisionDefinitionQuery versionTagLike(String versionTagLike) {
+    ensureNotNull(NotValidException.class, "versionTagLike", versionTagLike);
+    this.versionTagLike = versionTagLike;
+    return this;
+  }
+
+  public DecisionDefinitionQuery withoutDecisionRequirementsDefinition() {
+    withoutDecisionRequirementsDefinition = true;
+    return this;
+  }
+
+  public DecisionDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public DecisionDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId() {
+    this.includeDefinitionsWithoutTenantId  = true;
     return this;
   }
 
@@ -163,8 +223,18 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
+  public DecisionDefinitionQuery orderByTenantId() {
+    return orderBy(DecisionDefinitionQueryProperty.TENANT_ID);
+  }
+
+  @Override
+  public DecisionDefinitionQuery orderByVersionTag() {
+    return orderBy(DecisionDefinitionQueryProperty.VERSION_TAG);
+  }
+
   //results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -172,6 +242,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
       .findDecisionDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<DecisionDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
@@ -179,6 +250,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
       .findDecisionDefinitionsByQueryCriteria(this, page);
   }
 
+  @Override
   public void checkQueryOk() {
     super.checkQueryOk();
 
@@ -238,8 +310,15 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return version;
   }
 
+  public String getVersionTag() {
+    return versionTag;
+  }
+
+  public String getVersionTagLike() {
+    return versionTagLike;
+  }
+
   public boolean isLatest() {
     return latest;
   }
-
 }

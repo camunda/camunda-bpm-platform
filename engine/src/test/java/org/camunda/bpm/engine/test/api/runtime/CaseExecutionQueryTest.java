@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +28,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
@@ -337,7 +342,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     query.enabled();
 
-    verifyQueryResults(query, 6);
+    verifyQueryResults(query, 2);
 
   }
 
@@ -346,7 +351,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     query.active();
 
-    verifyQueryResults(query, 5);
+    verifyQueryResults(query, 9);
 
   }
 
@@ -2536,44 +2541,16 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     assertTrue(execution.isRequired());
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTask.cmmn")
-  public void testQueryByRepeatable() {
-    caseService.createCaseInstanceByKey("case");
-
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .repeatable();
-
-    verifyQueryResults(query, 1);
-
-    CaseExecution execution = query.singleResult();
-    assertNotNull(execution);
-    assertTrue(execution.isRepeatable());
-  }
-
-  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTask.cmmn")
-  public void testQueryByRepetition() {
-    String caseInstanceId = caseService.createCaseInstanceByKey("case").getId();
-
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(firstHumanTaskId);
-    caseService.completeCaseExecution(firstHumanTaskId);
-
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .repetition();
-
-    verifyQueryResults(query, 1);
-
-    CaseExecution execution = query.singleResult();
-    assertNotNull(execution);
-    assertTrue(execution.isRepetition());
+  public void testNullBusinessKeyForChildExecutions() {
+    caseService.createCaseInstanceByKey(CASE_DEFINITION_KEY, "7890");
+    List<CaseExecution> executions = caseService.createCaseExecutionQuery().caseInstanceBusinessKey("7890").list();
+    for (CaseExecution e : executions) {
+      if (((CaseExecutionEntity) e).isCaseInstanceExecution()) {
+        assertEquals("7890", ((CaseExecutionEntity) e).getBusinessKeyWithoutCascade());
+      } else {
+        assertNull(((CaseExecutionEntity) e).getBusinessKeyWithoutCascade());
+      }
+    }
   }
 
 }

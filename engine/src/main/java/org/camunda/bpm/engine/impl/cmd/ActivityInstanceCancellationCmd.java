@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +19,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
+import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -32,14 +36,22 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
   public ActivityInstanceCancellationCmd(String processInstanceId, String activityInstanceId) {
     super(processInstanceId);
     this.activityInstanceId = activityInstanceId;
+  }
 
+  public ActivityInstanceCancellationCmd(String processInstanceId, String activityInstanceId, String cancellationReason) {
+    super(processInstanceId, cancellationReason);
+    this.activityInstanceId = activityInstanceId;
+  }
+
+  public String getActivityInstanceId() {
+    return activityInstanceId;
   }
 
   protected ExecutionEntity determineSourceInstanceExecution(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
     // rebuild the mapping because the execution tree changes with every iteration
-    ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
+    ActivityExecutionTreeMapping mapping = new ActivityExecutionTreeMapping(commandContext, processInstanceId);
 
     ActivityInstance instance = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
       public ActivityInstance call() throws Exception {

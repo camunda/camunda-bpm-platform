@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,8 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -53,6 +60,8 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     super.eventNotificationsCompleted(execution);
 
+    execution.activityInstanceStarted();
+
     ExecutionStartContext startContext = execution.getExecutionStartContext();
     InstantiationStack instantiationStack = startContext.getInstantiationStack();
 
@@ -60,7 +69,8 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
     ActivityImpl activity = execution.getActivity();
     if (activity.getActivityBehavior() instanceof ModificationObserverBehavior) {
       ModificationObserverBehavior behavior = (ModificationObserverBehavior) activity.getActivityBehavior();
-      propagatingExecution = (PvmExecutionImpl) behavior.initializeScope(propagatingExecution);
+      List<ActivityExecution> concurrentExecutions = behavior.initializeScope(propagatingExecution, 1);
+      propagatingExecution = (PvmExecutionImpl) concurrentExecutions.get(0);
     }
 
     // if the stack has been instantiated

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,18 +16,20 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.Date;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler.ProcessDefinitionSuspensionStateConfiguration;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 
 /**
@@ -35,25 +41,23 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
   protected String processDefinitionId;
   protected String processDefinitionKey;
-  protected ProcessDefinitionEntity processDefinitionEntity;
-  protected Date executionDate;
 
-  public AbstractSetProcessDefinitionStateCmd(ProcessDefinitionEntity processDefinitionEntity, boolean includeProcessInstances, Date executionDate) {
-    super(includeProcessInstances, executionDate);
-    // If process definition is already provided (eg. when command is called through the DeployCmd),
-    // we can simply use the id of the entity and set is as processDefinitionId.
-    this.processDefinitionEntity = processDefinitionEntity;
-    this.processDefinitionId = processDefinitionEntity.getId();
-    this.executionDate = executionDate;
+  protected String tenantId;
+  protected boolean isTenantIdSet = false;
+
+  public AbstractSetProcessDefinitionStateCmd(UpdateProcessDefinitionSuspensionStateBuilderImpl builder) {
+    super(
+        builder.isIncludeProcessInstances(),
+        builder.getExecutionDate());
+
+    this.processDefinitionId = builder.getProcessDefinitionId();
+    this.processDefinitionKey = builder.getProcessDefinitionKey();
+
+    this.isTenantIdSet = builder.isTenantIdSet();
+    this.tenantId = builder.getProcessDefinitionTenantId();
   }
 
-  public AbstractSetProcessDefinitionStateCmd(String processDefinitionId, String processDefinitionKey, boolean includeProcessInstances, Date executionDate) {
-    super(includeProcessInstances, executionDate);
-    this.processDefinitionId = processDefinitionId;
-    this.processDefinitionKey = processDefinitionKey;
-    this.executionDate = executionDate;
-  }
-
+  @Override
   protected void checkParameters(CommandContext commandContext) {
     // Validation of input parameters
     if(processDefinitionId == null && processDefinitionKey == null) {
@@ -61,39 +65,46 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     }
   }
 
+  @Override
   protected void checkAuthorization(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    if (processDefinitionId != null) {
-      authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
 
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
-      }
-    } else
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (processDefinitionId != null) {
+        checker.checkUpdateProcessDefinitionSuspensionStateById(processDefinitionId);
 
-    if (processDefinitionKey != null) {
-      authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+        if (includeSubResources) {
+          checker.checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(processDefinitionId);
+        }
+      } else
 
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
-      }
+        if (processDefinitionKey != null) {
+          checker.checkUpdateProcessDefinitionSuspensionStateByKey(processDefinitionKey);
+
+          if (includeSubResources) {
+            checker.checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(processDefinitionKey);
+          }
+        }
     }
   }
 
+  @Override
   protected void updateSuspensionState(final CommandContext commandContext, SuspensionState suspensionState) {
     ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
 
     if (processDefinitionId != null) {
       processDefinitionManager.updateProcessDefinitionSuspensionStateById(processDefinitionId, suspensionState);
-    } else
 
-    if (processDefinitionKey != null) {
+    } else if (isTenantIdSet) {
+      processDefinitionManager.updateProcessDefinitionSuspensionStateByKeyAndTenantId(processDefinitionKey, tenantId, suspensionState);
+
+    } else {
       processDefinitionManager.updateProcessDefinitionSuspensionStateByKey(processDefinitionKey, suspensionState);
     }
 
     commandContext.runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
-        AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd();
+        UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder = createJobDefinitionCommandBuilder();
+        AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd(jobDefinitionSuspensionStateBuilder);
         jobDefinitionCmd.disableLogUserOperation();
         jobDefinitionCmd.execute(commandContext);
         return null;
@@ -101,22 +112,59 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     });
   }
 
-  protected String getJobHandlerConfiguration() {
-    String jobConfiguration = null;
+  protected UpdateJobDefinitionSuspensionStateBuilderImpl createJobDefinitionCommandBuilder() {
+    UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionBuilder = new UpdateJobDefinitionSuspensionStateBuilderImpl();
 
     if (processDefinitionId != null) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, isIncludeSubResources());
-    } else
+      jobDefinitionBuilder.byProcessDefinitionId(processDefinitionId);
 
-    if (processDefinitionKey != null) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
+    } else if (processDefinitionKey != null) {
+      jobDefinitionBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (isTenantIdSet && tenantId != null) {
+        jobDefinitionBuilder.processDefinitionTenantId(tenantId);
+
+      } else if (isTenantIdSet) {
+        jobDefinitionBuilder.processDefinitionWithoutTenantId();
+      }
     }
-
-    return jobConfiguration;
+    return jobDefinitionBuilder;
   }
 
+  protected UpdateProcessInstanceSuspensionStateBuilderImpl createProcessInstanceCommandBuilder() {
+    UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceBuilder = new UpdateProcessInstanceSuspensionStateBuilderImpl();
+
+    if (processDefinitionId != null) {
+      processInstanceBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      processInstanceBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (isTenantIdSet && tenantId != null) {
+        processInstanceBuilder.processDefinitionTenantId(tenantId);
+
+      } else if (isTenantIdSet) {
+        processInstanceBuilder.processDefinitionWithoutTenantId();
+      }
+    }
+    return processInstanceBuilder;
+  }
+
+  @Override
+  protected JobHandlerConfiguration getJobHandlerConfiguration() {
+
+    if (processDefinitionId != null) {
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionId(processDefinitionId, isIncludeSubResources());
+
+    } else if (isTenantIdSet) {
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionKeyAndTenantId(processDefinitionKey, tenantId, isIncludeSubResources());
+
+    } else {
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
+    }
+  }
+
+  @Override
   protected void logUserOperation(CommandContext commandContext) {
     PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
     commandContext.getOperationLogManager()
@@ -129,13 +177,23 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
    * Subclasses should return the type of the {@link JobHandler} here. it will be used when
    * the user provides an execution date on which the actual state change will happen.
    */
+  @Override
   protected abstract String getDelayedExecutionJobHandlerType();
 
   /**
    * Subclasses should return the type of the {@link AbstractSetJobDefinitionStateCmd} here.
    * It will be used to suspend or activate the {@link JobDefinition}s.
+   * @param jobDefinitionSuspensionStateBuilder
    */
-  protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd();
+  protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder);
 
-  protected abstract AbstractSetProcessInstanceStateCmd getNextCommand();
+  @Override
+  protected AbstractSetProcessInstanceStateCmd getNextCommand() {
+    UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder = createProcessInstanceCommandBuilder();
+
+    return getNextCommand(processInstanceCommandBuilder);
+  }
+
+  protected abstract AbstractSetProcessInstanceStateCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder);
+
 }

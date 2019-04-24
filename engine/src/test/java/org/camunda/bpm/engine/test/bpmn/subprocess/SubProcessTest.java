@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.subprocess;
 
 import java.util.Arrays;
@@ -510,5 +513,41 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     ActivityInstance serviceTaskInstance = subProcessInstance.getChildActivityInstances()[0];
     assertNotNull(serviceTaskInstance);
     assertEquals("ServiceTask_1", serviceTaskInstance.getActivityId());
+  }
+
+  public void testConcurrencyInSubProcess() {
+
+    org.camunda.bpm.engine.repository.Deployment deployment =
+      repositoryService.createDeployment()
+                  .addClasspathResource("org/camunda/bpm/engine/test/bpmn/subprocess/SubProcessTest.fixSystemFailureProcess.bpmn20.xml")
+                  .deploy();
+
+    // After staring the process, both tasks in the subprocess should be active
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("fixSystemFailure");
+    List<Task> tasks = taskService.createTaskQuery()
+                                  .processInstanceId(pi.getId())
+                                  .orderByTaskName()
+                                  .asc()
+                                  .list();
+
+    // Tasks are ordered by name (see query)
+    assertEquals(2, tasks.size());
+    Task investigateHardwareTask = tasks.get(0);
+    Task investigateSoftwareTask = tasks.get(1);
+    assertEquals("Investigate hardware", investigateHardwareTask.getName());
+    assertEquals("Investigate software", investigateSoftwareTask.getName());
+
+    // Completing both the tasks finishes the subprocess and enables the task after the subprocess
+    taskService.complete(investigateHardwareTask.getId());
+    taskService.complete(investigateSoftwareTask.getId());
+
+    Task writeReportTask = taskService
+      .createTaskQuery()
+      .processInstanceId(pi.getId())
+      .singleResult();
+    assertEquals("Write report", writeReportTask.getName());
+
+    // Clean up
+    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 }

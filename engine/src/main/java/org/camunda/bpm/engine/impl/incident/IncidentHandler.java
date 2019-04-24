@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,6 +15,8 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.incident;
+
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * The {@link IncidentHandler} interface may be implemented by components
@@ -37,16 +43,21 @@ public interface IncidentHandler {
   /**
    * Handle an incident that arose in the context of an execution.
    */
-  public void handleIncident(String processDefinitionId, String activityId, String executionId, String configuration, String message);
+  public Incident handleIncident(IncidentContext context, String message);
 
   /**
-   * Resolve an incident that arose in the context of an execution.
+   * Called in situations in which an incidenthandler may wich to resolve existing incidents
+   * The implementation receives this callback to enable it to resolve any open incidents that
+   * may exist.
    */
-  public void resolveIncident(String processDefinitionId, String activityId, String executionId, String configuration);
+  public void resolveIncident(IncidentContext context);
 
   /**
-   * Delete an incident that arose in the context of an execution.
+   * Called in situations in which an incidenthandler may wich to delete existing incidents
+   * Example: when a scope is ended or a job is deleted. The implementation receives
+   * this callback to enable it to delete any open incidents that may exist.
    */
-  public void deleteIncident(String processDefinitionId, String activityId, String executionId, String configuration);
+  public void deleteIncident(IncidentContext context);
 
 }
+ 

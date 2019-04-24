@@ -6,7 +6,7 @@
   
   <signal id="signalId" name="newSignal" />
   
-  <process id="process">
+  <process id="process" isExecutable="true">
   
     <startEvent id="theStart" />
     

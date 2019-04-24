@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,11 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.form.type.EnumFormType;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -179,9 +184,10 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
     assertEquals(formValues, runtimeService.getVariables(processInstance.getId()));
     runtimeService.deleteProcessInstance(processInstance.getId(), "test complete");
 
-    // invalid submit
     runtimeService.startProcessInstanceByKey("FormDataTest.testFormFieldSubmit");
     task = taskService.createTaskQuery().singleResult();
+    // invalid submit 1
+
     formValues = new HashMap<String, Object>();
     formValues.put("stringField", "1234");
     formValues.put("longField", 9L);
@@ -189,9 +195,81 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
     try {
       formService.submitTaskForm(task.getId(), formValues);
       fail();
-    } catch(ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("validation of minlength(5) failed"));
+    } catch (FormFieldValidatorException e) {
+      assertEquals(e.getName(), "minlength");
     }
+
+    // invalid submit 2
+    formValues = new HashMap<String, Object>();
+
+    formValues.put("customFieldWithValidationDetails", "C");
+    try {
+      formService.submitTaskForm(task.getId(), formValues);
+      fail();
+    } catch (FormFieldValidatorException e) {
+      assertEquals(e.getName(), "validator");
+      assertEquals(e.getId(), "customFieldWithValidationDetails");
+
+      assertTrue(e.getCause() instanceof FormFieldValidationException);
+
+      FormFieldValidationException exception = (FormFieldValidationException) e.getCause();
+      assertEquals(exception.getDetail(), "EXPIRED");
+    }
+
+  }
+
+  @Deployment
+  public void testSubmitFormDataWithEmptyDate() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormDataTest.testSubmitFormDataWithEmptyDate");
+    Task task = taskService.createTaskQuery().singleResult();
+    Map<String, Object> formValues = new HashMap<String, Object>();
+    formValues.put("stringField", "12345");
+    formValues.put("dateField", "");
+
+    // when
+    formService.submitTaskForm(task.getId(), formValues);
+
+    // then
+    formValues.put("dateField", null);
+    assertEquals(formValues, runtimeService.getVariables(processInstance.getId()));
+  }
+
+  @Deployment
+  public void testMissingFormVariables()
+  {
+    // given process definition with defined form varaibles
+    // when start process instance with no variables
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("date-form-property-test");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // then taskFormData contains form variables with null as values
+    TaskFormData taskFormData = formService.getTaskFormData(task.getId());
+    assertNotNull(taskFormData);
+    assertEquals(5, taskFormData.getFormFields().size());
+    for (FormField field : taskFormData.getFormFields()) {
+      assertNotNull(field);
+      assertNull(field.getValue().getValue());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/form/FormDataTest.testDoubleQuotesAreEscapedInGeneratedTaskForms.bpmn20.xml")
+  public void testDoubleQuotesAreEscapedInGeneratedTaskForms() {
+
+    // given
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "This is a \"Test\" message!");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Task taskWithForm = taskService.createTaskQuery().singleResult();
+
+    // when
+    Object renderedStartForm = formService.getRenderedTaskForm(taskWithForm.getId());
+    assertTrue(renderedStartForm instanceof String);
+
+    // then
+    String renderedForm = (String) renderedStartForm;
+    String expectedFormValueWithEscapedQuotes = "This is a &quot;Test&quot; message!";
+    assertTrue(renderedForm.contains(expectedFormValueWithEscapedQuotes));
 
   }
 

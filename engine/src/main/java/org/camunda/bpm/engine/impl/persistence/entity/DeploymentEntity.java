@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
@@ -20,15 +23,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+import org.camunda.bpm.engine.repository.*;
 
 
 /**
  * @author Tom Baeyens
  */
-public class DeploymentEntity implements Serializable, Deployment, DbEntity {
+public class DeploymentEntity implements Serializable, DeploymentWithDefinitions, DbEntity {
 
   private static final long serialVersionUID = 1L;
 
@@ -38,13 +45,14 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
   protected Date deploymentTime;
   protected boolean validatingSchema = true;
   protected boolean isNew;
+  protected String source;
+  protected String tenantId;
 
   /**
    * Will only be used during actual deployment to pass deployed artifacts (eg process definitions).
    * Will be null otherwise.
    */
-  protected Map<Class<?>, List<Object>> deployedArtifacts;
-  protected Map<Class<?>, List<Object>> notdeployedARtifacts;
+  protected Map<Class<?>, List> deployedArtifacts;
 
   public ResourceEntity getResource(String resourceName) {
     return getResources().get(resourceName);
@@ -55,6 +63,12 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
       resources = new HashMap<String, ResourceEntity>();
     }
     resources.put(resource.getName(), resource);
+  }
+
+  public void clearResources() {
+    if(resources!=null){
+      resources.clear();
+    }
   }
 
   // lazy loading /////////////////////////////////////////////////////////////
@@ -81,19 +95,23 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
 
   // Deployed artifacts manipulation //////////////////////////////////////////
 
-  public void addDeployedArtifact(Object deployedArtifact) {
+  public void addDeployedArtifact(ResourceDefinitionEntity deployedArtifact) {
     if (deployedArtifacts == null) {
-      deployedArtifacts = new HashMap<Class<?>, List<Object>>();
+      deployedArtifacts = new HashMap<Class<?>, List>();
     }
 
     Class<?> clazz = deployedArtifact.getClass();
-    List<Object> artifacts = deployedArtifacts.get(clazz);
+    List artifacts = deployedArtifacts.get(clazz);
     if (artifacts == null) {
-      artifacts = new ArrayList<Object>();
+      artifacts = new ArrayList();
       deployedArtifacts.put(clazz, artifacts);
     }
 
     artifacts.add(deployedArtifact);
+  }
+
+  public Map<Class<?>, List> getDeployedArtifacts() {
+    return deployedArtifacts;
   }
 
   @SuppressWarnings("unchecked")
@@ -102,6 +120,18 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
       return null;
     } else {
       return (List<T>) deployedArtifacts.get(clazz);
+    }
+  }
+
+  public void removeArtifact(ResourceDefinitionEntity notDeployedArtifact) {
+    if (deployedArtifacts != null) {
+      List artifacts = deployedArtifacts.get(notDeployedArtifact.getClass());
+      if (artifacts != null) {
+        artifacts.remove(notDeployedArtifact);
+        if (artifacts.isEmpty()) {
+          deployedArtifacts.remove(notDeployedArtifact.getClass());
+        }
+      }
     }
   }
 
@@ -151,6 +181,42 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
     this.isNew = isNew;
   }
 
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  @Override
+  public List<ProcessDefinition> getDeployedProcessDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(ProcessDefinitionEntity.class);
+  }
+
+  @Override
+  public List<CaseDefinition> getDeployedCaseDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(CaseDefinitionEntity.class);
+  }
+
+  @Override
+  public List<DecisionDefinition> getDeployedDecisionDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(DecisionDefinitionEntity.class);
+  }
+
+  @Override
+  public List<DecisionRequirementsDefinition> getDeployedDecisionRequirementsDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(DecisionRequirementsDefinitionEntity.class);
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -160,6 +226,9 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
            + ", deploymentTime=" + deploymentTime
            + ", validatingSchema=" + validatingSchema
            + ", isNew=" + isNew
+           + ", source=" + source
+           + ", tenantId=" + tenantId
            + "]";
   }
+
 }

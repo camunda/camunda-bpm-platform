@@ -6,7 +6,7 @@
   targetNamespace="Examples">
   <message id="messageId" name="Message1" />
   
-  <process id="process">
+  <process id="process" isExecutable="true">
   
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="subProcess" />

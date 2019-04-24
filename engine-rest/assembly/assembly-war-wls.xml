@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="urn:maven:assembly:1.1.2">
+  
+  <id>wls</id>
+  
+  <formats>
+    <format>war</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <fileSets>
+    <fileSet>
+      <directory>src/main/runtime/wls/webapp</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>      
+  </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <scope>provided</scope>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
+        <include>org.glassfish.jersey.containers:jersey-container-servlet:*</include>
+      </includes>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>**/web.xml</exclude>
+          <exclude>**/camunda-engine-rest-core-*</exclude>
+        </excludes>
+      </unpackOptions>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</assembly>

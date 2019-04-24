@@ -3,6 +3,7 @@ target
 .classpath
 .project
 .settings
+.editorconfig
 build.properties
 bin
 .metadata
@@ -17,5 +18,6 @@ faces-config.NavData
 *.sublime-workspace
 *.h2.db
 *.lock.db
+**/overlays
 
 *.DS_Store

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +18,17 @@ package org.camunda.bpm.engine.impl.history.handler;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionEvaluationEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoricScopeInstanceEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 
 /**
  * <p>History event handler that writes history events to the process engine
@@ -36,6 +43,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
       insertHistoricVariableUpdateEntity((HistoricVariableUpdateEventEntity) historyEvent);
+    } else if(historyEvent instanceof HistoricDecisionEvaluationEvent) {
+      insertHistoricDecisionEvaluationEvent((HistoricDecisionEvaluationEvent) historyEvent);
     } else {
       insertOrUpdate(historyEvent);
     }
@@ -53,8 +62,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     final DbEntityManager dbEntityManager = getDbEntityManager();
 
-    String eventType = historyEvent.getEventType();
-    if(eventType == null || isInitialEvent(eventType)) {
+    if(isInitialEvent(historyEvent)) {
       dbEntityManager.insert(historyEvent);
     } else {
       if(dbEntityManager.getCachedEntity(historyEvent.getClass(), historyEvent.getId()) == null) {
@@ -81,17 +89,19 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     DbEntityManager dbEntityManager = getDbEntityManager();
 
     // insert update only if history level = FULL
-    if(Context.getProcessEngineConfiguration().getHistoryLevel()
-        .isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL, historyEvent)) {
+    if(shouldWriteHistoricDetail(historyEvent)) {
 
       // insert byte array entity (if applicable)
       byte[] byteValue = historyEvent.getByteValue();
       if(byteValue != null) {
-        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue);
+        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue, ResourceTypes.HISTORY);
+        byteArrayEntity.setRootProcessInstanceId(historyEvent.getRootProcessInstanceId());
+        byteArrayEntity.setRemovalTime(historyEvent.getRemovalTime());
+
         Context
         .getCommandContext()
-        .getDbEntityManager()
-        .insert(byteArrayEntity);
+        .getByteArrayManager()
+        .insertByteArray(byteArrayEntity);
         historyEvent.setByteArrayId(byteArrayEntity.getId());
 
       }
@@ -99,14 +109,16 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     }
 
     // always insert/update HistoricProcessVariableInstance
-    if(HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName().equals(historyEvent.getEventType())) {
+    if (historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE)) {
       HistoricVariableInstanceEntity persistentObject = new HistoricVariableInstanceEntity(historyEvent);
       dbEntityManager.insert(persistentObject);
 
-    } else if(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE.getEventName().equals(historyEvent.getEventType())) {
+    } else if (historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE)
+        || historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE)) {
       HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
       if(historicVariableInstanceEntity != null) {
         historicVariableInstanceEntity.updateFromEvent(historyEvent);
+        historicVariableInstanceEntity.setState(HistoricVariableInstance.STATE_CREATED);
 
       } else {
         // #CAM-1344 / #SUPPORT-688
@@ -117,23 +129,43 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         dbEntityManager.insert(persistentObject);
       }
 
-    } else if(HistoryEventTypes.VARIABLE_INSTANCE_DELETE.getEventName().equals(historyEvent.getEventType())) {
+    } else if(historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_DELETE)) {
       HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
       if(historicVariableInstanceEntity != null) {
-        historicVariableInstanceEntity.delete();
+        historicVariableInstanceEntity.setState(HistoricVariableInstance.STATE_DELETED);
       }
     }
+  }
 
+  protected boolean shouldWriteHistoricDetail(HistoricVariableUpdateEventEntity historyEvent) {
+
+    return Context.getProcessEngineConfiguration().getHistoryLevel()
+        .isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL, historyEvent)
+      && !historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE);
   }
 
 
-  protected boolean isInitialEvent(String eventType) {
-    return HistoryEventTypes.ACTIVITY_INSTANCE_START.getEventName().equals(eventType)
-        || HistoryEventTypes.PROCESS_INSTANCE_START.getEventName().equals(eventType)
-        || HistoryEventTypes.TASK_INSTANCE_CREATE.getEventName().equals(eventType)
-        || HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName().equals(eventType)
-        || HistoryEventTypes.INCIDENT_CREATE.getEventName().equals(eventType)
-        || HistoryEventTypes.CASE_INSTANCE_CREATE.getEventName().equals(eventType)
+  protected void insertHistoricDecisionEvaluationEvent(HistoricDecisionEvaluationEvent event) {
+
+    Context
+      .getCommandContext()
+      .getHistoricDecisionInstanceManager()
+      .insertHistoricDecisionInstances(event);
+  }
+
+
+  protected boolean isInitialEvent(HistoryEvent historyEvent) {
+    return historyEvent.getEventType() == null
+        || historyEvent.isEventOfType(HistoryEventTypes.ACTIVITY_INSTANCE_START)
+        || historyEvent.isEventOfType(HistoryEventTypes.PROCESS_INSTANCE_START)
+        || historyEvent.isEventOfType(HistoryEventTypes.TASK_INSTANCE_CREATE)
+        || historyEvent.isEventOfType(HistoryEventTypes.FORM_PROPERTY_UPDATE)
+        || historyEvent.isEventOfType(HistoryEventTypes.INCIDENT_CREATE)
+        || historyEvent.isEventOfType(HistoryEventTypes.CASE_INSTANCE_CREATE)
+        || historyEvent.isEventOfType(HistoryEventTypes.DMN_DECISION_EVALUATE)
+        || historyEvent.isEventOfType(HistoryEventTypes.BATCH_START)
+        || historyEvent.isEventOfType(HistoryEventTypes.IDENTITY_LINK_ADD)
+        || historyEvent.isEventOfType(HistoryEventTypes.IDENTITY_LINK_DELETE)
         ;
   }
 

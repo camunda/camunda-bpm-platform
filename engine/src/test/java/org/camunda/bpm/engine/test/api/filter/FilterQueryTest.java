@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.filter;
 
 import static org.hamcrest.Matchers.contains;
@@ -40,7 +43,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     saveFilter("b", "b");
     saveFilter("d", "d");
     saveFilter("a", "a");
-    saveFilter("c", "c");
+    saveFilter("c_", "c");
   }
 
   protected void saveFilter(String name, String owner) {
@@ -128,6 +131,13 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  public void testQueryByNameLike() {
+    FilterQuery query = filterService.createFilterQuery().filterNameLike("%\\_");
+    assertNotNull(query.singleResult());
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
   public void testQueryByInvalidName() {
     FilterQuery query = filterService.createFilterQuery().filterName("invalid");
     assertNull(query.singleResult());
@@ -207,7 +217,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     Assert.assertThat(filterService.createFilterQuery().orderByFilterName().asc().list(),
         contains(hasProperty("name", equalTo("a")),
             hasProperty("name", equalTo("b")),
-            hasProperty("name", equalTo("c")),
+            hasProperty("name", equalTo("c_")),
             hasProperty("name", equalTo("d"))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterOwner().asc().list().size());
@@ -234,14 +244,14 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(4, filterService.createFilterQuery().orderByFilterName().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterName().desc().list(),
         contains(hasProperty("name", equalTo("d")),
-            hasProperty("name", equalTo("c")),
+            hasProperty("name", equalTo("c_")),
             hasProperty("name", equalTo("b")),
             hasProperty("name", equalTo("a"))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterOwner().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterOwner().desc().list(),
         contains(hasProperty("name", equalTo("d")),
-            hasProperty("name", equalTo("c")),
+            hasProperty("name", equalTo("c_")),
             hasProperty("name", equalTo("b")),
             hasProperty("name", equalTo("a"))));
 
@@ -250,15 +260,16 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNativeQuery() {
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(Filter.class));
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
     assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).list().size());
     assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class)).count());
 
-    assertEquals(16, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM ACT_RU_FILTER F1, ACT_RU_FILTER F2").count());
+    assertEquals(16, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + tablePrefix + "ACT_RU_FILTER F1, " + tablePrefix + "ACT_RU_FILTER F2").count());
 
     // select with distinct
-    assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT F1.* FROM ACT_RU_FILTER F1").list().size());
+    assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT F1.* FROM "+ tablePrefix + "ACT_RU_FILTER F1").list().size());
 
     assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'").count());
     assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'").list().size());
@@ -268,8 +279,9 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNativeQueryPaging() {
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(Filter.class));
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
     assertEquals(3, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(0, 3).size());
     assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(2, 2).size());
   }

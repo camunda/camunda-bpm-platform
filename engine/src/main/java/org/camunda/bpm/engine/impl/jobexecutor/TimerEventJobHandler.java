@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,57 +17,74 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
  * @author Roman Smirnov
  *
  */
-public abstract class TimerEventJobHandler implements JobHandler {
+public abstract class TimerEventJobHandler implements JobHandler<TimerJobConfiguration> {
 
   public static final String JOB_HANDLER_CONFIG_PROPERTY_DELIMITER = "$";
   public static final String JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED = "followUpJobCreated";
 
-  public static String getKey(String configuration) {
-    if (containsDelimiter(configuration)) {
-      String[] configParts = getConfigParts(configuration);
-      return configParts[0];
+  @Override
+  public TimerJobConfiguration newConfiguration(String canonicalString) {
+    String[] configParts = canonicalString.split("\\" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER);
+
+    if (configParts.length > 2) {
+      throw new ProcessEngineException("Illegal timer job handler configuration: '" + canonicalString
+          + "': exprecting a one or two part configuration seperated by '" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + "'.");
+    }
+
+    TimerJobConfiguration configuration = new TimerJobConfiguration();
+    configuration.timerElementKey = configParts[0];
+
+    if (configParts.length == 2) {
+      configuration.followUpJobCreated = JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED.equals(configParts[1]);
     }
 
     return configuration;
   }
 
-  public static boolean isFollowUpJobCreated(String configuration) {
-    if (containsDelimiter(configuration)) {
-      String[] configParts = getConfigParts(configuration);
-      String property = configParts[1];
+  public static class TimerJobConfiguration implements JobHandlerConfiguration {
 
-      return JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED.equals(property);
+    protected String timerElementKey;
+    protected boolean followUpJobCreated;
+
+    public String getTimerElementKey() {
+      return timerElementKey;
     }
 
-    return false;
-  }
-
-  public static String createJobHandlerConfigurationWithFollowUpJobCreated(String configuration) {
-    if (configuration == null) {
-      configuration = "";
+    public void setTimerElementKey(String timerElementKey) {
+      this.timerElementKey = timerElementKey;
     }
 
-    return configuration += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
-  }
-
-  protected static boolean containsDelimiter(String configuration) {
-    return configuration != null && configuration.contains(JOB_HANDLER_CONFIG_PROPERTY_DELIMITER);
-  }
-
-  protected static String[] getConfigParts(String configuration) {
-    String[] configParts = configuration.split("\\" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER);
-
-    if (configParts.length != 2) {
-      throw new ProcessEngineException("Illegal timer job handler configuration: '" + configuration + "': exprecting two parts seperated by '" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + "'.");
+    public boolean isFollowUpJobCreated() {
+      return followUpJobCreated;
     }
 
-    return configParts;
+    public void setFollowUpJobCreated(boolean followUpJobCreated) {
+      this.followUpJobCreated = followUpJobCreated;
+    }
+
+    @Override
+    public String toCanonicalString() {
+      String canonicalString = timerElementKey;
+
+      if (followUpJobCreated) {
+        canonicalString += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
+      }
+
+      return canonicalString;
+    }
+
+  }
+
+  public void onDelete(TimerJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

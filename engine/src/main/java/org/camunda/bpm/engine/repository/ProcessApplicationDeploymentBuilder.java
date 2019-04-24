@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,6 +18,7 @@ package org.camunda.bpm.engine.repository;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.application.ProcessApplication;
@@ -41,7 +46,7 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
    * previous versions of the deployment.</p>
    */
   ProcessApplicationDeploymentBuilder resumePreviousVersions();
-  
+
   /**
    * This method defines on what additional registrations will be based.
    * The value will only be recognized if {@link #resumePreviousVersions()} is set.
@@ -70,11 +75,28 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder name(String name);
   /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder nameFromDeployment(String deploymentId);
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder source(String source);
+  /* {@inheritDoc} */
   @Deprecated
   ProcessApplicationDeploymentBuilder enableDuplicateFiltering();
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder enableDuplicateFiltering(boolean deployChangedOnly);
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder activateProcessDefinitionsOn(Date date);
+
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResources(String deploymentId);
+
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourceById(String deploymentId, String resourceId);
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourcesById(String deploymentId, List<String> resourceIds);
+
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourceByName(String deploymentId, String resourceName);
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourcesByName(String deploymentId, List<String> resourceNames);
 
 }

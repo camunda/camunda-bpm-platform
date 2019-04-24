@@ -1,0 +1,1116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" expressionLanguage="http://www.omg.org/spec/FEEL/20140401" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn" typeLanguage="http://www.omg.org/spec/FEEL/20140401">
+  <decision id="oneHundredRulesTwoInputs" name="Benchmark">
+    <decisionTable hitPolicy="COLLECT" id="decisionTable" preferredOrientation="Rule-as-Row">
+      <input id="input1" label="number of matched rules">
+        <inputExpression id="inputExpression1" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_1209k69" label="number of matched rules (2)">
+        <inputExpression id="LiteralExpression_18jyq49" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="rule matched?" name="" typeRef="string"/>
+      <rule id="rule_8f57964f-2ff5-48df-b234-3094e96b6525">
+        <inputEntry id="inputEntry_d886232b-b650-4076-aa40-327a3d9d5ba7">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_99f5c71e-636f-405f-b8fe-a4e854345b7c">
+          <text>&gt; 0.0</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_9563c322-4e97-4425-8540-4e59fe869d78">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_ba14b3e6-d363-441b-8336-c74874a652e3">
+        <inputEntry id="inputEntry_d1a2d99c-1685-4f00-81ae-bba6f88264b1">
+          <text>&gt; 0.01</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_d95afb84-a4cc-43cc-8e20-379c95ac02fa">
+          <text>&gt; 0.01</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_540d7ba1-0c08-4ffc-b039-6ce920874fcc">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_0f5bf9c5-8c4b-4612-aa42-0eb7d49243d1">
+        <inputEntry id="inputEntry_d695f2f1-421e-4f71-9d43-284d902226e4">
+          <text>&gt; 0.02</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_19d16cda-2da1-445e-acd4-4d24960c0a99">
+          <text>&gt; 0.02</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fbb28514-2d21-419e-96a4-534a1c97b455">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_6282ea5d-411f-40b4-a601-14ef8620dedf">
+        <inputEntry id="inputEntry_0394dfe0-825e-41ca-9a89-9e26c1f73cb7">
+          <text>&gt; 0.03</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_f34b854b-1e83-4094-af06-fa1a98053770">
+          <text>&gt; 0.03</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_e58489cd-9b94-45cb-90d4-d0810a6fd1eb">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_801771f9-748c-4e6c-a877-7776c6b4722c">
+        <inputEntry id="inputEntry_9081232d-9f56-47a1-9413-b03f22567c23">
+          <text>&gt; 0.04</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_54c9dba5-d0fb-459b-bf07-29caef467bfa">
+          <text>&gt; 0.04</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8863db0d-23ab-492d-bb33-49ae875f146c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_169a4ba1-37b1-444e-a7e9-75da49975418">
+        <inputEntry id="inputEntry_8240dee7-0d43-4c48-8560-a4171dcd0b05">
+          <text>&gt; 0.05</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c5fcbf21-63c0-45e6-9b17-348d2d9ec00b">
+          <text>&gt; 0.05</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8fa60393-50f2-4ba1-a99c-0fe25ef01fbd">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_21f734a5-4440-4828-80de-d948fca95702">
+        <inputEntry id="inputEntry_1d750cdb-16a7-43aa-94e1-8cb66a10b103">
+          <text>&gt; 0.06</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_7b953d2a-efed-469e-a3f6-c862e0672c15">
+          <text>&gt; 0.06</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8ce512c2-7948-4e6b-b229-4a26b8a5fff0">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_40c5512d-022c-4961-be51-182d2b24fbdf">
+        <inputEntry id="inputEntry_dc199bb4-f141-4961-9486-1709e9dffce7">
+          <text>&gt; 0.07</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_9cda8235-799d-4c4f-8013-6d6463a444e1">
+          <text>&gt; 0.07</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8966ef4a-075f-4d03-a377-f449a5e855a3">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e452f054-8232-4e9e-b141-0ad15d6bb908">
+        <inputEntry id="inputEntry_9543e114-9909-4623-87f1-828aa5512fbd">
+          <text>&gt; 0.08</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_a5d46b13-144c-43f4-903f-5cdb38af557d">
+          <text>&gt; 0.08</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_79dc9966-e73b-4cf6-b1bb-97a21923dd35">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_44b10bb3-ac98-40bb-a965-7982729ad9a6">
+        <inputEntry id="inputEntry_0941bdf7-8c92-4d49-9388-028b19b9850e">
+          <text>&gt; 0.09</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_271a946d-66f7-4442-b76e-04431edf95b6">
+          <text>&gt; 0.09</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_5d77c512-0ed7-4e5d-bc09-6d11502fa1aa">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_1cf85a01-2b33-4a35-afe6-276291e177ca">
+        <inputEntry id="inputEntry_5df2bc1b-8597-40de-a052-49e9d8b2ad62">
+          <text>&gt; 0.1</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e61c9c5b-fedc-445b-acfc-5e7ac923a0b7">
+          <text>&gt; 0.1</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_d3c4a198-df2c-41ab-9d23-7b43c3622f83">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3ca6f5fe-a968-40ce-a492-a63458da0788">
+        <inputEntry id="inputEntry_4652d9d0-764d-4687-8a49-cc317218c00e">
+          <text>&gt; 0.11</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e5be9acd-2a21-417d-8169-0001e67ed4a3">
+          <text>&gt; 0.11</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4dd8a026-3602-40e8-94f8-1884b7dcffc3">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_fade8208-28a1-471a-9a29-afd19ec85bcd">
+        <inputEntry id="inputEntry_ce926a97-b6d9-40b4-a8dd-44edf426dbd4">
+          <text>&gt; 0.12</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_7e664a0d-9951-4567-80df-a0a521238ff2">
+          <text>&gt; 0.12</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_e07b2fa5-40c0-425b-a877-957ed9e5247e">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_63ce4f93-4e56-4198-b972-7577078afeb5">
+        <inputEntry id="inputEntry_acd51815-d90c-486c-8ed9-0c089347ef21">
+          <text>&gt; 0.13</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_f35eb583-2c7e-4d11-ab4f-4913e496a1f4">
+          <text>&gt; 0.13</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_b72d38e6-35a7-4245-a41d-e7cdc3177e8c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_8409c58c-b72d-4a7b-8158-fa0291b5057e">
+        <inputEntry id="inputEntry_2c687f86-33e5-4042-a3d0-115bacd78088">
+          <text>&gt; 0.14</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_dcae5739-4baf-455b-8eb9-d2b9a8c2a363">
+          <text>&gt; 0.14</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_1bb3f087-c89f-4b92-b371-2cd0ac102b43">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_857bc7de-38eb-46ec-848b-25f0e97378bf">
+        <inputEntry id="inputEntry_1a8f98f8-f68d-4171-957f-2c67392ecac0">
+          <text>&gt; 0.15</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_078c850c-3638-42c8-a37c-1509e43fde0c">
+          <text>&gt; 0.15</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_f743deb1-f5c4-4d28-a5a1-5be57d2b2f4c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e1200f25-2974-4cc7-a1a7-b463b821a524">
+        <inputEntry id="inputEntry_4130b3ef-1327-4465-bccc-087dc6f024a8">
+          <text>&gt; 0.16</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_90b4c740-e04e-4dd9-bf9f-ea4842a0f634">
+          <text>&gt; 0.16</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_a7aba11d-8b46-4121-b4aa-8eaafe8f99fd">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_2eb5e435-febb-4042-91bd-03d8b189c38d">
+        <inputEntry id="inputEntry_8cd91a16-7620-426c-8952-dbc6fcfc889b">
+          <text>&gt; 0.17</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_0433aaf6-dfba-429d-8672-55f371052566">
+          <text>&gt; 0.17</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_79af56f9-18af-4848-9a62-3dedb7d56b7d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_a777a0cc-f6b1-43cf-ad6b-f10fd60d453f">
+        <inputEntry id="inputEntry_8501cf58-1b52-4bf4-8491-0a56768264af">
+          <text>&gt; 0.18</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2e567fe8-53ea-4869-8aba-bf369a25d28a">
+          <text>&gt; 0.18</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_18da3ddd-6f98-46c2-b210-75b50b187fa0">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3392c9d1-f2e6-4e29-afa3-34da8f5723b5">
+        <inputEntry id="inputEntry_fd6be0f7-aacb-42d4-925f-73a1a7c7de56">
+          <text>&gt; 0.19</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e1099975-0812-4e60-87da-1f4c0af3db1b">
+          <text>&gt; 0.19</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_3ff9d71c-6b13-4bcc-a454-7e888ef30ab1">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_8d78d56e-b2ee-4742-8335-f72483493934">
+        <inputEntry id="inputEntry_01a5ab11-5eab-48ba-bfd5-8c82a8fc09c9">
+          <text>&gt; 0.2</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c2a7d7f2-422d-4900-8d4b-673428a10a60">
+          <text>&gt; 0.2</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_d218bc84-220d-49fd-b78f-e062b38c8524">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_f536aedc-3639-475e-a736-1e32264b0dec">
+        <inputEntry id="inputEntry_3a5572c6-30c9-4119-a532-5756211fec55">
+          <text>&gt; 0.21</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3723c651-3d55-4d58-8285-bea0dbccef65">
+          <text>&gt; 0.21</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_6ff7e8f5-79ca-4007-bcc8-a3efa14775e7">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_a92c81d4-2bb6-40f2-972f-4beaae20dfe6">
+        <inputEntry id="inputEntry_0fb1eb78-59aa-4562-8233-ff2592ff11e8">
+          <text>&gt; 0.22</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_655ef22c-3674-4bfe-8ae5-1eeaca739af1">
+          <text>&gt; 0.22</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_457c2347-f04b-413a-9426-309cf71eb1c2">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_bc1d5fd0-72b2-4b5e-9964-435e04526ca5">
+        <inputEntry id="inputEntry_33f138fd-e8f7-4bdd-88b5-d11f03fb361c">
+          <text>&gt; 0.23</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_aa69587d-88fa-4b01-a040-1eeae4a867b5">
+          <text>&gt; 0.23</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_73845d54-fab2-4ff0-bc77-22a036b07ba6">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_a743654e-71ae-48f1-b82a-cfb5569a5dc8">
+        <inputEntry id="inputEntry_f841823c-a44a-445d-ad0f-882c31dfad54">
+          <text>&gt; 0.24</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3f4642b4-9bc9-422a-ad78-4a993394075b">
+          <text>&gt; 0.24</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2aa63380-2ce2-4a1f-aaf7-982fc6826593">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_31b6d128-4d8b-4ddb-9ce1-dc21cfc2443e">
+        <inputEntry id="inputEntry_71bbfd89-4378-4f95-a35c-d6865dac9b46">
+          <text>&gt; 0.25</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_7b6507a2-5630-474f-a62d-5b46762879e6">
+          <text>&gt; 0.25</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_0f6e375e-ed58-4cf6-81ce-2fe7eb96767a">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_74009eb4-b7fa-42da-bc4a-4456e475ce99">
+        <inputEntry id="inputEntry_5ade7e6c-6ad2-401a-95e9-337dfc8e3a70">
+          <text>&gt; 0.26</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_227f30d4-bf74-4d61-b7d5-e9b52bcd1f54">
+          <text>&gt; 0.26</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_6917736f-9ef8-4f2a-ab25-98ea7ee7238d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_b5324f23-40f6-4f83-a12c-0c12a4fbc84b">
+        <inputEntry id="inputEntry_53b7fb0d-f853-48b6-ad07-63d8dd26e873">
+          <text>&gt; 0.27</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_9f9b7301-3591-4b7d-9091-3016aae6fb40">
+          <text>&gt; 0.27</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4b94218e-8898-4b36-99a4-2f711c7a1fe7">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_ee8548d0-4b4f-46aa-8d36-45ecf4444de9">
+        <inputEntry id="inputEntry_ea5869d3-4d79-4602-947b-d624098a38bf">
+          <text>&gt; 0.28</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3d3d4102-c645-4438-850a-e45ac2ee488f">
+          <text>&gt; 0.28</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_d1a600eb-8fcc-4aa0-9411-7afd6d67059b">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_6ab01d20-377f-43d5-a9aa-30428908e8f7">
+        <inputEntry id="inputEntry_22b72ef8-586f-41db-9027-4e4e95a9f6f2">
+          <text>&gt; 0.29</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c3a0cd9e-811f-4465-8855-50e0c6043e11">
+          <text>&gt; 0.29</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fbfaf10f-f9fd-4d41-913e-647130f2b1a6">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e79db775-d093-4f92-b742-7a4bab66db16">
+        <inputEntry id="inputEntry_0808d8d3-473e-4d57-8bb8-19aa75c33d0e">
+          <text>&gt; 0.3</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_b7a2bb75-558d-42e0-9bab-78b93aa790c0">
+          <text>&gt; 0.3</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_9c296dab-4f5a-48d7-81a2-c0b0d5d1baa7">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_acabe849-f03a-4b8c-8557-3f5530d59dc8">
+        <inputEntry id="inputEntry_938459a1-bf4a-4c28-a27b-af6ad0db4778">
+          <text>&gt; 0.31</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_f2972750-e72f-4631-9e49-03bfffa3e1ad">
+          <text>&gt; 0.31</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_72f57b83-88e3-45b6-8177-36e3d26d1717">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3ec71984-85f2-4959-8074-a975076a9bdf">
+        <inputEntry id="inputEntry_f5496e51-9ee1-4325-a873-a6451a15df63">
+          <text>&gt; 0.32</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_18decab9-ca4e-454b-97c8-f0cabf2cc89e">
+          <text>&gt; 0.32</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_20cded52-0d92-45dd-8d62-98869e8cb069">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_f64a54c9-1e73-4a73-9c16-291de0fbd4c9">
+        <inputEntry id="inputEntry_61dbfad3-fb3a-4c41-8f0f-a975a566c685">
+          <text>&gt; 0.33</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_a816cbb6-d3d6-4969-9f66-7fd2e27962db">
+          <text>&gt; 0.33</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_497e6a97-769a-43eb-8e2e-ae1f31052b39">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_c2267577-1876-4dfe-8360-ce2f9d8e0010">
+        <inputEntry id="inputEntry_cba76dd6-21c7-42ec-bd7a-fc22c69f8b0a">
+          <text>&gt; 0.34</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4e46a969-b905-44ac-9d8c-702b06114a55">
+          <text>&gt; 0.34</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_c25f7823-9848-472c-a42b-0c9fcecfac1d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_7012478b-1925-48db-8be5-26b65c3f6155">
+        <inputEntry id="inputEntry_76dd271d-861c-4083-9fc0-40ef45488304">
+          <text>&gt; 0.35</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_00b0b5bc-3f83-4524-b0a3-02603bbdffdd">
+          <text>&gt; 0.35</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4c7632f9-5573-413f-8aa5-fa33da3ff1cb">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_408c280a-f20e-4288-ba91-ba9a8d42f7cb">
+        <inputEntry id="inputEntry_dafcb569-8c2e-4226-b654-1a13c446af0f">
+          <text>&gt; 0.36</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3b39c39c-6004-408b-b16e-6b49489076c5">
+          <text>&gt; 0.36</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_51286e15-dd12-4427-b0a1-5396acda27df">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_f95d341c-a236-4ccb-b0c8-3839f7b761fd">
+        <inputEntry id="inputEntry_aaf3af06-a80a-4e36-b0b0-3547d48ce096">
+          <text>&gt; 0.37</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_23036495-0066-4862-a44d-ae8fc5071f63">
+          <text>&gt; 0.37</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fadc8849-73f3-4967-8a7d-da520a481b08">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_09547e4e-9c69-4577-b0c6-0eb0b8f67455">
+        <inputEntry id="inputEntry_1fd61bbd-4c93-483b-a6e6-9a37d3588b06">
+          <text>&gt; 0.38</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_7532c878-2eaf-4145-8462-3a15fce43e54">
+          <text>&gt; 0.38</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_361668dc-7a4e-4c90-a1a4-7f61918856b0">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_b38993d8-df4c-491d-bbf3-ce30fe7acfe9">
+        <inputEntry id="inputEntry_650cdf05-8922-413c-ae96-acfd9ae158b3">
+          <text>&gt; 0.39</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_b5f32072-89c9-4e42-911e-67ca31589dc8">
+          <text>&gt; 0.39</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_7393ad5e-191b-4305-8061-f8d88b255479">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_a6a3b46c-01d0-424e-8c67-158e4bf7202a">
+        <inputEntry id="inputEntry_6d2ce62f-5ea6-4c87-a8ef-6c88a9adfeac">
+          <text>&gt; 0.4</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_d3cc1950-93cc-4258-b063-e7bb69120ece">
+          <text>&gt; 0.4</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_dd28a815-a1f2-478b-ba7e-562e90668f63">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_9af99651-6dce-43f1-abc7-3615c6bfcb55">
+        <inputEntry id="inputEntry_4ec7e4e5-4eb0-4548-9d48-cf7539e90de6">
+          <text>&gt; 0.41</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_df07b9f1-d29e-436c-b770-d8ada0380d4a">
+          <text>&gt; 0.41</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_db41e475-cee6-4df1-8336-5485dde571b5">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_43286172-d9e5-48a2-b222-954ffdd057ca">
+        <inputEntry id="inputEntry_82513bea-ed9d-444e-9ea6-7853a4c50c8e">
+          <text>&gt; 0.42</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_57fc3152-5582-4d91-92f2-9d2137c22017">
+          <text>&gt; 0.42</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_dc053f7a-f9b1-49c4-827a-b8366628620f">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_0eb333a0-6570-4d77-96fe-af5cc882bd8f">
+        <inputEntry id="inputEntry_0271d26c-f187-42f8-860d-a943a7725643">
+          <text>&gt; 0.43</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_b6a7a046-f22b-4a53-956d-1843d6a829f0">
+          <text>&gt; 0.43</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_5ff5977d-e5eb-433b-8bc2-0a2b24960575">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_9ad463da-b019-4fa9-b8f1-d8b3ac48e4a5">
+        <inputEntry id="inputEntry_6bd5f716-fa49-4d18-a813-4b83e82dc044">
+          <text>&gt; 0.44</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_04ebe7c6-4d3f-4672-a2e5-e4db28600d30">
+          <text>&gt; 0.44</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_ce00df2b-7614-46fb-997e-d7aa22142b59">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e8bb8fab-8aaf-485f-b686-ee9e8dbe2dbc">
+        <inputEntry id="inputEntry_3cf0d9d8-9eba-4bc0-b1e7-d56851b63708">
+          <text>&gt; 0.45</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_fa76e563-ae10-4f98-8625-5f9e747e6db2">
+          <text>&gt; 0.45</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_6f00a6cf-0baa-4862-9009-80ab395008ef">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_542655b8-31c7-4976-880c-20a0921f6886">
+        <inputEntry id="inputEntry_eebec041-53af-4e55-a370-25cdc974f7d8">
+          <text>&gt; 0.46</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_76c2beb4-49e7-4526-b916-6a3b28213d48">
+          <text>&gt; 0.46</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_87748c0a-81c5-4b5e-8334-3ecc80d86c3e">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e162fee6-c6a3-4f80-814d-1dfaedc18b83">
+        <inputEntry id="inputEntry_8f96115c-d794-4fd9-a6b1-7e53bdc3ce33">
+          <text>&gt; 0.47</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_624e5753-43f1-458c-964d-b9c27af1c94c">
+          <text>&gt; 0.47</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_ca57f48d-533f-4c73-856e-6aaa9586e829">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_70515872-9aab-470a-8d45-319da68ef5b3">
+        <inputEntry id="inputEntry_6d78ca3b-989c-47d8-a8d4-7b32ca29bff0">
+          <text>&gt; 0.48</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_535a7363-92d1-441e-9f30-be1d56f222b0">
+          <text>&gt; 0.48</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fe07a3f6-2f4b-4976-9f45-e494f262b883">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_c6abf660-f4f6-481f-ae78-d8cef155fef0">
+        <inputEntry id="inputEntry_7d28b60a-d960-4161-a346-64ec9ab74f38">
+          <text>&gt; 0.49</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_65400d0f-1f98-4dff-8707-e9a018dedb4a">
+          <text>&gt; 0.49</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_03ed0d40-c1d1-430c-96ad-e5f00332108c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_9f2ea725-d1fa-4089-9dad-ac6655959740">
+        <inputEntry id="inputEntry_36a95ae6-8dcd-4455-8b0a-042677a3e8ea">
+          <text>&gt; 0.5</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_6a828ef1-7aa4-4345-a400-fa06723eddb3">
+          <text>&gt; 0.5</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_c970e5fc-77a4-4dca-8056-2afd73471708">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_46015b7e-d767-4d07-aa9a-0ea3817ee723">
+        <inputEntry id="inputEntry_520d7bc9-eefa-4f30-9967-9a2bbc8fe75f">
+          <text>&gt; 0.51</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_7eb381c0-fcbc-4403-b1a4-681a31f39287">
+          <text>&gt; 0.51</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_5690ec92-4c91-4640-bf86-08578a8a87d9">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_71071852-d415-4bdf-8968-e437a54294a8">
+        <inputEntry id="inputEntry_a649ee67-ab01-4a41-a786-90db52e9da85">
+          <text>&gt; 0.52</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4d424948-a76f-49d7-8525-42f61bfad371">
+          <text>&gt; 0.52</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_c83636b9-8388-4845-acf1-c54a376c1425">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_00f20c15-fd6e-4598-b5c9-e3840f79cdfd">
+        <inputEntry id="inputEntry_c72d6fb2-a6c1-4ae0-a0a5-eb4a51220d24">
+          <text>&gt; 0.53</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_6d3dd9b5-adc2-484f-b9bb-d318dc3b7a2a">
+          <text>&gt; 0.53</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_765032c5-6153-47ef-ab17-c7044c7c296b">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3b66eb34-fd85-4f03-8fdb-fc5a03c91439">
+        <inputEntry id="inputEntry_c9eb1958-4bae-446f-a61c-66c995119878">
+          <text>&gt; 0.54</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_486bae1b-89f4-4378-a2c5-82144465c551">
+          <text>&gt; 0.54</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_888bc37c-4b10-4536-a6f4-a9bf1ab31270">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_858f0dde-db3f-4106-9fbc-76eba2704b66">
+        <inputEntry id="inputEntry_1f55b2e5-e3ef-48ab-89f1-02e0ea9ea0bd">
+          <text>&gt; 0.55</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_34495890-e836-4c02-be60-6003621fb164">
+          <text>&gt; 0.55</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_cc53ee9f-47b7-4116-b034-ab56e1f23700">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_d438842f-72fa-45c9-910a-275959a97995">
+        <inputEntry id="inputEntry_a20b9fc0-b85c-46da-a7f5-7121956ca09d">
+          <text>&gt; 0.56</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_cfd3255b-03b1-4755-b7a5-f85735d8b315">
+          <text>&gt; 0.56</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_71430b0a-8706-4d13-9145-9205e17b387f">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_ea7dec7f-1960-42bd-996b-a3c78b475723">
+        <inputEntry id="inputEntry_02356ab6-4b9d-4d2d-bd2e-159ccbaad626">
+          <text>&gt; 0.57</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_26010189-c2b4-471d-a31c-689902a396d6">
+          <text>&gt; 0.57</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_9a273a94-c0cb-4e3a-b9be-dd122244336b">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_65ff8944-a09a-46d8-960c-33b5b9247c02">
+        <inputEntry id="inputEntry_d8fea4fb-b8c9-4fbc-9c6e-d27b66e52f20">
+          <text>&gt; 0.58</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_55c87d4d-9882-4996-b9af-ed3fdf9470e5">
+          <text>&gt; 0.58</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fee86296-720d-4105-9742-c98adeec4185">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_997b1dde-c6d0-4bc7-b903-235fe517b55b">
+        <inputEntry id="inputEntry_bb231791-adcd-4b66-9b26-0e5115ef9c0d">
+          <text>&gt; 0.59</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_6e323da3-67f1-4a50-8ee5-434e7364ab22">
+          <text>&gt; 0.59</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_33f245dd-6b0c-41e5-93e7-6a99983a8f5c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_1b073d4a-94bf-4c3c-8dc6-32726336e515">
+        <inputEntry id="inputEntry_11c1266c-9854-40b0-bc61-235131216255">
+          <text>&gt; 0.6</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e628e63d-3e38-468d-9368-54f12fb2bd2c">
+          <text>&gt; 0.6</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_0460fac1-1fcc-405b-bf7e-a84a90c893de">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_803f6819-078e-4d3d-8bbe-837868e5dccb">
+        <inputEntry id="inputEntry_67a9959e-f0ff-4c9c-a32d-935dfbafacb3">
+          <text>&gt; 0.61</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c703eb88-2ac4-4e39-8d6d-a7c26bda0a1b">
+          <text>&gt; 0.61</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_419bf56a-f2aa-4f0e-9cef-c9295baba54d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_81252a77-395a-4b15-b074-b9a081ee8a9f">
+        <inputEntry id="inputEntry_227c187b-9910-483f-8c9a-eff4dc012777">
+          <text>&gt; 0.62</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_a5e82e70-b269-48ff-b6c1-79df4db3f03b">
+          <text>&gt; 0.62</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_9dc9c3e0-3e27-42dd-a1ef-d895d8783b09">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_33a47e3f-4661-4239-b4f5-565ed532d960">
+        <inputEntry id="inputEntry_3dc56428-9af1-4843-ad3d-118bef6237cf">
+          <text>&gt; 0.63</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e832a6b2-e0b9-4280-8af9-7178cb007065">
+          <text>&gt; 0.63</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_e21d7285-0578-421e-9da6-5e46da29b3e2">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_55c1ab99-8d59-443b-a0e3-530c85df8356">
+        <inputEntry id="inputEntry_69f61fd4-4e1f-4023-a3e2-8e713b4895f8">
+          <text>&gt; 0.64</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c085af2e-2cb7-46e5-8b9a-689ff0af9f1f">
+          <text>&gt; 0.64</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_e844ecb8-459b-4df4-9940-ec95f09b7554">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_ef91f193-e48c-45b4-b5a7-4f4a770e6053">
+        <inputEntry id="inputEntry_baf58a2e-ddd6-44ce-a018-5c766e402025">
+          <text>&gt; 0.65</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e7bd949c-744c-43f4-a498-db66dddaefa4">
+          <text>&gt; 0.65</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4d84f1f8-eadf-494f-bea0-75bfbd316b96">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_abec5f8a-b461-4833-930e-18c1c5d49a6e">
+        <inputEntry id="inputEntry_9480331b-3b84-4b2f-804b-72421b809fed">
+          <text>&gt; 0.66</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_cd8fb1e0-ab93-412a-aee1-8bfb8f733aec">
+          <text>&gt; 0.66</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_5f0166e7-1a6f-4859-80b1-c0da18ab1c97">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_80f0dc9d-bcfe-4dc8-8ec4-7e9bc601da0c">
+        <inputEntry id="inputEntry_36e72f4b-7f38-4d88-b460-90f405bf1399">
+          <text>&gt; 0.67</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c8bf8d2f-f609-4376-b694-38bf290f5506">
+          <text>&gt; 0.67</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_3310bb41-5133-4172-9536-d4d9dbc027ca">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_2705bbfc-3fe6-4da3-85eb-7c91c5cfd345">
+        <inputEntry id="inputEntry_07c2cfb6-09bf-44b2-885c-0e820ab1abcf">
+          <text>&gt; 0.68</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_ba523b44-5773-4c68-bc83-9a65ed5b3c1f">
+          <text>&gt; 0.68</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8e10a213-c99c-4fde-a21f-2c18ed0899df">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_df2c184f-e650-486e-a905-fd2f16e16c38">
+        <inputEntry id="inputEntry_8ea36eb9-836b-44db-965c-caefb2af50fc">
+          <text>&gt; 0.69</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_b3522bd2-bc01-436b-844b-f2579796c734">
+          <text>&gt; 0.69</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_f75397cf-2a0b-445c-939b-e2c674c1ea1c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_9a77ac96-dd6b-44c0-893e-e45527279ae7">
+        <inputEntry id="inputEntry_35aab5ea-a537-4487-ab71-610533f92448">
+          <text>&gt; 0.7</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_9385b64a-c112-47cd-95e4-049f6fbd2075">
+          <text>&gt; 0.7</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_f9b5f82c-2d3c-4031-803c-27418ff4150c">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_846d95f2-2d29-4e39-9a8b-d08ab606312e">
+        <inputEntry id="inputEntry_ba711834-e3fc-4f5d-bff0-890096a440dd">
+          <text>&gt; 0.71</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_0ad8abf5-285a-4431-96bc-b870e6cec353">
+          <text>&gt; 0.71</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_1f6baf60-f00b-4dff-8b4b-9ccfd708cbf6">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_e02f212a-b4e2-4845-8169-e18f760ac24a">
+        <inputEntry id="inputEntry_b6ddce02-6dfc-47b8-b7f8-9be563f31dea">
+          <text>&gt; 0.72</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1eba935b-f318-4c6d-bb50-a8a9e22f0114">
+          <text>&gt; 0.72</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2a15edf9-a716-4489-8c36-0aa8074a9fc9">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_ab16e404-14fc-467b-8b11-f6fd08e4274f">
+        <inputEntry id="inputEntry_92df9f44-2678-4ea6-9665-9456f863799e">
+          <text>&gt; 0.73</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_671dfedc-3434-429f-90a7-0e7179d6637b">
+          <text>&gt; 0.73</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_cf2d4bf5-f398-40db-a882-09756136f470">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3eae631e-177d-4f95-85f8-e14b22643d34">
+        <inputEntry id="inputEntry_305c5481-3966-4489-bc74-80a68d371fbc">
+          <text>&gt; 0.74</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_a621d6b7-77ce-4c6a-85e8-13ccaf5a3edc">
+          <text>&gt; 0.74</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_e1a9809e-5025-4e6e-813d-87061c7c61f8">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_5f4db6b4-d5f7-424f-93ce-d0260f1a15fb">
+        <inputEntry id="inputEntry_cdff1746-8dc7-45d2-a58f-fd93495a80b8">
+          <text>&gt; 0.75</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_8a85663c-0599-4750-97ae-f74b82dd658d">
+          <text>&gt; 0.75</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_748ecbab-8087-44fb-948c-aa7917e6aa33">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_ba2086e6-c837-4456-86b4-fcc2ad8fadc2">
+        <inputEntry id="inputEntry_85450fea-08bb-4ff7-8705-5d40f8c23848">
+          <text>&gt; 0.76</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c51a80f1-e4a2-4cdb-8311-ec0d6299da89">
+          <text>&gt; 0.76</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_12fac694-2712-4efd-a2f9-0c47c72ebdeb">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_0f7fe038-f212-4764-84f7-37c462f7f216">
+        <inputEntry id="inputEntry_ccc55a2d-4953-4f76-bd21-8984570e271a">
+          <text>&gt; 0.77</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_38022804-6cb6-4a3e-a3a6-70e260310f28">
+          <text>&gt; 0.77</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_1a776d1f-293f-4280-a575-17ee80db5195">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_4801ac9a-8b12-451f-b491-e1b7ee96fa56">
+        <inputEntry id="inputEntry_96faa2c8-f536-44c5-b76f-8b7a51836698">
+          <text>&gt; 0.78</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_6b442e35-781b-46a9-adde-2204adcb9411">
+          <text>&gt; 0.78</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_f6f78410-25f0-4510-b908-eb8b4658df80">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_87eb7e2a-8674-4a2a-91c0-72e0ec4ab35c">
+        <inputEntry id="inputEntry_53798fc3-2800-447f-8c1b-6d184f908311">
+          <text>&gt; 0.79</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_98e381f9-4b18-4e24-acdc-eddac3a6ea46">
+          <text>&gt; 0.79</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_c0fb2dd4-dd2b-4a1c-b621-a768ccb9d629">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3d7dd68c-59d8-4cad-8dc4-72692b13d9bf">
+        <inputEntry id="inputEntry_9a80bbdb-d767-4a8d-8ab4-05e68670c843">
+          <text>&gt; 0.8</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_b075e805-c6ee-4b5a-9d0b-07756a8b3497">
+          <text>&gt; 0.8</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_85786f3f-7902-491f-bd65-acd1020f217f">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_37fa472d-f87c-460d-bf8f-80646b2541e1">
+        <inputEntry id="inputEntry_ff189b32-0aff-43a7-bcc7-f7f6dc96615c">
+          <text>&gt; 0.81</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_f9baddc6-30d4-42ae-9cfd-cdf3ba6c44d8">
+          <text>&gt; 0.81</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_108ec882-d936-4a88-82dd-ab3bebefa5d3">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_8fc0ebef-600b-41c1-b08a-4a973cf15080">
+        <inputEntry id="inputEntry_aa18673d-20f7-4e5d-b34d-95b61ae0f7ff">
+          <text>&gt; 0.82</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_b6703d7f-3c95-4a1b-bc9b-a82a0b2ddc70">
+          <text>&gt; 0.82</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8ad8d542-f612-486e-9e03-067ca138cb4d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_b7eaf7fc-f7e6-4542-8bf1-7819b06e370a">
+        <inputEntry id="inputEntry_e9a32c7c-c8ad-49f3-9b66-aba53c8cde05">
+          <text>&gt; 0.83</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_877e22be-c99c-4ba7-afc2-3adca1fed0bb">
+          <text>&gt; 0.83</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4e73e3f3-299a-40fb-a2dc-c06797c4e5e8">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_0ad13f83-0103-401a-82b0-bcbe3cc48d7e">
+        <inputEntry id="inputEntry_a44fcead-4b0c-4142-b782-22383c4a91d6">
+          <text>&gt; 0.84</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_246984e1-fd6d-452f-88b2-a5fb52b28b6f">
+          <text>&gt; 0.84</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_4c4ed0b7-fd62-4033-9497-0bad339bff0d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_c5264c94-65d4-41a8-b3d1-63c7228746b8">
+        <inputEntry id="inputEntry_a22829d3-589c-4348-ae23-5406600dec60">
+          <text>&gt; 0.85</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_9834649d-de54-49af-85e8-d0097d5f74c0">
+          <text>&gt; 0.85</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_ca2f7d67-06ac-4cb8-a2cb-8606f9864a60">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_59168ac6-7b26-49a4-a521-d9519cc7a318">
+        <inputEntry id="inputEntry_411b522c-7885-48d2-8f4e-511b258f9cdf">
+          <text>&gt; 0.86</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_c2eafc1b-ec43-4941-bb7e-46a6c9b4b879">
+          <text>&gt; 0.86</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_f195f49b-e9ec-41c4-9ad2-4fac74482ead">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_8c2307cf-29b5-4612-9155-80285d8d9cd7">
+        <inputEntry id="inputEntry_d8852776-2909-4ed2-a4bc-912034889b68">
+          <text>&gt; 0.87</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_466d130f-7aa2-414d-a272-7d4ab22105c8">
+          <text>&gt; 0.87</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2b231b92-687f-4d4c-87aa-758febde5382">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_551aed21-f362-4337-9ddf-eb013c683893">
+        <inputEntry id="inputEntry_ec4cd16a-50c8-411a-a776-5b843db587db">
+          <text>&gt; 0.88</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_9224ef19-b8ae-4378-a9ea-14afd039ee6d">
+          <text>&gt; 0.88</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_10bdd2b6-f4ff-47e6-b650-8d029231333a">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_6049afa1-f767-44e5-aee1-fb7d5c17db48">
+        <inputEntry id="inputEntry_d9a5a39e-1894-4b20-847c-72b10493a7ce">
+          <text>&gt; 0.89</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2449c390-dfb0-47e1-825e-440039b831e4">
+          <text>&gt; 0.89</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_581b5d68-747d-459d-9792-b384f2f2d4e8">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_769a01e8-9180-4b95-812c-faa9988180bd">
+        <inputEntry id="inputEntry_2befea2b-0e58-4591-899e-c345dd34aede">
+          <text>&gt; 0.9</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3fb59624-0fd7-4b14-aebb-d84b88a64bde">
+          <text>&gt; 0.9</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_e5e06e86-51f5-4947-97c0-c19400f8452d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_dc1afa93-bf02-4751-b39c-0ff3fcb2d481">
+        <inputEntry id="inputEntry_7a13fef9-8575-4cf0-89e3-089f113f4181">
+          <text>&gt; 0.91</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_e767f195-f78b-4c69-9a66-a5c3df42bc14">
+          <text>&gt; 0.91</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_5fc3c869-9579-4b6a-a88a-1b8db7409be4">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_80e5fd4f-86b2-4d72-8f93-287ea01344fa">
+        <inputEntry id="inputEntry_e6233a9f-00ad-449e-bf06-da800b9b4212">
+          <text>&gt; 0.92</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_2ae3afef-7c38-4b26-85e5-06ace0520548">
+          <text>&gt; 0.92</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fa3890eb-614c-4544-a39b-8e47936fc01e">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3251e405-e470-4307-80c8-2fdd67953fdb">
+        <inputEntry id="inputEntry_5817c533-234f-4afb-9274-c5d5ed5ec487">
+          <text>&gt; 0.93</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_99391ada-a59a-4993-adb9-c54560d482e6">
+          <text>&gt; 0.93</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_526e40fc-f129-4f47-a6e7-ed221cd94fd9">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_742a7924-8360-4e70-ace1-5f455cc80ae9">
+        <inputEntry id="inputEntry_792032e8-f3d8-48e1-abc2-6aa1a46d30a4">
+          <text>&gt; 0.94</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_07726488-70e9-4160-9861-64b441f9c0f6">
+          <text>&gt; 0.94</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_ccf42199-c35d-4e73-bfa6-4bcdcfe4802d">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_c9045b69-0da6-485c-b3e2-564e872b25df">
+        <inputEntry id="inputEntry_102b136b-a4b1-4bae-a952-3c9321684cf6">
+          <text>&gt; 0.95</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_dd7e88d0-a923-458c-a98a-903f388e9e35">
+          <text>&gt; 0.95</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_26a7e26c-7aef-4fe3-a155-44172ab72863">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_15474ae0-15f7-4c14-a9c0-1c2856e33bc1">
+        <inputEntry id="inputEntry_02a50c9b-8933-4520-a52a-be99cf5ddd44">
+          <text>&gt; 0.96</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_a7fad6a7-959d-437b-a5e5-81e69fbec94d">
+          <text>&gt; 0.96</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_6d52d3e1-b761-48c0-9771-b2309a6f44a3">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_951180d3-d8aa-42ef-81d9-5320f15b7435">
+        <inputEntry id="inputEntry_68ddee45-e129-4273-91c1-dcdc417bf61e">
+          <text>&gt; 0.97</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_1e51bbc2-15f8-4836-9c66-5e199ed046bb">
+          <text>&gt; 0.97</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_dc7ab7d4-2aed-4dfb-8b76-1e51528b1b53">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_2ea79534-8488-479b-91a1-ba4eed0807ce">
+        <inputEntry id="inputEntry_d1a37137-b873-4065-a386-94b2799223e6">
+          <text>&gt; 0.98</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_743ccc57-4f38-46d9-b2f1-08780f6dc4c7">
+          <text>&gt; 0.98</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_0e075f09-6a0d-47b2-97fd-34deee237f5b">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_afbb3223-ec48-4bc8-9973-e309e4ef5abc">
+        <inputEntry id="inputEntry_680f9240-474e-4d75-aaec-c47a90a8ce9a">
+          <text>&gt; 0.99</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_aed816a2-fbec-4740-ab16-adb0ccd88806">
+          <text>&gt; 0.99</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_0985d181-2e33-4ab6-8b72-483d9e00c4b6">
+          <text>"matched"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

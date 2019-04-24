@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.filter;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -39,6 +43,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
   protected Authorization readAuthorization;
   protected Authorization deleteAuthorization;
 
+  @Override
   public void setUp() {
     testUser = createTestUser("test");
 
@@ -51,6 +56,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     identityService.setAuthenticatedUserId(testUser.getId());
   }
 
+  @Override
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
     for (Filter filter : filterService.createFilterQuery().list()) {
@@ -239,6 +245,29 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  public void testReadFilterPermittedWithMultiple() {
+    Filter filter = createTestFilter();
+
+    grantReadFilter(filter.getId());
+    Authorization authorization = processEngine.getAuthorizationService().createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.addPermission(Permissions.READ);
+    authorization.setUserId(Authorization.ANY);
+    authorization.setResource(Resources.FILTER);
+    authorization.setResourceId(Authorization.ANY);
+    processEngine.getAuthorizationService().saveAuthorization(authorization);
+
+    long count = filterService.createFilterQuery().count();
+    assertEquals(1, count);
+
+    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId()).singleResult();
+    assertNotNull(returnedFilter);
+
+    returnedFilter = filterService.getFilter(filter.getId());
+    assertNotNull(returnedFilter);
+
+    processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
+  }
+
   public void testDefaultFilterAuthorization() {
     // create two other users beside testUser
     User ownerUser = createTestUser("ownerUser");
@@ -267,6 +296,41 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     assertFilterPermission(Permissions.DELETE, testUser, filter.getId(), false);
     assertFilterPermission(Permissions.DELETE, ownerUser, filter.getId(), true);
     assertFilterPermission(Permissions.DELETE, anotherUser, filter.getId(), false);
+  }
+
+  public void testCreateFilterGenericOwnerId() {
+    grantCreateFilter();
+
+    Filter filter = filterService.newTaskFilter("someName");
+    filter.setOwner("*");
+
+    try {
+      filterService.saveFilter(filter);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot create default authorization for filter owner *: "
+          + "id cannot be *. * is a reserved identifier.", e.getMessage());
+    }
+  }
+
+  /**
+   * CAM-4889
+   */
+  public void FAILING_testUpdateFilterGenericOwnerId() {
+    grantCreateFilter();
+
+    Filter filter = filterService.newTaskFilter("someName");
+    filterService.saveFilter(filter);
+
+    grantUpdateFilter(filter.getId());
+    filter.setOwner("*");
+
+    try {
+      filterService.saveFilter(filter);
+      fail("it should not be possible to save a filter with the generic owner id");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("foo", e.getMessage());
+    }
   }
 
   protected User createTestUser(String userId) {

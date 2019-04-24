@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -848,10 +852,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)
@@ -886,10 +886,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     caseService
@@ -926,10 +922,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)
@@ -963,10 +955,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     caseService
@@ -1002,10 +990,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     terminate(humanTaskId);
 
@@ -1038,10 +1022,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     terminate(humanTaskId);
@@ -1076,10 +1056,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     terminate(humanTaskId);
 
@@ -1111,10 +1087,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     terminate(humanTaskId);
@@ -1245,10 +1217,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     exit(humanTaskId);
@@ -1412,10 +1380,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     suspend(humanTaskId);
 
@@ -1448,10 +1412,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     suspend(humanTaskId);
@@ -1486,10 +1446,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     suspend(humanTaskId);
 
@@ -1521,10 +1477,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     suspend(humanTaskId);
@@ -1656,10 +1608,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     parentSuspend(humanTaskId);
 
@@ -1691,10 +1639,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     suspend(humanTaskId);
 
@@ -1731,10 +1675,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1770,10 +1710,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1808,10 +1744,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1845,10 +1777,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     suspend(humanTaskId);
 
@@ -1885,10 +1813,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1924,10 +1848,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1961,10 +1881,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     suspend(humanTaskId);
 
@@ -2584,9 +2500,28 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("couldn't instantiate class org.camunda.bpm.engine.test.cmmn.listener.NotExistingCaseExecutionListener", message);
+      assertTextPresent("Exception while instantiating class 'org.camunda.bpm.engine.test.cmmn.listener.NotExistingCaseExecutionListener'", message);
     }
 
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseExecutionListenerTest.testBusinessKeyAsCaseBusinessKey.cmmn"})
+  public void testBusinessKeyAsCaseBusinessKey() {
+    // given
+
+    // when
+    caseService.withCaseDefinitionByKey("case")
+      .businessKey("myBusinessKey")
+      .create()
+      .getId();
+
+    // then
+    VariableInstance v1 = runtimeService.createVariableInstanceQuery().variableName("businessKey").singleResult();
+    VariableInstance v2 = runtimeService.createVariableInstanceQuery().variableName("caseBusinessKey").singleResult();
+    assertNotNull(v1);
+    assertNotNull(v2);
+    assertEquals("myBusinessKey", v1.getValue());
+    assertEquals(v1.getValue(), v2.getValue());
   }
 
 }

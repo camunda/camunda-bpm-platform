@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="NestedMultiInstanceCompensationThrowInnerScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="subProcess" />
+    <subProcess id="subProcess">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>2</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      
+      <startEvent id="subProcessStart" />
+      
+      <sequenceFlow sourceRef="subProcessStart" targetRef="subProcessTask" />
+      <userTask id="subProcessTask">
+        <multiInstanceLoopCharacteristics isSequential="false">
+          <loopCardinality>2</loopCardinality>
+        </multiInstanceLoopCharacteristics>
+      </userTask>
+  
+      <!-- compensation boundary event -->
+      <boundaryEvent id="compensateBoundaryEvent" attachedToRef="subProcessTask">
+        <compensateEventDefinition />
+      </boundaryEvent>
+      <subProcess id="undoSubProcess" isForCompensation="true">
+        <startEvent id="undoSubProcessStart" />
+        
+        <sequenceFlow sourceRef="undoSubProcessStart" targetRef="undoTask" />
+        <userTask id="undoTask" />
+        
+        <sequenceFlow sourceRef="undoTask" targetRef="undoSubProcessEnd" />
+        <endEvent id="undoSubProcessEnd" />
+      </subProcess>
+  
+      <sequenceFlow sourceRef="subProcessTask" targetRef="throwCompensate" />
+      <intermediateThrowEvent id="throwCompensate">
+        <compensateEventDefinition />
+      </intermediateThrowEvent>
+      
+      <sequenceFlow sourceRef="throwCompensate" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+      
+      <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoSubProcess" />
+    </subProcess>
+    
+    <sequenceFlow sourceRef="subProcess" targetRef="end" />
+    <endEvent id="end" />
+    
+  </process>
+</definitions>

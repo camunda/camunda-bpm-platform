@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="org.camunda.bpm.engine.test.bpmn.deployment">
 
-  <process id="abcdefghijklmnopqrstuvwxyz12345678901234567891234567890123456789">
+  <process id="abcdefghijklmnopqrstuvwxyz12345678901234567891234567890123456789" isExecutable="true">
 
     <startEvent id="start" />
 

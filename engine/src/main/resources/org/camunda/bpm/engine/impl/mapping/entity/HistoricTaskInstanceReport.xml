@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TaskReportResultEntity">
+
+  <resultMap id="historicTaskReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TaskReportResultEntity">
+    <result property="count" column="COUNT_" jdbcType="BIGINT" />
+    <result property="taskName" column="TASK_NAME_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionName" column="PROC_DEF_NAME_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="selectHistoricTaskInstanceCountByTaskNameReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
+    SELECT
+      COUNTS.COUNT_ AS COUNT_,
+      COUNTS.TASK_NAME_ AS TASK_NAME_,
+      COUNTS.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
+      PROC_DEF2.ID_ AS PROC_DEF_ID_,
+      PROC_DEF2.NAME_ AS PROC_DEF_NAME_,
+      COUNTS.TENANT_ID_ AS TENANT_ID_
+    FROM (
+      SELECT
+        COUNT(DISTINCT(ID_)) AS COUNT_,
+        HTI.NAME_ AS TASK_NAME_,
+        HTI.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
+        PD.TENANT_ID_ AS TENANT_ID_,
+        PD.PROC_DEF_VERSION_ AS VERSION_
+      FROM
+        ${prefix}ACT_HI_TASKINST HTI
+
+      INNER JOIN (
+        SELECT
+          PD_JOIN2.KEY_     AS JOIN_KEY_,
+          PD_JOIN2.TENANT_ID_   AS TENANT_ID_,
+          MAX(PD_JOIN2.VERSION_) AS PROC_DEF_VERSION_
+        FROM
+          ${prefix}ACT_RE_PROCDEF PD_JOIN2
+        GROUP BY
+          PD_JOIN2.KEY_,
+          PD_JOIN2.TENANT_ID_
+      ) PD
+      ON
+        PD.JOIN_KEY_ = HTI.PROC_DEF_KEY_
+      AND
+        (HTI.TENANT_ID_ = PD.TENANT_ID_ OR (PD.TENANT_ID_ is null AND HTI.TENANT_ID_ is null))
+
+      <include refid="selectHistoricTaskInstancesForReportByCriteria" />
+
+      GROUP BY
+        HTI.NAME_,
+        HTI.PROC_DEF_KEY_,
+        PD.PROC_DEF_VERSION_,
+        PD.TENANT_ID_
+    ) COUNTS
+    INNER JOIN
+      ${prefix}ACT_RE_PROCDEF PROC_DEF2
+    ON
+      PROC_DEF2.KEY_ = COUNTS.PROC_DEF_KEY_
+    AND
+      PROC_DEF2.VERSION_ = COUNTS.VERSION_
+    AND
+      (PROC_DEF2.TENANT_ID_ = COUNTS.TENANT_ID_ OR (PROC_DEF2.TENANT_ID_ is null AND  COUNTS.TENANT_ID_ is null))
+
+    <where>
+      COUNTS.TASK_NAME_ IS NOT NULL AND COUNTS.TASK_NAME_ != ''
+    </where>
+
+    ORDER BY
+    COUNTS.TASK_NAME_ ASC, COUNTS.COUNT_ DESC
+  </select>
+
+  <select id="selectHistoricTaskInstanceCountByTaskNameReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
+    SELECT
+      COUNTS.COUNT_ AS COUNT_,
+      COUNTS.TASK_NAME_ AS TASK_NAME_,
+      COUNTS.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
+      PROC_DEF2.ID_ AS PROC_DEF_ID_,
+      PROC_DEF2.NAME_ AS PROC_DEF_NAME_,
+      COUNTS.TENANT_ID_ AS TENANT_ID_
+    FROM (
+      SELECT
+        COUNT(DISTINCT(ID_)) AS COUNT_,
+        HTI.NAME_ AS TASK_NAME_,
+        HTI.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
+        PD.TENANT_ID_ AS TENANT_ID_,
+        PD.PROC_DEF_VERSION_ AS VERSION_
+      FROM
+        ${prefix}ACT_HI_TASKINST HTI
+
+      INNER JOIN (
+        SELECT
+          PD_JOIN2.KEY_     AS JOIN_KEY_,
+          PD_JOIN2.TENANT_ID_   AS TENANT_ID_,
+          MAX(PD_JOIN2.VERSION_) AS PROC_DEF_VERSION_
+        FROM
+          ${prefix}ACT_RE_PROCDEF PD_JOIN2
+        GROUP BY
+          PD_JOIN2.KEY_,
+          PD_JOIN2.TENANT_ID_
+      ) PD
+      ON
+        PD.JOIN_KEY_ = HTI.PROC_DEF_KEY_
+      AND
+        (HTI.TENANT_ID_ = PD.TENANT_ID_ OR (PD.TENANT_ID_ is null AND HTI.TENANT_ID_ is null))
+
+      <include refid="selectHistoricTaskInstancesForReportByCriteria" />
+
+      GROUP BY
+        HTI.NAME_,
+        HTI.PROC_DEF_KEY_,
+        PD.PROC_DEF_VERSION_,
+        PD.TENANT_ID_
+    ) COUNTS
+    INNER JOIN
+      ${prefix}ACT_RE_PROCDEF PROC_DEF2
+    ON
+      PROC_DEF2.KEY_ = COUNTS.PROC_DEF_KEY_
+    AND
+      PROC_DEF2.VERSION_ = COUNTS.VERSION_
+    AND
+      (PROC_DEF2.TENANT_ID_ = COUNTS.TENANT_ID_ OR (PROC_DEF2.TENANT_ID_ is null AND  COUNTS.TENANT_ID_ is null))
+
+    <where>
+      COUNTS.TASK_NAME_ IS NOT NULL
+    </where>
+
+    ORDER BY
+      COUNTS.TASK_NAME_ ASC, COUNTS.COUNT_ DESC
+  </select>
+
+  <select id="selectHistoricTaskInstanceCountByProcDefKeyReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
+    SELECT
+      COUNTS.COUNT_ AS COUNT_,
+      COUNTS.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
+      PROC_DEF2.ID_ AS PROC_DEF_ID_,
+      PROC_DEF2.NAME_ AS PROC_DEF_NAME_,
+      COUNTS.TENANT_ID_ AS TENANT_ID_
+    FROM (
+      SELECT
+        COUNT(DISTINCT(ID_)) AS COUNT_,
+        HTI.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
+        PD.TENANT_ID_ AS TENANT_ID_,
+        PD.PROC_DEF_VERSION_ AS VERSION_
+      FROM
+        ${prefix}ACT_HI_TASKINST HTI
+
+      INNER JOIN (
+      SELECT
+        PD_JOIN2.KEY_     AS JOIN_KEY_,
+        PD_JOIN2.TENANT_ID_   AS TENANT_ID_,
+        MAX(PD_JOIN2.VERSION_) AS PROC_DEF_VERSION_
+      FROM
+        ${prefix}ACT_RE_PROCDEF PD_JOIN2
+      GROUP BY
+        PD_JOIN2.KEY_,
+        PD_JOIN2.TENANT_ID_
+      ) PD
+      ON
+        PD.JOIN_KEY_ = HTI.PROC_DEF_KEY_
+      AND
+        (HTI.TENANT_ID_ = PD.TENANT_ID_ OR (PD.TENANT_ID_ is null AND HTI.TENANT_ID_ is null))
+
+      <include refid="selectHistoricTaskInstancesForReportByCriteria" />
+
+      GROUP BY
+        HTI.PROC_DEF_KEY_,
+        PD.PROC_DEF_VERSION_,
+        PD.TENANT_ID_
+    ) COUNTS
+    INNER JOIN
+      ${prefix}ACT_RE_PROCDEF PROC_DEF2
+    ON
+      PROC_DEF2.KEY_ = COUNTS.PROC_DEF_KEY_
+    AND
+      PROC_DEF2.VERSION_ = COUNTS.VERSION_
+    AND
+      (PROC_DEF2.TENANT_ID_ = COUNTS.TENANT_ID_ OR (PROC_DEF2.TENANT_ID_ is null AND  COUNTS.TENANT_ID_ is null))
+    ORDER BY
+    PROC_DEF2.NAME_ ASC, PROC_DEF2.KEY_ ASC, COUNTS.COUNT_ DESC
+  </select>
+
+  <sql id="selectHistoricTaskInstancesForReportByCriteria">
+    <where>
+      HTI.END_TIME_ IS NOT NULL
+
+      <if test="completedBefore != null">
+        AND HTI.END_TIME_ &lt;= #{completedBefore}
+      </if>
+      <if test="completedAfter != null">
+        AND HTI.END_TIME_ &gt;= #{completedAfter}
+      </if>
+
+      <bind name="columnPrefix" value="'HTI.'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </where>
+  </sql>
+
+  <!-- DURATION REPORT -->
+
+  <select id="selectHistoricTaskInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="org.camunda.bpm.engine.impl.persistence.entity.ReportResultEntity.durationReportResultMap">
+    SELECT
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
+    FROM
+      (
+        SELECT
+          ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}HTI.END_TIME_${datepart3} AS PERIOD_, HTI.DURATION_
+          <include refid="selectHistoricTaskInstancesByCriteria"/>
+      ) RES
+    GROUP BY
+      PERIOD_
+  </select>
+
+  <select id="selectHistoricTaskInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="org.camunda.bpm.engine.impl.persistence.entity.ReportResultEntity.durationReportResultMap">
+    SELECT
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
+    FROM
+      (
+        SELECT
+          ${datepart1}HTI.END_TIME_${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3} AS PERIOD_, HTI.DURATION_
+          <include refid="selectHistoricTaskInstancesByCriteria"/>
+      ) RES
+    GROUP BY
+      PERIOD_
+  </select>
+
+  <sql id="selectHistoricTaskInstancesByCriteria">
+    FROM
+      ${prefix}ACT_HI_TASKINST HTI
+    <where>
+      END_TIME_ IS NOT NULL
+
+      <if test="completedBefore != null">
+        AND END_TIME_ &lt;= #{completedBefore}
+      </if>
+      <if test="completedAfter != null">
+        AND END_TIME_ &gt;= #{completedAfter}
+      </if>
+
+      <bind name="columnPrefix" value="'HTI.'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </where>
+  </sql>
+  
+</mapper>

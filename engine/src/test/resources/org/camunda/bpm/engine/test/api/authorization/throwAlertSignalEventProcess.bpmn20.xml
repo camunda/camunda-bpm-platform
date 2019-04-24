@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+	targetNamespace="Examples">
+
+	<signal id="signal" name="alert" />
+
+	<process id="throwAlertSignalProcess" isExecutable="true">
+
+		<startEvent id="start" />
+
+		<sequenceFlow sourceRef="start" targetRef="throwSignal" />
+
+		<intermediateThrowEvent id="throwSignal" name="throw signal">
+			<signalEventDefinition signalRef="signal"/>
+		</intermediateThrowEvent>
+
+		<sequenceFlow sourceRef="throwSignal" targetRef="end1" />
+
+		<endEvent id="end1" />
+
+	</process>
+
+</definitions>

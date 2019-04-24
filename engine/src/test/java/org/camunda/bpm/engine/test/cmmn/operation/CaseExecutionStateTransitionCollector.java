@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +18,13 @@ package org.camunda.bpm.engine.test.cmmn.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.test.TestLogger;
+import org.slf4j.Logger;
 
 /**
  * @author Roman Smirnov
@@ -27,7 +32,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  */
 public class CaseExecutionStateTransitionCollector implements CaseExecutionListener {
 
-  private static Logger log = Logger.getLogger(CaseExecutionStateTransitionCollector.class.getName());
+  private final static Logger LOG = TestLogger.TEST_LOGGER.getLogger();
 
   public List<String> stateTransitions = new ArrayList<String>();
 
@@ -46,7 +51,7 @@ public class CaseExecutionStateTransitionCollector implements CaseExecutionListe
 
     String stateTransition = previousStateName + " --" + execution.getEventName() + "(" + activityId + ")--> " + newState;
 
-    log.fine("collecting state transition: " +  stateTransition);
+    LOG.debug("collecting state transition: " +  stateTransition);
 
     stateTransitions.add(stateTransition);
   }

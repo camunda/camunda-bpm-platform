@@ -6,7 +6,7 @@
 
     <signal id="someSignal" name="Some Signal" />
 
-    <process id="signalSuspendedProcessInstance">
+    <process id="signalSuspendedProcessInstance" isExecutable="true">
 
         <startEvent id="start" />
         <sequenceFlow sourceRef="start" targetRef="task" />

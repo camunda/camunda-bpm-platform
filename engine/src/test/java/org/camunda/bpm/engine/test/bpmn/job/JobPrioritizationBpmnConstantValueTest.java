@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,6 +15,8 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.bpmn.job;
+
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -24,7 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngineTestCase {
 
-  protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
+  protected static final long EXPECTED_DEFAULT_PRIORITY = 0;
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTaskProcess.bpmn20.xml")
   public void testDefaultPrioritizationAsyncBefore() {
@@ -82,7 +88,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(10, (int) job.getPriority());
+    assertEquals(10, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
@@ -99,7 +105,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(10, (int) job.getPriority());
+    assertEquals(10, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
@@ -113,7 +119,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(8, (int) job.getPriority());
+    assertEquals(8, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
@@ -127,7 +133,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(5, (int) job.getPriority());
+    assertEquals(5, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
@@ -144,7 +150,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(5, (int) job.getPriority());
+    assertEquals(5, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
@@ -158,7 +164,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(4, (int) job.getPriority());
+    assertEquals(4, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/subProcessJobPrioProcess.bpmn20.xml")
@@ -173,7 +179,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then the job for that activity has priority 10 which is the process definition's
     // priority; the sub process priority is not inherited
     Job job = managementService.createJobQuery().singleResult();
-    assertEquals(10, (int) job.getPriority());
+    assertEquals(10, job.getPriority());
   }
 
   public void testFailOnMalformedInput() {
@@ -290,5 +296,32 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     Job signalStartJob = managementService.createJobQuery().singleResult();
     assertNotNull(signalStartJob);
     assertEquals(4, signalStartJob.getPriority());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/miBodyAsyncProcess.bpmn20.xml")
+  public void FAILING_testMultiInstanceBodyActivityPriority() {
+    // given a process instance that executes an async mi body
+    runtimeService.startProcessInstanceByKey("miBodyAsyncPriorityProcess");
+
+    // then there is a job that has the priority as defined on the activity
+    assertEquals(1, managementService.createJobQuery().count());
+    Job miBodyJob = managementService.createJobQuery().singleResult();
+    assertNotNull(miBodyJob);
+    assertEquals(5, miBodyJob.getPriority());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/miInnerAsyncProcess.bpmn20.xml")
+  public void testMultiInstanceInnerActivityPriority() {
+    // given a process instance that executes an async mi inner activity
+    runtimeService.startProcessInstanceByKey("miBodyAsyncPriorityProcess");
+
+    // then there are three jobs that have the priority as defined on the activity (TODO: or should it be MI characteristics?)
+    List<Job> jobs = managementService.createJobQuery().list();
+
+    assertEquals(3, jobs.size());
+    for (Job job : jobs) {
+      assertNotNull(job);
+      assertEquals(5, job.getPriority());
+    }
   }
 }

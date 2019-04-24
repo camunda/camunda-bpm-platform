@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="Examples">
+  <case id="testCaseDeployment" name="One Process Task Case">
+
+    <casePlanModel id="CasePlanModel_1">
+      <planItem id="PI_ProcessTask_1" definitionRef="ProcessTask_1" />
+
+      <processTask id="ProcessTask_1" name="A Process Task" processRef="testProcess" camunda:processBinding="deployment">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </processTask>
+    </casePlanModel>
+  </case>
+
+</definitions>

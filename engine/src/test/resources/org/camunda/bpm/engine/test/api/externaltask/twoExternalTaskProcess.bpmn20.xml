@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <error id="myError" errorCode="ERROR-OCCURED" name="name of error"/>
+  <process id="twoExternalTaskProcess" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="externalTask" />
+    <serviceTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic" />
+    <sequenceFlow id="flow2" sourceRef="externalTask" targetRef="afterExternalTask" />
+    <userTask id="afterExternalTask" />
+    <sequenceFlow id="flow3" sourceRef="afterExternalTask" targetRef="end" />        
+    <endEvent id="end" />
+    <boundaryEvent id="catchError" attachedToRef="externalTask">
+      <errorEventDefinition errorRef="myError" />
+    </boundaryEvent>
+    <sequenceFlow id="flow4" sourceRef="catchError" targetRef="afterBpmnError" />
+    <userTask id="afterBpmnError"/>
+  </process>
+</definitions>

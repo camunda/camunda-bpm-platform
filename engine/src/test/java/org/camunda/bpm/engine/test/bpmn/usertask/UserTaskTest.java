@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.usertask;
 
 import java.util.List;
@@ -27,6 +30,24 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Joram Barrez
  */
 public class UserTaskTest extends PluggableProcessEngineTestCase {
+
+  public void setUp() throws Exception {
+    identityService.saveUser(identityService.newUser("fozzie"));
+    identityService.saveUser(identityService.newUser("kermit"));
+
+    identityService.saveGroup(identityService.newGroup("accountancy"));
+    identityService.saveGroup(identityService.newGroup("management"));
+
+    identityService.createMembership("fozzie", "accountancy");
+    identityService.createMembership("kermit", "management");
+  }
+
+  public void tearDown() throws Exception {
+    identityService.deleteUser("fozzie");
+    identityService.deleteUser("kermit");
+    identityService.deleteGroup("accountancy");
+    identityService.deleteGroup("management");
+  }
 
   @Deployment
   public void testTaskPropertiesNotNull() {
@@ -84,5 +105,34 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
     assertNotNull(taskList);
     assertEquals(13, taskList.size());
 
+  }
+
+  @Deployment
+  public void testSimpleProcess() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("financialReport");
+
+    List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
+    assertEquals(1, tasks.size());
+    Task task = tasks.get(0);
+    assertEquals("Write monthly financial report", task.getName());
+
+    taskService.claim(task.getId(), "fozzie");
+    tasks = taskService
+      .createTaskQuery()
+      .taskAssignee("fozzie")
+      .list();
+
+    assertEquals(1, tasks.size());
+    taskService.complete(task.getId());
+
+    tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
+    assertEquals(0, tasks.size());
+    tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+    assertEquals(1, tasks.size());
+    assertEquals("Verify monthly financial report", tasks.get(0).getName());
+    taskService.complete(tasks.get(0).getId());
+
+    assertProcessEnded(processInstance.getId());
   }
 }

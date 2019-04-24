@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,13 +20,11 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -33,7 +35,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
  */
 public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugin {
 
-  protected Logger LOG = Logger.getLogger(AdministratorAuthorizationPlugin.class.getName());
+  private final static AdministratorAuthorizationPluginLogger LOG = ProcessEngineLogger.ADMIN_PLUGIN_LOGGER;
 
   /** The name of the administrator group.
    *
@@ -42,7 +44,7 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
    * on all built-in resources. */
   protected String administratorGroupName;
 
-  /** The name of the administrator group.
+  /** The name of the administrator user.
    *
    * If this name is set to a non-null and non-empty value,
    * the plugin will create group-level Administrator authorizations
@@ -53,6 +55,12 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
 
   public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     authorizationEnabled = processEngineConfiguration.isAuthorizationEnabled();
+    if (administratorGroupName != null && administratorGroupName.length() > 0) {
+      processEngineConfiguration.getAdminGroups().add(administratorGroupName);
+    }
+    if (administratorUserName != null && administratorUserName.length() > 0) {
+      processEngineConfiguration.getAdminUsers().add(administratorUserName);
+    }
   }
 
   public void postProcessEngineBuild(ProcessEngine processEngine) {
@@ -72,7 +80,7 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
           adminGroupAuth.setResourceId(ANY);
           adminGroupAuth.addPermission(ALL);
           authorizationService.saveAuthorization(adminGroupAuth);
-          LOG.log(Level.INFO, "GRANT group {0} ALL permissions on resource {1}.", new String[]{administratorGroupName, resource.resourceName()});
+          LOG.grantGroupPermissions(administratorGroupName, resource.resourceName());
 
         }
       }
@@ -88,7 +96,7 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
           adminUserAuth.setResourceId(ANY);
           adminUserAuth.addPermission(ALL);
           authorizationService.saveAuthorization(adminUserAuth);
-          LOG.log(Level.INFO, "GRANT user {0} ALL permissions on resource {1}.", new String[]{administratorUserName, resource.resourceName()});
+          LOG.grantUserPermissions(administratorUserName, resource.resourceName());
         }
       }
     }

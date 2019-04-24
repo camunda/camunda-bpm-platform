@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,16 +19,11 @@ package org.camunda.bpm.engine.impl.scripting;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
  * <p>Represents an executable script.</p>
@@ -61,87 +60,38 @@ public abstract class ExecutableScript {
    * @return the result of the script evaluation
    */
   public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
-    Object result = evaluate(scriptEngine, variableScope, bindings);
-    return postProcessResult(result);
+    return evaluate(scriptEngine, variableScope, bindings);
+  }
+
+  protected String getActivityIdExceptionMessage(VariableScope variableScope) {
+    String activityId = null;
+    String definitionIdMessage = "";
+
+    if (variableScope instanceof DelegateExecution) {
+      activityId = ((DelegateExecution) variableScope).getCurrentActivityId();
+      definitionIdMessage = " in the process definition with id '" + ((DelegateExecution) variableScope).getProcessDefinitionId() + "'";
+    } else if (variableScope instanceof TaskEntity) {
+      TaskEntity task = (TaskEntity) variableScope;
+      if (task.getExecution() != null) {
+        activityId = task.getExecution().getActivityId();
+        definitionIdMessage = " in the process definition with id '" + task.getProcessDefinitionId() + "'";
+      }
+      if (task.getCaseExecution() != null) {
+        activityId = task.getCaseExecution().getActivityId();
+        definitionIdMessage = " in the case definition with id '" + task.getCaseDefinitionId() + "'";
+      }
+    } else if (variableScope instanceof DelegateCaseExecution) {
+      activityId = ((DelegateCaseExecution) variableScope).getActivityId();
+      definitionIdMessage = " in the case definition with id '" + ((DelegateCaseExecution) variableScope).getCaseDefinitionId() + "'";
+    }
+
+    if (activityId == null) {
+      return "";
+    } else {
+      return " while executing activity '" + activityId + "'" + definitionIdMessage;
+    }
   }
 
   protected abstract Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings);
-
-  public Object postProcessResult(Object result) {
-    if (result != null && DmnScriptEngineFactory.names.contains(language)) {
-      return postProcessDmnResult((DmnDecisionResult) result);
-    }
-    else {
-      // do nothing
-      return result;
-    }
-  }
-
-  protected Object postProcessDmnResult(DmnDecisionResult result) {
-    if (result.isEmpty()) {
-      // the result contained no output
-      return null;
-    }
-    else if (result.size() == 1) {
-      // the result contained one output
-      return unpackDecisionOutput(result.get(0));
-    }
-    else {
-      // the result contained multiple output
-      return unpackDecisionOutputs(result);
-    }
-  }
-
-  protected Object unpackDecisionOutput(DmnDecisionOutput output) {
-    if (output.isEmpty()) {
-      // the output contained no entries
-      return Collections.<String, Object>emptyMap();
-    }
-    else if (output.size() == 1) {
-      // the output contained one entry
-      return output.getValue();
-    }
-    else {
-      // the output contained multiple entries
-      return output;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected Object unpackDecisionOutputs(DmnDecisionResult result) {
-    // determine maximal number of entries for single output
-    int entriesCount = 0;
-    for (DmnDecisionOutput output : result) {
-      int size = output.size();
-      if (size > entriesCount) {
-        entriesCount = size;
-      }
-    }
-
-    if (entriesCount == 0) {
-      // all output contained no entry
-      List<Map<String, Object>> nullList = new ArrayList<Map<String, Object>>();
-      for (DmnDecisionOutput output : result) {
-        nullList.add(null);
-      }
-      return nullList;
-    }
-    else if (entriesCount == 1) {
-      // every output contained maximal one entry => return list of entries
-      return createDecisionOutputList(result);
-    }
-    else {
-      // it exists outputs with multiple entries => return full result
-      return result;
-    }
-  }
-
-  protected List<Object> createDecisionOutputList(List<DmnDecisionOutput> result) {
-    List<Object> outputList = new ArrayList<Object>();
-    for (DmnDecisionOutput output : result) {
-      outputList.add(output.getValue());
-    }
-    return outputList;
-  }
 
 }

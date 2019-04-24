@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:fox="http://www.camunda.com/fox"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+    
+    <userTask id="task" camunda:asyncBefore="true">
+      <extensionElements>
+         <fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>5</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+        
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+  
+</definitions>

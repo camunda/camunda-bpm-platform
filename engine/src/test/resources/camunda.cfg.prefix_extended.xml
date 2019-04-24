@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:engine2;MVCC=TRUE;" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+    <property name="processEngineName" value="engine2" />
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="true" />
+
+    <!-- Empty beans map to for testing purpose -->
+    <property name="beans">
+      <map/>
+    </property>
+
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+
+    <property name="bpmnStacktraceVerbose" value="false" />
+
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+
+    <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+
+    <!--<property name="idGenerator" ref="uuidGenerator" />-->
+
+  </bean>
+
+</beans>

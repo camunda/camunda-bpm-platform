@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.db.entitymanager.cache;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.entitymanager.Recyclable;
 
 /**
@@ -28,6 +36,11 @@ public class CachedDbEntity implements Recyclable {
   protected Object copy;
 
   protected DbEntityState entityState;
+
+  /**
+   * Ids of referenced entities of the same entity type
+   */
+  protected Set<String> flushRelevantEntityReferences = null;
 
   public void recycle() {
     // clean out state
@@ -57,6 +70,23 @@ public class CachedDbEntity implements Recyclable {
     return entityState + " " + dbEntity.getClass().getSimpleName() + "["+dbEntity.getId()+"]";
   }
 
+  public void determineEntityReferences() {
+    if (dbEntity instanceof HasDbReferences) {
+      flushRelevantEntityReferences = ((HasDbReferences) dbEntity).getReferencedEntityIds();
+    }
+    else {
+      flushRelevantEntityReferences = Collections.emptySet();
+    }
+  }
+
+  public boolean areFlushRelevantReferencesDetermined() {
+    return flushRelevantEntityReferences != null;
+  }
+
+  public Set<String> getFlushRelevantEntityReferences() {
+    return flushRelevantEntityReferences;
+  }
+
   // getters / setters ////////////////////////////
 
   public DbEntity getEntity() {
@@ -73,6 +103,10 @@ public class CachedDbEntity implements Recyclable {
 
   public void setEntityState(DbEntityState entityState) {
     this.entityState = entityState;
+  }
+
+  public Class<? extends DbEntity> getEntityType() {
+    return dbEntity.getClass();
   }
 
 }

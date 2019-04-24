@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,6 +78,27 @@ public class ScriptCompilationTest extends PluggableProcessEngineTestCase {
 
     // re-enable script compilation
     processEngineConfiguration.setEnableScriptCompilation(true);
+  }
+
+  public void testDisableScriptCompilationByDisabledScriptEngineCaching() {
+    // when script engine caching is disabled and a script is created
+    processEngineConfiguration.setEnableScriptEngineCaching(false);
+    SourceExecutableScript script = createScript(SCRIPT_LANGUAGE, EXAMPLE_SCRIPT);
+    assertNotNull(script);
+
+    // then it should not be compiled on creation
+    assertTrue(script.isShouldBeCompiled());
+    assertNull(script.getCompiledScript());
+
+    // and after first execution
+    executeScript(script);
+
+    // it was also not compiled
+    assertFalse(script.isShouldBeCompiled());
+    assertNull(script.getCompiledScript());
+
+    // re-enable script engine caching
+    processEngineConfiguration.setEnableScriptEngineCaching(true);
   }
 
   public void testOverrideScriptSource() {

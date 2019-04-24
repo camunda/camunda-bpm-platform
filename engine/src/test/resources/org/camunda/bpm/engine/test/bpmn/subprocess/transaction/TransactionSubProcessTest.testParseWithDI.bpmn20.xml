@@ -5,7 +5,7 @@
 	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	targetNamespace="Exemples"
 	id="Definitions_1">
-	<bpmn2:process id="TransactionSubProcessTest" name="Default Process">
+	<bpmn2:process id="TransactionSubProcessTest" name="Default Process" isExecutable="true">
 		<bpmn2:startEvent id="StartEvent_1">
 			<bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
 		</bpmn2:startEvent>

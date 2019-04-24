@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,9 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.mapping;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.engine.impl.core.CoreLogger;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
@@ -32,7 +34,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
  */
 public class InputParameter extends IoParameter {
 
-  private final static Logger LOG = Logger.getLogger(InputParameter.class.getName());
+  private final static CoreLogger LOG = CoreLogger.CORE_LOGGER;
 
   public InputParameter(String name, ParameterValueProvider valueProvider) {
     super(name, valueProvider);
@@ -43,10 +45,7 @@ public class InputParameter extends IoParameter {
     // get value from outer scope
     Object value = valueProvider.getValue(outerScope);
 
-    if(LOG.isLoggable(Level.FINE)) {
-      LOG.log(Level.FINE, "Mapping value '"+value+"' from outer scope '"+outerScope
-          +"' to variable '"+name+ "' in inner scope '"+innerScope+"'.");
-    }
+    LOG.debugMappingValueFromOuterScopeToInnerScope(value,outerScope, name, innerScope);
 
     // set variable in inner scope
     innerScope.setVariableLocal(name, value);

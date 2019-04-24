@@ -47,7 +47,12 @@
               description="User database that can be updated and saved"
               factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
               pathname="conf/tomcat-users.xml" />
-              
+
+    <!-- Additional properties can be set to avoid a common exception
+         regarding connection timeout in the connection pool:
+          testOnBorrow="true"
+          validationQuery="SELECT 1"
+    -->
     <Resource name="jdbc/ProcessEngine"
               auth="Container"
               type="javax.sql.DataSource" 
@@ -55,10 +60,12 @@
               uniqueResourceName="process-engine"
               driverClassName="org.h2.Driver" 
               url="jdbc:h2:./camunda-h2-dbs/process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE"
+              defaultTransactionIsolation="READ_COMMITTED"
               username="sa"  
               password="sa"
               maxActive="20"
-              minIdle="5" />
+              minIdle="5"
+              maxIdle="20" />
 
     <Resource name="global/camunda-bpm-platform/process-engine/ProcessEngineService!org.camunda.bpm.ProcessEngineService" auth="Container"
               type="org.camunda.bpm.ProcessEngineService"

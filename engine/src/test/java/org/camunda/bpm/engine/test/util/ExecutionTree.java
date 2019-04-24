@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,12 +34,16 @@ import org.camunda.bpm.engine.runtime.Execution;
  */
 public class ExecutionTree implements Execution {
 
+  protected ExecutionTree parent;
   protected List<ExecutionTree> children;
   protected Execution wrappedExecution;
 
   protected ExecutionTree(Execution execution, List<ExecutionTree> children) {
     this.wrappedExecution = execution;
     this.children = children;
+    for (ExecutionTree child : children) {
+      child.parent = this;
+    }
   }
 
   public static ExecutionTree forExecution(final String executionId, ProcessEngine processEngine) {
@@ -69,6 +77,25 @@ public class ExecutionTree implements Execution {
     return children;
   }
 
+  public List<ExecutionTree> getLeafExecutions(String activityId) {
+    List<ExecutionTree> executions = new ArrayList<ExecutionTree>();
+
+    for (ExecutionTree child : children) {
+      if (!child.isEventScope()) {
+        if (child.getActivityId() != null) {
+          if (activityId.equals(child.getActivityId())) {
+            executions.add(child);
+          }
+        }
+        else {
+          executions.addAll(child.getLeafExecutions(activityId));
+        }
+      }
+    }
+
+    return executions;
+  }
+
   public String getId() {
     return wrappedExecution.getId();
   }
@@ -85,12 +112,12 @@ public class ExecutionTree implements Execution {
     return wrappedExecution.getProcessInstanceId();
   }
 
-  public String getActivityId() {
-    return ((PvmExecutionImpl) wrappedExecution).getActivityId();
+  public ExecutionTree getParent() {
+    return parent;
   }
 
-  public String toString() {
-    return wrappedExecution.toString();
+  public String getActivityId() {
+    return ((PvmExecutionImpl) wrappedExecution).getActivityId();
   }
 
   public Boolean isScope() {
@@ -105,8 +132,48 @@ public class ExecutionTree implements Execution {
     return ((PvmExecutionImpl) wrappedExecution).isEventScope();
   }
 
+  public String getTenantId() {
+    return wrappedExecution.getTenantId();
+  }
+
   public Execution getExecution() {
     return wrappedExecution;
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    appendString("", sb);
+    return sb.toString();
+  }
+
+  public void appendString(String prefix, StringBuilder sb) {
+    sb.append(prefix);
+    sb.append(executionTreeToString(this));
+    sb.append("\n");
+    for (ExecutionTree child : getExecutions()) {
+      child.appendString(prefix + "   ", sb);
+    }
+  }
+
+  protected static String executionTreeToString(ExecutionTree executionTree) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(executionTree.getExecution());
+
+    sb.append("[activityId=");
+    sb.append(executionTree.getActivityId());
+
+    sb.append(", isScope=");
+    sb.append(executionTree.isScope());
+
+    sb.append(", isConcurrent=");
+    sb.append(executionTree.isConcurrent());
+
+    sb.append(", isEventScope=");
+    sb.append(executionTree.isEventScope());
+
+    sb.append("]");
+
+    return sb.toString();
   }
 
 }

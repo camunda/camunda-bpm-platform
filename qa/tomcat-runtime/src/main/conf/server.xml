@@ -57,8 +57,10 @@
               url="${database.url}"
               username="${database.username}"
               password="${database.password}"
+              defaultTransactionIsolation="READ_COMMITTED"
               maxActive="20"
-              minIdle="5" />
+              minIdle="5"
+              maxIdle="20" />
               
     <Resource name="global/camunda-bpm-platform/process-engine/ProcessEngineService!org.camunda.bpm.ProcessEngineService" auth="Container"
               type="org.camunda.bpm.ProcessEngineService"

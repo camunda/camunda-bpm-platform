@@ -1,9 +1,13 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,13 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResourceId;
+
 import java.io.Serializable;
+
+import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 
 /**
@@ -35,10 +41,13 @@ public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> imple
   
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("group", group);
+    ensureWhitelistedResourceId(commandContext, "Group", group.getId());
 
-    commandContext
+    IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .saveGroup(group);
+
+    commandContext.getOperationLogManager().logGroupOperation(operationResult, group.getId());
 
     return null;
   }

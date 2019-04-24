@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="definitions" name="camunda" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision1" name="decision">
+    <decisionTable id="decisionTable1">
+      <output id="output1"/>
+    </decisionTable>
+  </decision>
+  <decision id="decision2" name="decision">
+    <decisionTable id="decisionTable2">
+      <output id="output2"/>
+    </decisionTable>
+  </decision>
+  <decision id="decision3" name="decision">
+    <decisionTable id="decisionTable3">
+      <output id="output3"/>
+    </decisionTable>
+  </decision>
+</definitions>

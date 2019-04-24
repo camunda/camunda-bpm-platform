@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,13 +29,11 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.variable.listener.ClassDelegateCaseVariableListener;
 import org.camunda.bpm.engine.impl.variable.listener.DelegateExpressionCaseVariableListener;
 import org.camunda.bpm.engine.impl.variable.listener.ExpressionCaseVariableListener;
-import org.camunda.bpm.engine.impl.variable.listener.ScriptCaseVariableListener;
 import org.camunda.bpm.engine.test.cmmn.handler.specification.SpecUtil;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaField;
-import org.camunda.bpm.model.cmmn.instance.camunda.CamundaScript;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaVariableListener;
 import org.junit.Assert;
 import org.junit.Before;

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +17,9 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 
 /**
  *
@@ -21,18 +27,21 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
  */
 public class ActivateProcessInstanceCmd extends AbstractSetProcessInstanceStateCmd {
 
-  public ActivateProcessInstanceCmd(String executionId, String processDefinitionId, String processDefinitionKey) {
-    super(executionId, processDefinitionId, processDefinitionKey);
+  public ActivateProcessInstanceCmd(UpdateProcessInstanceSuspensionStateBuilderImpl builder) {
+    super(builder);
   }
 
+  @Override
   protected SuspensionState getNewSuspensionState() {
     return SuspensionState.ACTIVE;
   }
 
-  protected ActivateJobCmd getNextCommand() {
-    return new ActivateJobCmd(null, null, processInstanceId, processDefinitionId, processDefinitionKey);
+  @Override
+  protected ActivateJobCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder) {
+    return new ActivateJobCmd(jobCommandBuilder);
   }
 
+  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
   }

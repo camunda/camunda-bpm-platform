@@ -4,18 +4,18 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
-  <process id="asyncOutputMapping">
+  <process id="asyncOutputMapping" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
     
     <userTask id="theTask" camunda:asyncBefore="true">
-  		<extensionElements>
+      <extensionElements>
         <camunda:inputOutput>
           <camunda:outputParameter name="outputMappingExecuted">${true}</camunda:outputParameter>
         </camunda:inputOutput>
       </extensionElements>
-  	</userTask>
+    </userTask>
     
     <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
         

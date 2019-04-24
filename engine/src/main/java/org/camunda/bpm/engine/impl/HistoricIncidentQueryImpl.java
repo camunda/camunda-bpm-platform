@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,15 +16,16 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -41,12 +46,10 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   protected String rootCauseIncidentId;
   protected String configuration;
   protected IncidentState incidentState;
+  protected String[] tenantIds;
+  protected String[] jobDefinitionIds;
 
   public HistoricIncidentQueryImpl() {
-  }
-
-  public HistoricIncidentQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public HistoricIncidentQueryImpl(CommandExecutor commandExecutor) {
@@ -107,9 +110,21 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public HistoricIncidentQuery configuration(String configuration) {
     ensureNotNull("configuration", configuration);
     this.configuration = configuration;
+    return this;
+  }
+
+  public HistoricIncidentQuery jobDefinitionIdIn(String... jobDefinitionIds) {
+    ensureNotNull("jobDefinitionIds", (Object[]) jobDefinitionIds);
+    this.jobDefinitionIds = jobDefinitionIds;
     return this;
   }
 
@@ -143,6 +158,13 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     orderBy(HistoricIncidentQueryProperty.INCIDENT_ID);
     return this;
   }
+
+  @Override
+  public HistoricIncidentQuery orderByIncidentMessage() {
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_MESSAGE);
+    return this;
+  }
+
 
   public HistoricIncidentQuery orderByCreateTime() {
     orderBy(HistoricIncidentQueryProperty.INCIDENT_CREATE_TIME);
@@ -192,6 +214,15 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQuery orderByConfiguration() {
     orderBy(HistoricIncidentQueryProperty.CONFIGURATION);
     return this;
+  }
+
+  public HistoricIncidentQuery orderByIncidentState() {
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_STATE);
+    return this;
+  }
+
+  public HistoricIncidentQuery orderByTenantId() {
+    return orderBy(HistoricIncidentQueryProperty.TENANT_ID);
   }
 
   // results ////////////////////////////////////////////////////

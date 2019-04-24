@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,15 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
@@ -51,7 +59,7 @@ public class CommentManager extends AbstractHistoricManager {
 
     ListQueryParameterObject query = new ListQueryParameterObject();
     query.setParameter(taskId);
-    query.setOrderBy("RES.TIME_ desc");
+    query.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TIME_"), Direction.DESCENDING));
 
     return getDbEntityManager().selectList("selectEventsByTaskId", query);
   }
@@ -59,6 +67,28 @@ public class CommentManager extends AbstractHistoricManager {
   public void deleteCommentsByTaskId(String taskId) {
     checkHistoryEnabled();
     getDbEntityManager().delete(CommentEntity.class, "deleteCommentsByTaskId", taskId);
+  }
+
+  public void deleteCommentsByProcessInstanceIds(List<String> processInstanceIds) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processInstanceIds", processInstanceIds);
+    deleteComments(parameters);
+  }
+
+  public void deleteCommentsByTaskProcessInstanceIds(List<String> processInstanceIds) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("taskProcessInstanceIds", processInstanceIds);
+    deleteComments(parameters);
+  }
+
+  public void deleteCommentsByTaskCaseInstanceIds(List<String> caseInstanceIds) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("taskCaseInstanceIds", caseInstanceIds);
+    deleteComments(parameters);
+  }
+
+  protected void deleteComments(Map<String, Object> parameters) {
+    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByIds", parameters);
   }
 
   @SuppressWarnings("unchecked")
@@ -75,6 +105,38 @@ public class CommentManager extends AbstractHistoricManager {
     parameters.put("id", commentId);
 
     return (CommentEntity) getDbEntityManager().selectOne("selectCommentByTaskIdAndCommentId", parameters);
+  }
+
+  public void addRemovalTimeToCommentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootProcessInstanceId", rootProcessInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(CommentEntity.class, "updateCommentsByRootProcessInstanceId", parameters);
+  }
+
+  public void addRemovalTimeToCommentsByProcessInstanceId(String processInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(CommentEntity.class, "updateCommentsByProcessInstanceId", parameters);
+  }
+
+  public DbOperation deleteCommentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("removalTime", removalTime);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    parameters.put("batchSize", batchSize);
+
+    return getDbEntityManager()
+      .deletePreserveOrder(CommentEntity.class, "deleteCommentsByRemovalTime",
+        new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }

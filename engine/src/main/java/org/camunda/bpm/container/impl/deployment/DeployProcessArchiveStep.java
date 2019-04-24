@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,10 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.deployment.scanning.ProcessApplicationScanningUtil;
 import org.camunda.bpm.container.impl.deployment.util.DeployedProcessArchive;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
@@ -34,7 +38,9 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
@@ -51,6 +57,8 @@ import org.camunda.bpm.engine.repository.ResumePreviousBy;
  */
 public class DeployProcessArchiveStep extends DeploymentOperationStep {
 
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
+
   protected final ProcessArchiveXml processArchive;
   protected URL metaFileUrl;
   protected ProcessApplicationDeployment deployment;
@@ -60,17 +68,19 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     this.metaFileUrl = url;
   }
 
+  @Override
   public String getName() {
     return "Deployment of process archive '" + processArchive.getName();
   }
 
+  @Override
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
     final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
     final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();
 
-    ProcessEngine processEngine = getProcessEngine(serviceContainer);
+    ProcessEngine processEngine = getProcessEngine(serviceContainer, processApplication.getDefaultDeployToEngineName());
 
     // start building deployment map
     Map<String, byte[]> deploymentMap = new HashMap<String, byte[]>();
@@ -106,6 +116,12 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     }
     deploymentBuilder.name(deploymentName);
 
+    // set the tenant id for the deployment
+    String tenantId = processArchive.getTenantId();
+    if(tenantId != null && !tenantId.isEmpty()) {
+      deploymentBuilder.tenantId(tenantId);
+    }
+
     // enable duplicate filtering
     deploymentBuilder.enableDuplicateFiltering(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, false));
 
@@ -123,7 +139,8 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
 
     Collection<String> deploymentResourceNames = deploymentBuilder.getResourceNames();
     if(!deploymentResourceNames.isEmpty()) {
-      logDeploymentSummary(deploymentResourceNames, deploymentName);
+
+      LOG.deploymentSummary(deploymentResourceNames, deploymentName);
 
       // perform the process engine deployment
       deployment = deploymentBuilder.deploy();
@@ -136,9 +153,9 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       }
       processArchiveDeploymentMap.put(processArchive.getName(), new DeployedProcessArchive(deployment));
 
-    } else {
-      LOGGER.info("Not creating a deployment for process archive '" + processArchive.getName() + "': no resources provided.");
-
+    }
+    else {
+      LOG.notCreatingPaDeployment(processApplication.getName());
     }
   }
 
@@ -155,7 +172,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       b.append(". Value was ").append(resumePreviousBy);
       b.append(" expected ").append(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME);
       b.append(" or ").append(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY).append(".");
-      throw new IllegalArgumentException(b.toString());
+      throw LOG.illegalValueForResumePreviousByProperty(b.toString());
     }
   }
 
@@ -167,22 +184,13 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     return ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl, additionalResourceSuffixes);
   }
 
-  protected void logDeploymentSummary(Collection<String> deploymentResourceNames, String deploymentName) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("Deployment summary for process archive '" + deploymentName + "': \n");
-    builder.append("\n");
-    for (String resourceName : deploymentResourceNames) {
-      builder.append("        " + resourceName);
-      builder.append("\n");
-    }
-    LOGGER.log(Level.INFO, builder.toString());
-  }
-
+  @Override
   public void cancelOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
+    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
 
-    ProcessEngine processEngine = getProcessEngine(serviceContainer);
+    ProcessEngine processEngine = getProcessEngine(serviceContainer, processApplication.getDefaultDeployToEngineName());
 
     // if a registration was performed, remove it.
     if (deployment != null && deployment.getProcessApplicationRegistration() != null) {
@@ -200,6 +208,10 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
   }
 
   protected ProcessEngine getProcessEngine(final PlatformServiceContainer serviceContainer) {
+    return getProcessEngine(serviceContainer, ProcessEngines.NAME_DEFAULT);
+  }
+
+  protected ProcessEngine getProcessEngine(final PlatformServiceContainer serviceContainer, String defaultDeployToProcessEngineName) {
     String processEngineName = processArchive.getProcessEngineName();
     if (processEngineName != null) {
       ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
@@ -208,7 +220,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       return processEngine;
 
     } else {
-      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, "default");
+      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, defaultDeployToProcessEngineName);
       ensureNotNull("Cannot deploy process archive '" + processArchive.getName() + "' to default process: no such process engine exists", "processEngine",
           processEngine);
       return processEngine;

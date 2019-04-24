@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,15 +20,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 
@@ -37,6 +43,7 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
   protected String formEngineName;
+  private static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   public GetRenderedStartFormCmd(String processDefinitionId, String formEngineName) {
     this.processDefinitionId = processDefinitionId;
@@ -49,8 +56,9 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     ensureNotNull("Process Definition '" + processDefinitionId + "' not found", "processDefinition", processDefinition);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(processDefinition);
+    }
 
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     if (startFormHandler == null) {
@@ -66,6 +74,12 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
 
     StartFormData startForm = startFormHandler.createStartFormData(processDefinition);
 
-    return formEngine.renderStartForm(startForm);
+    Object renderedStartForm = null;
+    try {
+      renderedStartForm = formEngine.renderStartForm(startForm);
+    } catch (ScriptEvaluationException e) {
+      LOG.exceptionWhenStartFormScriptEvaluation(processDefinitionId, e);
+    }
+    return renderedStartForm;
   }
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart"/>
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task"/>
+    <userTask id="task"/>
+
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="end"/>
+    <endEvent id="end"/>
+    
+    <boundaryEvent id="timer" attachedToRef="task" cancelActivity="false">
+      <timerEventDefinition>
+        <timeCycle>R/PT1H</timeCycle>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow3" sourceRef="timer" targetRef="afterBoundaryTask"/>
+    <userTask id="afterBoundaryTask" />
+
+    <sequenceFlow id="flow4" sourceRef="afterBoundaryTask" targetRef="nonInterruptingEnd"/>
+    <endEvent id="nonInterruptingEnd"/>
+  </process>
+
+</definitions>

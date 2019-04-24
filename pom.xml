@@ -4,16 +4,17 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
-    <version>2.5</version>
+    <version>3.2</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.4.0-SNAPSHOT</version>
+  <version>7.11.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Root Pom</name>
+  <inceptionYear>2013</inceptionYear>
 
   <description>
     This pom defines the modules that make up the build.
@@ -21,7 +22,22 @@
   </description>
 
   <properties>
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <profiles>
     <!-- distro profile is default and builds the complete distribution.
@@ -50,9 +66,10 @@
 
         <module>engine-plugins</module>
 
+        <module>distro/license-book</module>
         <module>distro/jbossas7</module>
-        <module>distro/gf31</module>
         <module>distro/tomcat</module>
+        <module>distro/wildfly8</module>
         <module>distro/sql-script</module>
 
         <module>database</module>
@@ -67,8 +84,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>distro/license-book</module>
         <module>distro/jbossas7</module>
-        <module>distro/gf31</module>
         <module>distro/tomcat</module>
       </modules>
     </profile>
@@ -104,21 +121,8 @@
       </activation>
       <modules>
         <module>javaee/ejb-client</module>
+        <module>distro/license-book</module>
         <module>distro/jbossas7</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>distro-gf31</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>javaee/ejb-service</module>
-        <module>javaee/ejb-client</module>
-        <module>javaee/jobexecutor-ra</module>
-        <module>javaee/jobexecutor-rar</module>
-        <module>distro/gf31</module>
       </modules>
     </profile>
 
@@ -128,6 +132,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>distro/license-book</module>
         <module>distro/tomcat</module>
       </modules>
     </profile>
@@ -139,7 +144,19 @@
       </activation>
       <modules>
         <module>javaee/ejb-client</module>
+        <module>distro/license-book</module>
+        <module>distro/wildfly8</module>
         <module>distro/wildfly</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-webjar</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/webjar</module>
       </modules>
     </profile>
 
@@ -157,6 +174,7 @@
         <module>bom</module>
       </modules>
     </profile>
+
     <profile>
       <!-- profile for running webapp unit tests in QA -->
       <id>check-webapps</id>
@@ -165,6 +183,7 @@
         <module>bom</module>
       </modules>
     </profile>
+
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
@@ -177,11 +196,26 @@
 
         <module>engine-plugins</module>
 
+        <module>distro/webjar</module>
+
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
     </profile>
+
+    <profile>
+      <id>license-header-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
   </profiles>
 
   <licenses>
@@ -218,4 +252,11 @@
     <system>Jira</system>
     <url>https://app.camunda.com/jira/browse/CAM/</url>
   </issueManagement>
+
+  <repositories>
+    <repository>
+      <id>fix-maven-snapshots-issue-with-nexus</id>
+      <url>allow-parent-pom-resolving-when-snapshot</url>
+    </repository>
+  </repositories>
 </project>

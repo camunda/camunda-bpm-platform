@@ -6,9 +6,12 @@
 
   <process-archive>
     <process-engine>default</process-engine>
+    <resource>invoice.v2.bpmn</resource>
+    <resource>invoiceBusinessDecisions.dmn</resource>
+    <resource>review-invoice.cmmn</resource>
     <properties>
       <property name="isDeleteUponUndeploy">false</property>
-      <property name="isScanForProcessDefinitions">true</property>
+      <property name="isScanForProcessDefinitions">false</property>
     </properties>
   </process-archive>
 

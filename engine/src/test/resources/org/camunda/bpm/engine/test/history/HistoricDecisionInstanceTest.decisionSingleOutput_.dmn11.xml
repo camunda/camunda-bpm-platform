@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="testDecisionWithUnderscore" name="sample_decision">
+    <decisionTable id="table">
+      <input id="in" label="input">
+        <inputExpression id="inputExpression">
+          <text>${input1}</text>
+        </inputExpression>
+      </input>
+      <output id="out" label="output" name="result" >
+      </output>
+      <rule id="rule">
+        <inputEntry>
+          <text/>
+        </inputEntry>
+        <outputEntry id="output1">
+          <text>${input1}</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
+

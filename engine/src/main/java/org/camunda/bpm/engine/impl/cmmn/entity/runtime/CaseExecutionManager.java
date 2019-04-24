@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,9 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -76,7 +82,7 @@ public class CaseExecutionManager extends AbstractManager {
       Context
         .getCommandContext()
         .getHistoricCaseInstanceManager()
-        .deleteHistoricCaseInstanceById(caseInstanceId);
+        .deleteHistoricCaseInstancesByIds(Arrays.asList(caseInstanceId));
     }
   }
 
@@ -93,20 +99,24 @@ public class CaseExecutionManager extends AbstractManager {
   }
 
   public long findCaseExecutionCountByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery) {
+    configureTenantCheck(caseExecutionQuery);
     return (Long) getDbEntityManager().selectOne("selectCaseExecutionCountByQueryCriteria", caseExecutionQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseExecution> findCaseExecutionsByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery, Page page) {
+    configureTenantCheck(caseExecutionQuery);
     return getDbEntityManager().selectList("selectCaseExecutionsByQueryCriteria", caseExecutionQuery, page);
   }
 
   public long findCaseInstanceCountByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery) {
+    configureTenantCheck(caseInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectCaseInstanceCountByQueryCriteria", caseInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseInstance> findCaseInstanceByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery, Page page) {
+    configureTenantCheck(caseInstanceQuery);
     return getDbEntityManager().selectList("selectCaseInstanceByQueryCriteria", caseInstanceQuery, page);
   }
 
@@ -118,6 +128,10 @@ public class CaseExecutionManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<CaseExecutionEntity> findChildCaseExecutionsByCaseInstanceId(String caseInstanceId) {
     return getDbEntityManager().selectList("selectCaseExecutionsByCaseInstanceId", caseInstanceId);
+  }
+
+  protected void configureTenantCheck(AbstractQuery<?, ?> query) {
+    getTenantManager().configureQuery(query);
   }
 
 }

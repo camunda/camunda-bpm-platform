@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="oneRuleTwoInputs" name="Benchmark">
+    <decisionTable id="decisionTable" hitPolicy="COLLECT">
+      <input id="input1" label="number of matched rules">
+        <inputExpression id="inputExpression1" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_1209k69" label="number of matched rules (2)">
+        <inputExpression id="LiteralExpression_18jyq49" typeRef="double">        <text>input</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="rule matched?" name="" typeRef="string" />
+      <rule id="rule_24cb71d8-a4e6-4e8b-9df8-55a24b303566">
+        <inputEntry id="inputEntry_ac5872d2-1e2e-4074-81e2-0077e2dddce0">        <text><![CDATA[> 0.0]]></text>
+</inputEntry>
+        <inputEntry id="inputEntry_2fe4dac4-2cf5-4f05-bac0-98c9d207be11">        <text><![CDATA[> 0.0]]></text>
+</inputEntry>
+        <outputEntry id="outputEntry_bcf3f1dc-7a7f-4249-beb5-a92ce4f15120">        <text><![CDATA["matched"]]></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

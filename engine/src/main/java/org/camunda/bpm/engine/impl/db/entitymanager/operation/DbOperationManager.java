@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +21,10 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -60,6 +66,9 @@ public class DbOperationManager {
 
   /** bulk modifications (DELETE, UPDATE) on an entity collection */
   public SortedMap<Class<?>, SortedSet<DbBulkOperation>> bulkOperations = new TreeMap<Class<?>, SortedSet<DbBulkOperation>>(MODIFICATION_TYPE_COMPARATOR);
+
+  /** bulk modifications (DELETE, UPDATE) for which order of execution is important */
+  public LinkedHashSet<DbBulkOperation> bulkOperationsInsertionOrder = new LinkedHashSet<DbBulkOperation>();
 
   public boolean addOperation(DbEntityOperation newOperation) {
     if(newOperation.getOperationType() == INSERT) {
@@ -114,6 +123,10 @@ public class DbOperationManager {
     return bulksByType.add(newOperation);
   }
 
+  public boolean addOperationPreserveOrder(DbBulkOperation newOperation) {
+    return bulkOperationsInsertionOrder.add(newOperation);
+  }
+
   public List<DbOperation> calculateFlush() {
     List<DbOperation> flush = new ArrayList<DbOperation>();
     // first INSERTs
@@ -158,7 +171,11 @@ public class DbOperationManager {
       if(bulkOperationsForType != null) {
         flush.addAll(bulkOperationsForType);
       }
+    }
 
+    //the very last perform bulk operations for which the order is important
+    if(bulkOperationsInsertionOrder != null) {
+      flush.addAll(bulkOperationsInsertionOrder);
     }
   }
 
@@ -188,16 +205,20 @@ public class DbOperationManager {
 
       DbEntityOperation currentOperation = opList.get(i);
       DbEntity currentEntity = currentOperation.getEntity();
+      Set<String> currentReferences = currentOperation.getFlushRelevantEntityReferences();
 
       // check whether this operation must be placed after another operation
       int moveTo = i;
       for(int k = i+1; k < opList.size(); k++) {
         DbEntityOperation otherOperation = opList.get(k);
         DbEntity otherEntity = otherOperation.getEntity();
+        Set<String> otherReferences = otherOperation.getFlushRelevantEntityReferences();
 
         if(currentOperation.getOperationType() == INSERT) {
+
+
           // if we reference the other entity, we need to be inserted after that entity
-          if(((HasDbReferences) currentEntity).hasReferenceTo(otherEntity)) {
+          if(currentReferences != null && currentReferences.contains(otherEntity.getId())) {
             moveTo = k;
             break; // we can only reference a single entity
           }
@@ -205,7 +226,7 @@ public class DbOperationManager {
         } else { // UPDATE or DELETE
 
           // if the other entity has a reference to us, we must be placed after the other entity
-          if(((HasDbReferences) otherEntity).hasReferenceTo(currentEntity)) {
+          if(otherReferences != null && otherReferences.contains(currentEntity.getId())) {
             moveTo = k;
             // cannot break, there may be another entity further to the right which also references us
           }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +35,63 @@ import org.camunda.bpm.engine.test.Deployment;
 public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testStartAutomated() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    caseService
+        .withCaseDefinition(caseDefinitionId)
+        .create();
+
+    CaseExecutionQuery caseExecutionQuery = caseService.createCaseExecutionQuery();
+
+    // an enabled child case execution of
+    // the case instance
+    String caseExecutionId = caseExecutionQuery
+        .activityId("PI_Stage_1")
+        .singleResult()
+        .getId();
+
+    // then
+
+    // the child case execution is active...
+    CaseExecution caseExecution = caseExecutionQuery.singleResult();
+    assertTrue(caseExecution.isActive());
+    // ... and not enabled
+    assertFalse(caseExecution.isEnabled());
+
+    // there exists two new case execution:
+    verifyTasksState(caseExecutionQuery);
+
+
+  }
+
+  protected void verifyTasksState(CaseExecutionQuery caseExecutionQuery) {
+    // (1) one case case execution representing "PI_HumanTask_1"
+    CaseExecution firstHumanTask = caseExecutionQuery
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNotNull(firstHumanTask);
+    assertTrue(firstHumanTask.isActive());
+    assertFalse(firstHumanTask.isEnabled());
+
+    // (2) one case case execution representing "PI_HumanTask_2"
+    CaseExecution secondHumanTask = caseExecutionQuery
+        .activityId("PI_HumanTask_2")
+        .singleResult();
+
+    assertNotNull(secondHumanTask);
+    assertTrue(secondHumanTask.isActive());
+    assertFalse(secondHumanTask.isEnabled());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
   public void testManualStart() {
     // given:
     // a deployed case definition
@@ -70,25 +131,10 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     // there exists two new case execution:
 
     // (1) one case case execution representing "PI_HumanTask_1"
-    CaseExecution firstHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult();
-
-    assertNotNull(firstHumanTask);
-    assertTrue(firstHumanTask.isEnabled());
-    assertFalse(firstHumanTask.isActive());
-
-    // (2) one case case execution representing "PI_HumanTask_2"
-    CaseExecution secondHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult();
-
-    assertNotNull(secondHumanTask);
-    assertTrue(secondHumanTask.isEnabled());
-    assertFalse(secondHumanTask.isActive());
+    verifyTasksState(caseExecutionQuery);
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
   public void testManualStartWithVariable() {
     // given:
     // a deployed case definition
@@ -129,22 +175,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     assertFalse(caseExecution.isEnabled());
 
     // (1) one case case execution representing "PI_HumanTask_1"
-    CaseExecution firstHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult();
-
-    assertNotNull(firstHumanTask);
-    assertTrue(firstHumanTask.isEnabled());
-    assertFalse(firstHumanTask.isActive());
-
-    // (2) one case case execution representing "PI_HumanTask_2"
-    CaseExecution secondHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult();
-
-    assertNotNull(secondHumanTask);
-    assertTrue(secondHumanTask.isEnabled());
-    assertFalse(secondHumanTask.isActive());
+    verifyTasksState(caseExecutionQuery);
 
     // the case instance has two variables:
     // - aVariableName
@@ -153,28 +184,11 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .list();
 
-    assertFalse(result.isEmpty());
-    assertEquals(2, result.size());
-
-    for (VariableInstance variable : result) {
-
-      assertEquals(caseInstanceId, variable.getCaseExecutionId());
-      assertEquals(caseInstanceId, variable.getCaseInstanceId());
-
-      if (variable.getName().equals("aVariableName")) {
-        assertEquals("aVariableName", variable.getName());
-        assertEquals("abc", variable.getValue());
-      } else if (variable.getName().equals("anotherVariableName")) {
-        assertEquals("anotherVariableName", variable.getName());
-        assertEquals(999, variable.getValue());
-      } else {
-        fail("Unexpected variable: " + variable.getName());
-      }
-    }
+    verifyVariables(caseInstanceId, caseInstanceId, result);
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
   public void testManualWithVariables() {
     // given:
     // a deployed case definition
@@ -219,22 +233,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     assertFalse(caseExecution.isEnabled());
 
     // (1) one case case execution representing "PI_HumanTask_1"
-    CaseExecution firstHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult();
-
-    assertNotNull(firstHumanTask);
-    assertTrue(firstHumanTask.isEnabled());
-    assertFalse(firstHumanTask.isActive());
-
-    // (2) one case case execution representing "PI_HumanTask_2"
-    CaseExecution secondHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult();
-
-    assertNotNull(secondHumanTask);
-    assertTrue(secondHumanTask.isEnabled());
-    assertFalse(secondHumanTask.isActive());
+    verifyTasksState(caseExecutionQuery);
 
     // the case instance has two variables:
     // - aVariableName
@@ -243,28 +242,11 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .list();
 
-    assertFalse(result.isEmpty());
-    assertEquals(2, result.size());
-
-    for (VariableInstance variable : result) {
-
-      assertEquals(caseInstanceId, variable.getCaseExecutionId());
-      assertEquals(caseInstanceId, variable.getCaseInstanceId());
-
-      if (variable.getName().equals("aVariableName")) {
-        assertEquals("aVariableName", variable.getName());
-        assertEquals("abc", variable.getValue());
-      } else if (variable.getName().equals("anotherVariableName")) {
-        assertEquals("anotherVariableName", variable.getName());
-        assertEquals(999, variable.getValue());
-      } else {
-        fail("Unexpected variable: " + variable.getName());
-      }
-    }
+    verifyVariables(caseInstanceId, caseInstanceId, result);
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
   public void testManualStartWithLocalVariable() {
     // given:
     // a deployed case definition
@@ -305,22 +287,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     assertFalse(caseExecution.isEnabled());
 
     // (1) one case case execution representing "PI_HumanTask_1"
-    CaseExecution firstHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult();
-
-    assertNotNull(firstHumanTask);
-    assertTrue(firstHumanTask.isEnabled());
-    assertFalse(firstHumanTask.isActive());
-
-    // (2) one case case execution representing "PI_HumanTask_2"
-    CaseExecution secondHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult();
-
-    assertNotNull(secondHumanTask);
-    assertTrue(secondHumanTask.isEnabled());
-    assertFalse(secondHumanTask.isActive());
+    verifyTasksState(caseExecutionQuery);
 
     // the case instance has two variables:
     // - aVariableName
@@ -329,6 +296,11 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .list();
 
+    verifyVariables(caseInstanceId, caseExecutionId, result);
+
+  }
+
+  protected void verifyVariables(String caseInstanceId, String caseExecutionId, List<VariableInstance> result) {
     assertFalse(result.isEmpty());
     assertEquals(2, result.size());
 
@@ -347,10 +319,9 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         fail("Unexpected variable: " + variable.getName());
       }
     }
-
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
   public void testManualStartWithLocalVariables() {
     // given:
     // a deployed case definition
@@ -395,22 +366,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     assertFalse(caseExecution.isEnabled());
 
     // (1) one case case execution representing "PI_HumanTask_1"
-    CaseExecution firstHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult();
-
-    assertNotNull(firstHumanTask);
-    assertTrue(firstHumanTask.isEnabled());
-    assertFalse(firstHumanTask.isActive());
-
-    // (2) one case case execution representing "PI_HumanTask_2"
-    CaseExecution secondHumanTask = caseExecutionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult();
-
-    assertNotNull(secondHumanTask);
-    assertTrue(secondHumanTask.isEnabled());
-    assertFalse(secondHumanTask.isActive());
+    verifyTasksState(caseExecutionQuery);
 
     // the case instance has two variables:
     // - aVariableName
@@ -419,24 +375,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .createVariableInstanceQuery()
         .list();
 
-    assertFalse(result.isEmpty());
-    assertEquals(2, result.size());
-
-    for (VariableInstance variable : result) {
-
-      assertEquals(caseExecutionId, variable.getCaseExecutionId());
-      assertEquals(caseInstanceId, variable.getCaseInstanceId());
-
-      if (variable.getName().equals("aVariableName")) {
-        assertEquals("aVariableName", variable.getName());
-        assertEquals("abc", variable.getValue());
-      } else if (variable.getName().equals("anotherVariableName")) {
-        assertEquals("anotherVariableName", variable.getName());
-        assertEquals(999, variable.getValue());
-      } else {
-        fail("Unexpected variable: " + variable.getName());
-      }
-    }
+    verifyVariables(caseInstanceId, caseExecutionId, result);
 
   }
 
@@ -470,7 +409,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
   public void testReenableAnDisabledStage() {
     // given:
     // a deployed case definition
@@ -530,10 +469,6 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     // when
     try {
       caseService
@@ -544,7 +479,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
   public void testDisableAnEnabledStage() {
     // given:
     // a deployed case definition
@@ -579,7 +514,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     assertFalse(caseExecution.isEnabled());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
   public void testDisableADisabledStage() {
     // given:
     // a deployed case definition
@@ -635,10 +570,6 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     // when
     try {
       caseService
@@ -649,7 +580,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
   public void testManualStartOfADisabledStage() {
     // given:
     // a deployed case definition
@@ -703,10 +634,6 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     try {
       // when
       caseService
@@ -717,7 +644,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
   public void testDisableShouldCompleteCaseInstance() {
     // given:
     // a deployed case definition
@@ -786,14 +713,13 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     // when
 
     caseService
-      .withCaseExecution(caseExecutionId)
+      .withCaseExecution(queryCaseExecutionByActivityId("PI_HumanTask_1").getId())
+      .complete();
+    caseService
+      .withCaseExecution(queryCaseExecutionByActivityId("PI_HumanTask_2").getId())
       .complete();
 
     // then
@@ -838,14 +764,13 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     // when
+    caseService
+      .withCaseExecution(queryCaseExecutionByActivityId("PI_HumanTask_11").getId())
+      .complete();
 
     caseService
-      .withCaseExecution(caseExecutionId)
+      .withCaseExecution(queryCaseExecutionByActivityId("PI_HumanTask_2").getId())
       .complete();
 
     // then
@@ -898,7 +823,7 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     } catch (NotAllowedException e) {}
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskAndOneStageWithManualActivationCase.cmmn"})
   public void testCompleteDisabledStage() {
     // given:
     // a deployed case definition
@@ -943,17 +868,6 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
     caseService
        .withCaseDefinition(caseDefinitionId)
        .create();
-
-    String caseExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_Stage_1")
-        .singleResult()
-        .getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
 
     // then
 
@@ -1004,4 +918,100 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testTerminate() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+      .createCaseDefinitionQuery()
+      .singleResult()
+      .getId();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create()
+      .getId();
+
+    CaseExecution stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+
+    // when
+    CaseExecution humanTaskExecution1 = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    assertTrue(humanTaskExecution1.isActive());
+    
+    CaseExecution humanTaskExecution2 = queryCaseExecutionByActivityId("PI_HumanTask_2");
+    assertTrue(humanTaskExecution2.isActive());
+    
+    caseService.withCaseExecution(stageExecution.getId())
+      .terminate();
+    
+    // then
+    stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+    assertNull(stageExecution);
+
+    humanTaskExecution1 = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    assertNull(humanTaskExecution1);
+
+    humanTaskExecution2 = queryCaseExecutionByActivityId("PI_HumanTask_2");
+    assertNull(humanTaskExecution2);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testTerminateNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+      .createCaseDefinitionQuery()
+      .singleResult()
+      .getId();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create()
+      .getId();
+
+    CaseExecution stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+
+    // when
+    caseService.terminateCaseExecution(stageExecution.getId());
+      
+    // then
+    stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+    assertNull(stageExecution);
+    
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCaseWithManualActivation.cmmn"})
+  public void testTerminateWithNonActiveState() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+      .createCaseDefinitionQuery()
+      .singleResult()
+      .getId();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create()
+      .getId();
+
+    CaseExecution stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+
+    // when
+    try {
+      // when
+      caseService.terminateCaseExecution(stageExecution.getId());
+      fail("It should not be possible to terminate a task.");
+    } catch (NotAllowedException e) {
+      boolean result = e.getMessage().contains("The case execution must be in state 'active' to terminate");
+      assertTrue(result);
+    }
+    
+  }
+
+  protected CaseExecution queryCaseExecutionByActivityId(String activityId) {
+    return caseService
+      .createCaseExecutionQuery()
+      .activityId(activityId)
+      .singleResult();
+  }
 }

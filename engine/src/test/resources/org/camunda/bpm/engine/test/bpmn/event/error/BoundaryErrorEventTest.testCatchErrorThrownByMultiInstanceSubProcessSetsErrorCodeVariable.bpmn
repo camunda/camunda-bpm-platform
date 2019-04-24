@@ -60,7 +60,7 @@
     </bpmn2:endEvent>
     <bpmn2:boundaryEvent id="BoundaryEvent_1" name="" attachedToRef="SubProcess_1">
       <bpmn2:outgoing>SequenceFlow_9</bpmn2:outgoing>
-      <bpmn2:errorEventDefinition id="_ErrorEventDefinition_6" camunda:errorCodeVariable="errorVariable"/>
+      <bpmn2:errorEventDefinition id="_ErrorEventDefinition_6" camunda:errorCodeVariable="errorVariable" camunda:errorMessageVariable="errorMessageVariable" />
     </bpmn2:boundaryEvent>
     <bpmn2:sequenceFlow id="SequenceFlow_9" name="" sourceRef="BoundaryEvent_1" targetRef="UserTask_3"/>
   </bpmn2:process>

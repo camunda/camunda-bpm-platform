@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
@@ -25,6 +28,7 @@
         ID_,
         PROC_DEF_KEY_,
         PROC_DEF_ID_,
+        ROOT_PROC_INST_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
         CASE_DEF_KEY_,
@@ -44,11 +48,14 @@
         TASK_DEF_KEY_,
         PRIORITY_,
         DUE_DATE_,
-        FOLLOW_UP_DATE_
+        FOLLOW_UP_DATE_,
+        TENANT_ID_,
+        REMOVAL_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
+        #{rootProcessInstanceId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
         #{caseDefinitionKey, jdbcType=VARCHAR},
@@ -68,7 +75,9 @@
         #{taskDefinitionKey ,jdbcType=VARCHAR},
         #{priority, jdbcType=INTEGER},
         #{dueDate, jdbcType=TIMESTAMP},
-        #{followUpDate, jdbcType=TIMESTAMP}
+        #{followUpDate, jdbcType=TIMESTAMP},
+        #{tenantId, jdbcType=VARCHAR},
+        #{removalTime, jdbcType=TIMESTAMP}
       )
   </insert>
 
@@ -77,6 +86,8 @@
   <update id="updateHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     update ${prefix}ACT_HI_TASKINST set
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       NAME_ = #{name, jdbcType=VARCHAR},
       PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
       DESCRIPTION_ = #{description, jdbcType=VARCHAR},
@@ -96,6 +107,21 @@
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricTaskInstancesByRootProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_TASKINST set
+    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricTaskInstancesByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_TASKINST
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- HISTORIC TASK INSTANCE SELECT -->
 
   <select id="selectHistoricTaskInstanceEvent" parameterType="java.lang.String" resultMap="historicTaskInstanceResultMap">
@@ -109,12 +135,77 @@
     delete from ${prefix}ACT_HI_TASKINST where ID_ = #{id}
   </delete>
 
+  <delete id="deleteHistoricTaskInstanceByProcessInstanceIds">
+    delete
+    from ${prefix}ACT_HI_TASKINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'PROC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </delete>
+
+  <delete id="deleteHistoricTaskInstanceByCaseInstanceIds">
+    delete
+    from ${prefix}ACT_HI_TASKINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'CASE_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <delete id="deleteHistoricTaskInstancesByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_TASKINST
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricTaskInstancesByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_TASKINST
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricTaskInstancesByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_TASKINST
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_TASKINST
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
+  </delete>
+
   <!-- HISTORIC TASK INSTANCE RESULT MAP -->
 
   <resultMap id="historicTaskInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
@@ -135,6 +226,8 @@
     <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
     <result property="followUpDate" column="FOLLOW_UP_DATE_" jdbcType="TIMESTAMP" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->
@@ -143,29 +236,10 @@
     select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId}
   </select>
 
-  <select id="selectHistoricTaskInstanceIdsByParameters" resultType="string" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select ID_
-    from ${prefix}ACT_HI_TASKINST
-    <where>
-      <if test="parameter.processInstanceId != null">
-        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.processDefinitionId != null">
-        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.caseInstanceId != null">
-        and CASE_INST_ID_ = #{parameter.caseInstanceId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.caseDefinitionId != null">
-        and CASE_DEF_ID_ = #{parameter.caseDefinitionId, jdbcType=VARCHAR}
-      </if>
-    </where>
-  </select>
-
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -173,13 +247,21 @@
   </select>
 
   <select id="selectHistoricTaskInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricTaskInstancesByQueryCriteriaSql">
+
     from ${prefix}ACT_HI_TASKINST RES
-    <if test="processFinished || processUnfinished">
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+    </if>
+
+    <if test="processFinished || processUnfinished || processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null ||
+              (processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0)">
       inner join ${prefix}ACT_HI_PROCINST HPI ON RES.PROC_INST_ID_ = HPI.ID_
     </if>
     <if test="processDefinitionKey != null || processDefinitionName != null">
@@ -189,6 +271,41 @@
       inner join ${prefix}ACT_RE_CASE_DEF CD on RES.CASE_DEF_ID_ = CD.ID_
     </if>
     <where>
+
+      <if test="taskInvolvedUser != null || taskInvolvedGroup != null || taskHadCandidateUser != null || taskHadCandidateGroup != null || withCandidateGroups">
+          RES.ID_ in (select TASK_ID_ from ${prefix}ACT_HI_IDENTITYLINK HIL
+          <where>
+            <if test= "taskInvolvedUser != null">
+              HIL.USER_ID_ = #{taskInvolvedUser}
+            </if>
+            <if test ="taskInvolvedGroup != null">
+             and HIL.GROUP_ID_ = #{taskInvolvedGroup}
+            </if>
+            <if test="taskHadCandidateUser != null">
+             and HIL.TYPE_ = 'candidate' and HIL.USER_ID_ = #{taskHadCandidateUser}
+            </if>
+            <if test="taskHadCandidateGroup != null">
+              and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ = #{taskHadCandidateGroup}
+            </if>
+            <if test="withCandidateGroups">
+              and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
+            </if>
+         </where>
+         )
+      </if>
+
+      <if test="withoutCandidateGroups">
+        RES.ID_ not in (
+          select
+            TASK_ID_
+          from
+            ${prefix}ACT_HI_IDENTITYLINK HIL
+          <where>
+            HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
+          </where>
+        )
+      </if>
+
       <if test="taskId != null">
         RES.ID_ = #{taskId}
       </if>
@@ -204,8 +321,25 @@
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
-      <if test="taskDefinitionKey != null">
-        and RES.TASK_DEF_KEY_ = #{taskDefinitionKey}
+      <if test="processInstanceBusinessKey != null">
+        and HPI.BUSINESS_KEY_ = #{processInstanceBusinessKey}
+      </if>
+      <if test="processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0">
+        and HPI.BUSINESS_KEY_ in
+        <foreach item="item" index="index" collection="processInstanceBusinessKeys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processInstanceBusinessKeyLike != null">
+        HPI.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="taskDefinitionKeys != null &amp;&amp; taskDefinitionKeys.length > 0">
+        and RES.TASK_DEF_KEY_ in
+        <foreach item="taskDefinitionKey" index="index" collection="taskDefinitionKeys"
+                 open="(" separator="," close=")">
+          #{taskDefinitionKey}
+        </foreach>
       </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
@@ -236,7 +370,7 @@
         and RES.NAME_ = #{taskName}
       </if>
       <if test="taskNameLike != null">
-        and RES.NAME_ like #{taskNameLike}
+        and RES.NAME_ like #{taskNameLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskParentTaskId != null">
         and RES.PARENT_TASK_ID_ = #{taskParentTaskId}
@@ -245,25 +379,31 @@
         and RES.DESCRIPTION_ = #{taskDescription}
       </if>
       <if test="taskDescriptionLike != null">
-        and RES.DESCRIPTION_ like #{taskDescriptionLike}
+        and RES.DESCRIPTION_ like #{taskDescriptionLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskDeleteReason != null">
         and RES.DELETE_REASON_ = #{taskDeleteReason}
       </if>
       <if test="taskDeleteReasonLike != null">
-        and RES.DELETE_REASON_ like #{taskDeleteReasonLike}
+        and RES.DELETE_REASON_ like #{taskDeleteReasonLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskOwner != null">
         and RES.OWNER_ = #{taskOwner}
       </if>
       <if test="taskOwnerLike != null">
-        and RES.OWNER_ like #{taskOwnerLike}
+        and RES.OWNER_ like #{taskOwnerLike} ESCAPE ${escapeChar}
+      </if>
+      <if test="assigned">
+        and RES.ASSIGNEE_ is not null
+      </if>
+      <if test="unassigned">
+        and RES.ASSIGNEE_ is null
       </if>
       <if test="taskAssignee != null">
         and RES.ASSIGNEE_ = #{taskAssignee}
       </if>
       <if test="taskAssigneeLike != null">
-        and RES.ASSIGNEE_ like #{taskAssigneeLike}
+        and RES.ASSIGNEE_ like #{taskAssigneeLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskPriority != null">
         and RES.PRIORITY_ = #{taskPriority}
@@ -279,6 +419,18 @@
       </if>
       <if test="processUnfinished">
         and HPI.END_TIME_ is null
+      </if>
+      <if test="startedAfter != null">
+        and RES.START_TIME_ &gt;= #{startedAfter}
+      </if>
+      <if test="startedBefore != null">
+        and RES.START_TIME_ &lt;= #{startedBefore}
+      </if>
+      <if test="finishedBefore != null">
+        and RES.END_TIME_ &lt;= #{finishedBefore}
+      </if>
+      <if test="finishedAfter != null">
+        and RES.END_TIME_ &gt;= #{finishedAfter}
       </if>
       <if test="dueDate != null">
         and RES.DUE_DATE_ = #{dueDate}
@@ -303,6 +455,13 @@
       </if>
       <if test="followUpDate != null || followUpBefore != null || followUpAfter != null">
         and RES.FOLLOW_UP_DATE_ is not null
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
       <foreach collection="variables" index="index" item="queryVariableValue">
         and exists (
@@ -330,22 +489,15 @@
         )
       </foreach>
 
-      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-        AND
-          ( CASE
-
-            WHEN
-              <!-- task exists in context of a process instance -->
-              RES.EXECUTION_ID_ is not null
-            THEN
-              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
-
-            ELSE
-              <!-- (1) standalone task or -->
-              <!-- (2) a task which exists in context of a case instance -->
-              1
-          END ) = 1
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        and (
+        (RES.EXECUTION_ID_ is not null
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+        ) or RES.EXECUTION_ID_ is null
+        )
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>
@@ -372,5 +524,47 @@
 
   <select id="selectHistoricTaskInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
+  </select>
+
+  <select id="selectCompletedHistoricTaskInstancePage" resultMap="historicTaskInstanceResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_TASKINST RES
+
+    <where>
+      <if test="parameter.finishedAfter != null">
+        and RES.END_TIME_ &gt; #{parameter.finishedAfter}
+      </if>
+      <if test="parameter.finishedAt != null">
+        and RES.END_TIME_ = #{parameter.finishedAt}
+      </if>
+      <if test="parameter.finishedAfter == null and parameter.finishedAt == null">
+        and RES.END_TIME_ is not null
+      </if>
+    </where>
+
+    ORDER BY RES.END_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
+  <select id="selectRunningHistoricTaskInstancePage" resultMap="historicTaskInstanceResultMap"
+          parameterType="java.util.Map">
+    <bind name="maxResults" value="parameter.maxResults"/>
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_TASKINST RES
+
+    <where>
+      <if test="parameter.startedAfter != null">
+        and RES.START_TIME_ &gt; #{parameter.startedAfter}
+      </if>
+      <if test="parameter.startedAt != null">
+        and RES.START_TIME_ = #{parameter.startedAt}
+      </if>
+      and RES.END_TIME_ is null
+    </where>
+
+    ORDER BY RES.START_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
   </select>
 </mapper>

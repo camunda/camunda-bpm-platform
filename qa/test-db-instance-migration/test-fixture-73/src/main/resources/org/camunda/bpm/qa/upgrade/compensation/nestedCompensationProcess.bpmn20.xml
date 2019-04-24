@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="NestedCompensationScenario" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow sourceRef="start" targetRef="subProcess" />
+    
+    <subProcess id="subProcess" >
+      <startEvent id="subProcessStart" />
+      
+      <sequenceFlow sourceRef="subProcessStart" targetRef="userTask" />
+      <userTask id="userTask"/>
+  
+      <sequenceFlow sourceRef="userTask" targetRef="throwCompensate" />
+      <intermediateThrowEvent id="throwCompensate">
+        <compensateEventDefinition />
+      </intermediateThrowEvent>
+      
+      <sequenceFlow sourceRef="throwCompensate" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+      
+      <!-- compensation -->
+      <boundaryEvent id="compensateBoundaryEvent" attachedToRef="userTask">
+        <compensateEventDefinition />
+      </boundaryEvent>
+      <userTask id="undoTask" isForCompensation="true"/>
+      
+      <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoTask" />
+    </subProcess>
+    
+    <sequenceFlow sourceRef="subProcess" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,20 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.executionByProcessDefinitionId;
@@ -169,7 +159,7 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionId().asc().list();
     assertEquals(13, executions.size());
-    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+    verifySorting(executions, executionByProcessDefinitionId());
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionKey().asc().list();
     assertEquals(13, executions.size());
@@ -181,7 +171,7 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionId().desc().list();
     assertEquals(13, executions.size());
-    verifySorting(executions, inverted(executionByProcessDefinitionId(processEngine)));
+    verifySorting(executions, inverted(executionByProcessDefinitionId()));
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionKey().desc().list();
     assertEquals(13, executions.size());
@@ -189,11 +179,11 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().asc().list();
     assertEquals(12, executions.size());
-    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+    verifySorting(executions, executionByProcessDefinitionId());
 
     executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().desc().list();
     assertEquals(12, executions.size());
-    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+    verifySorting(executions, executionByProcessDefinitionId());
 
     executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionKey().asc()
         .orderByProcessInstanceId().desc().list();
@@ -719,74 +709,74 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-public void testBooleanVariable() throws Exception {
+  public void testBooleanVariable() throws Exception {
 
-  // TEST EQUALS
-  HashMap<String, Object> vars = new HashMap<String, Object>();
-  vars.put("booleanVar", true);
-  ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    // TEST EQUALS
+    HashMap<String, Object> vars = new HashMap<String, Object>();
+    vars.put("booleanVar", true);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
-  vars = new HashMap<String, Object>();
-  vars.put("booleanVar", false);
-  ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    vars = new HashMap<String, Object>();
+    vars.put("booleanVar", false);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
-  List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", true).list();
+    List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", true).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance1.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance1.getId(), instances.get(0).getId());
 
-  instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", false).list();
+    instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", false).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance2.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance2.getId(), instances.get(0).getId());
 
-  // TEST NOT_EQUALS
-  instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", true).list();
+    // TEST NOT_EQUALS
+    instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", true).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance2.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance2.getId(), instances.get(0).getId());
 
-  instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", false).list();
+    instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", false).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance1.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance1.getId(), instances.get(0).getId());
 
-  // Test unsupported operations
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueGreaterThan("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'greater than' condition", ae.getMessage());
+    // Test unsupported operations
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueGreaterThan("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'greater than' condition", ae.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'greater than or equal' condition", ae.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueLessThan("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'less than' condition", ae.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'less than or equal' condition", ae.getMessage());
+    }
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
   }
-
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'greater than or equal' condition", ae.getMessage());
-  }
-
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueLessThan("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'less than' condition", ae.getMessage());
-  }
-
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'less than or equal' condition", ae.getMessage());
-  }
-
-  runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
-  runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
-}
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1090,8 +1080,9 @@ public void testBooleanVariable() throws Exception {
   }
 
   public void testNativeQuery() {
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     // just test that the query will be constructed and executed, details are tested in the TaskQueryTest
-    assertEquals("ACT_RU_EXECUTION", managementService.getTableName(Execution.class));
+    assertEquals(tablePrefix + "ACT_RU_EXECUTION", managementService.getTableName(Execution.class));
 
     long executionCount = runtimeService.createExecutionQuery().count();
 
@@ -1244,7 +1235,7 @@ public void testBooleanVariable() throws Exception {
 
     List<Execution> executionList = runtimeService
         .createExecutionQuery()
-        .incidentMessageLike("%exception%").list();
+        .incidentMessageLike("%\\_exception%").list();
 
     assertEquals(1, executionList.size());
   }
@@ -1526,6 +1517,18 @@ public void testBooleanVariable() throws Exception {
         Collections.<String, Object>singletonMap("var", "123"));
 
     assertEquals(4, runtimeService.createExecutionQuery().processVariableValueNotEquals("var", Variables.numberValue(123)).count());
+  }
+
+  public void testNullBusinessKeyForChildExecutions() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONCURRENT_PROCESS_KEY, "76545");
+    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    for (Execution e : executions) {
+      if (((ExecutionEntity) e).isProcessInstanceExecution()) {
+        assertEquals("76545", ((ExecutionEntity) e).getBusinessKeyWithoutCascade());
+      } else {
+        assertNull(((ExecutionEntity) e).getBusinessKeyWithoutCascade());
+      }
+    }
   }
 
 }

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="xyz"
+             name="Xyz"
+             namespace="xyz_">
+             
+  <decision id="xyz_" name="Xyz_">
+    <informationRequirement>
+      <requiredDecision href="#score-decision" />
+    </informationRequirement>
+    <decisionTable id="table" hitPolicy="UNIQUE">
+      <input id="score-in">
+        <inputExpression id="inputExpression" typeRef="integer">
+          <text>score</text>
+        </inputExpression>
+      </input>
+      <output id="result" name="result" typeRef="string" />     
+      <rule id="rule1">
+        <inputEntry>
+          <text><![CDATA[< 50]]></text>
+        </inputEntry>
+        <outputEntry>
+          <text>bad</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule2">
+        <inputEntry>
+          <text><![CDATA[<= 75]]></text>
+        </inputEntry>
+        <outputEntry>
+          <text>okay</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule3">
+        <inputEntry>
+          <text><![CDATA[> 75]]></text>
+        </inputEntry>
+        <outputEntry>
+          <text>good</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="score-decision" name="Score Decision">
+    <decisionTable id="score-table" hitPolicy="UNIQUE">
+      <input id="input">
+        <inputExpression id="score-inputExpression" typeRef="string">
+          <text>input</text>
+        </inputExpression>
+      </input>
+      <output id="score-out" name="score" typeRef="integer" />     
+      <rule id="rule4">
+        <inputEntry>
+          <text>"john"</text>
+        </inputEntry>
+        <outputEntry>
+          <text>35</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule5">
+        <inputEntry>
+          <text>"peter"</text>
+        </inputEntry>
+        <outputEntry>
+          <text>65</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule6">
+        <inputEntry>
+          <text>"mary"</text>
+        </inputEntry>
+        <outputEntry>
+          <text>89</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+</definitions>
+

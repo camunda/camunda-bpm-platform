@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.repository;
 
 import org.camunda.bpm.engine.RepositoryService;
@@ -41,7 +44,16 @@ public interface ResourceDefinition {
   /** The deployment in which this definition is contained. */
   String getDeploymentId();
 
-  /** The diagram resource name for this decision if exist */
+  /** The diagram resource name for this definition if exist */
   String getDiagramResourceName();
+
+  /**
+   * The id of the tenant this definition belongs to. Can be <code>null</code>
+   * if the definition belongs to no single tenant.
+   */
+  String getTenantId();
+
+  /** History time to live. Is taken into account in history cleanup. */
+  Integer getHistoryTimeToLive();
 
 }

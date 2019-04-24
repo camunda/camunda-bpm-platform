@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,7 +59,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
     Thread thread = new Thread(new Runnable() {
       public void run() {
         try {
-          processEngineConfiguration.getCommandExecutorTxRequired().execute(command);
+          processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(command);
         } catch(RuntimeException e) {
           command.monitor.setException(e);
           controlThread.interrupt();
@@ -73,7 +77,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
   }
 
 
-  static abstract class ControllableCommand<T> implements Command<T> {
+  public static abstract class ControllableCommand<T> implements Command<T> {
 
     protected final ThreadControl monitor;
 
@@ -81,9 +85,13 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
       this.monitor = new ThreadControl();
     }
 
+    public ControllableCommand(ThreadControl threadControl) {
+      this.monitor = threadControl;
+    }
+
   }
 
-  static class ThreadControl {
+  public static class ThreadControl {
 
     protected volatile boolean syncAvailable = false;
 
@@ -91,6 +99,15 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
     protected volatile boolean reportFailure;
     protected volatile Exception exception;
+
+    protected boolean ignoreSync = false;
+
+    public ThreadControl() {
+    }
+
+    public ThreadControl(Thread executingThread) {
+      this.executingThread = executingThread;
+    }
 
     public void waitForSync() {
       waitForSync(Long.MAX_VALUE);
@@ -123,6 +140,11 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
     }
 
     public void waitUntilDone() {
+      waitUntilDone(false);
+    }
+
+    public void waitUntilDone(boolean ignoreUpcomingSyncs) {
+      ignoreSync = ignoreUpcomingSyncs;
       makeContinue();
       join();
     }
@@ -139,6 +161,10 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
     public void sync() {
       synchronized (this) {
+        if (ignoreSync) {
+          return;
+        }
+
         syncAvailable = true;
         try {
           notifyAll();
@@ -160,8 +186,17 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
       }
     }
 
+    public void makeContinueAndWaitForSync() {
+      makeContinue();
+      waitForSync();
+    }
+
     public void reportInterrupts() {
       this.reportFailure = true;
+    }
+
+    public void ignoreFutureSyncs() {
+      this.ignoreSync = true;
     }
 
     public synchronized void setException(Exception e) {
@@ -171,7 +206,6 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
     public Throwable getException() {
       return exception;
     }
-
   }
 
 }

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -67,7 +72,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -95,7 +99,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -123,7 +126,33 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
+    complete(humanTaskId);
+    close(subCaseInstance.getId());
+    assertProcessEnded(superProcessInstanceId);
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseWithCompositeExpression.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testCallCaseWithCompositeExpression() {
+    // given
+    // a deployed process definition and case definition
+
+    // when
+    String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+
+    // then
+    String callActivityId = queryExecutionByActivityId(CALL_ACTIVITY_ID).getId();
+
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(subCaseInstance);
+
+    assertEquals(callActivityId, subCaseInstance.getSuperExecutionId());
+
+    // complete
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -166,7 +195,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -216,7 +244,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -266,7 +293,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -317,7 +343,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -361,7 +386,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -393,7 +417,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -444,7 +467,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -493,7 +515,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -539,7 +560,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -588,7 +608,54 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
+    complete(humanTaskId);
+    close(subCaseInstance.getId());
+    assertProcessEnded(superProcessInstanceId);
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputSourceAsCompositeExpression.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testInputSourceAsCompositeExpression() {
+    // given
+    VariableMap parameters = Variables.createVariables()
+      .putValue("aVariable", "abc")
+      .putValue("anotherVariable", 999);
+
+    // when
+    String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY, parameters).getId();
+
+    // then
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(subCaseInstance);
+
+    List<VariableInstance> variables = runtimeService
+      .createVariableInstanceQuery()
+      .caseInstanceIdIn(subCaseInstance.getId())
+      .list();
+
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
+    for (VariableInstance variable : variables) {
+      String name = variable.getName();
+      if ("aVariable".equals(name)) {
+        assertEquals("aVariable", name);
+        assertEquals("Prefixabc", variable.getValue());
+
+      } else if ("anotherVariable".equals(name)) {
+        assertEquals("anotherVariable", name);
+        assertEquals("Prefix" + (long)1000, variable.getValue());
+
+      } else {
+        fail("Found an unexpected variable: '"+name+"'");
+      }
+    }
+
+    // complete ////////////////////////////////////////////////////////
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -635,7 +702,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     // complete ////////////////////////////////////////////////////////
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
     complete(humanTaskId);
     close(subCaseInstance.getId());
     assertProcessEnded(superProcessInstanceId);
@@ -652,8 +718,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
-
-    manualStart(humanTaskId);
 
     // when
     complete(humanTaskId);
@@ -692,8 +756,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       .execute();
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
-
-    manualStart(humanTaskId);
 
     // when
     complete(humanTaskId);
@@ -747,8 +809,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
-
     // when
     complete(humanTaskId);
 
@@ -794,7 +854,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
-    manualStart(humanTaskId);
 
     // when
     complete(humanTaskId);
@@ -848,8 +907,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
 
-    manualStart(humanTaskId);
-
     // when
     complete(humanTaskId);
 
@@ -886,6 +943,58 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputSourceAsCompositeExpression.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testOutputSourceAsCompositeExpression() {
+    // given
+    String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+    String subCaseInstanceId = queryOneTaskCaseInstance().getId();
+
+    caseService
+      .withCaseExecution(subCaseInstanceId)
+      .setVariable("aVariable", "abc")
+      .setVariable("anotherVariable", 999)
+      .execute();
+
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+
+    // when
+    complete(humanTaskId);
+
+    // then
+    List<VariableInstance> variables = runtimeService
+      .createVariableInstanceQuery()
+      .processInstanceIdIn(superProcessInstanceId)
+      .list();
+
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
+    for (VariableInstance variable : variables) {
+      String name = variable.getName();
+      if ("aVariable".equals(name)) {
+        assertEquals("aVariable", name);
+        assertEquals("Prefixabc", variable.getValue());
+      } else if ("anotherVariable".equals(name)) {
+        assertEquals("anotherVariable", name);
+        assertEquals("Prefix"+(long) 1000, variable.getValue());
+      } else {
+        fail("Found an unexpected variable: '"+name+"'");
+      }
+    }
+
+    // complete ////////////////////////////////////////////////////////
+    close(subCaseInstanceId);
+    assertCaseEnded(subCaseInstanceId);
+
+    String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
+    taskService.complete(taskId);
+    assertProcessEnded(superProcessInstanceId);
+
+  }
+
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputAll.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
@@ -901,8 +1010,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       .execute();
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
-
-    manualStart(humanTaskId);
 
     // when
     complete(humanTaskId);
@@ -964,7 +1071,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       .execute();
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
-    manualStart(humanTaskId);
 
     // when
     complete(humanTaskId);
@@ -1010,7 +1116,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       .execute();
 
     String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
-    manualStart(humanTaskId);
 
     // when
     complete(humanTaskId);
@@ -1049,7 +1154,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputAll.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testCallCaseOutputAllVariablesTypedToProcess(){
     startProcessInstanceByKey("process");
@@ -1063,14 +1168,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       .setVariable(variableName2, variableValue2)
       .execute();
     complete(caseInstance.getId());
-    
+
     Task task = taskService.createTaskQuery().singleResult();
     TypedValue value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName);
     assertThat(value, is(variableValue));
     value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName2);
     assertThat(value, is(variableValue2));
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1119,7 +1224,6 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
     assertNotNull(subCaseInstance);
     assertTrue(subCaseInstance.isActive());
 
-    manualStart(humanTaskId);
     try {
       // when
       complete(humanTaskId);
@@ -1170,7 +1274,7 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testSuspendSubCaseInstance() {
     // given
@@ -1224,6 +1328,191 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     assertEquals(superProcessInstanceId, task.getProcessInstanceId());
     assertEquals("userTask", task.getTaskDefinitionKey());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputAllVariables.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalInputAllVariables() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputAllVariables");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then only the local variable specified in the io mapping is passed to the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    complete(humanTaskId);
+
+    // then the call activity output variable has been mapped to the process instance execution
+    // and the output mapping variable as well
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(3, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(42L, callingInstanceVariables.get("calledCaseVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputSingleVariable.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalInputSingleVariable() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputSingleVariable");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then the local variable specified in the io mapping is passed to the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals("val2", calledInstanceVariables.get("mappedInputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    complete(humanTaskId);
+
+    // then the call activity output variable has been mapped to the process instance execution
+    // and the output mapping variable as well
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(4, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", callingInstanceVariables.get("mappedInputParameter"));
+    assertEquals(42L, callingInstanceVariables.get("calledCaseVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputSingleVariableExpression.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalInputSingleVariableExpression() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputSingleVariableExpression");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then the local input parameter can be resolved because its source expression variable
+    // is defined in the call activity's input mapping
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals(43L, calledInstanceVariables.get("mappedInputParameter"));
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    complete(humanTaskId);
+
+    // and executing a call activity in parameter where the source variable is not mapped by an activity
+    // input parameter fails
+
+    Task beforeSecondCallActivityTask = taskService.createTaskQuery().singleResult();
+    runtimeService.setVariable(processInstance.getId(), "globalVariable", "42");
+
+    try {
+      taskService.complete(beforeSecondCallActivityTask.getId());
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalOutputAllVariables.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn" })
+  public void testSubProcessLocalOutputAllVariables() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalOutputAllVariables");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then all variables have been mapped into the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(2, calledInstanceVariables.size());
+    assertEquals("val1", calledInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // then only the output mapping variable has been mapped into the calling process instance
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(2, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalOutputSingleVariable.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalOutputSingleVariable() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputSingleVariable");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then all variables have been mapped into the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(2, calledInstanceVariables.size());
+    assertEquals("val1", calledInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    complete(humanTaskId);
+
+    // then only the output mapping variable has been mapped into the calling process instance
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(2, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
   }
 
   protected ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {

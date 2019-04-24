@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,38 +16,36 @@
  */
 package org.camunda.bpm.engine.impl.history.producer;
 
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
-import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionByteArray;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.history.ExternalTaskState;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.history.event.*;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -55,8 +57,14 @@ import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.task.IdentityLink;
+
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.getExceptionStacktrace;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
  * @author Daniel Meyer
@@ -66,19 +74,55 @@ import org.camunda.bpm.engine.runtime.Job;
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
-
-    String activityId = execution.getActivityId();
+    PvmScope eventSource = execution.getActivity();
+    if (eventSource == null) {
+      eventSource = (PvmScope) execution.getEventSource();
+    }
     String activityInstanceId = execution.getActivityInstanceId();
 
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
 
-    if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution)) {
+    if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution) && execution.getActivity() != null) {
       parentActivityInstanceId = CompensationBehavior.getParentActivityInstanceId(execution);
-    }
-    else {
+    } else {
       parentActivityInstanceId = execution.getParentActivityInstanceId();
     }
+
+    initActivityInstanceEvent(evt,
+        execution,
+        eventSource,
+        activityInstanceId,
+        parentActivityInstanceId,
+        eventType);
+  }
+
+  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, MigratingActivityInstance migratingActivityInstance, HistoryEventType eventType) {
+    PvmScope eventSource = migratingActivityInstance.getTargetScope();
+    String activityInstanceId = migratingActivityInstance.getActivityInstanceId();
+
+    MigratingActivityInstance parentInstance = migratingActivityInstance.getParent();
+    String parentActivityInstanceId = null;
+    if (parentInstance != null) {
+      parentActivityInstanceId = parentInstance.getActivityInstanceId();
+    }
+
+    ExecutionEntity execution = migratingActivityInstance.resolveRepresentativeExecution();
+
+    initActivityInstanceEvent(evt,
+        execution,
+        eventSource,
+        activityInstanceId,
+        parentActivityInstanceId,
+        eventType);
+  }
+
+  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt,
+      ExecutionEntity execution,
+      PvmScope eventSource,
+      String activityInstanceId,
+      String parentActivityInstanceId,
+      HistoryEventType eventType) {
 
     evt.setId(activityInstanceId);
     evt.setEventType(eventType.getEventName());
@@ -87,24 +131,35 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(execution.getProcessDefinitionId());
     evt.setProcessInstanceId(execution.getProcessInstanceId());
     evt.setExecutionId(execution.getId());
+    evt.setTenantId(execution.getTenantId());
+    evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
 
-    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-    if (definition != null) {
-      evt.setProcessDefinitionKey(definition.getKey());
+    if (isHistoryRemovalTimeStrategyStart()) {
+      provideRemovalTime(evt);
     }
 
-    PvmScope eventSource = null;
-    if(activityId != null) {
-      eventSource = execution.getActivity();
-    } else {
-      eventSource = (PvmScope) execution.getEventSource();
+    ProcessDefinitionEntity definition = execution.getProcessDefinition();
+    if (definition != null) {
+      evt.setProcessDefinitionKey(definition.getKey());
     }
 
     evt.setActivityId(eventSource.getId());
     evt.setActivityName((String) eventSource.getProperty("name"));
     evt.setActivityType((String) eventSource.getProperty("type"));
 
+    // update sub process reference
+    ExecutionEntity subProcessInstance = execution.getSubProcessInstance();
+    if (subProcessInstance != null) {
+      evt.setCalledProcessInstanceId(subProcessInstance.getId());
+    }
+
+    // update sub case reference
+    CaseExecutionEntity subCaseInstance = execution.getSubCaseInstance();
+    if (subCaseInstance != null) {
+      evt.setCalledCaseInstanceId(subCaseInstance.getId());
+    }
   }
+
 
   protected void initProcessInstanceEvent(HistoricProcessInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
 
@@ -113,8 +168,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String executionId = execution.getId();
     // the given execution is the process instance!
     String caseInstanceId = execution.getCaseInstanceId();
+    String tenantId = execution.getTenantId();
 
-    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity definition = execution.getProcessDefinition();
     String processDefinitionKey = null;
     if (definition != null) {
       processDefinitionKey = definition.getKey();
@@ -128,6 +184,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setExecutionId(executionId);
     evt.setBusinessKey(execution.getProcessBusinessKey());
     evt.setCaseInstanceId(caseInstanceId);
+    evt.setTenantId(tenantId);
+    evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
 
     if (execution.getSuperCaseExecution() != null) {
       evt.setSuperCaseInstanceId(execution.getSuperCaseExecution().getCaseInstanceId());
@@ -158,6 +216,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String caseDefinitionId = taskEntity.getCaseDefinitionId();
     String caseExecutionId = taskEntity.getCaseExecutionId();
     String caseInstanceId = taskEntity.getCaseInstanceId();
+    String tenantId = taskEntity.getTenantId();
 
     evt.setId(taskEntity.getId());
     evt.setEventType(eventType.getEventName());
@@ -182,10 +241,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setParentTaskId(taskEntity.getParentTaskId());
     evt.setPriority(taskEntity.getPriority());
     evt.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
+    evt.setTenantId(tenantId);
 
     ExecutionEntity execution = taskEntity.getExecution();
     if (execution != null) {
       evt.setActivityInstanceId(execution.getActivityInstanceId());
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+
+      if (isHistoryRemovalTimeStrategyStart()) {
+        provideRemovalTime(evt);
+      }
     }
 
   }
@@ -204,13 +269,20 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setRevision(variableInstance.getRevision());
     evt.setVariableName(variableInstance.getName());
     evt.setSerializerName(variableInstance.getSerializerName());
+    evt.setTenantId(variableInstance.getTenantId());
+    evt.setUserOperationId(Context.getCommandContext().getOperationId());
 
     ExecutionEntity execution = variableInstance.getExecution();
     if (execution != null) {
-      ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity definition = execution.getProcessDefinition();
       if (definition != null) {
         evt.setProcessDefinitionId(definition.getId());
         evt.setProcessDefinitionKey(definition.getKey());
+      }
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+
+      if (isHistoryRemovalTimeStrategyStart()) {
+        provideRemovalTime(evt);
       }
     }
 
@@ -229,14 +301,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setDoubleValue(variableInstance.getDoubleValue());
     evt.setLongValue(variableInstance.getLongValue());
     if (variableInstance.getByteArrayValueId() != null) {
-      ByteArrayEntity byteArrayValue = variableInstance.getByteArrayValue();
-      evt.setByteValue(byteArrayValue.getBytes());
+      evt.setByteValue(variableInstance.getByteArrayValue());
     }
   }
 
   protected void initUserOperationLogEvent(UserOperationLogEntryEventEntity evt, UserOperationLogContext context,
       UserOperationLogContextEntry contextEntry, PropertyChange propertyChange) {
     // init properties
+    evt.setDeploymentId(contextEntry.getDeploymentId());
     evt.setEntityType(contextEntry.getEntityType());
     evt.setOperationType(contextEntry.getOperationType());
     evt.setOperationId(context.getOperationId());
@@ -251,7 +323,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTaskId(contextEntry.getTaskId());
     evt.setJobId(contextEntry.getJobId());
     evt.setJobDefinitionId(contextEntry.getJobDefinitionId());
+    evt.setBatchId(contextEntry.getBatchId());
+    evt.setCategory(contextEntry.getCategory());
     evt.setTimestamp(ClockUtil.getCurrentTime());
+    evt.setRootProcessInstanceId(contextEntry.getRootProcessInstanceId());
+    evt.setExternalTaskId(contextEntry.getExternalTaskId());
+
+    if (isHistoryRemovalTimeStrategyStart()) {
+      provideRemovalTime(evt);
+    }
 
     // init property value
     evt.setProperty(propertyChange.getPropertyName());
@@ -272,11 +352,30 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setRootCauseIncidentId(incident.getRootCauseIncidentId());
     evt.setConfiguration(incident.getConfiguration());
     evt.setIncidentMessage(incident.getIncidentMessage());
+    evt.setTenantId(incident.getTenantId());
+    evt.setJobDefinitionId(incident.getJobDefinitionId());
+
+    String jobId = incident.getConfiguration();
+    if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
+      HistoricBatchEntity historicBatch = getHistoricBatchByJobId(jobId);
+      if (historicBatch != null) {
+        evt.setRemovalTime(historicBatch.getRemovalTime());
+      }
+    }
 
     IncidentEntity incidentEntity = (IncidentEntity) incident;
     ProcessDefinitionEntity definition = incidentEntity.getProcessDefinition();
     if (definition != null) {
       evt.setProcessDefinitionKey(definition.getKey());
+    }
+
+    ExecutionEntity execution = incidentEntity.getExecution();
+    if (execution != null) {
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+
+      if (isHistoryRemovalTimeStrategyStart()) {
+        provideRemovalTime(evt);
+      }
     }
 
     // init event type
@@ -309,8 +408,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
         scopeActivityInstanceId = scopeExecution.getActivityInstanceId();
       }
     }
+    else if (variableInstance.getCaseExecutionId() != null) {
+      scopeActivityInstanceId = variableInstance.getCaseExecutionId();
+    }
 
     ExecutionEntity sourceExecution = null;
+    CaseExecutionEntity sourceCaseExecution = null;
     if (sourceVariableScope instanceof ExecutionEntity) {
       sourceExecution = (ExecutionEntity) sourceVariableScope;
       sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
@@ -320,6 +423,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       if (sourceExecution != null) {
         sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
       }
+      else {
+        sourceCaseExecution = ((TaskEntity) sourceVariableScope).getCaseExecution();
+        if (sourceCaseExecution != null) {
+          sourceActivityInstanceId = sourceCaseExecution.getId();
+        }
+      }
+    }
+    else if (sourceVariableScope instanceof CaseExecutionEntity) {
+      sourceCaseExecution = (CaseExecutionEntity) sourceVariableScope;
+      sourceActivityInstanceId = sourceCaseExecution.getId();
     }
 
     // create event
@@ -368,6 +481,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return new HistoricJobLogEventEntity();
   }
 
+  protected HistoricBatchEntity newBatchEventEntity(BatchEntity batch) {
+    return new HistoricBatchEntity();
+  }
+
   protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
     return newProcessInstanceEventEntity(execution);
   }
@@ -382,6 +499,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected HistoricIncidentEventEntity loadIncidentEvent(Incident incident) {
     return newIncidentEventEntity(incident);
+  }
+
+  protected HistoricBatchEntity loadBatchEntity(BatchEntity batch) {
+    return newBatchEventEntity(batch);
   }
 
   // Implementation ////////////////////////////////
@@ -404,8 +525,20 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setSuperProcessInstanceId(superExecution.getProcessInstanceId());
     }
 
+    //state
+    evt.setState(HistoricProcessInstance.STATE_ACTIVE);
+
     // set start user Id
     evt.setStartUserId(Context.getCommandContext().getAuthenticatedUserId());
+
+    if (isHistoryRemovalTimeStrategyStart()) {
+      if (isRootProcessInstance(evt)) {
+        Date removalTime = calculateRemovalTime(evt);
+        evt.setRemovalTime(removalTime);
+      } else {
+        provideRemovalTime(evt);
+      }
+    }
 
     return evt;
   }
@@ -414,10 +547,29 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
     // create event instance
-    HistoricProcessInstanceEventEntity evt = newProcessInstanceEventEntity(executionEntity);
+    HistoricProcessInstanceEventEntity evt = loadProcessInstanceEventEntity(executionEntity);
 
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_UPDATE);
+
+    if (executionEntity.isSuspended()) {
+      evt.setState(HistoricProcessInstance.STATE_SUSPENDED);
+    } else {
+      evt.setState(HistoricProcessInstance.STATE_ACTIVE);
+    }
+
+    return evt;
+  }
+
+  @Override
+  public HistoryEvent createProcessInstanceMigrateEvt(DelegateExecution execution) {
+    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    // create event instance
+    HistoricProcessInstanceEventEntity evt = newProcessInstanceEventEntity(executionEntity);
+
+    // initialize event
+    initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_MIGRATE);
 
     return evt;
   }
@@ -431,6 +583,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_END);
 
+    determineEndState(executionEntity, evt);
+
     // set end activity id
     evt.setEndActivityId(executionEntity.getActivityId());
     evt.setEndTime(ClockUtil.getCurrentTime());
@@ -439,12 +593,53 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setDurationInMillis(evt.getEndTime().getTime()-evt.getStartTime().getTime());
     }
 
+    if (isRootProcessInstance(evt) && isHistoryRemovalTimeStrategyEnd()) {
+      Date removalTime = calculateRemovalTime(evt);
+
+      if (removalTime != null) {
+        addRemovalTimeToHistoricProcessInstances(evt.getRootProcessInstanceId(), removalTime);
+
+        if (isDmnEnabled()) {
+          addRemovalTimeToHistoricDecisions(evt.getRootProcessInstanceId(), removalTime);
+        }
+      }
+    }
+
     // set delete reason (if applicable).
     if (executionEntity.getDeleteReason() != null) {
       evt.setDeleteReason(executionEntity.getDeleteReason());
     }
 
     return evt;
+  }
+
+  protected void addRemovalTimeToHistoricDecisions(String rootProcessInstanceId, Date removalTime) {
+    Context.getCommandContext()
+      .getHistoricDecisionInstanceManager()
+      .addRemovalTimeToDecisionsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+  }
+
+  protected void addRemovalTimeToHistoricProcessInstances(String rootProcessInstanceId, Date removalTime) {
+    Context.getCommandContext()
+      .getHistoricProcessInstanceManager()
+      .addRemovalTimeToProcessInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+  }
+
+  protected boolean isDmnEnabled() {
+    return Context.getCommandContext()
+      .getProcessEngineConfiguration()
+      .isDmnEnabled();
+  }
+
+  protected void determineEndState(ExecutionEntity executionEntity, HistoricProcessInstanceEventEntity evt) {
+    //determine state
+    if (executionEntity.getActivity() != null) {
+      evt.setState(HistoricProcessInstance.STATE_COMPLETED);
+    } else if (executionEntity.getActivity() == null && executionEntity.isExternallyTerminated()) {
+      evt.setState(HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED);
+    } else if (executionEntity.getActivity() == null && !executionEntity.isExternallyTerminated()) {
+      evt.setState(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED);
+    }
   }
 
   public HistoryEvent createActivityInstanceStartEvt(DelegateExecution execution) {
@@ -464,6 +659,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  @Override
+  public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution) {
+    return createActivityInstanceUpdateEvt(execution, null);
+  }
+
+  @Override
   public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
@@ -479,20 +680,21 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setTaskAssignee(task.getAssignee());
     }
 
-    // update sub process reference
-    ExecutionEntity subProcessInstance = executionEntity.getSubProcessInstance();
-    if (subProcessInstance != null) {
-      evt.setCalledProcessInstanceId(subProcessInstance.getId());
-    }
+    return evt;
+  }
 
-    // update sub case reference
-    CaseExecutionEntity subCaseInstance = executionEntity.getSubCaseInstance();
-    if (subCaseInstance != null) {
-      evt.setCalledCaseInstanceId(subCaseInstance.getId());
-    }
+  @Override
+  public HistoryEvent createActivityInstanceMigrateEvt(MigratingActivityInstance actInstance) {
+
+    // create event instance
+    HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(actInstance.resolveRepresentativeExecution());
+
+    // initialize event
+    initActivityInstanceEvent(evt, actInstance, HistoryEventTypes.ACTIVITY_INSTANCE_MIGRATE);
 
     return evt;
   }
+
 
   public HistoryEvent createActivityInstanceEndEvt(DelegateExecution execution) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
@@ -536,6 +738,17 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  @Override
+  public HistoryEvent createTaskInstanceMigrateEvt(DelegateTask task) {
+    // create event instance
+    HistoricTaskInstanceEventEntity evt = loadTaskInstanceEvent(task);
+
+    // initialize event
+    initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEventTypes.TASK_INSTANCE_MIGRATE);
+
+    return evt;
+  }
+
   public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason) {
 
     // create event instance
@@ -561,14 +774,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   public List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context) {
     List<HistoryEvent> historyEvents = new ArrayList<HistoryEvent>();
 
-    String userId = null;
-    CommandContext commandContext = Context.getCommandContext();
-    if (commandContext != null) {
-      userId = commandContext.getAuthenticatedUserId();
-    }
-    context.setUserId(userId);
-
-    String operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
+    String operationId = Context.getCommandContext().getOperationId();
     context.setOperationId(operationId);
 
     for (UserOperationLogContextEntry entry : context.getEntries()) {
@@ -598,6 +804,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE);
   }
 
+  @Override
+  public HistoryEvent createHistoricVariableMigrateEvt(VariableInstanceEntity variableInstance) {
+    return createHistoricVariableEvent(variableInstance, null, HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE);
+  }
+
   // form Properties ///////////////////////////
 
   public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, String propertyValue, String taskId) {
@@ -616,8 +827,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setPropertyId(propertyId);
     historicFormPropertyEntity.setPropertyValue(propertyValue);
     historicFormPropertyEntity.setTaskId(taskId);
+    historicFormPropertyEntity.setTenantId(execution.getTenantId());
+    historicFormPropertyEntity.setUserOperationId(Context.getCommandContext().getOperationId());
+    historicFormPropertyEntity.setRootProcessInstanceId(execution.getRootProcessInstanceId());
 
-    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    if (isHistoryRemovalTimeStrategyStart()) {
+      provideRemovalTime(historicFormPropertyEntity);
+    }
+
+    ProcessDefinitionEntity definition = execution.getProcessDefinition();
     if (definition != null) {
       historicFormPropertyEntity.setProcessDefinitionKey(definition.getKey());
     }
@@ -642,17 +860,152 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_DELETE);
   }
 
+  public HistoryEvent createHistoricIncidentMigrateEvt(Incident incident) {
+    return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_MIGRATE);
+  }
+
   protected HistoryEvent createHistoricIncidentEvt(Incident incident, HistoryEventTypes eventType) {
     // create event
     HistoricIncidentEventEntity evt = loadIncidentEvent(incident);
     // initialize
     initHistoricIncidentEvent(evt, incident, eventType);
 
-    if (!HistoryEventTypes.INCIDENT_CREATE.equals(eventType)) {
+    if (HistoryEventTypes.INCIDENT_RESOLVE.equals(eventType) || HistoryEventTypes.INCIDENT_DELETE.equals(eventType)) {
       evt.setEndTime(ClockUtil.getCurrentTime());
     }
 
     return evt;
+  }
+
+  // Historic identity link
+  @Override
+  public HistoryEvent createHistoricIdentityLinkAddEvent(IdentityLink identityLink) {
+    return createHistoricIdentityLinkEvt(identityLink, HistoryEventTypes.IDENTITY_LINK_ADD);
+  }
+
+  @Override
+  public HistoryEvent createHistoricIdentityLinkDeleteEvent(IdentityLink identityLink) {
+    return createHistoricIdentityLinkEvt(identityLink, HistoryEventTypes.IDENTITY_LINK_DELETE);
+  }
+
+  protected HistoryEvent createHistoricIdentityLinkEvt(IdentityLink identityLink, HistoryEventTypes eventType) {
+    // create historic identity link event
+    HistoricIdentityLinkLogEventEntity evt = newIdentityLinkEventEntity();
+    // Mapping all the values of identity link to HistoricIdentityLinkEvent
+    initHistoricIdentityLinkEvent(evt, identityLink, eventType);
+    return evt;
+  }
+
+  protected HistoricIdentityLinkLogEventEntity newIdentityLinkEventEntity() {
+    return new HistoricIdentityLinkLogEventEntity();
+  }
+
+  protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkLogEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
+
+    if (identityLink.getTaskId() != null) {
+      TaskEntity task = Context
+          .getCommandContext()
+          .getTaskManager()
+          .findTaskById(identityLink.getTaskId());
+
+      evt.setProcessDefinitionId(task.getProcessDefinitionId());
+
+      if (task.getProcessDefinition() != null) {
+        evt.setProcessDefinitionKey(task.getProcessDefinition().getKey());
+      }
+
+      ExecutionEntity execution = task.getExecution();
+      if (execution != null) {
+        evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+
+        if (isHistoryRemovalTimeStrategyStart()) {
+          provideRemovalTime(evt);
+        }
+      }
+    }
+
+    if (identityLink.getProcessDefId() != null) {
+      evt.setProcessDefinitionId(identityLink.getProcessDefId());
+
+      ProcessDefinitionEntity definition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findProcessDefinitionFromCache(identityLink.getProcessDefId());
+      evt.setProcessDefinitionKey(definition.getKey());
+    }
+
+    evt.setTime(ClockUtil.getCurrentTime());
+    evt.setType(identityLink.getType());
+    evt.setUserId(identityLink.getUserId());
+    evt.setGroupId(identityLink.getGroupId());
+    evt.setTaskId(identityLink.getTaskId());
+    evt.setTenantId(identityLink.getTenantId());
+    // There is a conflict in HistoryEventTypes for 'delete' keyword,
+    // So HistoryEventTypes.IDENTITY_LINK_ADD /
+    // HistoryEventTypes.IDENTITY_LINK_DELETE is provided with the event name
+    // 'add-identity-link' /'delete-identity-link'
+    // and changed to 'add'/'delete' (While inserting it into the database) on
+    // Historic identity link add / delete event
+    String operationType = "add";
+    if (eventType.getEventName().equals(HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName())) {
+      operationType = "delete";
+    }
+
+    evt.setOperationType(operationType);
+    evt.setEventType(eventType.getEventName());
+    evt.setAssignerId(Context.getCommandContext().getAuthenticatedUserId());
+  }
+  // Batch
+
+  @Override
+  public HistoryEvent createBatchStartEvent(Batch batch) {
+    HistoryEvent historicBatch = createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_START);
+
+    if (isHistoryRemovalTimeStrategyStart()) {
+      provideRemovalTime((HistoricBatchEntity) historicBatch);
+    }
+
+    return historicBatch;
+  }
+
+  @Override
+  public HistoryEvent createBatchEndEvent(Batch batch) {
+    HistoryEvent historicBatch = createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_END);
+
+    if (isHistoryRemovalTimeStrategyEnd()) {
+      provideRemovalTime((HistoricBatchEntity) historicBatch);
+
+      addRemovalTimeToHistoricJobLog((HistoricBatchEntity) historicBatch);
+      addRemovalTimeToHistoricIncidents((HistoricBatchEntity) historicBatch);
+    }
+
+    return historicBatch;
+  }
+
+  protected HistoryEvent createBatchEvent(BatchEntity batch, HistoryEventTypes eventType) {
+    HistoricBatchEntity event = loadBatchEntity(batch);
+
+    event.setId(batch.getId());
+    event.setType(batch.getType());
+    event.setTotalJobs(batch.getTotalJobs());
+    event.setBatchJobsPerSeed(batch.getBatchJobsPerSeed());
+    event.setInvocationsPerBatchJob(batch.getInvocationsPerBatchJob());
+    event.setSeedJobDefinitionId(batch.getSeedJobDefinitionId());
+    event.setMonitorJobDefinitionId(batch.getMonitorJobDefinitionId());
+    event.setBatchJobDefinitionId(batch.getBatchJobDefinitionId());
+    event.setTenantId(batch.getTenantId());
+    event.setEventType(eventType.getEventName());
+
+    if (HistoryEventTypes.BATCH_START.equals(eventType)) {
+      event.setStartTime(ClockUtil.getCurrentTime());
+      event.setCreateUserId(Context.getCommandContext().getAuthenticatedUserId());
+    }
+
+    if (HistoryEventTypes.BATCH_END.equals(eventType)) {
+      event.setEndTime(ClockUtil.getCurrentTime());
+    }
+
+    return event;
   }
 
   // Job Log
@@ -669,9 +1022,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       event.setJobExceptionMessage(exception.getMessage());
 
       // stacktrace
-      String exceptionStacktrace = getJobExceptionStacktrace(exception);
+      String exceptionStacktrace = getExceptionStacktrace(exception);
       byte[] exceptionBytes = toByteArray(exceptionStacktrace);
-      ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes);
+
+      ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes, ResourceTypes.HISTORY);
+      byteArray.setRootProcessInstanceId(event.getRootProcessInstanceId());
+
+      if (isHistoryRemovalTimeStrategyStart()) {
+        byteArray.setRemovalTime(event.getRemovalTime());
+      }
+
       event.setExceptionByteArrayId(byteArray.getId());
     }
 
@@ -693,7 +1053,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected void initHistoricJobLogEvent(HistoricJobLogEventEntity evt, Job job, HistoryEventType eventType) {
-    evt.setTimestamp(new Date());
+    evt.setTimestamp(ClockUtil.getCurrentTime());
 
     JobEntity jobEntity = (JobEntity) job;
     evt.setJobId(jobEntity.getId());
@@ -706,6 +1066,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setJobDefinitionId(jobDefinition.getId());
       evt.setJobDefinitionType(jobDefinition.getJobType());
       evt.setJobDefinitionConfiguration(jobDefinition.getJobConfiguration());
+
+      String historicBatchId = jobDefinition.getJobConfiguration();
+      if (historicBatchId != null && isHistoryRemovalTimeStrategyStart()) {
+        HistoricBatchEntity historicBatch = getHistoricBatchById(historicBatchId);
+        if (historicBatch != null) {
+          evt.setRemovalTime(historicBatch.getRemovalTime());
+        }
+      }
+
     }
     else {
       // in case of async signal there does not exist a job definition
@@ -719,6 +1088,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());
     evt.setProcessDefinitionKey(jobEntity.getProcessDefinitionKey());
     evt.setDeploymentId(jobEntity.getDeploymentId());
+    evt.setTenantId(jobEntity.getTenantId());
+
+    ExecutionEntity execution = jobEntity.getExecution();
+    if (execution != null) {
+      evt.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+
+      if (isHistoryRemovalTimeStrategyStart()) {
+        provideRemovalTime(evt);
+      }
+    }
 
     // initialize sequence counter
     initSequenceCounter(jobEntity, evt);
@@ -739,6 +1118,159 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setState(state.getStateCode());
   }
 
+  @Override
+  public HistoryEvent createHistoricExternalTaskLogCreatedEvt(ExternalTask task) {
+    return initHistoricExternalTaskLog((ExternalTaskEntity) task, ExternalTaskState.CREATED);
+  }
+
+  @Override
+  public HistoryEvent createHistoricExternalTaskLogFailedEvt(ExternalTask task) {
+    HistoricExternalTaskLogEntity event = initHistoricExternalTaskLog((ExternalTaskEntity) task, ExternalTaskState.FAILED);
+    event.setErrorMessage(task.getErrorMessage());
+    String errorDetails = ((ExternalTaskEntity) task).getErrorDetails();
+    if( errorDetails != null) {
+      event.setErrorDetails(errorDetails);
+    }
+    return event;
+  }
+
+  @Override
+  public HistoryEvent createHistoricExternalTaskLogSuccessfulEvt(ExternalTask task) {
+    return initHistoricExternalTaskLog((ExternalTaskEntity) task, ExternalTaskState.SUCCESSFUL);
+  }
+
+  @Override
+  public HistoryEvent createHistoricExternalTaskLogDeletedEvt(ExternalTask task) {
+    return initHistoricExternalTaskLog((ExternalTaskEntity) task, ExternalTaskState.DELETED);
+  }
+
+  protected HistoricExternalTaskLogEntity initHistoricExternalTaskLog(ExternalTaskEntity entity, ExternalTaskState state) {
+    HistoricExternalTaskLogEntity event = new HistoricExternalTaskLogEntity();
+    event.setTimestamp(ClockUtil.getCurrentTime());
+    event.setExternalTaskId(entity.getId());
+    event.setTopicName(entity.getTopicName());
+    event.setWorkerId(entity.getWorkerId());
+
+    event.setPriority(entity.getPriority());
+    event.setRetries(entity.getRetries());
+
+    event.setActivityId(entity.getActivityId());
+    event.setActivityInstanceId(entity.getActivityInstanceId());
+    event.setExecutionId(entity.getExecutionId());
+
+    event.setProcessInstanceId(entity.getProcessInstanceId());
+    event.setProcessDefinitionId(entity.getProcessDefinitionId());
+    event.setProcessDefinitionKey(entity.getProcessDefinitionKey());
+    event.setTenantId(entity.getTenantId());
+    event.setState(state.getStateCode());
+
+    ExecutionEntity execution = entity.getExecution();
+    if (execution != null) {
+      event.setRootProcessInstanceId(execution.getRootProcessInstanceId());
+
+      if (isHistoryRemovalTimeStrategyStart()) {
+        provideRemovalTime(event);
+      }
+    }
+
+    return event;
+  }
+
+  protected boolean isRootProcessInstance(HistoricProcessInstanceEventEntity evt) {
+    return evt.getProcessInstanceId().equals(evt.getRootProcessInstanceId());
+  }
+
+  protected boolean isHistoryRemovalTimeStrategyStart() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_START.equals(getHistoryRemovalTimeStrategy());
+  }
+
+  protected boolean isHistoryRemovalTimeStrategyEnd() {
+    return HISTORY_REMOVAL_TIME_STRATEGY_END.equals(getHistoryRemovalTimeStrategy());
+  }
+
+  protected String getHistoryRemovalTimeStrategy() {
+    return Context.getProcessEngineConfiguration()
+      .getHistoryRemovalTimeStrategy();
+  }
+
+  protected Date calculateRemovalTime(HistoryEvent historyEvent) {
+    String processDefinitionId = historyEvent.getProcessDefinitionId();
+    ProcessDefinition processDefinition = findProcessDefinitionById(processDefinitionId);
+
+    return Context.getProcessEngineConfiguration()
+      .getHistoryRemovalTimeProvider()
+      .calculateRemovalTime((HistoricProcessInstanceEventEntity) historyEvent, processDefinition);
+  }
+
+  protected Date calculateRemovalTime(HistoricBatchEntity historicBatch) {
+    return Context.getProcessEngineConfiguration()
+      .getHistoryRemovalTimeProvider()
+      .calculateRemovalTime(historicBatch);
+  }
+
+  protected void provideRemovalTime(HistoricBatchEntity historicBatch) {
+    Date removalTime = calculateRemovalTime(historicBatch);
+    if (removalTime != null) {
+      historicBatch.setRemovalTime(removalTime);
+    }
+  }
+
+  protected void provideRemovalTime(HistoryEvent historyEvent) {
+    String rootProcessInstanceId = historyEvent.getRootProcessInstanceId();
+    if (rootProcessInstanceId != null) {
+      HistoricProcessInstanceEventEntity historicRootProcessInstance =
+        getHistoricRootProcessInstance(rootProcessInstanceId);
+
+      if (historicRootProcessInstance != null) {
+        Date removalTime = historicRootProcessInstance.getRemovalTime();
+        historyEvent.setRemovalTime(removalTime);
+      }
+    }
+  }
+
+  protected HistoricProcessInstanceEventEntity getHistoricRootProcessInstance(String rootProcessInstanceId) {
+    return Context.getCommandContext()
+      .getDbEntityManager()
+      .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
+  }
+
+  protected ProcessDefinition findProcessDefinitionById(String processDefinitionId) {
+    return Context.getCommandContext()
+      .getProcessEngineConfiguration()
+      .getDeploymentCache()
+      .findDeployedProcessDefinitionById(processDefinitionId);
+  }
+
+  protected HistoricBatchEntity getHistoricBatchById(String batchId) {
+    return Context.getCommandContext()
+      .getHistoricBatchManager()
+      .findHistoricBatchById(batchId);
+  }
+
+  protected HistoricBatchEntity getHistoricBatchByJobId(String jobId) {
+    return Context.getCommandContext()
+      .getHistoricBatchManager()
+      .findHistoricBatchByJobId(jobId);
+  }
+
+  protected void addRemovalTimeToHistoricJobLog(HistoricBatchEntity historicBatch) {
+    Date removalTime = historicBatch.getRemovalTime();
+    if (removalTime != null) {
+      Context.getCommandContext()
+        .getHistoricJobLogManager()
+        .addRemovalTimeToJobLogByBatchId(historicBatch.getId(), removalTime);
+    }
+  }
+
+  protected void addRemovalTimeToHistoricIncidents(HistoricBatchEntity historicBatch) {
+    Date removalTime = historicBatch.getRemovalTime();
+    if (removalTime != null) {
+      Context.getCommandContext()
+        .getHistoricIncidentManager()
+        .addRemovalTimeToHistoricIncidentsByBatchId(historicBatch.getId(), removalTime);
+    }
+  }
+
   // sequence counter //////////////////////////////////////////////////////
 
   protected void initSequenceCounter(ExecutionEntity execution, HistoryEvent event) {
@@ -756,5 +1288,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected void initSequenceCounter(long sequenceCounter, HistoryEvent event) {
     event.setSequenceCounter(sequenceCounter);
   }
+
+
 
 }

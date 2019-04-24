@@ -7,7 +7,7 @@
   <error id="myError" errorCode="MyError" />
   <error id="myException" errorCode="org.camunda.bpm.integrationtest.functional.error.MyBusinessException" />
 
-  <process id="testProcessParallelMI">
+  <process id="testProcessParallelMI" isExecutable="true">
   
     <startEvent id="start" />
 

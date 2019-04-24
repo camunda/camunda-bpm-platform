@@ -6,7 +6,7 @@
   
   <signal id="someSignal" name="signal1" />
   
-  <process id="testErrorThrownByJavaDelegateNotCaughtByOtherEventType">
+  <process id="testErrorThrownByJavaDelegateNotCaughtByOtherEventType" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subProcess" />

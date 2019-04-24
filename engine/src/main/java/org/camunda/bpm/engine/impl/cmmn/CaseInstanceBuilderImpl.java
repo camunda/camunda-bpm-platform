@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +26,9 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.cmd.CreateCaseInstanceCmd;
+import org.camunda.bpm.engine.impl.cmmn.operation.CmmnOperationLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -36,6 +42,8 @@ import org.camunda.bpm.engine.variable.Variables;
  */
 public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
+  private final static CmmnOperationLogger LOG = ProcessEngineLogger.CMMN_OPERATION_LOGGER;
+
   protected CommandExecutor commandExecutor;
   protected CommandContext commandContext;
 
@@ -43,6 +51,9 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   protected String caseDefinitionId;
   protected String businessKey;
   protected VariableMap variables;
+
+  protected String caseDefinitionTenantId;
+  protected boolean isTenantIdSet = false;
 
   public CaseInstanceBuilderImpl(CommandExecutor commandExecutor, String caseDefinitionKey, String caseDefinitionId) {
     this(caseDefinitionKey, caseDefinitionId);
@@ -63,6 +74,18 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
   public CaseInstanceBuilder businessKey(String businessKey) {
     this.businessKey = businessKey;
+    return this;
+  }
+
+  public CaseInstanceBuilder caseDefinitionTenantId(String tenantId) {
+    this.caseDefinitionTenantId = tenantId;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public CaseInstanceBuilder caseDefinitionWithoutTenantId() {
+    this.caseDefinitionTenantId = null;
+    isTenantIdSet = true;
     return this;
   }
 
@@ -88,6 +111,10 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   }
 
   public CaseInstance create() {
+    if (isTenantIdSet && caseDefinitionId != null) {
+      throw LOG.exceptionCreateCaseInstanceByIdAndTenantId();
+    }
+
     try {
       CreateCaseInstanceCmd command = new CreateCaseInstanceCmd(this);
       if(commandExecutor != null) {
@@ -124,6 +151,14 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
   public VariableMap getVariables() {
     return variables;
+  }
+
+  public String getCaseDefinitionTenantId() {
+    return caseDefinitionTenantId;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 
 }

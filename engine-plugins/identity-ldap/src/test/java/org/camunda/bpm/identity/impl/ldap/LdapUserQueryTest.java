@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,9 +16,22 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import org.camunda.bpm.engine.identity.User;
+import java.util.HashSet;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.List;
+import java.util.Set;
+
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.identity.User;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPagingWithMemberOfGroup;
 
 /**
  * @author Daniel Meyer
@@ -24,7 +41,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
   public void testQueryNoFilter() {
     List<User> result = identityService.createUserQuery().list();
-    assertEquals(8, result.size());
+    assertEquals(12, result.size());
   }
 
   public void testFilterByUserId() {
@@ -55,6 +72,25 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
     assertNotNull(users);
     assertEquals(3, users.size());
   }
+  
+  public void testFilterByUserIdWithCapitalization() {
+	try {
+	  processEngineConfiguration.setAuthorizationEnabled(true);
+	  identityService.setAuthenticatedUserId("Oscar");
+	  User user = identityService.createUserQuery().userId("Oscar").singleResult();
+	  assertNotNull(user);
+
+	  // validate user
+	  assertEquals("oscar", user.getId());
+	  assertEquals("Oscar", user.getFirstName());
+	  assertEquals("The Crouch", user.getLastName());
+	  assertEquals("oscar@camunda.org", user.getEmail());
+	}
+	finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+	  identityService.clearAuthentication();
+	}
+  }
 
   public void testFilterByFirstname() {
     User user = identityService.createUserQuery().userFirstName("Oscar").singleResult();
@@ -83,7 +119,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
   public void testFilterByLastnameLike() {
     User user = identityService.createUserQuery().userLastNameLike("The Cro*").singleResult();
     assertNotNull(user);
-    user = identityService.createUserQuery().userLastNameLike("The*").singleResult();
+    user = identityService.createUserQuery().userLastNameLike("The C*").singleResult();
     assertNotNull(user);
 
     user = identityService.createUserQuery().userLastNameLike("non-exist*").singleResult();
@@ -146,7 +182,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
   public void testFilterByGroupIdAndEmailLike() {
     List<User> result = identityService.createUserQuery()
         .memberOfGroup("development")
-        .userEmail("*@camunda.org")
+        .userEmailLike("*@camunda.org")
         .list();
     assertEquals(3, result.size());
   }
@@ -173,6 +209,90 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
       processEngineConfiguration.setAuthorizationEnabled(false);
       identityService.clearAuthentication();
     }
+  }
+
+  public void testPagination() {
+    testUserPaging(identityService);
+  }
+
+  public void testPaginationWithMemberOfGroup() {
+    testUserPagingWithMemberOfGroup(identityService);
+  }
+
+  public void testPaginationWithAuthenticatedUser() {
+    createGrantAuthorization(USER, "roman", "oscar", READ);
+    createGrantAuthorization(USER, "daniel", "oscar", READ);
+    createGrantAuthorization(USER, "monster", "oscar", READ);
+    createGrantAuthorization(USER, "ruecker", "oscar", READ);
+
+    try {
+      processEngineConfiguration.setAuthorizationEnabled(true);
+
+      identityService.setAuthenticatedUserId("oscar");
+
+      Set<String> userNames = new HashSet<String>();
+      List<User> users = identityService.createUserQuery().listPage(0, 2);
+      assertEquals(2, users.size());
+      checkPagingResults(userNames, users.get(0).getId(), users.get(1).getId());
+
+      users = identityService.createUserQuery().listPage(2, 2);
+      assertEquals(2, users.size());
+      checkPagingResults(userNames, users.get(0).getId(), users.get(1).getId());
+
+      users = identityService.createUserQuery().listPage(4, 2);
+      assertEquals(1, users.size());
+      assertFalse(userNames.contains(users.get(0).getId()));
+      userNames.add(users.get(0).getId());
+
+      identityService.setAuthenticatedUserId("daniel");
+
+      users = identityService.createUserQuery().listPage(0, 2);
+      assertEquals(1, users.size());
+
+      assertEquals("daniel", users.get(0).getId());
+
+      users = identityService.createUserQuery().listPage(2, 2);
+      assertEquals(0, users.size());
+
+    } finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+      identityService.clearAuthentication();
+
+      for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
+        authorizationService.deleteAuthorization(authorization.getId());
+      }
+
+    }
+  }
+
+  public void testNativeQueryFail() {
+    try {
+      identityService.createNativeUserQuery();
+      fail("Native queries are not supported in LDAP case.");
+    } catch (BadUserRequestException ex) {
+      assertTrue("Wrong exception", ex.getMessage().contains("Native user queries are not supported for LDAP"));
+    }
+
+  }
+
+  protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+    Authorization authorization = createAuthorization(AUTH_TYPE_GRANT, resource, resourceId);
+    authorization.setUserId(userId);
+    for (Permission permission : permissions) {
+      authorization.addPermission(permission);
+    }
+    authorizationService.saveAuthorization(authorization);
+  }
+
+  protected Authorization createAuthorization(int type, Resource resource, String resourceId) {
+    Authorization authorization = authorizationService.createNewAuthorization(type);
+
+    authorization.setResource(resource);
+    if (resourceId != null) {
+      authorization.setResourceId(resourceId);
+    }
+
+    return authorization;
   }
 
 }

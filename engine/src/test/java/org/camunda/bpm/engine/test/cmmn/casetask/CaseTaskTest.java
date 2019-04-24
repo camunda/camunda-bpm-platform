@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +28,8 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
  * @author Roman Smirnov
@@ -44,13 +50,7 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
-
     // then
-
     CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
     assertNotNull(subCaseInstance);
 
@@ -79,14 +79,10 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   public void testCallCaseAsExpressionStartsWithDollar() {
     // given
     // a deployed case definition
-    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    VariableMap vars = new VariableMapImpl();
+    vars.putValue("oneTaskCase", ONE_TASK_CASE);
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, vars).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariable("oneTaskCase", ONE_TASK_CASE)
-      .manualStart();
 
     // then
 
@@ -117,14 +113,10 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   public void testCallCaseAsExpressionStartsWithHash() {
     // given
     // a deployed case definition
-    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    VariableMap vars = new VariableMapImpl();
+    vars.putValue("oneTaskCase", ONE_TASK_CASE);
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, vars).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariable("oneTaskCase", ONE_TASK_CASE)
-      .manualStart();
 
     // then
 
@@ -148,6 +140,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(superCaseInstanceId);
   }
 
+  /**
+   * assert on default behaviour - remove manual activation
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testCallLatestCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -172,11 +167,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
       .latestVersion()
       .singleResult()
       .getId();
-
-    // when:
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     // then
 
@@ -203,6 +193,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId, true);
   }
 
+  /**
+   * default behaviour of manual activation changed - remove manual activation
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testCallCaseByDeployment.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -233,11 +226,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
       .singleResult()
       .getId();
 
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
-
     // then
 
     CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
@@ -263,6 +251,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId, true);
   }
 
+  /**
+   * assertions on completion - take manual activation out
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testCallCaseByVersion.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -292,11 +283,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
       .deploymentId(secondDeploymentId)
       .singleResult()
       .getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     // then
 
@@ -345,7 +331,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
     assertEquals(4, repositoryService.createCaseDefinitionQuery().count());
 
-    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    VariableMap vars = new VariableMapImpl();
+    vars.putValue("myVersion", 2);
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE,vars).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
     String caseDefinitionIdInSecondDeployment = repositoryService
@@ -354,12 +342,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
       .deploymentId(secondDeploymentId)
       .singleResult()
       .getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariable("myVersion", 2)
-      .manualStart();
 
     // then
 
@@ -450,6 +432,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     repositoryService.deleteDeployment(thirdDeploymentId, true);
   }
 
+  /**
+   * assertion on default behaviour - remove manual activation
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputBusinessKey.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -459,11 +444,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     String businessKey = "myBusinessKey";
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, businessKey).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     // then
 
@@ -489,6 +469,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * variable passed in manual activation - change process definition
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputDifferentBusinessKey.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -529,8 +512,11 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assertion on variables which are set on manual start - change process definition
+   */
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputSource.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputSourceWithManualActivation.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
   public void testInputSource() {
@@ -584,21 +570,20 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * default manual activation behaviour changed - remove manual activation statement
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputSourceDifferentTarget.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
   public void testInputSourceDifferentTarget() {
     // given
-    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    VariableMap vars = new VariableMapImpl();
+    vars.putValue("aVariable", "abc");
+    vars.putValue("anotherVariable", 999);
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, vars).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariable("aVariable", "abc")
-      .setVariable("anotherVariable", 999)
-      .manualStart();
 
     // then
 
@@ -638,6 +623,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assertion on default execution - take manual start out
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputSource.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -646,11 +634,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     // then
 
@@ -690,21 +673,20 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(superCaseInstanceId);
   }
 
+  /**
+   * Default manual activation changed - add variables to case instantiation, remove manual activation
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputSourceExpression.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
   public void testInputSourceExpression() {
     // given
-    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    VariableMap vars = new VariableMapImpl();
+    vars.putValue("aVariable", "abc");
+    vars.putValue("anotherVariable", 999);
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE,vars).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariable("aVariable", "abc")
-      .setVariable("anotherVariable", 999)
-      .manualStart();
 
     // then
 
@@ -749,15 +731,11 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     })
   public void testInputAll() {
     // given
-    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    VariableMap vars = new VariableMapImpl();
+    vars.putValue("aVariable", "abc");
+    vars.putValue("anotherVariable", 999);
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, vars).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariable("aVariable", "abc")
-      .setVariable("anotherVariable", 999)
-      .manualStart();
 
     // then
 
@@ -797,8 +775,42 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assert on variable defined during manual start - change process definition
+   */
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputAllLocal.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+    })
+  public void testInputAllLocal() {
+    // given
+    createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
+
+    // when
+    caseService
+      .withCaseExecution(caseTaskId)
+      .setVariable("aVariable", "abc")
+      .setVariableLocal("aLocalVariable", "def")
+      .manualStart();
+
+    // then only the local variable is mapped to the subCaseInstance
+    CaseInstance subCaseInstance = queryOneTaskCaseInstance();
+
+    List<VariableInstance> variables = runtimeService
+        .createVariableInstanceQuery()
+        .caseInstanceIdIn(subCaseInstance.getId())
+        .list();
+
+    assertEquals(1, variables.size());
+    assertEquals("aLocalVariable", variables.get(0).getName());
+  }
+
+  /**
+   * assertion on manual activation operation - change process definition
+   */
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn"
     })
   public void testCaseNotFound() {
     // given
@@ -822,6 +834,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assertion on completion - remove manual start
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -829,18 +844,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   public void testCompleteSimpleCase() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
     String humanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     caseService
@@ -862,18 +868,16 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * subprocess manual start with variables - change process definition
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testOutputSource.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testOutputSource() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
@@ -928,6 +932,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * default behaviour of manual activation changed - remove manual activation
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testOutputSourceDifferentTarget.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -935,11 +942,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   public void testOutputSourceDifferentTarget() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
@@ -950,10 +952,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
       .execute();
 
     String humanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     caseService
       .withCaseExecution(humanTaskId)
@@ -993,6 +991,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assertion on default behaviour - remove manual activations
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testOutputSource.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1000,18 +1001,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   public void testOutputSourceNullValue() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
     String humanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     caseService
       .withCaseExecution(humanTaskId)
@@ -1051,18 +1043,17 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assertion on variables - change process definition
+   * manual start on case not needed enaymore and therefore removed
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testOutputSourceExpression.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testOutputSourceExpression() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
@@ -1116,18 +1107,17 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * since assertion happens on variables, changing oneTaskCase definition to have manual activation,
+   * case task behaviour changed, so manual activation is taken out
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testOutputAll.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testOutputAll() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
@@ -1182,8 +1172,8 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testOutputAll.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testOutputVariablesShouldNotExistAnymore.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testOutputVariablesShouldNotExistAnymore() {
     // given
@@ -1237,21 +1227,20 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assertion on variables - change subprocess definition
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testVariablesRoundtrip.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testVariablesRoundtrip() {
     // given
-    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
-    caseService
-      .withCaseExecution(caseTaskId)
-      // set variables local
-      .setVariable("aVariable", "xyz")
-      .setVariable("anotherVariable", 123)
-      .manualStart();
+    VariableMap vars = new VariableMapImpl();
+    vars.putValue("aVariable", "xyz");
+    vars.putValue("anotherVariable", 123);
+    String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE, vars).getId();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
@@ -1306,6 +1295,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * Default behaviour changed, so manual start is taken out
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1314,10 +1306,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     try {
       // when
@@ -1341,6 +1329,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assert on default behaviour - remove manual activation
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1349,10 +1340,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     CaseInstance subCaseInstance = queryOneTaskCaseInstance();
     assertTrue(subCaseInstance.isActive());
@@ -1375,6 +1362,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * removed manual start as it is handled by default behaviour
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1383,10 +1373,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
@@ -1413,6 +1399,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assertion on completion - remove manual start
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1421,10 +1410,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     CaseInstance subCaseInstance = queryOneTaskCaseInstance();
     assertTrue(subCaseInstance.isActive());
@@ -1448,18 +1433,18 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * default behaviour of manual activation changed - remove manual activation
+   * change definition of oneTaskCase in order to allow suspension state
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"
     })
   public void testSuspendSubCaseInstance() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     String subCaseInstanceId = queryOneTaskCaseInstance().getId();
 
@@ -1495,10 +1480,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
 
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
-
     suspend(caseTaskId);
 
     CaseInstance subCaseInstance = queryOneTaskCaseInstance();
@@ -1527,6 +1508,9 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  /**
+   * assert on default behaviour - remove manual activation
+   */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testNotBlockingCaseTask.cmmn",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1534,12 +1518,6 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   public void testNotBlockingCaseTask() {
     // given
     String superCaseInstanceId = createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
-    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
-
-    // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .manualStart();
 
     // then
     CaseInstance subCaseInstance = queryOneTaskCaseInstance();
@@ -1566,7 +1544,10 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  /**
+   * Changed process definition as we prove activity type
+   */
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn"})
   public void testActivityType() {
     // given
     createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();

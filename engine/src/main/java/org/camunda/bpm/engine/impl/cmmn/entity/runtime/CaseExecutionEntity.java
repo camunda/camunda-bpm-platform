@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,13 +20,20 @@ import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTI
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
@@ -32,7 +43,13 @@ import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.CmmnVariableInvocationListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableOnPartListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -41,16 +58,24 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.CaseExecutionEntityReferencer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntityFactory;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntityPersistenceListener;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceHistoryListener;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceSequenceCounterListener;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -60,7 +85,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, DbEntity, HasDbRevision, HasDbReferences {
+public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, DbEntity, HasDbRevision, HasDbReferences, VariablesProvider<VariableInstanceEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -91,7 +116,9 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // associated entities /////////////////////////////////////////////////////
 
-  protected CaseExecutionEntityVariableStore variableStore = new CaseExecutionEntityVariableStore(this);
+  @SuppressWarnings({ "unchecked" })
+  protected VariableStore<VariableInstanceEntity> variableStore = new VariableStore<VariableInstanceEntity>(
+      this, new CaseExecutionEntityReferencer(this));
 
   // Persistence //////////////////////////////////////////////////////////////
 
@@ -355,6 +382,38 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     return parentId == null;
   }
 
+  @Override
+  public void create(Map<String, Object> variables) {
+    // determine tenant Id if null
+    if(tenantId == null) {
+      provideTenantId(variables);
+    }
+    super.create(variables);
+  }
+
+  protected void provideTenantId(Map<String, Object> variables) {
+    TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+
+    if(tenantIdProvider != null) {
+      VariableMap variableMap = Variables.fromMap(variables);
+      CaseDefinition caseDefinition = (CaseDefinition) getCaseDefinition();
+
+      TenantIdProviderCaseInstanceContext ctx = null;
+
+      if(superExecutionId != null) {
+        ctx = new TenantIdProviderCaseInstanceContext(caseDefinition, variableMap, getSuperExecution());
+      }
+      else if(superCaseExecutionId != null) {
+        ctx = new TenantIdProviderCaseInstanceContext(caseDefinition, variableMap, getSuperCaseExecution());
+      }
+      else {
+        ctx = new TenantIdProviderCaseInstanceContext(caseDefinition, variableMap);
+      }
+
+      tenantId = tenantIdProvider.provideTenantIdForCaseInstance(ctx);
+    }
+  }
+
   protected CaseExecutionEntity createCaseExecution(CmmnActivity activity) {
     CaseExecutionEntity child = newCaseExecution();
 
@@ -370,6 +429,11 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
     // set case definition
     child.setCaseDefinition(getCaseDefinition());
+
+    // inherit the tenant id from parent case execution
+    if(tenantId != null) {
+      child.setTenantId(tenantId);
+    }
 
     return child;
   }
@@ -401,10 +465,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public void setSuperExecution(PvmExecutionImpl superExecution) {
+    if (this.superExecutionId != null) {
+      ensureSuperExecutionInstanceInitialized();
+      this.superExecution.setSubCaseInstance(null);
+    }
+
     this.superExecution = (ExecutionEntity) superExecution;
 
     if (superExecution != null) {
       this.superExecutionId = superExecution.getId();
+      this.superExecution.setSubCaseInstance(this);
     } else {
       this.superExecutionId = null;
     }
@@ -441,6 +511,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
     ExecutionEntity subProcessInstance = (ExecutionEntity) processDefinition.createProcessInstance(businessKey, caseInstanceId);
 
+    // inherit the tenant-id from the process definition
+    String tenantId = ((ProcessDefinitionEntity) processDefinition).getTenantId();
+    if (tenantId != null) {
+      subProcessInstance.setTenantId(tenantId);
+    }
+    else {
+      // if process definition has no tenant id, inherit this case instance's tenant id
+      subProcessInstance.setTenantId(this.tenantId);
+    }
+
     // manage bidirectional super-subprocess relation
     subProcessInstance.setSuperCaseExecution(this);
     setSubProcessInstance(subProcessInstance);
@@ -476,6 +556,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
     CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+
+    // inherit the tenant-id from the case definition
+    String tenantId = ((CaseDefinitionEntity) caseDefinition).getTenantId();
+    if (tenantId != null) {
+      subCaseInstance.setTenantId(tenantId);
+    }
+    else {
+      // if case definition has no tenant id, inherit this case instance's tenant id
+      subCaseInstance.setTenantId(this.tenantId);
+    }
 
     // manage bidirectional super-sub-case-instances relation
     subCaseInstance.setSuperCaseExecution(this);
@@ -612,20 +702,42 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // variables //////////////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
-    return variableStore;
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected VariableStore<CoreVariableInstance> getVariableStore() {
+    return (VariableStore) variableStore;
   }
 
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    variableInstance.setCaseInstanceId(caseInstanceId);
-    variableInstance.setCaseExecutionId(id);
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory() {
+    return (VariableInstanceFactory) VariableInstanceEntityFactory.INSTANCE;
   }
 
-  protected List<VariableInstanceEntity> loadVariableInstances() {
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
+    return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList((VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE,
+        (VariableInstanceLifecycleListener) CmmnVariableInvocationListener.INSTANCE,
+        (VariableInstanceLifecycleListener) new VariableOnPartListener(this)
+      );
+
+  }
+
+  @Override
+  public Collection<VariableInstanceEntity> provideVariables() {
     return Context
-        .getCommandContext()
-        .getVariableInstanceManager()
-        .findVariableInstancesByCaseExecutionId(id);
+      .getCommandContext()
+      .getVariableInstanceManager()
+      .findVariableInstancesByCaseExecutionId(id);
+  }
+
+  public Collection<VariableInstanceEntity> provideVariables(Collection<String> variableNames) {
+    return Context
+      .getCommandContext()
+      .getVariableInstanceManager()
+      .findVariableInstancesByCaseExecutionIdAndVariableNames(id, variableNames);
   }
 
   // toString /////////////////////////////////////////////////////////////
@@ -644,10 +756,15 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // delete/remove ///////////////////////////////////////////////////////
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void remove() {
     super.remove();
 
-    variableStore.removeVariablesWithoutFiringEvents();
+    for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
+      invokeVariableLifecycleListenersDelete(variableInstance, this,
+          Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList((VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE));
+      variableStore.removeVariable(variableInstance.getName());
+    }
 
     CommandContext commandContext = Context.getCommandContext();
 
@@ -683,25 +800,35 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       .forceUpdate(this);
   }
 
-  public boolean hasReferenceTo(DbEntity entity) {
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referenceIds = new HashSet<String>();
 
-    if (entity instanceof CaseExecutionEntity) {
-      CaseExecutionEntity otherEntity = (CaseExecutionEntity) entity;
-      String otherId = otherEntity.getId();
-
-      // parentId
-      if(parentId != null && parentId.equals(otherId)) {
-        return true;
-      }
-
-      // superExecutionId
-      if(superCaseExecutionId != null && superCaseExecutionId.equals(otherId)) {
-        return true;
-      }
-
+    if (parentId != null) {
+      referenceIds.add(parentId);
     }
-    return false;
+    if (superCaseExecutionId != null) {
+      referenceIds.add(superCaseExecutionId);
+    }
 
+    return referenceIds;
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+
+    if (parentId != null) {
+      referenceIdAndClass.put(parentId, CaseExecutionEntity.class);
+    }
+    if (superCaseExecutionId != null) {
+      referenceIdAndClass.put(superCaseExecutionId, CaseExecutionEntity.class);
+    }
+    if (caseDefinitionId != null) {
+      referenceIdAndClass.put(caseDefinitionId, CmmnCaseDefinition.class);
+    }
+
+    return referenceIdAndClass;
   }
 
   public Object getPersistentState() {
@@ -712,6 +839,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     persistentState.put("parentId", parentId);
     persistentState.put("currentState", currentState);
     persistentState.put("previousState", previousState);
+    persistentState.put("superExecutionId", superExecutionId);
     return persistentState;
   }
 
@@ -755,6 +883,10 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
         .getProcessEngine();
   }
 
+  public ProcessEngine getProcessEngine() {
+    return Context.getProcessEngineConfiguration().getProcessEngine();
+  }
+
   public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
     Context.getCommandContext()
       .performOperation((CmmnAtomicOperation) operation, this);
@@ -764,5 +896,4 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     Context.getCommandContext()
       .performOperation((CmmnAtomicOperation) operation, this);
   }
-
 }

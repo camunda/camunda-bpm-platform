@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.UserEntity">
@@ -7,13 +24,14 @@
   <!-- USER INSERT -->
 
   <insert id="insertUser" parameterType="org.camunda.bpm.engine.impl.persistence.entity.UserEntity">
-    insert into ${prefix}ACT_ID_USER (ID_, FIRST_, LAST_, EMAIL_, PWD_, REV_)
+    insert into ${prefix}ACT_ID_USER (ID_, FIRST_, LAST_, EMAIL_, PWD_, SALT_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{firstName ,jdbcType=VARCHAR},
       #{lastName ,jdbcType=VARCHAR},
       #{email ,jdbcType=VARCHAR},
       #{password ,jdbcType=VARCHAR},
+      #{salt ,jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -26,7 +44,17 @@
       FIRST_ = #{firstName ,jdbcType=VARCHAR},
       LAST_ = #{lastName ,jdbcType=VARCHAR},
       EMAIL_ = #{email ,jdbcType=VARCHAR},
-      PWD_ = #{password ,jdbcType=VARCHAR}
+      PWD_ = #{password ,jdbcType=VARCHAR},
+      SALT_ = #{salt ,jdbcType=VARCHAR}
+    where ID_ = #{id}
+      and REV_ = #{revision}
+  </update>
+  
+  <update id="updateUserLock" parameterType="org.camunda.bpm.engine.impl.persistence.entity.UserEntity">
+    update ${prefix}ACT_ID_USER set
+      REV_ = #{revisionNext ,jdbcType=INTEGER},
+      LOCK_EXP_TIME_ = #{lockExpirationTime ,jdbcType=TIMESTAMP},
+      ATTEMPTS_ = #{attempts ,jdbcType=INTEGER}
     where ID_ = #{id}
       and REV_ = #{revision}
   </update>
@@ -46,6 +74,9 @@
     <result property="lastName" column="LAST_" jdbcType="VARCHAR" />
     <result property="email" column="EMAIL_" jdbcType="VARCHAR" />
     <result property="dbPassword" column="PWD_" jdbcType="VARCHAR" />
+    <result property="salt" column="SALT_" jdbcType="VARCHAR" />
+    <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
+    <result property="attempts" column="ATTEMPTS_" jdbcType="INTEGER" />
   </resultMap>
   
   <!-- USER SELECT -->
@@ -57,7 +88,7 @@
   <select id="selectUserByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserQueryImpl" resultMap="userResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select ${distinct} RES.* 
     ${limitBetween}
     <include refid="selectUserByQueryCriteriaSql" />
     ${orderBy}
@@ -65,16 +96,23 @@
   </select>
   
    <select id="selectUserCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectUserByQueryCriteriaSql" />
   </select>
   
   <sql id="selectUserByQueryCriteriaSql">
+
     from ${prefix}ACT_ID_USER RES 
     <if test="groupId != null">
       inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.USER_ID_
       inner join ${prefix}ACT_ID_GROUP G on M.GROUP_ID_ = G.ID_
     </if>
+    <if test="tenantId != null">
+      inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.USER_ID_
+    </if>
+    
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
+    
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -90,30 +128,57 @@
         and RES.FIRST_ = #{firstName}
       </if>
       <if test="firstNameLike != null">
-        and RES.FIRST_ like #{firstNameLike}
+        and RES.FIRST_ like #{firstNameLike} ESCAPE ${escapeChar}
       </if>
       <if test="lastName != null">
         and RES.LAST_ = #{lastName}
       </if>
       <if test="lastNameLike != null">
-        and RES.LAST_ like #{lastNameLike}
+        and RES.LAST_ like #{lastNameLike} ESCAPE ${escapeChar}
       </if>
       <if test="email != null">
         and RES.EMAIL_ = #{email}
       </if>
       <if test="emailLike != null">
-        and RES.EMAIL_ like #{emailLike}
+        and RES.EMAIL_ like #{emailLike} ESCAPE ${escapeChar}
       </if>
       <if test="groupId != null">
         and G.ID_ = #{groupId}
       </if>
       <if test="procDefId != null">
         and exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{procDefId} and USER_ID_=RES.ID_ )
+      </if>
+      <if test="tenantId != null">
+        and TM.TENANT_ID_ = #{tenantId}
       </if>      
       
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
       
     </where>
   </sql>
+
+  <select id="selectUserByNativeQuery" parameterType="java.util.Map" resultMap="userResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitBefore}
+    </if>
+    ${sql}
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
+  </select>
+
+  <select id="selectUserByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="userResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitBeforeNativeQuery}
+    </if>
+    ${sql}
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
+  </select>
+
+  <select id="selectUserCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
   
 </mapper>

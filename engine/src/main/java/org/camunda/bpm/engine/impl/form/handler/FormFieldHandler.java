@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +27,7 @@ import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
+import org.camunda.bpm.engine.impl.form.FormDataImpl;
 import org.camunda.bpm.engine.impl.form.FormFieldImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -42,6 +47,7 @@ public class FormFieldHandler {
   protected Expression defaultValueExpression;
   protected Map<String, String> properties = new HashMap<String, String>();
   protected List<FormFieldValidationConstraintHandler> validationHandlers = new ArrayList<FormFieldValidationConstraintHandler>();
+  protected boolean businessKey;
 
   public FormField createFormField(ExecutionEntity executionEntity) {
     FormFieldImpl formField = new FormFieldImpl();
@@ -51,10 +57,14 @@ public class FormFieldHandler {
 
     // set label (evaluate expression)
     VariableScope variableScope = executionEntity != null ? executionEntity : StartProcessVariableScope.getSharedInstance();
-    Object labelValueObject = label.getValue(variableScope);
-    if(labelValueObject != null) {
-      formField.setLabel(labelValueObject.toString());
+    if (label != null) {
+      Object labelValueObject = label.getValue(variableScope);
+      if(labelValueObject != null) {
+        formField.setLabel(labelValueObject.toString());
+      }
     }
+
+    formField.setBusinessKey(businessKey);
 
     // set type
     formField.setType(type);
@@ -63,6 +73,7 @@ public class FormFieldHandler {
     Object defaultValue = null;
     if(defaultValueExpression != null) {
       defaultValue = defaultValueExpression.getValue(variableScope);
+
       if(defaultValue != null) {
         formField.setDefaultValue(type.convertFormValueToModelValue(defaultValue));
       } else {
@@ -190,4 +201,11 @@ public class FormFieldHandler {
     this.validationHandlers = validationHandlers;
   }
 
+  public void setBusinessKey(boolean businessKey) {
+    this.businessKey = businessKey;
+  }
+
+  public boolean isBusinessKey() {
+    return businessKey;
+  }
 }

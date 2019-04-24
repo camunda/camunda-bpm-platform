@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
+
+  <!-- INSERT HISTORIC IDENTITY LINK -->
+  
+  <insert id="insertHistoricIdentityLinkLogEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity">
+    insert into ${prefix}ACT_HI_IDENTITYLINK (
+    		ID_,
+    		TIMESTAMP_,
+    		TYPE_,
+    		USER_ID_, 
+    		GROUP_ID_, 
+    		TASK_ID_,
+    		ROOT_PROC_INST_ID_,
+    		PROC_DEF_ID_, 
+    		OPERATION_TYPE_,
+            ASSIGNER_ID_,
+            PROC_DEF_KEY_,
+            TENANT_ID_,
+            REMOVAL_TIME_)
+    values (#{id, jdbcType=VARCHAR},
+            #{time, jdbcType=TIMESTAMP},  
+            #{type, jdbcType=VARCHAR},
+            #{userId, jdbcType=VARCHAR},
+            #{groupId, jdbcType=VARCHAR},
+            #{taskId, jdbcType=VARCHAR},
+            #{rootProcessInstanceId, jdbcType=VARCHAR},
+            #{processDefinitionId, jdbcType=VARCHAR},
+            #{operationType, jdbcType=VARCHAR},
+            #{assignerId, jdbcType=VARCHAR},
+            #{processDefinitionKey, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR},
+            #{removalTime, jdbcType=TIMESTAMP}
+           )
+  </insert>
+
+  <!-- HISTORIC IDENTITY LINK UPDATE -->
+
+  <update id="updateIdentityLinkLogByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_IDENTITYLINK set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateIdentityLinkLogByRootProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_IDENTITYLINK set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      TIMESTAMP_ = TIMESTAMP_
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateIdentityLinkLogByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_IDENTITYLINK
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_DEF_ID_ IN (
+        SELECT PROC_DEF_ID_
+        FROM ${prefix}ACT_HI_PROCINST
+        WHERE ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+  
+  <!-- HISTORIC IDENTITY LINK DELETE -->
+
+  <delete id="deleteHistoricIdentityLinksByProcessDefinitionId">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_DEF_ID_ = #{processDefinitionId}
+  </delete>
+  
+  <delete id="deleteHistoricIdentityLinksByTaskId">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{taskId}
+  </delete>
+
+  <delete id="deleteHistoricIdentityLinksByTaskProcessInstanceIds">
+    delete
+    from ${prefix}ACT_HI_IDENTITYLINK
+    where TASK_ID_ in (
+      select ID_
+      from ${prefix}ACT_HI_TASKINST
+      where
+        <bind name="listOfIds" value="list"/>
+        <bind name="fieldName" value="'PROC_INST_ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+      )
+  </delete>
+
+  <delete id="deleteHistoricIdentityLinksByTaskProcessInstanceIds_mysql">
+    delete I from ${prefix}ACT_HI_IDENTITYLINK I
+    inner join ${prefix}ACT_HI_TASKINST T
+      on T.ID_ = I.TASK_ID_
+      and T.PROC_INST_ID_ in
+        <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
+          #{processInstanceId}
+        </foreach>
+  </delete>
+
+  <delete id="deleteHistoricIdentityLinksByTaskCaseInstanceIds">
+    delete from ${prefix}ACT_HI_IDENTITYLINK
+    where TASK_ID_ in (
+      select ID_
+      from ${prefix}ACT_HI_TASKINST
+      where
+        <bind name="listOfIds" value="list"/>
+        <bind name="fieldName" value="'CASE_INST_ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    )
+  </delete>
+
+  <delete id="deleteHistoricIdentityLinksByTaskCaseInstanceIds_mysql">
+    delete I from ${prefix}ACT_HI_IDENTITYLINK I
+    inner join ACT_HI_TASKINST T
+      on I.TASK_ID_ = T.ID_
+      and T.CASE_INST_ID_ in
+        <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+          #{caseInstanceId}
+        </foreach>
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <delete id="deleteHistoricIdentityLinkLogByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_IDENTITYLINK
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricIdentityLinkLogByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_IDENTITYLINK
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteHistoricIdentityLinkLogByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_IDENTITYLINK
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_IDENTITYLINK
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
+  </delete>
+
+  <!-- HISTORIC IDENTITY LINK RESULTMAP -->
+
+  <resultMap id="historicIdentityLinkResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="time" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="operationType" column="OPERATION_TYPE_" jdbcType="VARCHAR"/>
+    <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  
+  <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultMap="historicIdentityLinkResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectHistoricIdentityLinkByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricIdentityLinkCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectHistoricIdentityLinkByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectHistoricIdentityLinkByQueryCriteriaSql">
+    from ${prefix}ACT_HI_IDENTITYLINK RES
+    
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+    </if>
+    
+    <where>
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
+      </if>
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId}
+      </if>
+      <if test="groupId != null">
+        and RES.GROUP_ID_ = #{groupId}
+      </if>
+      <if test="taskId != null">
+        and RES.TASK_ID_ = #{taskId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="operationType != null">
+        and RES.OPERATION_TYPE_ = #{operationType}
+      </if>
+      <if test="assignerId != null">
+        and RES.ASSIGNER_ID_ = #{assignerId}
+      </if>
+	  <if test="dateBefore != null">
+        and RES.TIMESTAMP_ &lt;= #{dateBefore}
+      </if>
+      <if test="dateAfter != null">
+        and RES.TIMESTAMP_ &gt;= #{dateAfter}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        and (
+          (RES.PROC_DEF_KEY_ is not null
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+          ) or RES.PROC_DEF_KEY_ is null
+        )
+      </if>
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      
+    </where>
+  </sql>
+</mapper>

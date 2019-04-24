@@ -6,7 +6,7 @@
 
   <error id="Error_1" errorCode="error1" name="error1"/>
   
-  <process id="compensateProcess">
+  <process id="compensateProcess" isExecutable="true">
 
     <startEvent id="start" />
 

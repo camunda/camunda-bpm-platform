@@ -9,9 +9,9 @@
         <camunda:inputOutput>
             <camunda:inputParameter name="var1">
               <camunda:map>
-                <entry key="a">${1+1}</entry>
-                <entry key="b">${1+2}</entry>
-                <entry key="c">${1+3}</entry>
+                <camunda:entry key="a">${1+1}</camunda:entry>
+                <camunda:entry key="b">${1+2}</camunda:entry>
+                <camunda:entry key="c">${1+3}</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
         </camunda:inputOutput>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +20,7 @@ import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.transformer.AbstractCmmnTransformListener;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
@@ -48,6 +53,10 @@ public class MetricsCmmnTransformListener extends AbstractCmmnTransformListener 
   }
 
   public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity) {
+    addListeners(activity);
+  }
+
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity activity) {
     addListeners(activity);
   }
 

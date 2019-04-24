@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:camunda="http://camunda.org/schema/1.0/cmmn" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <cmmn:case id="Case_1">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+      <cmmn:planItem id="Stage_1" name="Stage1" definitionRef="Stage_103b2ja" />
+      <cmmn:planItem id="HumanTask_1" name="HumanTask1" definitionRef="HumanTask_19t7kyj">
+        <cmmn:entryCriterion id="Sentry_1" sentryRef="Sentry_189a50z" />
+      </cmmn:planItem>
+      <cmmn:sentry id="Sentry_189a50z" >
+        <cmmn:extensionElements>
+          <camunda:variableOnPart variableName = "value_1">
+            <camunda:variableEvent>update</camunda:variableEvent>
+           </camunda:variableOnPart>
+        </cmmn:extensionElements>
+      </cmmn:sentry>    
+      <cmmn:stage id="Stage_103b2ja" name="Stage_1">
+        <cmmn:planItem id="Stage_2" name="Stage2" definitionRef="Stage_0vdudh7" />
+        <cmmn:stage id="Stage_0vdudh7" name="Stage_2">
+          <cmmn:planItem id="HumanTask_2" name="HumanTask 2" definitionRef="HumanTask_1sx0k5g">
+            <cmmn:entryCriterion id="Sentry_2" sentryRef="Sentry_0r1ufpw" />
+          </cmmn:planItem>
+          <cmmn:sentry id="Sentry_0r1ufpw" >
+            <cmmn:extensionElements>
+              <camunda:variableOnPart variableName = "value_2">
+                <camunda:variableEvent>update</camunda:variableEvent>
+              </camunda:variableOnPart>
+            </cmmn:extensionElements>
+          </cmmn:sentry>
+          <cmmn:humanTask id="HumanTask_1sx0k5g" name="HumanTask2" >
+            <cmmn:defaultControl>
+              <cmmn:manualActivationRule>
+                <cmmn:condition>${true}</cmmn:condition>
+              </cmmn:manualActivationRule>
+            </cmmn:defaultControl>
+          </cmmn:humanTask>
+        </cmmn:stage>
+      </cmmn:stage>
+      <cmmn:humanTask id="HumanTask_19t7kyj" name="HumanTask 1" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_1">
+        <dc:Bounds x="407" y="143" width="897" height="589" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_00gno5g_di" cmmnElementRef="Sentry_1">
+        <dc:Bounds x="439" y="322" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1flahgu_di" cmmnElementRef="Stage_1">
+        <dc:Bounds x="569" y="213" width="648" height="399" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_1jdzubq_di" cmmnElementRef="Sentry_2">
+        <dc:Bounds x="780" y="392" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1m8by1d_di" cmmnElementRef="HumanTask_1">
+        <dc:Bounds x="449" y="300" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0rhqp0c_di" cmmnElementRef="HumanTask_2">
+        <dc:Bounds x="790" y="361" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0wf4vgf_di" cmmnElementRef="Stage_2">
+        <dc:Bounds x="664" y="298" width="350" height="200" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

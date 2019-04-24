@@ -12,6 +12,13 @@
 
   <dependencySets>
    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm:license-book:zip</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
+   <dependencySet>
       <outputDirectory>server/</outputDirectory>
       <includes>
         <include>org.apache.tomcat:tomcat:tar.gz</include>
@@ -37,7 +44,8 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
-        <include>org.slf4j:*:jar</include>
+        <include>org.slf4j:slf4j-api:jar:*</include>
+        <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:*:jar</include>
@@ -66,7 +74,8 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
-        <include>org.slf4j:*:jar</include>
+        <include>org.slf4j:slf4j-api:jar:*</include>
+        <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:*:jar</include>
@@ -107,7 +116,18 @@
       <outputDirectory></outputDirectory>
       <fileMode>0755</fileMode>
     </file>
-    
+    <file>
+      <source>src/shutdown-camunda.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
+      <source>src/shutdown-camunda.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+
     <file>
       <source>src/conf/server.xml</source>
       <outputDirectory>server/apache-tomcat-${version.tomcat}/conf/</outputDirectory>

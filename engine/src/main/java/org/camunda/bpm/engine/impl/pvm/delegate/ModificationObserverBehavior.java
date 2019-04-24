@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,6 +15,8 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.pvm.delegate;
+
+import java.util.List;
 
 /**
  * When a (scope) activity behavior implements this behavior,
@@ -27,23 +33,23 @@ package org.camunda.bpm.engine.impl.pvm.delegate;
 public interface ModificationObserverBehavior extends ActivityBehavior {
 
   /**
-   * Implement to customize the creation of executions in the scope. Called with the
-   * scope execution already created for this scope, implementations may create additional execution,
-   * set variables, etc. (cf. parallel multi instance that always creates a concurrent execution,
-   * although there is only one instance)
+   * Implement to customize initialization of the scope. Called with the
+   * scope execution already created. Implementations may set variables, etc.
+   * Implementations should provide return as many executions as there are requested by the argument.
+   * Valid number of instances are >= 0.
    */
-  ActivityExecution initializeScope(ActivityExecution scopeExecution);
+  List<ActivityExecution> initializeScope(ActivityExecution scopeExecution, int nrOfInnerInstances);
 
   /**
-   * implement to handle reorganization of the scope when a concurrent execution in the scope is created
-   * (e.g. implement to override the default pruning behavior)
+   * Returns an execution that can be used to execute an activity within that scope.
+   * May reorganize other executions in that scope (e.g. implement to override the default pruning behavior).
    */
-  void concurrentExecutionCreated(ActivityExecution scopeExecution, ActivityExecution concurrentExecution);
+  ActivityExecution createInnerInstance(ActivityExecution scopeExecution);
 
   /**
-   * implement to handle reorganization of the scope when a concurrent execution in the scope is removed
-   * (e.g. implement to override the default pruning behavior)
+   * implement to destroy an execution in this scope and handle the scope's reorganization
+   * (e.g. implement to override the default pruning behavior). The argument execution is not yet removed.
    */
-  void concurrentExecutionDeleted(ActivityExecution scopeExecution, ActivityExecution concurrentExecution);
+  void destroyInnerInstance(ActivityExecution concurrentExecution);
 
 }

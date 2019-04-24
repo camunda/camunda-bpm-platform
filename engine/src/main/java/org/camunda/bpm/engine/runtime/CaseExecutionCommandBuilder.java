@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -328,6 +332,20 @@ public interface CaseExecutionCommandBuilder {
    */
   void complete();
 
+  /**
+   * <p>Additionally to {@link #execute()} the associated case execution will
+   * be terminated. Therefore there happens a transition to state <code>TERMINATED</code>.</p>
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done or
+   *      when the case execution is a case instance
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void terminate();
+  
   /**
    * <p>Additionally to {@link #execute()} the associated case instance will
    * be closed, so that no further work or modifications is allowed for the

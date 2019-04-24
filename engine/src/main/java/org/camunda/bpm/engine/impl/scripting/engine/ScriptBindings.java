@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.scripting.engine;
 
 import java.util.Arrays;
@@ -22,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.script.Bindings;
+import javax.script.ScriptEngine;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -54,7 +58,21 @@ public class ScriptBindings implements Bindings {
    * This list contains the keywords for JUEL, Javascript and Groovy.
    */
   protected static final Set<String> UNSTORED_KEYS =
-    new HashSet<String>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println"));
+    new HashSet<String>(Arrays.asList(
+      "out",
+      "out:print",
+      "lang:import",
+      "context",
+      "elcontext",
+      "print",
+      "println",
+      "S", // Spin Internal Variable
+      "XML", // Spin Internal Variable
+      "JSON", // Spin Internal Variable
+      ScriptEngine.ARGV, // jRuby is only setting this variable and execution instead of exporting any other variables
+      "execution",
+      "__doc__" // do not export python doc string
+      ));
 
   protected List<Resolver> scriptResolvers;
   protected VariableScope variableScope;

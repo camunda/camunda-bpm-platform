@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
@@ -64,6 +67,11 @@ public class QueryOrderingProperty implements Serializable {
   public QueryOrderingProperty() {
   }
 
+  public QueryOrderingProperty(QueryProperty queryProperty, Direction direction) {
+    this.queryProperty = queryProperty;
+    this.direction = direction;
+  }
+
   public QueryOrderingProperty(String relation, QueryProperty queryProperty) {
     this.relation = relation;
     this.queryProperty = queryProperty;
@@ -114,6 +122,7 @@ public class QueryOrderingProperty implements Serializable {
     return relation == null && queryProperty.getFunction() == null;
   }
 
+  @Override
   public String toString() {
 
     return "QueryOrderingProperty["
@@ -127,11 +136,13 @@ public class QueryOrderingProperty implements Serializable {
   public String getRelationConditionsString() {
     StringBuilder builder = new StringBuilder();
     builder.append("[");
-    for (int i = 0; i < relationConditions.size(); i++) {
-      if (i > 0) {
-        builder.append(",");
+    if(relationConditions != null) {
+      for (int i = 0; i < relationConditions.size(); i++) {
+        if (i > 0) {
+          builder.append(",");
+        }
+        builder.append(relationConditions.get(i));
       }
-      builder.append(relationConditions.get(i));
     }
     builder.append("]");
     return builder.toString();

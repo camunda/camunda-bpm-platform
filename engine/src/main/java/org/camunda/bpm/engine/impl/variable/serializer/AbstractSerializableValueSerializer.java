@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,9 +17,9 @@
 package org.camunda.bpm.engine.impl.variable.serializer;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -98,7 +102,7 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
   protected abstract void updateTypedValue(T value, String serializedStringValue);
 
   protected byte[] readSerializedValueFromFields(ValueFields valueFields) {
-    return ByteArrayValueSerializer.getBytes(valueFields);
+    return valueFields.getByteArrayValue();
   }
 
   protected String getSerializedStringValue(byte[] serializedByteValue) {
@@ -128,43 +132,24 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
 
   protected boolean canWriteValue(TypedValue typedValue) {
 
-    Object objectToSerialize = null;
-    String requestedDataformat = null;
-
-    if(typedValue instanceof UntypedValueImpl) {
-      objectToSerialize = typedValue.getValue();
-      requestedDataformat = null;
-    }
-    else if(typedValue instanceof SerializableValue) {
-      SerializableValue serializableValue = (SerializableValue) typedValue;
-      String requestedDataFormat = serializableValue.getSerializationDataFormat();
-
-      if(!serializableValue.isDeserialized()) {
-        // serialized object => dataformat must match
-        return serializationDataFormat.equals(requestedDataFormat);
-      }
-      else {
-        objectToSerialize = typedValue.getValue();
-        requestedDataformat = serializableValue.getSerializationDataFormat();
-      }
-    } else {
-      // not an object value
+    if (!(typedValue instanceof SerializableValue) && !(typedValue instanceof UntypedValueImpl)) {
       return false;
     }
 
-    boolean canSerialize = objectToSerialize == null || canSerializeValue(objectToSerialize);
+    if (typedValue instanceof SerializableValue) {
+      SerializableValue serializableValue = (SerializableValue) typedValue;
+      String requestedDataFormat = serializableValue.getSerializationDataFormat();
+      if (!serializableValue.isDeserialized()) {
+        // serialized object => dataformat must match
+        return serializationDataFormat.equals(requestedDataFormat);
+      } else {
+        final boolean canSerialize = typedValue.getValue() == null || canSerializeValue(typedValue.getValue());
+        return canSerialize && (requestedDataFormat == null || serializationDataFormat.equals(requestedDataFormat));
+      }
+    } else {
+      return typedValue.getValue() == null || canSerializeValue(typedValue.getValue());
+    }
 
-    if(requestedDataformat != null) {
-      if(requestedDataformat.equals(serializationDataFormat)) {
-        return canSerialize;
-      }
-      else {
-        return false;
-      }
-    }
-    else {
-      return canSerialize;
-    }
   }
 
 

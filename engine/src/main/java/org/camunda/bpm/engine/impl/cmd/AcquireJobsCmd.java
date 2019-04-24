@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,14 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.TransactionState;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
@@ -30,7 +27,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.management.Metrics;
+
+import java.util.*;
 
 
 /**
@@ -42,44 +40,45 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
   private final JobExecutor jobExecutor;
 
   protected AcquiredJobs acquiredJobs;
+  protected int numJobsToAcquire;
 
   public AcquireJobsCmd(JobExecutor jobExecutor) {
+    this(jobExecutor, jobExecutor.getMaxJobsPerAcquisition());
+  }
+
+  public AcquireJobsCmd(JobExecutor jobExecutor, int numJobsToAcquire) {
     this.jobExecutor = jobExecutor;
+    this.numJobsToAcquire = numJobsToAcquire;
   }
 
   public AcquiredJobs execute(CommandContext commandContext) {
 
-    String lockOwner = jobExecutor.getLockOwner();
-    int lockTimeInMillis = jobExecutor.getLockTimeInMillis();
-    int maxNonExclusiveJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();
+    acquiredJobs = new AcquiredJobs(numJobsToAcquire);
 
-    acquiredJobs = new AcquiredJobs();
     List<JobEntity> jobs = commandContext
       .getJobManager()
-      .findNextJobsToExecute(new Page(0, maxNonExclusiveJobsPerAcquisition));
+      .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
-    for (JobEntity job: jobs) {
-      List<String> jobIds = new ArrayList<String>();
+    Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<String, List<String>>();
 
-      if (job != null && !acquiredJobs.contains(job.getId())) {
-        if (job.isExclusive() && job.getProcessInstanceId() != null) {
-          // acquire all exclusive jobs in the same process instance
-          // (includes the current job)
-          List<JobEntity> exclusiveJobs = commandContext.getJobManager()
-            .findExclusiveJobsToExecute(job.getProcessInstanceId());
-          for (JobEntity exclusiveJob : exclusiveJobs) {
-            if(exclusiveJob != null) {
-              lockJob(exclusiveJob, lockOwner, lockTimeInMillis);
-              jobIds.add(exclusiveJob.getId());
-            }
-          }
-        } else {
-          lockJob(job, lockOwner, lockTimeInMillis);
-          jobIds.add(job.getId());
+    for (JobEntity job : jobs) {
+
+      lockJob(job);
+
+      if(job.isExclusive()) {
+        List<String> list = exclusiveJobsByProcessInstance.get(job.getProcessInstanceId());
+        if (list == null) {
+          list = new ArrayList<String>();
+          exclusiveJobsByProcessInstance.put(job.getProcessInstanceId(), list);
         }
-
+        list.add(job.getId());
       }
+      else {
+        acquiredJobs.addJobIdBatch(job.getId());
+      }
+    }
 
+    for (List<String> jobIds : exclusiveJobsByProcessInstance.values()) {
       acquiredJobs.addJobIdBatch(jobIds);
     }
 
@@ -89,11 +88,16 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       .getDbEntityManager()
       .registerOptimisticLockingListener(this);
 
+
     return acquiredJobs;
   }
 
-  protected void lockJob(JobEntity job, String lockOwner, int lockTimeInMillis) {
+  protected void lockJob(JobEntity job) {
+    String lockOwner = jobExecutor.getLockOwner();
     job.setLockOwner(lockOwner);
+
+    int lockTimeInMillis = jobExecutor.getLockTimeInMillis();
+
     GregorianCalendar gregorianCalendar = new GregorianCalendar();
     gregorianCalendar.setTime(ClockUtil.getCurrentTime());
     gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);

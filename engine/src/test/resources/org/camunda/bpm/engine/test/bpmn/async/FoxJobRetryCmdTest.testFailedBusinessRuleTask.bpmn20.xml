@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+
+	<process id="failedBusinessRuleTask" isExecutable="true">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingBusinessRuleTask" />
+		
+		<businessRuleTask id="failingBusinessRuleTask" name="business rule task" 
+						  camunda:class="org.camunda.bpm.engine.test.cmd.FailingDelegate"
+						  camunda:async="true">
+ 		<extensionElements>
+	       		<fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
+	       	</extensionElements>
+		</businessRuleTask>
+        
+		<sequenceFlow id="flow2" sourceRef="failingBusinessRuleTask" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

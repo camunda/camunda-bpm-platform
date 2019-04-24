@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +22,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.JobDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.JobDefinition;
 
@@ -44,12 +49,12 @@ public class JobDefinitionManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<JobDefinition> findJobDefnitionByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery, Page page) {
-    getAuthorizationManager().configureJobDefinitionQuery(jobDefinitionQuery);
+    configureQuery(jobDefinitionQuery);
     return getDbEntityManager().selectList("selectJobDefinitionByQueryCriteria", jobDefinitionQuery, page);
   }
 
   public long findJobDefinitionCountByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery) {
-    getAuthorizationManager().configureJobDefinitionQuery(jobDefinitionQuery);
+    configureQuery(jobDefinitionQuery);
     return (Long) getDbEntityManager().selectOne("selectJobDefinitionCountByQueryCriteria", jobDefinitionQuery);
   }
 
@@ -57,21 +62,40 @@ public class JobDefinitionManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateJobDefinitionSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateJobDefinitionSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", configureParameterizedQuery(parameters));
+  }
+
+  public void updateJobDefinitionSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", true);
+    parameters.put("processDefinitionTenantId", processDefinitionTenantId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", configureParameterizedQuery(parameters));
+  }
+
+  protected void configureQuery(JobDefinitionQueryImpl query) {
+    getAuthorizationManager().configureJobDefinitionQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
   }
 
 }

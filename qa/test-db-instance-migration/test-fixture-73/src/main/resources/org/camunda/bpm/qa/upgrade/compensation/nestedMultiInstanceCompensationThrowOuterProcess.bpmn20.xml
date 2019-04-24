@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="NestedMultiInstanceCompensationThrowOuterScenario" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="outerSubProcess" />
+    <subProcess id="outerSubProcess">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>2</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      
+      <startEvent id="outerSubProcessStart" />
+      
+      <sequenceFlow sourceRef="outerSubProcessStart" targetRef="innerSubProcess" />
+      <subProcess id="innerSubProcess">
+        <startEvent id="innerSubProcessStart" />
+        
+        <sequenceFlow sourceRef="innerSubProcessStart" targetRef="innerSubProcessTask" />
+        <userTask id="innerSubProcessTask">
+          <multiInstanceLoopCharacteristics isSequential="false">
+            <loopCardinality>2</loopCardinality>
+          </multiInstanceLoopCharacteristics>
+        </userTask>
+        
+        <!-- compensation boundary event -->
+        <boundaryEvent id="compensateBoundaryEvent" attachedToRef="innerSubProcessTask">
+          <compensateEventDefinition />
+        </boundaryEvent>
+        <subProcess id="undoSubProcess" isForCompensation="true">
+          <startEvent id="undoSubProcessStart" />
+          
+          <sequenceFlow sourceRef="undoSubProcessStart" targetRef="undoTask" />
+          <userTask id="undoTask"/>
+          
+          <sequenceFlow sourceRef="undoTask" targetRef="undoSubProcessEnd" />
+          <endEvent id="undoSubProcessEnd" />
+        </subProcess>
+  
+        <sequenceFlow sourceRef="innerSubProcessTask" targetRef="innerSubProcessEnd" />
+        <endEvent id="innerSubProcessEnd" />
+        
+        <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="undoSubProcess" />
+      </subProcess>
+      
+      <sequenceFlow sourceRef="innerSubProcess" targetRef="outerSubProcessEnd" />
+      <endEvent id="outerSubProcessEnd" />
+      
+    </subProcess>
+    
+    <sequenceFlow sourceRef="outerSubProcess" targetRef="throwCompensate" />
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="end" />
+    <endEvent id="end" />
+    
+  </process>
+</definitions>

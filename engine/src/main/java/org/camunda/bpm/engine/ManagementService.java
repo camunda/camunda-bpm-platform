@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +18,21 @@ package org.camunda.bpm.engine;
 
 import java.sql.Connection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.BatchQuery;
+import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
@@ -32,10 +43,15 @@ import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.management.UpdateJobSuspensionStateBuilder;
+import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 
 
@@ -82,7 +98,6 @@ public interface ManagementService {
    *          the Id of the deployment to deactivate
    * @param removeProcessDefinitionsFromCache
    *          indicates whether the process definitions should be removed from the deployment cache
-   * @return true if the registration was cleared
    *
    * @throws AuthorizationException
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
@@ -98,7 +113,6 @@ public interface ManagementService {
    *          the Ids of the deployments to deactivate
    * @param removeProcessDefinitionsFromCache
    *          indicates whether the process definitions should be removed from the deployment cache
-   * @return true if the registration was cleared
    *
    * @throws AuthorizationException
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
@@ -198,11 +212,12 @@ public interface ManagementService {
    * will be <strong>not</strong> activated.
    * </p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the job definition id is equal null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @see #activateJobById(String)
    * @see #activateJobByJobDefinitionId(String)
@@ -217,11 +232,12 @@ public interface ManagementService {
    * will be <strong>not</strong> activated.
    * </p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @see #activateJobByProcessDefinitionId(String)
    */
@@ -235,11 +251,12 @@ public interface ManagementService {
    * will be <strong>not</strong> activated.
    * </p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @see #activateJobByProcessDefinitionKey(String)
    */
@@ -248,14 +265,23 @@ public interface ManagementService {
   /**
    * <p>Activates the {@link JobDefinition} with the given id immediately.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @param activateJobs If true, all the {@link Job}s of the provided job definition
    *                     will be activated too.
    *
    * @throws ProcessEngineException
    *          If the job definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>activateJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #activateJobById(String)
    * @see #activateJobByJobDefinitionId(String)
@@ -265,14 +291,23 @@ public interface ManagementService {
   /**
    * <p>Activates all {@link JobDefinition}s of the provided process definition id immediately.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @param activateJobs If true, all the {@link Job}s of the provided job definition
    *                     will be activated too.
    *
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>activateJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #activateJobByProcessDefinitionId(String)
    */
@@ -281,14 +316,23 @@ public interface ManagementService {
   /**
    * <p>Activates all {@link JobDefinition}s of the provided process definition key immediately.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @param activateJobs If true, all the {@link Job}s of the provided job definition
    *                     will be activated too.
    *
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>activateJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #activateJobByProcessDefinitionKey(String)
    */
@@ -296,6 +340,8 @@ public interface ManagementService {
 
   /**
    * Activates the {@link JobDefinition} with the given id.
+   *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
    *
    * @param activateJobs If true, all the {@link Job}s of the provided job definition
    *                     will be activated too.
@@ -306,9 +352,16 @@ public interface ManagementService {
    *
    * @throws ProcessEngineException
    *          If the job definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>activateJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #activateJobById(String)
    * @see #activateJobByJobDefinitionId(String)
@@ -318,6 +371,8 @@ public interface ManagementService {
   /**
    * <p>Activates all {@link JobDefinition}s of the provided process definition id.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @param activateJobs If true, all the {@link Job}s of the provided job definition
    *                     will be activated too.
    *
@@ -327,9 +382,16 @@ public interface ManagementService {
    *
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>activateJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #activateJobByProcessDefinitionId(String)
    */
@@ -337,6 +399,8 @@ public interface ManagementService {
 
   /**
    * <p>Activates all {@link JobDefinition}s of the provided process definition key.</p>
+   *
+   * <p>Note: for more complex activate commands use {@link #updateJobDefinitionSuspensionState()}.</p>
    *
    * @param activateJobs If true, all the {@link Job}s of the provided job definition
    *                     will be activated too.
@@ -347,9 +411,16 @@ public interface ManagementService {
    *
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>activateJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #activateJobByProcessDefinitionKey(String)
    */
@@ -357,6 +428,8 @@ public interface ManagementService {
 
   /**
    * <p>Suspends the {@link JobDefinition} with the given id immediately.</p>
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
    *
    * <p>
    * <strong>Note:</strong> All {@link Job}s of the provided job definition
@@ -366,8 +439,7 @@ public interface ManagementService {
    * @throws ProcessEngineException
    *          If no such job definition can be found.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @see #suspendJobById(String)
    * @see #suspendJobByJobDefinitionId(String)
@@ -377,6 +449,8 @@ public interface ManagementService {
   /**
    * <p>Suspends all {@link JobDefinition} of the provided process definition id immediately.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * <p>
    * <strong>Note:</strong> All {@link Job}s of the provided job definition
    * will be <strong>not</strong> suspended.
@@ -385,8 +459,7 @@ public interface ManagementService {
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @see #suspendJobByProcessDefinitionId(String)
    */
@@ -394,6 +467,8 @@ public interface ManagementService {
 
   /**
    * <p>Suspends all {@link JobDefinition} of the provided process definition key immediately.</p>
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
    *
    * <p>
    * <strong>Note:</strong> All {@link Job}s of the provided job definition
@@ -403,8 +478,7 @@ public interface ManagementService {
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @see #suspendJobByProcessDefinitionKey(String)
    */
@@ -413,14 +487,23 @@ public interface ManagementService {
   /**
    * Suspends the {@link JobDefinition} with the given id immediately.
    *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @param suspendJobs If true, all the {@link Job}s of the provided job definition
    *                     will be suspended too.
    *
    * @throws ProcessEngineException
    *          If the job definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>suspendJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #suspendJobById(String)
    * @see #suspendJobByJobDefinitionId(String)
@@ -430,14 +513,23 @@ public interface ManagementService {
   /**
    * Suspends all {@link JobDefinition}s of the provided process definition id immediately.
    *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @param suspendJobs If true, all the {@link Job}s of the provided job definition
    *                     will be suspended too.
    *
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>suspendJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #suspendJobByProcessDefinitionId(String)
    */
@@ -446,14 +538,23 @@ public interface ManagementService {
   /**
    * Suspends all {@link JobDefinition}s of the provided process definition key immediately.
    *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
+   *
    * @param suspendJobs If true, all the {@link Job}s of the provided job definition
    *                     will be suspended too.
    *
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>suspendJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #suspendJobByProcessDefinitionKey(String)
    */
@@ -461,6 +562,8 @@ public interface ManagementService {
 
   /**
    * Suspends the {@link JobDefinition} with the given id.
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
    *
    * @param suspendJobs If true, all the {@link Job}s of the provided job definition
    *                     will be suspended too.
@@ -471,9 +574,16 @@ public interface ManagementService {
    *
    * @throws ProcessEngineException
    *          If the job definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>suspendJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #suspendJobById(String)
    * @see #suspendJobByJobDefinitionId(String)
@@ -482,6 +592,8 @@ public interface ManagementService {
 
   /**
    * Suspends all {@link JobDefinition}s of the provided process definition id.
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
    *
    * @param suspendJobs If true, all the {@link Job}s of the provided job definition
    *                     will be suspended too.
@@ -492,9 +604,16 @@ public interface ManagementService {
    *
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>suspendJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #suspendJobByProcessDefinitionId(String)
    */
@@ -502,6 +621,8 @@ public interface ManagementService {
 
   /**
    * Suspends all {@link JobDefinition}s of the provided process definition key.
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateJobDefinitionSuspensionState()}.</p>
    *
    * @param suspendJobs If true, all the {@link Job}s of the provided job definition
    *                     will be suspended too.
@@ -512,9 +633,16 @@ public interface ManagementService {
    *
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If <code>suspendJobs</code> is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#UPDATE} on any {@link Resources#PROCESS_INSTANCE}</li>
+   *   </ul>
    *
    * @see #suspendJobByProcessDefinitionKey(String)
    */
@@ -522,6 +650,8 @@ public interface ManagementService {
 
   /**
    * <p>Activates the {@link Job} with the given id.</p>
+   *
+   * <p>Note: for more complex activate commands use {@link #updateJobSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          If the job id is equal null.
@@ -534,6 +664,8 @@ public interface ManagementService {
   /**
    * <p>Activates all {@link Job}s of the provided job definition id.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the job definition id is equal null.
    * @throws AuthorizationException
@@ -544,6 +676,8 @@ public interface ManagementService {
 
   /**
    * <p>Activates all {@link Job}s of the provided process instance id.</p>
+   *
+   * <p>Note: for more complex activate commands use {@link #updateJobSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          If the process instance id is equal null.
@@ -556,6 +690,8 @@ public interface ManagementService {
   /**
    * <p>Activates all {@link Job}s of the provided process definition id.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateJobSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
    * @throws AuthorizationException
@@ -566,6 +702,8 @@ public interface ManagementService {
 
   /**
    * <p>Activates {@link Job}s of the provided process definition key.</p>
+   *
+   * <p>Note: for more complex activate commands use {@link #updateJobSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
@@ -578,6 +716,8 @@ public interface ManagementService {
   /**
    * <p>Suspends the {@link Job} with the given id.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateJobSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the job id is equal null.
    * @throws AuthorizationException
@@ -588,6 +728,8 @@ public interface ManagementService {
 
   /**
    * <p>Suspends all {@link Job}s of the provided job definition id.</p>
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateJobSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          If the job definition id is equal null.
@@ -600,6 +742,8 @@ public interface ManagementService {
   /**
    * <p>Suspends all {@link Job}s of the provided process instance id.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateJobSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the process instance id is equal null.
    * @throws AuthorizationException
@@ -611,6 +755,8 @@ public interface ManagementService {
   /**
    * <p>Suspends all {@link Job}s of the provided process definition id.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateJobSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If the process definition id is equal null.
    * @throws AuthorizationException
@@ -620,7 +766,9 @@ public interface ManagementService {
   void suspendJobByProcessDefinitionId(String processDefinitionId);
 
   /**
-   * <p>Activates {@link Job}s of the provided process definition key.</p>
+   * <p>Suspends {@link Job}s of the provided process definition key.</p>
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateJobSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          If the process definition key is equal null.
@@ -629,6 +777,27 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void suspendJobByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Activate or suspend jobs using a fluent builder. Specify the jobs by
+   * calling one of the <i>by</i> methods, like <i>byJobId</i>. To update the
+   * suspension state call {@link UpdateJobSuspensionStateBuilder#activate()} or
+   * {@link UpdateJobSuspensionStateBuilder#suspend()}.
+   *
+   * @return the builder to update the suspension state
+   */
+  UpdateJobSuspensionStateSelectBuilder updateJobSuspensionState();
+
+  /**
+   * Activate or suspend job definitions using a fluent builder. Specify the job
+   * definitions by calling one of the <i>by</i> methods, like
+   * <i>byJobDefinitionId</i>. To update the suspension state call
+   * {@link UpdateJobDefinitionSuspensionStateBuilder#activate()} or
+   * {@link UpdateJobDefinitionSuspensionStateBuilder#suspend()}.
+   *
+   * @return the builder to update the suspension state
+   */
+  UpdateJobDefinitionSuspensionStateSelectBuilder updateJobDefinitionSuspensionState();
 
   /**
    * Sets the number of retries that a job has left.
@@ -642,9 +811,105 @@ public interface ManagementService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link ProcessInstancePermissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link ProcessDefinitionPermissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(String jobId, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * @param jobIds ids of the jobs to modify, cannot be null.
+   * @param retries number of retries.
+   *
+   * @throws BadUserRequestException if jobIds is null
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void setJobRetries(List<String> jobIds, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * @param jobIds ids of the jobs to modify, cannot be null.
+   * @param retries number of retries.
+   *
+   * @throws BadUserRequestException if jobIds is null
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync(List<String> jobIds, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * @param jobQuery query that identifies which jobs should be modified, cannot be null.
+   * @param retries number of retries.
+   *
+   * @throws BadUserRequestException if jobQuery is null
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync(JobQuery jobQuery, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * Either jobIds or jobQuery has to be provided. If both are provided resulting list
+   * of affected jobs will contain jobs matching query as well as jobs defined in the list.
+   *
+   * @param jobIds ids of the jobs to modify.
+   * @param jobQuery query that identifies which jobs should be modified.
+   * @param retries number of retries.
+   *
+   * @throws BadUserRequestException if neither jobIds, nor jobQuery is provided or result in empty list
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * Either jobIds or jobQuery has to be provided. If both are provided resulting list
+   * of affected jobs will contain jobs matching query as well as jobs defined in the list.
+   *
+   * @param processInstanceIds ids of the process instances that for which jobs retries will be set
+   * @param query query that identifies process instances with jobs that have to be modified
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} or
+   *          {@link BatchPermissions#CREATE_BATCH_SET_JOB_RETRIES} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync (List<String> processInstanceIds, ProcessInstanceQuery query, int retries);
 
   /**
    * <p>
@@ -665,12 +930,14 @@ public interface ManagementService {
    * the corresponding incident will be resolved.
    * </p>
    *
-   * @param jobdefinitionId id of the job definition, cannot be null.
+   * @param jobDefinitionId id of the job definition, cannot be null.
    * @param retries number of retries.
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#RETRY_JOB} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries);
 
@@ -687,6 +954,22 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobDuedate(String jobId, Date newDuedate);
+  
+  /**
+   * Triggers the recalculation for the job with the provided id.
+   * 
+   * @param jobId id of job to recalculate, must neither be null nor empty.
+   * @param creationDateBased
+   *          indicates whether the recalculation should be based on the
+   *          creation date of the job or the current date
+   * 
+   * @throws AuthorizationException
+   *           If the user has no {@link Permissions#UPDATE} permission on
+   *           {@link Resources#PROCESS_INSTANCE} or no
+   *           {@link Permissions#UPDATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
+   */
+  void recalculateJobDuedate(String jobId, boolean creationDateBased);
 
   /**
    * Sets a new priority for the job with the provided id.
@@ -702,7 +985,7 @@ public interface ManagementService {
    *
    * @since 7.4
    */
-  void setJobPriority(String jobId, int priority);
+  void setJobPriority(String jobId, long priority);
 
   /**
    * <p>Sets an explicit priority for jobs of the given job definition.
@@ -722,7 +1005,7 @@ public interface ManagementService {
    *
    * @since 7.4
    */
-  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority);
+  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority);
 
   /**
    * <p>Sets an explicit default priority for jobs of the given job definition.
@@ -752,7 +1035,7 @@ public interface ManagementService {
    *
    * @since 7.4
    */
-  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority, boolean cascade);
+  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority, boolean cascade);
 
   /**
    * <p>Clears the job definition's overriding job priority if set. After invoking this method,
@@ -787,13 +1070,23 @@ public interface ManagementService {
    */
   String getJobExceptionStacktrace(String jobId);
 
-  /** get the list of properties. */
+  /**
+   * @return a map of all properties.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   */
   Map<String, String> getProperties();
 
-  /** Set the value for a property.
+  /**
+   * Set the value for a property.
    *
-   *  @param name the name of the property.
-   *  @param value the new value for the property.
+   * @param name the name of the property.
+   *
+   * @param value the new value for the property.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
   void setProperty(String name, String value);
 
@@ -801,6 +1094,9 @@ public interface ManagementService {
    * Deletes a property by name. If the property does not exist, the request is ignored.
    *
    * @param name the name of the property to delete
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
   void deleteProperty(String name);
 
@@ -903,5 +1199,70 @@ public interface ManagementService {
    * reporter is deactivated
    */
   void reportDbMetricsNow();
+
+  /**
+   * Creates a query to search for {@link org.camunda.bpm.engine.batch.Batch} instances.
+   *
+   * @since 7.5
+   */
+  BatchQuery createBatchQuery();
+
+  /**
+   * <p>
+   *   Suspends the {@link Batch} with the given id immediately.
+   * </p>
+   *
+   * <p>
+   *   <strong>Note:</strong> All {@link JobDefinition}s and {@link Job}s
+   *   related to the provided batch will be suspended.
+   * </p>
+   *
+   * @throws BadUserRequestException
+   *          If no such batch can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
+   *
+   * @since 7.5
+   */
+  void suspendBatchById(String batchId);
+
+  /**
+   * <p>
+   *   Activates the {@link Batch} with the given id immediately.
+   * </p>
+   *
+   * <p>
+   *   <strong>Note:</strong> All {@link JobDefinition}s and {@link Job}s
+   *   related to the provided batch will be activated.
+   * </p>
+   *
+   * @throws BadUserRequestException
+   *          If no such batch can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
+   *
+   * @since 7.5
+   */
+  void activateBatchById(String batchId);
+
+  /**
+   * Deletes a batch instance and the corresponding job definitions.
+   *
+   * If cascade is set to true the historic batch instances and the
+   * historic jobs logs are also removed.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#BATCH}
+   *
+   * @since 7.5
+   */
+  void deleteBatch(String batchId, boolean cascade);
+
+  /**
+   * Query for the statistics of the batch execution jobs of a batch.
+   *
+   * @since 7.5
+   */
+  BatchStatisticsQuery createBatchStatisticsQuery();
 
 }

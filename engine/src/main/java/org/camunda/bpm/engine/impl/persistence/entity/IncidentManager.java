@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,8 +41,12 @@ public class IncidentManager extends AbstractManager {
   }
 
   public long findIncidentCountByQueryCriteria(IncidentQueryImpl incidentQuery) {
-    configureAuthorizationCheck(incidentQuery);
+    configureQuery(incidentQuery);
     return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", incidentQuery);
+  }
+
+  public Incident findIncidentById(String id) {
+    return (Incident) getDbEntityManager().selectById(IncidentEntity.class, id);
   }
 
   public List<Incident> findIncidentByConfiguration(String configuration) {
@@ -55,12 +63,13 @@ public class IncidentManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl incidentQuery, Page page) {
-    configureAuthorizationCheck(incidentQuery);
+    configureQuery(incidentQuery);
     return getDbEntityManager().selectList("selectIncidentByQueryCriteria", incidentQuery, page);
   }
 
-  protected void configureAuthorizationCheck(IncidentQueryImpl query) {
+  protected void configureQuery(IncidentQueryImpl query) {
     getAuthorizationManager().configureIncidentQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
 }

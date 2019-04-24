@@ -9,7 +9,7 @@
     expressionLanguage="http://www.w3.org/1999/XPath"
     targetNamespace="test">
 
-  <process id="FormDataTest.testGetFormFieldProperties">
+  <process id="FormDataTest.testGetFormFieldProperties" isExecutable="true">
 
     <startEvent id="start" />
 

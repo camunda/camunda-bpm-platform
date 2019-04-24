@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +35,8 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.container.impl.deployment.util.InjectionUtil;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
@@ -82,6 +88,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
   /** injector for the default process engine */
   protected InjectedValue<ProcessEngine> defaultProcessEngineInjector = new InjectedValue<ProcessEngine>();
 
+  protected InjectedValue<BpmPlatformPlugins> platformPluginsInjector = new InjectedValue<BpmPlatformPlugins>();
+
   protected AnnotationInstance preUndeployDescription;
   protected AnnotationInstance postDeployDescription;
 
@@ -97,6 +105,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     this.paModule = paModule;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
 
     ManagedReference reference = null;
@@ -138,6 +147,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       }
       processApplicationInfo.setDeploymentInfo(deploymentInfos);
 
+      notifyBpmPlatformPlugins(platformPluginsInjector.getValue(), processApplication);
+
       if(postDeployDescription != null) {
         invokePostDeploy(processApplication);
       }
@@ -145,7 +156,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       // install the ManagedProcessApplication Service as a child to this service
       // if this service stops (at undeployment) the ManagedProcessApplication service is removed as well.
       ServiceName serviceName = ServiceNames.forManagedProcessApplication(processApplicationInfo.getName());
-      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo);
+      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo, processApplication.getReference());
       context.getChildTarget().addService(serviceName, managedProcessApplication).install();
 
     } catch (StartException e) {
@@ -161,8 +172,13 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     }
   }
 
+  protected void notifyBpmPlatformPlugins(BpmPlatformPlugins value, ProcessApplicationInterface processApplication) {
+    for (BpmPlatformPlugin plugin : value.getPlugins()) {
+      plugin.postProcessApplicationDeploy(processApplication);
+    }
+  }
 
-
+  @Override
   public void stop(StopContext context) {
 
     ManagedReference reference = null;
@@ -198,6 +214,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     if(postDeployMethod != null) {
       try {
         processApplication.execute(new Callable<Void>() {
+          @Override
           public Void call() throws Exception {
             postDeployMethod.invoke(processApplication.getRawObject(), getInjections(postDeployMethod));
             return null;
@@ -218,6 +235,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       if(preUndeployMethod != null) {
         try {
           processApplication.execute(new Callable<Void>() {
+            @Override
             public Void call() throws Exception {
               preUndeployMethod.invoke(processApplication.getRawObject(), getInjections(preUndeployMethod));
               return null;
@@ -243,9 +261,9 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
         Class<?> parameterClass = (Class<?>)parameterType;
 
-        // support injection of the default process engine
+        // support injection of the default process engine, if present
         if(ProcessEngine.class.isAssignableFrom(parameterClass)) {
-          parameters.add(defaultProcessEngineInjector.getValue());
+          parameters.add(defaultProcessEngineInjector.getOptionalValue());
           injectionResolved = true;
         }
 
@@ -297,12 +315,17 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     return paComponentViewInjector;
   }
 
+  @Override
   public ProcessApplicationStartService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
 
   public InjectedValue<ProcessEngine> getDefaultProcessEngineInjector() {
     return defaultProcessEngineInjector;
+  }
+
+  public InjectedValue<BpmPlatformPlugins> getPlatformPluginsInjector() {
+    return platformPluginsInjector;
   }
 
 }

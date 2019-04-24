@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">
@@ -21,16 +24,20 @@
   <!-- ATTACHMENT INSERT -->
 
   <insert id="insertAttachment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">
-    insert into ${prefix}ACT_HI_ATTACHMENT (ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, REV_)
+    insert into ${prefix}ACT_HI_ATTACHMENT (ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, ROOT_PROC_INST_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TENANT_ID_, CREATE_TIME_, REMOVAL_TIME_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{name ,jdbcType=VARCHAR},
       #{description ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
       #{taskId ,jdbcType=VARCHAR},
+      #{rootProcessInstanceId ,jdbcType=VARCHAR},
       #{processInstanceId ,jdbcType=VARCHAR},
       #{url ,jdbcType=VARCHAR},
       #{contentId ,jdbcType=VARCHAR},
+      #{tenantId ,jdbcType=VARCHAR},
+      #{createTime, jdbcType=TIMESTAMP},
+      #{removalTime, jdbcType=TIMESTAMP},
       1
     )
   </insert>
@@ -40,11 +47,31 @@
   <update id="updateAttachment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">
     update ${prefix}ACT_HI_ATTACHMENT 
     set
-      REV_ = #{nextRevision, jdbcType=INTEGER},
+      REV_ = #{revisionNext, jdbcType=INTEGER},
       NAME_ = #{name, jdbcType=VARCHAR},
       DESCRIPTION_ = #{description, jdbcType=TIMESTAMP}
     where ID_ = #{id}
       and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <update id="updateAttachmentsByRootProcessInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_ATTACHMENT set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateAttachmentsByProcessInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_ATTACHMENT
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        or TASK_ID_ in (
+          SELECT ID_
+          FROM ${prefix}ACT_HI_TASKINST
+          WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        )
   </update>
 
   <!-- ATTACHMENT DELETE -->
@@ -53,7 +80,92 @@
     delete from ${prefix}ACT_HI_ATTACHMENT 
     where ID_ = #{id} and REV_ = #{revision} 
   </delete>
-  
+
+  <delete id="deleteAttachmentByIds" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ATTACHMENT
+    <where>
+      <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+      <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql"/>
+    </where>
+  </delete>
+
+  <delete id="deleteAttachmentByIds_mysql" parameterType="java.util.Map">
+    delete A from ${prefix}ACT_HI_ATTACHMENT A
+    <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
+    <where>
+      <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+    </where>
+  </delete>
+
+  <delete id="deleteAttachmentByteArraysByIds" parameterType="java.util.Map">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select distinct CONTENT_ID_
+      from ${prefix}ACT_HI_ATTACHMENT
+      <where>
+        <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+        <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql"/>
+        and CONTENT_ID_ is not NULL
+      </where>)
+  </delete>
+
+  <delete id="deleteAttachmentByteArraysByIds_mysql" parameterType="java.util.Map">
+    delete B from ${prefix}ACT_GE_BYTEARRAY B
+    inner join ${prefix}ACT_HI_ATTACHMENT A
+      on B.ID_ = A.CONTENT_ID_
+      <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
+      <where>
+        <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+        and A.CONTENT_ID_ is not NULL
+      </where>
+  </delete>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <delete id="deleteAttachmentsByRemovalTime"
+    parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_ATTACHMENT
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteAttachmentsByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_ATTACHMENT
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteAttachmentsByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_HI_ATTACHMENT
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_HI_ATTACHMENT
+       WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
+  </delete>
+
   <!-- ATTACHMENT RESULTMAP -->
 
   <resultMap id="attachmentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">
@@ -63,13 +175,16 @@
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
     <result property="type" column="TYPE_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="url" column="URL_" jdbcType="VARCHAR" />
     <result property="contentId" column="CONTENT_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
   
   <!-- ATTACHMENT SELECT -->
-
   <select id="selectAttachment" parameterType="string" resultMap="attachmentResultMap">
     select * from ${prefix}ACT_HI_ATTACHMENT where ID_ = #{id,jdbcType=VARCHAR}
   </select>
@@ -87,5 +202,56 @@
     where TASK_ID_ = #{taskId,jdbcType=VARCHAR}
     and ID_ = #{id,jdbcType=VARCHAR}
   </select>
+
+  <sql id="selectAttachmentsProcessInstanceByIdsSql">
+    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+      and
+        <bind name="listOfIds" value="processInstanceIds"/>
+        <bind name="fieldName" value="'PROC_INST_ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    </if>
+  </sql>
+
+  <sql id="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      and TASK_ID_ in (
+      select ID_
+      from ${prefix}ACT_HI_TASKINST
+      where
+        <bind name="listOfIds" value="taskProcessInstanceIds"/>
+        <bind name="fieldName" value="'PROC_INST_ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+      )
+    </if>
+    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
+      and TASK_ID_ in (
+      select ID_ from
+      ${prefix}ACT_HI_TASKINST
+      where
+        <bind name="listOfIds" value="caseInstanceIds"/>
+        <bind name="fieldName" value="'CASE_INST_ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+      )
+    </if>
+  </sql>
+
+  <sql id="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql_mysql">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      inner join ${prefix}ACT_HI_TASKINST T
+        on TASK_ID_ = T.ID_
+        and
+          <bind name="listOfIds" value="taskProcessInstanceIds"/>
+          <bind name="fieldName" value="'T.PROC_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    </if>
+    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
+      inner join ${prefix}ACT_HI_TASKINST T
+        on TASK_ID_ = T.ID_
+        and
+          <bind name="listOfIds" value="caseInstanceIds"/>
+          <bind name="fieldName" value="'T.CASE_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+    </if>
+  </sql>
 
 </mapper>

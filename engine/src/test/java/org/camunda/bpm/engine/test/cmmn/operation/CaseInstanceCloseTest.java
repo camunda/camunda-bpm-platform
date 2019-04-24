@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +23,7 @@ import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
+import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
@@ -54,6 +59,7 @@ public class CaseInstanceCloseTest extends PvmTestCase {
       .listener("close", stateTransitionCollector)
       .createActivity("A")
         .behavior(new TaskWaitState())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
       .endActivity()
       .buildCaseDefinition();
 

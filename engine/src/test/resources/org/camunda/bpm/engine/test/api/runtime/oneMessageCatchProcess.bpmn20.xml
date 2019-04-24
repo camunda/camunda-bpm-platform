@@ -7,7 +7,7 @@
   
   <message id="newInvoice" name="newInvoiceMessage" />
   
-  <process id="oneMessageCatchProcess">
+  <process id="oneMessageCatchProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     

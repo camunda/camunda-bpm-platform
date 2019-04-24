@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +44,14 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey, String processDefinitionKey);
 
   /**
+   * Select process instances with a business key like the given value.
+   *
+   * @param processInstanceBusinessKeyLike The string can include the wildcard character '%' to express
+   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   */
+  ProcessInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike);
+
+  /**
    * Select the process instances which are defined by a process definition with
    * the given key.
    */
@@ -50,6 +62,12 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * with the given id.
    */
   ProcessInstanceQuery processDefinitionId(String processDefinitionId);
+
+  /**
+   * Selects the process instances which belong to the given deployment id.
+   * @since 7.4
+   */
+  ProcessInstanceQuery deploymentId(String deploymentId);
 
   /**
    * Select the process instances which are a sub process instance of the given
@@ -167,6 +185,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery active();
 
   /**
+   * Only selects process instances with at least one incident.
+   */
+  ProcessInstanceQuery hasIncident();
+
+  /**
    * Only selects process instances with the given incident type.
    */
   ProcessInstanceQuery incidentType(String incidentType);
@@ -186,6 +209,32 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    */
   ProcessInstanceQuery incidentMessageLike(String incidentMessageLike);
 
+  /** Only select process instances with one of the given tenant ids. */
+  ProcessInstanceQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects process instances which have no tenant id. */
+  ProcessInstanceQuery withoutTenantId();
+
+  /**
+   * <p>Only selects process instances with leaf activity instances
+   * or transition instances (async before, async after) in
+   * at least one of the given activity ids.
+   *
+   * <p><i>Leaf instance</i> means this filter works for instances
+   * of a user task is matched, but not the embedded sub process it is
+   * contained in.
+   */
+  ProcessInstanceQuery activityIdIn(String... activityIds);
+
+  /** Only selects process instances which are top level process instances. */
+  ProcessInstanceQuery rootProcessInstances();
+
+  /** Only selects process instances which don't have subprocesses and thus are leaves of the execution tree. */
+  ProcessInstanceQuery leafProcessInstances();
+
+  /** Only selects process instances which process definition has no tenant id. */
+  ProcessInstanceQuery processDefinitionWithoutTenantId();
+
   //ordering /////////////////////////////////////////////////////////////////
 
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -197,4 +246,12 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   /** Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ProcessInstanceQuery orderByProcessDefinitionId();
 
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of process instances without tenant id is database-specific.
+   */
+  ProcessInstanceQuery orderByTenantId();
+
+  /** Order by the business key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  ProcessInstanceQuery orderByBusinessKey();
 }

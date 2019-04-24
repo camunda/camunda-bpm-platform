@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <bpmn:process id="process_sending_with_connector" name="Sending with connector" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="send with connector wanted">
+      <bpmn:outgoing>SequenceFlow_02p0m3b</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_02p0m3b" sourceRef="StartEvent_1" targetRef="SendTask_10npufc" />
+    <bpmn:sendTask id="SendTask_10npufc" name="send with connector">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="reqParam1">${someInputVariable}</camunda:inputParameter>
+            <camunda:outputParameter name="out1">${someOutputParameter}</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>testConnector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_02p0m3b</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0e4gcph</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="EndEvent_1ipije7" name="test finished">
+      <bpmn:incoming>SequenceFlow_0wc0nkt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0e4gcph" sourceRef="SendTask_10npufc" targetRef="Task_1esy9kp" />
+    <bpmn:sequenceFlow id="SequenceFlow_0wc0nkt" sourceRef="Task_1esy9kp" targetRef="EndEvent_1ipije7" />
+    <bpmn:receiveTask id="Task_1esy9kp" name="wait">
+      <bpmn:incoming>SequenceFlow_0e4gcph</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0wc0nkt</bpmn:outgoing>
+    </bpmn:receiveTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process_sending_with_connector">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_02p0m3b_di" bpmnElement="SequenceFlow_02p0m3b">
+        <di:waypoint xsi:type="dc:Point" x="209" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="279" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="199" y="95" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SendTask_10npufc_di" bpmnElement="SendTask_10npufc">
+        <dc:Bounds x="279" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1ipije7_di" bpmnElement="EndEvent_1ipije7">
+        <dc:Bounds x="556" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="529" y="138" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0e4gcph_di" bpmnElement="SequenceFlow_0e4gcph">
+        <di:waypoint xsi:type="dc:Point" x="379" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="418" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="353.7826934414149" y="95" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0wc0nkt_di" bpmnElement="SequenceFlow_0wc0nkt">
+        <di:waypoint xsi:type="dc:Point" x="518" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="556" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="492" y="95" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ReceiveTask_0h1hc9t_di" bpmnElement="Task_1esy9kp">
+        <dc:Bounds x="418" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

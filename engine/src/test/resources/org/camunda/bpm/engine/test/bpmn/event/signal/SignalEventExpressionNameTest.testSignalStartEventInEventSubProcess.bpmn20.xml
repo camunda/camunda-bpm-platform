@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn" targetNamespace="Examples">
+
+  <signal id="alertSignal" name="alert-${'foo'}" />
+
+  <process id="signalStartEventInEventSubProcess" isExecutable="true">
+  
+    <startEvent id="startEvent" />
+
+    <sequenceFlow id="sequenceFlow_1" sourceRef="startEvent" targetRef="userTask" />
+
+    <userTask id="userTask" name="NonInterruptingUserTask" />
+
+    <sequenceFlow id="sequenceFlow_5" sourceRef="userTask" targetRef="endEvent" />
+
+    <endEvent id="endEvent" />
+
+     <subProcess id="subProcess" name="Subprocess" triggeredByEvent="true">
+       <startEvent id="subprocessStartEvent">
+        <signalEventDefinition signalRef="alertSignal" />
+       </startEvent>
+       <sequenceFlow id="sequenceFlow_2" sourceRef="subprocessStartEvent" targetRef="subprocessServiceTask" />
+       <serviceTask id="subprocessServiceTask" camunda:class="org.camunda.bpm.engine.test.bpmn.event.signal.DummyServiceTask" />       
+       <sequenceFlow id="sequenceFlow_3" sourceRef="subprocessServiceTask" targetRef="subprocessEndEvent" />
+       <endEvent id="subprocessEndEvent" />
+     </subProcess>
+    
+  </process>
+
+</definitions>

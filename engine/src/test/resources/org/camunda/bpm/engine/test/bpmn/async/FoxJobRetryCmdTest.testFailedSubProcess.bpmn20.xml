@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+
+	<process id="failedSubProcess" isExecutable="true">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingSubProcess" />
+		
+	    <subProcess id="failingSubProcess" camunda:async="true">    
+			<extensionElements>
+	       		<fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
+	       	</extensionElements>
+	       	
+	    	<startEvent id="subStart" />
+	    	
+	    	<sequenceFlow sourceRef="subStart" targetRef="service" />
+	    	    	
+	 		<serviceTask id="service" camunda:class="org.camunda.bpm.engine.test.cmd.FailingDelegate" />
+	 		
+	 		<sequenceFlow sourceRef="service" targetRef="subEnd" />
+	 		
+	    	<endEvent id="subEnd" />    
+	    </subProcess>		
+
+        
+		<sequenceFlow id="flow2" sourceRef="failingSubProcess" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+	
+</definitions>

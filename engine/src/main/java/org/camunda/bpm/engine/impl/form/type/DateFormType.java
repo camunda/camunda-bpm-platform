@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.form.type;
 
 import java.text.DateFormat;
@@ -53,14 +56,18 @@ public class DateFormType extends AbstractFormFieldType {
   public TypedValue convertToModelValue(TypedValue propertyValue) {
     Object value = propertyValue.getValue();
     if(value == null) {
-      return Variables.dateValue(null);
+      return Variables.dateValue(null, propertyValue.isTransient());
     }
     else if(value instanceof Date) {
-      return Variables.dateValue((Date) value);
+      return Variables.dateValue((Date) value, propertyValue.isTransient());
     }
     else if(value instanceof String) {
+      String strValue = ((String) value).trim();
+      if (strValue.isEmpty()) {
+        return Variables.dateValue(null, propertyValue.isTransient());
+      }
       try {
-        return Variables.dateValue((Date) dateFormat.parseObject((String) value));
+        return Variables.dateValue((Date) dateFormat.parseObject(strValue), propertyValue.isTransient());
       } catch (ParseException e) {
         throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.");
       }
@@ -71,12 +78,10 @@ public class DateFormType extends AbstractFormFieldType {
   }
 
   public TypedValue convertToFormValue(TypedValue modelValue) {
-    if(modelValue.getType() == ValueType.DATE) {
-      if(modelValue.getValue() == null) {
-        return Variables.stringValue(null);
-      } else {
-        return Variables.stringValue(dateFormat.format(modelValue.getValue()));
-      }
+    if(modelValue.getValue() == null) {
+      return Variables.stringValue(null, modelValue.isTransient());
+    } else if(modelValue.getType() == ValueType.DATE) {
+      return Variables.stringValue(dateFormat.format(modelValue.getValue()), modelValue.isTransient());
     }
     else {
       throw new ProcessEngineException("Expected value to be of type '"+ValueType.DATE+"' but got '"+modelValue.getType()+"'.");

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,14 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
-
+import java.util.Collections;
+import java.util.List;
 import javax.sql.DataSource;
 
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.identity.PasswordPolicy;
+import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
+import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
+import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
@@ -49,7 +58,7 @@ import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
  * userguide.
  * </p>
  *
- * <p>The second option is great for testing: {@link #createStandalonInMemeProcessEngineConfiguration()}
+ * <p>The second option is great for testing: {@link #createStandaloneInMemProcessEngineConfiguration()}
  * <pre>ProcessEngine processEngine = ProcessEngineConfiguration
  *   .createStandaloneInMemProcessEngineConfiguration()
  *   .buildProcessEngine();
@@ -137,6 +146,61 @@ public abstract class ProcessEngineConfiguration {
    */
   public static final String HISTORY_DEFAULT = HISTORY_AUDIT;
 
+  /**
+   * History cleanup is performed based on end time.
+   */
+  public static final String HISTORY_CLEANUP_STRATEGY_END_TIME_BASED = "endTimeBased";
+
+  /**
+   * History cleanup is performed based on removal time.
+   */
+  public static final String HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED = "removalTimeBased";
+
+  /**
+   * Removal time for historic entities is set on execution start.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_START = "start";
+
+  /**
+   * Removal time for historic entities is set if execution has been ended.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_END = "end";
+
+  /**
+   * Removal time for historic entities is not set.
+   */
+  public static final String HISTORY_REMOVAL_TIME_STRATEGY_NONE = "none";
+
+  /**
+   * Always enables check for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations.
+   * This mode is equal to the &lt; 7.5 behavior.
+   *<p />
+   * *NOTE:* Checking revoke authorizations is very expensive for resources with a high potential
+   * cardinality like tasks or process instances and can render authorized access to the process engine
+   * effectively unusable on most databases. You are therefore strongly discouraged from using this mode.
+   *
+   */
+  public static final String AUTHORIZATION_CHECK_REVOKE_ALWAYS = "always";
+
+  /**
+   * Never checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations. This mode
+   * has best performance effectively disables the use of {@link Authorization#AUTH_TYPE_REVOKE}.
+   * *Note*: It is strongly recommended to use this mode.
+   */
+  public static final String AUTHORIZATION_CHECK_REVOKE_NEVER = "never";
+
+  /**
+   * This mode only checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations if at least
+   * one revoke authorization currently exits for the current user or one of the groups the user is a member
+   * of. To achieve this it is checked once per command whether potentially applicable revoke authorizations
+   * exist. Based on the outcome, the authorization check then uses revoke or not.
+   *<p />
+   * *NOTE:* Checking revoke authorizations is very expensive for resources with a high potential
+   * cardinality like tasks or process instances and can render authorized access to the process engine
+   * effectively unusable on most databases.
+   */
+  public static final String AUTHORIZATION_CHECK_REVOKE_AUTO = "auto";
+
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;
   protected String history = HISTORY_DEFAULT;
@@ -146,7 +210,9 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jobExecutorAcquireByDueDate = false;
   protected boolean jobExecutorAcquireByPriority = false;
 
+  protected boolean ensureJobDueDateNotNull = false;
   protected boolean producePrioritizedJobs = true;
+  protected boolean producePrioritizedExternalTasks = true;
 
   /**
    * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
@@ -177,9 +243,13 @@ public abstract class ProcessEngineConfiguration {
   protected String jdbcPingQuery = null;
   protected int jdbcPingConnectionNotUsedFor;
   protected DataSource dataSource;
+  protected SchemaOperationsCommand schemaOperationsCommand = new SchemaOperationsProcessEngineBuild();
+  protected ProcessEngineBootstrapCommand bootstrapCommand = new BootstrapEngineCommand();
+  protected HistoryLevelSetupCommand historyLevelCommand = new HistoryLevelSetupCommand();
   protected boolean transactionsExternallyManaged = false;
   /** the number of seconds the jdbc driver will wait for a response from the database */
   protected Integer jdbcStatementTimeout;
+  protected boolean jdbcBatchProcessing = true;
 
   protected String jpaPersistenceUnitName;
   protected Object jpaEntityManagerFactory;
@@ -192,10 +262,27 @@ public abstract class ProcessEngineConfiguration {
   protected boolean createIncidentOnFailedJobEnabled = true;
 
   /**
+   * configuration of password policy
+   */
+  protected boolean enablePasswordPolicy;
+  protected PasswordPolicy passwordPolicy;
+
+  /**
    * switch for controlling whether the process engine performs authorization checks.
    * The default value is false.
    */
   protected boolean authorizationEnabled = false;
+
+  /**
+   * Provides the default task permission for the user related to a task
+   * User can be related to a task in the following ways
+   * - Candidate user
+   * - Part of candidate group
+   * - Assignee
+   * - Owner
+   * The default value is UPDATE.
+   */
+  protected String defaultUserPermissionNameForTask = "UPDATE";
 
   /**
    * <p>The following flag <code>authorizationEnabledForCustomCode</code> will
@@ -211,7 +298,88 @@ public abstract class ProcessEngineConfiguration {
    */
   protected boolean authorizationEnabledForCustomCode = false;
 
+  /**
+   * If the value of this flag is set <code>true</code> then the process engine
+   * performs tenant checks to ensure that an authenticated user can only access
+   * data that belongs to one of his tenants.
+   */
+  protected boolean tenantCheckEnabled = true;
+
   protected ValueTypeResolver valueTypeResolver;
+
+  protected String authorizationCheckRevokes = AUTHORIZATION_CHECK_REVOKE_AUTO;
+
+  /**
+   * A parameter used for defining acceptable values for the User, Group
+   * and Tenant IDs. The pattern can be defined by using the standard
+   * Java Regular Expression syntax should be used.
+   *
+   * <p>By default only alphanumeric values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String generalResourceWhitelistPattern =  "[a-zA-Z0-9]+|camunda-admin";
+
+  /**
+   * A parameter used for defining acceptable values for the User IDs.
+   * The pattern can be defined by using the standard Java Regular
+   * Expression syntax should be used.
+   *
+   * <p>If not defined, the general pattern is used. Only alphanumeric
+   * values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String userResourceWhitelistPattern;
+
+  /**
+   * A parameter used for defining acceptable values for the Group IDs.
+   * The pattern can be defined by using the standard Java Regular
+   * Expression syntax should be used.
+   *
+   * <p>If not defined, the general pattern is used. Only alphanumeric
+   * values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String groupResourceWhitelistPattern;
+
+  /**
+   * A parameter used for defining acceptable values for the Tenant IDs.
+   * The pattern can be defined by using the standard Java Regular
+   * Expression syntax should be used.
+   *
+   * <p>If not defined, the general pattern is used. Only alphanumeric
+   * values (or 'camunda-admin') will be accepted.</p>
+   */
+  protected String tenantResourceWhitelistPattern;
+
+  /**
+   * If the value of this flag is set <code>true</code> then the process engine
+   * throws {@link ProcessEngineException} when no catching boundary event was
+   * defined for an error event.
+   *
+   * <p>The default value is <code>false</code>.</p>
+   */
+  protected boolean enableExceptionsAfterUnhandledBpmnError = false;
+
+  /**
+   * If the value of this flag is set to <code>false</code>, {@link OptimisticLockingException}s
+   * are not skipped for UPDATE or DELETE operations applied to historic entities.
+   *
+   * <p>The default value is <code>true</code>.</p>
+   */
+  protected boolean skipHistoryOptimisticLockingExceptions = true;
+
+  /**
+   * If the value of this flag is set to <code>true</code>,
+   * READ_INSTANCE_VARIABLE,
+   * READ_HISTORY_VARIABLE, or
+   * READ_TASK_VARIABLE on Process Definition resource, and
+   * READ_VARIABLE on Task resource
+   * will be required to fetch variables when the autorizations are enabled.
+   */
+  protected boolean enforceSpecificVariablePermission = false;
+
+  /**
+   * Specifies which permissions will not be taken into account in the
+   * authorizations checks if authorization is enabled.
+   */
+  protected List<String> disabledPermissions = Collections.emptyList();
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -369,6 +537,30 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  public SchemaOperationsCommand getSchemaOperationsCommand() {
+    return schemaOperationsCommand;
+  }
+
+  public void setSchemaOperationsCommand(SchemaOperationsCommand schemaOperationsCommand) {
+    this.schemaOperationsCommand = schemaOperationsCommand;
+  }
+
+  public ProcessEngineBootstrapCommand getProcessEngineBootstrapCommand() {
+    return bootstrapCommand;
+  }
+
+  public void setProcessEngineBootstrapCommand(ProcessEngineBootstrapCommand bootstrapCommand) {
+    this.bootstrapCommand = bootstrapCommand;
+  }
+
+  public HistoryLevelSetupCommand getHistoryLevelCommand() {
+    return historyLevelCommand;
+  }
+
+  public void setHistoryLevelCommand(HistoryLevelSetupCommand historyLevelCommand) {
+    this.historyLevelCommand = historyLevelCommand;
+  }
+
   public String getJdbcDriver() {
     return jdbcDriver;
   }
@@ -488,6 +680,15 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  public boolean isJdbcBatchProcessing() {
+    return jdbcBatchProcessing;
+  }
+
+  public ProcessEngineConfiguration setJdbcBatchProcessing(boolean jdbcBatchProcessing) {
+    this.jdbcBatchProcessing = jdbcBatchProcessing;
+    return this;
+  }
+
   public boolean isJobExecutorActivate() {
     return jobExecutorActivate;
   }
@@ -603,6 +804,15 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  public String getDefaultUserPermissionNameForTask() {
+    return defaultUserPermissionNameForTask;
+  }
+
+  public ProcessEngineConfiguration setDefaultUserPermissionNameForTask(String defaultUserPermissionNameForTask) {
+    this.defaultUserPermissionNameForTask = defaultUserPermissionNameForTask;
+    return this;
+  }
+
   public boolean isAuthorizationEnabledForCustomCode() {
     return authorizationEnabledForCustomCode;
   }
@@ -610,6 +820,47 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setAuthorizationEnabledForCustomCode(boolean authorizationEnabledForCustomCode) {
     this.authorizationEnabledForCustomCode = authorizationEnabledForCustomCode;
     return this;
+  }
+
+  public boolean isTenantCheckEnabled() {
+    return tenantCheckEnabled;
+  }
+
+  public ProcessEngineConfiguration setTenantCheckEnabled(boolean isTenantCheckEnabled) {
+    this.tenantCheckEnabled = isTenantCheckEnabled;
+    return this;
+  }
+
+  public String getGeneralResourceWhitelistPattern() {
+    return generalResourceWhitelistPattern;
+  }
+
+  public void setGeneralResourceWhitelistPattern(String generalResourceWhitelistPattern) {
+    this.generalResourceWhitelistPattern = generalResourceWhitelistPattern;
+  }
+
+  public String getUserResourceWhitelistPattern() {
+    return userResourceWhitelistPattern;
+  }
+
+  public void setUserResourceWhitelistPattern(String userResourceWhitelistPattern) {
+    this.userResourceWhitelistPattern = userResourceWhitelistPattern;
+  }
+
+  public String getGroupResourceWhitelistPattern() {
+    return groupResourceWhitelistPattern;
+  }
+
+  public void setGroupResourceWhitelistPattern(String groupResourceWhitelistPattern) {
+    this.groupResourceWhitelistPattern = groupResourceWhitelistPattern;
+  }
+
+  public String getTenantResourceWhitelistPattern() {
+    return tenantResourceWhitelistPattern;
+  }
+
+  public void setTenantResourceWhitelistPattern(String tenantResourceWhitelistPattern) {
+    this.tenantResourceWhitelistPattern = tenantResourceWhitelistPattern;
   }
 
   public int getDefaultNumberOfRetries() {
@@ -629,6 +880,14 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  public boolean isEnsureJobDueDateNotNull() {
+    return ensureJobDueDateNotNull;
+  }
+
+  public void setEnsureJobDueDateNotNull(boolean ensureJobDueDateNotNull) {
+    this.ensureJobDueDateNotNull = ensureJobDueDateNotNull;
+  }
+
   public boolean isProducePrioritizedJobs() {
     return producePrioritizedJobs;
   }
@@ -645,4 +904,70 @@ public abstract class ProcessEngineConfiguration {
     this.jobExecutorAcquireByPriority = jobExecutorAcquireByPriority;
   }
 
+  public boolean isProducePrioritizedExternalTasks() {
+    return producePrioritizedExternalTasks;
+  }
+
+  public void setProducePrioritizedExternalTasks(boolean producePrioritizedExternalTasks) {
+    this.producePrioritizedExternalTasks = producePrioritizedExternalTasks;
+  }
+
+  public void setAuthorizationCheckRevokes(String authorizationCheckRevokes) {
+    this.authorizationCheckRevokes = authorizationCheckRevokes;
+  }
+
+  public String getAuthorizationCheckRevokes() {
+    return authorizationCheckRevokes;
+  }
+
+  public boolean isEnableExceptionsAfterUnhandledBpmnError() {
+    return enableExceptionsAfterUnhandledBpmnError;
+  }
+
+  public void setEnableExceptionsAfterUnhandledBpmnError(boolean enableExceptionsAfterUnhandledBpmnError) {
+    this.enableExceptionsAfterUnhandledBpmnError = enableExceptionsAfterUnhandledBpmnError;
+  }
+
+  public boolean isSkipHistoryOptimisticLockingExceptions() {
+    return skipHistoryOptimisticLockingExceptions;
+  }
+
+  public ProcessEngineConfiguration setSkipHistoryOptimisticLockingExceptions(boolean skipHistoryOptimisticLockingExceptions) {
+    this.skipHistoryOptimisticLockingExceptions = skipHistoryOptimisticLockingExceptions;
+    return this;
+  }
+
+  public boolean isEnforceSpecificVariablePermission() {
+    return enforceSpecificVariablePermission;
+  }
+
+  public void setEnforceSpecificVariablePermission(boolean ensureSpecificVariablePermission) {
+    this.enforceSpecificVariablePermission = ensureSpecificVariablePermission;
+  }
+
+  public List<String> getDisabledPermissions() {
+    return disabledPermissions;
+  }
+
+  public void setDisabledPermissions(List<String> disabledPermissions) {
+    this.disabledPermissions = disabledPermissions;
+  }
+
+  public boolean isEnablePasswordPolicy() {
+    return enablePasswordPolicy;
+  }
+
+  public ProcessEngineConfiguration setEnablePasswordPolicy(boolean enablePasswordPolicy) {
+    this.enablePasswordPolicy = enablePasswordPolicy;
+    return this;
+  }
+
+  public PasswordPolicy getPasswordPolicy() {
+    return passwordPolicy;
+  }
+
+  public ProcessEngineConfiguration setPasswordPolicy(PasswordPolicy passwordPolicy) {
+    this.passwordPolicy = passwordPolicy;
+    return this;
+  }
 }

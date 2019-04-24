@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,21 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 
 public class TimerStartEventJobHandler extends TimerEventJobHandler {
 
-  private static Logger log = Logger.getLogger(TimerStartEventJobHandler.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public static final String TYPE = "timer-start-event";
 
@@ -34,25 +35,30 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     DeploymentCache deploymentCache = Context
             .getProcessEngineConfiguration()
             .getDeploymentCache();
 
-    String definitionKey = getKey(configuration);
-    ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(definitionKey);
+    String definitionKey = configuration.getTimerElementKey();
+    ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(definitionKey, tenantId);
+
     try {
-      if(!processDefinition.isSuspended()) {
-        new StartProcessInstanceCmd(definitionKey, null, null, null, null).execute(commandContext);
-      } else {
-        log.log(Level.FINE, "ignoring timer of suspended process definition " + processDefinition.getName());
-      }
-    } catch (RuntimeException e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
+      startProcessInstance(commandContext, tenantId, processDefinition);
+    }
+    catch (RuntimeException e) {
       throw e;
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
-      throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
+    }
+  }
+
+  protected void startProcessInstance(CommandContext commandContext, String tenantId, ProcessDefinition processDefinition) {
+    if(!processDefinition.isSuspended()) {
+
+      RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
+      runtimeService.createProcessInstanceByKey(processDefinition.getKey()).processDefinitionTenantId(tenantId).execute();
+
+    } else {
+      LOG.ignoringSuspendedJob(processDefinition);
     }
   }
 }

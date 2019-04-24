@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.2.0-nightly">
+  <bpmn:process id="parentprocess" isExecutable="true">
+
+    <bpmn:startEvent id="parentStart">
+      <bpmn:outgoing>start_to_call</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:callActivity id="callActivity" calledElement="subprocess">
+      <bpmn:incoming>start_to_call</bpmn:incoming>
+      <bpmn:outgoing>call_to_outer</bpmn:outgoing>
+    </bpmn:callActivity>
+
+    <bpmn:userTask id="outerTask">
+      <bpmn:incoming>call_to_outer</bpmn:incoming>
+      <bpmn:outgoing>outer_to_end</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="parentEnd">
+      <bpmn:incoming>SequenceFlow_0hllsvx</bpmn:incoming>
+    </bpmn:endEvent>
+
+
+    <bpmn:sequenceFlow id="start_to_call" sourceRef="parentStart" targetRef="callActivity" />
+    <bpmn:sequenceFlow id="call_to_outer" sourceRef="callActivity" targetRef="outerTask" />
+    <bpmn:sequenceFlow id="outer_to_end" sourceRef="outerTask" targetRef="parentEnd" />
+
+  </bpmn:process>
+</bpmn:definitions>

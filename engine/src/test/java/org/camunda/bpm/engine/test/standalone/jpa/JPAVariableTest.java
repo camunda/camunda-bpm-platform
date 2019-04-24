@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,35 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-
-
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
 import org.junit.Ignore;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
@@ -46,6 +54,7 @@ import org.junit.Ignore;
  */
 public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
+  protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/variables/oneTaskProcess.bpmn20.xml";
   protected static ProcessEngine cachedProcessEngine;
 
   private FieldAccessJPAEntity simpleEntityFieldAccess;
@@ -86,6 +95,8 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     protected void setUp() throws Exception {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
           .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
+
+      processEngineConfiguration.setJavaSerializationFormatEnabled(true);
 
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 
@@ -483,6 +494,29 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
     assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
     assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testFailSerializationForUnknownSerializedValueType() throws IOException {
+    // given
+    JavaSerializable pojo = new JavaSerializable("foo");
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(pojo);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    ObjectValue serializedObjectValue = Variables
+      .serializedObjectValue(serializedObject)
+      .serializationDataFormat(SerializationDataFormats.JAVA)
+      .objectTypeName(pojo.getClass().getName())
+      .create();
+    VariableMap variables = Variables.createVariables().putValueTyped("var", serializedObjectValue);
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    // then
+    JavaSerializable returnedPojo = (JavaSerializable) runtimeService.getVariable(processInstance.getId(), "var");
+    assertEquals(pojo, returnedPojo);
   }
 
 }

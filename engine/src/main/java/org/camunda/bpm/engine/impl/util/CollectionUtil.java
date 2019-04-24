@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,10 +17,13 @@
 package org.camunda.bpm.engine.impl.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * helper/convience methods for working with collections.
@@ -51,6 +58,13 @@ public class CollectionUtil {
     return result;
   }
 
+  public static <T> Set<T> asHashSet(T... elements) {
+    Set<T> set = new HashSet<T>();
+    Collections.addAll(set, elements);
+
+    return set;
+  }
+
   public static <S, T> void addToMapOfLists(Map<S, List<T>> map, S key, T value) {
     List<T> list = map.get(key);
     if (list == null) {
@@ -60,4 +74,33 @@ public class CollectionUtil {
     list.add(value);
   }
 
+  public static <S, T> void addToMapOfSets(Map<S, Set<T>> map, S key, T value) {
+    Set<T> set = map.get(key);
+    if (set == null) {
+      set = new HashSet<T>();
+      map.put(key, set);
+    }
+    set.add(value);
+  }
+
+  public static <S, T> void addCollectionToMapOfSets(Map<S, Set<T>> map, S key, Collection<T> values) {
+    Set<T> set = map.get(key);
+    if (set == null) {
+      set = new HashSet<T>();
+      map.put(key, set);
+    }
+    set.addAll(values);
+  }
+
+  /**
+   * Chops a list into non-view sublists of length partitionSize.
+   */
+  public static <T> List<List<T>> partition(List<T> list, final int partitionSize) {
+    List<List<T>> parts = new ArrayList<List<T>>();
+    final int listSize = list.size();
+    for (int i = 0; i < listSize; i += partitionSize) {
+      parts.add(new ArrayList<T>(list.subList(i, Math.min(listSize, i + partitionSize))));
+    }
+    return parts;
+  }
 }

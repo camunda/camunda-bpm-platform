@@ -5,7 +5,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples2">
 
-  <process id="two" name="Two">
+  <process id="two" name="Two" isExecutable="true">
   
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />

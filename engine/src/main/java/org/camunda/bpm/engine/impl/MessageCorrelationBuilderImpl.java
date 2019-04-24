@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,31 +16,50 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.HashMap;
+import java.util.List;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Map;
+
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
+import org.camunda.bpm.engine.impl.cmd.CorrelateStartMessageCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
  * @author Daniel Meyer
+ * @author Christopher Zell
  *
  */
 public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder {
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected CommandExecutor commandExecutor;
   protected CommandContext commandContext;
 
   protected boolean isExclusiveCorrelation = false;
+
   protected String messageName;
   protected String businessKey;
   protected String processInstanceId;
-  protected Map<String, Object> correlationProcessInstanceVariables;
-  protected Map<String, Object> payloadProcessInstanceVariables;
+  protected String processDefinitionId;
+
+  protected VariableMap correlationProcessInstanceVariables;
+  protected VariableMap correlationLocalVariables;
+  protected VariableMap payloadProcessInstanceVariables;
+  protected VariableMap payloadProcessInstanceVariablesLocal;
+
+  protected String tenantId = null;
+  protected boolean isTenantIdSet = false;
 
   public MessageCorrelationBuilderImpl(CommandExecutor commandExecutor, String messageName) {
     this(messageName);
@@ -55,64 +78,195 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder processInstanceBusinessKey(String businessKey) {
+    ensureNotNull("businessKey", businessKey);
     this.businessKey = businessKey;
     return this;
   }
 
   public MessageCorrelationBuilder processInstanceVariableEquals(String variableName, Object variableValue) {
     ensureNotNull("variableName", variableName);
-    if(correlationProcessInstanceVariables == null) {
-      correlationProcessInstanceVariables = new HashMap<String, Object>();
-    }
+    ensureCorrelationProcessInstanceVariablesInitialized();
+
     correlationProcessInstanceVariables.put(variableName, variableValue);
     return this;
   }
 
+  public MessageCorrelationBuilder processInstanceVariablesEqual(Map<String, Object> variables) {
+    ensureNotNull("variables", variables);
+    ensureCorrelationProcessInstanceVariablesInitialized();
+
+    correlationProcessInstanceVariables.putAll(variables);
+    return this;
+  }
+
+  public MessageCorrelationBuilder localVariableEquals(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
+    ensureCorrelationLocalVariablesInitialized();
+
+    correlationLocalVariables.put(variableName, variableValue);
+    return this;
+  }
+
+  public MessageCorrelationBuilder localVariablesEqual(Map<String, Object> variables) {
+    ensureNotNull("variables", variables);
+    ensureCorrelationLocalVariablesInitialized();
+
+    correlationLocalVariables.putAll(variables);
+    return this;
+  }
+
+  protected void ensureCorrelationProcessInstanceVariablesInitialized() {
+    if(correlationProcessInstanceVariables == null) {
+      correlationProcessInstanceVariables = new VariableMapImpl();
+    }
+  }
+
+  protected void ensureCorrelationLocalVariablesInitialized() {
+    if(correlationLocalVariables == null) {
+      correlationLocalVariables = new VariableMapImpl();
+    }
+  }
+
   public MessageCorrelationBuilder processInstanceId(String id) {
+    ensureNotNull("processInstanceId", id);
     this.processInstanceId = id;
+    return this;
+  }
+
+  public MessageCorrelationBuilder processDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefinitionId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   public MessageCorrelationBuilder setVariable(String variableName, Object variableValue) {
     ensureNotNull("variableName", variableName);
-    if(payloadProcessInstanceVariables == null) {
-      payloadProcessInstanceVariables = new HashMap<String, Object>();
-    }
+    ensurePayloadProcessInstanceVariablesInitialized();
     payloadProcessInstanceVariables.put(variableName, variableValue);
+    return this;
+  }
+
+  public MessageCorrelationBuilder setVariableLocal(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
+    ensurePayloadProcessInstanceVariablesLocalInitialized();
+    payloadProcessInstanceVariablesLocal.put(variableName, variableValue);
     return this;
   }
 
   public MessageCorrelationBuilder setVariables(Map<String, Object> variables) {
     if (variables != null) {
-      if (payloadProcessInstanceVariables == null) {
-        payloadProcessInstanceVariables = new HashMap<String, Object>();
-      }
+      ensurePayloadProcessInstanceVariablesInitialized();
       payloadProcessInstanceVariables.putAll(variables);
     }
     return this;
   }
 
-  public void correlate() {
-    CorrelateMessageCmd command = new CorrelateMessageCmd(this);
-    if(commandExecutor != null) {
-      commandExecutor.execute(command);
-    } else {
-      command.execute(commandContext);
+  @Override
+  public MessageCorrelationBuilder setVariablesLocal(Map<String, Object> variables) {
+    if (variables != null) {
+      ensurePayloadProcessInstanceVariablesLocalInitialized();
+      payloadProcessInstanceVariablesLocal.putAll(variables);
+    }
+    return this;
+  }
+
+  protected void ensurePayloadProcessInstanceVariablesInitialized() {
+    if (payloadProcessInstanceVariables == null) {
+      payloadProcessInstanceVariables = new VariableMapImpl();
     }
   }
 
+  protected void ensurePayloadProcessInstanceVariablesLocalInitialized() {
+    if (payloadProcessInstanceVariablesLocal == null) {
+      payloadProcessInstanceVariablesLocal = new VariableMapImpl();
+    }
+  }
 
+  public MessageCorrelationBuilder tenantId(String tenantId) {
+    ensureNotNull(
+        "The tenant-id cannot be null. Use 'withoutTenantId()' if you want to correlate the message to a process definition or an execution which has no tenant-id.",
+        "tenantId", tenantId);
+
+    isTenantIdSet = true;
+    this.tenantId = tenantId;
+    return this;
+  }
+
+  public MessageCorrelationBuilder withoutTenantId() {
+    isTenantIdSet = true;
+    tenantId = null;
+    return this;
+  }
+
+  @Override
+  public void correlate() {
+    correlateWithResult();
+  }
+
+  @Override
+  public MessageCorrelationResult correlateWithResult() {
+    ensureProcessDefinitionIdNotSet();
+    ensureProcessInstanceAndTenantIdNotSet();
+
+    return execute(new CorrelateMessageCmd(this));
+  }
+
+  @Override
   public void correlateExclusively() {
     isExclusiveCorrelation = true;
+
     correlate();
   }
 
+  @Override
   public void correlateAll() {
-    CorrelateAllMessageCmd command = new CorrelateAllMessageCmd(this);
+    correlateAllWithResult();
+  }
+
+  @Override
+  public List<MessageCorrelationResult> correlateAllWithResult() {
+    ensureProcessDefinitionIdNotSet();
+    ensureProcessInstanceAndTenantIdNotSet();
+
+    return execute(new CorrelateAllMessageCmd(this));
+  }
+
+  public ProcessInstance correlateStartMessage() {
+    ensureCorrelationVariablesNotSet();
+    ensureProcessDefinitionAndTenantIdNotSet();
+
+    return execute(new CorrelateStartMessageCmd(this));
+  }
+
+  protected void ensureProcessDefinitionIdNotSet() {
+    if(processDefinitionId != null) {
+      throw LOG.exceptionCorrelateMessageWithProcessDefinitionId();
+    }
+  }
+
+  protected void ensureProcessInstanceAndTenantIdNotSet() {
+    if (processInstanceId != null && isTenantIdSet) {
+      throw LOG.exceptionCorrelateMessageWithProcessInstanceAndTenantId();
+    }
+  }
+
+  protected void ensureCorrelationVariablesNotSet() {
+    if (correlationProcessInstanceVariables != null || correlationLocalVariables != null) {
+      throw LOG.exceptionCorrelateStartMessageWithCorrelationVariables();
+    }
+  }
+
+  protected void ensureProcessDefinitionAndTenantIdNotSet() {
+    if (processDefinitionId != null && isTenantIdSet) {
+      throw LOG.exceptionCorrelateMessageWithProcessDefinitionAndTenantId();
+    }
+  }
+
+  protected <T> T execute(Command<T> command) {
     if(commandExecutor != null) {
-      commandExecutor.execute(command);
+      return commandExecutor.execute(command);
     } else {
-      command.execute(commandContext);
+      return command.execute(commandContext);
     }
   }
 
@@ -138,16 +292,36 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     return processInstanceId;
   }
 
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
   public Map<String, Object> getCorrelationProcessInstanceVariables() {
     return correlationProcessInstanceVariables;
+  }
+
+  public Map<String, Object> getCorrelationLocalVariables() {
+    return correlationLocalVariables;
   }
 
   public Map<String, Object> getPayloadProcessInstanceVariables() {
     return payloadProcessInstanceVariables;
   }
 
+  public VariableMap getPayloadProcessInstanceVariablesLocal() {
+    return payloadProcessInstanceVariablesLocal;
+  }
+
   public boolean isExclusiveCorrelation() {
     return isExclusiveCorrelation;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 
 }

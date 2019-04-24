@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-archive name="for tenant 1" tenantId="tenant1">
+    <process-engine>default</process-engine>
+    <resource>org/camunda/bpm/application/impl/embedded/StartToEndTest.testStartToEnd.bpmn20.xml</resource>
+    
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isScanForProcessDefinitions">false</property>
+    </properties>
+  </process-archive>
+  
+  <process-archive name="for tenant 2" tenantId="tenant2">
+    <process-engine>default</process-engine>
+    <resource>org/camunda/bpm/application/impl/embedded/StartToEndTest.testStartToEnd.bpmn20.xml</resource>
+    
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isScanForProcessDefinitions">false</property>
+    </properties>
+  </process-archive>
+  
+</process-application>

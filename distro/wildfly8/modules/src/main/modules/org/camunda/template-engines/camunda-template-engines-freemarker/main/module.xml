@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.template-engines.camunda-template-engines-freemarker">
+  <resources>
+    <resource-root path="camunda-template-engines-freemarker-@version.camunda.template-engines@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="org.freemarker.freemarker" />
+  </dependencies>
+</module>

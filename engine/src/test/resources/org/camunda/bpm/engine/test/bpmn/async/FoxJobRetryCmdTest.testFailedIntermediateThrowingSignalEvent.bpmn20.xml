@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:fox="http://www.camunda.com/fox"
+  targetNamespace="Examples">
+
+  <signal id="signal" name="abort" />
+
+  <process id="failedIntermediateThrowingSignalEvent" isExecutable="true">
+
+    <startEvent id="theStart" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="failingSignalEvent" />
+    
+    <intermediateThrowEvent id="failingSignalEvent">
+      <extensionElements>
+        <camunda:failedJobRetryTimeCycle>R5/PT5M</camunda:failedJobRetryTimeCycle>
+      </extensionElements>
+      <signalEventDefinition signalRef="signal" camunda:async="true" />
+    </intermediateThrowEvent>
+        
+    <sequenceFlow sourceRef="failingSignalEvent" targetRef="end" />
+        
+    <endEvent id="end" />
+
+  </process>
+
+</definitions>

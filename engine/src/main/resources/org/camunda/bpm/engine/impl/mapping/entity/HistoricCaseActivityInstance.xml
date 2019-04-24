@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity">
@@ -37,8 +40,7 @@
         DURATION_,
         STATE_,
         REQUIRED_,
-        REPEATABLE_,
-        REPETITION_
+        TENANT_ID_
       ) values (
         #{id, jdbcType=VARCHAR},
         #{parentCaseActivityInstanceId, jdbcType=VARCHAR},
@@ -55,8 +57,7 @@
         #{durationInMillis, jdbcType=BIGINT},
         #{caseActivityInstanceState, jdbcType=INTEGER},
         #{required, jdbcType=BOOLEAN},
-        #{repeatable, jdbcType=BOOLEAN},
-        #{repetition, jdbcType=BOOLEAN}
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -70,10 +71,12 @@
 
       <if test="eventType == 'update'">
         , TASK_ID_ = #{taskId, jdbcType=VARCHAR}
-        , CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
         , CALL_CASE_INST_ID_ = #{calledCaseInstanceId, jdbcType=VARCHAR}
       </if>
-      <if test="endTime!=null">
+      <if test="calledProcessInstanceId != null">
+        , CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+      </if>
+      <if test="endTime != null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
         , DURATION_ = #{durationInMillis, jdbcType=BIGINT}
       </if>
@@ -90,8 +93,13 @@
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE DELETE -->
 
-  <delete id="deleteHistoricCaseActivityInstancesByCaseInstanceId">
-    delete from ${prefix}ACT_HI_CASEACTINST where CASE_INST_ID_ = #{caseInstanceId}
+  <delete id="deleteHistoricCaseActivityInstancesByCaseInstanceIds">
+    delete
+    from ${prefix}ACT_HI_CASEACTINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'CASE_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE RESULT MAP -->
@@ -112,8 +120,7 @@
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="caseActivityInstanceState" column="STATE_" jdbcType="INTEGER" />
     <result property="required" column="REQUIRED_" jdbcType="BOOLEAN" />
-    <result property="repeatable" column="REPEATABLE_" jdbcType="BOOLEAN" />
-    <result property="repetition" column="REPETITION_" jdbcType="BOOLEAN" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE SELECT -->
@@ -125,7 +132,7 @@
   <select id="selectHistoricCaseActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultMap="historicCaseActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -133,7 +140,7 @@
   </select>
 
   <select id="selectHistoricCaseActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
   </select>
 
@@ -143,14 +150,22 @@
       <if test="caseInstanceId != null">
         RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
-      <if test="caseActivityInstanceId != null">
-        and RES.ID_ = #{caseActivityInstanceId}
+      <if test="caseActivityInstanceIds != null &amp;&amp; caseActivityInstanceIds.length > 0">
+        and RES.ID_ in
+        <foreach item="caseActivityInstanceId" index="index" collection="caseActivityInstanceIds"
+                 open="(" separator="," close=")">
+          #{caseActivityInstanceId}
+        </foreach>
       </if>
       <if test="caseDefinitionId != null">
         and RES.CASE_DEF_ID_ = #{caseDefinitionId}
       </if>
-      <if test="caseActivityId != null">
-        and RES.CASE_ACT_ID_ = #{caseActivityId}
+      <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+        and RES.CASE_ACT_ID_ in
+        <foreach item="caseActivityId" index="index" collection="caseActivityIds"
+                 open="(" separator="," close=")">
+          #{caseActivityId}
+        </foreach>
       </if>
       <if test="caseActivityName != null">
         and RES.CASE_ACT_NAME_ = #{caseActivityName}
@@ -182,12 +197,16 @@
       <if test="required">
         and RES.REQUIRED_ = ${trueConstant}
       </if>
-      <if test="repeatable">
-        and RES.REPEATABLE_ = ${trueConstant}
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
-      <if test="repetition">
-        and RES.REPETITION_ = ${trueConstant}
-      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
     </where>
   </sql>
 

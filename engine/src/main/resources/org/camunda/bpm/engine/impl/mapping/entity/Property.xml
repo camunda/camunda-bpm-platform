@@ -1,5 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity">
@@ -49,20 +66,36 @@
     select VALUE_ from ${prefix}ACT_GE_PROPERTY where NAME_ = 'schema.version'
   </select>
 
-  <select id="selectProperty" parameterType="string" resultMap="propertyResultMap">
+  <select id="selectProperty" parameterType="string" resultMap="propertyResultMap" flushCache="true">
     select * from ${prefix}ACT_GE_PROPERTY where NAME_ = #{name}
   </select>
   
   <select id="selectProperties" resultMap="propertyResultMap">
-    select * from ${prefix}ACT_GE_PROPERTY 
+    select * from ${prefix}ACT_GE_PROPERTY
   </select>
 
-  <update id="lockDeploymentLockProperty">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'deployment.lock' ${constant.for.update}
-  </update>
+  <select id="lockDeploymentLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'deployment.lock' ${constant_for_update}
+  </select>
 
-  <update id="lockDeploymentLockProperty_mssql">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'deployment.lock'
-  </update>
+  <select id="lockDeploymentLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'deployment.lock'
+  </select>
+
+  <select id="lockHistoryCleanupJobLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'history.cleanup.job.lock' ${constant_for_update}
+  </select>
+
+  <select id="lockHistoryCleanupJobLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'history.cleanup.job.lock'
+  </select>
+
+  <select id="lockStartupLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'startup.lock' ${constant_for_update}
+  </select>
+
+  <select id="lockStartupLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'startup.lock'
+  </select>
 
 </mapper>

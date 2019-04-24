@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="twoTopicsProcess" isExecutable="true">
+    <startEvent id="start" />
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="fork" />
+    <parallelGateway id="fork"/>
+    
+    <sequenceFlow id="flow2" sourceRef="fork" targetRef="externalTask1" />
+    <serviceTask id="externalTask1" camunda:type="external" camunda:topic="topic1" />
+    <sequenceFlow id="flow3" sourceRef="externalTask1" targetRef="end1" />
+    <endEvent id="end1" />
+    
+    <sequenceFlow id="flow4" sourceRef="fork" targetRef="externalTask2" />
+    <serviceTask id="externalTask2" camunda:type="external" camunda:topic="topic2" />
+    <sequenceFlow id="flow5" sourceRef="externalTask2" targetRef="end2" />
+    <endEvent id="end2" />
+  </process>
+</definitions>

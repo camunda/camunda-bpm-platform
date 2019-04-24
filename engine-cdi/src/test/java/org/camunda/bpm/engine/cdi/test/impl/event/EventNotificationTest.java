@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,18 +16,24 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.event;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import java.util.concurrent.TimeUnit;
-
+import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+@RunWith(Arquillian.class)
 public class EventNotificationTest extends CdiProcessEngineTestCase {
 
   @Test
@@ -140,6 +150,31 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     // 2: user task (start + task create event)
     // = 19
     assertThat(listenerBean.getEventsReceived().size(), is(19));
+  }
+
+  @Test
+  @Deployment
+  public void testMultiInstanceEventsAfterExternalTrigger() {
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
+    listenerBean.reset();
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(3, tasks.size());
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    // 6: three user task instances (complete + end)
+    // 1: one mi body instance (end)
+    // 1: one sequence flow instance (take)
+    // 2: one end event instance (start + end)
+    // = 5
+    Set<BusinessProcessEvent> eventsReceived = listenerBean.getEventsReceived();
+    assertThat(eventsReceived.size(), is(10));
   }
 
 }

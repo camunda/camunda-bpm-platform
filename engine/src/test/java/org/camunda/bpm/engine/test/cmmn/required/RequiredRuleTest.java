@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +23,10 @@ import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
+
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Roman Smirnov
@@ -101,4 +109,29 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
     caseService.completeCaseExecution(caseInstance.getId());
   }
 
+  @Deployment
+  public void testDefaultRequiredRuleWithoutConditionEvaluatesToTrue() {
+    caseService.createCaseInstanceByKey("case");
+
+    CaseExecution taskExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertThat(taskExecution, is(notNullValue()));
+    assertThat(taskExecution.isRequired(), is(true));
+  }
+
+  @Deployment
+  public void testDefaultRequiredRuleWithEmptyConditionEvaluatesToTrue() {
+    caseService.createCaseInstanceByKey("case");
+
+    CaseExecution taskExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertThat(taskExecution, is(notNullValue()));
+    assertThat(taskExecution.isRequired(), is(true));
+  }
 }

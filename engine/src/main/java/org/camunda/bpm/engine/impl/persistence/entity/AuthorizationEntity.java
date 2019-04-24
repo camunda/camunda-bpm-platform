@@ -1,9 +1,13 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,10 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -23,14 +32,16 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevision, Serializable {
+public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevision, HasDbReferences, Serializable {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   private static final long serialVersionUID = 1L;
@@ -44,6 +55,8 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   protected String groupId;
   protected Integer resourceType;
   protected String resourceId;  
+
+  private Set<Permission> cachedPermissions = new HashSet<>();
 
   public AuthorizationEntity() {
   }
@@ -59,6 +72,8 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   }
 
   protected void resetPermissions() {
+    cachedPermissions = new HashSet<>();
+
     if(authorizationType == AUTH_TYPE_GLOBAL) {
       this.permissions = Permissions.NONE.getValue();
       
@@ -76,10 +91,12 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   // grant / revoke methods ////////////////////////////
 
   public void addPermission(Permission p) {
+    cachedPermissions.add(p);
     permissions |= p.getValue();
   }
   
   public void removePermission(Permission p) {
+    cachedPermissions.add(p);
     permissions &= ~p.getValue();
   }
   
@@ -87,12 +104,24 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     if(AUTH_TYPE_REVOKE == authorizationType) {
       throw LOG.permissionStateException("isPermissionGranted", "REVOKE");
     }
+
+    ensureNotNull("Authorization 'resourceType' cannot be null", "authorization.getResource()", resourceType);
+
+    if (!ResourceTypeUtil.resourceIsContainedInArray(resourceType, p.getTypes())) {
+      return false;
+    }
     return (permissions & p.getValue()) == p.getValue();    
   }
   
   public boolean isPermissionRevoked(Permission p) {
     if(AUTH_TYPE_GRANT == authorizationType) {
       throw LOG.permissionStateException("isPermissionRevoked", "GRANT");
+    }
+
+    ensureNotNull("Authorization 'resourceType' cannot be null", "authorization.getResource()", resourceType);
+
+    if (!ResourceTypeUtil.resourceIsContainedInArray(resourceType, p.getTypes())) {
+      return false;
     }
     return (permissions & p.getValue()) != p.getValue();    
   }
@@ -222,6 +251,10 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     return permissions;
   }
 
+  public Set<Permission> getCachedPermissions() {
+    return cachedPermissions;
+  }
+
   public int getRevisionNext() {
     return revision + 1;
   }
@@ -236,6 +269,18 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
     state.put("permissions", permissions);
     
     return state;
+  }
+
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    return referenceIdAndClass;
   }
 
   @Override

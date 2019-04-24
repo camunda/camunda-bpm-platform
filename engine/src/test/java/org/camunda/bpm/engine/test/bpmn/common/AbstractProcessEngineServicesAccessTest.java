@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -66,18 +71,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     // given
     createAndDeployModelForClass(getStartProcessInstanceClass());
 
-    deployModel(Bpmn.createExecutableProcess(CALLED_PROCESS_DEF_ID)
-      .startEvent()
-      .userTask(TASK_DEF_KEY)
-      .endEvent()
-    .done());
-
-    // if
-    runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
-
-    // then
-    // the started process instance is still active and waiting at the user task
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_DEF_KEY).count());
+    assertStartProcessInstance();
   }
 
   public void testStartProcessInstanceFails() {
@@ -85,6 +79,18 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     // given
     createAndDeployModelForClass(getStartProcessInstanceClass());
 
+    assertStartProcessInstanceFails();
+  }
+
+  public void testProcessEngineStartProcessInstance() {
+
+    // given
+    createAndDeployModelForClass(getProcessEngineStartProcessClass());
+
+    assertStartProcessInstance();
+  }
+
+  protected void assertStartProcessInstanceFails() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CALLED_PROCESS_DEF_ID)
         .startEvent()
         .scriptTask("scriptTask")
@@ -114,6 +120,8 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
 
   protected abstract Class<?> getStartProcessInstanceClass();
 
+  protected abstract Class<?> getProcessEngineStartProcessClass();
+
   protected abstract Task createModelAccessTask(BpmnModelInstance modelInstance, Class<?> delegateClass);
 
   // Helper methods //////////////////////////////////////////////
@@ -139,6 +147,29 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
   }
 
 
+  protected void assertStartProcessInstance() {
+    deployModel(Bpmn.createExecutableProcess(CALLED_PROCESS_DEF_ID)
+      .startEvent()
+      .userTask(TASK_DEF_KEY)
+      .endEvent()
+    .done());
+
+    // if
+    runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
+
+    // then
+    // the started process instance is still active and waiting at the user task
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_DEF_KEY).count());
+  }
+
+  public void testProcessEngineStartProcessInstanceFails() {
+
+    // given
+    createAndDeployModelForClass(getProcessEngineStartProcessClass());
+
+    assertStartProcessInstanceFails();
+  }
+
   public static void assertCanAccessServices(ProcessEngineServices services) {
     Assert.assertNotNull(services.getAuthorizationService());
     Assert.assertNotNull(services.getFormService());
@@ -160,4 +191,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     services.getRuntimeService().startProcessInstanceByKey(CALLED_PROCESS_DEF_ID);
   }
 
+  public static void assertCanStartProcessInstance(ProcessEngine processEngine) {
+    processEngine.getRuntimeService().startProcessInstanceByKey(CALLED_PROCESS_DEF_ID);
+  }
 }

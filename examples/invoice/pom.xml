@@ -10,7 +10,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -68,11 +68,14 @@
       <build>
         <resources>
           <resource>
-            <!-- override processes.xml, providing custom process engine -->
-            <directory>src/develop/resources</directory>
+            <directory>src/main/resources</directory>
+            <excludes>
+                <exclude>META-INF/processes.xml</exclude>
+            </excludes>
           </resource>
           <resource>
-            <directory>src/main/resources</directory>
+            <!-- override processes.xml, providing custom process engine -->
+            <directory>src/develop/resources</directory>
           </resource>
         </resources>
         <plugins>

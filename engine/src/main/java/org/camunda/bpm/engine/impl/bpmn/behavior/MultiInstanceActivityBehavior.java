@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -73,6 +76,8 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
   protected void performInstance(ActivityExecution execution, PvmActivity activity, int loopCounter) {
     setLoopVariable(execution, LOOP_COUNTER, loopCounter);
     evaluateCollectionVariable(execution, loopCounter);
+    execution.setEnded(false);
+    execution.setActive(true);
     execution.executeActivity(activity);
   }
 
@@ -159,10 +164,10 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
   }
 
   @Override
-  protected void leave(ActivityExecution execution) {
+  public void doLeave(ActivityExecution execution) {
     CompensationUtil.createEventScopeExecution((ExecutionEntity) execution);
 
-    super.leave(execution);
+    super.doLeave(execution);
   }
 
   /**
@@ -172,15 +177,15 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
    *          of multi instance activity
    * @return inner activity
    */
-  protected ActivityImpl getInnerActivity(ActivityExecution execution) {
-    for (PvmActivity activity : execution.getActivity().getActivities()) {
+  public ActivityImpl getInnerActivity(PvmActivity miBodyActivity) {
+    for (PvmActivity activity : miBodyActivity.getActivities()) {
       ActivityImpl innerActivity = (ActivityImpl) activity;
       // note that miBody can contains also a compensation handler
       if (!innerActivity.isCompensationHandler()) {
         return innerActivity;
       }
     }
-    throw new ProcessEngineException("inner activity of multi instance execution '" + execution.getId() + "' not found");
+    throw new ProcessEngineException("inner activity of multi instance body activity '" + miBodyActivity.getId() + "' not found");
   }
 
   protected void setLoopVariable(ActivityExecution execution, String variableName, Object value) {
@@ -193,8 +198,17 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     return value.getValue();
   }
 
+
   protected Integer getLocalLoopVariable(ActivityExecution execution, String variableName) {
     return (Integer) execution.getVariableLocal(variableName);
+  }
+
+  public boolean hasLoopVariable(ActivityExecution execution, String variableName) {
+    return execution.hasVariableLocal(variableName);
+  }
+
+  public void removeLoopVariable(ActivityExecution execution, String variableName) {
+    execution.removeVariableLocal(variableName);
   }
 
   // Getters and Setters ///////////////////////////////////////////////////////////

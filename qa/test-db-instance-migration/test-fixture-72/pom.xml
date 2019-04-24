@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa.upgrade</groupId>
+    <artifactId>camunda-qa-db-instance-migration</artifactId>
+    <version>7.11.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>camunda-qa-upgrade-test-fixture-72</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.2.0</name>
+
+  <!-- Due to https://issues.apache.org/jira/browse/MRELEASE-799 the release test fails when
+     the version is managed in a property. Thus we use explicit versions everywhere. -->
+<!--   <properties> -->
+<!--     <camunda.version.current>7.2.0</camunda.version.current> -->
+<!--   </properties> -->
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-bpmn-model</artifactId>
+        <version>7.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-cmmn-model</artifactId>
+      <version>7.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-xml-model</artifactId>
+      <version>7.2.0</version>
+    </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
+      you declare them to be ${camunda.version.current} here -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <version>7.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa.upgrade</groupId>
+      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>instance-migration</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+              <cleanupDaemonThreads>false</cleanupDaemonThreads>
+              <includeProjectDependencies>true</includeProjectDependencies>
+              <includePluginDependencies>false</includePluginDependencies>
+              <classpathScope>test</classpathScope>
+            </configuration>
+            <executions>
+              <execution>
+                <id>create-test-fixture</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+                <configuration>
+                  <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

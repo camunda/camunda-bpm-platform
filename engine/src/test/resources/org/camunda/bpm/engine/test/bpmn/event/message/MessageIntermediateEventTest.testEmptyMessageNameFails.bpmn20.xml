@@ -7,7 +7,7 @@
   
   <message id="newInvoice" />
   
-  <process id="process">
+  <process id="process" isExecutable="true">
   
     <startEvent id="theStart" />
     

@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
-  <process id="simpleSubProcess">
+  <process id="simpleSubProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     
@@ -18,6 +18,8 @@
         execution.setVariable("myVar", scriptVar)
         def scriptVar1 = "test666"
         execution.setVariable("myVar1", scriptVar1)
+        def scriptVar2 = "test777"
+        execution.setVariable("my_Var2", scriptVar2)
       </script>
     </scriptTask>
     

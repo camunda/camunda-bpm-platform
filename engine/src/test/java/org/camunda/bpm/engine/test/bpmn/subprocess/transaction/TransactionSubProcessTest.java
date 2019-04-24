@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.subprocess.transaction;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
+import org.camunda.bpm.engine.variable.Variables;
 
 
 /**
@@ -580,6 +584,27 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
 
     // and the process has ended
     assertProcessEnded(instance.getId());
+  }
+
+  @Deployment
+  public void FAILURE_testMultipleCompensationOfCancellationOfMultipleTx() {
+    // when
+    List<String> devices = new ArrayList<String>();
+	  devices.add("device1");
+    devices.add("device2");
+    devices.add("fail");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey( //
+	      "order", //
+	      Variables.putValue("devices", devices));
+
+    // then the compensation should be triggered three times
+    int expected = 3;
+    int actual = historyService
+      .createHistoricActivityInstanceQuery()
+      .activityId("ServiceTask_CompensateConfiguration")
+      .list()
+      .size();
+    assertEquals(expected, actual);
   }
 
   public void testMultipleCancelBoundaryFails() {

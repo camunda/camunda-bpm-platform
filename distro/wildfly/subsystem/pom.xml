@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.wildfly</groupId>
     <artifactId>camunda-wildfly</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.11.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-wildfly-subsystem</artifactId>
@@ -38,22 +38,11 @@
 
     <dependency>
       <groupId>org.wildfly</groupId>
-      <artifactId>wildfly-controller</artifactId>
-      <version>${version.wildfly}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.wildfly</groupId>
-      <artifactId>wildfly-server</artifactId>
-      <version>${version.wildfly}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.wildfly</groupId>
       <artifactId>wildfly-web-common</artifactId>
       <version>${version.wildfly}</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.wildfly</groupId>
       <artifactId>wildfly-ejb3</artifactId>
@@ -61,17 +50,17 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.wildfly.core</groupId>
+      <artifactId>wildfly-subsystem-test-framework</artifactId>
+      <version>${version.wildfly.core}</version>
+      <scope>test</scope>
+    </dependency>
 
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.wildfly</groupId>
-      <artifactId>wildfly-subsystem-test-framework</artifactId>
-      <version>${version.wildfly}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

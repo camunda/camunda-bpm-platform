@@ -1,48 +1,96 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
-                  xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
-                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
-                  targetNamespace="Examples">
-  <case id="case">
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/cmmn" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.9.0">
+  <cmmn:case id="case">
 
-    <casePlanModel id="CasePlanModel_1">
+    <cmmn:casePlanModel id="CasePlanModel_1">
 
-      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
-      <planItem id="PI_Stage_1" definitionRef="Stage_1" exitCriteriaRefs="Sentry_1" />
+      <cmmn:planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <cmmn:planItem id="PI_Stage_1" definitionRef="Stage_1">
+        <cmmn:exitCriterion id="EntryCriterion_0nq0amd" sentryRef="Sentry_1" />
+      </cmmn:planItem>
 
-      <sentry id="Sentry_1">
-        <planItemOnPart sourceRef="PI_HumanTask_1">
-          <standardEvent>complete</standardEvent>
-        </planItemOnPart>
-      </sentry>
+      <cmmn:sentry id="Sentry_1">
+        <cmmn:planItemOnPart id="PlanItemOnPart_1qi5yvw" sourceRef="PI_HumanTask_1">
+          <cmmn:standardEvent>complete</cmmn:standardEvent>
+        </cmmn:planItemOnPart>
+      </cmmn:sentry>
 
-      <humanTask id="HumanTask_1" />
+      <cmmn:humanTask id="HumanTask_1" />
 
-      <milestone id="Milestone_1">
-        <extensionElements>
+      <cmmn:milestone id="Milestone_1">
+        <cmmn:extensionElements>
           <camunda:caseExecutionListener event="parentTerminate" class="org.camunda.bpm.engine.test.cmmn.sentry.SentryTriggerListener" />
-        </extensionElements>
-      </milestone>
+        </cmmn:extensionElements>
+      </cmmn:milestone>
 
-      <stage id="Stage_1">
+      <cmmn:stage id="Stage_1">
 
-        <extensionElements>
+        <cmmn:extensionElements>
           <camunda:caseExecutionListener event="exit" class="org.camunda.bpm.engine.test.cmmn.sentry.SentryTriggerListener" />
-        </extensionElements>
+        </cmmn:extensionElements>
 
-        <planItem id="PI_Milestone_1" definitionRef="Milestone_1" entryCriteriaRefs="Sentry_2" />
-        <planItem id="PI_HumanTask_2" definitionRef="HumanTask_1" />
+        <cmmn:planItem id="PI_Milestone_1" definitionRef="Milestone_1">
+          <cmmn:entryCriterion id="EntryCriterion_1na0f6d" sentryRef="Sentry_2" />
+        </cmmn:planItem>
+        <cmmn:planItem id="PI_HumanTask_2" definitionRef="HumanTask_2" />
 
-        <sentry id="Sentry_2">
-          <planItemOnPart sourceRef="PI_HumanTask_2">
-            <standardEvent>complete</standardEvent>
-          </planItemOnPart>
-        </sentry>
+        <cmmn:sentry id="Sentry_2">
+          <cmmn:planItemOnPart id="PlanItemOnPart_0ydkuat" sourceRef="PI_HumanTask_2">
+            <cmmn:standardEvent>complete</cmmn:standardEvent>
+          </cmmn:planItemOnPart>
+        </cmmn:sentry>
+        <cmmn:humanTask id="HumanTask_2" />
 
-      </stage>
+      </cmmn:stage>
 
-    </casePlanModel>
-  </case>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_1">
+        <dc:Bounds x="114" y="63" width="621" height="389" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0xs0kif_di" cmmnElementRef="PI_HumanTask_1">
+        <dc:Bounds x="147" y="141" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_01a0gnf_di" cmmnElementRef="PI_Stage_1">
+        <dc:Bounds x="322" y="96" width="350" height="200" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="PlanItemOnPart_1qi5yvw_di" cmmnElementRef="PlanItemOnPart_1qi5yvw" targetCMMNElementRef="EntryCriterion_0nq0amd" isStandardEventVisible="true">
+        <di:waypoint xsi:type="dc:Point" x="247" y="181" />
+        <di:waypoint xsi:type="dc:Point" x="312" y="181" />
+        <cmmndi:CMMNLabel>
+          <dc:Bounds x="257" y="190" width="50" height="12" />
+        </cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNShape id="ExitCriterion_1dx58d7_di" cmmnElementRef="EntryCriterion_0nq0amd">
+        <dc:Bounds x="312" y="167" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0aybm4g_di" cmmnElementRef="PI_HumanTask_2">
+        <dc:Bounds x="353" y="149" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1l5qi0f_di" cmmnElementRef="PI_Milestone_1">
+        <dc:Bounds x="552" y="168" width="100" height="40" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="EntryCriterion_1na0f6d_di" cmmnElementRef="EntryCriterion_1na0f6d">
+        <dc:Bounds x="542" y="175" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="PlanItemOnPart_0ydkuat_di" cmmnElementRef="PlanItemOnPart_0ydkuat" targetCMMNElementRef="EntryCriterion_1na0f6d" isStandardEventVisible="true">
+        <di:waypoint xsi:type="dc:Point" x="453" y="189" />
+        <di:waypoint xsi:type="dc:Point" x="542" y="189" />
+        <cmmndi:CMMNLabel>
+          <dc:Bounds x="475" y="191.5" width="50" height="12" />
+        </cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
 
-</definitions>
+</cmmn:definitions>

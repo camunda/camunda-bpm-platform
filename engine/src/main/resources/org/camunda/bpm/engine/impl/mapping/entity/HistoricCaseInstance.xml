@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity">
+
+  <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CleanableHistoricCaseInstanceReportResultEntity">
+    <result property="cleanableCaseInstanceCount" column="CLEANABLE_" jdbcType="BIGINT" />
+    <result property="finishedCaseInstanceCount" column="FINISHED_" jdbcType="BIGINT" />
+    <result property="caseDefinitionId" column="ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionName" column="NAME_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionVersion" column="VERSION_" jdbcType="VARCHAR" />
+    <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="BIGINT" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+  </resultMap>
 
   <!-- HISTORIC CASE INSTANCE INSERT -->
 
@@ -32,7 +46,8 @@
         STATE_,
         CREATE_USER_ID_,
         SUPER_CASE_INSTANCE_ID_,
-        SUPER_PROCESS_INSTANCE_ID_
+        SUPER_PROCESS_INSTANCE_ID_,
+        TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
@@ -44,7 +59,8 @@
         #{state, jdbcType=INTEGER},
         #{createUserId, jdbcType=VARCHAR},
         #{superCaseInstanceId, jdbcType=VARCHAR},
-        #{superProcessInstanceId, jdbcType=VARCHAR}
+        #{superProcessInstanceId, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -72,8 +88,13 @@
 
   <!-- HISTORIC CASE INSTANCE DELETE -->
 
-  <delete id="deleteHistoricCaseInstance">
-    delete from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{caseInstanceId}
+  <delete id="deleteHistoricCaseInstancesByIds">
+    delete
+    from ${prefix}ACT_HI_CASEINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'CASE_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <!-- HISTORIC CASE INSTANCE RESULT MAP -->
@@ -83,6 +104,8 @@
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionName" column="NAME_" jdbcType="VARCHAR" />
     <result property="startTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="CLOSE_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
@@ -90,6 +113,7 @@
     <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC CASE INSTANCE SELECT -->
@@ -107,7 +131,7 @@
   <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -120,98 +144,132 @@
   </select>
 
   <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_CASEINST RES
-    <if test="caseKeyNotIn != null || caseDefinitionKey != null || caseDefinitionName != null || caseDefinitionNameLike != null">
-      inner join ${prefix}ACT_RE_CASE_DEF DEF on RES.CASE_DEF_ID_ = DEF.ID_
-    </if>
-    <where>
-      <if test="caseInstanceId != null">
-        RES.CASE_INST_ID_ = #{caseInstanceId}
-      </if>
-      <if test="caseInstanceIds != null and !caseInstanceIds.isEmpty()">
-        and RES.CASE_INST_ID_ in
-        <foreach item="item" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="caseDefinitionId != null">
-        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
-      </if>
-      <if test="caseDefinitionKey != null">
-        and DEF.KEY_ = #{caseDefinitionKey}
-      </if>
-      <if test="caseDefinitionName != null">
-        and DEF.NAME_ = #{caseDefinitionName}
-      </if>
-      <if test="caseDefinitionNameLike != null">
-        and DEF.NAME_ like #{caseDefinitionNameLike}
-      </if>
-      <if test="businessKey != null">
-        and RES.BUSINESS_KEY_ = #{businessKey}
-      </if>
-      <if test="businessKeyLike != null">
-        and RES.BUSINESS_KEY_ like #{businessKeyLike}
+
+    from (
+
+      SELECT RES.*, DEF.NAME_, DEF.KEY_
+      FROM ${prefix}ACT_HI_CASEINST RES
+
+      LEFT JOIN ${prefix}ACT_RE_CASE_DEF DEF
+      ON RES.CASE_DEF_ID_ = DEF.ID_
+
+      <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+        inner join ${prefix}ACT_HI_CASEACTINST HCA on RES.CASE_INST_ID_ = HCA.CASE_INST_ID_
       </if>
 
-      <if test="createdBefore != null">
-        and RES.CREATE_TIME_ &lt;= #{createdBefore}
-      </if>
-      <if test="createdAfter != null">
-        and RES.CREATE_TIME_ &gt;= #{createdAfter}
-      </if>
-      <if test="closedBefore != null">
-        and RES.CLOSE_TIME_ &lt;= #{closedBefore}
-      </if>
-      <if test="closedAfter != null">
-        and RES.CLOSE_TIME_ &gt;= #{closedAfter}
-      </if>
-      <if test="caseKeyNotIn != null">
-        <foreach collection="caseKeyNotIn" index="index" item="caseDefKey">
-        and DEF.KEY_ not like #{caseDefKey}
-      </foreach>
-      </if>
-
-      <if test="state != null">
-        and RES.STATE_ = #{state}
-      </if>
-
-      <if test="notClosed != null &amp;&amp; notClosed">
-        and RES.CLOSE_TIME_ IS NULL
-      </if>
-      <if test="createdBy != null">
-        and RES.CREATE_USER_ID_ = #{createdBy}
-      </if>
-      <if test="superCaseInstanceId != null">
-        and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
-      </if>
-      <if test="subCaseInstanceId != null">
-        and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
-      </if>
-      <if test="superProcessInstanceId != null">
-        and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
-      </if>
-      <if test="subProcessInstanceId != null">
-        and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
-      </if>
-      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        and EXISTS (
-          select
-            ID_
-          from
-            ${prefix}ACT_HI_VARINST
-          WHERE
-            NAME_= #{queryVariableValue.name}
-          AND CASE_INST_ID_ = RES.CASE_INST_ID_
-
-        <bind name="varTypeField" value="'VAR_TYPE_'"/>
-        <bind name="varPrefix" value="''"/>
-        <if test="queryVariableValue.valueConditions != null">
-          and 
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+      <where>
+        <if test="caseInstanceId != null">
+          RES.CASE_INST_ID_ = #{caseInstanceId}
         </if>
-        )
-      </foreach>
-    </where>
+        <if test="caseInstanceIds != null and !caseInstanceIds.isEmpty()">
+          and RES.CASE_INST_ID_ in
+          <foreach item="item" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+        <if test="caseDefinitionId != null">
+          and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+        </if>
+        <if test="caseDefinitionKey != null">
+          and DEF.KEY_ = #{caseDefinitionKey}
+        </if>
+        <if test="caseDefinitionName != null">
+          and DEF.NAME_ = #{caseDefinitionName}
+        </if>
+        <if test="caseDefinitionNameLike != null">
+          and DEF.NAME_ like #{caseDefinitionNameLike} ESCAPE ${escapeChar}
+        </if>
+        <if test="businessKey != null">
+          and RES.BUSINESS_KEY_ = #{businessKey}
+        </if>
+        <if test="businessKeyLike != null">
+          and RES.BUSINESS_KEY_ like #{businessKeyLike} ESCAPE ${escapeChar}
+        </if>
+
+        <if test="createdBefore != null">
+          and RES.CREATE_TIME_ &lt;= #{createdBefore}
+        </if>
+        <if test="createdAfter != null">
+          and RES.CREATE_TIME_ &gt;= #{createdAfter}
+        </if>
+        <if test="closedBefore != null">
+          and RES.CLOSE_TIME_ &lt;= #{closedBefore}
+        </if>
+        <if test="closedAfter != null">
+          and RES.CLOSE_TIME_ &gt;= #{closedAfter}
+        </if>
+        <if test="caseKeyNotIn != null">
+          <foreach collection="caseKeyNotIn" index="index" item="caseDefKey">
+          and DEF.KEY_ not like #{caseDefKey} ESCAPE ${escapeChar}
+        </foreach>
+        </if>
+
+        <if test="state != null">
+          and RES.STATE_ = #{state}
+        </if>
+
+        <if test="notClosed != null &amp;&amp; notClosed">
+          and RES.CLOSE_TIME_ IS NULL
+        </if>
+        <if test="createdBy != null">
+          and RES.CREATE_USER_ID_ = #{createdBy}
+        </if>
+        <if test="superCaseInstanceId != null">
+          and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
+        </if>
+        <if test="subCaseInstanceId != null">
+          and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
+        </if>
+        <if test="superProcessInstanceId != null">
+          and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
+        </if>
+        <if test="subProcessInstanceId != null">
+          and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+        </if>
+        <if test="isTenantIdSet">
+          <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+            and RES.TENANT_ID_ in
+            <foreach item="tenantId" index="index" collection="tenantIds"
+                     open="(" separator="," close=")">
+              #{tenantId}
+            </foreach>
+          </if>
+          <if test="tenantIds == null">
+            and RES.TENANT_ID_ is null
+          </if>
+        </if>
+        <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+          and HCA.CASE_ACT_ID_ in
+          <foreach item="caseActivityId" index="index" collection="caseActivityIds"
+                   open="(" separator="," close=")">
+            #{caseActivityId}
+          </foreach>
+        </if>
+        <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+          and EXISTS (
+            select
+              ID_
+            from
+              ${prefix}ACT_HI_VARINST
+            WHERE
+              NAME_= #{queryVariableValue.name}
+            AND CASE_INST_ID_ = RES.CASE_INST_ID_
+
+          <bind name="varTypeField" value="'VAR_TYPE_'"/>
+          <bind name="varPrefix" value="''"/>
+          <if test="queryVariableValue.valueConditions != null">
+            and
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+          </if>
+          )
+        </foreach>
+
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+      </where>
+
+    ) RES
+
   </sql>
 
   <select id="selectHistoricCaseInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicCaseInstanceResultMap">
@@ -237,4 +295,133 @@
   <select id="selectHistoricCaseInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
+
+  <!-- Select ids for async history cleanup -->
+  <sql id="selectHistoricCaseInstanceIdsForCleanupSql">
+    <bind name="days" value="'cd.HISTORY_TTL_'"/>
+    <bind name="date" value="'ci.CLOSE_TIME_'"/>
+    <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    FROM ${prefix}ACT_HI_CASEINST ci, ${prefix}ACT_RE_CASE_DEF cd
+    where
+      ci.CASE_DEF_ID_ = cd.ID_
+      AND not cd.HISTORY_TTL_ is NULL
+      AND ${dayComparator}
+  </sql>
+
+  <select id="selectHistoricCaseInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT ${limitBeforeWithoutOffset} ci.ID_, ci.CLOSE_TIME_
+    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </select>
+
+  <select id="selectHistoricCaseInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(ci) NO_PARALLEL(cd) */ ci.ID_, ci.CLOSE_TIME_
+    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </select>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}ci.CLOSE_TIME_${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}ci.CLOSE_TIME_${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <!-- Select History Cleanup Report Entities -->
+  <select id="selectFinishedCaseInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricCaseInstanceReportImpl" resultType="long">
+    SELECT COUNT(DISTINCT RES.ID_)
+    <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedCaseInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricCaseInstanceReportImpl" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    SELECT ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectFinishedCaseInstancesReportEntitiesSql">
+    <bind name="days" value="'RES.HISTORY_TTL_'"/>
+    <bind name="date" value="'CI.CLOSE_TIME_'"/>
+
+    FROM (
+      SELECT RES.ID_,
+        RES.KEY_,
+        RES.NAME_,
+        RES.VERSION_,
+        RES.HISTORY_TTL_,
+        RES.TENANT_ID_,
+        F.FINISHED_,
+        SUM(CASE WHEN RES.HISTORY_TTL_ is not null and CI.CLOSE_TIME_ is not null and (RES.HISTORY_TTL_ = 0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
+      FROM ${prefix}ACT_RE_CASE_DEF RES
+      LEFT JOIN ${prefix}ACT_HI_CASEINST CI
+      ON CI.CASE_DEF_ID_ = RES.ID_
+      LEFT JOIN (
+        SELECT COUNT(CI.ID_) AS FINISHED_
+            ,CI.CASE_DEF_ID_
+        FROM ${prefix}ACT_HI_CASEINST CI
+        WHERE CI.CLOSE_TIME_ IS NOT NULL
+        GROUP BY CI.CASE_DEF_ID_
+        ) F ON F.CASE_DEF_ID_ = CI.CASE_DEF_ID_
+      <where>
+
+        <if test="caseDefinitionIdIn != null &amp;&amp; caseDefinitionIdIn.length > 0">
+          RES.ID_ IN
+          <foreach item="caseInstanceId" index="index" collection="caseDefinitionIdIn" open="(" separator="," close=")">
+              #{caseInstanceId}
+          </foreach>
+        </if>
+
+        <if test="caseDefinitionKeyIn != null &amp;&amp; caseDefinitionKeyIn.length > 0">
+          and RES.KEY_ IN
+          <foreach item="caseInstanceKey" index="index" collection="caseDefinitionKeyIn" open="(" separator="," close=")">
+              #{caseInstanceKey}
+          </foreach>
+        </if>
+
+        <if test="isTenantIdSet">
+          <if test="tenantIdIn != null &amp;&amp; tenantIdIn.length > 0">
+            and RES.TENANT_ID_ in
+            <foreach item="tenantId" index="index" collection="tenantIdIn"
+                     open="(" separator="," close=")">
+              #{tenantId}
+            </foreach>
+          </if>
+          <if test="tenantIdIn == null">
+            and RES.TENANT_ID_ is null
+          </if>
+        </if>
+
+        <if test="isCompact">
+          and F.FINISHED_ > 0
+        </if>
+
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+      </where>
+      GROUP BY RES.ID_,
+        RES.KEY_,
+        RES.NAME_,
+        RES.VERSION_,
+        RES.HISTORY_TTL_,
+        RES.TENANT_ID_,
+        F.FINISHED_
+
+    ) RES
+
+  </sql>
+
 </mapper>

@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -128,6 +132,11 @@ public interface ActivityExecution extends DelegateExecution {
   List<? extends ActivityExecution> getExecutions();
 
   /**
+   * returns child executions that are not event scope executions.
+   */
+  List<? extends ActivityExecution> getNonEventScopeExecutions();
+
+  /**
    * @return true if this execution has child executions (event scope executions or not)
    */
   boolean hasChildren();
@@ -202,6 +211,8 @@ public interface ActivityExecution extends DelegateExecution {
    */
   List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity);
 
+  List<ActivityExecution> findInactiveChildExecutions(PvmActivity activity);
+
   /**
    * Takes the given outgoing transitions, and potentially reusing
    * the given list of executions that were previously joined.
@@ -256,5 +267,7 @@ public interface ActivityExecution extends DelegateExecution {
    * Assumption: the current execution is active and executing an activity ({@link #getActivity()} is not null).
    */
   public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping();
+
+  void setEnded(boolean b);
 
 }

@@ -7,7 +7,7 @@
 	<error id="myError" errorCode="123" />
 	<error id="someOtherError" errorCode="456" />
 
-	<process id="boundaryErrorTest">
+	<process id="boundaryErrorTest" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />

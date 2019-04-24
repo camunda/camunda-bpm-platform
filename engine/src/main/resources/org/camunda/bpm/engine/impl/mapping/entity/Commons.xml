@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.Commons">
@@ -22,6 +25,7 @@
   
   <!-- This snippet is used by all queries that allow filtering by variable values -->
   <sql id="variableValueConditions">
+
     <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
     (
     <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
@@ -32,20 +36,30 @@
         </if>
          
         <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
-          and ${varPrefix}TEXT_ is not null and ${varPrefix}TEXT_
-        <choose>
-          <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
-        </choose>
-          #{valueCondition.textValue}
+          and ${varPrefix}TEXT_ is not null and 
+		  <choose>
+		  	<when test="queryVariableValue.variableValueIgnoreCase">UPPER(${varPrefix}TEXT_)</when>
+		  	<otherwise>${varPrefix}TEXT_</otherwise>
+		  </choose>
+		  <choose>
+		    <when test="queryVariableValue.operatorName.contains('LIKE')">LIKE</when>
+		    <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
+		  </choose>
+		  <choose>
+		  	<when test="queryVariableValue.variableValueIgnoreCase">UPPER(#{valueCondition.textValue})</when>
+		  	<otherwise>#{valueCondition.textValue}</otherwise>
+		  </choose>
+		  ${collationForCaseSensitivity}
+          <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE ${escapeChar}</if>
         </if>
         <if test="valueCondition.textValue2 != null">
           and ${varPrefix}TEXT2_ is not null and ${varPrefix}TEXT2_
-        <choose>
-          <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
-        </choose>
+          <choose>
+            <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+            <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
+          </choose>
           #{valueCondition.textValue2}
+          <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE ${escapeChar}</if>
         </if>
     
         <if test="valueCondition.longValue != null">
@@ -68,7 +82,7 @@
     </foreach>
     )
   </sql>
-  
+
   <sql id="executionVariableOperator">
     <choose>
       <when test="queryVariableValue.operatorName.equals('EQUALS')">=</when>
@@ -86,17 +100,24 @@
   <!-- Output: property "orderBy", filled with ordering constraints -->
   <!-- Example Output: V0_TEXT_ asc, RES.ID_ desc, RES.NAME_ asc -->
   <sql id="bindOrderBy">
-    <foreach collection="orderingProperties" item="orderingProperty" index="index">
-      <bind name="newOrderBy" value="
-        @org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperty, index)" />
-      
-      <if test="index == 0">
-        <bind name="orderBy" value="newOrderBy"/>
-      </if>
-      <if test="index > 0">
-        <bind name="orderBy" value="orderBy + ', ' + newOrderBy"/>
-      </if>
-    </foreach>
+    <choose>
+      <when test="orderingProperties.size > 0">
+        <foreach collection="orderingProperties" item="orderingProperty" index="index">
+          <bind name="newOrderBy" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperty, index)" />
+
+          <if test="index == 0">
+            <bind name="internalOrderBy" value="newOrderBy"/>
+          </if>
+          <if test="index > 0">
+            <bind name="internalOrderBy" value="internalOrderBy + ', ' + newOrderBy"/>
+          </if>
+        </foreach>
+      </when>
+      <otherwise>
+        <bind name="internalOrderBy" value="'RES.ID_ asc'"/>
+      </otherwise>
+    </choose>
+
   </sql>
   
   <!-- Input: property "orderingProperties", a collection of OrderingProperty objects -->
@@ -132,5 +153,43 @@
         </if>
       </foreach>
     </if>
+  </sql>
+
+  <!-- Input: "sizeOfIds": size of ID containing list;
+              "listOfIds": a list of IDs;
+              "fieldName": the field name that should be used before IN clause -->
+  <!-- Output: a conjunction of IN clauses -->
+  <!-- Example Output: PROC_INST_ID_ IN ( "1", "2" ..... "1000") or IN ("1000", "1001") -->
+  <sql id="applyInForPaginatedSql">
+	( ${fieldName} IN
+	<foreach item="id" index="index" collection="listOfIds" open = "(" separator="" close=")">
+	  #{id}
+	  <choose>
+	  <when test="index != 0 &amp;&amp; (index+1)%1000 == 0 &amp;&amp; (index+1) &lt; sizeOfIds">
+		) or ${fieldName} IN (
+	  </when>
+	  <when test="index == sizeOfIds -1"></when>
+	  <otherwise> ,</otherwise>
+	  </choose>
+	</foreach>
+	)
+  </sql>
+
+  <sql id="applyInForPaginatedCollection">
+    <bind name="sizeOfIds" value="listOfIds.size" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedSql" />
+  </sql>
+
+  <sql id="applyInForPaginatedArray">
+    <bind name="sizeOfIds" value="listOfIds.length" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedSql" />
+  </sql>
+
+  <sql id="periodUnitFunction">
+    <choose>
+      <when test="reportPeriodUnitName.equals('MONTH')">${constant.datepart.month}</when>
+      <when test="reportPeriodUnitName.equals('QUARTER')">${constant.datepart.quarter}</when>
+      <when test="reportPeriodUnitName.equals('MINUTE')">${constant.datepart.minute}</when>
+    </choose>
   </sql>
 </mapper>

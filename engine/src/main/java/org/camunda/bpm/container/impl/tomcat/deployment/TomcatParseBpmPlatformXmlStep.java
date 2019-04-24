@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,14 +16,14 @@
  */
 package org.camunda.bpm.container.impl.tomcat.deployment;
 
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.deployment.AbstractParseBpmPlatformXmlStep;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
 
 /**
  * <p>This deployment operation step is responsible for parsing and attaching the bpm-platform.xml file on tomcat.</p>
@@ -31,6 +35,8 @@ import java.util.logging.Level;
  *
  */
 public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlStep {
+
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   public static final String CATALINA_BASE = "catalina.base";
   public static final String CATALINA_HOME = "catalina.home";
@@ -58,12 +64,13 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
       URL fileLocation = checkValidFileLocation(bpmPlatformFileLocation);
 
       if (fileLocation != null) {
-        LOGGER.log(Level.INFO, "Found camunda bpm platform configuration in CATALINA_BASE/CATALINA_HOME conf directory [" + bpmPlatformFileLocation + "] at " + fileLocation.toString());
+        LOG.foundTomcatDeploymentDescriptor(bpmPlatformFileLocation, fileLocation.toString());
       }
 
       return fileLocation;
-    } catch (MalformedURLException e) {
-      throw new ProcessEngineException("'" + bpmPlatformFileLocation + "' is not a valid camunda bpm platform configuration resource location.", e);
+    }
+    catch (MalformedURLException e) {
+      throw LOG.invalidDeploymentDescriptorLocation(bpmPlatformFileLocation, e);
     }
   }
 

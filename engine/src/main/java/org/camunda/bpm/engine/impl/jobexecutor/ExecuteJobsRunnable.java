@@ -1,9 +1,13 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,14 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmd.UnlockJobCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import java.util.List;
 
 
 /**
@@ -27,56 +30,70 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  * @author Daniel Meyer
  */
 public class ExecuteJobsRunnable implements Runnable {
-  
-  private final static Logger LOGG = Logger.getLogger(ExecuteJobsRunnable.class.getName());
+
+  private static final JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected final List<String> jobIds;
   protected JobExecutor jobExecutor;
   protected ProcessEngineImpl processEngine;
-  
-  public ExecuteJobsRunnable(JobExecutor jobExecutor, List<String> jobIds) {
-    this.jobExecutor = jobExecutor;
-    this.jobIds = jobIds;
-  }
-  
+
   public ExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     this.jobIds = jobIds;
     this.processEngine = processEngine;
+    this.jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
   }
 
   public void run() {
     final JobExecutorContext jobExecutorContext = new JobExecutorContext();
+
     final List<String> currentProcessorJobQueue = jobExecutorContext.getCurrentProcessorJobQueue();
-    CommandExecutor commandExecutor = null;
-    
-    if(processEngine == null) {
-      // temporary hack to maintain API compatibility 
-      commandExecutor = jobExecutor.getCommandExecutor();
-    } else {
-      commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    }
+    CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
 
     currentProcessorJobQueue.addAll(jobIds);
-    
+
     Context.setJobExecutorContext(jobExecutorContext);
     try {
       while (!currentProcessorJobQueue.isEmpty()) {
-        
+
         String nextJobId = currentProcessorJobQueue.remove(0);
-        try {
-          executeJob(nextJobId, commandExecutor);        
-        } catch(Throwable t) {
-          LOGG.log(Level.WARNING, "Exception while executing job with id "+nextJobId, t);
+        if(jobExecutor.isActive()) {
+          try {
+             executeJob(nextJobId, commandExecutor);
+          }
+          catch(Throwable t) {
+            LOG.exceptionWhileExecutingJob(nextJobId, t);
+          }
+        } else {
+            try {
+              unlockJob(nextJobId, commandExecutor);
+            }
+            catch(Throwable t) {
+              LOG.exceptionWhileUnlockingJob(nextJobId, t);
+            }
+
         }
-        
-      }      
-    }finally {
+      }
+
+      // if there were only exclusive jobs then the job executor
+      // does a backoff. In order to avoid too much waiting time
+      // we need to tell him to check once more if there were any jobs added.
+      jobExecutor.jobWasAdded();
+
+    } finally {
       Context.removeJobExecutorContext();
     }
   }
-  
-  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {    
-    commandExecutor.execute(new ExecuteJobsCmd(nextJobId));
+
+  /**
+   * Note: this is a hook to be overridden by
+   * org.camunda.bpm.container.impl.threading.ra.inflow.JcaInflowExecuteJobsRunnable.executeJob(String, CommandExecutor)
+   */
+  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
+    ExecuteJobHelper.executeJob(nextJobId, commandExecutor);
   }
-  
+
+  protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
+    commandExecutor.execute(new UnlockJobCmd(nextJobId));
+  }
+
 }

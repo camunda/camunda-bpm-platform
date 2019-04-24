@@ -1,8 +1,12 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,25 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.api.task;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -37,7 +34,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -51,18 +48,95 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskServiceTest extends PluggableProcessEngineTestCase {
+public class TaskServiceTest {
 
   protected static final String TWO_TASKS_PROCESS = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml";
 
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJavaSerializationFormatEnabled(true);
+      return configuration;
+    }
+  };
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  private RuntimeService runtimeService;
+  private TaskService taskService;
+  private RepositoryService repositoryService;
+  private HistoryService historyService;
+  private CaseService caseService;
+  private IdentityService identityService;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  private static final SimpleDateFormat SDF = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+
+  @Before
+  public void init() {
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    repositoryService = engineRule.getRepositoryService();
+    historyService = engineRule.getHistoryService();
+    caseService = engineRule.getCaseService();
+    identityService = engineRule.getIdentityService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+  }
+
+  @After
+  public void tearDown() {
+    ClockUtil.setCurrentTime(new Date());
+  }
+
+  @Test
   public void testSaveTaskUpdate() throws Exception{
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
@@ -138,6 +212,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testSaveTaskSetParentTaskId() {
     // given
     Task parent = taskService.newTask("parent");
@@ -160,6 +235,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask("subTask", true);
   }
 
+  @Test
   public void testSaveTaskWithNonExistingParentTask() {
     // given
     Task task = taskService.newTask();
@@ -174,6 +250,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (NotValidException e) {}
   }
 
+  @Test
   public void testTaskOwner() {
     Task task = taskService.newTask();
     task.setOwner("johndoe");
@@ -193,6 +270,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testTaskComments() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -231,6 +309,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testAddTaskCommentNull() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -247,6 +326,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testAddTaskNullComment() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -258,6 +338,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testTaskAttachments() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -286,7 +367,83 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.deleteTask(taskId, true);
     }
   }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testProcessAttachmentsOneProcessExecution() {
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
+      // create attachment
+      Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+
+      assertEquals("weatherforcast", attachment.getName());
+      assertEquals("temperatures and more", attachment.getDescription());
+      assertEquals("web page", attachment.getType());
+      assertNull(attachment.getTaskId());
+      assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
+      assertEquals("http://weather.com", attachment.getUrl());
+      assertNull(taskService.getAttachmentContent(attachment.getId()));
+    }
+  
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml"})
+  public void testProcessAttachmentsTwoProcessExecutions() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoParallelTasksProcess");
+    
+    // create attachment
+    Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+    
+    assertEquals("weatherforcast", attachment.getName());
+    assertEquals("temperatures and more", attachment.getDescription());
+    assertEquals("web page", attachment.getType());
+    assertNull(attachment.getTaskId());
+    assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
+    assertEquals("http://weather.com", attachment.getUrl());
+    assertNull(taskService.getAttachmentContent(attachment.getId()));
+  }
+
+  @Test
+  public void testSaveAttachment() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      // given
+      Task task = taskService.newTask();
+      taskService.saveTask(task);
+
+      String attachmentType = "someAttachment";
+      String processInstanceId = "someProcessInstanceId";
+      String attachmentName = "attachmentName";
+      String attachmentDescription = "attachmentDescription";
+      String url = "http://camunda.org";
+
+      Attachment attachment = taskService.createAttachment(
+          attachmentType,
+          task.getId(),
+          processInstanceId,
+          attachmentName,
+          attachmentDescription,
+          url);
+
+      // when
+      attachment.setDescription("updatedDescription");
+      attachment.setName("updatedName");
+      taskService.saveAttachment(attachment);
+
+      // then
+      Attachment fetchedAttachment = taskService.getAttachment(attachment.getId());
+      assertEquals(attachment.getId(), fetchedAttachment.getId());
+      assertEquals(attachmentType, fetchedAttachment.getType());
+      assertEquals(task.getId(), fetchedAttachment.getTaskId());
+      assertEquals(processInstanceId, fetchedAttachment.getProcessInstanceId());
+      assertEquals("updatedName", fetchedAttachment.getName());
+      assertEquals("updatedDescription", fetchedAttachment.getDescription());
+      assertEquals(url, fetchedAttachment.getUrl());
+
+      taskService.deleteTask(task.getId(), true);
+    }
+  }
+
+  @Test
   public void testTaskDelegation() {
     Task task = taskService.newTask();
     task.setOwner("johndoe");
@@ -325,6 +482,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testTaskDelegationThroughServiceCall() {
     Task task = taskService.newTask();
     task.setOwner("johndoe");
@@ -352,6 +510,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testTaskAssignee() {
     Task task = taskService.newTask();
     task.setAssignee("johndoe");
@@ -371,15 +530,18 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+
+  @Test
   public void testSaveTaskNullTask() {
     try {
       taskService.saveTask(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("task is null", ae.getMessage());
+      testRule.assertTextPresent("task is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testDeleteTaskNullTaskId() {
     try {
       taskService.deleteTask(null);
@@ -389,11 +551,13 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeleteTaskUnexistingTaskId() {
     // Deleting unexisting task should be silently ignored
     taskService.deleteTask("unexistingtaskid");
   }
 
+  @Test
   public void testDeleteTasksNullTaskIds() {
     try {
       taskService.deleteTasks(null);
@@ -403,6 +567,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeleteTasksTaskIdsUnexistingTaskId() {
 
     Task existingTask = taskService.newTask();
@@ -416,15 +581,17 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertNull(existingTask);
   }
 
+  @Test
   public void testClaimNullArguments() {
     try {
       taskService.claim(null, "userid");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testClaimUnexistingTaskId() {
     User user = identityService.newUser("user");
     identityService.saveUser(user);
@@ -433,12 +600,13 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.claim("unexistingtaskid", user.getId());
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingtaskid", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingtaskid", ae.getMessage());
     }
 
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testClaimAlreadyClaimedTaskByOtherUser() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -454,7 +622,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.claim(task.getId(), secondUser.getId());
       fail("ProcessEngineException expected");
     } catch (TaskAlreadyClaimedException ae) {
-      assertTextPresent("Task '" + task.getId() + "' is already claimed by someone else.", ae.getMessage());
+      testRule.assertTextPresent("Task '" + task.getId() + "' is already claimed by someone else.", ae.getMessage());
     }
 
     taskService.deleteTask(task.getId(), true);
@@ -462,6 +630,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(secondUser.getId());
   }
 
+  @Test
   public void testClaimAlreadyClaimedTaskBySameUser() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -479,6 +648,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testUnClaimTask() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -500,24 +670,27 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testCompleteTaskNullTaskId() {
     try {
       taskService.complete(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testCompleteTaskUnexistingTaskId() {
     try {
       taskService.complete("unexistingtask");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
     }
   }
 
+  @Test
   public void testCompleteTaskWithParametersNullTaskId() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("myKey", "myValue");
@@ -526,10 +699,11 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.complete(null, variables);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testCompleteTaskWithParametersUnexistingTaskId() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("myKey", "myValue");
@@ -538,10 +712,11 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.complete("unexistingtask", variables);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
     }
   }
 
+  @Test
   public void testCompleteTaskWithParametersNullParameters() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -559,6 +734,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testCompleteTaskWithParametersEmptyParameters() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -577,6 +753,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources = TWO_TASKS_PROCESS)
+  @Test
   public void testCompleteWithParametersTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
 
@@ -598,8 +775,130 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, variables.size());
     assertEquals("myValue", variables.get("myParam"));
   }
+  
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.testCompleteTaskWithVariablesInReturn.bpmn20.xml" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturn() {
+    String processVarName = "processVar";
+    String processVarValue = "processVarValue";
+
+    String taskVarName = "taskVar";
+    String taskVarValue = "taskVarValue";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(processVarName, processVarValue);
+
+    runtimeService.startProcessInstanceByKey("TaskServiceTest.testCompleteTaskWithVariablesInReturn", variables);
+
+    Task firstUserTask = taskService.createTaskQuery().taskName("First User Task").singleResult();
+    taskService.setVariable(firstUserTask.getId(), "x", 1);
+    // local variables should not be returned
+    taskService.setVariableLocal(firstUserTask.getId(), "localVar", "localVarValue");
+
+    Map<String, Object> additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put(taskVarName, taskVarValue);
+
+    // After completion of firstUserTask a script Task sets 'x' = 5
+    VariableMap vars = taskService.completeWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+
+    assertEquals(3, vars.size());
+    assertEquals(5, vars.get("x"));
+    assertEquals(ValueType.INTEGER, vars.getValueTyped("x").getType());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(taskVarValue, vars.get(taskVarName));
+    assertEquals(ValueType.STRING, vars.getValueTyped(taskVarName).getType());
+
+    additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put("x", 7);
+    Task secondUserTask = taskService.createTaskQuery().taskName("Second User Task").singleResult();
+
+    vars = taskService.completeWithVariablesInReturn(secondUserTask.getId(), additionalVariables);
+    assertEquals(3, vars.size());
+    assertEquals(7, vars.get("x"));
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(taskVarValue, vars.get(taskVarName));
+  }
+  
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testCompleteStandaloneTaskWithVariablesInReturn() {
+    String taskVarName = "taskVar";
+    String taskVarValue = "taskVarValue";
+
+    String taskId = "myTask";
+    Task standaloneTask = taskService.newTask(taskId);
+    taskService.saveTask(standaloneTask);
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(taskVarName, taskVarValue);
+    
+    Map<String, Object> returnedVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+    // expect empty Map for standalone tasks
+    assertEquals(0, returnedVariables.size());
+
+    historyService.deleteHistoricTaskInstance(taskId);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturnParallel() {
+    String processVarName = "processVar";
+    String processVarValue = "processVarValue";
+
+    String task1VarName = "taskVar1";
+    String task2VarName = "taskVar2";
+    String task1VarValue = "taskVarValue1";
+    String task2VarValue = "taskVarValue2";
+
+    String additionalVar = "additionalVar";
+    String additionalVarValue = "additionalVarValue";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(processVarName, processVarValue);
+    runtimeService.startProcessInstanceByKey("twoParallelTasksProcess", variables);
+
+    Task firstTask = taskService.createTaskQuery().taskName("First Task").singleResult();
+    taskService.setVariable(firstTask.getId(), task1VarName, task1VarValue);
+    Task secondTask = taskService.createTaskQuery().taskName("Second Task").singleResult();
+    taskService.setVariable(secondTask.getId(), task2VarName, task2VarValue);
+
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(firstTask.getId(), null);
+
+    assertEquals(3, vars.size());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(task1VarValue, vars.get(task1VarName));
+    assertEquals(task2VarValue, vars.get(task2VarName));
+
+    Map<String, Object> additionalVariables = new HashMap<String, Object>();
+    additionalVariables.put(additionalVar, additionalVarValue);
+
+    vars = taskService.completeWithVariablesInReturn(secondTask.getId(), additionalVariables);
+    assertEquals(4, vars.size());
+    assertEquals(processVarValue, vars.get(processVarName));
+    assertEquals(task1VarValue, vars.get(task1VarName));
+    assertEquals(task2VarValue, vars.get(task2VarName));
+    assertEquals(additionalVarValue, vars.get(additionalVar));
+  }
+  
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  @Test
+  public void testCompleteTaskWithVariablesInReturnCMMN() {
+    String taskVariableName = "taskVar";
+    String taskVariableValue = "taskVal";
+
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
+    caseService.withCaseDefinition(caseDefinitionId).create();
+
+    Task task1 = taskService.createTaskQuery().singleResult();
+    assertNotNull(task1);
+
+    taskService.setVariable(task1.getId(), taskVariableName, taskVariableValue);
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(task1.getId(), null);
+    assertNull(vars);
+  }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testCompleteTaskShouldCompleteCaseExecution() {
     // given
     String caseDefinitionId = repositoryService
@@ -617,10 +916,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
 
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
@@ -649,24 +944,27 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(caseInstance.isCompleted());
   }
 
+  @Test
   public void testResolveTaskNullTaskId() {
     try {
       taskService.resolveTask(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testResolveTaskUnexistingTaskId() {
     try {
       taskService.resolveTask("unexistingtask");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
     }
   }
 
+  @Test
   public void testResolveTaskWithParametersNullParameters() {
     Task task = taskService.newTask();
     task.setDelegationState(DelegationState.PENDING);
@@ -687,6 +985,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testResolveTaskWithParametersEmptyParameters() {
     Task task = taskService.newTask();
     task.setDelegationState(DelegationState.PENDING);
@@ -707,6 +1006,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = TWO_TASKS_PROCESS)
+  @Test
   public void testResolveWithParametersTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
 
@@ -731,6 +1031,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("myValue", variables.get("myParam"));
   }
 
+  @Test
   public void testSetAssignee() {
     User user = identityService.newUser("user");
     identityService.saveUser(user);
@@ -750,15 +1051,17 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testSetAssigneeNullTaskId() {
     try {
       taskService.setAssignee(null, "userId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testSetAssigneeUnexistingTask() {
     User user = identityService.newUser("user");
     identityService.saveUser(user);
@@ -767,12 +1070,13 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.setAssignee("unexistingTaskId", user.getId());
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
     }
 
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testAddCandidateUserDuplicate() {
     // Check behavior when adding the same user twice as candidate
     User user = identityService.newUser("user");
@@ -790,24 +1094,27 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testAddCandidateUserNullTaskId() {
     try {
       taskService.addCandidateUser(null, "userId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddCandidateUserNullUserId() {
     try {
       taskService.addCandidateUser("taskId", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
+      testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddCandidateUserUnexistingTask() {
     User user = identityService.newUser("user");
     identityService.saveUser(user);
@@ -816,30 +1123,33 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.addCandidateUser("unexistingTaskId", user.getId());
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
     }
 
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testAddCandidateGroupNullTaskId() {
     try {
       taskService.addCandidateGroup(null, "groupId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddCandidateGroupNullGroupId() {
     try {
       taskService.addCandidateGroup("taskId", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
+      testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddCandidateGroupUnexistingTask() {
     Group group = identityService.newGroup("group");
     identityService.saveGroup(group);
@@ -847,29 +1157,32 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.addCandidateGroup("unexistingTaskId", group.getId());
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
     }
     identityService.deleteGroup(group.getId());
   }
 
+  @Test
   public void testAddGroupIdentityLinkNullTaskId() {
     try {
       taskService.addGroupIdentityLink(null, "groupId", IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddGroupIdentityLinkNullUserId() {
     try {
       taskService.addGroupIdentityLink("taskId", null, IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
+      testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddGroupIdentityLinkUnexistingTask() {
     User user = identityService.newUser("user");
     identityService.saveUser(user);
@@ -878,30 +1191,33 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.addGroupIdentityLink("unexistingTaskId", user.getId(), IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
     }
 
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testAddUserIdentityLinkNullTaskId() {
     try {
       taskService.addUserIdentityLink(null, "userId", IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddUserIdentityLinkNullUserId() {
     try {
       taskService.addUserIdentityLink("taskId", null, IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
+      testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
 
+  @Test
   public void testAddUserIdentityLinkUnexistingTask() {
     User user = identityService.newUser("user");
     identityService.saveUser(user);
@@ -910,12 +1226,13 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       taskService.addUserIdentityLink("unexistingTaskId", user.getId(), IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
     }
 
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testGetIdentityLinksWithCandidateUser() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -935,6 +1252,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("kermit");
   }
 
+  @Test
   public void testGetIdentityLinksWithCandidateGroup() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -954,6 +1272,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup("muppets");
   }
 
+  @Test
   public void testGetIdentityLinksWithAssignee() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -973,6 +1292,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("kermit");
   }
 
+  @Test
   public void testGetIdentityLinksWithNonExistingAssignee() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -989,6 +1309,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testGetIdentityLinksWithOwner() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -1019,6 +1340,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("fozzie");
   }
 
+  @Test
   public void testGetIdentityLinksWithNonExistingOwner() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -1043,6 +1365,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(taskId, true);
   }
 
+  @Test
   public void testSetPriority() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -1056,27 +1379,30 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  @Test
   public void testSetPriorityUnexistingTaskId() {
     try {
       taskService.setPriority("unexistingtask", 12345);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
     }
   }
 
+  @Test
   public void testSetPriorityNullTaskId() {
     try {
       taskService.setPriority(null, 12345);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
   /**
    * @see http://jira.codehaus.org/browse/ACT-1059
    */
+  @Test
   public void testSetDelegationState() {
     Task task = taskService.newTask();
     task.setOwner("wuzh");
@@ -1126,6 +1452,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testRemoveVariable() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1142,17 +1469,19 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
   }
 
+  @Test
   public void testRemoveVariableNullTaskId() {
     try {
       taskService.removeVariable(null, "variable");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources = {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testRemoveVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1186,17 +1515,19 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testRemoveVariablesNullTaskId() {
     try {
       taskService.removeVariables(null, Collections.EMPTY_LIST);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources = {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testRemoveVariableLocal() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1214,17 +1545,19 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     checkHistoricVariableUpdateEntity("variable1", processInstance.getId());
   }
 
+  @Test
   public void testRemoveVariableLocalNullTaskId() {
     try {
       taskService.removeVariableLocal(null, "variable");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources = {
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testRemoveVariablesLocal() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1258,16 +1591,18 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testRemoveVariablesLocalNullTaskId() {
     try {
       taskService.removeVariablesLocal(null, Collections.EMPTY_LIST);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testUserTaskOptimisticLocking() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1287,6 +1622,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeleteTaskWithDeleteReason() {
     // ACT-900: deleteReason can be manually specified - can only be validated when historyLevel > ACTIVITY
     if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
@@ -1312,6 +1648,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testDeleteTaskPartOfProcess() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Task task = taskService.createTaskQuery().singleResult();
@@ -1356,6 +1693,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testDeleteTaskPartOfCaseInstance() {
     String caseDefinitionId = repositoryService
         .createCaseDefinitionQuery()
@@ -1372,10 +1710,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
 
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
@@ -1424,6 +1758,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testGetTaskCommentByTaskIdAndCommentId() {
     if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save new task
@@ -1450,7 +1785,11 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testTaskAttachmentByTaskIdAndAttachmentId() {
+  @Test
+  public void testTaskAttachmentByTaskIdAndAttachmentId() throws ParseException {
+    Date fixedDate = SDF.parse("01/01/2001 01:01:01.000");
+    ClockUtil.setCurrentTime(fixedDate);
+
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // create and save task
@@ -1472,6 +1811,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       assertEquals("someprocessinstanceid", attachment.getProcessInstanceId());
       assertEquals("http://weather.com", attachment.getUrl());
       assertNull(taskService.getAttachmentContent(attachment.getId()));
+      assertThat(attachment.getCreateTime(), is(fixedDate));
 
       // delete attachment for taskId and attachmentId
       taskService.deleteTaskAttachment(taskId, attachmentId);
@@ -1483,6 +1823,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testGetTaskAttachmentContentByTaskIdAndAttachmentId() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -1507,6 +1848,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testGetTaskAttachmentWithNullParameters() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -1515,6 +1857,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testGetTaskAttachmentContentWithNullParameters() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -1523,16 +1866,33 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testCreateTaskAttachmentWithNullTaskId() {
-    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
-    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      try {
-        taskService.createAttachment("web page", null, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
-        fail("expected process engine exception");
-      } catch (ProcessEngineException e) {}
-    }
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @Test
+  public void testCreateTaskAttachmentWithNullTaskAndProcessInstance() {
+    try {
+      taskService.createAttachment("web page", null, null, "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+      fail("expected process engine exception");
+    } catch (ProcessEngineException e) {}
   }
 
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @Test
+  public void testCreateTaskAttachmentWithNullTaskId() throws ParseException {
+    Date fixedDate = SDF.parse("01/01/2001 01:01:01.000");
+    ClockUtil.setCurrentTime(fixedDate);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+    Attachment fetched = taskService.getAttachment(attachment.getId());
+    assertThat(fetched,is(notNullValue()));
+    assertThat(fetched.getTaskId(), is(nullValue()));
+    assertThat(fetched.getProcessInstanceId(),is(notNullValue()));
+    assertThat(fetched.getCreateTime(), is(fixedDate));
+    taskService.deleteAttachment(attachment.getId());
+  }
+
+  @Test
   public void testDeleteTaskAttachmentWithNullParameters() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -1543,6 +1903,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testDeleteTaskAttachmentWithTaskIdNull() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -1553,6 +1914,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testGetTaskAttachmentsWithTaskIdNull() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
@@ -1562,6 +1924,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testUpdateVariablesLocal() {
     Map<String, Object> globalVars = new HashMap<String, Object>();
     globalVars.put("variable4", "value4");
@@ -1591,6 +1954,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("value4", runtimeService.getVariable(processInstance.getId(), "variable4"));
   }
 
+  @Test
   public void testUpdateVariablesLocalForNonExistingTaskId() {
     Map<String, Object> modifications = new HashMap<String, Object>();
     modifications.put("variable1", "anotherValue1");
@@ -1608,6 +1972,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testUpdateVariablesLocaForNullTaskId() {
     Map<String, Object> modifications = new HashMap<String, Object>();
     modifications.put("variable1", "anotherValue1");
@@ -1627,6 +1992,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testUpdateVariables() {
     Map<String, Object> globalVars = new HashMap<String, Object>();
     globalVars.put("variable4", "value4");
@@ -1656,6 +2022,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertNull(runtimeService.getVariable(processInstance.getId(), "variable4"));
   }
 
+  @Test
   public void testUpdateVariablesForNonExistingTaskId() {
     Map<String, Object> modifications = new HashMap<String, Object>();
     modifications.put("variable1", "anotherValue1");
@@ -1673,6 +2040,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testUpdateVariablesForNullTaskId() {
     Map<String, Object> modifications = new HashMap<String, Object>();
     modifications.put("variable1", "anotherValue1");
@@ -1690,6 +2058,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testTaskCaseInstanceId() {
     Task task = taskService.newTask();
     task.setCaseInstanceId("aCaseInstanceId");
@@ -1712,6 +2081,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesTyped() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -1725,6 +2095,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesTypedDeserialize() {
 
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
@@ -1744,19 +2115,20 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       taskService.getVariablesTyped(taskId);
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
 
     // this does not
     try {
       taskService.getVariablesTyped(taskId, Arrays.asList("broken"), true);
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
   }
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesLocalTyped() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -1772,6 +2144,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesLocalTypedDeserialize() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1791,19 +2164,20 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       taskService.getVariablesLocalTyped(taskId);
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
 
     // this does not
     try {
       taskService.getVariablesLocalTyped(taskId, Arrays.asList("broken"), true);
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
 
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testHumanTaskCompleteWithVariables() {
     // given
     caseService.createCaseInstanceByKey("oneTaskCase");
@@ -1813,10 +2187,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -1834,6 +2204,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testHumanTaskWithLocalVariablesCompleteWithVariable() {
     // given
     caseService.createCaseInstanceByKey("oneTaskCase");
@@ -1843,10 +2214,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String variableName = "aVariable";
     String variableValue = "aValue";
@@ -1867,6 +2234,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml"})
+  @Test
   public void testUserTaskWithLocalVariablesCompleteWithVariable() {
     // given
     runtimeService.startProcessInstanceByKey("twoTasksProcess");
@@ -1890,6 +2258,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testHumanTaskLocalVariables() {
     // given
     String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
@@ -1899,10 +2268,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String variableName = "aVariable";
     String variableValue = "aValue";
@@ -1921,6 +2286,78 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(caseInstanceId, variableInstance.getCaseInstanceId());
     assertEquals(humanTaskId, variableInstance.getCaseExecutionId());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
+
+    // when
+    Map<String, Object> variables = taskService.getVariables(taskId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesTypedByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesTyped(taskId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocal(taskId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalTypedByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
   }
 
 }

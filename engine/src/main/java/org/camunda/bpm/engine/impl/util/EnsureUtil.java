@@ -1,5 +1,9 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -10,22 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.util;
 
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Sebastian Menski
  * @author Roman Smirnov
  */
 public final class EnsureUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   public static void ensureNotNull(String variableName, Object value) {
     ensureNotNull("", variableName, value);
@@ -139,22 +150,46 @@ public final class EnsureUtil {
     }
   }
 
-  public static void ensurePositive(String variableName, Integer value) {
+  public static void ensureEquals(Class<? extends ProcessEngineException> exceptionClass, String variableName, long obj1, long obj2) {
+    if (obj1 != obj2) {
+      throw generateException(exceptionClass, "", variableName, "value differs from expected");
+    }
+  }
+
+  public static void ensureEquals(String variableName, long obj1, long obj2) {
+    ensureEquals(ProcessEngineException.class, variableName, obj1, obj2);
+  }
+
+  public static void ensurePositive(String variableName, Long value) {
     ensurePositive("", variableName, value);
   }
 
-  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String variableName, Integer value) {
+  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String variableName, Long value) {
     ensurePositive(exceptionClass, null, variableName, value);
   }
 
-  public static void ensurePositive(String message, String variableName, Integer value) {
+  public static void ensurePositive(String message, String variableName, Long value) {
     ensurePositive(ProcessEngineException.class, message, variableName, value);
   }
 
-  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Integer value) {
+  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Long value) {
     ensureNotNull(exceptionClass, variableName, value);
     if (value <= 0) {
-      throw generateException(exceptionClass, message, variableName, "is not positive");
+      throw generateException(exceptionClass, message, variableName, "is not greater than 0");
+    }
+  }
+
+  public static void ensureGreaterThanOrEqual(String variableName, long value1, long value2) {
+    ensureGreaterThanOrEqual("", variableName, value1, value2);
+  }
+
+  public static void ensureGreaterThanOrEqual(String message, String variableName, long value1, long value2) {
+    ensureGreaterThanOrEqual(ProcessEngineException.class, message, variableName, value1, value2);
+  }
+
+  public static void ensureGreaterThanOrEqual(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, long value1, long value2) {
+    if (value1 < value2) {
+      throw generateException(exceptionClass, message, variableName, "is not greater than or equal to " + value2);
     }
   }
 
@@ -252,6 +287,10 @@ public final class EnsureUtil {
     ensureNotContainsNull(NullValueException.class, message, variableName, values);
   }
 
+  public static void ensureNotContainsNull(Class<? extends ProcessEngineException> exceptionClass, String variableName, Collection<?> values) {
+    ensureNotContainsNull(exceptionClass, null, variableName, values);
+  }
+
   public static void ensureNotContainsNull(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection<?> values) {
     ensureNotNull(exceptionClass, message, variableName, values.toArray(new Object[values.size()]));
   }
@@ -267,11 +306,70 @@ public final class EnsureUtil {
   }
 
   @SuppressWarnings("rawtypes")
+  public static void ensureNumberOfElements(Class<? extends ProcessEngineException> exceptionClass, String variableName, Collection collection, int elements) {
+    ensureNumberOfElements(exceptionClass, "", variableName, collection, elements);
+  }
+
+  @SuppressWarnings("rawtypes")
   public static void ensureNumberOfElements(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection collection, int elements) {
     ensureNotNull(exceptionClass, message, variableName, collection);
     if (collection.size() != elements) {
       throw generateException(exceptionClass, message, variableName, "does not have " + elements + " elements");
     }
+  }
+
+  public static void ensureValidIndividualResourceId(String message, String id) {
+    ensureValidIndividualResourceId(ProcessEngineException.class, message, id);
+  }
+
+  public static void ensureValidIndividualResourceId(Class<? extends ProcessEngineException> exceptionClass, String message, String id) {
+    ensureNotNull(exceptionClass, message, "id", id);
+    if (Authorization.ANY.equals(id)) {
+      throw generateException(exceptionClass, message, "id", "cannot be "
+          + Authorization.ANY + ". " + Authorization.ANY + " is a reserved identifier.");
+    }
+  }
+
+  public static void ensureValidIndividualResourceIds(String message, Collection<String> ids) {
+    ensureValidIndividualResourceIds(ProcessEngineException.class, message, ids);
+  }
+
+  public static void ensureValidIndividualResourceIds(Class<? extends ProcessEngineException> exceptionClass, String message, Collection<String> ids) {
+    ensureNotNull(exceptionClass, message, "id", ids);
+    for (String id : ids) {
+      ensureValidIndividualResourceId(exceptionClass, message, id);
+    }
+  }
+
+  public static void ensureWhitelistedResourceId(CommandContext commandContext, String resourceType, String resourceId) {
+    String resourcePattern = determineResourceWhitelistPattern(commandContext.getProcessEngineConfiguration(), resourceType);
+    Pattern PATTERN = Pattern.compile(resourcePattern);
+
+    if (!PATTERN.matcher(resourceId).matches()) {
+      throw generateException(ProcessEngineException.class, resourceType + " has an invalid id", "'" + resourceId + "'", "is not a valid resource identifier.");
+    }
+  }
+
+  protected static String determineResourceWhitelistPattern(ProcessEngineConfiguration processEngineConfiguration, String resourceType) {
+    String resourcePattern = null;
+
+    if (resourceType.equals("User")) {
+      resourcePattern = processEngineConfiguration.getUserResourceWhitelistPattern();
+    }
+
+    if (resourceType.equals("Group")) {
+      resourcePattern =  processEngineConfiguration.getGroupResourceWhitelistPattern();
+    }
+
+    if (resourceType.equals("Tenant")) {
+      resourcePattern =  processEngineConfiguration.getTenantResourceWhitelistPattern();
+    }
+
+    if (resourcePattern != null && !resourcePattern.isEmpty()) {
+      return resourcePattern;
+    }
+
+    return processEngineConfiguration.getGeneralResourceWhitelistPattern();
   }
 
   protected static <T extends ProcessEngineException> T generateException(Class<T> exceptionClass, String message, String variableName, String description) {
@@ -282,8 +380,9 @@ public final class EnsureUtil {
 
       return constructor.newInstance(formattedMessage);
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("Couldn't instantiate class " + exceptionClass.getName(), e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInstantiatingClass(exceptionClass.getName(), e);
     }
 
   }
@@ -301,4 +400,9 @@ public final class EnsureUtil {
     }
   }
 
+  public static void ensureActiveCommandContext(String operation) {
+    if(Context.getCommandContext() == null) {
+      throw LOG.notInsideCommandContext(operation);
+    }
+  }
 }

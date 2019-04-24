@@ -9,7 +9,7 @@
     expressionLanguage="http://www.w3.org/1999/XPath"
     targetNamespace="test">
 
-  <process id="FormDataTest.testFormFieldSubmit">
+  <process id="FormDataTest.testFormFieldSubmit" isExecutable="true">
 
     <startEvent id="start" />
     <sequenceFlow sourceRef="start" targetRef="usertask" />
@@ -33,6 +33,12 @@
               <camunda:constraint name="validator" config="org.camunda.bpm.engine.test.api.form.CustomValidator" />
             </camunda:validation>
           </camunda:formField>
+          <camunda:formField id="customFieldWithValidationDetails" label="Custom Field with validation details" type="string">
+            <camunda:validation>
+              <camunda:constraint name="validator" config="org.camunda.bpm.engine.test.api.form.CustomValidatorWithDetail" />
+            </camunda:validation>
+          </camunda:formField>
+
         </camunda:formData>
       </extensionElements>
     </userTask>
