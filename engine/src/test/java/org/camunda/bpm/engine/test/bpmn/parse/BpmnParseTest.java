@@ -60,6 +60,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a timer start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("timerEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      assertTextPresent("element TimerEventDefinition_1", e.getMessage());
     }
   }
 
@@ -70,6 +71,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process definition could be parsed, although the sub process contains not a blanco start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("messageEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element MessageEventDefinition_1", e.getMessage());
     }
   }
 
@@ -80,6 +82,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a conditional start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("conditionalEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      assertTextPresent("element ConditionalEventDefinition_1", e.getMessage());
     }
   }
 
@@ -90,6 +93,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a signal start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("signalEventDefintion only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element SignalEventDefinition_1", e.getMessage());
     }
   }
 
@@ -100,6 +104,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a error start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("errorEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element ErrorEventDefinition_1", e.getMessage());
     }
   }
 
@@ -110,6 +115,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a escalation start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("escalationEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      // TODO: assertTextPresent("escalationEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element EscalationEventDefinition_1", e.getMessage());
     }
   }
 
@@ -120,6 +127,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a compensation start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("compensateEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      assertTextPresent("element CompensateEventDefinition_1", e.getMessage());
     }
   }
 
@@ -130,6 +138,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process definition could be parsed, although the sub process contains not a blanco start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("messageEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element MessageEventDefinition_1", e.getMessage());
     }
   }
 
@@ -140,6 +149,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a timer start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("timerEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      // TODO: assertTextPresent("conditionalEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element TimerEventDefinition_1", e.getMessage());
     }
   }
 
@@ -150,6 +161,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a conditional start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("conditionalEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      // TODO: assertTextPresent("conditionalEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element ConditionalEventDefinition_1", e.getMessage());
     }
   }
 
@@ -160,6 +173,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a signal start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("signalEventDefintion only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element SignalEventDefinition_1", e.getMessage());
     }
   }
 
@@ -170,6 +184,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a error start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("errorEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element ErrorEventDefinition_1", e.getMessage());
     }
   }
 
@@ -180,6 +195,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a escalation start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("escalationEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      // TODO: assertTextPresent("escalationEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element EscalationEventDefinition_1", e.getMessage());
     }
   }
 
@@ -190,6 +207,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could be parsed, although the sub process contains a compensation start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("compensateEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      assertTextPresent("element CompensateEventDefinition_2", e.getMessage());
     }
   }
 
@@ -202,6 +220,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       assertTextPresent("cvc-complex-type.3.2.2:", e.getMessage());
       assertTextPresent("invalidAttribute", e.getMessage());
       assertTextPresent("process", e.getMessage());
+      assertTextPresent("element bogusProcess", e.getMessage());
     }
   }
 
@@ -212,6 +231,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition could not be parsed, the expression contains an escalation start event.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Error parsing '${currentUser()': syntax error at position 15, encountered 'null', expected '}'", e.getMessage());
+      assertTextPresent("element Task_1p99tc1", e.getMessage());
     }
   }
 
@@ -233,6 +253,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("Invalid incoming sequence flow of event subprocess", e.getMessage());
       assertTextPresent("Invalid outgoing sequence flow of event subprocess", e.getMessage());
+      assertTextPresent("element SequenceFlow_1", e.getMessage());
+      assertTextPresent("element SequenceFlow_2", e.getMessage());
     }
   }
 
@@ -250,7 +272,10 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       // fail in "regular" subprocess
       assertTextPresent("timerEventDefinition is not allowed on start event within a subprocess", e.getMessage());
+      // TODO: assertTextPresent("timerEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
       assertTextPresent("messageEventDefinition only allowed on start event if subprocess is an event subprocess", e.getMessage());
+      assertTextPresent("element TimerEventDefinition_2", e.getMessage());
+      assertTextPresent("element MessageEventDefinition_2", e.getMessage());
       // doesn't fail in event subprocess/process because the bpmn parser parse
       // only this first event definition
     }
@@ -287,6 +312,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       // fail on asyncAfter
       assertTextPresent("'asyncAfter' not supported for", e.getMessage());
+      assertTextPresent("element eventBasedGateway", e.getMessage());
     }
   }
 
@@ -532,25 +558,28 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseServiceTaskWithoutClass");
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
-      fail();
+      fail("Exception expected: service task must have an implementation");
     } catch (ProcessEngineException e) {
       assertTextPresent("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on serviceTask. | org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseServiceTaskWithoutClass.bpmn | line 4 | column 43 | element ServiceTask_1", e.getMessage());
     }
   }
 
 
-  public void parseInvalidConditionalEvent(String processDefinitionResource) {
+  public String parseInvalidConditionalEvent(String processDefinitionResource) {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), processDefinitionResource);
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
       fail("Exception expected: Process definition could be parsed, conditional event definition contains no condition.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Conditional event must contain an expression for evaluation.", e.getMessage());
+      return e.getMessage();
     }
+	return null;
   }
 
   public void testParseInvalidConditionalBoundaryEvent() {
-    parseInvalidConditionalEvent("testParseInvalidConditionalBoundaryEvent");
+    String message = parseInvalidConditionalEvent("testParseInvalidConditionalBoundaryEvent");
+    assertTextPresent("element conditionalBoundaryEvent", message);
   }
 
   @Deployment
@@ -574,7 +603,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   }
 
   public void testParseInvalidIntermediateConditionalEvent() {
-    parseInvalidConditionalEvent("testParseInvalidIntermediateConditionalEvent");
+	String message = parseInvalidConditionalEvent("testParseInvalidIntermediateConditionalEvent");
+    assertTextPresent("element intermediateConditionalEvent", message);
   }
 
   @Deployment
@@ -586,7 +616,8 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   }
 
   public void testParseInvalidEventSubprocessConditionalStartEvent() {
-    parseInvalidConditionalEvent("testParseInvalidEventSubprocessConditionalStartEvent");
+	String message = parseInvalidConditionalEvent("testParseInvalidEventSubprocessConditionalStartEvent");
+    assertTextPresent("element conditionalStartEventSubProcess", message);
   }
 
   @Deployment
@@ -629,6 +660,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:in extension element should contain source!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Missing parameter 'source' or 'sourceExpression' when passing variables", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -651,6 +683,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:in extension element should contain source!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Empty attribute 'source' when passing variables", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -673,6 +706,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:in extension element should contain target!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -685,6 +719,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:in extension element should contain target!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
     }
@@ -697,6 +732,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:in extension element should contain target!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Empty attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -719,6 +755,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:out extension element should contain source!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Missing parameter 'source' or 'sourceExpression' when passing variables", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -741,6 +778,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:out extension element should contain source!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Empty attribute 'source' when passing variables", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -763,6 +801,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:out extension element should contain target!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -775,6 +814,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:out extension element should contain target!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     } finally {
       processEngineConfiguration.setDisableStrictCallActivityValidation(false);
     }
@@ -787,6 +827,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Process camunda:out extension element should contain target!");
     } catch (ProcessEngineException e) {
       assertTextPresent("Empty attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+      assertTextPresent("element callActivity", e.getMessage());
     }
   }
 
@@ -833,6 +874,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+      assertTextPresent("element oneTaskProcess", e.getMessage());
     }
   }
 
@@ -882,6 +924,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+      assertTextPresent("element oneTaskProcess", e.getMessage());
     } finally {
       processEngineConfiguration.setHistoryTimeToLive(null);
     }
@@ -895,6 +938,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+      assertTextPresent("element oneTaskProcess", e.getMessage());
     } finally {
       processEngineConfiguration.setHistoryTimeToLive(null);
     }
@@ -908,6 +952,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+      assertTextPresent("element oneTaskProcess", e.getMessage());
     } finally {
       processEngineConfiguration.setHistoryTimeToLive(null);
     }
@@ -920,6 +965,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+      assertTextPresent("element oneTaskProcess", e.getMessage());
     }
   }
 
@@ -930,6 +976,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
       assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+      assertTextPresent("element oneTaskProcess", e.getMessage());
     }
   }
 
