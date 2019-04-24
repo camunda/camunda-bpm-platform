@@ -27,7 +27,8 @@ var $ = window.jQuery = window.$ = require('jquery'),
     sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular'),
     angular = require('camunda-commons-ui/vendor/angular'),
     camCommon = require('../../../common/scripts/module'),
-    lodash = require('camunda-commons-ui/vendor/lodash');
+    lodash = require('camunda-commons-ui/vendor/lodash'),
+    moment = require('camunda-commons-ui/vendor/moment');
 
 
 var APP_NAME = 'cam.admin';
@@ -186,4 +187,5 @@ module.exports.exposePackages = function(requirePackages) {
   requirePackages['camunda-bpm-sdk-js'] = sdk;
   requirePackages['cam-common'] = camCommon;
   requirePackages['lodash'] = lodash;
+  requirePackages['moment'] = moment;
 };
