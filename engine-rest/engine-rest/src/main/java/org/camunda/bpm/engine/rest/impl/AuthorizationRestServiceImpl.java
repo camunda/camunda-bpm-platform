@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -35,7 +36,6 @@ import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCheckResultDto
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCreateDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationQueryDto;
-import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
 import org.camunda.bpm.engine.rest.sub.authorization.impl.AuthorizationResourceImpl;
@@ -85,7 +85,8 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
     ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
-    Permission permission = PermissionConverter.getPermissionProvider().getPermissionForName(permissionName, resourceType);
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+    Permission permission = processEngineConfiguration.getPermissionProvider().getPermissionForName(permissionName, resourceType);
     String currentUserId = currentAuthentication.getUserId();
 
     boolean isUserAuthorized = false;
@@ -161,7 +162,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
       resultList = query.list();
     }
 
-    return AuthorizationDto.fromAuthorizationList(resultList);
+    return AuthorizationDto.fromAuthorizationList(resultList, processEngine.getProcessEngineConfiguration());
   }
 
   public CountResultDto getAuthorizationCount(UriInfo uriInfo) {
@@ -179,7 +180,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
     Authorization newAuthorization = authorizationService.createNewAuthorization(dto.getType());
-    AuthorizationCreateDto.update(dto, newAuthorization);
+    AuthorizationCreateDto.update(dto, newAuthorization, processEngine.getProcessEngineConfiguration());
 
     newAuthorization = authorizationService.saveAuthorization(newAuthorization);
 

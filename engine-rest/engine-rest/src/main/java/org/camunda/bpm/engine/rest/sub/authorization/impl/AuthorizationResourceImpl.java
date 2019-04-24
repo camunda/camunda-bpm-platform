@@ -55,7 +55,7 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
 
     Authorization dbAuthorization = getDbAuthorization();
 
-    return AuthorizationDto.fromAuthorization(dbAuthorization);
+    return AuthorizationDto.fromAuthorization(dbAuthorization, processEngine.getProcessEngineConfiguration());
 
   }
 
@@ -68,7 +68,7 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
     // get db auth
     Authorization dbAuthorization = getDbAuthorization();
     // copy values from dto
-    AuthorizationDto.update(dto, dbAuthorization);
+    AuthorizationDto.update(dto, dbAuthorization, processEngine.getProcessEngineConfiguration());
     // save
     authorizationService.saveAuthorization(dbAuthorization);
   }

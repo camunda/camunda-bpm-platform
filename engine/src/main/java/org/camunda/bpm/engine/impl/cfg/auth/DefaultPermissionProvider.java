@@ -14,18 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.spi;
+package org.camunda.bpm.engine.impl.cfg.auth;
 
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 
 /**
- * A simple provider SPI used to determinate custom {@link Permission}
+ * Default implementation of {@link PermissionProvider}
  * 
  * @author Yana.Vasileva
+ * @author Tobias Metzke
  *
  */
-public interface PermissionProvider {
+public class DefaultPermissionProvider implements PermissionProvider {
 
-  Permission getPermissionForName(String name, int resourceType);
+  @Override
+  public Permission getPermissionForName(String name, int resourceType) {
+    return ResourceTypeUtil.getPermissionByNameAndResourceType(name, resourceType);
+  }
+  
+  @Override
+  public Permission[] getPermissionsForResource(int resourceType) {
+    return ResourceTypeUtil.getPermissionsByResourceType(resourceType);
+  }
+  
+  @Override
+  public String getNameForResource(int resourceType) {
+    Resource resourceByType = ResourceTypeUtil.getResourceByType(resourceType);
+    return resourceByType == null ? null : resourceByType.resourceName();
+  }
 
 }

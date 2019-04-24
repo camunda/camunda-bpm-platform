@@ -19,10 +19,11 @@ package org.camunda.bpm.engine.rest.dto.authorization;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
-import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.PermissionConverter;
 
 /**
  * @author Daniel Meyer
@@ -40,13 +41,13 @@ public class AuthorizationDto {
 
   // transformers ///////////////////////////////////////
 
-  public static AuthorizationDto fromAuthorization(Authorization dbAuthorization) {
+  public static AuthorizationDto fromAuthorization(Authorization dbAuthorization, ProcessEngineConfiguration engineConfiguration) {
     AuthorizationDto authorizationDto = new AuthorizationDto();
 
     authorizationDto.setId(dbAuthorization.getId());
     authorizationDto.setType(dbAuthorization.getAuthorizationType());
 
-    Permission[] dbPermissions = getPermissions(dbAuthorization);
+    Permission[] dbPermissions = getPermissions(dbAuthorization, engineConfiguration);
     authorizationDto.setPermissions(PermissionConverter.getNamesForPermissions(dbAuthorization, dbPermissions));
 
     authorizationDto.setUserId(dbAuthorization.getUserId());
@@ -57,7 +58,7 @@ public class AuthorizationDto {
     return authorizationDto;
   }
 
-  public static void update(AuthorizationDto dto, Authorization dbAuthorization) {
+  public static void update(AuthorizationDto dto, Authorization dbAuthorization, ProcessEngineConfiguration engineConfiguration) {
 
     dbAuthorization.setGroupId(dto.getGroupId());
     dbAuthorization.setUserId(dto.getUserId());
@@ -70,16 +71,16 @@ public class AuthorizationDto {
     }
 
     if(dto.getPermissions() != null) {
-      dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions(), dto.getResourceType()));
+      dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions(), dto.getResourceType(), engineConfiguration));
     }
 
   }
 
-  public static List<AuthorizationDto> fromAuthorizationList(List<Authorization> resultList) {
+  public static List<AuthorizationDto> fromAuthorizationList(List<Authorization> resultList, ProcessEngineConfiguration engineConfiguration) {
     ArrayList<AuthorizationDto> result = new ArrayList<AuthorizationDto>();
 
     for (Authorization authorization : resultList) {
-      result.add(fromAuthorization(authorization));
+      result.add(fromAuthorization(authorization, engineConfiguration));
     }
 
     return result;
@@ -130,10 +131,9 @@ public class AuthorizationDto {
     this.resourceId = resourceId;
   }
 
-  private static Permission[] getPermissions(Authorization dbAuthorization) {
+  private static Permission[] getPermissions(Authorization dbAuthorization, ProcessEngineConfiguration engineConfiguration) {
     int givenResourceType = dbAuthorization.getResourceType();
-    Permission[] permissionsByResourceType = ResourceTypeUtil.getPermissionsByResourceType(givenResourceType);
-
+    Permission[] permissionsByResourceType = ((ProcessEngineConfigurationImpl) engineConfiguration).getPermissionProvider().getPermissionsForResource(givenResourceType);
     return dbAuthorization.getPermissions(permissionsByResourceType);
   }
 

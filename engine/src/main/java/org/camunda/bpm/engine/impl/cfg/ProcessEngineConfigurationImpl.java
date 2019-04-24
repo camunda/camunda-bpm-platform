@@ -116,6 +116,8 @@ import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
 import org.camunda.bpm.engine.impl.cfg.auth.AuthorizationCommandChecker;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
+import org.camunda.bpm.engine.impl.cfg.auth.DefaultPermissionProvider;
+import org.camunda.bpm.engine.impl.cfg.auth.PermissionProvider;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantCommandChecker;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
@@ -620,6 +622,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
   protected HistoryEventHandler historyEventHandler;
+  
+  protected PermissionProvider permissionProvider;
 
   protected boolean isExecutionTreePrefetchEnabled = true;
 
@@ -840,6 +844,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPasswordDigest();
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
+    initPermissionProvider();
     initMetrics();
     initMigration();
     initCommandCheckers();
@@ -2361,6 +2366,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resourceAuthorizationProvider = new DefaultAuthorizationProvider();
     }
   }
+  
+  protected void initPermissionProvider() {
+    if (permissionProvider == null) {
+      permissionProvider = new DefaultPermissionProvider();
+    }
+  }
 
   protected void initDefaultUserPermissionForTask() {
     if (defaultUserPermissionForTask == null) {
@@ -3421,6 +3432,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setResourceAuthorizationProvider(ResourceAuthorizationProvider resourceAuthorizationProvider) {
     this.resourceAuthorizationProvider = resourceAuthorizationProvider;
+  }
+  
+  public PermissionProvider getPermissionProvider() {
+    return permissionProvider;
+  }
+  
+  public void setPermissionProvider(PermissionProvider permissionProvider) {
+    this.permissionProvider = permissionProvider;
   }
 
   public List<ProcessEnginePlugin> getProcessEnginePlugins() {

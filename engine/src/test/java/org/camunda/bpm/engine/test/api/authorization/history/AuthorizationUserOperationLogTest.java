@@ -21,12 +21,19 @@ import java.util.Arrays;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.impl.cfg.auth.DefaultPermissionProvider;
+import org.camunda.bpm.engine.impl.cfg.auth.PermissionProvider;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.camunda.bpm.engine.test.api.identity.TestPermissions;
+import org.camunda.bpm.engine.test.api.identity.TestResource;
 
 /**
  * @author Tobias Metzke
@@ -44,13 +51,19 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     createGrantAuthorizationGroup(Resources.PROCESS_DEFINITION, Authorization.ANY, "testGroupId", ProcessDefinitionPermissions.DELETE);
     
     // then
-    assertEquals(5, query.count());
+    assertEquals(6, query.count());
     
-    UserOperationLogEntry entry = query.property("permissions").singleResult();
+    UserOperationLogEntry entry = query.property("permissionBits").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
     assertEquals(String.valueOf(ProcessDefinitionPermissions.DELETE.getValue()), entry.getNewValue());
+    
+    entry = query.property("permissions").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, entry.getOperationType());
+    assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
+    assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
+    assertEquals(ProcessDefinitionPermissions.DELETE.getName(), entry.getNewValue());
     
     entry = query.property("type").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, entry.getOperationType());
@@ -91,13 +104,19 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     saveAuthorization(authorization);
     
     // then
-    assertEquals(5, query.count());
+    assertEquals(6, query.count());
     
-    UserOperationLogEntry entry = query.property("permissions").singleResult();
+    UserOperationLogEntry entry = query.property("permissionBits").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
     assertEquals(String.valueOf(ProcessDefinitionPermissions.DELETE.getValue()|ProcessDefinitionPermissions.READ.getValue()), entry.getNewValue());
+    
+    entry = query.property("permissions").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
+    assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
+    assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
+    assertEquals(ProcessDefinitionPermissions.READ.getName() + ", " + ProcessDefinitionPermissions.DELETE.getName(), entry.getNewValue());
     
     entry = query.property("type").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
@@ -137,13 +156,19 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     authorizationService.deleteAuthorization(authorization.getId());
     
     // then
-    assertEquals(5, query.count());
+    assertEquals(6, query.count());
     
-    UserOperationLogEntry entry = query.property("permissions").singleResult();
+    UserOperationLogEntry entry = query.property("permissionBits").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
     assertEquals(String.valueOf(ProcessDefinitionPermissions.DELETE.getValue()), entry.getNewValue());
+    
+    entry = query.property("permissions").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, entry.getOperationType());
+    assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
+    assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
+    assertEquals(ProcessDefinitionPermissions.DELETE.getName(), entry.getNewValue());
     
     entry = query.property("type").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, entry.getOperationType());
@@ -168,5 +193,65 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
     assertEquals("testUserId", entry.getNewValue());
+  }
+  
+  public void testLogCreatedOnAuthorizationCreationWithExceedingPermissionStringList() {
+    // given
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+    assertEquals(0, query.count());
+    
+    // when
+    PermissionProvider permissionProvider = processEngineConfiguration.getPermissionProvider();
+    processEngineConfiguration.setPermissionProvider(new TestPermissionProvider());
+    createGrantAuthorizationGroup(TestResource.RESOURCE1, Authorization.ANY, "testGroupId", TestPermissions.LONG_NAME);
+    processEngineConfiguration.setPermissionProvider(permissionProvider);
+    
+    // then
+    assertEquals(6, query.count());
+    
+    UserOperationLogEntry entry = query.property("permissions").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, entry.getOperationType());
+    assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
+    assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
+    assertEquals(TestPermissions.LONG_NAME.getName().substring(0, StringUtil.DB_MAX_STRING_LENGTH), entry.getNewValue());
+  }
+  
+  public void testLogCreatedOnAuthorizationCreationWithAllPermission() {
+    // given
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+    assertEquals(0, query.count());
+    
+    // when
+    PermissionProvider permissionProvider = processEngineConfiguration.getPermissionProvider();
+    processEngineConfiguration.setPermissionProvider(new TestPermissionProvider());
+    createGrantAuthorizationGroup(TestResource.RESOURCE1, Authorization.ANY, "testGroupId", TestPermissions.ALL, TestPermissions.CREATE,
+        TestPermissions.DELETE, TestPermissions.LONG_NAME, TestPermissions.RANDOM);
+    processEngineConfiguration.setPermissionProvider(permissionProvider);
+    
+    // then
+    assertEquals(6, query.count());
+    
+    UserOperationLogEntry entry = query.property("permissions").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, entry.getOperationType());
+    assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
+    assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
+    assertEquals(TestPermissions.ALL.getName(), entry.getNewValue());
+  }
+  
+  public static class TestPermissionProvider extends DefaultPermissionProvider {
+    @Override
+    public String getNameForResource(int resourceType) {
+      for (Resource resource : TestResource.values()) {
+        if (resourceType == resource.resourceType()) {
+          return  resource.resourceName();
+        }
+      }
+      return null;
+    }
+    
+    @Override
+    public Permission[] getPermissionsForResource(int resourceType) {
+      return TestPermissions.values();
+    }
   }
 }

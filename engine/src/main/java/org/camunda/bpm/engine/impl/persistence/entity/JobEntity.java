@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -63,13 +64,6 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   public static final boolean DEFAULT_EXCLUSIVE = true;
   public static final int DEFAULT_RETRIES = 3;
-
-  /**
-   * Note: {@link String#length()} counts Unicode supplementary
-   * characters twice, so for a String consisting only of those,
-   * the limit is effectively MAX_EXCEPTION_MESSAGE_LENGTH / 2
-   */
-  public static int MAX_EXCEPTION_MESSAGE_LENGTH = 666;
 
   private static final long serialVersionUID = 1L;
 
@@ -544,11 +538,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   }
 
   public void setExceptionMessage(String exceptionMessage) {
-    if(exceptionMessage != null && exceptionMessage.length() > MAX_EXCEPTION_MESSAGE_LENGTH) {
-      this.exceptionMessage = exceptionMessage.substring(0, MAX_EXCEPTION_MESSAGE_LENGTH);
-    } else {
-      this.exceptionMessage = exceptionMessage;
-    }
+    this.exceptionMessage = StringUtil.trimToMaximumLengthAllowed(exceptionMessage);
   }
 
   public String getExceptionByteArrayId() {

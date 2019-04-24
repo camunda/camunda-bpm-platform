@@ -16,8 +16,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.authorization;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
+import org.camunda.bpm.engine.impl.util.PermissionConverter;
 
 /**
  * @author Daniel Meyer
@@ -34,13 +35,13 @@ public class AuthorizationCreateDto {
   
   // transformers ///////////////////////////////////////
     
-  public static void update(AuthorizationCreateDto dto, Authorization dbAuthorization) {
+  public static void update(AuthorizationCreateDto dto, Authorization dbAuthorization, ProcessEngineConfiguration engineConfiguration) {
     
     dbAuthorization.setGroupId(dto.getGroupId());
     dbAuthorization.setUserId(dto.getUserId());
     dbAuthorization.setResourceType(dto.getResourceType());
     dbAuthorization.setResourceId(dto.getResourceId());
-    dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions(), dto.getResourceType()));
+    dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions(), dto.getResourceType(), engineConfiguration));
     
   }
     

@@ -50,7 +50,6 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -61,12 +60,13 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.auth.DefaultPermissionProvider;
+import org.camunda.bpm.engine.impl.cfg.auth.PermissionProvider;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
-import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.spi.PermissionProvider;
 import org.camunda.bpm.engine.rest.util.ResourceUtil;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
@@ -88,7 +88,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
   protected AuthorizationService authorizationServiceMock;
   protected IdentityService identityServiceMock;
-  protected ProcessEngineConfiguration processEngineConfigurationMock;
+  protected ProcessEngineConfigurationImpl processEngineConfigurationMock;
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -97,11 +97,12 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
   public void setUpRuntimeData() {
     authorizationServiceMock = mock(AuthorizationServiceImpl.class);
     identityServiceMock = mock(IdentityServiceImpl.class);
-    processEngineConfigurationMock = mock(ProcessEngineConfiguration.class);
+    processEngineConfigurationMock = mock(ProcessEngineConfigurationImpl.class);
 
     when(processEngine.getAuthorizationService()).thenReturn(authorizationServiceMock);
     when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationMock);
+    when(processEngineConfigurationMock.getPermissionProvider()).thenReturn(new DefaultPermissionProvider());
   }
 
   @Test
@@ -518,7 +519,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
     when(authorizationQuery.singleResult()).thenReturn(authorization);
 
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     given()
         .body(dto).contentType(ContentType.JSON)
@@ -547,7 +548,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
     when(authorizationQuery.singleResult()).thenReturn(authorization);
 
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     given()
         .body(dto).contentType(ContentType.JSON)
@@ -576,7 +577,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
     when(authorizationQuery.singleResult()).thenReturn(authorization);
 
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     given()
         .body(dto).contentType(ContentType.JSON)
@@ -599,7 +600,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     when(authorizationServiceMock.createNewAuthorization(Authorization.AUTH_TYPE_GRANT)).thenThrow(new AuthorizationException(message));
 
     Authorization authorization = MockProvider.createMockGrantAuthorization();
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     given()
         .body(dto)
@@ -651,7 +652,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
     Authorization authorization = MockProvider.createMockGrantAuthorization();
     when(authorizationServiceMock.createNewAuthorization(Authorization.AUTH_TYPE_GRANT)).thenReturn(authorization);
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     given()
         .body(dto)
@@ -740,7 +741,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
     when(authorizationQuery.singleResult()).thenReturn(authorization);
 
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_AUTHORIZATION_ID)
@@ -771,7 +772,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
     when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
     when(authorizationQuery.singleResult()).thenReturn(null);
 
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_AUTHORIZATION_ID)
@@ -789,7 +790,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
   @Test
   public void testUpdateAuthorizationThrowsAuthorizationException() {
     Authorization authorization = MockProvider.createMockGlobalAuthorization();
-    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
+    AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization, processEngineConfigurationMock);
 
     AuthorizationQuery authorizationQuery = mock(AuthorizationQuery.class);
     when(authorizationServiceMock.createAuthorizationQuery()).thenReturn(authorizationQuery);
@@ -1100,7 +1101,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
 
 
   protected PermissionProvider getPermissionProvider() {
-    return PermissionConverter.getPermissionProvider();
+    return processEngineConfigurationMock.getPermissionProvider();
   }
 
   protected List<String> setupGroupQueryMock() {

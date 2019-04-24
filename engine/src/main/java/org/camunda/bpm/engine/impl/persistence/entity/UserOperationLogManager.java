@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
@@ -44,12 +45,14 @@ import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
+import org.camunda.bpm.engine.impl.util.PermissionConverter;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
  *
  * @author Danny Gräf
+ * @author Tobias Metzke
  */
 public class UserOperationLogManager extends AbstractHistoricManager {
 
@@ -564,9 +567,10 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   public void logAuthorizationOperation(String operation, AuthorizationEntity authorization) {
     if (isUserOperationLogEnabled()) {
       List<PropertyChange> propertyChanges = new ArrayList<>();
-      propertyChanges.add(new PropertyChange("permissions", null, authorization.getPermissions()));
+      propertyChanges.add(new PropertyChange("permissionBits", null, authorization.getPermissions()));
+      propertyChanges.add(new PropertyChange("permissions", null, getPermissionStringList(authorization)));
       propertyChanges.add(new PropertyChange("type", null, authorization.getAuthorizationType()));
-      propertyChanges.add(new PropertyChange("resource", null, ResourceTypeUtil.getResourceByType(authorization.getResourceType()).resourceName()));
+      propertyChanges.add(new PropertyChange("resource", null, getResourceName(authorization.getResourceType())));
       propertyChanges.add(new PropertyChange("resourceId", null, authorization.getResourceId()));
       if (authorization.getUserId() != null) {
         propertyChanges.add(new PropertyChange("userId", null, authorization.getUserId()));
@@ -583,6 +587,17 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
     }
+  }
+
+  protected String getPermissionStringList(AuthorizationEntity authorization) {
+    Permission[] permissionsForResource = Context.getProcessEngineConfiguration().getPermissionProvider().getPermissionsForResource(authorization.getResourceType());
+    Permission[] permissions = authorization.getPermissions(permissionsForResource);
+    String[] namesForPermissions = PermissionConverter.getNamesForPermissions(authorization, permissions);
+    return StringUtil.trimToMaximumLengthAllowed(StringUtil.join(Arrays.asList(namesForPermissions).iterator()));
+  }
+  
+  protected String getResourceName(int resourceType) {
+    return Context.getProcessEngineConfiguration().getPermissionProvider().getNameForResource(resourceType);
   }
 
   public boolean isUserOperationLogEnabled() {

@@ -14,36 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.converter;
+package org.camunda.bpm.engine.impl.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
 
-import javax.ws.rs.core.Response.Status;
-
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.spi.PermissionProvider;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
- * <p>Converts between the String-Array based representation of permissions in the REST API
- * and the Integer-based representation in the JAVA API.</p>
+ * <p>
+ * Converts between the String-Array based and the Integer-based representation
+ * of permissions.
+ * </p>
  * 
  * @author Daniel Meyer
+ * @author Tobias Metzke
  *
  */
 public class PermissionConverter {
 
-  public static Permission[] getPermissionsForNames(String[] names, int resourceType) {
+  public static Permission[] getPermissionsForNames(String[] names, int resourceType, ProcessEngineConfiguration engineConfiguration) {
     
     final Permission[] permissions = new Permission[names.length];
     
     for (int i = 0; i < names.length; i++) {
-      permissions[i] = getPermissionProvider().getPermissionForName(names[i], resourceType);
+      permissions[i] = ((ProcessEngineConfigurationImpl) engineConfiguration).getPermissionProvider().getPermissionForName(names[i], resourceType);
     }
         
     return permissions;    
@@ -75,20 +74,6 @@ public class PermissionConverter {
     }
 
     return names.toArray(new String[names.size()]);
-  }
-
-  // permission provider SPI /////////////////////////////////////
-
-  public static PermissionProvider getPermissionProvider() {
-    ServiceLoader<PermissionProvider> serviceLoader = ServiceLoader.load(PermissionProvider.class);
-    Iterator<PermissionProvider> iterator = serviceLoader.iterator();
-
-    if (iterator.hasNext()) {
-      PermissionProvider provider = iterator.next();
-      return provider;
-    } else {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the " + PermissionProvider.class + " - SPI");
-    }
   }
 
 }

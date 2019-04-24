@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -1257,7 +1256,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
         .singleResult();
 
     assertNotNull(failedHistoricJobLog);
-    assertEquals(exceptionMessage.substring(0, JobEntity.MAX_EXCEPTION_MESSAGE_LENGTH),
+    assertEquals(exceptionMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH),
         failedHistoricJobLog.getJobExceptionMessage());
   }
 
