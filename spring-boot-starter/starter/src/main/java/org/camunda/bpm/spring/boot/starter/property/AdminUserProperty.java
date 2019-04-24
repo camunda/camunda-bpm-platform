@@ -104,7 +104,7 @@ public class AdminUserProperty implements User {
       .add("firstName=" + firstName)
       .add("lastName=" + lastName)
       .add("email=" + email)
-      .add("password=" + password)
+      .add("password=******")
       .toString();
   }
 
