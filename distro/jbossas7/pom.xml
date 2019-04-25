@@ -40,7 +40,7 @@
     <profile>
       <id>jdk-9-and-onwards</id>
       <activation>
-        <jdk>[9,</jdk>
+        <jdk>[9,)</jdk>
       </activation>
       <modules>
         <module>webapp</module>

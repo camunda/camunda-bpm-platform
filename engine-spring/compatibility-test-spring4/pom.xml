@@ -108,7 +108,7 @@
     <profile>
       <id>java11</id>
       <activation>
-        <jdk>[1.11,)</jdk>
+        <jdk>[11,)</jdk>
       </activation>
       <dependencies>
         <!-- Hibernate requires JAXB which is not present in Java 11+ -->
