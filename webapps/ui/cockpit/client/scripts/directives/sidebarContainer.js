@@ -156,7 +156,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
 
         var originalCollapsableSize = collapsableElement[changeAttr]();
 
-        localConf.get('ctnCollapsableParent:size:'+ containerId, originalCollapsableSize);
+        originalCollapsableSize = localConf.get('ctnCollapsableParent:size:'+ containerId, originalCollapsableSize);
 
         originalCollapsableSize = Math.max(minWidth, originalCollapsableSize);
 
