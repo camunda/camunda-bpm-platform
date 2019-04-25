@@ -67,14 +67,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>jaxrs-api</artifactId>
-      <version>${version.resteasy3}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>async-http-servlet-3.0</artifactId>
-      <version>${version.resteasy3}</version>
+      <version>3.0.12.Final</version>
       <scope>provided</scope>
     </dependency>
 
