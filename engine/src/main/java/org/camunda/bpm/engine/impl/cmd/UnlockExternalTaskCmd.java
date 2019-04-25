@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 
 /**
@@ -35,5 +36,10 @@ public class UnlockExternalTaskCmd extends ExternalTaskCmd {
   @Override
   protected void execute(ExternalTaskEntity externalTask) {
     externalTask.unlock();
+  }
+  
+  @Override
+  protected String getUserOperationLogOperationType() {
+    return UserOperationLogEntry.OPERATION_TYPE_UNLOCK;
   }
 }

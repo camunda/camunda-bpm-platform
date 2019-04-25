@@ -16,7 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * Represents the command to set the priority of an existing external task.
@@ -42,5 +47,15 @@ public class SetExternalTaskPriorityCmd extends ExternalTaskCmd {
 
   @Override
   protected void validateInput() {
+  }
+  
+  @Override
+  protected String getUserOperationLogOperationType() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
+  }
+  
+  @Override
+  protected List<PropertyChange> getUserOperationLogPropertyChanges(ExternalTaskEntity externalTask) {
+    return Collections.singletonList(new PropertyChange("priority", externalTask.getPriority(), priority));
   }
 }

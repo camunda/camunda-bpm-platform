@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -44,8 +44,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+/**
+ * 
+ * @author Tobias Metzke
+ *
+ */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class SetExternalTaskRetriesUserOperationLogTest {
+public class ExternalTaskUserOperationLogTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
@@ -57,46 +62,14 @@ public class SetExternalTaskRetriesUserOperationLogTest {
   private static String PROCESS_DEFINITION_KEY_2 = "twoExternalTaskWithPriorityProcess";
 
   protected RuntimeService runtimeService;
-  protected ManagementService managementService;
   protected ExternalTaskService externalTaskService;
-  protected static final Date START_DATE = new Date(1457326800000L);
-
-  protected List<String> processInstanceIds;
 
   @Before
   public void initServices() {
     runtimeService = rule.getRuntimeService();
     externalTaskService = rule.getExternalTaskService();
-    managementService = rule.getManagementService();
   }
-
-  @Before
-  public void deployTestProcesses() throws Exception {
-    org.camunda.bpm.engine.repository.Deployment deployment = rule.getRepositoryService().createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
-      .deploy();
-
-    rule.manageDeployment(deployment);
-
-    RuntimeService runtimeService = rule.getRuntimeService();
-    processInstanceIds = new ArrayList<String>();
-    for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
-    }
-    processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2).getId());
-  }
-
-  @Before
-  public void setClock() {
-    ClockUtil.setCurrentTime(START_DATE);
-  }
-
-  @After
-  public void resetClock() {
-    ClockUtil.reset();
-  }
-
+  
   @After
   public void removeAllRunningAndHistoricBatches() {
     HistoryService historyService = rule.getHistoryService();
@@ -111,12 +84,14 @@ public class SetExternalTaskRetriesUserOperationLogTest {
   }
 
   @Test
-  public void testLogCreationForOneExternalTaskId() {
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesLogCreationForOneExternalTaskId() {
     // given
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
     rule.getIdentityService().setAuthenticatedUserId("userId");
 
     // when
-    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
     externalTaskService.setRetries(externalTask.getId(), 5);
     rule.getIdentityService().clearAuthentication();
     // then
@@ -139,9 +114,12 @@ public class SetExternalTaskRetriesUserOperationLogTest {
   }
 
   @Test
-  public void testLogCreationSync() {
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesLogCreationSync() {
     // given
-    rule.getIdentityService().setAuthenticatedUserId("userId");
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    
     List<ExternalTask> list = externalTaskService.createExternalTaskQuery().list();
     List<String> externalTaskIds = new ArrayList<String>();
 
@@ -150,6 +128,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     }
 
     // when
+    rule.getIdentityService().setAuthenticatedUserId("userId");
     externalTaskService.setRetries(externalTaskIds, 5);
     rule.getIdentityService().clearAuthentication();
     // then
@@ -179,7 +158,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(numInstancesEntry.getProcessDefinitionKey());
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
-    Assert.assertEquals("6", numInstancesEntry.getNewValue());
+    Assert.assertEquals("2", numInstancesEntry.getNewValue());
     Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstancesEntry.getCategory());
 
     UserOperationLogEntry retriesEntry = entries.get("retries");
@@ -197,11 +176,14 @@ public class SetExternalTaskRetriesUserOperationLogTest {
   }
 
   @Test
-  public void testLogCreationAsync() {
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesLogCreationAsync() {
     // given
-    rule.getIdentityService().setAuthenticatedUserId("userId");
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
 
     // when
+    rule.getIdentityService().setAuthenticatedUserId("userId");
     externalTaskService.setRetriesAsync(null, externalTaskService.createExternalTaskQuery(), 5);
     rule.getIdentityService().clearAuthentication();
     // then
@@ -231,7 +213,7 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNull(numInstancesEntry.getProcessDefinitionKey());
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
-    Assert.assertEquals("6", numInstancesEntry.getNewValue());
+    Assert.assertEquals("2", numInstancesEntry.getNewValue());
     Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, numInstancesEntry.getCategory());
 
     UserOperationLogEntry retriesEntry = entries.get("retries");
@@ -246,6 +228,67 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertEquals("5", retriesEntry.getNewValue());
     Assert.assertEquals(asyncEntry.getOperationId(), retriesEntry.getOperationId());
     Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, retriesEntry.getCategory());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
+  public void testSetPriorityLogCreation() {
+    // given
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, Collections.<String, Object>singletonMap("priority", 14));
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().priorityHigherThanOrEquals(1).singleResult();
+    
+    // when
+    rule.getIdentityService().setAuthenticatedUserId("userId");
+    externalTaskService.setPriority(externalTask.getId(), 78L);
+    rule.getIdentityService().clearAuthentication();
+    
+    // then
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();
+    Assert.assertEquals(1, opLogEntries.size());
+
+    UserOperationLogEntry entry = opLogEntries.get(0);
+    Assert.assertNotNull(entry);
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, entry.getEntityType());
+    Assert.assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, entry.getOperationType());
+    Assert.assertEquals(externalTask.getId(), entry.getExternalTaskId());
+    Assert.assertEquals(externalTask.getProcessInstanceId(), entry.getProcessInstanceId());
+    Assert.assertEquals(externalTask.getProcessDefinitionId(), entry.getProcessDefinitionId());
+    Assert.assertEquals(externalTask.getProcessDefinitionKey(), entry.getProcessDefinitionKey());
+    Assert.assertEquals("priority", entry.getProperty());
+    Assert.assertEquals("14", entry.getOrgValue());
+    Assert.assertEquals("78", entry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, entry.getCategory());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUnlockLogCreation() {
+    // given
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
+    externalTaskService.fetchAndLock(1, "aWorker").topic(externalTask.getTopicName(), 3000L).execute();
+    
+    // when
+    rule.getIdentityService().setAuthenticatedUserId("userId");
+    externalTaskService.unlock(externalTask.getId());
+    rule.getIdentityService().clearAuthentication();
+    
+    // then
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();
+    Assert.assertEquals(1, opLogEntries.size());
+
+    UserOperationLogEntry entry = opLogEntries.get(0);
+    Assert.assertNotNull(entry);
+    Assert.assertEquals(EntityTypes.EXTERNAL_TASK, entry.getEntityType());
+    Assert.assertEquals(UserOperationLogEntry.OPERATION_TYPE_UNLOCK, entry.getOperationType());
+    Assert.assertEquals(externalTask.getId(), entry.getExternalTaskId());
+    Assert.assertEquals(externalTask.getProcessInstanceId(), entry.getProcessInstanceId());
+    Assert.assertEquals(externalTask.getProcessDefinitionId(), entry.getProcessDefinitionId());
+    Assert.assertEquals(externalTask.getProcessDefinitionKey(), entry.getProcessDefinitionKey());
+    Assert.assertNull(entry.getProperty());
+    Assert.assertNull(entry.getOrgValue());
+    Assert.assertNull(entry.getNewValue());
+    Assert.assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, entry.getCategory());
   }
 
   protected Map<String, UserOperationLogEntry> asMap(List<UserOperationLogEntry> logEntries) {
