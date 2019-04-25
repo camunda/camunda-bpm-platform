@@ -187,7 +187,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   /**
    * Only selects process instances with at least one incident.
    */
-  ProcessInstanceQuery hasIncident();
+  ProcessInstanceQuery withIncident();
 
   /**
    * Only selects process instances with the given incident type.

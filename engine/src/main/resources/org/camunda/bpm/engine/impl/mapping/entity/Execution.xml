@@ -219,7 +219,7 @@
   <sql id="selectProcessInstanceByQueryCriteriaSql">
 
     from ${prefix}ACT_RU_EXECUTION RES
-    <if test="hasIncident || incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
+    <if test="withIncident || incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
       inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
     </if>
     <if test="activityIds != null &amp;&amp; activityIds.length > 0">

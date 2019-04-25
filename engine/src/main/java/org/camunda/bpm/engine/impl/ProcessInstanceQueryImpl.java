@@ -51,7 +51,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   protected SuspensionState suspensionState;
-  protected boolean hasIncident;
+  protected boolean withIncident;
   protected String incidentType;
   protected String incidentId;
   protected String incidentMessage;
@@ -190,8 +190,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
-  public ProcessInstanceQuery hasIncident() {
-    this.hasIncident = true;
+  public ProcessInstanceQuery withIncident() {
+    this.withIncident = true;
     return this;
   }
 
@@ -333,8 +333,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     this.suspensionState = suspensionState;
   }
 
-  public boolean isHasIncident() {
-    return hasIncident;
+  public boolean isWithIncident() {
+    return withIncident;
   }
 
   public String getIncidentId() {

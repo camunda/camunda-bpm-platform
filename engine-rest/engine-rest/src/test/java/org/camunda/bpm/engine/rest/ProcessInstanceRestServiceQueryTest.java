@@ -975,22 +975,22 @@ public class ProcessInstanceRestServiceQueryTest extends
   }
 
   @Test
-  public void testQueryProcessInstanceHasIncident() {
+  public void testQueryProcessInstanceWithIncident() {
     given()
-      .queryParam("hasIncident", true)
+      .queryParam("withIncident", true)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
     .when()
       .get(PROCESS_INSTANCE_QUERY_URL);
 
-    verify(mockedQuery).hasIncident();
+    verify(mockedQuery).withIncident();
   }
   
   @Test
-  public void testQueryProcessInstanceHasIncidentAsPost() {
+  public void testQueryProcessInstanceWithIncidentAsPost() {
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("hasIncident", true);
+    params.put("withIncident", true);
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1001,6 +1001,6 @@ public class ProcessInstanceRestServiceQueryTest extends
       .when()
         .post(PROCESS_INSTANCE_QUERY_URL);
     
-    verify(mockedQuery).hasIncident();
+    verify(mockedQuery).withIncident();
   }
 }

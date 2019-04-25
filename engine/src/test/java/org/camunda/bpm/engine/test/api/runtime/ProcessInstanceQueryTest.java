@@ -1259,7 +1259,7 @@ public class ProcessInstanceQueryTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/failingProcessCreateOneIncident.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testQueryHasIncident() {
+  public void testQueryWithIncident() {
     ProcessInstance instanceWithIncident = runtimeService.startProcessInstanceByKey("failingProcess");
     ProcessInstance instanceWithoutIncident = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1268,7 +1268,7 @@ public class ProcessInstanceQueryTest {
     List<Incident> incidentList = runtimeService.createIncidentQuery().list();
     assertEquals(1, incidentList.size());
 
-    ProcessInstance instance = runtimeService.createProcessInstanceQuery().hasIncident().singleResult();
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().withIncident().singleResult();
     assertThat(instance.getId(), is(instanceWithIncident.getId()));
   }
 
