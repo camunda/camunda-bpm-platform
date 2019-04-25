@@ -45,10 +45,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule;
+import org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule.TestProcessBuilder;
 import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -480,6 +482,33 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     // then
     assertThat(identityLinkLog.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+  }
+
+  @Test
+  public void shouldNotSetUnaffectedRemovalTime_IdentityLinkLog() {
+    // given
+    TestProcessBuilder testProcessBuilder = testRule.process().userTask().deploy();
+
+    String instance1 = testProcessBuilder.start();
+    String instance2 = testProcessBuilder.start();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query.processInstanceId(instance1))
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    Task task2 = taskService.createTaskQuery().processInstanceId(instance2).singleResult();
+
+    HistoricIdentityLinkLog identityLinkLog = historyService.createHistoricIdentityLinkLogQuery()
+        .taskId(task2.getId()).singleResult();
+
+    // then
+    assertThat(identityLinkLog.getRemovalTime()).isNull();
   }
 
   @Test
