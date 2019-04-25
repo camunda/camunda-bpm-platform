@@ -38,12 +38,20 @@ public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
   SetRemovalTimeToHistoricProcessInstancesAsyncBuilder byQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
 
   /**
-   * Sets the removal time to an absolute date or {@code null}.
+   * Sets the removal time to an absolute date or {@code null} (clears the removal time).
    *
    * @param removalTime supposed to be set to historic entities.
    * @return the builder.
    */
-  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder removalTime(Date removalTime);
+  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder absoluteRemovalTime(Date removalTime);
+
+  /**
+   * Calculates the removal time dynamically based on the respective process definition time to
+   * live and the process engine's removal time strategy.
+   *
+   * @return the builder.
+   */
+  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder calculatedRemovalTime();
 
   /**
    * Sets the removal time asynchronously as batch. The returned batch can be used to

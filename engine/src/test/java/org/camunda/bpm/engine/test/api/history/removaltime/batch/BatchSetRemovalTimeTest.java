@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -82,7 +83,7 @@ public class BatchSetRemovalTimeTest {
     // given
     testRule.getProcessEngineConfiguration()
       .setDmnEnabled(false);
-    
+
     testRule.process().ruleTask("dish-decision").deploy().startWithVariables(
       Variables.createVariables()
         .putValue("temperature", 32)
@@ -102,7 +103,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
-        .removalTime(REMOVAL_TIME)
+        .absoluteRemovalTime(REMOVAL_TIME)
         .executeAsync()
     );
 
@@ -127,7 +128,7 @@ public class BatchSetRemovalTimeTest {
 
     // assume
     assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
-    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isNull();
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
@@ -135,7 +136,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
-        .removalTime(REMOVAL_TIME)
+        .absoluteRemovalTime(REMOVAL_TIME)
         .executeAsync()
     );
 
@@ -159,7 +160,7 @@ public class BatchSetRemovalTimeTest {
 
     // assume
     assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
-    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isNull();
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
@@ -167,7 +168,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
-        .removalTime(REMOVAL_TIME)
+        .absoluteRemovalTime(REMOVAL_TIME)
         .executeAsync()
     );
 
@@ -198,6 +199,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
+        .calculatedRemovalTime()
         .executeAsync()
     );
 
@@ -229,6 +231,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
+        .calculatedRemovalTime()
         .executeAsync()
     );
 
@@ -258,6 +261,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
+        .calculatedRemovalTime()
         .executeAsync()
     );
 
@@ -289,6 +293,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
+        .calculatedRemovalTime()
         .executeAsync()
     );
 
@@ -318,7 +323,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
-        .removalTime(null)
+        .absoluteRemovalTime(null)
         .executeAsync()
     );
 
@@ -348,7 +353,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
-        .removalTime(REMOVAL_TIME)
+        .absoluteRemovalTime(REMOVAL_TIME)
         .executeAsync()
     );
 
@@ -371,7 +376,7 @@ public class BatchSetRemovalTimeTest {
     // when
     historyService.setRemovalTimeToHistoricProcessInstancesAsync()
       .byQuery(query)
-      .removalTime(REMOVAL_TIME)
+      .absoluteRemovalTime(REMOVAL_TIME)
       .executeAsync();
   }
 
@@ -386,6 +391,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
         .byQuery(query)
+        .calculatedRemovalTime()
         .executeAsync()
     );
 
@@ -395,6 +401,38 @@ public class BatchSetRemovalTimeTest {
     assertThat(historicBatch.getType()).isEqualTo("process-set-removal-time");
     assertThat(historicBatch.getStartTime()).isEqualTo(CURRENT_DATE);
     assertThat(historicBatch.getEndTime()).isEqualTo(CURRENT_DATE);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfNoRemovalTimeSettingDefined()
+  {
+    // given
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    SetRemovalTimeToHistoricProcessInstancesAsyncBuilder batchBuilder = historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+      .byQuery(query);
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("removalTime is null");
+
+    // when
+    batchBuilder.executeAsync();
+  }
+
+  @Test
+  public void shouldThrowExceptionIfNoQueryDefined()
+  {
+    // given
+    SetRemovalTimeToHistoricProcessInstancesAsyncBuilder batchBuilder = historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+      .absoluteRemovalTime(new Date());
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("query is null");
+
+    // when
+    batchBuilder.executeAsync();
   }
 
 }

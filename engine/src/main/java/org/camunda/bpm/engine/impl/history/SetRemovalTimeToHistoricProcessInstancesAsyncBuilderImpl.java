@@ -31,7 +31,7 @@ public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements
 
   protected HistoricProcessInstanceQuery query;
   protected Date removalTime;
-  protected boolean hasRemovalTime = false;
+  protected Mode mode = null;
 
   protected CommandExecutor commandExecutor;
 
@@ -44,9 +44,15 @@ public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements
     return this;
   }
 
-  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder removalTime(Date removalTime) {
-    hasRemovalTime = true;
+  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder absoluteRemovalTime(Date removalTime) {
+    this.mode = Mode.ABSOLUTE_REMOVAL_TIME;
     this.removalTime = removalTime;
+    return this;
+  }
+
+  @Override
+  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder calculatedRemovalTime() {
+    this.mode = Mode.CALCULATED_REMOVAL_TIME;
     return this;
   }
 
@@ -62,8 +68,13 @@ public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements
     return removalTime;
   }
 
-  public boolean hasRemovalTime() {
-    return hasRemovalTime;
+  public Mode getMode() {
+    return mode;
   }
 
+  public static enum Mode
+  {
+    CALCULATED_REMOVAL_TIME,
+    ABSOLUTE_REMOVAL_TIME;
+  }
 }

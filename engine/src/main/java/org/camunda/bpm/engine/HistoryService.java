@@ -159,7 +159,7 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstance(String processInstanceId);
-  
+
   /**
    * Deletes historic process instance. All historic activities, historic task and
    * historic details (variable updates, form properties) are deleted as well.
@@ -185,7 +185,7 @@ public interface HistoryService {
    * Deletes historic process instances. All historic activities, historic task and
    * historic details (variable updates, form properties) are deleted as well. Does not
    * fail if a process instance was not found.
-   * 
+   *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
@@ -392,7 +392,7 @@ public interface HistoryService {
   /**
    * Deletes a historic variable instance by its id. All related historic
    * details (variable updates, form properties) are deleted as well.
-   * 
+   *
    * @param variableInstanceId
    *          the id of the variable instance
    * @throws BadUserRequestException
@@ -404,7 +404,7 @@ public interface HistoryService {
    *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricVariableInstance(String variableInstanceId);
-  
+
   /**
    * Deletes all historic variables and historic details (variable updates, form properties) of a process instance.
    *
@@ -414,7 +414,7 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
-  
+
   /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL
    */
@@ -563,17 +563,21 @@ public interface HistoryService {
   String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId);
 
   /**
-   * Set a removal time asynchronously to historic process instances and
+   * <p>Set a removal time asynchronously to historic process instances and
    * all associated historic entities using a fluent builder.
    *
-   * Historic process instances can be specified by passing a query to
+   * <p>Historic process instances can be specified by passing a query to
    * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#byQuery(HistoricProcessInstanceQuery)}.
    *
-   * An absolute or no removal time can be specified via
-   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#removalTime(Date)}.
-   * Pass {@code null} to set no removal time.
+   * <p>An absolute time can be specified via
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#absoluteRemovalTime(Date)}.
+   * Pass {@code null} to clear the removal time.
    *
-   * To create the batch and complete the configuration chain, call
+   * <p>As an alternative, the removal time can also be calculated via
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#calculatedRemovalTime()}
+   * based on the configured time to live values.
+   *
+   * <p>To create the batch and complete the configuration chain, call
    * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#executeAsync()}.
    *
    * @since 7.11
