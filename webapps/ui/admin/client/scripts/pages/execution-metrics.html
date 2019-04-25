@@ -1,5 +1,5 @@
 <form name="form">
-  <h3>{{ 'EXECUTION_METRICS' | translate }}</h3>  
+  <h3>{{ 'EXECUTION_METRICS' | translate }}</h3>
 
   <div uib-alert class="alert alert-info">
     <p>
@@ -47,10 +47,10 @@
       <div class="panel-body">
         <ul>
           <li>
-            <strong>{{ metrics.flowNodes }}</strong> {{ 'EXECUTION_METRICS_FNI' | translate }}
+            <strong>{{ metrics.flowNodes.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_FNI' | translate }}
           </li>
           <li>
-            <strong>{{ metrics.decisionElements }}</strong> {{ 'EXECUTION_METRICS_EDE' | translate }}
+            <strong>{{ metrics.decisionElements.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_EDE' | translate }}
           </li>
         </ul>
       </div>
