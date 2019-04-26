@@ -17,10 +17,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * @author Daniel Meyer
@@ -39,7 +43,8 @@ public class DeleteMetricsCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-
+    writeUserOperationLog(commandContext);
+    
     if(timestamp == null && reporter == null) {
       commandContext.getMeterLogManager()
        .deleteAll();
@@ -49,6 +54,21 @@ public class DeleteMetricsCmd implements Command<Void>, Serializable {
        .deleteByTimestampAndReporter(timestamp, reporter);
     }
     return null;
+  }
+
+  protected void writeUserOperationLog(CommandContext commandContext) {
+    List<PropertyChange> propertyChanges = new ArrayList<>();
+    if (timestamp != null) {
+      propertyChanges.add(new PropertyChange("timestamp", null, timestamp));
+    }
+    if (reporter != null) {
+      propertyChanges.add(new PropertyChange("reporter", null, reporter));
+    }
+    if (propertyChanges.isEmpty()) {
+      propertyChanges.add(PropertyChange.EMPTY_CHANGE);
+    }
+    commandContext.getOperationLogManager().logMetricsOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+        propertyChanges);
   }
 
 }

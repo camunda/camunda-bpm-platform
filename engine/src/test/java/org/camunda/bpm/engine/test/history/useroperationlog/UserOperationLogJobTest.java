@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.EntityTypes;
@@ -369,5 +370,95 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     assertEquals("creationDateBased", entry.getProperty());
     assertNull(entry.getOrgValue());
     assertFalse(Boolean.valueOf(entry.getNewValue()));
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  public void testDelete() {
+    // given a job
+    runtimeService.startProcessInstanceByKey("asyncTaskProcess");
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when I delete a job
+    managementService.deleteJob(job.getId());
+
+    // then an op log entry is written
+    UserOperationLogEntry userOperationLogEntry = historyService
+            .createUserOperationLogQuery()
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE)
+            .singleResult();
+    assertNotNull(userOperationLogEntry);
+
+    assertEquals(EntityTypes.JOB, userOperationLogEntry.getEntityType());
+    assertEquals(job.getId(), userOperationLogEntry.getJobId());
+
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+        userOperationLogEntry.getOperationType());
+
+    assertNull(userOperationLogEntry.getProperty());
+    assertNull(userOperationLogEntry.getNewValue());
+    assertNull(userOperationLogEntry.getOrgValue());
+
+    assertEquals(USER_ID, userOperationLogEntry.getUserId());
+
+    assertEquals(job.getJobDefinitionId(), userOperationLogEntry.getJobDefinitionId());
+    assertEquals(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
+    assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
+    assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  public void testExecute() {
+    // given a job
+    runtimeService.startProcessInstanceByKey("asyncTaskProcess");
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when I execute a job manually
+    managementService.executeJob(job.getId());
+
+    // then an op log entry is written
+    UserOperationLogEntry userOperationLogEntry = historyService
+            .createUserOperationLogQuery()
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_EXECUTE)
+            .singleResult();
+    assertNotNull(userOperationLogEntry);
+
+    assertEquals(EntityTypes.JOB, userOperationLogEntry.getEntityType());
+    assertEquals(job.getId(), userOperationLogEntry.getJobId());
+
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_EXECUTE,
+        userOperationLogEntry.getOperationType());
+
+    assertNull(userOperationLogEntry.getProperty());
+    assertNull(userOperationLogEntry.getNewValue());
+    assertNull(userOperationLogEntry.getOrgValue());
+
+    assertEquals(USER_ID, userOperationLogEntry.getUserId());
+
+    assertEquals(job.getJobDefinitionId(), userOperationLogEntry.getJobDefinitionId());
+    assertEquals(job.getProcessInstanceId(), userOperationLogEntry.getProcessInstanceId());
+    assertEquals(job.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
+    assertEquals(job.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  public void testExecuteByJobExecutor() {
+    // given a job
+    runtimeService.startProcessInstanceByKey("asyncTaskProcess");
+    managementService.createJobQuery().singleResult();
+
+    // when a job is executed by the job executor
+    waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
+
+    // then no op log entry is written
+    assertEquals(0L, managementService.createJobQuery().count());
+    long logEntriesCount = historyService
+            .createUserOperationLogQuery()
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_EXECUTE)
+            .count();
+    assertEquals(0L, logEntriesCount);
   }
 }

@@ -564,6 +564,18 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
   
+  public void logMetricsOperation(String operation, List<PropertyChange> propertyChanges) {
+    if (isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.METRICS)
+            .propertyChanges(propertyChanges)
+            .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
   public void logAuthorizationOperation(String operation, AuthorizationEntity authorization) {
     if (isUserOperationLogEnabled()) {
       List<PropertyChange> propertyChanges = new ArrayList<>();

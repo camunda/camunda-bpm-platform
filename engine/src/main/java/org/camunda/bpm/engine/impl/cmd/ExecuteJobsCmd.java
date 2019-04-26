@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.Collections;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * @author Tom Baeyens
@@ -82,6 +84,10 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
       for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
         checker.checkUpdateJob(job);
       }
+      // write a user operation log since we're not called by the job executor
+      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_EXECUTE, 
+          jobId, job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), 
+          job.getProcessDefinitionKey(), PropertyChange.EMPTY_CHANGE);
     } else {
       jobExecutorContext.setCurrentJob(job);
 
