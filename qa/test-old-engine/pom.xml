@@ -176,6 +176,12 @@
           <artifactId>openjpa</artifactId>
           <scope>test</scope>
         </dependency>
+        
+        <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-email</artifactId>
+          <scope>test</scope>
+        </dependency>
 
         <dependency>
           <groupId>org.subethamail</groupId>
