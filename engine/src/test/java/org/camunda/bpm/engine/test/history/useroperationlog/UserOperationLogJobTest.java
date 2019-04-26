@@ -448,7 +448,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
   public void testExecuteByJobExecutor() {
     // given a job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
-    managementService.createJobQuery().singleResult();
+    assertEquals(1L, managementService.createJobQuery().count());
 
     // when a job is executed by the job executor
     waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
