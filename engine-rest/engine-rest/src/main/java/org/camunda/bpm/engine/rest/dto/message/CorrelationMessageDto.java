@@ -34,6 +34,7 @@ public class CorrelationMessageDto {
 
   private boolean all = false;
   private boolean resultEnabled = false;
+  private boolean variablesInResultEnabled = false;
 
   public String getMessageName() {
     return messageName;
@@ -121,5 +122,13 @@ public class CorrelationMessageDto {
 
   public void setResultEnabled(boolean resultEnabled) {
     this.resultEnabled = resultEnabled;
+  }
+
+  public boolean isVariablesInResultEnabled() {
+    return variablesInResultEnabled;
+  }
+
+  public void setVariablesInResultEnabled(boolean variablesInResultEnabled) {
+    this.variablesInResultEnabled = variablesInResultEnabled;
   }
 }

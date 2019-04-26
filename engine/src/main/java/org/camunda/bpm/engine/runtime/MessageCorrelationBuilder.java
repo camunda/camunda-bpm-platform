@@ -202,6 +202,17 @@ public interface MessageCorrelationBuilder {
   MessageCorrelationResult correlateWithResult();
 
   /**
+   * Executes the message correlation.
+   *
+   * @see {@link #correlateWithResult()}
+   *
+   * @return The result of the message correlation. Result contains either the
+   *         execution id or the start event activity id, the process definition,
+   *         and the process variables.
+   */
+  MessageCorrelationResultWithVariables correlateWithResultAndVariables();
+
+  /**
    * <p>
    *   Behaves like {@link #correlate()}, however uses pessimistic locking for correlating a waiting execution, meaning
    *   that two threads correlating a message to the same execution in parallel do not end up continuing the
@@ -255,6 +266,17 @@ public interface MessageCorrelationBuilder {
    * @since 7.6
    */
   List<MessageCorrelationResult> correlateAllWithResult();
+
+  /**
+   * Executes the message correlation.
+   *
+   * @see {@link #correlateAllWithResult()}
+   *
+   * @return The result list of the message correlations. Each result contains
+   *         either the execution id or the start event activity id, the process
+   *         definition, and the process variables.
+   */
+  List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables();
 
   /**
    * Executes the message correlation.

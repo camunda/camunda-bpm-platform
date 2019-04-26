@@ -21,12 +21,15 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariablesImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
@@ -41,6 +44,9 @@ public abstract class AbstractCorrelateMessageCmd {
 
   protected final MessageCorrelationBuilderImpl builder;
 
+  protected ExecutionVariableSnapshotObserver variablesListener;
+  protected boolean variablesEnabled;
+
   /**
    * Initialize the command with a builder
    *
@@ -49,6 +55,11 @@ public abstract class AbstractCorrelateMessageCmd {
   protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder) {
     this.builder = builder;
     this.messageName = builder.getMessageName();
+  }
+
+  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder, boolean variablesEnabled) {
+    this(builder);
+    this.variablesEnabled = variablesEnabled;
   }
 
   protected void triggerExecution(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
@@ -63,6 +74,10 @@ public abstract class AbstractCorrelateMessageCmd {
 
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
     ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), messageStartEvent);
+
+    if (variablesEnabled) {
+      variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false);
+    }
 
     processInstance.setVariablesLocal(builder.getPayloadProcessInstanceVariablesLocal());
 
@@ -95,7 +110,33 @@ public abstract class AbstractCorrelateMessageCmd {
       ProcessInstance instance = instantiateProcess(commandContext, handlerResult);
       result.setProcessInstance(instance);
     }
+
     return result;
+  }
+
+  protected MessageCorrelationResultWithVariables createMessageCorrelationResultWithVariables(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
+    MessageCorrelationResultWithVariablesImpl resultWithVariables = new MessageCorrelationResultWithVariablesImpl(handlerResult);
+    if (MessageCorrelationResultType.Execution.equals(handlerResult.getResultType())) {
+      ExecutionEntity execution = findProcessInstanceExecution(commandContext, handlerResult);
+      if (execution != null) {
+        variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
+      }
+      triggerExecution(commandContext, handlerResult);
+    } else {
+      ProcessInstance instance = instantiateProcess(commandContext, handlerResult);
+      resultWithVariables.setProcessInstance(instance);
+    }
+
+    if (variablesListener != null) {
+      resultWithVariables.setVariables(variablesListener.getVariables());
+    }
+
+    return resultWithVariables;
+  }
+
+  protected ExecutionEntity findProcessInstanceExecution(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
+    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(handlerResult.getExecution().getProcessInstanceId());
+    return execution;
   }
 
 }

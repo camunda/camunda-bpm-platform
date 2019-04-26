@@ -52,11 +52,24 @@ public class MessageCorrelationResultDto {
     return resultType;
   }
 
+  public void setResultType(MessageCorrelationResultType resultType) {
+    this.resultType = resultType;
+  }
+
   public ExecutionDto getExecution() {
     return execution;
+  }
+
+  public void setExecution(ExecutionDto execution) {
+    this.execution = execution;
   }
 
   public ProcessInstanceDto getProcessInstance() {
     return processInstance;
   }
+
+  public void setProcessInstance(ProcessInstanceDto processInstance) {
+    this.processInstance = processInstance;
+  }
+
 }

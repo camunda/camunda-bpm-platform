@@ -94,6 +94,7 @@ import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -3064,6 +3065,19 @@ public abstract class MockProvider {
     return result;
   }
 
+  public static MessageCorrelationResultWithVariables createMessageCorrelationResultWithVariables(MessageCorrelationResultType type) {
+    MessageCorrelationResultWithVariables result = mock(MessageCorrelationResultWithVariables.class);
+    when(result.getResultType()).thenReturn(type);
+    if (result.getResultType().equals(MessageCorrelationResultType.Execution)) {
+      Execution ex = createMockExecution();
+      when(result.getExecution()).thenReturn(ex);
+    } else {
+      ProcessInstance instance = createMockInstance();
+      when(result.getProcessInstance()).thenReturn(instance);
+    }
+    when(result.getVariables()).thenReturn(createMockSerializedVariables());
+    return result;
+  }
 
   public static List<MessageCorrelationResult> createMessageCorrelationResultList(MessageCorrelationResultType type) {
     List<MessageCorrelationResult> list = new ArrayList<MessageCorrelationResult>();

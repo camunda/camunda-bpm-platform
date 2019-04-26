@@ -32,6 +32,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
@@ -41,6 +43,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -1618,10 +1621,10 @@ public class MessageCorrelationTest {
     messageLocalPayload.put(localVarName, outpuValue);
 
     // when
-    MessageCorrelationResult messageCorrelationResult = runtimeService
+    MessageCorrelationResultWithVariables messageCorrelationResult = runtimeService
         .createMessageCorrelation("1")
         .setVariablesLocal(messageLocalPayload)
-        .correlateWithResult();
+        .correlateWithResultAndVariables();
 
     // then
     checkExecutionMessageCorrelationResult(messageCorrelationResult, processInstance, "message_1");
@@ -1641,6 +1644,10 @@ public class MessageCorrelationTest {
         .variableName(localVarName)
         .singleResult();
     assertNull(variableNonExisting);
+
+    VariableMap variablesInReturn = messageCorrelationResult.getVariables();
+    assertEquals(variable.getTypedValue(), variablesInReturn.getValueTyped(outputVarName));
+    assertEquals("processInstanceVarValue", variablesInReturn.getValue("processInstanceVar", String.class));
   }
 
   @Test
@@ -1765,4 +1772,101 @@ public class MessageCorrelationTest {
     assertEquals(MessageCorrelationResultType.ProcessDefinition, result.getResultType());
   }
 
+  @Test
+  public void testMessageStartEventCorrelationWithVariablesInResult() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+        .message("1")
+        .userTask("UserTask_1")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    // when
+    MessageCorrelationResultWithVariables result = runtimeService
+        .createMessageCorrelation("1")
+        .setVariable("foo", "bar")
+        .correlateWithResultAndVariables();
+
+    // then
+    assertNotNull(result);
+    assertEquals(MessageCorrelationResultType.ProcessDefinition, result.getResultType());
+    assertEquals("bar", result.getVariables().getValue("foo", String.class));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
+  public void testCorrelateAllWithResultVariables() {
+    //given
+    ProcessInstance procInstance1 = runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var1", "foo"));
+    ProcessInstance procInstance2 = runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var2", "bar"));
+
+    //when correlated all with result and variables
+    List<MessageCorrelationResultWithVariables> resultList = runtimeService
+        .createMessageCorrelation("newInvoiceMessage")
+        .correlateAllWithResultAndVariables();
+
+    assertEquals(2, resultList.size());
+    //then result should contains executions on which messages was correlated
+    for (MessageCorrelationResultWithVariables result : resultList) {
+      assertNotNull(result);
+      assertEquals(MessageCorrelationResultType.Execution, result.getResultType());
+      ExecutionEntity execution = (ExecutionEntity) result.getExecution();
+      VariableMap variables = result.getVariables();
+      assertEquals(1, variables.size());
+      if (procInstance1.getId().equalsIgnoreCase(execution.getProcessInstanceId())) {
+        assertEquals("foo", variables.getValue("var1", String.class));
+      } else if (procInstance2.getId().equalsIgnoreCase(execution.getProcessInstanceId())) {
+        assertEquals("bar", variables.getValue("var2", String.class));
+      } else {
+        fail("Only those process instances should exist");
+      }
+    }
+  }
+
+  @Test
+  public void testCorrelationWithModifiedVariablesInResult() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+        .intermediateCatchEvent("Message_1")
+        .message("1")
+        .serviceTask()
+        .camundaClass(ChangeVariableDelegate.class.getName())
+        .userTask("UserTask_1")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    runtimeService.startProcessInstanceByKey("Process_1",
+        Variables.createVariables()
+        .putValue("a", 40)
+        .putValue("b", 2));
+
+    // when
+    MessageCorrelationResultWithVariables result = runtimeService
+        .createMessageCorrelation("1")
+        .correlateWithResultAndVariables();
+
+    // then
+    assertNotNull(result);
+    assertEquals(MessageCorrelationResultType.Execution, result.getResultType());
+    assertEquals(3, result.getVariables().size());
+    assertEquals("foo", result.getVariables().get("a"));
+    assertEquals(2, result.getVariables().get("b"));
+    assertEquals(42, result.getVariables().get("sum"));
+  }
+
+  public static class ChangeVariableDelegate implements JavaDelegate {
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      Integer a = (Integer) execution.getVariable("a");
+      Integer b = (Integer) execution.getVariable("b");
+      execution.setVariable("sum", a + b);
+      execution.setVariable("a", "foo");
+    }
+  }
 }

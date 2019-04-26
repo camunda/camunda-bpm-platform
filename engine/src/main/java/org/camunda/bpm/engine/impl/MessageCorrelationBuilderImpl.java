@@ -23,13 +23,16 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
+import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageVariablesInReturn;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
+import org.camunda.bpm.engine.impl.cmd.CorrelateMessageVariablesInReturnCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateStartMessageCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
@@ -212,6 +215,14 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   @Override
+  public MessageCorrelationResultWithVariables correlateWithResultAndVariables() {
+    ensureProcessDefinitionIdNotSet();
+    ensureProcessInstanceAndTenantIdNotSet();
+
+    return execute(new CorrelateMessageVariablesInReturnCmd(this));
+  }
+
+  @Override
   public void correlateExclusively() {
     isExclusiveCorrelation = true;
 
@@ -229,6 +240,14 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     ensureProcessInstanceAndTenantIdNotSet();
 
     return execute(new CorrelateAllMessageCmd(this));
+  }
+
+  @Override
+  public List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables() {
+    ensureProcessDefinitionIdNotSet();
+    ensureProcessInstanceAndTenantIdNotSet();
+
+    return execute(new CorrelateAllMessageVariablesInReturn(this));
   }
 
   public ProcessInstance correlateStartMessage() {

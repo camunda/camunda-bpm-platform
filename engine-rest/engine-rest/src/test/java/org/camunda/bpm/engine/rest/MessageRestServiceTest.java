@@ -55,6 +55,8 @@ import java.util.List;
 import junit.framework.Assert;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
+
 import static org.mockito.Mockito.when;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
@@ -83,6 +85,9 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   private List<MessageCorrelationResult> procInstanceResultList;
   private List<MessageCorrelationResult> mixedResultList;
 
+  private MessageCorrelationResultWithVariables executionResultWithVariables;
+  private List<MessageCorrelationResultWithVariables> execResultWithVariablesList;
+
   @Before
   public void setupMocks() {
     runtimeServiceMock = mock(RuntimeService.class);
@@ -103,6 +108,10 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     procInstanceResultList = MockProvider.createMessageCorrelationResultList(MessageCorrelationResultType.ProcessDefinition);
     mixedResultList = new ArrayList<MessageCorrelationResult>(executionResultList);
     mixedResultList.addAll(procInstanceResultList);
+
+    executionResultWithVariables = MockProvider.createMessageCorrelationResultWithVariables(MessageCorrelationResultType.Execution);
+    execResultWithVariablesList = new ArrayList<MessageCorrelationResultWithVariables>();
+    execResultWithVariablesList.add(executionResultWithVariables);
 
   }
 
@@ -1152,6 +1161,104 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     verify(messageCorrelationBuilderMock, Mockito.never()).processInstanceBusinessKey(anyString());
     verify(messageCorrelationBuilderMock).correlateWithResult();
     verifyNoMoreInteractions(messageCorrelationBuilderMock);
+  }
+
+  @Test
+  public void testCorrelationWithVariablesInResult() {
+    // given
+    when(messageCorrelationBuilderMock.correlateWithResultAndVariables()).thenReturn(executionResultWithVariables);
+
+    String messageName = "aMessageName";
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("resultEnabled", true);
+    messageParameters.put("variablesInResultEnabled", true);
+
+    // when
+    Response response = given().contentType(POST_JSON_CONTENT_TYPE)
+           .body(messageParameters)
+    .then().expect()
+           .contentType(ContentType.JSON)
+           .statusCode(Status.OK.getStatusCode())
+    .when().post(MESSAGE_URL);
+
+    // then
+    assertNotNull(response);
+    String content = response.asString();
+    assertTrue(!content.isEmpty());
+    checkVariablesInResult(content, 0);
+
+    verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
+    verify(messageCorrelationBuilderMock).correlateWithResultAndVariables();
+  }
+
+  @Test
+  public void testCorrelationAllWithVariablesInResult() {
+    // given
+    when(messageCorrelationBuilderMock.correlateAllWithResultAndVariables()).thenReturn(execResultWithVariablesList);
+
+    String messageName = "aMessageName";
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("all", true);
+    messageParameters.put("resultEnabled", true);
+    messageParameters.put("variablesInResultEnabled", true);
+
+    // when
+    Response response = given().contentType(POST_JSON_CONTENT_TYPE)
+           .body(messageParameters)
+    .then().expect()
+           .contentType(ContentType.JSON)
+           .statusCode(Status.OK.getStatusCode())
+    .when().post(MESSAGE_URL);
+
+    // then
+    assertNotNull(response);
+    String content = response.asString();
+    assertTrue(!content.isEmpty());
+
+    List<HashMap<Object, Object>> results = from(content).getList("");
+    assertEquals(1, results.size());
+    checkVariablesInResult(content, 0);
+
+    verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
+    verify(messageCorrelationBuilderMock).correlateAllWithResultAndVariables();
+  }
+
+  @Test
+  public void testFailingCorrelationWithVariablesInResultDueToDisabledResult() {
+    // given
+    String messageName = "aMessageName";
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("resultEnabled", false);
+    messageParameters.put("variablesInResultEnabled", true);
+
+    // when/
+    given().contentType(POST_JSON_CONTENT_TYPE)
+           .body(messageParameters)
+    .then().expect()
+           .contentType(ContentType.JSON)
+           .statusCode(Status.BAD_REQUEST.getStatusCode())
+           .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+           .body("message", equalTo("Parameter 'variablesInResultEnabled' cannot be used without 'resultEnabled' set to true."))
+    .when().post(MESSAGE_URL);
+  }
+
+
+  protected void checkVariablesInResult(String content, int idx) {
+    List<String> variableNames = java.util.Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME);
+
+    for (String variableName : variableNames) {
+      String variablePath = "[" + idx + "].variables." + variableName;
+      assertEquals(MockProvider.FORMAT_APPLICATION_JSON, from(content).getMap(variablePath + ".valueInfo").get("serializationDataFormat"));
+      assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE, from(content).get(variablePath + ".value"));
+      assertEquals(Object.class.getSimpleName(), from(content).get(variablePath + ".type"));
+    }
+    assertEquals(ArrayList.class.getName(),
+        from(content).getMap("[" + idx + "].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo").get("objectTypeName"));
+    assertEquals(Object.class.getName(),
+        from(content).getMap("[" + idx + "].variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".valueInfo").get("objectTypeName"));
   }
 
 }
