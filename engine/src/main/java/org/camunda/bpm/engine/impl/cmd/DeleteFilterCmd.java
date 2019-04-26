@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -35,6 +36,8 @@ public class DeleteFilterCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
+    commandContext.getOperationLogManager().logFilterOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, filterId);
+    
     commandContext
       .getFilterManager()
       .deleteFilter(filterId);

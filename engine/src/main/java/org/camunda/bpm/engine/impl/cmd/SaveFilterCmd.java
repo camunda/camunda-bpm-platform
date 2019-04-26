@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -38,10 +39,16 @@ public class SaveFilterCmd implements Command<Filter>, Serializable {
 
   public Filter execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull("filter", filter);
-
-    return commandContext
+    
+    String operation = filter.getId() == null ? UserOperationLogEntry.OPERATION_TYPE_CREATE : UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+    
+    Filter savedFilter = commandContext
       .getFilterManager()
       .insertOrUpdateFilter(filter);
+    
+    commandContext.getOperationLogManager().logFilterOperation(operation, filter.getId());
+    
+    return savedFilter;
   }
 
 }

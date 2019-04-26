@@ -576,6 +576,18 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
   
+  public void logFilterOperation(String operation, String filterId) {
+    if (isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.FILTER)
+            .propertyChanges(new PropertyChange("filterId", null, filterId))
+            .category(UserOperationLogEntry.CATEGORY_TASK_WORKER);
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+  }
+  
   public void logAuthorizationOperation(String operation, AuthorizationEntity authorization) {
     if (isUserOperationLogEnabled()) {
       List<PropertyChange> propertyChanges = new ArrayList<>();
