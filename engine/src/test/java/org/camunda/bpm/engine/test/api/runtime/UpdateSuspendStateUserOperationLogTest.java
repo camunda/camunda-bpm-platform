@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -76,9 +78,9 @@ public class UpdateSuspendStateUserOperationLogTest {
 
     // when
     Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
+    rule.getIdentityService().clearAuthentication();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
-    rule.getIdentityService().clearAuthentication();
 
     // then
     List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();
@@ -131,7 +133,7 @@ public class UpdateSuspendStateUserOperationLogTest {
     rule.getIdentityService().clearAuthentication();
 
     // then
-    assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().count());
+    assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count());
   }
 
   protected Map<String, UserOperationLogEntry> asMap(List<UserOperationLogEntry> logEntries) {

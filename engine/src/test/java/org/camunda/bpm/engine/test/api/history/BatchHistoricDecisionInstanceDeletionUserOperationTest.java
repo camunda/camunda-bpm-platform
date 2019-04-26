@@ -276,7 +276,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     engineRule.getIdentityService().clearAuthentication();
 
     // then
-    assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().count());
+    assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.DECISION_INSTANCE).count());
   }
 
   @Test
@@ -291,7 +291,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     engineRule.getIdentityService().clearAuthentication();
 
     // then
-    assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().count());
+    assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.DECISION_INSTANCE).count());
   }
 
   @Test
@@ -306,7 +306,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     engineRule.getIdentityService().clearAuthentication();
 
     // then
-    assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().count());
+    assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.DECISION_INSTANCE).count());
   }
 
   @Test

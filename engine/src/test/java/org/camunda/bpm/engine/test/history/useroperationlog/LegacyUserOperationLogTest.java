@@ -185,7 +185,7 @@ public class LegacyUserOperationLogTest {
       managementService.executeJob(pending.getId());
     }
 
-    assertEquals(5, userOperationLogQuery().count());
+    assertEquals(5, userOperationLogQuery().entityTypeIn(EntityTypes.PROCESS_INSTANCE, EntityTypes.DEPLOYMENT).count());
   }
 
   @Test
@@ -216,7 +216,7 @@ public class LegacyUserOperationLogTest {
     managementService.executeJob(migrationJob.getId());
 
     // then
-    assertEquals(7, userOperationLogQuery().count());
+    assertEquals(9, userOperationLogQuery().count());
     assertEquals(2, userOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
         .entityType(EntityTypes.DEPLOYMENT)
