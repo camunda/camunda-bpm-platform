@@ -55,19 +55,22 @@
       <version>${version.resteasy3}</version>
       <scope>provided</scope>
     </dependency>
+    
+    <!-- this overrides a transitive dependency Resteasy 3.0.26;
+    Resteasy depends on 1.0.1.Beta1, which was compiled with Java 8 and therefore
+     does not work in Java 7 environments (e.g. JBoss 7). 1.0.1.Final
+     was compiled with Java 7. -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.ws.rs</groupId>
+      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+      <version>1.0.1.Final</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
       <version>${version.jersey2}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- jboss as 7.2 dependencies -->
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
-      <version>3.0.12.Final</version>
       <scope>provided</scope>
     </dependency>
 
