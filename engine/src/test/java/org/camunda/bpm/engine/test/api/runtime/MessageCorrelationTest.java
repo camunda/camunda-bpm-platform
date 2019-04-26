@@ -58,6 +58,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -1733,6 +1734,35 @@ public class MessageCorrelationTest {
     // waiting process must be finished
     waitingProcess = runtimeService.createExecutionQuery().executionId(messageWaitProcess.getProcessInstanceId()).singleResult();
     Assert.assertNull(waitingProcess);
+  }
+
+  @Test
+  @Ignore("CAM-10198")
+  public void testMessageStartEventCorrelationWithLocalVariables() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
+        .startEvent()
+        .message("1")
+        .userTask("userTask1")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    Map<String, Object> messagePayload = new HashMap<String, Object>();
+    String outpuValue = "outputValue";
+    String localVarName = "testLocalVar";
+    messagePayload.put(localVarName, outpuValue);
+
+    // when
+    MessageCorrelationResult result = runtimeService
+        .createMessageCorrelation("1")
+        .setVariablesLocal(messagePayload)
+        .correlateWithResult();
+
+    // then
+    assertNotNull(result);
+    assertEquals(MessageCorrelationResultType.ProcessDefinition, result.getResultType());
   }
 
 }
