@@ -32,7 +32,31 @@ import org.camunda.bpm.engine.repository.ResourceType;
  * @author Askar Akhmerov
  */
 public class ExceptionUtil {
+  /** A marker interface used by getMessageWithCauses to halt recursion */
+  public static interface NoRecurseCause {};
 
+  /** The maximum number of levels to recurse when including the causes of an exception in the message returned by getMessageWithCauses(Throwable) */
+  private static int numLevelsOfCauseToInclude;
+
+  /** Sets the maximum number of levels to recurse when including the causes of an exception in the message returned by getMessageWithCauses(Throwable) */
+  public static void setNumLevelsOfCauseToInclude(final int numLevels) {
+      numLevelsOfCauseToInclude = numLevels;
+  }
+
+  /** @return throwable's message concatenated with the messages of each of its causes, up to the limit specified in setNumLevelsOfCauseToInclude(int) */
+  public static String getMessageWithCauses(Throwable throwable) {
+    String message = throwable.toString();
+    int numLevels = numLevelsOfCauseToInclude;
+    while ((throwable.getCause() != null) && (numLevels-- > 0)) {
+      throwable = throwable.getCause();
+      message += " caused by " + throwable;
+      if (throwable instanceof NoRecurseCause) {
+        break;
+      }
+    }
+    return message;
+  }
+  
   public static String getExceptionStacktrace(Throwable exception) {
     StringWriter stringWriter = new StringWriter();
     exception.printStackTrace(new PrintWriter(stringWriter));

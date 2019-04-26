@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
 
@@ -197,7 +198,8 @@ public abstract class ProcessEngineConfiguration {
    * effectively unusable on most databases.
    */
   public static final String AUTHORIZATION_CHECK_REVOKE_AUTO = "auto";
-
+  
+  protected int numLevelsOfExceptionCauseToDisplay = 0;
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;
   protected String history = HISTORY_DEFAULT;
@@ -402,6 +404,15 @@ public abstract class ProcessEngineConfiguration {
 
 
   // getters and setters //////////////////////////////////////////////////////
+  
+  public int getNumLevelsOfExceptionCauseToDisplay() {
+    return numLevelsOfExceptionCauseToDisplay;
+  }
+
+  public void setNumLevelsOfExceptionCauseToDisplay(final int numLevels) {
+    numLevelsOfExceptionCauseToDisplay = numLevels;
+    ExceptionUtil.setNumLevelsOfCauseToInclude(numLevels);
+  }
 
   public String getProcessEngineName() {
     return processEngineName;

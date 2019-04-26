@@ -15,15 +15,29 @@
  */
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
 /**
  * Runtime exception that is the superclass of all exceptions in the process engine.
  *
  * @author Tom Baeyens
  */
-public class ProcessEngineException extends RuntimeException {
+public class ProcessEngineException extends RuntimeException implements ExceptionUtil.NoRecurseCause {
 
   private static final long serialVersionUID = 1L;
+  
+  @Override
+  public String getMessage()
+  {
+    if (getCause() == null)
+    {
+      return super.getMessage();
+    }
+    else
+    {
+      return super.getMessage() + " caused by " + ExceptionUtil.getMessageWithCauses(getCause());
+    }
+  }
 
   public ProcessEngineException() {
     super();
