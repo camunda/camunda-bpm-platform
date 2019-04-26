@@ -94,6 +94,9 @@ public class DateFormType extends AbstractFormFieldType {
     if (propertyValue==null || "".equals(propertyValue)) {
       return null;
     }
+    if (propertyValue instanceof Date) {
+      return propertyValue;
+    }
     try {
       return dateFormat.parseObject(propertyValue.toString());
     } catch (ParseException e) {
