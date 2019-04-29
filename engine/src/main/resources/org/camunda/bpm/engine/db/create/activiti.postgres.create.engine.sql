@@ -58,7 +58,7 @@ create table ACT_GE_BYTEARRAY (
 create table ACT_GE_SCHEMA_LOG (
     ID_ varchar(64),
     TIMESTAMP_ timestamp,
-    VERSION_ varchar(64),
+    VERSION_ varchar(255),
     primary key (ID_)
 );
 

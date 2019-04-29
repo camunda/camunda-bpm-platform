@@ -24,7 +24,7 @@ ALTER TABLE ACT_HI_OP_LOG
   create table ACT_GE_SCHEMA_LOG (
     ID_ nvarchar(64),
     TIMESTAMP_ datetime2,
-    VERSION_ nvarchar(64),
+    VERSION_ nvarchar(255),
     primary key (ID_)
 );
 

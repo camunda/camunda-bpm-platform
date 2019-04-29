@@ -58,7 +58,7 @@ create table ACT_GE_BYTEARRAY (
 create table ACT_GE_SCHEMA_LOG (
     ID_ varchar(64),
     TIMESTAMP_ datetime,
-    VERSION_ varchar(64),
+    VERSION_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

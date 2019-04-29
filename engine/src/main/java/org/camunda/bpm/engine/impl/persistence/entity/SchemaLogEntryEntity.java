@@ -22,12 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.management.SchemaLogEntry;
 
 /**
  * @author Miklas Boskamp
  *
  */
-public class SchemaLogEntry implements DbEntity, Serializable {
+public class SchemaLogEntryEntity implements SchemaLogEntry, DbEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
