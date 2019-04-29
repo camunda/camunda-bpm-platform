@@ -404,6 +404,10 @@ public class CommandContext {
   public TenantManager getTenantManager() {
     return getSession(TenantManager.class);
   }
+  
+  public SchemaLogManager getSchemaLogManager() {
+    return getSession(SchemaLogManager.class);
+  }
 
   // CMMN /////////////////////////////////////////////////////////////////////
 

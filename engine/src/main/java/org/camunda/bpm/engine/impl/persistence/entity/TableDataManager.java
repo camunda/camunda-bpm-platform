@@ -143,7 +143,7 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(PropertyEntity.class, "ACT_GE_PROPERTY");
     persistentObjectToTableNameMap.put(ByteArrayEntity.class, "ACT_GE_BYTEARRAY");
     persistentObjectToTableNameMap.put(ResourceEntity.class, "ACT_GE_BYTEARRAY");
-    persistentObjectToTableNameMap.put(SchemaLogEntry.class, "ACT_GE_SCHEMA_LOG");
+    persistentObjectToTableNameMap.put(SchemaLogEntryEntity.class, "ACT_GE_SCHEMA_LOG");
     persistentObjectToTableNameMap.put(FilterEntity.class, "ACT_RU_FILTER");
 
     // and now the map for the API types (does not cover all cases)

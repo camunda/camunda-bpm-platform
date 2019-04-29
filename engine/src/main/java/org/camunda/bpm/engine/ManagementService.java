@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.management.SchemaLogQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
@@ -1264,5 +1265,12 @@ public interface ManagementService {
    * @since 7.5
    */
   BatchStatisticsQuery createBatchStatisticsQuery();
+
+  /**
+   * Query for entries of the database schema log.
+   * 
+   * @since 7.11
+   */
+  SchemaLogQuery createSchemaLogQuery();
 
 }

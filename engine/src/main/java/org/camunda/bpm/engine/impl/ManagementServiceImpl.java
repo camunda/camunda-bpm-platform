@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.management.SchemaLogQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePageQuery;
 import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
@@ -473,4 +474,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return new BatchStatisticsQueryImpl(commandExecutor);
   }
 
+  public SchemaLogQuery createSchemaLogQuery() {
+    return new SchemaLogQueryImpl(commandExecutor);
+  }
 }

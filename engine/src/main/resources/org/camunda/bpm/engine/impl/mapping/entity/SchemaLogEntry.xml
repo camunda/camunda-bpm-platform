@@ -19,11 +19,11 @@
 -->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
-<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity">
 
   <!-- SCHEMALOGENTRY INSERT -->
   
-  <insert id="insertschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+  <insert id="insertschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity">
       insert into ${prefix}ACT_GE_SCHEMA_LOG (
         ID_,
         TIMESTAMP_,
@@ -35,30 +35,32 @@
       )
   </insert>
 
-  <!-- SCHEMALOGENTRY UPDATE -->
-  
-  <update id="updateschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
-    update ${prefix}ACT_GE_SCHEMA_LOG
-    <set>
-      TIMESTAMP_ = #{timestamp, jdbcType=TIMESTAMP},
-      VERSION_ = #{version, jdbcType=VARCHAR}
-    </set>
-    where ID_ = #{id, jdbcType=VARCHAR}
-  </update>
-
-  <!-- SCHEMALOGENTRY DELETE -->
-  
-  <delete id="deleteschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
-    delete from ${prefix}ACT_GE_SCHEMA_LOG where ID_ = #{id}
-  </delete>
-
-
   <!-- SCHEMALOGENTRY SELECT -->
   
-  <resultMap id="schemaLogEntryResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+  <resultMap id="schemaLogEntryResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
     <result property="version" column="VERSION_" jdbcType="VARCHAR" />
   </resultMap>
+
+  <select id="selectSchemaLogEntryCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.SchemaLogQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectSchemaLogEntrySql"/>
+  </select>
+
+  <select id="selectSchemaLogEntryByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.SchemaLogQueryImpl" resultMap="schemaLogEntryResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
+    <include refid="selectSchemaLogEntrySql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <sql id="selectSchemaLogEntrySql">
+    from ${prefix}ACT_GE_SCHEMA_LOG RES
+  </sql>
 
 </mapper>
