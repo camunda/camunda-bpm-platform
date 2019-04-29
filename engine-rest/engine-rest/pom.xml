@@ -24,6 +24,7 @@
     <!-- other JAX-RS implementations -->
     <wink.version>1.1.1-incubating</wink.version>
     <jersey.version>1.17.1</jersey.version>
+    <javax.activation.version>1.1.1</javax.activation.version>
   </properties>
 
   <dependencies>
@@ -48,6 +49,13 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>activation</artifactId>
+      <version>${javax.activation.version}</version>
       <scope>provided</scope>
     </dependency>
 
