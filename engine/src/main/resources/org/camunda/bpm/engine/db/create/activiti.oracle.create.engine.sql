@@ -55,6 +55,16 @@ create table ACT_GE_BYTEARRAY (
     primary key (ID_)
 );
 
+create table ACT_GE_SCHEMA_LOG (
+    ID_ NVARCHAR(64),
+    TIMESTAMP_ TIMESTAMP(6),
+    VERSION_ NVARCHAR(64),
+    primary key (ID_)
+);
+
+insert into ACT_GE_SCHEMA_LOG
+values ('0', CURRENT_TIMESTAMP, '7.11.0');
+
 create table ACT_RE_DEPLOYMENT (
     ID_ NVARCHAR2(64),
     NAME_ NVARCHAR2(255),

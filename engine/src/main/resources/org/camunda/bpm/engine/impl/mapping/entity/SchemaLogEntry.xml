@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+
+  <!-- SCHEMALOGENTRY INSERT -->
+  
+  <insert id="insertschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+      insert into ${prefix}ACT_GE_SCHEMA_LOG (
+        ID_,
+        TIMESTAMP_,
+        VERSION_
+      ) values (
+        #{id ,jdbcType=VARCHAR},
+        #{timestamp, jdbcType=TIMESTAMP},
+        #{version, jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <!-- SCHEMALOGENTRY UPDATE -->
+  
+  <update id="updateschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+    update ${prefix}ACT_GE_SCHEMA_LOG
+    <set>
+      TIMESTAMP_ = #{timestamp, jdbcType=TIMESTAMP},
+      VERSION_ = #{version, jdbcType=VARCHAR}
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
+  <!-- SCHEMALOGENTRY DELETE -->
+  
+  <delete id="deleteschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+    delete from ${prefix}ACT_GE_SCHEMA_LOG where ID_ = #{id}
+  </delete>
+
+
+  <!-- SCHEMALOGENTRY SELECT -->
+  
+  <resultMap id="schemaLogEntryResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntry">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="version" column="VERSION_" jdbcType="VARCHAR" />
+  </resultMap>
+
+</mapper>

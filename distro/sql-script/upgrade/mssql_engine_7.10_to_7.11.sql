@@ -20,3 +20,13 @@ ALTER TABLE ACT_HI_OP_LOG
 
 ALTER TABLE ACT_HI_OP_LOG
   ADD EXTERNAL_TASK_ID_ nvarchar(64);
+
+  create table ACT_GE_SCHEMA_LOG (
+    ID_ nvarchar(64),
+    TIMESTAMP_ datetime2,
+    VERSION_ nvarchar(64),
+    primary key (ID_)
+);
+
+insert into ACT_GE_SCHEMA_LOG
+values ('0', CURRENT_TIMESTAMP, '7.11.0');

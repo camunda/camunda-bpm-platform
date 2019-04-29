@@ -51,3 +51,13 @@ ALTER TABLE ACT_HI_OP_LOG
   
 ALTER TABLE ACT_HI_OP_LOG
   ADD COLUMN EXTERNAL_TASK_ID_ varchar(64);
+
+create table ACT_GE_SCHEMA_LOG (
+    ID_ varchar(64),
+    TIMESTAMP_ datetime,
+    VERSION_ varchar(64),
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
+insert into ACT_GE_SCHEMA_LOG
+values ('0', CURRENT_TIMESTAMP, '7.11.0');
