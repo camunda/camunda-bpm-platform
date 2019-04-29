@@ -2,9 +2,9 @@ camunda-spin
 ============
 
 <p>
-  <a href="http://camunda.org/">Home</a> |
-  <a href="http://docs.camunda.org/latest/api-references/spin/">Documentation</a> |
-  <a href="http://camunda.org/community/forum.html">Forum</a> |
+  <a href="https://camunda.com/">Home</a> |
+  <a href="https://docs.camunda.org/manual/reference/spin/">Documentation</a> |
+  <a href="https://forum.camunda.org/">Forum</a> |
   <a href="https://app.camunda.com/jira/browse/CAM">Issues</a> |
   <a href="LICENSE">License</a> |
   <a href="CONTRIBUTING.md">Contribute</a>
