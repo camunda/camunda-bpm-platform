@@ -26,10 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
 import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariablesImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
@@ -102,23 +99,11 @@ public abstract class AbstractCorrelateMessageCmd {
     }
   }
 
-  protected MessageCorrelationResult createMessageCorrelationResult(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
-    MessageCorrelationResultImpl result = new MessageCorrelationResultImpl(handlerResult);
-    if (MessageCorrelationResultType.Execution.equals(handlerResult.getResultType())) {
-      triggerExecution(commandContext, handlerResult);
-    } else {
-      ProcessInstance instance = instantiateProcess(commandContext, handlerResult);
-      result.setProcessInstance(instance);
-    }
-
-    return result;
-  }
-
-  protected MessageCorrelationResultWithVariables createMessageCorrelationResultWithVariables(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
-    MessageCorrelationResultWithVariablesImpl resultWithVariables = new MessageCorrelationResultWithVariablesImpl(handlerResult);
+  protected MessageCorrelationResultImpl createMessageCorrelationResult(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
+    MessageCorrelationResultImpl resultWithVariables = new MessageCorrelationResultImpl(handlerResult);
     if (MessageCorrelationResultType.Execution.equals(handlerResult.getResultType())) {
       ExecutionEntity execution = findProcessInstanceExecution(commandContext, handlerResult);
-      if (execution != null) {
+      if (variablesEnabled && execution != null) {
         variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
       }
       triggerExecution(commandContext, handlerResult);

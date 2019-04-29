@@ -23,9 +23,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
-import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageVariablesInReturn;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
-import org.camunda.bpm.engine.impl.cmd.CorrelateMessageVariablesInReturnCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateStartMessageCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -211,7 +209,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return execute(new CorrelateMessageCmd(this));
+    return execute(new CorrelateMessageCmd(this, false));
   }
 
   @Override
@@ -219,7 +217,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return execute(new CorrelateMessageVariablesInReturnCmd(this));
+    return execute(new CorrelateMessageCmd(this, true));
   }
 
   @Override
@@ -239,7 +237,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return execute(new CorrelateAllMessageCmd(this));
+    return (List) execute(new CorrelateAllMessageCmd(this, false));
   }
 
   @Override
@@ -247,7 +245,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return execute(new CorrelateAllMessageVariablesInReturn(this));
+    return (List) execute(new CorrelateAllMessageCmd(this, true));
   }
 
   public ProcessInstance correlateStartMessage() {

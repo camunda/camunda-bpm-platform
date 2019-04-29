@@ -56,6 +56,7 @@ import junit.framework.Assert;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 import static org.mockito.Mockito.when;
 import static io.restassured.RestAssured.given;
@@ -106,11 +107,11 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     procInstanceResult = MockProvider.createMessageCorrelationResult(MessageCorrelationResultType.ProcessDefinition);
     executionResultList = MockProvider.createMessageCorrelationResultList(MessageCorrelationResultType.Execution);
     procInstanceResultList = MockProvider.createMessageCorrelationResultList(MessageCorrelationResultType.ProcessDefinition);
-    mixedResultList = new ArrayList<MessageCorrelationResult>(executionResultList);
+    mixedResultList = new ArrayList<>(executionResultList);
     mixedResultList.addAll(procInstanceResultList);
 
     executionResultWithVariables = MockProvider.createMessageCorrelationResultWithVariables(MessageCorrelationResultType.Execution);
-    execResultWithVariablesList = new ArrayList<MessageCorrelationResultWithVariables>();
+    execResultWithVariablesList = new ArrayList<>();
     execResultWithVariablesList.add(executionResultWithVariables);
 
   }
@@ -132,7 +133,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
         .variable("anotherLocalKey", 1)
         .variable("aThirdLocalKey", false).getVariables();
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", correlationKeys);
     messageParameters.put("localCorrelationKeys", localCorrelationKeys);
@@ -144,19 +145,19 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(MESSAGE_URL);
 
-    Map<String, Object> expectedCorrelationKeys = new HashMap<String, Object>();
+    Map<String, Object> expectedCorrelationKeys = new HashMap<>();
     expectedCorrelationKeys.put("aKey", "aValue");
     expectedCorrelationKeys.put("anotherKey", 1);
     expectedCorrelationKeys.put("aThirdKey", true);
 
-    Map<String, Object> expectedLocalCorrelationKeys = new HashMap<String, Object>();
+    Map<String, Object> expectedLocalCorrelationKeys = new HashMap<>();
     expectedLocalCorrelationKeys.put("aLocalKey", "aValue");
     expectedLocalCorrelationKeys.put("anotherLocalKey", 1);
     expectedLocalCorrelationKeys.put("aThirdLocalKey", false);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("aKey", "aValue");
-    Map<String, Object> expectedVariablesLocal = new HashMap<String, Object>();
+    Map<String, Object> expectedVariablesLocal = new HashMap<>();
     expectedVariablesLocal.put("aKeyLocal", "aValueLocal");
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
@@ -188,7 +189,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateWithResult()).thenReturn(executionResult);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("resultEnabled", true);
 
@@ -226,7 +227,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateWithResult()).thenReturn(procInstanceResult);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("resultEnabled", true);
 
@@ -276,7 +277,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
         .variable("anotherLocalKey", 1)
         .variable("aThirdLocalKey", false).getVariables();
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", correlationKeys);
     messageParameters.put("localCorrelationKeys", localCorrelationKeys);
@@ -289,19 +290,19 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(MESSAGE_URL);
 
-    Map<String, Object> expectedCorrelationKeys = new HashMap<String, Object>();
+    Map<String, Object> expectedCorrelationKeys = new HashMap<>();
     expectedCorrelationKeys.put("aKey", "aValue");
     expectedCorrelationKeys.put("anotherKey", 1);
     expectedCorrelationKeys.put("aThirdKey", true);
 
-    Map<String, Object> expectedLocalCorrelationKeys = new HashMap<String, Object>();
+    Map<String, Object> expectedLocalCorrelationKeys = new HashMap<>();
     expectedLocalCorrelationKeys.put("aLocalKey", "aValue");
     expectedLocalCorrelationKeys.put("anotherLocalKey", 1);
     expectedLocalCorrelationKeys.put("aThirdLocalKey", false);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("aKey", "aValue");
-    Map<String, Object> expectedVariablesLocal = new HashMap<String, Object>();
+    Map<String, Object> expectedVariablesLocal = new HashMap<>();
     expectedVariablesLocal.put("aKeyLocal", "aValueLocal");
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
@@ -331,7 +332,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateAllWithResult()).thenReturn(executionResultList);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("all", true);
     messageParameters.put("resultEnabled", true);
@@ -365,7 +366,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateAllWithResult()).thenReturn(procInstanceResultList);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("all", true);
     messageParameters.put("resultEnabled", true);
@@ -399,7 +400,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateAllWithResult()).thenReturn(mixedResultList);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("all", true);
     messageParameters.put("resultEnabled", true);
@@ -440,7 +441,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateAllWithResult()).thenReturn(mixedResultList);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("all", true);
 
@@ -464,7 +465,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   public void testMessageNameOnlyCorrelation() {
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
@@ -481,7 +482,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     String messageName = "aMessageName";
     String businessKey = "aBusinessKey";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("businessKey", businessKey);
 
@@ -504,7 +505,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     String messageName = "aMessageName";
     String businessKey = "aBusinessKey";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("businessKey", businessKey);
     messageParameters.put("all", true);
@@ -527,7 +528,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     doThrow(new MismatchingMessageCorrelationException(messageName, "Expected exception: cannot correlate"))
       .when(messageCorrelationBuilderMock).correlateWithResult();
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
@@ -544,7 +545,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     doThrow(new ProcessEngineException("Expected exception"))
       .when(messageCorrelationBuilderMock).correlateWithResult();
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -566,7 +567,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   public void testMessageCorrelationWithTenantId() {
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
 
@@ -584,7 +585,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   public void testMessageCorrelationWithoutTenantId() {
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("withoutTenantId", true);
 
@@ -602,7 +603,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   public void testFailingInvalidTenantParameters() {
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
     messageParameters.put("withoutTenantId", true);
@@ -629,7 +630,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", variableJson);
 
@@ -651,7 +652,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("localCorrelationKeys", variableJson);
 
@@ -673,7 +674,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", variableJson);
 
@@ -695,7 +696,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("localCorrelationKeys", variableJson);
 
@@ -717,7 +718,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", variableJson);
 
@@ -739,7 +740,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("localCorrelationKeys", variableJson);
 
@@ -761,7 +762,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", variableJson);
 
@@ -783,7 +784,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("localCorrelationKeys", variableJson);
 
@@ -805,7 +806,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", variableJson);
 
@@ -827,7 +828,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("localCorrelationKeys", variableJson);
 
@@ -849,7 +850,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", variableJson);
 
@@ -870,7 +871,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("localCorrelationKeys", variableJson);
 
@@ -891,7 +892,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariables", variableJson);
 
@@ -913,7 +914,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariables", variableJson);
 
@@ -935,7 +936,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariables", variableJson);
 
@@ -957,7 +958,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariables", variableJson);
 
@@ -979,7 +980,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariables", variableJson);
 
@@ -1001,7 +1002,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariables", variableJson);
 
@@ -1022,7 +1023,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariablesLocal", variableLocalJson);
 
@@ -1044,7 +1045,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariablesLocal", variableLocalJson);
 
@@ -1065,7 +1066,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processVariablesLocal", variableLocalJson);
 
@@ -1080,7 +1081,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   @Test
   public void testCorrelateThrowsAuthorizationException() {
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
 
     String message = "expected exception";
@@ -1100,7 +1101,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   @Test
   public void testcorrelateAllThrowsAuthorizationException() {
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("all", true);
 
@@ -1122,7 +1123,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   public void testMessageCorrelationWithProcessInstanceId() {
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -1146,7 +1147,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     String messageName = "aMessageName";
 
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
 
     given()
@@ -1169,7 +1170,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateWithResultAndVariables()).thenReturn(executionResultWithVariables);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("resultEnabled", true);
     messageParameters.put("variablesInResultEnabled", true);
@@ -1198,7 +1199,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.correlateAllWithResultAndVariables()).thenReturn(execResultWithVariablesList);
 
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("all", true);
     messageParameters.put("resultEnabled", true);
@@ -1229,7 +1230,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   public void testFailingCorrelationWithVariablesInResultDueToDisabledResult() {
     // given
     String messageName = "aMessageName";
-    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    Map<String, Object> messageParameters = new HashMap<>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("resultEnabled", false);
     messageParameters.put("variablesInResultEnabled", true);
@@ -1253,8 +1254,9 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       String variablePath = "[" + idx + "].variables." + variableName;
       assertEquals(MockProvider.FORMAT_APPLICATION_JSON, from(content).getMap(variablePath + ".valueInfo").get("serializationDataFormat"));
       assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE, from(content).get(variablePath + ".value"));
-      assertEquals(Object.class.getSimpleName(), from(content).get(variablePath + ".type"));
+      assertEquals(ValueType.OBJECT.getName(), from(content).get(variablePath + ".type"));
     }
+
     assertEquals(ArrayList.class.getName(),
         from(content).getMap("[" + idx + "].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo").get("objectTypeName"));
     assertEquals(Object.class.getName(),

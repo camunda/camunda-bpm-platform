@@ -27,8 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
 /**
@@ -36,18 +36,18 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNul
  * @author Daniel Meyer
  * @author Michael Scholz
  */
-public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<List<MessageCorrelationResult>> {
+public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<List<MessageCorrelationResultImpl>> {
 
   /**
    * Initialize the command with a builder
    *
    * @param messageCorrelationBuilderImpl
    */
-  public CorrelateAllMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
-    super(messageCorrelationBuilderImpl);
+  public CorrelateAllMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl, boolean collectVariables) {
+    super(messageCorrelationBuilderImpl, collectVariables);
   }
 
-  public List<MessageCorrelationResult> execute(final CommandContext commandContext) {
+  public List<MessageCorrelationResultImpl> execute(final CommandContext commandContext) {
     ensureAtLeastOneNotNull(
         "At least one of the following correlation criteria has to be present: " + "messageName, businessKey, correlationKeys, processInstanceId", messageName,
         builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(), builder.getProcessInstanceId());
@@ -65,7 +65,7 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implemen
       checkAuthorization(correlationResult);
     }
 
-    List<MessageCorrelationResult> results = new ArrayList<MessageCorrelationResult>();
+    List<MessageCorrelationResultImpl> results = new ArrayList<>();
     for (CorrelationHandlerResult correlationResult : correlationResults) {
       results.add(createMessageCorrelationResult(commandContext, correlationResult));
     }

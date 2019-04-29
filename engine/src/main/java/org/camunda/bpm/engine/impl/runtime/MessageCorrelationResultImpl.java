@@ -17,19 +17,21 @@
 package org.camunda.bpm.engine.impl.runtime;
 
 import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class MessageCorrelationResultImpl implements MessageCorrelationResult {
+public class MessageCorrelationResultImpl implements MessageCorrelationResultWithVariables {
 
   protected final Execution execution;
   protected final MessageCorrelationResultType resultType;
   protected ProcessInstance processInstance;
+  protected VariableMap variables;
 
 
   public MessageCorrelationResultImpl(CorrelationHandlerResult handlerResult) {
@@ -56,4 +58,12 @@ public class MessageCorrelationResultImpl implements MessageCorrelationResult {
     return resultType;
   }
 
+  @Override
+  public VariableMap getVariables() {
+    return variables;
+  }
+
+  public void setVariables(VariableMap variables) {
+    this.variables = variables;
+  }
 }

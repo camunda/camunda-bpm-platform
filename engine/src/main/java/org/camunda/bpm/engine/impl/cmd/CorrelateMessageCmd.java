@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
@@ -25,10 +27,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
-import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
-import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
 
 /**
  * @author Thorben Lindhauer
@@ -36,18 +37,18 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNul
  * @author Michael Scholz
  * @author Christopher Zell
  */
-public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements Command<MessageCorrelationResult> {
+public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements Command<MessageCorrelationResultImpl> {
 
    /**
    * Initialize the command with a builder
    *
    * @param messageCorrelationBuilderImpl
    */
-  public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
-    super(messageCorrelationBuilderImpl);
+  public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl, boolean collectVariables) {
+    super(messageCorrelationBuilderImpl, collectVariables);
   }
 
-  public MessageCorrelationResult execute(final CommandContext commandContext) {
+  public MessageCorrelationResultImpl execute(final CommandContext commandContext) {
     ensureAtLeastOneNotNull(
         "At least one of the following correlation criteria has to be present: " + "messageName, businessKey, correlationKeys, processInstanceId", messageName,
         builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(), builder.getProcessInstanceId());

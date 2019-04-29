@@ -30,6 +30,7 @@ public class MessageCorrelationResultWithVariableDto extends MessageCorrelationR
 
   public static MessageCorrelationResultWithVariableDto fromMessageCorrelationResultWithVariables(MessageCorrelationResultWithVariables result) {
     MessageCorrelationResultWithVariableDto dto = new MessageCorrelationResultWithVariableDto();
+
     if (result != null) {
       dto.setResultType(result.getResultType());
       if (result.getProcessInstance() != null) {
@@ -37,15 +38,14 @@ public class MessageCorrelationResultWithVariableDto extends MessageCorrelationR
       } else if (result.getExecution() != null) {
         dto.setExecution(ExecutionDto.fromExecution(result.getExecution()));
       }
-    }
-      if (result != null) {
-        Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
-        for (String variableName : result.getVariables().keySet()) {
-          VariableValueDto valueDto = VariableValueDto.fromTypedValue(result.getVariables().getValueTyped(variableName), true);
-          values.put(variableName, valueDto);
-        }
-        dto.variables = values;
+
+      Map<String, VariableValueDto> values = new HashMap<>();
+      for (String variableName : result.getVariables().keySet()) {
+        VariableValueDto valueDto = VariableValueDto.fromTypedValue(result.getVariables().getValueTyped(variableName), true);
+        values.put(variableName, valueDto);
       }
+      dto.variables = values;
+    }
     return dto;
   }
 

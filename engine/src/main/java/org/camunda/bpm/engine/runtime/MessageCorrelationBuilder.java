@@ -202,7 +202,8 @@ public interface MessageCorrelationBuilder {
   MessageCorrelationResult correlateWithResult();
 
   /**
-   * Executes the message correlation.
+   * Executes the message correlation. If you do not need access to the process variables, use {@link #correlateWithResult()}
+   * to avoid unnecessary variable access.
    *
    * @see {@link #correlateWithResult()}
    *
@@ -268,7 +269,8 @@ public interface MessageCorrelationBuilder {
   List<MessageCorrelationResult> correlateAllWithResult();
 
   /**
-   * Executes the message correlation.
+   * Executes the message correlation. If you do not need access to the process variables, use {@link #correlateAllWithResult()}
+   * to avoid unnecessary variable access.
    *
    * @see {@link #correlateAllWithResult()}
    *
