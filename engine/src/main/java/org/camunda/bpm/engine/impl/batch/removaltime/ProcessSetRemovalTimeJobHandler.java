@@ -54,15 +54,43 @@ public class ProcessSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Set
 
       HistoricProcessInstanceEntity instance = findProcessInstanceById(instanceId, commandContext);
 
-      if (!batchConfiguration.hasRemovalTime()) {
-        if (canSetRemovalTime(instance, commandContext)) {
-          addRemovalTime(instanceId, calculateRemovalTime(instance, commandContext), commandContext);
+      if (batchConfiguration.isHierarchical() && hasHierarchy(instance)) {
+        String rootProcessInstanceId = instance.getRootProcessInstanceId();
+
+        HistoricProcessInstanceEntity rootInstance = findProcessInstanceById(rootProcessInstanceId, commandContext);
+
+        if (batchConfiguration.hasRemovalTime() || hasBaseTime(rootInstance, commandContext)) {
+          Date removalTime = getOrCalculateRemovalTime(batchConfiguration, rootInstance, commandContext);
+
+          addRemovalTimeToHierarchy(rootProcessInstanceId, removalTime, commandContext);
 
         }
-      } else {
-        addRemovalTime(instanceId, batchConfiguration.getRemovalTime(), commandContext);
+      } else if (batchConfiguration.hasRemovalTime() || hasBaseTime(instance, commandContext)) {
+        Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
+
+        addRemovalTime(instanceId, removalTime, commandContext);
 
       }
+    }
+  }
+
+  protected Date getOrCalculateRemovalTime(SetRemovalTimeBatchConfiguration batchConfiguration, HistoricProcessInstanceEntity instance, CommandContext commandContext) {
+    if (batchConfiguration.hasRemovalTime()) {
+      return batchConfiguration.getRemovalTime();
+
+    } else {
+      return calculateRemovalTime(instance, commandContext);
+
+    }
+  }
+
+  protected void addRemovalTimeToHierarchy(String rootProcessInstanceId, Date removalTime, CommandContext commandContext) {
+    commandContext.getHistoricProcessInstanceManager()
+      .addRemovalTimeToProcessInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+
+    if (isDmnEnabled(commandContext)) {
+      commandContext.getHistoricDecisionInstanceManager()
+        .addRemovalTimeToDecisionsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
     }
   }
 
@@ -76,7 +104,7 @@ public class ProcessSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Set
     }
   }
 
-  protected boolean canSetRemovalTime(HistoricProcessInstanceEntity instance, CommandContext commandContext) {
+  protected boolean hasBaseTime(HistoricProcessInstanceEntity instance, CommandContext commandContext) {
     return isStrategyStart(commandContext) || (isStrategyEnd(commandContext) && isEnded(instance));
   }
 
@@ -90,6 +118,10 @@ public class ProcessSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Set
 
   protected boolean isStrategyEnd(CommandContext commandContext) {
     return HISTORY_REMOVAL_TIME_STRATEGY_END.equals(getHistoryRemovalTimeStrategy(commandContext));
+  }
+
+  protected boolean hasHierarchy(HistoricProcessInstanceEntity instance) {
+    return instance.getRootProcessInstanceId() != null;
   }
 
   protected String getHistoryRemovalTimeStrategy(CommandContext commandContext) {
@@ -130,7 +162,10 @@ public class ProcessSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Set
   }
 
   protected SetRemovalTimeBatchConfiguration createJobConfiguration(SetRemovalTimeBatchConfiguration configuration, List<String> processInstanceIds) {
-    return new SetRemovalTimeBatchConfiguration(processInstanceIds, configuration.getRemovalTime(), configuration.hasRemovalTime());
+    return new SetRemovalTimeBatchConfiguration(processInstanceIds)
+      .setRemovalTime(configuration.getRemovalTime())
+      .setHasRemovalTime(configuration.hasRemovalTime())
+      .setHierarchical(configuration.isHierarchical());
   }
 
   protected JsonObjectConverter<SetRemovalTimeBatchConfiguration> getJsonConverterInstance() {

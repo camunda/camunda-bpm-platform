@@ -123,7 +123,7 @@
 
   <select id="selectHistoricProcessInstanceForRemovalTimeBatch" parameterType="java.lang.String"
           resultMap="historicProcessInstanceResultMap">
-    select START_TIME_, END_TIME_, PROC_DEF_ID_ from ${prefix}ACT_HI_PROCINST
+    select ROOT_PROC_INST_ID_, START_TIME_, END_TIME_, PROC_DEF_ID_ from ${prefix}ACT_HI_PROCINST
     where ID_ = #{id, jdbcType=VARCHAR}
   </select>
 

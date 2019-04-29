@@ -28,19 +28,37 @@ public class SetRemovalTimeBatchConfiguration extends BatchConfiguration {
 
   protected Date removalTime;
   protected boolean hasRemovalTime;
+  protected boolean isHierarchical;
 
-  public SetRemovalTimeBatchConfiguration(List<String> ids, Date removalTime, boolean hasRemovalTime) {
+  public SetRemovalTimeBatchConfiguration(List<String> ids) {
     super(ids);
-    this.removalTime = removalTime;
-    this.hasRemovalTime = hasRemovalTime;
   }
 
   public Date getRemovalTime() {
     return removalTime;
   }
 
+  public SetRemovalTimeBatchConfiguration setRemovalTime(Date removalTime) {
+    this.removalTime = removalTime;
+    return this;
+  }
+
   public boolean hasRemovalTime() {
     return hasRemovalTime;
+  }
+
+  public SetRemovalTimeBatchConfiguration setHasRemovalTime(boolean hasRemovalTime) {
+    this.hasRemovalTime = hasRemovalTime;
+    return this;
+  }
+
+  public boolean isHierarchical() {
+    return isHierarchical;
+  }
+
+  public SetRemovalTimeBatchConfiguration setHierarchical(boolean hierarchical) {
+    isHierarchical = hierarchical;
+    return this;
   }
 
 }

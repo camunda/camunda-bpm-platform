@@ -33,13 +33,15 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
   protected static final String IDS = "ids";
   protected static final String REMOVAL_TIME = "removalTime";
   protected static final String HAS_REMOVAL_TIME = "hasRemovalTime";
-  
+  protected static final String IS_HIERARCHICAL = "isHierarchical";
+
   public JsonObject toJsonObject(SetRemovalTimeBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, IDS, configuration.getIds());
     JsonUtil.addDateField(json, REMOVAL_TIME, configuration.getRemovalTime());
     JsonUtil.addField(json, HAS_REMOVAL_TIME, configuration.hasRemovalTime());
+    JsonUtil.addField(json, IS_HIERARCHICAL, configuration.isHierarchical());
 
     return json;
   }
@@ -53,7 +55,12 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
 
     boolean hasRemovalTime = JsonUtil.getBoolean(jsonObject, HAS_REMOVAL_TIME);
 
-    return new SetRemovalTimeBatchConfiguration(processInstanceIds, removalTime, hasRemovalTime);
+    boolean isHierarchical = JsonUtil.getBoolean(jsonObject, IS_HIERARCHICAL);
+
+    return new SetRemovalTimeBatchConfiguration(processInstanceIds)
+      .setRemovalTime(removalTime)
+      .setHasRemovalTime(hasRemovalTime)
+      .setHierarchical(isHierarchical);
   }
 
 }

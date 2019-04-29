@@ -74,7 +74,10 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
-    return new SetRemovalTimeBatchConfiguration(ids, builder.getRemovalTime(), builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME ? true : false);
+    return new SetRemovalTimeBatchConfiguration(ids)
+      .setHierarchical(builder.isHierarchical())
+      .setHasRemovalTime(builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME)
+      .setRemovalTime(builder.getRemovalTime());
   }
 
   protected BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {

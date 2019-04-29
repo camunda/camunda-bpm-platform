@@ -32,6 +32,7 @@ public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements
   protected HistoricProcessInstanceQuery query;
   protected Date removalTime;
   protected Mode mode = null;
+  protected boolean isHierarchical;
 
   protected CommandExecutor commandExecutor;
 
@@ -56,6 +57,11 @@ public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements
     return this;
   }
 
+  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder hierarchical() {
+    isHierarchical = true;
+    return this;
+  }
+
   public Batch executeAsync() {
     return commandExecutor.execute(new SetRemovalTimeToHistoricProcessInstancesCmd(this));
   }
@@ -77,4 +83,9 @@ public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements
     CALCULATED_REMOVAL_TIME,
     ABSOLUTE_REMOVAL_TIME;
   }
+
+  public boolean isHierarchical() {
+    return isHierarchical;
+  }
+
 }

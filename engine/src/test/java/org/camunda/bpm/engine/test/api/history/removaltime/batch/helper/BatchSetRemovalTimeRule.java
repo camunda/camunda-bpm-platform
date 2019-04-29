@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.batch.helper;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -27,11 +29,13 @@ import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.camunda.bpm.model.bpmn.builder.StartEventBuilder;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +52,7 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   public final Date CURRENT_DATE = new Date(1363608000000L);
   public final Date REMOVAL_TIME = new Date(1363609000000L);
 
-  protected String batchId;
+  protected List<String> batchIds = new ArrayList<>();
 
   public BatchSetRemovalTimeRule(ProcessEngineRule engineRule, ProcessEngineTestRule engineTestRule) {
     this.engineRule = engineRule;
@@ -56,6 +60,11 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   }
 
   protected void starting(Description description) {
+    getProcessEngineConfiguration()
+      .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
+      .setHistoryRemovalTimeStrategy(ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START)
+      .initHistoryRemovalTime();
+
     ClockUtil.setCurrentTime(CURRENT_DATE);
 
     super.starting(description);
@@ -78,13 +87,15 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
     ClockUtil.reset();
 
-    if (batchId != null) {
-      String historicBatchId = engineRule.getHistoryService().createHistoricBatchQuery()
-        .batchId(batchId)
-        .singleResult()
-        .getId();
+    if (!batchIds.isEmpty()) {
+      for (String batchId : batchIds) {
+        String historicBatchId = engineRule.getHistoryService().createHistoricBatchQuery()
+          .batchId(batchId)
+          .singleResult()
+          .getId();
 
-      engineRule.getHistoryService().deleteHistoricBatch(historicBatchId);
+        engineRule.getHistoryService().deleteHistoricBatch(historicBatchId);
+      }
     }
 
     super.finished(description);
@@ -100,9 +111,10 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     return engineRule.getProcessEngineConfiguration();
   }
 
-  public void updateHistoryTimeToLive(int ttl) {
+  public void updateHistoryTimeToLive(String key, int ttl) {
     String processDefinitionId = engineRule.getRepositoryService()
       .createProcessDefinitionQuery()
+      .processDefinitionKey(key)
       .singleResult()
       .getId();
 
@@ -111,13 +123,17 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
   public class TestProcessBuilder {
 
-    ProcessBuilder builder = Bpmn.createExecutableProcess("process");
+    protected static final String PROCESS_KEY = "process";
+    protected static final String ROOT_PROCESS_KEY = "rootProcess";
 
+    ProcessBuilder builder = Bpmn.createExecutableProcess(PROCESS_KEY);
     StartEventBuilder startEventBuilder = builder.startEvent();
+    ProcessBuilder rootProcessBuilder = null;
+    Integer ttl;
+    CallActivityBuilder callActivityBuilder;
 
     public TestProcessBuilder ttl(Integer ttl) {
-      builder.camundaHistoryTimeToLive(ttl);
-
+      this.ttl = ttl;
       return this;
     }
 
@@ -131,6 +147,27 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
       startEventBuilder
         .businessRuleTask()
         .camundaDecisionRef(ref);
+
+      return this;
+    }
+
+    public TestProcessBuilder call() {
+      rootProcessBuilder = Bpmn.createExecutableProcess(ROOT_PROCESS_KEY);
+
+      callActivityBuilder = rootProcessBuilder
+        .startEvent()
+        .callActivity()
+          .calledElement(PROCESS_KEY);
+
+      return this;
+    }
+
+    public TestProcessBuilder passVars(String... vars) {
+      for (String variable : vars) {
+        callActivityBuilder.camundaIn(variable, variable);
+      }
+
+      callActivityBuilder.endEvent();
 
       return this;
     }
@@ -170,9 +207,21 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     }
 
     public TestProcessBuilder deploy() {
+      if (ttl != null) {
+        if (rootProcessBuilder != null) {
+          rootProcessBuilder.camundaHistoryTimeToLive(ttl);
+        } else {
+          builder.camundaHistoryTimeToLive(ttl);
+        }
+      }
+
       BpmnModelInstance process = startEventBuilder.endEvent().done();
 
       engineTestRule.deploy(process);
+
+      if (rootProcessBuilder != null) {
+        engineTestRule.deploy(rootProcessBuilder.done());
+      }
 
       return this;
     }
@@ -182,12 +231,20 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     }
 
     public String startWithVariables(Map<String, Object> variables) {
-      return engineRule.getRuntimeService().startProcessInstanceByKey("process", variables).getId();
+      String key = null;
+
+      if (rootProcessBuilder != null) {
+        key = ROOT_PROCESS_KEY;
+      } else {
+        key = PROCESS_KEY;
+      }
+
+      return engineRule.getRuntimeService().startProcessInstanceByKey(key, variables).getId();
     }
   }
 
   public void syncExec(Batch batch) {
-    batchId = batch.getId();
+    batchIds.add(batch.getId());
 
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
 
@@ -218,7 +275,7 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     engineRule.getManagementService().executeJob(jobId);
   }
 
-  public Date addDays(Date date, int amount) {
+  public static Date addDays(Date date, int amount) {
     Calendar c = Calendar.getInstance();
     c.setTime(date);
     c.add(Calendar.DATE, amount);
