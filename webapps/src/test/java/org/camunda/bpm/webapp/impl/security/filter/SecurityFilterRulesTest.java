@@ -290,15 +290,17 @@ public class SecurityFilterRulesTest {
     });
   }
 
-  /**
-   * Admin only exposes resources that are intended to be invoked by un-authenticated users.
-   */
   @Test
-  public void shouldPassAdminApi_GET_LOGGED_OUT() throws Exception {
+  public void shouldRejectAdminApi_GET_LOGGED_OUT() throws Exception {
 
-    Authorization authorization = getAuthorization("GET", "/api/admin/foo");
+    Authorization authorization = getAuthorization("GET", "/api/admin/auth/user/some-engine/");
 
-    assertThat(authorization.isGranted()).isTrue();
+    assertThat(authorization.isGranted()).isFalse();
+    assertThat(authorization.isAuthenticated()).isFalse();
+
+    authorization = getAuthorization("GET", "/api/admin/setup/some-engine/");
+
+    assertThat(authorization.isGranted()).isFalse();
     assertThat(authorization.isAuthenticated()).isFalse();
   }
 
@@ -318,11 +320,36 @@ public class SecurityFilterRulesTest {
   }
 
   @Test
-  public void shouldPassAdminApiPlugin_GET_LOGGED_OUT() throws Exception {
+  public void shouldPassAdminApi_AnonymousEndpoints_LOGGED_OUT() throws Exception {
 
-    Authorization authorization = getAuthorization("GET", "/api/admin/plugin/adminPlugins");
+    Authorization authorization = getAuthorization("GET", "/api/admin/auth/user/bar");
 
     assertThat(authorization.isGranted()).isTrue();
+    assertThat(authorization.isAuthenticated()).isFalse();
+
+    authorization = getAuthorization("POST", "/api/admin/auth/user/bar/logout");
+
+    assertThat(authorization.isGranted()).isTrue();
+    assertThat(authorization.isAuthenticated()).isFalse();
+
+    authorization = getAuthorization("POST", "/api/admin/auth/user/bar/login/some-app");
+
+    assertThat(authorization.isGranted()).isTrue();
+    assertThat(authorization.isAuthenticated()).isFalse();
+
+    authorization = getAuthorization("POST", "/api/admin/setup/some-engine/user/create");
+
+    assertThat(authorization.isGranted()).isTrue();
+    assertThat(authorization.isAuthenticated()).isFalse();
+  }
+
+
+  @Test
+  public void shouldRejectAdminApiPlugin_GET_LOGGED_OUT() throws Exception {
+
+    Authorization authorization = getAuthorization("GET", "/api/admin/plugin/adminPlugins/some-engine/endpoint");
+
+    assertThat(authorization.isGranted()).isFalse();
     assertThat(authorization.isAuthenticated()).isFalse();
   }
 
@@ -333,7 +360,7 @@ public class SecurityFilterRulesTest {
 
       @Override
       public void run() {
-        Authorization authorization = getAuthorization("GET", "/api/admin/plugin/adminPlugins");
+        Authorization authorization = getAuthorization("GET", "/api/admin/plugin/adminPlugins/some-engine");
 
         assertThat(authorization.isGranted()).isTrue();
         assertThat(authorization.isAuthenticated()).isFalse();
