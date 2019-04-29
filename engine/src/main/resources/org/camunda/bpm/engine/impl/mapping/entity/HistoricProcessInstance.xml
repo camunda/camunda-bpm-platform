@@ -119,14 +119,6 @@
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
-  <!-- HISTORIC PROCESS INSTANCE REMOVAL TIME SELECT -->
-
-  <select id="selectHistoricProcessInstanceForRemovalTimeBatch" parameterType="java.lang.String"
-          resultMap="historicProcessInstanceResultMap">
-    select ROOT_PROC_INST_ID_, START_TIME_, END_TIME_, PROC_DEF_ID_ from ${prefix}ACT_HI_PROCINST
-    where ID_ = #{id, jdbcType=VARCHAR}
-  </select>
-
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
 
   <select id="selectHistoricProcessInstanceEvent" parameterType="java.lang.String"

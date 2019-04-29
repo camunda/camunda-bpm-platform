@@ -154,7 +154,7 @@ public class ProcessSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Set
 
   protected HistoricProcessInstanceEntity findProcessInstanceById(String instanceId, CommandContext commandContext) {
     return commandContext.getHistoricProcessInstanceManager()
-      .findHistoricProcessInstanceByIdForRemovalTimeBatch(instanceId);
+      .findHistoricProcessInstance(instanceId);
   }
 
   public JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration() {

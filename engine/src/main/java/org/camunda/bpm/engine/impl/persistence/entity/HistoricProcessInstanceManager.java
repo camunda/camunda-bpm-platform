@@ -152,12 +152,6 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectFinishedProcessInstancesReportEntitiesCount", query);
   }
 
-  @SuppressWarnings("unchecked")
-  public HistoricProcessInstanceEntity findHistoricProcessInstanceByIdForRemovalTimeBatch(String processInstanceId) {
-    return (HistoricProcessInstanceEntity) getDbEntityManager()
-      .selectOne("selectHistoricProcessInstanceForRemovalTimeBatch", processInstanceId);
-  }
-
   public void addRemovalTimeToProcessInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
     CommandContext commandContext = Context.getCommandContext();
 
