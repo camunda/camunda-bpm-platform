@@ -34,16 +34,18 @@ public class VariableContextElResolver extends ELResolver {
 
   @Override
   public Object getValue(ELContext context, Object base, Object property) {
-    VariableContext variableContext = (VariableContext) context.getContext(VariableContext.class);
-    if(variableContext != null) {
-      if(VAR_CTX_KEY.equals(property)) {
-        context.setPropertyResolved(true);
-        return variableContext;
-      }
-      TypedValue typedValue = variableContext.resolve((String) property);
-      if(typedValue != null) {
-        context.setPropertyResolved(true);
-        return unpack(typedValue);
+    if (base == null) {
+      VariableContext variableContext = (VariableContext) context.getContext(VariableContext.class);
+      if(variableContext != null) {
+        if(VAR_CTX_KEY.equals(property)) {
+          context.setPropertyResolved(true);
+          return variableContext;
+        }
+        TypedValue typedValue = variableContext.resolve((String) property);
+        if(typedValue != null) {
+          context.setPropertyResolved(true);
+          return unpack(typedValue);
+        }
       }
     }
     return null;
