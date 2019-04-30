@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -30,9 +32,25 @@ import org.camunda.bpm.engine.management.SchemaLogQuery;
 public class SchemaLogQueryImpl extends AbstractQuery<SchemaLogQuery, SchemaLogEntry> implements SchemaLogQuery {
 
   private static final long serialVersionUID = 1L;
+  private static final QueryPropertyImpl TIMESTAMP_PROPERTY = new QueryPropertyImpl("TIMESTAMP_");
+
+  protected String version;
 
   public SchemaLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  @Override
+  public SchemaLogQuery version(String version) {
+    ensureNotNull("version", version);
+    this.version = version;
+    return this;
+  }
+
+  @Override
+  public SchemaLogQuery orderByTimestamp() {
+    orderBy(TIMESTAMP_PROPERTY);
+    return this;
   }
 
   @Override

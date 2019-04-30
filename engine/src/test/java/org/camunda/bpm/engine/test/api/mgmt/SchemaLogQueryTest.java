@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.schemaLogEntryByTimestamp;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -24,6 +27,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Before;
@@ -39,13 +49,18 @@ public class SchemaLogQueryTest {
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule();
   ManagementService managementService;
-  
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
+
   Date startDate;
+  SchemaLogEntryEntity dummySchemaLogEntry;
 
   @Before
   public void init() {
     managementService = engineRule.getManagementService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+
     startDate = new Date();
+    dummySchemaLogEntry = createDummySchemaLogEntry();
   }
 
   @Test
@@ -63,16 +78,107 @@ public class SchemaLogQueryTest {
 
   @Test
   public void testQuerySchemaLogEntryList() {
-    //given a clean database
+    // given a clean database
 
-    //when
+    // when
     List<SchemaLogEntry> schemaLogEntries = managementService.createSchemaLogQuery().list();
 
-    //then expect one entry
+    // then expect one entry
     assertThat(managementService.createSchemaLogQuery().count(), is(1L));
     SchemaLogEntry schemaLogEntry = schemaLogEntries.get(0);
     assertThat(schemaLogEntry.getId(), is("0"));
     assertThat(schemaLogEntry.getTimestamp(), notNullValue());
     assertThat(schemaLogEntry.getVersion(), notNullValue());
+  }
+
+  @Test
+  public void testOrderByTimestamp() {
+    // given two schema log entries
+    populateTable();
+
+    // then sorting works
+    verifySorting(managementService.createSchemaLogQuery().orderByTimestamp().asc().list(), schemaLogEntryByTimestamp());
+    verifySorting(managementService.createSchemaLogQuery().orderByTimestamp().desc().list(), inverted(schemaLogEntryByTimestamp()));
+
+    cleanupTable();
+  }
+
+  @Test
+  public void testFilterByVersion() {
+    // given two schema log entries
+    populateTable();
+
+    // when
+    SchemaLogEntry schemaLogEntry = managementService.createSchemaLogQuery().version("dummyVersion").singleResult();
+
+    // then
+    assertThat(schemaLogEntry.getId(), is(dummySchemaLogEntry.getId()));
+    assertThat(schemaLogEntry.getTimestamp(), is(dummySchemaLogEntry.getTimestamp()));
+    assertThat(schemaLogEntry.getVersion(), is(dummySchemaLogEntry.getVersion()));
+
+    cleanupTable();
+  }
+
+  @Test
+  public void testSortedPagedQuery() {
+    // given two schema log entries
+    populateTable();
+
+    // then paging works
+    // ascending order
+    List<SchemaLogEntry> schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(0, 1);
+    assertThat(schemaLogEntry.size(), is(1));
+    assertThat(schemaLogEntry.get(0).getId(), is("0"));
+
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(1, 1);
+    assertThat(schemaLogEntry.size(), is(1));
+    assertThat(schemaLogEntry.get(0).getId(), is("uniqueId"));
+
+    // descending order
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(0, 1);
+    assertThat(schemaLogEntry.size(), is(1));
+    assertThat(schemaLogEntry.get(0).getId(), is("uniqueId"));
+
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(1, 1);
+    assertThat(schemaLogEntry.size(), is(1));
+    assertThat(schemaLogEntry.get(0).getId(), is("0"));
+
+    cleanupTable();
+  }
+
+  private void populateTable() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      @Override
+      public Void execute(CommandContext commandContext) {
+
+        DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
+        DbEntityManager newEntityManager = dbEntityManagerFactory.openSession();
+        newEntityManager.insert(dummySchemaLogEntry);
+        newEntityManager.flush();
+        return null;
+      }
+    });
+    assertThat(managementService.createSchemaLogQuery().count(), is(2L));
+  }
+
+  private void cleanupTable() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      @Override
+      public Void execute(CommandContext commandContext) {
+        DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+        dbEntityManager.delete(dummySchemaLogEntry);
+        dbEntityManager.flush();
+        return null;
+      }
+    });
+    assertThat(managementService.createSchemaLogQuery().count(), is(1L));
+  }
+
+  private SchemaLogEntryEntity createDummySchemaLogEntry() {
+    SchemaLogEntryEntity dummy = new SchemaLogEntryEntity();
+    dummy.setId("uniqueId");
+    dummy.setTimestamp(new Date());
+    dummy.setVersion("dummyVersion");
+    return dummy;
   }
 }

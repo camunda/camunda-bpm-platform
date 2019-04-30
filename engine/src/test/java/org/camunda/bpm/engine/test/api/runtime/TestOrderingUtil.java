@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -678,6 +679,16 @@ public class TestOrderingUtil {
       @Override
       public String getProperty(HistoricExternalTaskLog obj) {
         return obj.getTenantId();
+      }
+    });
+  }
+
+  // SCHEMA LOG
+  public static NullTolerantComparator<SchemaLogEntry> schemaLogEntryByTimestamp() {
+    return propertyComparator(new PropertyAccessor<SchemaLogEntry, Date>() {
+      @Override
+      public Date getProperty(SchemaLogEntry obj) {
+        return obj.getTimestamp();
       }
     });
   }

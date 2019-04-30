@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.SchemaLogQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -29,13 +31,30 @@ import org.camunda.bpm.engine.management.SchemaLogQuery;
  *
  */
 public class SchemaLogManager extends AbstractManager {
-  
+
   public Long findSchemaLogEntryCountByQueryCriteria(SchemaLogQuery schemaLogQuery) {
-    return (Long) getDbEntityManager().selectOne("selectSchemaLogEntryCountByQueryCriteria", schemaLogQuery);
+    if (isAuthorized()) {
+      return (Long) getDbEntityManager().selectOne("selectSchemaLogEntryCountByQueryCriteria", schemaLogQuery);
+    } else {
+      return 0L;
+    }
   }
 
   @SuppressWarnings("unchecked")
   public List<SchemaLogEntry> findSchemaLogEntriesByQueryCriteria(SchemaLogQueryImpl schemaLogQueryImpl, Page page) {
-    return getDbEntityManager().selectList("selectSchemaLogEntryByQueryCriteria", schemaLogQueryImpl, page);
+    if (isAuthorized()) {
+      return getDbEntityManager().selectList("selectSchemaLogEntryByQueryCriteria", schemaLogQueryImpl, page);
+    } else {
+      return new ArrayList<SchemaLogEntry>();
+    }
+  }
+
+  private boolean isAuthorized() {
+    try {
+      getAuthorizationManager().checkCamundaAdmin();
+      return true;
+    } catch (AuthorizationException e) {
+      return false;
+    }
   }
 }

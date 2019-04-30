@@ -23,7 +23,7 @@
 
   <!-- SCHEMALOGENTRY INSERT -->
   
-  <insert id="insertschemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity">
+  <insert id="insertSchemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity">
       insert into ${prefix}ACT_GE_SCHEMA_LOG (
         ID_,
         TIMESTAMP_,
@@ -34,6 +34,13 @@
         #{version, jdbcType=VARCHAR}
       )
   </insert>
+
+  <!-- SCHEMALOGENTRY DELETE -->
+  
+  <delete id="deleteSchemaLogEntry" parameterType="org.camunda.bpm.engine.impl.persistence.entity.SchemaLogEntryEntity">
+      delete from ${prefix}ACT_GE_SCHEMA_LOG
+      where ID_ = #{id}
+  </delete>
 
   <!-- SCHEMALOGENTRY SELECT -->
   
@@ -61,6 +68,9 @@
   
   <sql id="selectSchemaLogEntrySql">
     from ${prefix}ACT_GE_SCHEMA_LOG RES
+    <if test="version != null">
+    where VERSION_ = #{version}
+    </if>
   </sql>
 
 </mapper>

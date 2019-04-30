@@ -24,4 +24,13 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface SchemaLogQuery extends Query<SchemaLogQuery, SchemaLogEntry> {
 
+  /**
+   * Only show {@link SchemaLogEntry entries} with a given version.
+   */
+  SchemaLogQuery version(String version);
+  
+  /**
+   * Order by task timestamp (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
+  SchemaLogQuery orderByTimestamp();
 }
