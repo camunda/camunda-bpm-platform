@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
@@ -1254,7 +1255,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       String variablePath = "[" + idx + "].variables." + variableName;
       assertEquals(MockProvider.FORMAT_APPLICATION_JSON, from(content).getMap(variablePath + ".valueInfo").get("serializationDataFormat"));
       assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE, from(content).get(variablePath + ".value"));
-      assertEquals(ValueType.OBJECT.getName(), from(content).get(variablePath + ".type"));
+      assertEquals(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT), from(content).get(variablePath + ".type"));
     }
 
     assertEquals(ArrayList.class.getName(),
