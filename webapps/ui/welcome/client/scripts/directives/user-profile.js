@@ -97,11 +97,9 @@ module.exports = ['camAPI', 'Notifications', '$translate', function(camAPI, Noti
       };
 
       function checkPassword() {
-        $scope.passwordsMismatch = $scope.changePassword.new.$dirty &&
-                                      $scope.changePassword.confirmation.$dirty &&
-                                      $scope.password.new !== $scope.password.confirmation;
+        $scope.passwordsMismatch = $scope.changePassword.confirmation.$dirty &&
+                                   $scope.password.new !== $scope.password.confirmation;
 
-        $scope.changePassword.new.$setValidity('mismatch', !$scope.passwordsMismatch);
         $scope.changePassword.confirmation.$setValidity('mismatch', !$scope.passwordsMismatch);
       }
 

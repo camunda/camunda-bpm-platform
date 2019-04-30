@@ -61,9 +61,11 @@ module.exports = function(pluginDependencies) {
   var ModuleConfig = [
     '$routeProvider',
     'UriProvider',
+    '$animateProvider',
     function(
       $routeProvider,
-      UriProvider
+      UriProvider,
+      $animateProvider
     ) {
       $routeProvider.otherwise({ redirectTo: '/welcome' });
 
@@ -85,6 +87,8 @@ module.exports = function(pluginDependencies) {
           throw new Error('no process engine selected');
         }
       }]);
+
+      $animateProvider.classNameFilter(/angular-animate/);
     }];
 
   appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camWelcomeConf, 'Welcome'));
