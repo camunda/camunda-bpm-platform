@@ -15,8 +15,6 @@
  */
 package org.camunda.bpm.engine;
 
-import org.camunda.bpm.engine.impl.util.ExceptionUtil;
-
 /**
  * Runtime exception that is the superclass of all exceptions in the process engine.
  *
@@ -25,7 +23,7 @@ import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 public class ProcessEngineException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
-  
+
   public ProcessEngineException() {
     super();
   }
