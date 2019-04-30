@@ -577,6 +577,10 @@ public interface HistoryService {
    * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
+   * <p>To additionally take those historic process instances into account that are part of
+   * a hierarchy, enable the flag
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#hierarchical()}
+   *
    * <p>To create the batch and complete the configuration chain, call
    * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#executeAsync()}.
    *

@@ -54,8 +54,8 @@ public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
   SetRemovalTimeToHistoricProcessInstancesAsyncBuilder calculatedRemovalTime();
 
   /**
-   * Takes additionally historic process instances into account that are part of
-   * the hierarchy of the given historic process instances.
+   * Takes additionally those historic process instances into account that are part of
+   * the hierarchy of the given historic process instance.
    *
    * If the root process instance id of the given historic process instance is {@code null},
    * the hierarchy is ignored. This is the case for instances that were started with a version
