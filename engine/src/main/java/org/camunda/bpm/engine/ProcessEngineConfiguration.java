@@ -16,7 +16,7 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
-
+import java.util.function.Function;
 import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
-
 
 /** Configuration information from which a process engine can be build.
  *
@@ -199,6 +198,12 @@ public abstract class ProcessEngineConfiguration {
    */
   public static final String AUTHORIZATION_CHECK_REVOKE_AUTO = "auto";
   
+  protected Function<Throwable, String> throwableMessageHook =
+    new Function<Throwable, String>() {
+      public String apply(Throwable throwable) {
+        return throwable.getMessage();
+      }
+    };
   protected int numLevelsOfExceptionCauseToDisplay = 0;
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;
@@ -409,9 +414,27 @@ public abstract class ProcessEngineConfiguration {
     return numLevelsOfExceptionCauseToDisplay;
   }
 
-  public void setNumLevelsOfExceptionCauseToDisplay(final int numLevels) {
+  public ProcessEngineConfiguration setThrowableMessageHook(Function<Throwable,String> getMessage) {
+    throwableMessageHook = getMessage;
+    return this;
+  }
+
+  public Function<Throwable,String> getThrowableMessageHook() {
+    return this.throwableMessageHook;
+  }
+
+  public ProcessEngineConfiguration setNumLevelsOfExceptionCauseToDisplay(final int numLevels) {
     numLevelsOfExceptionCauseToDisplay = numLevels;
     ExceptionUtil.setNumLevelsOfCauseToInclude(numLevels);
+    if (numLevels > 0)
+    {
+      setThrowableMessageHook(new Function<Throwable,String>() {
+        public String apply(Throwable throwable) {
+          return ExceptionUtil.getMessageWithCauses(throwable);
+        }
+      });
+    }
+    return this;
   }
 
   public String getProcessEngineName() {

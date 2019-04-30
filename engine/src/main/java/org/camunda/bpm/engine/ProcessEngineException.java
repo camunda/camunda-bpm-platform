@@ -22,23 +22,10 @@ import org.camunda.bpm.engine.impl.util.ExceptionUtil;
  *
  * @author Tom Baeyens
  */
-public class ProcessEngineException extends RuntimeException implements ExceptionUtil.NoRecurseCause {
+public class ProcessEngineException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
   
-  @Override
-  public String getMessage()
-  {
-    if (getCause() == null)
-    {
-      return super.getMessage();
-    }
-    else
-    {
-      return super.getMessage() + " caused by " + ExceptionUtil.getMessageWithCauses(getCause());
-    }
-  }
-
   public ProcessEngineException() {
     super();
   }

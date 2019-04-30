@@ -15,6 +15,10 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import java.util.Objects;
+import java.util.function.Function;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngines;
 
 /**
  *
@@ -24,6 +28,28 @@ public class ExceptionDto {
 
   protected String type;
   protected String message;
+  
+  private static ProcessEngineConfiguration processEngineConfiguration;
+
+  private static Function<Throwable, String> getExceptionMessage = new Function<Throwable, String> () {
+     public String apply(Throwable throwable) {
+       return getProcessEngineConfiguration().getThrowableMessageHook().apply(throwable);
+    }
+  };
+
+  public static void setProcessEngineConfiguration(ProcessEngineConfiguration config) {
+    processEngineConfiguration = config;
+  }
+
+  private static ProcessEngineConfiguration getProcessEngineConfiguration() {
+    if (processEngineConfiguration == null)
+    {
+      processEngineConfiguration = ProcessEngines.getDefaultProcessEngine().getProcessEngineConfiguration();
+    }
+    return processEngineConfiguration;
+  }
+
+
 
   public ExceptionDto() {
 
@@ -37,12 +63,15 @@ public class ExceptionDto {
     return message;
   }
 
-  public static ExceptionDto fromException(Exception e) {
+  public static void setGetMessageHook(Function<Throwable, String> getExceptionMessage) {
+    getExceptionMessage = Objects.requireNonNull(getExceptionMessage);
+  }
 
+  public static ExceptionDto fromException(Exception e) {
     ExceptionDto dto = new ExceptionDto();
 
     dto.type = e.getClass().getSimpleName();
-    dto.message = e.getMessage();
+    dto.message = getExceptionMessage.apply(e);
 
     return dto;
   }
@@ -52,7 +81,7 @@ public class ExceptionDto {
     ExceptionDto dto = new ExceptionDto();
 
     dto.type = e.getClass().getSimpleName();
-    dto.message = e.getMessage();
+    dto.message = getExceptionMessage.apply(e);
 
     return dto;
   }
