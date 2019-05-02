@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
@@ -617,6 +618,9 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     Permission[] permissionsForResource = Context.getProcessEngineConfiguration().getPermissionProvider().getPermissionsForResource(authorization.getResourceType());
     Permission[] permissions = authorization.getPermissions(permissionsForResource);
     String[] namesForPermissions = PermissionConverter.getNamesForPermissions(authorization, permissions);
+    if (namesForPermissions.length == 0) {
+      return Permissions.NONE.getName();
+    }
     return StringUtil.trimToMaximumLengthAllowed(StringUtil.join(Arrays.asList(namesForPermissions).iterator()));
   }
   

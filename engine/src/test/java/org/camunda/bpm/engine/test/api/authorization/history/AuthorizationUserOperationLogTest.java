@@ -224,8 +224,7 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     // when
     PermissionProvider permissionProvider = processEngineConfiguration.getPermissionProvider();
     processEngineConfiguration.setPermissionProvider(new TestPermissionProvider());
-    createGrantAuthorizationGroup(TestResource.RESOURCE1, Authorization.ANY, "testGroupId", TestPermissions.ALL, TestPermissions.CREATE,
-        TestPermissions.DELETE, TestPermissions.LONG_NAME, TestPermissions.RANDOM);
+    createGrantAuthorizationGroup(TestResource.RESOURCE1, Authorization.ANY, "testGroupId", TestPermissions.ALL);
     processEngineConfiguration.setPermissionProvider(permissionProvider);
     
     // then
@@ -236,6 +235,27 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
     assertEquals(TestPermissions.ALL.getName(), entry.getNewValue());
+  }
+  
+  public void testLogCreatedOnAuthorizationCreationWithNonePermission() {
+    // given
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+    assertEquals(0, query.count());
+    
+    // when
+    PermissionProvider permissionProvider = processEngineConfiguration.getPermissionProvider();
+    processEngineConfiguration.setPermissionProvider(new TestPermissionProvider());
+    createGrantAuthorizationGroup(TestResource.RESOURCE1, Authorization.ANY, "testGroupId", TestPermissions.NONE);
+    processEngineConfiguration.setPermissionProvider(permissionProvider);
+    
+    // then
+    assertEquals(6, query.count());
+    
+    UserOperationLogEntry entry = query.property("permissions").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, entry.getOperationType());
+    assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
+    assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
+    assertEquals(TestPermissions.NONE.getName(), entry.getNewValue());
   }
   
   public static class TestPermissionProvider extends DefaultPermissionProvider {
