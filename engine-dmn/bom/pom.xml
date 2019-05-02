@@ -12,7 +12,7 @@
 
   <groupId>org.camunda.bpm.dmn</groupId>
   <artifactId>camunda-engine-dmn-bom</artifactId>
-  <version>7.11.0-alpha4</version>
+  <version>7.11.0-SNAPSHOT</version>
   <name>camunda DMN - engine - bom</name>
   <packaging>pom</packaging>
 
@@ -44,7 +44,7 @@
     <url>https://github.com/camunda/camunda-engine-dmn</url>
     <connection>scm:git:git@github.com:camunda/camunda-engine-dmn.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-engine-dmn.git</developerConnection>
-    <tag>7.11.0-alpha4</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
