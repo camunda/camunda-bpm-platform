@@ -41,9 +41,8 @@ public class WebappEeTest {
   private TestRestTemplate testRestTemplate;
 
   @Test
-  public void testLicenseEndpointAvailable() {
-    final ResponseEntity<String> response = testRestTemplate
-      .getForEntity("/api/admin/plugin/license/default/key", String.class);
+  public void testEeResourceAvailable() {
+    final ResponseEntity<String> response = testRestTemplate.getForEntity("/plugin/adminEE/app/plugin.js", String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
   }

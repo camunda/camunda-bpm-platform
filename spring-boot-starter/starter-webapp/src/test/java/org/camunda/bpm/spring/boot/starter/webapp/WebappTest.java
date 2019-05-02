@@ -41,8 +41,8 @@ public class WebappTest {
   private TestRestTemplate testRestTemplate;
 
   @Test
-  public void testLicenseEndpointNotAvailable() {
-    final ResponseEntity<String> response = testRestTemplate.getForEntity("/api/admin/plugin/license/default/key", String.class);
+  public void testEeResourceNotAvailable() {
+    final ResponseEntity<String> response = testRestTemplate.getForEntity("/plugin/adminEE/app/plugin.js", String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
