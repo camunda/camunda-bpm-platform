@@ -121,6 +121,8 @@ public interface UserOperationLogEntry {
 
   public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
   public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";
+  
+  public static String OPERATION_TYPE_CREATE_INCIDENT = "CreateIncident";
 
   public static String CATEGORY_ADMIN = "Admin";
   public static String CATEGORY_OPERATOR = "Operator";

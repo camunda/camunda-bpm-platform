@@ -34,14 +34,13 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class CreateAndResolveIncidentUserOperationLogTest {
+public class IncidentUserOperationLogTest {
   
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -64,7 +63,6 @@ public class CreateAndResolveIncidentUserOperationLogTest {
   }
   
   @Test
-  @Ignore("prepared for CAM-10146, needs to be filled with further assertions on the entry's content")
   public void shouldLogIncidentCreation() {
     // given
     testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
@@ -73,11 +71,33 @@ public class CreateAndResolveIncidentUserOperationLogTest {
 
     // when
     identityService.setAuthenticatedUserId("userId");
-    runtimeService.createIncident("foo", processInstance.getId(), "aa", "bar");
+    Incident incident = runtimeService.createIncident("foo", processInstance.getId(), "aa", "bar");
     identityService.clearAuthentication();
 
     // then
-    assertEquals(1, historyService.createUserOperationLogQuery().count());
+    assertEquals(2, historyService.createUserOperationLogQuery().count());
+    
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().property("incidentType").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE_INCIDENT, entry.getOperationType());
+    assertEquals(EntityTypes.PROCESS_INSTANCE, entry.getEntityType());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, entry.getCategory());
+    assertNull(entry.getOrgValue());
+    assertEquals("foo", entry.getNewValue());
+    assertNull(entry.getExecutionId());
+    assertEquals(processInstance.getId(), entry.getProcessInstanceId());
+    assertEquals(processInstance.getProcessDefinitionId(), entry.getProcessDefinitionId());
+    assertEquals("Process", entry.getProcessDefinitionKey());
+    
+    entry = historyService.createUserOperationLogQuery().property("configuration").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE_INCIDENT, entry.getOperationType());
+    assertEquals(EntityTypes.PROCESS_INSTANCE, entry.getEntityType());
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, entry.getCategory());
+    assertNull(entry.getOrgValue());
+    assertEquals(incident.getConfiguration(), entry.getNewValue());
+    assertNull(entry.getExecutionId());
+    assertEquals(processInstance.getId(), entry.getProcessInstanceId());
+    assertEquals(processInstance.getProcessDefinitionId(), entry.getProcessDefinitionId());
+    assertEquals("Process", entry.getProcessDefinitionKey());
   }
 
   @Test
