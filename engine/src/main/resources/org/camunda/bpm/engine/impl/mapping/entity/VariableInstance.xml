@@ -528,6 +528,50 @@
       )
   </update>
 
+  <update id="updateByteArraysByRootDecisionInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
+        <!-- decision inputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_IN I
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON I.DEC_INST_ID_ = D.ID_
+        WHERE D.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR} <!-- null for root dec instances -->
+           OR D.ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
+      ) or ID_ IN (
+        <!-- decision outputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_OUT O
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON O.DEC_INST_ID_ = D.ID_
+        WHERE D.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR} <!-- null for root dec instances -->
+           OR D.ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateByteArraysByDecisionInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
+        <!-- decision inputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_IN I
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON I.DEC_INST_ID_ = D.ID_
+        WHERE D.ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
+      ) or ID_ IN (
+        <!-- decision outputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_OUT O
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON O.DEC_INST_ID_ = D.ID_
+        WHERE D.ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
   <!-- BYTE ARRAY DELETE -->
 
   <select id="selectBytesOfByteArray" parameterType="string" resultType="hashmap">

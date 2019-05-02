@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
@@ -587,5 +588,31 @@ public interface HistoryService {
    * @since 7.11
    */
   SetRemovalTimeToHistoricProcessInstancesAsyncBuilder setRemovalTimeToHistoricProcessInstancesAsync();
+
+  /**
+   * <p>Set a removal time asynchronously to historic decision instances and
+   * all associated historic entities using a fluent builder.
+   *
+   * <p>Historic decision instances can be specified by passing a query to
+   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#byQuery(HistoricDecisionInstanceQuery)}.
+   *
+   * <p>An absolute time can be specified via
+   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#absoluteRemovalTime(Date)}.
+   * Pass {@code null} to clear the removal time.
+   *
+   * <p>As an alternative, the removal time can also be calculated via
+   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#calculatedRemovalTime()}
+   * based on the configured time to live values.
+   *
+   * <p>To additionally take those historic decision instances into account that are part of
+   * a hierarchy, enable the flag
+   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#hierarchical()}
+   *
+   * <p>To create the batch and complete the configuration chain, call
+   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#executeAsync()}.
+   *
+   * @since 7.11
+   */
+  SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder setRemovalTimeToHistoricDecisionInstancesAsync();
 
 }

@@ -320,6 +320,42 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       .updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "updateHistoricDecisionOutputInstancesByProcessInstanceId", parameters);
   }
 
+  public void addRemovalTimeToDecisionsByRootDecisionInstanceId(String rootInstanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("rootDecisionInstanceId", rootInstanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionInstanceEntity.class, "updateHistoricDecisionInstancesByRootDecisionInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionInputInstanceEntity.class, "updateHistoricDecisionInputInstancesByRootDecisionInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "updateHistoricDecisionOutputInstancesByRootDecisionInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByRootDecisionInstanceId", parameters);
+  }
+
+  public void addRemovalTimeToDecisionsByDecisionInstanceId(String instanceId, Date removalTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("decisionInstanceId", instanceId);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionInstanceEntity.class, "updateHistoricDecisionInstancesByDecisionInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionInputInstanceEntity.class, "updateHistoricDecisionInputInstancesByDecisionInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "updateHistoricDecisionOutputInstancesByDecisionInstanceId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByDecisionInstanceId", parameters);
+  }
+
   public Map<Class<? extends DbEntity>, DbOperation> deleteHistoricDecisionsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);

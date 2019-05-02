@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="Definitions_0ugqhu7" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="3.0.1">
+  <decision id="child" name="child">
+    <extensionElements>
+      <biodi:bounds x="150" y="203" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable_1">
+      <input id="input_1">
+        <inputExpression id="inputExpression_1">
+          <text>pojo</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" name="pojo" />
+      <rule id="DecisionRule_1q38vum">
+        <inputEntry id="UnaryTests_0tvyy8v">
+          <text>pojo</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0lody56">
+          <text>pojo</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="root" name="root">
+    <extensionElements>
+      <biodi:bounds x="149" y="81" width="180" height="80" />
+      <biodi:edge source="child">
+        <biodi:waypoints x="240" y="203" />
+        <biodi:waypoints x="239" y="161" />
+      </biodi:edge>
+    </extensionElements>
+    <informationRequirement>
+      <requiredDecision href="#child" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_1dpj902">
+      <input id="InputClause_0bniikv">
+        <inputExpression id="LiteralExpression_0amla3i">
+          <text>pojo</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_18x22kd" name="pojo" />
+      <rule id="DecisionRule_1fva835">
+        <inputEntry id="UnaryTests_1boqgry">
+          <text>pojo</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0z6fdy9">
+          <text>pojo</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

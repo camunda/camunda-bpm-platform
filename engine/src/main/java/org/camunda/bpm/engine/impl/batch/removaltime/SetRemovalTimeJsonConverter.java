@@ -51,13 +51,13 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
     long removalTimeMills = JsonUtil.getLong(jsonObject, REMOVAL_TIME);
     Date removalTime = removalTimeMills > 0 ? new Date(removalTimeMills) : null;
 
-    List<String> processInstanceIds =  JsonUtil.asStringList(JsonUtil.getArray(jsonObject, IDS));
+    List<String> instanceIds =  JsonUtil.asStringList(JsonUtil.getArray(jsonObject, IDS));
 
     boolean hasRemovalTime = JsonUtil.getBoolean(jsonObject, HAS_REMOVAL_TIME);
 
     boolean isHierarchical = JsonUtil.getBoolean(jsonObject, IS_HIERARCHICAL);
 
-    return new SetRemovalTimeBatchConfiguration(processInstanceIds)
+    return new SetRemovalTimeBatchConfiguration(instanceIds)
       .setRemovalTime(removalTime)
       .setHasRemovalTime(hasRemovalTime)
       .setHierarchical(isHierarchical);

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd.batch;
+package org.camunda.bpm.engine.impl.cmd.batch.removaltime;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.SetRemovalTimeBatchConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl.Mode;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;

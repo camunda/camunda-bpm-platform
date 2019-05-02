@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.batch;
 
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -87,10 +89,12 @@ public class BatchSetRemovalTimeHierarchicalTest {
   protected TaskService taskService;
   protected IdentityService identityService;
   protected ExternalTaskService externalTaskService;
+  protected DecisionService decisionService;
 
   @Before
   public void assignServices() {
     runtimeService = engineRule.getRuntimeService();
+    decisionService = engineRule.getDecisionService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
     taskService = engineRule.getTaskService();
@@ -142,6 +146,88 @@ public class BatchSetRemovalTimeHierarchicalTest {
     assertThat(historicDecisionInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
     assertThat(historicDecisionInstances.get(1).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
     assertThat(historicDecisionInstances.get(2).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeToStandaloneDecision_RootDecisionInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("dish-decision")
+      .list();
+
+    // assume
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("dish-decision")
+      .list();
+
+    // then
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeToStandaloneDecision_ChildDecisionInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("season")
+      .list();
+
+    // assume
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("season")
+      .list();
+
+    // then
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
   }
 
   @Test
@@ -202,6 +288,100 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  public void shouldSetRemovalTimeForStandaloneDecision_RootDecisionInputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .decisionDefinitionKey("dish-decision")
+      .singleResult();
+
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+
+    // assume
+    assertThat(historicDecisionInputInstances.get(0).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .decisionDefinitionKey("dish-decision")
+      .singleResult();
+
+    historicDecisionInputInstances = historicDecisionInstance.getInputs();
+
+    // then
+    assertThat(historicDecisionInputInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ChildDecisionInputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .decisionDefinitionKey("season")
+      .singleResult();
+
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+
+    // assume
+    assertThat(historicDecisionInputInstances.get(0).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .decisionDefinitionKey("season")
+      .singleResult();
+
+    historicDecisionInputInstances = historicDecisionInstance.getInputs();
+
+    // then
+    assertThat(historicDecisionInputInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
   public void shouldSetRemovalTime_DecisionOutputInstance() {
     // given
     testRule.process()
@@ -242,6 +422,100 @@ public class BatchSetRemovalTimeHierarchicalTest {
     historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
       .rootDecisionInstancesOnly()
       .includeOutputs()
+      .singleResult();
+
+    historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+
+    // then
+    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_RootDecisionOutputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeOutputs()
+      .decisionDefinitionKey("dish-decision")
+      .singleResult();
+
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+
+    // assume
+    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeOutputs()
+      .decisionDefinitionKey("dish-decision")
+      .singleResult();
+
+    historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+
+    // then
+    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ChildDecisionOutputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeOutputs()
+      .decisionDefinitionKey("season")
+      .singleResult();
+
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+
+    // assume
+    assertThat(historicDecisionOutputInstances.get(0).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeOutputs()
+      .decisionDefinitionKey("season")
       .singleResult();
 
     historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
@@ -952,6 +1226,94 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/removaltime/drd.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ByteArray_RootDecisionInputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("root")
+      .variables(
+        Variables.createVariables()
+          .putValue("pojo", new TestPojo("okay", 13.37))
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .decisionDefinitionKey("root")
+      .singleResult();
+
+    String byteArrayId = ((HistoricDecisionInputInstanceEntity) historicDecisionInstance.getInputs().get(0))
+      .getByteArrayValueId();
+
+    testRule.updateHistoryTimeToLiveDmn("root", 5);
+
+    ByteArrayEntity byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // assume
+    assertThat(byteArrayEntity.getRemovalTime()).isNull();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/removaltime/drd.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ByteArray_ChildDecisionInputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("root")
+      .variables(
+        Variables.createVariables()
+          .putValue("pojo", new TestPojo("okay", 13.37))
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeInputs()
+      .decisionDefinitionKey("child")
+      .singleResult();
+
+    String byteArrayId = ((HistoricDecisionInputInstanceEntity) historicDecisionInstance.getInputs().get(0))
+      .getByteArrayValueId();
+
+    testRule.updateHistoryTimeToLiveDmn("root", 5);
+
+    ByteArrayEntity byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // assume
+    assertThat(byteArrayEntity.getRemovalTime()).isNull();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
     "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
   })
   public void shouldSetRemovalTime_ByteArray_DecisionOutputInstance() {
@@ -987,6 +1349,94 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/removaltime/drd.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ByteArray_RootDecisionOutputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("root")
+      .variables(
+        Variables.createVariables()
+          .putValue("pojo", new TestPojo("okay", 13.37))
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeOutputs()
+      .decisionDefinitionKey("root")
+      .singleResult();
+
+    String byteArrayId = ((HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0))
+      .getByteArrayValueId();
+
+    testRule.updateHistoryTimeToLiveDmn("root", 5);
+
+    ByteArrayEntity byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // assume
+    assertThat(byteArrayEntity.getRemovalTime()).isNull();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/history/removaltime/drd.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ByteArray_ChildDecisionOutputInstance() {
+    // given
+    decisionService.evaluateDecisionByKey("root")
+      .variables(
+        Variables.createVariables()
+          .putValue("pojo", new TestPojo("okay", 13.37))
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .includeOutputs()
+      .decisionDefinitionKey("child")
+      .singleResult();
+
+    String byteArrayId = ((HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0))
+      .getByteArrayValueId();
+
+    testRule.updateHistoryTimeToLiveDmn("root", 5);
+
+    ByteArrayEntity byteArrayEntity = testRule.findByteArrayById(byteArrayId);
+
+    // assume
+    assertThat(byteArrayEntity.getRemovalTime()).isNull();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
         .byQuery(query)
         .calculatedRemovalTime()
         .hierarchical()

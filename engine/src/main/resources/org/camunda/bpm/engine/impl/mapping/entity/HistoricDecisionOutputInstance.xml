@@ -84,6 +84,25 @@
       )
   </update>
 
+  <update id="updateHistoricDecisionOutputInstancesByRootDecisionInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_DEC_OUT set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where DEC_INST_ID_ IN (
+        SELECT ID_ FROM ${prefix}ACT_HI_DECINST
+        WHERE ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR})  <!-- null for root dec instances -->
+           or DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricDecisionOutputInstancesByDecisionInstanceId"
+          parameterType="java.util.Map">
+      update ${prefix}ACT_HI_DEC_OUT set
+      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+
+      where DEC_INST_ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- delete -->
   
   <delete id="deleteHistoricDecisionOutputInstance" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity">

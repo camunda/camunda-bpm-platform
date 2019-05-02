@@ -121,6 +121,16 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitionId, ttl);
   }
 
+  public void updateHistoryTimeToLiveDmn(String key, int ttl) {
+    String decisionDefinitionId = engineRule.getRepositoryService()
+      .createDecisionDefinitionQuery()
+      .decisionDefinitionKey(key)
+      .singleResult()
+      .getId();
+
+    engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, ttl);
+  }
+
   public class TestProcessBuilder {
 
     protected static final String PROCESS_KEY = "process";
