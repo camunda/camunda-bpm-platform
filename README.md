@@ -1,4 +1,4 @@
-camunda BPM - The open source BPM platform
+camunda BPM - The open source BPM platform (WIP)  
 ==========================================
 
 [![Build Status](https://travis-ci.org/camunda/camunda-bpm-platform.svg?branch=master)](https://travis-ci.org/camunda/camunda-bpm-platform)
