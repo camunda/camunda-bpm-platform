@@ -19,13 +19,18 @@ package org.camunda.bpm.engine.impl.dmn.cmd;
 import static org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil.evaluateDecision;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.dmn.DecisionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -63,9 +68,18 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionResult> {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkEvaluateDecision(decisionDefinition);
     }
+    
+    writeUserOperationLog(commandContext, decisionDefinition);
 
     return doEvaluateDecision(decisionDefinition, variables);
 
+  }
+
+  protected void writeUserOperationLog(CommandContext commandContext, DecisionDefinition decisionDefinition) {
+    List<PropertyChange> propertyChanges = new ArrayList<>();
+    propertyChanges.add(new PropertyChange("decisionDefinitionId", null, decisionDefinition.getId()));
+    propertyChanges.add(new PropertyChange("decisionDefinitionKey", null, decisionDefinition.getKey()));
+    commandContext.getOperationLogManager().logDecisionDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_EVALUATE, propertyChanges);
   }
 
   protected DmnDecisionResult doEvaluateDecision(DecisionDefinition decisionDefinition, VariableMap variables) {

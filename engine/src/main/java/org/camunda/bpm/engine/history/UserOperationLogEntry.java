@@ -95,6 +95,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_RECALC_DUEDATE = "RecalculateDueDate";
   public static String OPERATION_TYPE_UNLOCK = "Unlock";
   public static String OPERATION_TYPE_EXECUTE = "Execute";
+  public static String OPERATION_TYPE_EVALUATE = "Evaluate";
 
   public static String OPERATION_TYPE_ADD_ATTACHMENT = "AddAttachment";
   public static String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";
