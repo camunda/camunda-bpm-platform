@@ -64,6 +64,10 @@ function initializePaginationInController($scope, search, updateCallback) {
     }
   });
 
+  $scope.$on('$destroy', function() {
+    search('page', null);
+  });
+
   return pages;
 }
 
