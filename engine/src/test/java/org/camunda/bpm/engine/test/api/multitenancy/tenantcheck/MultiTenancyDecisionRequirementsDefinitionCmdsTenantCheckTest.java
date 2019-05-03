@@ -50,7 +50,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   
   protected static final String DRD_DMN = "org/camunda/bpm/engine/test/api/multitenancy/DecisionRequirementsGraph.png";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule();
+  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 

@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class CompensateEventOrderTest {
 
-  @Rule public ProcessEngineRule engineRule = new ProcessEngineRule();
+  @Rule public ProcessEngineRule engineRule = new ProcessEngineRule(true);
   @Rule public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Test

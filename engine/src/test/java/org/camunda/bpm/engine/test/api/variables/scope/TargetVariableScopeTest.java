@@ -50,7 +50,7 @@ import static org.junit.Assert.assertThat;
  */
 public class TargetVariableScopeTest {
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
   @Rule
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
   @Rule

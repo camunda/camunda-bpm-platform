@@ -54,7 +54,7 @@ import static org.junit.Assert.assertEquals;
 public class TaskQueryOrTest {
 
   @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule(true);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

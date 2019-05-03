@@ -45,7 +45,7 @@ import org.junit.rules.ExpectedException;
 public class DefaultPasswordPolicyTest {
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule();
+  public ProcessEngineRule rule = new ProcessEngineRule(true);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

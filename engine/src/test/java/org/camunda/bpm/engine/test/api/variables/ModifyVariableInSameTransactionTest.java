@@ -40,7 +40,7 @@ import org.junit.Test;
 
 public class ModifyVariableInSameTransactionTest {
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
   @Rule
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 

@@ -43,9 +43,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -59,7 +57,7 @@ import org.junit.Test;
 public class UserOperationIdTest {
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
   @Rule
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);

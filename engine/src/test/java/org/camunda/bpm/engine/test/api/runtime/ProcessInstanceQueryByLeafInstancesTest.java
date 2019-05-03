@@ -35,7 +35,7 @@ import org.junit.Test;
 public class ProcessInstanceQueryByLeafInstancesTest {
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
   protected RuntimeService runtimeService;
 

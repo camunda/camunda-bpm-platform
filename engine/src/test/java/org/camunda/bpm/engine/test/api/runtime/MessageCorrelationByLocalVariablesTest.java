@@ -44,7 +44,7 @@ import static org.junit.Assert.assertNotNull;
 public class MessageCorrelationByLocalVariablesTest {
 
   public static final String TEST_MESSAGE_NAME = "TEST_MSG";
-  @Rule public ProcessEngineRule engineRule = new ProcessEngineRule();
+  @Rule public ProcessEngineRule engineRule = new ProcessEngineRule(true);
   @Rule public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
   @Rule public ExpectedException thrown = ExpectedException.none();
 

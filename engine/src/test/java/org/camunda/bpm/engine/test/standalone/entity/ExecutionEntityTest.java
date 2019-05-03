@@ -47,7 +47,7 @@ import static org.junit.Assert.fail;
 public class ExecutionEntityTest {
 
   @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule(true);
   @Rule
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(processEngineRule);
   @Rule

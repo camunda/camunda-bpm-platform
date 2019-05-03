@@ -47,7 +47,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class FoxJobRetryCmdEventsTest {
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   @Rule
   public ExpectedException thrown = ExpectedException.none();
