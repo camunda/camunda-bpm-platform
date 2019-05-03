@@ -39,12 +39,7 @@ public class MessageCorrelationResultWithVariableDto extends MessageCorrelationR
         dto.setExecution(ExecutionDto.fromExecution(result.getExecution()));
       }
 
-      Map<String, VariableValueDto> values = new HashMap<>();
-      for (String variableName : result.getVariables().keySet()) {
-        VariableValueDto valueDto = VariableValueDto.fromTypedValue(result.getVariables().getValueTyped(variableName), true);
-        values.put(variableName, valueDto);
-      }
-      dto.variables = values;
+      dto.variables = VariableValueDto.fromMap(result.getVariables(), true);
     }
     return dto;
   }

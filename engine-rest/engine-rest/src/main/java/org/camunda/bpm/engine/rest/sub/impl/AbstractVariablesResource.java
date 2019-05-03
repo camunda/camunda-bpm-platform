@@ -38,7 +38,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,13 +61,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
     VariableMap variables = getVariableEntities(deserializeValues);
 
-    Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
-    for (String variableName : variables.keySet()) {
-      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getValueTyped(variableName));
-      values.put(variableName, valueDto);
-    }
-
-    return values;
+    return VariableValueDto.fromMap(variables);
   }
 
   @Override

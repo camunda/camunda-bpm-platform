@@ -157,6 +157,22 @@ public class VariableValueDto {
     return result;
   }
 
+  public static Map<String, VariableValueDto> fromMap(VariableMap variables)
+  {
+    return fromMap(variables, false);
+  }
+
+  public static Map<String, VariableValueDto> fromMap(VariableMap variables, boolean preferSerializedValue)
+  {
+    Map<String, VariableValueDto> result = new HashMap<>();
+    for (String variableName : variables.keySet()) {
+      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getValueTyped(variableName), preferSerializedValue);
+      result.put(variableName, valueDto);
+    }
+
+    return result;
+  }
+
   public static VariableValueDto fromTypedValue(TypedValue typedValue) {
     VariableValueDto dto = new VariableValueDto();
     fromTypedValue(dto, typedValue);
@@ -210,14 +226,6 @@ public class VariableValueDto {
     return name.substring(0, 1).toLowerCase() + name.substring(1);
   }
 
-  public static Map<String, VariableValueDto> fromVariableMap(VariableMap variables) {
-    Map<String, VariableValueDto> result = new HashMap<String, VariableValueDto>();
-    for(String name: variables.keySet()) {
-      result.put(name, fromTypedValue(variables.getValueTyped(name)));
-    }
-    return result;
-  }
-
   public static VariableValueDto fromFormPart(String type, FormPart binaryDataFormPart) {
     VariableValueDto dto = new VariableValueDto();
 
@@ -231,7 +239,7 @@ public class VariableValueDto {
         contentType = MediaType.APPLICATION_OCTET_STREAM;
       }
 
-      dto.valueInfo = new HashMap<String, Object>();
+      dto.valueInfo = new HashMap<>();
       dto.valueInfo.put(FileValueType.VALUE_INFO_FILE_NAME, binaryDataFormPart.getFileName());
       MimeType mimeType = null;
       try {

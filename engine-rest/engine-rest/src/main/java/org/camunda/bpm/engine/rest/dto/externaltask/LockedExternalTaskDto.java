@@ -123,7 +123,7 @@ public class LockedExternalTaskDto {
     dto.topicName = task.getTopicName();
     dto.workerId = task.getWorkerId();
     dto.tenantId = task.getTenantId();
-    dto.variables = VariableValueDto.fromVariableMap(task.getVariables());
+    dto.variables = VariableValueDto.fromMap(task.getVariables());
     dto.priority = task.getPriority();
     dto.businessKey = task.getBusinessKey();
 
@@ -131,7 +131,7 @@ public class LockedExternalTaskDto {
   }
 
   public static List<LockedExternalTaskDto> fromLockedExternalTasks(List<LockedExternalTask> tasks) {
-    List<LockedExternalTaskDto> dtos = new ArrayList<LockedExternalTaskDto>();
+    List<LockedExternalTaskDto> dtos = new ArrayList<>();
 
     for (LockedExternalTask task : tasks) {
       dtos.add(LockedExternalTaskDto.fromLockedExternalTask(task));

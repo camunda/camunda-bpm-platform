@@ -240,7 +240,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
     List<ActivityStatistics> queryResults = query.list();
 
-    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
+    List<StatisticsResultDto> results = new ArrayList<>();
     for (ActivityStatistics queryResult : queryResults) {
       StatisticsResultDto dto = ActivityStatisticsResultDto.fromActivityStatistics(queryResult);
       results.add(dto);
@@ -374,7 +374,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
     VariableMap startFormVariables = formService.getStartFormVariables(processDefinitionId, formVariables, deserializeValues);
 
-    return VariableValueDto.fromVariableMap(startFormVariables);
+    return VariableValueDto.fromMap(startFormVariables);
   }
 
   @Override

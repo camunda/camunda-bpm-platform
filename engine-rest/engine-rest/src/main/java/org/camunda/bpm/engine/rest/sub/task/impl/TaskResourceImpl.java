@@ -100,8 +100,11 @@ public class TaskResourceImpl implements TaskResource {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       if (dto.isWithVariablesInReturn()) {
         VariableMap taskVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+
+        Map<String, VariableValueDto> body = VariableValueDto.fromMap(taskVariables, true);
+
         return Response
-            .ok(taskVariables)
+            .ok(body)
             .type(MediaType.APPLICATION_JSON)
             .build();
       } else {
@@ -125,7 +128,7 @@ public class TaskResourceImpl implements TaskResource {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
   }
-  
+
   public Response submit(CompleteTaskDto dto) {
     FormService formService = engine.getFormService();
 
@@ -133,8 +136,10 @@ public class TaskResourceImpl implements TaskResource {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       if (dto.isWithVariablesInReturn()) {
         VariableMap taskVariables = formService.submitTaskFormWithVariablesInReturn(taskId, variables);
+
+        Map<String, VariableValueDto> body = VariableValueDto.fromMap(taskVariables, true);
         return Response
-            .ok(taskVariables)
+            .ok(body)
             .type(MediaType.APPLICATION_JSON)
             .build();
       } else {
@@ -148,7 +153,7 @@ public class TaskResourceImpl implements TaskResource {
 
     } catch (AuthorizationException e) {
       throw e;
-    
+
     } catch (FormFieldValidationException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
       throw new RestException(Status.BAD_REQUEST, e, errorMessage);
@@ -297,7 +302,7 @@ public class TaskResourceImpl implements TaskResource {
     TaskService taskService = engine.getTaskService();
     List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
 
-    List<IdentityLinkDto> result = new ArrayList<IdentityLinkDto>();
+    List<IdentityLinkDto> result = new ArrayList<>();
     for (IdentityLink link : identityLinks) {
       if (type == null || type.equals(link.getType())) {
         result.add(IdentityLinkDto.fromIdentityLink(link));
@@ -363,7 +368,7 @@ public class TaskResourceImpl implements TaskResource {
 
     VariableMap startFormVariables = formService.getTaskFormVariables(taskId, formVariables, deserializeValues);
 
-    return VariableValueDto.fromVariableMap(startFormVariables);
+    return VariableValueDto.fromMap(startFormVariables);
   }
 
   public void updateTask(TaskDto taskDto) {

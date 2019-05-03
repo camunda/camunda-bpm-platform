@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import java.util.HashMap;
 import java.util.Map;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -50,12 +49,8 @@ public class ProcessInstanceWithVariablesDto extends ProcessInstanceDto {
   public static ProcessInstanceDto fromProcessInstance(ProcessInstanceWithVariables instance) {
     ProcessInstanceWithVariablesDto result = new ProcessInstanceWithVariablesDto(instance);
     VariableMap variables = instance.getVariables();
-    Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
-    for (String variableName : variables.keySet()) {
-      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getValueTyped(variableName), true);
-      values.put(variableName, valueDto);
-    }
-    result.variables = values;
+
+    result.variables = VariableValueDto.fromMap(variables, true);
     return result;
   }
 }

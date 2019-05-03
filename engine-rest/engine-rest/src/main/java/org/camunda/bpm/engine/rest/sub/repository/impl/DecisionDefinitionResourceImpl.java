@@ -170,7 +170,7 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
   }
 
   protected List<Map<String, VariableValueDto>> createDecisionResultDto(DmnDecisionResult decisionResult) {
-    List<Map<String, VariableValueDto>> dto = new ArrayList<Map<String, VariableValueDto>>();
+    List<Map<String, VariableValueDto>> dto = new ArrayList<>();
 
     for (DmnDecisionResultEntries entries : decisionResult) {
       Map<String, VariableValueDto> resultEntriesDto = createResultEntriesDto(entries);
@@ -188,7 +188,7 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       variableMap.putValueTyped(key, typedValue);
     }
 
-    return VariableValueDto.fromVariableMap(variableMap);
+    return VariableValueDto.fromMap(variableMap);
   }
 
 }
