@@ -40,9 +40,18 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
   protected String taskId;
   protected Map<String, Object> variables;
 
+  // only fetch variables if they are actually requested;
+  // this avoids unnecessary loading of variables
+  protected boolean returnVariables;
+
   public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
+    this(taskId, variables, false);
+  }
+
+  public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean returnVariables) {
     this.taskId = taskId;
     this.variables = variables;
+    this.returnVariables = returnVariables;
   }
 
   public VariableMap execute(CommandContext commandContext) {
@@ -60,17 +69,26 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
 
     ExecutionEntity execution = task.getProcessInstance();
     ExecutionVariableSnapshotObserver variablesListener = null;
-    if (execution != null) {
+
+    if (returnVariables && execution != null) {
       variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
     }
 
     completeTask(task);
 
-    if (variablesListener != null) {
-      return variablesListener.getVariables();
-    } else {
-      return task.getCaseDefinitionId() != null ? null : task.getVariablesTyped(false);
+    if (returnVariables)
+    {
+      if (variablesListener != null) {
+        return variablesListener.getVariables();
+      } else {
+        return task.getCaseDefinitionId() != null ? null : task.getVariablesTyped(false);
+      }
     }
+    else
+    {
+      return null;
+    }
+
   }
 
   protected void completeTask(TaskEntity task) {

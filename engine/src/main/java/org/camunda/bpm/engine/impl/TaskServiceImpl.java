@@ -170,15 +170,15 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void complete(String taskId) {
-    commandExecutor.execute(new CompleteTaskCmd(taskId, null));
+    complete(taskId, null);
   }
 
   public void complete(String taskId, Map<String, Object> variables) {
-    commandExecutor.execute(new CompleteTaskCmd(taskId, variables));
+    commandExecutor.execute(new CompleteTaskCmd(taskId, variables, false));
   }
 
   public VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables) {
-    return commandExecutor.execute(new CompleteTaskCmd(taskId, variables));
+    return commandExecutor.execute(new CompleteTaskCmd(taskId, variables, true));
   }
 
   public void delegateTask(String taskId, String userId) {
@@ -276,14 +276,14 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   public void setVariable(String taskId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put(variableName, value);
     setVariables(taskId, variables, false);
   }
 
   public void setVariableLocal(String taskId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put(variableName, value);
     setVariables(taskId, variables, true);
   }
@@ -327,13 +327,13 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void removeVariable(String taskId, String variableName) {
-    Collection<String> variableNames = new ArrayList<String>();
+    Collection<String> variableNames = new ArrayList<>();
     variableNames.add(variableName);
     commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, false));
   }
 
   public void removeVariableLocal(String taskId, String variableName) {
-    Collection<String> variableNames = new ArrayList<String>(1);
+    Collection<String> variableNames = new ArrayList<>(1);
     variableNames.add(variableName);
     commandExecutor.execute(new RemoveTaskVariablesCmd(taskId, variableNames, true));
   }

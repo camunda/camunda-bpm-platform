@@ -47,9 +47,14 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
   protected String taskId;
   protected VariableMap properties;
 
-  public SubmitTaskFormCmd(String taskId, Map<String, Object> properties) {
+  // only fetch variables if they are actually requested;
+  // this avoids unnecessary loading of variables
+  protected boolean returnVariables;
+
+  public SubmitTaskFormCmd(String taskId, Map<String, Object> properties, boolean returnVariables) {
     this.taskId = taskId;
     this.properties = Variables.fromMap(properties);
+    this.returnVariables = returnVariables;
   }
 
   public VariableMap execute(CommandContext commandContext) {
@@ -73,7 +78,7 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
 
     ExecutionEntity execution = task.getProcessInstance();
     ExecutionVariableSnapshotObserver variablesListener = null;
-    if(execution != null) {
+    if (returnVariables && execution != null) {
       variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
     }
 
@@ -86,10 +91,17 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     }
 
-    if (variablesListener != null) {
-      return variablesListener.getVariables();
-    } else {
-      return task.getCaseDefinitionId() == null ? null : task.getVariablesTyped(false);
+    if (returnVariables)
+    {
+      if (variablesListener != null) {
+        return variablesListener.getVariables();
+      } else {
+        return task.getCaseDefinitionId() == null ? null : task.getVariablesTyped(false);
+      }
+    }
+    else
+    {
+      return null;
     }
   }
 }

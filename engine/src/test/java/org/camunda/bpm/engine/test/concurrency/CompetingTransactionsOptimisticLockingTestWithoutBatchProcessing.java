@@ -61,7 +61,7 @@ public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing ex
       try {
         processEngineConfiguration
           .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
+          .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null, false)));
 
       } catch (ProcessEngineException e) {
         this.exception = e;
