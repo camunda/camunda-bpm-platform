@@ -1170,6 +1170,36 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  public void shouldSetRemovalTimeInHierarchy_ByChildInstance() {
+    // given
+    String rootProcessInstance = testRule.process().call().ttl(5).userTask().deploy().start();
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // assume
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+      .superProcessInstanceId(rootProcessInstance);
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isEqualTo(REMOVAL_TIME);
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isEqualTo(REMOVAL_TIME);
+  }
+
+  @Test
   public void shouldThrowBadUserRequestException() {
     // given
 

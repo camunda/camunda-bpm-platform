@@ -22,8 +22,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.qa.upgrade.Origin;
-import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,8 +36,6 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Tassilo Weidner
  */
-@ScenarioUnderTest("CreateRootProcessInstanceWithoutRootIdScenario")
-@Origin("7.11.0")
 public class RemovalTimeBatchTest {
 
   @Rule
@@ -52,7 +48,6 @@ public class RemovalTimeBatchTest {
     historyService = engineRule.getHistoryService();
   }
 
-  @ScenarioUnderTest("initRootProcessInstanceWithoutRootId.1")
   @Test
   public void shouldSetRemovalTimeForRootProcessInstanceOnly() {
     // given

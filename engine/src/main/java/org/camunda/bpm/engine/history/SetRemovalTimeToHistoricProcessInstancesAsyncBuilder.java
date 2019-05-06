@@ -46,8 +46,11 @@ public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
   SetRemovalTimeToHistoricProcessInstancesAsyncBuilder absoluteRemovalTime(Date removalTime);
 
   /**
-   * Calculates the removal time dynamically based on the respective process definition time to
+   * <p> Calculates the removal time dynamically based on the respective process definition time to
    * live and the process engine's removal time strategy.
+   *
+   * <p> In case {@link #hierarchical()} is enabled, the removal time is being calculated
+   * based on the base time and time to live of the historic root process instance.
    *
    * @return the builder.
    */
