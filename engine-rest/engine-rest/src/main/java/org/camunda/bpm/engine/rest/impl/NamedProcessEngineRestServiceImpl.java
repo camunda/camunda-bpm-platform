@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.ModificationRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
+import org.camunda.bpm.engine.rest.SchemaLogRestService;
 import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.TenantRestService;
@@ -252,6 +253,11 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + VersionRestService.PATH)
   public VersionRestService getVersionRestService(@PathParam("name") String engineName) {
     return super.getVersionRestService(engineName);
+  }
+
+  @Path("/{name}" + SchemaLogRestService.PATH)
+  public SchemaLogRestService getSchemaLogRestService(@PathParam("name") String engineName) {
+    return super.getSchemaLogRestService(engineName);
   }
 
   @GET
