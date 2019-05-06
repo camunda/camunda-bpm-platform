@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEn
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
@@ -1624,6 +1625,52 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
     // then
     assertThat(jobLogs.get(0).getRemovalTime(), is(addDays(START_DATE, 5)));
     assertThat(jobLogs.get(1).getRemovalTime(), is(addDays(START_DATE, 5)));
+
+    // cleanup
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldResolveBatchJobLog_ByteArray() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+        .camundaExecutionListenerClass("end", FailingExecutionListener.class)
+      .endEvent()
+      .done());
+
+    ClockUtil.setCurrentTime(START_DATE);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.executeJob(jobId);
+
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      try {
+        managementService.executeJob(job.getId());
+      } catch (RuntimeException ignored) { }
+    }
+
+    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity)historyService.createHistoricJobLogQuery()
+      .failureLog()
+      .singleResult();
+
+    String byteArrayId = jobLog.getExceptionByteArrayId();
+
+    ByteArrayEntity byteArray = findByteArrayById(byteArrayId);
+
+    // then
+    assertThat(byteArray.getRemovalTime(), is(addDays(START_DATE, 5)));
 
     // cleanup
     managementService.deleteBatch(batch.getId(), true);

@@ -1744,6 +1744,58 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     historyService.deleteHistoricBatch(batch.getId());
   }
 
+  @Test
+  public void shouldResolveBatchJobLog_ByteArray() {
+    // given
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+        .camundaExecutionListenerClass("end", FailingExecutionListener.class)
+      .endEvent()
+      .done());
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    String jobId = managementService.createJobQuery()
+      .singleResult()
+      .getId();
+
+    managementService.executeJob(jobId);
+
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      try {
+        managementService.executeJob(job.getId());
+      } catch (RuntimeException ignored) { }
+    }
+
+    jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      managementService.executeJob(job.getId());
+    }
+
+    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity)historyService.createHistoricJobLogQuery()
+      .failureLog()
+      .singleResult();
+
+    String byteArrayId = jobLog.getExceptionByteArrayId();
+
+    ByteArrayEntity byteArray = findByteArrayById(byteArrayId);
+
+    // then
+    assertThat(byteArray.getRemovalTime(), is(addDays(END_DATE, 5)));
+
+    // cleanup
+    historyService.deleteHistoricBatch(batch.getId());
+  }
+
   /**
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
