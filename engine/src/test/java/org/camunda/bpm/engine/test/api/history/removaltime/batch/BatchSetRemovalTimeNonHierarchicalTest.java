@@ -628,7 +628,7 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
     historicIncident = historyService.createHistoricIncidentQuery().singleResult();
 
     // then
-    assertThat(historicIncident.getRemovalTime()).isEqualTo(CREATE_TIME);
+    assertThat(historicIncident.getCreateTime()).isEqualTo(CREATE_TIME);
   }
 
   @Test
