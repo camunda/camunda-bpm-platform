@@ -83,6 +83,18 @@
         WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
       )
   </update>
+
+  <update id="updateIdentityLinkLogByProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_IDENTITYLINK
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+          TIMESTAMP_ = TIMESTAMP_
+      where TASK_ID_ IN (
+        SELECT ID_
+        FROM ${prefix}ACT_HI_TASKINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
   
   <!-- HISTORIC IDENTITY LINK DELETE -->
 

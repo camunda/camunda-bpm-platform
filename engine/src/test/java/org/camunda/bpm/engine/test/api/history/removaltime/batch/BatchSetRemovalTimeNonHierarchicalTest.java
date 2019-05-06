@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Task;
@@ -87,6 +88,8 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule).around(testRule);
 
   protected final Date REMOVAL_TIME = testRule.REMOVAL_TIME;
+
+  protected final Date CREATE_TIME = new Date(1363608000000L);
 
   protected RuntimeService runtimeService;
   protected DecisionService decisionService;
@@ -502,6 +505,37 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
     assertThat(historicExternalTaskLog.getRemovalTime()).isEqualTo(REMOVAL_TIME);
   }
 
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-10172
+   */
+  @Test
+  public void shouldSetRemovalTime_ExternalTaskLog_WithPreservedCreateTime() {
+    // given
+    ClockUtil.setCurrentTime(CREATE_TIME);
+
+    testRule.process().externalTask().deploy().start();
+
+    HistoricExternalTaskLog historicExternalTaskLog = historyService.createHistoricExternalTaskLogQuery().singleResult();
+
+    // assume
+    assertThat(historicExternalTaskLog.getTimestamp()).isEqualTo(CREATE_TIME);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    historicExternalTaskLog = historyService.createHistoricExternalTaskLogQuery().singleResult();
+
+    // then
+    assertThat(historicExternalTaskLog.getTimestamp()).isEqualTo(CREATE_TIME);
+  }
+
   @Test
   public void shouldSetRemovalTime_JobLog() {
     // given
@@ -562,6 +596,41 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
     assertThat(historicIncident.getRemovalTime()).isEqualTo(REMOVAL_TIME);
   }
 
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-10172
+   */
+  @Test
+  public void shouldSetRemovalTime_Incident_WithPreservedCreateTime() {
+    // given
+    ClockUtil.setCurrentTime(CREATE_TIME);
+
+    testRule.process().async().userTask().deploy().start();
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+
+    managementService.setJobRetries(jobId, 0);
+
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // assume
+    assertThat(historicIncident.getCreateTime()).isEqualTo(CREATE_TIME);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // then
+    assertThat(historicIncident.getRemovalTime()).isEqualTo(CREATE_TIME);
+  }
+
   @Test
   public void shouldSetRemovalTime_OperationLog() {
     // given
@@ -592,6 +661,41 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
     assertThat(userOperationLog.getRemovalTime()).isEqualTo(REMOVAL_TIME);
   }
 
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-10172
+   */
+  @Test
+  public void shouldSetRemovalTime_OperationLog_WithPreservedTimestamp() {
+    // given
+    ClockUtil.setCurrentTime(CREATE_TIME);
+
+    String processInstanceId = testRule.process().async().userTask().deploy().start();
+
+    identityService.setAuthenticatedUserId("aUserId");
+    runtimeService.suspendProcessInstanceById(processInstanceId);
+    identityService.clearAuthentication();
+
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+
+    // assume
+    assertThat(userOperationLog.getTimestamp()).isEqualTo(CREATE_TIME);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+
+    // then
+    assertThat(userOperationLog.getTimestamp()).isEqualTo(CREATE_TIME);
+  }
+
   @Test
   public void shouldSetRemovalTime_IdentityLinkLog() {
     // given
@@ -616,6 +720,37 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     // then
     assertThat(identityLinkLog.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+  }
+
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-10172
+   */
+  @Test
+  public void shouldSetRemovalTime_IdentityLinkLog_WithPreservedTime() {
+    // given
+    ClockUtil.setCurrentTime(CREATE_TIME);
+
+    testRule.process().userTask().deploy().start();
+
+    HistoricIdentityLinkLog identityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+
+    // assume
+    assertThat(identityLinkLog.getTime()).isEqualTo(CREATE_TIME);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    identityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+
+    // then
+    assertThat(identityLinkLog.getTime()).isEqualTo(CREATE_TIME);
   }
 
   @Test

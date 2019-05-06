@@ -93,6 +93,14 @@
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateExternalTaskLogByProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_EXT_TASK_LOG
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+          TIMESTAMP_ = TIMESTAMP_
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- DELETE -->
 
   <delete id="deleteHistoricExternalTaskLogByProcessInstanceIds">

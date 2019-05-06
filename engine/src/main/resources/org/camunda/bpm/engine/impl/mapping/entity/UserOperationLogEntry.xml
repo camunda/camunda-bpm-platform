@@ -107,6 +107,14 @@
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateUserOperationLogByProcessInstanceId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_HI_OP_LOG
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+          TIMESTAMP_ = TIMESTAMP_
+      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <!-- OPERATION LOG ENTRY DELETE -->
 
   <delete id="deleteUserOperationLogEntryById">
