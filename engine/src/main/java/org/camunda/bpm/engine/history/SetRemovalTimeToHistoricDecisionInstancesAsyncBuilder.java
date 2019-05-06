@@ -46,8 +46,11 @@ public interface SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder {
   SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder absoluteRemovalTime(Date removalTime);
 
   /**
-   * Calculates the removal time dynamically based on the respective decision definition time to
+   * <p> Calculates the removal time dynamically based on the respective decision definition time to
    * live and the engine's removal time strategy.
+   *
+   * <p> In case {@link #hierarchical()} is enabled, the removal time is being calculated
+   * based on the base time and time to live of the historic root decision instance.
    *
    * @return the builder.
    */
