@@ -20,6 +20,8 @@
     <!-- database driver versions -->
     <version.h2>1.4.190</version.h2>
     <version.oracle-12>12.1.0.2</version.oracle-12>
+    <!-- Oracle 12 version is forwards compatible -->
+    <version.oracle-18>${version.oracle-12}</version.oracle-18>
     <version.oracle-11>11.2.0.4</version.oracle-11>
     <version.oracle-10>10.2.0.5</version.oracle-10>
     <version.oracle>${version.oracle-11}</version.oracle>
@@ -316,7 +318,20 @@
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc6</artifactId>
+          <artifactId>ojdbc7</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>oracle-18</id>
+      <properties>
+        <version.oracle>${version.oracle-18}</version.oracle>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc7</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
