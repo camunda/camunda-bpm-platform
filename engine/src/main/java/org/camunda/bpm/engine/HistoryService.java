@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesAsyncBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
@@ -614,5 +615,27 @@ public interface HistoryService {
    * @since 7.11
    */
   SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder setRemovalTimeToHistoricDecisionInstancesAsync();
+
+  /**
+   * <p>Set a removal time asynchronously to historic batches and all
+   * associated historic entities using a fluent builder.
+   *
+   * <p>Historic batches can be specified by passing a query to
+   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#byQuery(HistoricBatchQuery)}.
+   *
+   * <p>An absolute time can be specified via
+   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#absoluteRemovalTime(Date)}.
+   * Pass {@code null} to clear the removal time.
+   *
+   * <p>As an alternative, the removal time can also be calculated via
+   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#calculatedRemovalTime()}
+   * based on the configured time to live values.
+   *
+   * <p>To create the batch and complete the configuration chain, call
+   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#executeAsync()}.
+   *
+   * @since 7.11
+   */
+  SetRemovalTimeToHistoricBatchesAsyncBuilder setRemovalTimeToHistoricBatchesAsync();
 
 }

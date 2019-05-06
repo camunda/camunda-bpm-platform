@@ -95,6 +95,7 @@ import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
+import org.camunda.bpm.engine.impl.batch.removaltime.BatchSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.DecisionSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.ProcessSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
@@ -1120,6 +1121,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       DecisionSetRemovalTimeJobHandler decisionSetRemovalTimeJobHandler = new DecisionSetRemovalTimeJobHandler();
       batchHandlers.put(decisionSetRemovalTimeJobHandler.getType(), decisionSetRemovalTimeJobHandler);
+
+      BatchSetRemovalTimeJobHandler batchSetRemovalTimeJobHandler = new BatchSetRemovalTimeJobHandler();
+      batchHandlers.put(batchSetRemovalTimeJobHandler.getType(), batchSetRemovalTimeJobHandler);
     }
 
     if (customBatchJobHandlers != null) {

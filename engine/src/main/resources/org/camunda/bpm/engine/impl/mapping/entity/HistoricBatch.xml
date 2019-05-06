@@ -148,6 +148,14 @@
     where ID_= #{id, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricBatchRemovalTimeById" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+    update ${prefix}ACT_HI_BATCH
+    <set>
+        REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
   <!-- SELECT -->
   <select id="selectHistoricBatch" parameterType="string" resultMap="historicBatchResultMap">
     select * from ${prefix}ACT_HI_BATCH where ID_ = #{id}

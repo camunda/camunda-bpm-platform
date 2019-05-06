@@ -23,6 +23,9 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -63,6 +66,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -1101,6 +1105,149 @@ public class BatchSetRemovalTimeNonHierarchicalTest {
 
     // then
     assertThat(byteArrayEntity.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+  }
+
+  @Test
+  public void shouldSetRemovalTimeToBatch() {
+    // given
+    String processInstanceId = testRule.process().userTask().deploy().start();
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+
+    // assume
+    assertThat(historicBatch.getRemovalTime()).isNull();
+
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatchesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    historicBatch = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_PROCESS_INSTANCE_DELETION)
+      .singleResult();
+
+    // then
+    assertThat(historicBatch.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+
+    // clear database
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldSetRemovalTimeToBatch_JobLog() {
+    // given
+    String processInstanceId = testRule.process().userTask().deploy().start();
+
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+
+    HistoricJobLog historicJobLog = historyService.createHistoricJobLogQuery()
+      .jobDefinitionConfiguration(batch.getId())
+      .singleResult();
+
+    // assume
+    assertThat(historicJobLog.getRemovalTime()).isNull();
+
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatchesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    historicJobLog = historyService.createHistoricJobLogQuery()
+      .jobDefinitionConfiguration(batch.getId())
+      .singleResult();
+
+    // then
+    assertThat(historicJobLog.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+
+    // clear database
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldSetRemovalTimeToBatch_JobLogByteArray() {
+    // given
+    String processInstance = testRule.process().failingCustomListener().deploy().start();
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstance), "aDeleteReason");
+
+    try {
+      testRule.syncExec(batch);
+    } catch (RuntimeException e) {
+      // assume
+      assertThat(e).hasMessage("I'm supposed to fail!");
+    }
+
+    HistoricJobLogEventEntity historicJobLog = (HistoricJobLogEventEntity) historyService.createHistoricJobLogQuery()
+      .jobDefinitionConfiguration(batch.getId())
+      .failureLog()
+      .singleResult();
+
+    ByteArrayEntity byteArrayEntity = testRule.findByteArrayById(historicJobLog.getExceptionByteArrayId());
+
+    // assume
+    assertThat(byteArrayEntity.getRemovalTime()).isNull();
+
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatchesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    byteArrayEntity = testRule.findByteArrayById(historicJobLog.getExceptionByteArrayId());
+
+    // then
+    assertThat(byteArrayEntity.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+
+    // clear database
+    managementService.deleteBatch(batch.getId(), true);
+    runtimeService.deleteProcessInstance(processInstance, "", true);
+  }
+
+  @Test
+  public void shouldSetRemovalTimeToBatch_Incident() {
+    // given
+    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList("aProcessInstanceId"), "aDeleteReason");
+
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.setJobRetries(jobId, 0);
+
+    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // assume
+    assertThat(historicIncident.getRemovalTime()).isNull();
+
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatchesAsync()
+        .byQuery(query)
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+
+    // then
+    assertThat(historicIncident.getRemovalTime()).isEqualTo(REMOVAL_TIME);
+
+    // clear database
+    managementService.deleteBatch(batch.getId(), true);
   }
 
 }

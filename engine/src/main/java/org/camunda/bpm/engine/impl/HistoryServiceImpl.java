@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesAsyncBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.batch.history.DeleteHistoricBatchCmd;
@@ -70,6 +71,7 @@ import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByInsta
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBulkCmd;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricBatchesAsyncBuilderImpl;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl;
 import org.camunda.bpm.engine.runtime.Job;
@@ -332,6 +334,10 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder setRemovalTimeToHistoricDecisionInstancesAsync() {
     return new SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl(commandExecutor);
+  }
+
+  public SetRemovalTimeToHistoricBatchesAsyncBuilder setRemovalTimeToHistoricBatchesAsync() {
+    return new SetRemovalTimeToHistoricBatchesAsyncBuilderImpl(commandExecutor);
   }
 
 }

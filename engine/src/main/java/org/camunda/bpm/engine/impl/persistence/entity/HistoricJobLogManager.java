@@ -93,6 +93,9 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
 
     getDbEntityManager()
       .updatePreserveOrder(HistoricJobLogEventEntity.class, "updateJobLogByBatchId", parameters);
+
+    getDbEntityManager()
+      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByBatchId", parameters);
   }
 
   // delete ///////////////////////////////////////////////////////////////////

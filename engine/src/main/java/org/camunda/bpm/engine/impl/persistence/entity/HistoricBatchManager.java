@@ -165,4 +165,21 @@ public class HistoricBatchManager extends AbstractManager {
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
+  public void addRemovalTimeById(String id, Date removalTime) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    commandContext.getHistoricIncidentManager()
+      .addRemovalTimeToHistoricIncidentsByBatchId(id, removalTime);
+
+    commandContext.getHistoricJobLogManager()
+      .addRemovalTimeToJobLogByBatchId(id, removalTime);
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("id", id);
+    parameters.put("removalTime", removalTime);
+
+    getDbEntityManager()
+      .updatePreserveOrder(HistoricBatchEntity.class, "updateHistoricBatchRemovalTimeById", parameters);
+  }
+
 }

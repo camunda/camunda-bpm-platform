@@ -572,6 +572,17 @@
       )
   </update>
 
+  <update id="updateByteArraysByBatchId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
+        SELECT JOB_EXCEPTION_STACK_ID_
+        FROM ${prefix}ACT_HI_JOB_LOG
+        WHERE JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+      )
+  </update>
+
   <!-- BYTE ARRAY DELETE -->
 
   <select id="selectBytesOfByteArray" parameterType="string" resultType="hashmap">

@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.history.removaltime.batch.helper;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
+import org.camunda.bpm.engine.test.bpmn.async.FailingExecutionListener;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -79,6 +81,8 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     getProcessEngineConfiguration().setBatchOperationHistoryTimeToLive(null);
     getProcessEngineConfiguration().setBatchOperationsForHistoryCleanup(null);
 
+    getProcessEngineConfiguration().setBatchOperationHistoryTimeToLive(null);
+    getProcessEngineConfiguration().setHistoryCleanupStrategy(null);
     getProcessEngineConfiguration().initHistoryCleanup();
 
     getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
@@ -89,12 +93,13 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
     if (!batchIds.isEmpty()) {
       for (String batchId : batchIds) {
-        String historicBatchId = engineRule.getHistoryService().createHistoricBatchQuery()
+        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
           .batchId(batchId)
-          .singleResult()
-          .getId();
+          .singleResult();
 
-        engineRule.getHistoryService().deleteHistoricBatch(historicBatchId);
+        if (historicBatch != null) {
+          engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
+        }
       }
     }
 
@@ -212,6 +217,14 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
       startEventBuilder
         .serviceTask()
         .camundaExpression("${true}");
+
+      return this;
+    }
+
+    public TestProcessBuilder failingCustomListener() {
+      startEventBuilder
+        .userTask()
+        .camundaExecutionListenerClass("end", FailingExecutionListener.class);
 
       return this;
     }
