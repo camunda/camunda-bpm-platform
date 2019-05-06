@@ -24,14 +24,11 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
  */
 public class FailingExecutionListener implements ExecutionListener {
 
-  protected static ThreadLocal<Boolean> shouldFail = new ThreadLocal<>();
-  static {
-    shouldFail.set(true);
-  }
+  protected static boolean shouldFail = true;
 
   public void notify(DelegateExecution execution) throws Exception {
-    if (shouldFail.get()) {
-      shouldFail.set(false);
+    if (shouldFail) {
+      shouldFail = false;
       throw new RuntimeException("I'm supposed to fail!");
     }
   }

@@ -1750,6 +1750,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     processEngineConfiguration.initHistoryCleanup();
 
+    FailingExecutionListener.shouldFail = true;
+
     testRule.deploy(Bpmn.createExecutableProcess("process")
       .startEvent()
       .userTask()
@@ -1794,6 +1796,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     // cleanup
     historyService.deleteHistoricBatch(batch.getId());
+    FailingExecutionListener.shouldFail = false;
   }
 
   /**
