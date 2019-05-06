@@ -695,7 +695,7 @@ public class TaskRestServiceInteractionTest extends
   @Test
   public void testSubmitFormWithVariablesInReturn() {
     VariableMap variables = MockProvider.createMockSerializedVariables();
-    when(formServiceMock.submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null)).thenReturn(variables);
+    when(formServiceMock.submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null, false)).thenReturn(variables);
 
     Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("withVariablesInReturn", true);
@@ -727,7 +727,7 @@ public class TaskRestServiceInteractionTest extends
               equalTo(MockProvider.FORMAT_APPLICATION_JSON))
     .when().post(SUBMIT_FORM_URL);
 
-    verify(formServiceMock).submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null);
+    verify(formServiceMock).submitTaskFormWithVariablesInReturn(EXAMPLE_TASK_ID, null, false);
   }
 
   @Test
@@ -1575,7 +1575,7 @@ public class TaskRestServiceInteractionTest extends
   @Test
   public void testCompleteTaskWithVariablesInReturn() {
     VariableMap variables = MockProvider.createMockSerializedVariables();
-    when(taskServiceMock.completeWithVariablesInReturn(EXAMPLE_TASK_ID, null)).thenReturn(variables);
+    when(taskServiceMock.completeWithVariablesInReturn(EXAMPLE_TASK_ID, null, false)).thenReturn(variables);
 
     Map<String, Object> json = new HashMap<>();
     json.put("withVariablesInReturn", Boolean.TRUE);
@@ -1608,7 +1608,7 @@ public class TaskRestServiceInteractionTest extends
     .when()
       .post(COMPLETE_TASK_URL);
 
-    verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null);
+    verify(taskServiceMock).completeWithVariablesInReturn(EXAMPLE_TASK_ID, null, false);
   }
 
   @Test

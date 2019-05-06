@@ -1005,7 +1005,7 @@ public class FormServiceTest {
     additionalVariables.put(taskVarName, taskVarValue);
 
     // After completion of firstUserTask a script Task sets 'x' = 5
-    VariableMap vars = formService.submitTaskFormWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+    VariableMap vars = formService.submitTaskFormWithVariablesInReturn(firstUserTask.getId(), additionalVariables, true);
     assertEquals(3, vars.size());
     assertEquals(5, vars.get("x"));
     assertEquals(ValueType.INTEGER, vars.getValueTyped("x").getType());
@@ -1016,7 +1016,7 @@ public class FormServiceTest {
     additionalVariables = new HashMap<>();
     additionalVariables.put("x", 7);
     Task secondUserTask = taskService.createTaskQuery().taskName("Second User Task").singleResult();
-    vars = formService.submitTaskFormWithVariablesInReturn(secondUserTask.getId(), additionalVariables);
+    vars = formService.submitTaskFormWithVariablesInReturn(secondUserTask.getId(), additionalVariables, true);
     assertEquals(3, vars.size());
     assertEquals(7, vars.get("x"));
     assertEquals(processVarValue, vars.get(processVarName));
@@ -1046,7 +1046,7 @@ public class FormServiceTest {
     Task secondTask = taskService.createTaskQuery().taskName("Second Task").singleResult();
     taskService.setVariable(secondTask.getId(), task2VarName, task2VarValue);
 
-    Map<String, Object> vars = formService.submitTaskFormWithVariablesInReturn(firstTask.getId(), null);
+    Map<String, Object> vars = formService.submitTaskFormWithVariablesInReturn(firstTask.getId(), null, true);
 
     assertEquals(3, vars.size());
     assertEquals(processVarValue, vars.get(processVarName));
@@ -1056,7 +1056,7 @@ public class FormServiceTest {
     Map<String, Object> additionalVariables = new HashMap<>();
     additionalVariables.put(additionalVar, additionalVarValue);
 
-    vars = formService.submitTaskFormWithVariablesInReturn(secondTask.getId(), additionalVariables);
+    vars = formService.submitTaskFormWithVariablesInReturn(secondTask.getId(), additionalVariables, true);
     assertEquals(4, vars.size());
     assertEquals(processVarValue, vars.get(processVarName));
     assertEquals(task1VarValue, vars.get(task1VarName));
@@ -1070,7 +1070,7 @@ public class FormServiceTest {
    * Loading all variables may be expensive.
    */
   @Test
-  public void testCompleteTaskAndDoNotDeserializeVariables()
+  public void testSubmitTaskFormAndDoNotDeserializeVariables()
   {
     // given
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
@@ -1104,6 +1104,51 @@ public class FormServiceTest {
 
     // then
     assertThat(hasLoadedAnyVariables).isFalse();
+  }
+
+
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
+  public void testSubmitTaskFormWithVarialbesInReturnShouldDeserializeObjectValue()
+  {
+    // given
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    VariableMap result = formService.submitTaskFormWithVariablesInReturn(task.getId(), null, true);
+
+    // then
+    ObjectValue returnedValue = result.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isTrue();
+    assertThat(returnedValue.getValue()).isEqualTo("value");
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
+  public void testSubmitTaskFormWithVarialbesInReturnShouldNotDeserializeObjectValue()
+  {
+    // given
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+    String serializedValue = ((ObjectValue) runtimeService.getVariableTyped(instance.getId(), "var")).getValueSerialized();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    VariableMap result = formService.submitTaskFormWithVariablesInReturn(task.getId(), null, false);
+
+    // then
+    ObjectValue returnedValue = result.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isFalse();
+    assertThat(returnedValue.getValueSerialized()).isEqualTo(serializedValue);
   }
 
   @Deployment

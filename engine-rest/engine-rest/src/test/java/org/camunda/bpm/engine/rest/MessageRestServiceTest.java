@@ -1168,7 +1168,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   @Test
   public void testCorrelationWithVariablesInResult() {
     // given
-    when(messageCorrelationBuilderMock.correlateWithResultAndVariables()).thenReturn(executionResultWithVariables);
+    when(messageCorrelationBuilderMock.correlateWithResultAndVariables(false)).thenReturn(executionResultWithVariables);
 
     String messageName = "aMessageName";
     Map<String, Object> messageParameters = new HashMap<>();
@@ -1191,13 +1191,13 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     checkVariablesInResult(content, 0);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
-    verify(messageCorrelationBuilderMock).correlateWithResultAndVariables();
+    verify(messageCorrelationBuilderMock).correlateWithResultAndVariables(false);
   }
 
   @Test
   public void testCorrelationAllWithVariablesInResult() {
     // given
-    when(messageCorrelationBuilderMock.correlateAllWithResultAndVariables()).thenReturn(execResultWithVariablesList);
+    when(messageCorrelationBuilderMock.correlateAllWithResultAndVariables(false)).thenReturn(execResultWithVariablesList);
 
     String messageName = "aMessageName";
     Map<String, Object> messageParameters = new HashMap<>();
@@ -1224,7 +1224,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     checkVariablesInResult(content, 0);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
-    verify(messageCorrelationBuilderMock).correlateAllWithResultAndVariables();
+    verify(messageCorrelationBuilderMock).correlateAllWithResultAndVariables(false);
   }
 
   @Test

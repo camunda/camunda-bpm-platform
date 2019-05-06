@@ -88,11 +88,11 @@ public class FormServiceImpl extends ServiceImpl implements FormService {
   }
 
   public void submitTaskForm(String taskId, Map<String, Object> properties) {
-    commandExecutor.execute(new SubmitTaskFormCmd(taskId, properties, false));
+    commandExecutor.execute(new SubmitTaskFormCmd(taskId, properties, false, false));
   }
 
-  public VariableMap submitTaskFormWithVariablesInReturn(String taskId, Map<String, Object> properties) {
-    return commandExecutor.execute(new SubmitTaskFormCmd(taskId, properties, true));
+  public VariableMap submitTaskFormWithVariablesInReturn(String taskId, Map<String, Object> properties, boolean deserializeValues) {
+    return commandExecutor.execute(new SubmitTaskFormCmd(taskId, properties, true, deserializeValues));
   }
 
   public String getStartFormKey(String processDefinitionId) {

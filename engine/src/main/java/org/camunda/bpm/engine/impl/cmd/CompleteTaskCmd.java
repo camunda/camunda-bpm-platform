@@ -43,15 +43,18 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
   // only fetch variables if they are actually requested;
   // this avoids unnecessary loading of variables
   protected boolean returnVariables;
+  protected boolean deserializeReturnedVariables;
 
   public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
-    this(taskId, variables, false);
+    this(taskId, variables, false, false);
   }
 
-  public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean returnVariables) {
+  public CompleteTaskCmd(String taskId, Map<String, Object> variables,
+      boolean returnVariables, boolean deserializeReturnedVariables) {
     this.taskId = taskId;
     this.variables = variables;
     this.returnVariables = returnVariables;
+    this.deserializeReturnedVariables = deserializeReturnedVariables;
   }
 
   public VariableMap execute(CommandContext commandContext) {
@@ -71,7 +74,7 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
     ExecutionVariableSnapshotObserver variablesListener = null;
 
     if (returnVariables && execution != null) {
-      variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
+      variablesListener = new ExecutionVariableSnapshotObserver(execution, false, deserializeReturnedVariables);
     }
 
     completeTask(task);

@@ -174,11 +174,11 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void complete(String taskId, Map<String, Object> variables) {
-    commandExecutor.execute(new CompleteTaskCmd(taskId, variables, false));
+    commandExecutor.execute(new CompleteTaskCmd(taskId, variables, false, false));
   }
 
-  public VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables) {
-    return commandExecutor.execute(new CompleteTaskCmd(taskId, variables, true));
+  public VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables, boolean deserializeValues) {
+    return commandExecutor.execute(new CompleteTaskCmd(taskId, variables, true, deserializeValues));
   }
 
   public void delegateTask(String taskId, String userId) {

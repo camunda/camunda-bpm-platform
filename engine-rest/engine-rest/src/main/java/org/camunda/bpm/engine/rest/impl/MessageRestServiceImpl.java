@@ -59,7 +59,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
       throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter 'variablesInResultEnabled' cannot be used without 'resultEnabled' set to true.");
     }
 
-    List<MessageCorrelationResultDto> resultDtos = new ArrayList<MessageCorrelationResultDto>();
+    List<MessageCorrelationResultDto> resultDtos = new ArrayList<>();
     try {
       MessageCorrelationBuilder correlation = createMessageCorrelationBuilder(messageDto);
         if (!variablesInResultEnabled) {
@@ -78,7 +78,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   protected List<MessageCorrelationResultDto> correlate(CorrelationMessageDto messageDto, MessageCorrelationBuilder correlation) {
-    List<MessageCorrelationResultDto> resultDtos = new ArrayList<MessageCorrelationResultDto>();
+    List<MessageCorrelationResultDto> resultDtos = new ArrayList<>();
     if (!messageDto.isAll()) {
       MessageCorrelationResult result = correlation.correlateWithResult();
       resultDtos.add(MessageCorrelationResultDto.fromMessageCorrelationResult(result));
@@ -92,12 +92,12 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   protected List<MessageCorrelationResultWithVariableDto> correlateWithVariablesEnabled(CorrelationMessageDto messageDto, MessageCorrelationBuilder correlation) {
-    List<MessageCorrelationResultWithVariableDto> resultDtos = new ArrayList<MessageCorrelationResultWithVariableDto>();
+    List<MessageCorrelationResultWithVariableDto> resultDtos = new ArrayList<>();
     if (!messageDto.isAll()) {
-      MessageCorrelationResultWithVariables result = correlation.correlateWithResultAndVariables();
+      MessageCorrelationResultWithVariables result = correlation.correlateWithResultAndVariables(false);
       resultDtos.add(MessageCorrelationResultWithVariableDto.fromMessageCorrelationResultWithVariables(result));
     } else {
-      List<MessageCorrelationResultWithVariables> results = correlation.correlateAllWithResultAndVariables();
+      List<MessageCorrelationResultWithVariables> results = correlation.correlateAllWithResultAndVariables(false);
       for (MessageCorrelationResultWithVariables result : results) {
         resultDtos.add(MessageCorrelationResultWithVariableDto.fromMessageCorrelationResultWithVariables(result));
       }

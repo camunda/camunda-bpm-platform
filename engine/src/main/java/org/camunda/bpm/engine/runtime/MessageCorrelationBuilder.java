@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
 
 /**
  * <p>A fluent builder for defining message correlation</p>
@@ -207,11 +208,15 @@ public interface MessageCorrelationBuilder {
    *
    * @see {@link #correlateWithResult()}
    *
+   * @param deserializeValues if false, returned {@link SerializableValue}s
+   *   will not be deserialized (unless they are passed into this method as a
+   *   deserialized value or if the BPMN process triggers deserialization)
+   *
    * @return The result of the message correlation. Result contains either the
    *         execution id or the start event activity id, the process definition,
    *         and the process variables.
    */
-  MessageCorrelationResultWithVariables correlateWithResultAndVariables();
+  MessageCorrelationResultWithVariables correlateWithResultAndVariables(boolean deserializeValues);
 
   /**
    * <p>
@@ -274,11 +279,15 @@ public interface MessageCorrelationBuilder {
    *
    * @see {@link #correlateAllWithResult()}
    *
+   * @param deserializeValues if false, returned {@link SerializableValue}s
+   *   will not be deserialized (unless they are passed into this method as a
+   *   deserialized value or if the BPMN process triggers deserialization)
+   *
    * @return The result list of the message correlations. Each result contains
    *         either the execution id or the start event activity id, the process
    *         definition, and the process variables.
    */
-  List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables();
+  List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables(boolean deserializeValues);
 
   /**
    * Executes the message correlation.

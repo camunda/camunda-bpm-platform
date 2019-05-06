@@ -99,7 +99,7 @@ public class TaskResourceImpl implements TaskResource {
     try {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       if (dto.isWithVariablesInReturn()) {
-        VariableMap taskVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+        VariableMap taskVariables = taskService.completeWithVariablesInReturn(taskId, variables, false);
 
         Map<String, VariableValueDto> body = VariableValueDto.fromMap(taskVariables, true);
 
@@ -135,7 +135,7 @@ public class TaskResourceImpl implements TaskResource {
     try {
       VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
       if (dto.isWithVariablesInReturn()) {
-        VariableMap taskVariables = formService.submitTaskFormWithVariablesInReturn(taskId, variables);
+        VariableMap taskVariables = formService.submitTaskFormWithVariablesInReturn(taskId, variables, false);
 
         Map<String, VariableValueDto> body = VariableValueDto.fromMap(taskVariables, true);
         return Response

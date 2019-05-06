@@ -67,6 +67,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -108,18 +109,18 @@ public class MessageCorrelationTest {
   @Deployment
   @Test
   public void testCatchingMessageEventCorrelation() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "anotherValue");
     runtimeService.startProcessInstanceByKey("process", variables);
 
     String messageName = "newInvoiceMessage";
-    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    Map<String, Object> correlationKeys = new HashMap<>();
     correlationKeys.put("aKey", "aValue");
-    Map<String, Object> messagePayload = new HashMap<String, Object>();
+    Map<String, Object> messagePayload = new HashMap<>();
     messagePayload.put("aNewKey", "aNewVariable");
 
     runtimeService.correlateMessage(messageName, correlationKeys, messagePayload);
@@ -139,7 +140,7 @@ public class MessageCorrelationTest {
 
     // this time: use the builder ////////////////
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "aValue");
     processInstance = runtimeService.startProcessInstanceByKey("process", variables);
 
@@ -167,11 +168,11 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testOneMatchinProcessInstanceUsingFluentCorrelateAll() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", variables);
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "anotherValue");
     runtimeService.startProcessInstanceByKey("process", variables);
 
@@ -203,16 +204,16 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testTwoMatchingProcessInstancesCorrelation() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", variables);
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", variables);
 
     String messageName = "newInvoiceMessage";
-    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    Map<String, Object> correlationKeys = new HashMap<>();
     correlationKeys.put("aKey", "aValue");
 
     try {
@@ -236,16 +237,16 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testTwoMatchingProcessInstancesUsingFluentCorrelateAll() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", variables);
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", variables);
 
     String messageName = "newInvoiceMessage";
-    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    Map<String, Object> correlationKeys = new HashMap<>();
     correlationKeys.put("aKey", "aValue");
 
     // fluent builder multiple should not fail
@@ -361,7 +362,7 @@ public class MessageCorrelationTest {
     String businessKey = "aBusinessKey";
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", businessKey);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.correlateMessage("newInvoiceMessage", businessKey, variables);
 
@@ -497,7 +498,7 @@ public class MessageCorrelationTest {
   @Deployment
   @Test
   public void testMessageStartEventCorrelation() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
 
     runtimeService.correlateMessage("newInvoiceMessage", new HashMap<String, Object>(), variables);
@@ -967,19 +968,19 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testCorrelationByBusinessKeyAndVariables() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", "anotherBusinessKey", variables);
 
     String messageName = "newInvoiceMessage";
-    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    Map<String, Object> correlationKeys = new HashMap<>();
     correlationKeys.put("aKey", "aValue");
 
-    Map<String, Object> processVariables = new HashMap<String, Object>();
+    Map<String, Object> processVariables = new HashMap<>();
     processVariables.put("aProcessVariable", "aVariableValue");
     runtimeService.correlateMessage(messageName, "aBusinessKey", correlationKeys, processVariables);
 
@@ -998,7 +999,7 @@ public class MessageCorrelationTest {
 
     // fluent builder /////////////////////////////
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "aValue");
     processInstance = runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
 
@@ -1026,7 +1027,7 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testCorrelationByBusinessKeyAndVariablesUsingFluentCorrelateAll() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
     runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
@@ -1166,7 +1167,7 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testCorrelationByBusinessKeyAndNullVariableEqualsUsingFluentCorrelateAll() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("foo", "bar");
     runtimeService.startProcessInstanceByKey("process", "aBusinessKey", variables);
 
@@ -1211,7 +1212,7 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testCorrelationByVariablesOnly() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variable", "value1");
     runtimeService.startProcessInstanceByKey("process", variables);
 
@@ -1269,7 +1270,7 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testCorrelationWithoutMessageNameFluent() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variable", "value1");
     runtimeService.startProcessInstanceByKey("process", variables);
 
@@ -1293,7 +1294,7 @@ public class MessageCorrelationTest {
       "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCorrelateAllWithoutMessage.bpmn20.xml"})
   @Test
   public void testCorrelateAllWithoutMessage() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variable", "value1");
     runtimeService.startProcessInstanceByKey("process", variables);
     runtimeService.startProcessInstanceByKey("secondProcess", variables);
@@ -1384,7 +1385,7 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testSuspendedProcessInstance() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     String processInstance = runtimeService.startProcessInstanceByKey("process", variables).getId();
 
@@ -1392,7 +1393,7 @@ public class MessageCorrelationTest {
     runtimeService.suspendProcessInstanceById(processInstance);
 
     String messageName = "newInvoiceMessage";
-    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    Map<String, Object> correlationKeys = new HashMap<>();
     correlationKeys.put("aKey", "aValue");
 
     try {
@@ -1406,11 +1407,11 @@ public class MessageCorrelationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   @Test
   public void testOneMatchingAndOneSuspendedProcessInstance() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
     String firstProcessInstance = runtimeService.startProcessInstanceByKey("process", variables).getId();
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("aKey", "aValue");
     String secondProcessInstance = runtimeService.startProcessInstanceByKey("process", variables).getId();
 
@@ -1418,10 +1419,10 @@ public class MessageCorrelationTest {
     runtimeService.suspendProcessInstanceById(secondProcessInstance);
 
     String messageName = "newInvoiceMessage";
-    Map<String, Object> correlationKeys = new HashMap<String, Object>();
+    Map<String, Object> correlationKeys = new HashMap<>();
     correlationKeys.put("aKey", "aValue");
 
-    Map<String, Object> messagePayload = new HashMap<String, Object>();
+    Map<String, Object> messagePayload = new HashMap<>();
     messagePayload.put("aNewKey", "aNewVariable");
 
     runtimeService.correlateMessage(messageName, correlationKeys, messagePayload);
@@ -1453,7 +1454,7 @@ public class MessageCorrelationTest {
 
     repositoryService.suspendProcessDefinitionById(processDefinitionId);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aKey", "aValue");
 
     try {
@@ -1611,11 +1612,11 @@ public class MessageCorrelationTest {
 
     testRule.deploy(model);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("processInstanceVar", "processInstanceVarValue");
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
 
-    Map<String, Object> messageLocalPayload = new HashMap<String, Object>();
+    Map<String, Object> messageLocalPayload = new HashMap<>();
     String outpuValue = "outputValue";
     String localVarName = "testLocalVar";
     messageLocalPayload.put(localVarName, outpuValue);
@@ -1624,7 +1625,7 @@ public class MessageCorrelationTest {
     MessageCorrelationResultWithVariables messageCorrelationResult = runtimeService
         .createMessageCorrelation("1")
         .setVariablesLocal(messageLocalPayload)
-        .correlateWithResultAndVariables();
+        .correlateWithResultAndVariables(true);
 
     // then
     checkExecutionMessageCorrelationResult(messageCorrelationResult, processInstance, "message_1");
@@ -1665,11 +1666,11 @@ public class MessageCorrelationTest {
 
     testRule.deploy(model);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("processInstanceVar", "processInstanceVarValue");
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", variables);
 
-    Map<String, Object> messageLocalPayload = new HashMap<String, Object>();
+    Map<String, Object> messageLocalPayload = new HashMap<>();
     String outpuValue = "outputValue";
     String localVarName = "testLocalVar";
     messageLocalPayload.put(localVarName, outpuValue);
@@ -1703,7 +1704,7 @@ public class MessageCorrelationTest {
   @Test
   public void testCorrelateWithResultTwoTimesInSameTransaction() {
     // start process that waits for message
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("correlationKey", "someCorrelationKey");
     ProcessInstance messageWaitProcess = runtimeService.startProcessInstanceByKey("waitForMessageProcess", variables);
 
@@ -1727,7 +1728,7 @@ public class MessageCorrelationTest {
   @Test
   public void testCorrelateAllWithResultTwoTimesInSameTransaction() {
     // start process that waits for message
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("correlationKey", "someCorrelationKey");
     ProcessInstance messageWaitProcess = runtimeService.startProcessInstanceByKey("waitForMessageProcess", variables);
 
@@ -1756,7 +1757,7 @@ public class MessageCorrelationTest {
 
     testRule.deploy(model);
 
-    Map<String, Object> messagePayload = new HashMap<String, Object>();
+    Map<String, Object> messagePayload = new HashMap<>();
     String outpuValue = "outputValue";
     String localVarName = "testLocalVar";
     messagePayload.put(localVarName, outpuValue);
@@ -1788,7 +1789,7 @@ public class MessageCorrelationTest {
     MessageCorrelationResultWithVariables result = runtimeService
         .createMessageCorrelation("1")
         .setVariable("foo", "bar")
-        .correlateWithResultAndVariables();
+        .correlateWithResultAndVariables(true);
 
     // then
     assertNotNull(result);
@@ -1806,7 +1807,7 @@ public class MessageCorrelationTest {
     //when correlated all with result and variables
     List<MessageCorrelationResultWithVariables> resultList = runtimeService
         .createMessageCorrelation("newInvoiceMessage")
-        .correlateAllWithResultAndVariables();
+        .correlateAllWithResultAndVariables(true);
 
     assertEquals(2, resultList.size());
     //then result should contains executions on which messages was correlated
@@ -1849,7 +1850,7 @@ public class MessageCorrelationTest {
     // when
     MessageCorrelationResultWithVariables result = runtimeService
         .createMessageCorrelation("1")
-        .correlateWithResultAndVariables();
+        .correlateWithResultAndVariables(true);
 
     // then
     assertNotNull(result);
@@ -1858,6 +1859,136 @@ public class MessageCorrelationTest {
     assertEquals("foo", result.getVariables().get("a"));
     assertEquals(2, result.getVariables().get("b"));
     assertEquals(42, result.getVariables().get("sum"));
+  }
+
+  @Test
+  public void testCorrelateWithVariablesInReturnShouldDeserializeObjectValue()
+  {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .intermediateCatchEvent("Message_1")
+      .message("1")
+      .userTask("UserTask_1")
+      .endEvent()
+      .done();
+
+    testRule.deploy(model);
+
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    // when
+    MessageCorrelationResultWithVariables result = runtimeService.createMessageCorrelation("1")
+        .correlateWithResultAndVariables(true);
+
+    // then
+    VariableMap resultVariables = result.getVariables();
+
+    ObjectValue returnedValue = resultVariables.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isTrue();
+    assertThat(returnedValue.getValue()).isEqualTo("value");
+  }
+
+  @Test
+  public void testCorrelateWithVariablesInReturnShouldNotDeserializeObjectValue()
+  {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .intermediateCatchEvent("Message_1")
+      .message("1")
+      .userTask("UserTask_1")
+      .endEvent()
+      .done();
+
+    testRule.deploy(model);
+
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process", variables);
+    String serializedValue = ((ObjectValue) runtimeService.getVariableTyped(instance.getId(), "var")).getValueSerialized();
+
+    // when
+    MessageCorrelationResultWithVariables result = runtimeService.createMessageCorrelation("1")
+        .correlateWithResultAndVariables(false);
+
+    // then
+    VariableMap resultVariables = result.getVariables();
+
+    ObjectValue returnedValue = resultVariables.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isFalse();
+    assertThat(returnedValue.getValueSerialized()).isEqualTo(serializedValue);
+  }
+
+  @Test
+  public void testCorrelateAllWithVariablesInReturnShouldDeserializeObjectValue()
+  {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .intermediateCatchEvent("Message_1")
+      .message("1")
+      .userTask("UserTask_1")
+      .endEvent()
+      .done();
+
+    testRule.deploy(model);
+
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    // when
+    List<MessageCorrelationResultWithVariables> result = runtimeService.createMessageCorrelation("1")
+        .correlateAllWithResultAndVariables(true);
+
+    // then
+    assertThat(result).hasSize(1);
+
+    VariableMap resultVariables = result.get(0).getVariables();
+
+    ObjectValue returnedValue = resultVariables.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isTrue();
+    assertThat(returnedValue.getValue()).isEqualTo("value");
+  }
+
+  @Test
+  public void testCorrelateAllWithVariablesInReturnShouldNotDeserializeObjectValue()
+  {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .intermediateCatchEvent("Message_1")
+      .message("1")
+      .userTask("UserTask_1")
+      .endEvent()
+      .done();
+
+    testRule.deploy(model);
+
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process", variables);
+    String serializedValue = ((ObjectValue) runtimeService.getVariableTyped(instance.getId(), "var")).getValueSerialized();
+
+    // when
+    List<MessageCorrelationResultWithVariables> result = runtimeService.createMessageCorrelation("1")
+        .correlateAllWithResultAndVariables(false);
+
+    // then
+    assertThat(result).hasSize(1);
+
+    VariableMap resultVariables = result.get(0).getVariables();
+
+    ObjectValue returnedValue = resultVariables.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isFalse();
+    assertThat(returnedValue.getValueSerialized()).isEqualTo(serializedValue);
   }
 
   public static class ChangeVariableDelegate implements JavaDelegate {

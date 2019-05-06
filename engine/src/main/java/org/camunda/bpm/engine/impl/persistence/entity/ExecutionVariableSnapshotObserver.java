@@ -33,15 +33,17 @@ public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
   protected ExecutionEntity execution;
 
   protected boolean localVariables = true;
+  protected boolean deserializeValues = false;
 
   public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity) {
-    this(executionEntity, true);
+    this(executionEntity, true, false);
   }
 
-  public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity, boolean localVariables) {
+  public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity, boolean localVariables, boolean deserializeValues) {
     this.execution = executionEntity;
     this.execution.addExecutionObserver(this);
     this.localVariables = localVariables;
+    this.deserializeValues = deserializeValues;
   }
 
   @Override
@@ -58,8 +60,8 @@ public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
       return variableSnapshot;
     }
   }
-  
+
   private VariableMap getVariables(final boolean localVariables) {
-    return this.localVariables ? execution.getVariablesLocalTyped(false) : execution.getVariablesTyped(false);
+    return this.localVariables ? execution.getVariablesLocalTyped(deserializeValues) : execution.getVariablesTyped(deserializeValues);
   }
 }

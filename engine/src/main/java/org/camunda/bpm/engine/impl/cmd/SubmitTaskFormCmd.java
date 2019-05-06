@@ -50,11 +50,13 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
   // only fetch variables if they are actually requested;
   // this avoids unnecessary loading of variables
   protected boolean returnVariables;
+  protected boolean deserializeValues;
 
-  public SubmitTaskFormCmd(String taskId, Map<String, Object> properties, boolean returnVariables) {
+  public SubmitTaskFormCmd(String taskId, Map<String, Object> properties, boolean returnVariables, boolean deserializeValues) {
     this.taskId = taskId;
     this.properties = Variables.fromMap(properties);
     this.returnVariables = returnVariables;
+    this.deserializeValues = deserializeValues;
   }
 
   public VariableMap execute(CommandContext commandContext) {
@@ -79,7 +81,7 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
     ExecutionEntity execution = task.getProcessInstance();
     ExecutionVariableSnapshotObserver variablesListener = null;
     if (returnVariables && execution != null) {
-      variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
+      variablesListener = new ExecutionVariableSnapshotObserver(execution, false, deserializeValues);
     }
 
     // complete or resolve the task

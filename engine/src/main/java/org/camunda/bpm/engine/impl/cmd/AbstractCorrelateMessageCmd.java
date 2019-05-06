@@ -42,7 +42,8 @@ public abstract class AbstractCorrelateMessageCmd {
   protected final MessageCorrelationBuilderImpl builder;
 
   protected ExecutionVariableSnapshotObserver variablesListener;
-  protected boolean variablesEnabled;
+  protected boolean variablesEnabled = false;
+  protected boolean deserializeVariableValues = false;
 
   /**
    * Initialize the command with a builder
@@ -54,9 +55,10 @@ public abstract class AbstractCorrelateMessageCmd {
     this.messageName = builder.getMessageName();
   }
 
-  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder, boolean variablesEnabled) {
+  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder, boolean variablesEnabled, boolean deserializeVariableValues) {
     this(builder);
     this.variablesEnabled = variablesEnabled;
+    this.deserializeVariableValues = deserializeVariableValues;
   }
 
   protected void triggerExecution(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
@@ -73,7 +75,7 @@ public abstract class AbstractCorrelateMessageCmd {
     ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), messageStartEvent);
 
     if (variablesEnabled) {
-      variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false);
+      variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false, deserializeVariableValues);
     }
 
     processInstance.setVariablesLocal(builder.getPayloadProcessInstanceVariablesLocal());
@@ -104,7 +106,7 @@ public abstract class AbstractCorrelateMessageCmd {
     if (MessageCorrelationResultType.Execution.equals(handlerResult.getResultType())) {
       ExecutionEntity execution = findProcessInstanceExecution(commandContext, handlerResult);
       if (variablesEnabled && execution != null) {
-        variablesListener = new ExecutionVariableSnapshotObserver(execution, false);
+        variablesListener = new ExecutionVariableSnapshotObserver(execution, false, deserializeVariableValues);
       }
       triggerExecution(commandContext, handlerResult);
     } else {

@@ -303,6 +303,9 @@ public interface TaskService {
    *
    * @param taskId the id of the task to complete, cannot be null.
    * @param variables task parameters. May be null or empty.
+   * @param deserializeValues if false, returned {@link SerializableValue}s
+   *   will not be deserialized (unless they are passed into this method as a
+   *   deserialized value or if the BPMN process triggers deserialization)
    *
    * @return All task variables with their current value
    *
@@ -313,7 +316,7 @@ public interface TaskService {
    *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
    *          (if the task is part of a running process instance).
    */
-  VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables);
+  VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables, boolean deserializeValues);
 
   /**
    * Changes the assignee of the given task to the given userId.

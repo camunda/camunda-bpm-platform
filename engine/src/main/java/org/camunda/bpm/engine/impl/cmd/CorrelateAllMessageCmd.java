@@ -43,8 +43,8 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implemen
    *
    * @param messageCorrelationBuilderImpl
    */
-  public CorrelateAllMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl, boolean collectVariables) {
-    super(messageCorrelationBuilderImpl, collectVariables);
+  public CorrelateAllMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl, boolean collectVariables, boolean deserializeVariableValues) {
+    super(messageCorrelationBuilderImpl, collectVariables, deserializeVariableValues);
   }
 
   public List<MessageCorrelationResultImpl> execute(final CommandContext commandContext) {

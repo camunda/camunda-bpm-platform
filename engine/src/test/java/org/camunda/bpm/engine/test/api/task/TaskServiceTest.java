@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -807,7 +808,7 @@ public class TaskServiceTest {
     additionalVariables.put(taskVarName, taskVarValue);
 
     // After completion of firstUserTask a script Task sets 'x' = 5
-    VariableMap vars = taskService.completeWithVariablesInReturn(firstUserTask.getId(), additionalVariables);
+    VariableMap vars = taskService.completeWithVariablesInReturn(firstUserTask.getId(), additionalVariables, true);
 
     assertEquals(3, vars.size());
     assertEquals(5, vars.get("x"));
@@ -820,7 +821,7 @@ public class TaskServiceTest {
     additionalVariables.put("x", 7);
     Task secondUserTask = taskService.createTaskQuery().taskName("Second User Task").singleResult();
 
-    vars = taskService.completeWithVariablesInReturn(secondUserTask.getId(), additionalVariables);
+    vars = taskService.completeWithVariablesInReturn(secondUserTask.getId(), additionalVariables, true);
     assertEquals(3, vars.size());
     assertEquals(7, vars.get("x"));
     assertEquals(processVarValue, vars.get(processVarName));
@@ -840,7 +841,7 @@ public class TaskServiceTest {
     Map<String, Object> variables = new HashMap<>();
     variables.put(taskVarName, taskVarValue);
 
-    Map<String, Object> returnedVariables = taskService.completeWithVariablesInReturn(taskId, variables);
+    Map<String, Object> returnedVariables = taskService.completeWithVariablesInReturn(taskId, variables, true);
     // expect empty Map for standalone tasks
     assertEquals(0, returnedVariables.size());
 
@@ -870,7 +871,7 @@ public class TaskServiceTest {
     Task secondTask = taskService.createTaskQuery().taskName("Second Task").singleResult();
     taskService.setVariable(secondTask.getId(), task2VarName, task2VarValue);
 
-    Map<String, Object> vars = taskService.completeWithVariablesInReturn(firstTask.getId(), null);
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(firstTask.getId(), null, true);
 
     assertEquals(3, vars.size());
     assertEquals(processVarValue, vars.get(processVarName));
@@ -880,7 +881,7 @@ public class TaskServiceTest {
     Map<String, Object> additionalVariables = new HashMap<>();
     additionalVariables.put(additionalVar, additionalVarValue);
 
-    vars = taskService.completeWithVariablesInReturn(secondTask.getId(), additionalVariables);
+    vars = taskService.completeWithVariablesInReturn(secondTask.getId(), additionalVariables, true);
     assertEquals(4, vars.size());
     assertEquals(processVarValue, vars.get(processVarName));
     assertEquals(task1VarValue, vars.get(task1VarName));
@@ -930,6 +931,49 @@ public class TaskServiceTest {
     assertThat(hasLoadedAnyVariables).isFalse();
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
+  public void testCompleteTaskWithVariablesInReturnShouldDeserializeObjectValue()
+  {
+    // given
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    VariableMap result = taskService.completeWithVariablesInReturn(task.getId(), null, true);
+
+    // then
+    ObjectValue returnedValue = result.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isTrue();
+    assertThat(returnedValue.getValue()).isEqualTo("value");
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
+  public void testCompleteTaskWithVariablesInReturnShouldNotDeserializeObjectValue()
+  {
+    // given
+    ObjectValue value = Variables.objectValue("value").create();
+    VariableMap variables = Variables.createVariables().putValue("var", value);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("twoTasksProcess", variables);
+    String serializedValue = ((ObjectValue) runtimeService.getVariableTyped(instance.getId(), "var")).getValueSerialized();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    VariableMap result = taskService.completeWithVariablesInReturn(task.getId(), null, false);
+
+    // then
+    ObjectValue returnedValue = result.getValueTyped("var");
+    assertThat(returnedValue.isDeserialized()).isFalse();
+    assertThat(returnedValue.getValueSerialized()).isEqualTo(serializedValue);
+  }
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   @Test
   public void testCompleteTaskWithVariablesInReturnCMMN() {
@@ -943,7 +987,7 @@ public class TaskServiceTest {
     assertNotNull(task1);
 
     taskService.setVariable(task1.getId(), taskVariableName, taskVariableValue);
-    Map<String, Object> vars = taskService.completeWithVariablesInReturn(task1.getId(), null);
+    Map<String, Object> vars = taskService.completeWithVariablesInReturn(task1.getId(), null, true);
     assertNull(vars);
   }
 

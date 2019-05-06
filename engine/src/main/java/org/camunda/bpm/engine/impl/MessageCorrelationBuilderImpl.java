@@ -209,15 +209,15 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return execute(new CorrelateMessageCmd(this, false));
+    return execute(new CorrelateMessageCmd(this, false, false));
   }
 
   @Override
-  public MessageCorrelationResultWithVariables correlateWithResultAndVariables() {
+  public MessageCorrelationResultWithVariables correlateWithResultAndVariables(boolean deserializeValues) {
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return execute(new CorrelateMessageCmd(this, true));
+    return execute(new CorrelateMessageCmd(this, true, deserializeValues));
   }
 
   @Override
@@ -237,15 +237,15 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return (List) execute(new CorrelateAllMessageCmd(this, false));
+    return (List) execute(new CorrelateAllMessageCmd(this, false, false));
   }
 
   @Override
-  public List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables() {
+  public List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables(boolean deserializeValues) {
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    return (List) execute(new CorrelateAllMessageCmd(this, true));
+    return (List) execute(new CorrelateAllMessageCmd(this, true, deserializeValues));
   }
 
   public ProcessInstance correlateStartMessage() {

@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
 
 
 /** Access to form data and rendered forms for starting new process instances and completing tasks.
@@ -177,19 +178,22 @@ public interface FormService {
    *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void submitTaskForm(String taskId, Map<String, Object> properties);
-  
+
   /**
    * Completes a task with the user data that was entered as properties in a task form.
    *
    * @param taskId
-   * @param properties 
+   * @param properties
+   * @param deserializeValues if false, returned {@link SerializableValue}s
+   *   will not be deserialized (unless they are passed into this method as a
+   *   deserialized value or if the BPMN process triggers deserialization)
    * @return a map of process variables
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
    *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  VariableMap submitTaskFormWithVariablesInReturn(String taskId, Map<String, Object> properties);
+  VariableMap submitTaskFormWithVariablesInReturn(String taskId, Map<String, Object> properties, boolean deserializeValues);
 
   /**
    * Retrieves a list of all variables for rendering a start from. The method takes into account
