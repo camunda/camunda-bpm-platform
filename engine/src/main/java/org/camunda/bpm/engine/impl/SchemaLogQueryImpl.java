@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.management.SchemaLogQuery;
+import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
  * @author Miklas Boskamp
@@ -32,7 +33,7 @@ import org.camunda.bpm.engine.management.SchemaLogQuery;
 public class SchemaLogQueryImpl extends AbstractQuery<SchemaLogQuery, SchemaLogEntry> implements SchemaLogQuery {
 
   private static final long serialVersionUID = 1L;
-  private static final QueryPropertyImpl TIMESTAMP_PROPERTY = new QueryPropertyImpl("TIMESTAMP_");
+  private static final QueryProperty TIMESTAMP_PROPERTY = new QueryPropertyImpl("TIMESTAMP_");
 
   protected String version;
 
