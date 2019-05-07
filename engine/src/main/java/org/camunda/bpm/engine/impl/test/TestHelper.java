@@ -67,7 +67,8 @@ public abstract class TestHelper {
   public static final String EMPTY_LINE = "                                                                                           ";
 
   public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY"
+    "ACT_GE_PROPERTY",
+    "ACT_GE_SCHEMA_LOG"
   );
 
   static Map<String, ProcessEngine> processEngines = new HashMap<>();

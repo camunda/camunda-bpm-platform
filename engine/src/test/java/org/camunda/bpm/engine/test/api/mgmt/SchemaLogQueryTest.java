@@ -51,15 +51,12 @@ public class SchemaLogQueryTest {
   ManagementService managementService;
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  Date startDate;
   SchemaLogEntryEntity dummySchemaLogEntry;
 
   @Before
   public void init() {
     managementService = engineRule.getManagementService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-
-    startDate = new Date();
     dummySchemaLogEntry = createDummySchemaLogEntry();
   }
 
@@ -113,7 +110,7 @@ public class SchemaLogQueryTest {
 
     // then
     assertThat(schemaLogEntry.getId(), is(dummySchemaLogEntry.getId()));
-    assertThat(schemaLogEntry.getTimestamp(), is(dummySchemaLogEntry.getTimestamp()));
+    assertThat(schemaLogEntry.getTimestamp(), notNullValue());
     assertThat(schemaLogEntry.getVersion(), is(dummySchemaLogEntry.getVersion()));
 
     cleanupTable();

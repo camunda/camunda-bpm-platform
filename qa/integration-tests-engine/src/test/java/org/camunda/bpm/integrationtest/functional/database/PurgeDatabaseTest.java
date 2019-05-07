@@ -45,7 +45,8 @@ import java.util.Map;
 public class PurgeDatabaseTest extends AbstractFoxPlatformIntegrationTest {
 
   public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY"
+    "ACT_GE_PROPERTY",
+    "ACT_GE_SCHEMA_LOG"
   );
 
   @Deployment
