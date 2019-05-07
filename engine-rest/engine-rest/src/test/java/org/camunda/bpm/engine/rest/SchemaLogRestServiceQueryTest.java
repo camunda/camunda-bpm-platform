@@ -44,7 +44,7 @@ import org.mockito.Mockito;
  * @author Miklas Boskamp
  *
  */
-public class SchemLogRestServiceQueryTest extends AbstractRestServiceTest {
+public class SchemaLogRestServiceQueryTest extends AbstractRestServiceTest {
 
   /**
    * 

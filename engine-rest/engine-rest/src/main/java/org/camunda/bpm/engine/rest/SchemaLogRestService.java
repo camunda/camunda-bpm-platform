@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.rest.dto.SchemaLogQueryDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface SchemaLogRestService {
 
-  public static final String PATH = "/schema/update-log";
+  public static final String PATH = "/schema/log";
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
