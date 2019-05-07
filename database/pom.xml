@@ -55,6 +55,11 @@
       </dependency>
       <dependency>
         <groupId>com.oracle.jdbc</groupId>
+        <artifactId>ojdbc7</artifactId>
+        <version>${version.oracle}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.oracle.jdbc</groupId>
         <artifactId>ojdbc14</artifactId>
         <version>${version.oracle-10}</version>
       </dependency>
