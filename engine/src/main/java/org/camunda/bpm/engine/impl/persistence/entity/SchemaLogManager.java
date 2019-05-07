@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
@@ -45,7 +45,7 @@ public class SchemaLogManager extends AbstractManager {
     if (isAuthorized()) {
       return getDbEntityManager().selectList("selectSchemaLogEntryByQueryCriteria", schemaLogQueryImpl, page);
     } else {
-      return new ArrayList<SchemaLogEntry>();
+      return Collections.emptyList();
     }
   }
 
