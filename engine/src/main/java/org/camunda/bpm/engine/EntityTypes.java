@@ -47,4 +47,5 @@ public class EntityTypes {
   public static final String REPORT = "Report";
   public static final String DASHBOARD = "Dashboard";
   public static final String METRICS = "Metrics";
+  public static final String CASE_INSTANCE = "CaseInstance";
 }

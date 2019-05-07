@@ -16,13 +16,16 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -551,7 +554,8 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testDeleteHistoricCaseInstance() {
     CaseInstance caseInstance = createCaseInstance();
 
-    HistoricCaseInstance historicInstance = queryHistoricCaseInstance(caseInstance.getId());
+    String caseInstanceId = caseInstance.getId();
+    HistoricCaseInstance historicInstance = queryHistoricCaseInstance(caseInstanceId);
     assertNotNull(historicInstance);
 
     try {
@@ -563,10 +567,25 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
       // expected
     }
 
-    terminate(caseInstance.getId());
-    close(caseInstance.getId());
+    terminate(caseInstanceId);
+    close(caseInstanceId);
 
+    identityService.setAuthenticatedUserId("testUser");
     historyService.deleteHistoricCaseInstance(historicInstance.getId());
+    identityService.clearAuthentication();
+    
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+      // a user operation log should have been created
+      assertEquals(1, historyService.createUserOperationLogQuery().count());
+      UserOperationLogEntry entry = historyService.createUserOperationLogQuery().singleResult();
+      assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, entry.getCategory());
+      assertEquals(EntityTypes.CASE_INSTANCE, entry.getEntityType());
+      assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, entry.getOperationType());
+      assertEquals(caseInstanceId, entry.getCaseInstanceId());
+      assertNull(entry.getProperty());
+      assertNull(entry.getOrgValue());
+      assertNull(entry.getNewValue());
+    }
 
     assertCount(0, historicQuery());
   }

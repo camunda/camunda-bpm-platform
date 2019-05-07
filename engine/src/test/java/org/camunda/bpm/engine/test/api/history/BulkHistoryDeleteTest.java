@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.history;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -876,6 +877,35 @@ public class BulkHistoryDeleteTest {
     // then
     detailsList = historyService.createHistoricDetailQuery().list();
     assertEquals(0, detailsList.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testCleanupHistoryCaseInstanceOperationLog() {
+    // given
+    // create case instances
+    int instanceCount = 10;
+    List<String> caseInstanceIds = prepareHistoricCaseInstance(instanceCount);
+
+    // assume
+    List<HistoricCaseInstance> caseInstanceList = historyService.createHistoricCaseInstanceQuery().list();
+    assertEquals(instanceCount, caseInstanceList.size());
+
+    // when
+    identityService.setAuthenticatedUserId(USER_ID);
+    historyService.deleteHistoricCaseInstancesBulk(caseInstanceIds);
+    identityService.clearAuthentication();
+
+    // then
+    assertEquals(1, historyService.createUserOperationLogQuery().operationType(OPERATION_TYPE_DELETE_HISTORY).count());
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().operationType(OPERATION_TYPE_DELETE_HISTORY).singleResult();
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, entry.getCategory());
+    assertEquals(EntityTypes.CASE_INSTANCE, entry.getEntityType());
+    assertEquals(OPERATION_TYPE_DELETE_HISTORY, entry.getOperationType());
+    assertNull(entry.getCaseInstanceId());
+    assertEquals("nrOfInstances", entry.getProperty());
+    assertNull(entry.getOrgValue());
+    assertEquals(String.valueOf(instanceCount), entry.getNewValue());
   }
 
   private List<String> prepareHistoricCaseInstance(int instanceCount) {

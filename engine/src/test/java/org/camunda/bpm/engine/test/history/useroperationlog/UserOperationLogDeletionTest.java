@@ -174,7 +174,8 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
 
     UserOperationLogQuery query = historyService
         .createUserOperationLogQuery()
-        .caseInstanceId(caseInstanceId);
+        .caseInstanceId(caseInstanceId)
+        .entityType(EntityTypes.TASK);
     assertEquals(1, query.count());
 
     // when
@@ -182,6 +183,13 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
 
     // then
     assertEquals(1, query.count());
+    
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
+        .operationType(OPERATION_TYPE_DELETE_HISTORY)
+        .singleResult();
+
+    assertNotNull(entry);
+    assertEquals(CATEGORY_OPERATOR, entry.getCategory());
   }
 
   @Deployment(resources = PROCESS_PATH)

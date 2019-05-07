@@ -20,11 +20,14 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * @author Sebastian Menski
@@ -53,6 +56,9 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
     }
 
     ensureNotNull("Case instance is still running, cannot delete historic case instance: " + caseInstanceId, "instance.getCloseTime()", instance.getCloseTime());
+    
+    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, 
+        caseInstanceId, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     commandContext
       .getHistoricCaseInstanceManager()

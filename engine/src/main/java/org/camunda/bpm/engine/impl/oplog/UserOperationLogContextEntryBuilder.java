@@ -298,6 +298,11 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
   
+  public UserOperationLogContextEntryBuilder caseInstanceId(String caseInstanceId) {
+    entry.setCaseInstanceId(caseInstanceId);
+    return this;
+  }
+
   public UserOperationLogContextEntryBuilder category(String category) {
     entry.setCategory(category);
     return this;

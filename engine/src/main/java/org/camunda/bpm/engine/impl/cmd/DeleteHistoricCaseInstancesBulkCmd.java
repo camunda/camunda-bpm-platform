@@ -20,14 +20,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureEquals;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 public class DeleteHistoricCaseInstancesBulkCmd implements Command<Void>, Serializable {
 
@@ -53,6 +56,9 @@ public class DeleteHistoricCaseInstancesBulkCmd implements Command<Void>, Serial
       }
     });
 
+    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, 
+        null, Collections.singletonList(new PropertyChange("nrOfInstances", null, caseInstanceIds.size())));
+    
     commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(caseInstanceIds);
 
     return null;
