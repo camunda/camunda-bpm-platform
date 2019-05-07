@@ -17,9 +17,9 @@
 package org.camunda.bpm.engine.impl.history;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
-import org.camunda.bpm.engine.impl.cmd.batch.removaltime.SetRemovalTimeToHistoricProcessInstancesCmd;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
+import org.camunda.bpm.engine.impl.cmd.batch.removaltime.SetRemovalTimeToHistoricDecisionInstancesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 import java.util.Date;
@@ -27,46 +27,46 @@ import java.util.Date;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
+public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements SetRemovalTimeToHistoricDecisionInstancesBuilder {
 
-  protected HistoricProcessInstanceQuery query;
+  protected HistoricDecisionInstanceQuery query;
   protected Date removalTime;
   protected Mode mode = null;
   protected boolean isHierarchical;
 
   protected CommandExecutor commandExecutor;
 
-  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl(CommandExecutor commandExecutor) {
+  public SetRemovalTimeToHistoricDecisionInstancesBuilderImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
   }
 
-  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder byQuery(HistoricProcessInstanceQuery query) {
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder byQuery(HistoricDecisionInstanceQuery query) {
     this.query = query;
     return this;
   }
 
-  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder absoluteRemovalTime(Date removalTime) {
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder absoluteRemovalTime(Date removalTime) {
     this.mode = Mode.ABSOLUTE_REMOVAL_TIME;
     this.removalTime = removalTime;
     return this;
   }
 
   @Override
-  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder calculatedRemovalTime() {
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder calculatedRemovalTime() {
     this.mode = Mode.CALCULATED_REMOVAL_TIME;
     return this;
   }
 
-  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder hierarchical() {
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder hierarchical() {
     isHierarchical = true;
     return this;
   }
 
   public Batch executeAsync() {
-    return commandExecutor.execute(new SetRemovalTimeToHistoricProcessInstancesCmd(this));
+    return commandExecutor.execute(new SetRemovalTimeToHistoricDecisionInstancesCmd(this));
   }
 
-  public HistoricProcessInstanceQuery getQuery() {
+  public HistoricDecisionInstanceQuery getQuery() {
     return query;
   }
 
@@ -78,8 +78,7 @@ public class SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl implements
     return mode;
   }
 
-  public static enum Mode
-  {
+  public enum Mode {
     CALCULATED_REMOVAL_TIME,
     ABSOLUTE_REMOVAL_TIME;
   }

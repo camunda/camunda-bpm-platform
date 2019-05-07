@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.history;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesAsyncBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
 import org.camunda.bpm.engine.impl.cmd.batch.removaltime.SetRemovalTimeToHistoricBatchesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -27,7 +27,7 @@ import java.util.Date;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeToHistoricBatchesAsyncBuilderImpl implements SetRemovalTimeToHistoricBatchesAsyncBuilder {
+public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTimeToHistoricBatchesBuilder {
 
   protected HistoricBatchQuery query;
   protected Mode mode = null;
@@ -35,22 +35,22 @@ public class SetRemovalTimeToHistoricBatchesAsyncBuilderImpl implements SetRemov
 
   protected CommandExecutor commandExecutor;
 
-  public SetRemovalTimeToHistoricBatchesAsyncBuilderImpl(CommandExecutor commandExecutor) {
+  public SetRemovalTimeToHistoricBatchesBuilderImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
   }
 
-  public SetRemovalTimeToHistoricBatchesAsyncBuilder byQuery(HistoricBatchQuery query) {
+  public SetRemovalTimeToHistoricBatchesBuilder byQuery(HistoricBatchQuery query) {
     this.query = query;
     return this;
   }
 
-  public SetRemovalTimeToHistoricBatchesAsyncBuilder absoluteRemovalTime(Date removalTime) {
+  public SetRemovalTimeToHistoricBatchesBuilder absoluteRemovalTime(Date removalTime) {
     this.mode = Mode.ABSOLUTE_REMOVAL_TIME;
     this.removalTime = removalTime;
     return this;
   }
 
-  public SetRemovalTimeToHistoricBatchesAsyncBuilder calculatedRemovalTime() {
+  public SetRemovalTimeToHistoricBatchesBuilder calculatedRemovalTime() {
     this.mode = Mode.CALCULATED_REMOVAL_TIME;
     return this;
   }

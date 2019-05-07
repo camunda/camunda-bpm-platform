@@ -21,24 +21,25 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 
 import java.util.Date;
 
 /**
- * Fluent builder to set the removal time to historic decision instances and
- * all associated historic entities asynchronously.
+ * Fluent builder to set the removal time to historic batches and
+ * all associated historic entities.
  *
  * @author Tassilo Weidner
  */
-public interface SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder {
+public interface SetRemovalTimeToHistoricBatchesBuilder {
 
   /**
-   * Selects historic decision instances by the given query.
+   * Selects historic batches by the given query.
    *
-   * @param historicDecisionInstanceQuery to be evaluated.
+   * @param historicBatchQuery to be evaluated.
    * @return the builder.
    */
-  SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder byQuery(HistoricDecisionInstanceQuery historicDecisionInstanceQuery);
+  SetRemovalTimeToHistoricBatchesBuilder byQuery(HistoricBatchQuery historicBatchQuery);
 
   /**
    * Sets the removal time to an absolute date or {@code null} (clears the removal time).
@@ -46,36 +47,21 @@ public interface SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder {
    * @param removalTime supposed to be set to historic entities.
    * @return the builder.
    */
-  SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder absoluteRemovalTime(Date removalTime);
+  SetRemovalTimeToHistoricBatchesBuilder absoluteRemovalTime(Date removalTime);
 
   /**
-   * <p> Calculates the removal time dynamically based on the respective decision definition time to
-   * live and the engine's removal time strategy.
-   *
-   * <p> In case {@link #hierarchical()} is enabled, the removal time is being calculated
-   * based on the base time and time to live of the historic root decision instance.
+   * Calculates the removal time dynamically based on the time to
+   * live of the respective batch and the engine's removal time strategy.
    *
    * @return the builder.
    */
-  SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder calculatedRemovalTime();
-
-  /**
-   * Takes additionally historic decision instances into account that are part of
-   * the hierarchy of the given historic decision instances.
-   *
-   * If the root decision instance id of the given historic decision instance is {@code null},
-   * the hierarchy is ignored. This is the case for instances that were started with a version
-   * prior 7.10.
-   *
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder hierarchical();
+  SetRemovalTimeToHistoricBatchesBuilder calculatedRemovalTime();
 
   /**
    * Sets the removal time asynchronously as batch. The returned batch can be used to
    * track the progress of setting a removal time.
    *
-   * @throws BadUserRequestException when no historic decision instances could be found.
+   * @throws BadUserRequestException when no historic batches could be found.
    * @throws AuthorizationException when no {@link BatchPermissions#CREATE_BATCH_SET_REMOVAL_TIME} permission
    * is granted on {@link Resources#BATCH}.
    *

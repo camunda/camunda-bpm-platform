@@ -28,8 +28,8 @@ import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.SetRemovalTimeBatchConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
-import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl;
-import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl.Mode;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesBuilderImpl;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesBuilderImpl.Mode;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
@@ -45,9 +45,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBasedBatchCmd<Batch> {
 
-  protected SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl builder;
+  protected SetRemovalTimeToHistoricDecisionInstancesBuilderImpl builder;
 
-  public SetRemovalTimeToHistoricDecisionInstancesCmd(SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl builder) {
+  public SetRemovalTimeToHistoricDecisionInstancesCmd(SetRemovalTimeToHistoricDecisionInstancesBuilderImpl builder) {
     this.builder = builder;
   }
 

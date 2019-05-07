@@ -82,7 +82,7 @@ public class SetRemovalTimeForHistoricProcessInstancesBatchAuthorizationTest ext
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+    historyService.setRemovalTimeToHistoricProcessInstances()
       .byQuery(query)
       .absoluteRemovalTime(new Date())
       .executeAsync();

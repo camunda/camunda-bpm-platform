@@ -26,11 +26,11 @@ import java.util.Date;
 
 /**
  * Fluent builder to set the removal time to historic process instances and
- * all associated historic entities asynchronously.
+ * all associated historic entities.
  *
  * @author Tassilo Weidner
  */
-public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
+public interface SetRemovalTimeToHistoricProcessInstancesBuilder {
 
   /**
    * Selects historic process instances by the given query.
@@ -38,7 +38,7 @@ public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
    * @param historicProcessInstanceQuery to be evaluated.
    * @return the builder.
    */
-  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder byQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
+  SetRemovalTimeToHistoricProcessInstancesBuilder byQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
 
   /**
    * Sets the removal time to an absolute date or {@code null} (clears the removal time).
@@ -46,7 +46,7 @@ public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
    * @param removalTime supposed to be set to historic entities.
    * @return the builder.
    */
-  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder absoluteRemovalTime(Date removalTime);
+  SetRemovalTimeToHistoricProcessInstancesBuilder absoluteRemovalTime(Date removalTime);
 
   /**
    * <p> Calculates the removal time dynamically based on the respective process definition time to
@@ -57,7 +57,7 @@ public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
    *
    * @return the builder.
    */
-  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder calculatedRemovalTime();
+  SetRemovalTimeToHistoricProcessInstancesBuilder calculatedRemovalTime();
 
   /**
    * Takes additionally those historic process instances into account that are part of
@@ -69,7 +69,7 @@ public interface SetRemovalTimeToHistoricProcessInstancesAsyncBuilder {
    *
    * @return the builder.
    */
-  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder hierarchical();
+  SetRemovalTimeToHistoricProcessInstancesBuilder hierarchical();
 
   /**
    * Sets the removal time asynchronously as batch. The returned batch can be used to

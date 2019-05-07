@@ -28,8 +28,8 @@ import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.SetRemovalTimeBatchConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
-import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl;
-import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl.Mode;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesBuilderImpl;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesBuilderImpl.Mode;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
@@ -45,9 +45,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBasedBatchCmd<Batch> {
 
-  protected SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl builder;
+  protected SetRemovalTimeToHistoricProcessInstancesBuilderImpl builder;
 
-  public SetRemovalTimeToHistoricProcessInstancesCmd(SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl builder) {
+  public SetRemovalTimeToHistoricProcessInstancesCmd(SetRemovalTimeToHistoricProcessInstancesBuilderImpl builder) {
     this.builder = builder;
   }
 

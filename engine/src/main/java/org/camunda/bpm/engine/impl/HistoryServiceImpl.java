@@ -49,8 +49,8 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesAsyncBuilder;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.batch.history.DeleteHistoricBatchCmd;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
@@ -70,10 +70,10 @@ import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByDefin
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByInstanceIdCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBulkCmd;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
-import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricBatchesAsyncBuilderImpl;
-import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl;
-import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricBatchesBuilderImpl;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricDecisionInstancesBuilderImpl;
+import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricProcessInstancesBuilderImpl;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -328,16 +328,16 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     return commandExecutor.execute(new GetHistoricExternalTaskLogErrorDetailsCmd(historicExternalTaskLogId));
   }
 
-  public SetRemovalTimeToHistoricProcessInstancesAsyncBuilder setRemovalTimeToHistoricProcessInstancesAsync() {
-    return new SetRemovalTimeToHistoricProcessInstancesAsyncBuilderImpl(commandExecutor);
+  public SetRemovalTimeToHistoricProcessInstancesBuilder setRemovalTimeToHistoricProcessInstances() {
+    return new SetRemovalTimeToHistoricProcessInstancesBuilderImpl(commandExecutor);
   }
 
-  public SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder setRemovalTimeToHistoricDecisionInstancesAsync() {
-    return new SetRemovalTimeToHistoricDecisionInstancesAsyncBuilderImpl(commandExecutor);
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder setRemovalTimeToHistoricDecisionInstances() {
+    return new SetRemovalTimeToHistoricDecisionInstancesBuilderImpl(commandExecutor);
   }
 
-  public SetRemovalTimeToHistoricBatchesAsyncBuilder setRemovalTimeToHistoricBatchesAsync() {
-    return new SetRemovalTimeToHistoricBatchesAsyncBuilderImpl(commandExecutor);
+  public SetRemovalTimeToHistoricBatchesBuilder setRemovalTimeToHistoricBatches() {
+    return new SetRemovalTimeToHistoricBatchesBuilderImpl(commandExecutor);
   }
 
 }

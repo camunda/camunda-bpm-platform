@@ -61,12 +61,12 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesAsyncBuilder;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
-import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesAsyncBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -565,77 +565,77 @@ public interface HistoryService {
   String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId);
 
   /**
-   * <p>Set a removal time asynchronously to historic process instances and
+   * <p>Set a removal time to historic process instances and
    * all associated historic entities using a fluent builder.
    *
    * <p>Historic process instances can be specified by passing a query to
-   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#byQuery(HistoricProcessInstanceQuery)}.
+   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#byQuery(HistoricProcessInstanceQuery)}.
    *
    * <p>An absolute time can be specified via
-   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#absoluteRemovalTime(Date)}.
+   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
    * <p>As an alternative, the removal time can also be calculated via
-   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#calculatedRemovalTime()}
+   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
    * <p>To additionally take those historic process instances into account that are part of
    * a hierarchy, enable the flag
-   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#hierarchical()}
+   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#hierarchical()}
    *
    * <p>To create the batch and complete the configuration chain, call
-   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#executeAsync()}.
+   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#executeAsync()}.
    *
    * @since 7.11
    */
-  SetRemovalTimeToHistoricProcessInstancesAsyncBuilder setRemovalTimeToHistoricProcessInstancesAsync();
+  SetRemovalTimeToHistoricProcessInstancesBuilder setRemovalTimeToHistoricProcessInstances();
 
   /**
-   * <p>Set a removal time asynchronously to historic decision instances and
+   * <p>Set a removal time to historic decision instances and
    * all associated historic entities using a fluent builder.
    *
    * <p>Historic decision instances can be specified by passing a query to
-   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#byQuery(HistoricDecisionInstanceQuery)}.
+   * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#byQuery(HistoricDecisionInstanceQuery)}.
    *
    * <p>An absolute time can be specified via
-   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#absoluteRemovalTime(Date)}.
+   * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
    * <p>As an alternative, the removal time can also be calculated via
-   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#calculatedRemovalTime()}
+   * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
    * <p>To additionally take those historic decision instances into account that are part of
    * a hierarchy, enable the flag
-   * {@link SetRemovalTimeToHistoricProcessInstancesAsyncBuilder#hierarchical()}
+   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#hierarchical()}
    *
    * <p>To create the batch and complete the configuration chain, call
-   * {@link SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder#executeAsync()}.
+   * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#executeAsync()}.
    *
    * @since 7.11
    */
-  SetRemovalTimeToHistoricDecisionInstancesAsyncBuilder setRemovalTimeToHistoricDecisionInstancesAsync();
+  SetRemovalTimeToHistoricDecisionInstancesBuilder setRemovalTimeToHistoricDecisionInstances();
 
   /**
-   * <p>Set a removal time asynchronously to historic batches and all
+   * <p>Set a removal time to historic batches and all
    * associated historic entities using a fluent builder.
    *
    * <p>Historic batches can be specified by passing a query to
-   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#byQuery(HistoricBatchQuery)}.
+   * {@link SetRemovalTimeToHistoricBatchesBuilder#byQuery(HistoricBatchQuery)}.
    *
    * <p>An absolute time can be specified via
-   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#absoluteRemovalTime(Date)}.
+   * {@link SetRemovalTimeToHistoricBatchesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
    * <p>As an alternative, the removal time can also be calculated via
-   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#calculatedRemovalTime()}
+   * {@link SetRemovalTimeToHistoricBatchesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
    * <p>To create the batch and complete the configuration chain, call
-   * {@link SetRemovalTimeToHistoricBatchesAsyncBuilder#executeAsync()}.
+   * {@link SetRemovalTimeToHistoricBatchesBuilder#executeAsync()}.
    *
    * @since 7.11
    */
-  SetRemovalTimeToHistoricBatchesAsyncBuilder setRemovalTimeToHistoricBatchesAsync();
+  SetRemovalTimeToHistoricBatchesBuilder setRemovalTimeToHistoricBatches();
 
 }

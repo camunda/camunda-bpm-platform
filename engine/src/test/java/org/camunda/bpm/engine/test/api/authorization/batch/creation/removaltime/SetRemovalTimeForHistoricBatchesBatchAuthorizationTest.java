@@ -78,7 +78,7 @@ public class SetRemovalTimeForHistoricBatchesBatchAuthorizationTest extends Batc
     HistoricBatchQuery query = historyService.createHistoricBatchQuery().batchId(batchId);
 
     // when
-    historyService.setRemovalTimeToHistoricBatchesAsync()
+    historyService.setRemovalTimeToHistoricBatches()
       .byQuery(query)
       .absoluteRemovalTime(new Date())
       .executeAsync();
