@@ -55,7 +55,7 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
 
         HistoricDecisionInstanceEntity instance = findDecisionInstanceById(instanceId, commandContext);
 
-        if (batchConfiguration.isHierarchical() && canWriteRemovalTime(commandContext)) {
+        if (batchConfiguration.isHierarchical()) {
 
           String rootDecisionInstanceId = getRootDecisionInstance(instance);
 
@@ -65,11 +65,13 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
 
           addRemovalTimeToHierarchy(rootDecisionInstanceId, removalTime, commandContext);
 
-        } else if (canWriteRemovalTime(commandContext)) {
+        } else {
           Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
 
-          addRemovalTime(instanceId, removalTime, commandContext);
+          if (removalTime != instance.getRemovalTime()) {
+            addRemovalTime(instanceId, removalTime, commandContext);
 
+          }
         }
       }
     }
@@ -83,8 +85,11 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
     if (batchConfiguration.hasRemovalTime()) {
       return batchConfiguration.getRemovalTime();
 
-    } else {
+    } else if (hasBaseTime(commandContext)){
       return calculateRemovalTime(instance, commandContext);
+
+    } else {
+      return null;
 
     }
   }
@@ -99,7 +104,7 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
       .addRemovalTimeToDecisionsByDecisionInstanceId(instanceId, removalTime);
   }
 
-  protected boolean canWriteRemovalTime(CommandContext commandContext) {
+  protected boolean hasBaseTime(CommandContext commandContext) {
     return isStrategyStart(commandContext) || isStrategyEnd(commandContext);
   }
 

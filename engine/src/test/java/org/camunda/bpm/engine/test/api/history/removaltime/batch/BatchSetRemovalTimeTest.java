@@ -456,12 +456,42 @@ public class BatchSetRemovalTimeTest {
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE)
       .initHistoryRemovalTime();
 
-    testRule.process().serviceTask().deploy().start();
+    testRule.process().ttl(5).serviceTask().deploy().start();
 
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
 
     // assume
     assertThat(historicProcessInstance.getRemovalTime()).isNull();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .executeAsync()
+    );
+
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+
+    // then
+    assertThat(historicProcessInstance.getRemovalTime()).isNull();
+  }
+
+  @Test
+  public void shouldClearRemovalTime_BaseTimeNone() {
+    // given
+    testRule.process().ttl(5).serviceTask().deploy().start();
+
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+
+    // assume
+    assertThat(historicProcessInstance.getRemovalTime()).isNotNull();
+
+    testRule.getProcessEngineConfiguration()
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE)
+      .initHistoryRemovalTime();
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
@@ -524,19 +554,96 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldClearRemovalTimeForStandaloneDecision_BaseTimeNone() {
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+
+    // assume
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isNotNull();
+    assertThat(historicDecisionInstances.get(1).getRemovalTime()).isNotNull();
+    assertThat(historicDecisionInstances.get(2).getRemovalTime()).isNotNull();
+
+    testRule.getProcessEngineConfiguration()
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE)
+      .initHistoryRemovalTime();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .executeAsync()
+    );
+
+    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+
+    // then
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isNull();
+    assertThat(historicDecisionInstances.get(1).getRemovalTime()).isNull();
+    assertThat(historicDecisionInstances.get(2).getRemovalTime()).isNull();
+  }
+
+  @Test
   public void shouldNotSetRemovalTimeInHierarchy_BaseTimeNone() {
     // given
     testRule.getProcessEngineConfiguration()
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE)
       .initHistoryRemovalTime();
 
-    testRule.process().call().serviceTask().deploy().start();
+    testRule.process().ttl(5).call().serviceTask().deploy().start();
 
     List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
 
     // assume
     assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
     assertThat(historicProcessInstances.get(1).getRemovalTime()).isNull();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().rootProcessInstances();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isNull();
+  }
+
+  @Test
+  public void shouldClearRemovalTimeInHierarchy_BaseTimeNone() {
+    // given
+    testRule.process().ttl(5).call().serviceTask().deploy().start();
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // assume
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNotNull();
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isNotNull();
+
+    testRule.getProcessEngineConfiguration()
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE)
+      .initHistoryRemovalTime();
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().rootProcessInstances();
 
@@ -602,6 +709,51 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldClearRemovalTimeForStandaloneDecisionInHierarchy_BaseTimeNone() {
+    // given
+    testRule.updateHistoryTimeToLiveDmn("dish-decision", 5);
+
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("season")
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance.getRemovalTime()).isNotNull();
+
+    testRule.getProcessEngineConfiguration()
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE)
+      .initHistoryRemovalTime();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("season")
+      .singleResult();
+
+    // then
+    assertThat(historicDecisionInstance.getRemovalTime()).isNull();
+  }
+
+  @Test
   public void shouldNotSetRemovalTimeForBatch_BaseTimeNone() {
     // given
     ProcessEngineConfigurationImpl configuration = testRule.getProcessEngineConfiguration();
@@ -626,6 +778,51 @@ public class BatchSetRemovalTimeTest {
     // assume
     assertThat(historicBatches.get(0).getRemovalTime()).isNull();
     assertThat(historicBatches.get(1).getRemovalTime()).isNull();
+
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatchesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .executeAsync()
+    );
+
+    historicBatches = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .list();
+
+    // then
+    assertThat(historicBatches.get(0).getRemovalTime()).isNull();
+    assertThat(historicBatches.get(1).getRemovalTime()).isNull();
+  }
+
+  @Test
+  public void shouldClearRemovalTimeForBatch_BaseTimeNone() {
+    // given
+    ProcessEngineConfigurationImpl configuration = testRule.getProcessEngineConfiguration();
+
+    configuration.setBatchOperationHistoryTimeToLive("P5D");
+    configuration.initHistoryCleanup();
+
+    String processInstanceIdOne = testRule.process().serviceTask().deploy().start();
+    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdOne), "");
+    testRule.syncExec(batchOne);
+
+    String processInstanceIdTwo = testRule.process().serviceTask().deploy().start();
+    Batch batchTwo = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceIdTwo), "");
+    testRule.syncExec(batchTwo);
+
+    List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .list();
+
+    // assume
+    assertThat(historicBatches.get(0).getRemovalTime()).isNotNull();
+    assertThat(historicBatches.get(1).getRemovalTime()).isNotNull();
+
+    configuration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE);
 
     HistoricBatchQuery query = historyService.createHistoricBatchQuery();
 
@@ -872,6 +1069,36 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  public void shouldClearRemovalTime_BaseTimeEnd() {
+    // given
+    testRule.process().ttl(5).userTask().deploy().start();
+
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+
+    // assume
+    assertThat(historicProcessInstance.getRemovalTime()).isNotNull();
+
+    testRule.getProcessEngineConfiguration()
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+      .initHistoryRemovalTime();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .executeAsync()
+    );
+
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+
+    // then
+    assertThat(historicProcessInstance.getRemovalTime()).isNull();
+  }
+
+  @Test
   public void shouldNotSetRemovalTimeForBatch_BaseTimeEnd() {
     // given
     ProcessEngineConfigurationImpl configuration = testRule.getProcessEngineConfiguration();
@@ -915,6 +1142,47 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  public void shouldClearRemovalTimeForBatch_BaseTimeEnd() {
+    // given
+    ProcessEngineConfigurationImpl configuration = testRule.getProcessEngineConfiguration();
+    configuration.setBatchOperationHistoryTimeToLive("P5D");
+    configuration.initHistoryCleanup();
+
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+    Batch batch = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .singleResult();
+
+    // assume
+    assertThat(historicBatch.getRemovalTime()).isNotNull();
+
+    configuration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
+
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION);
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatchesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .executeAsync()
+    );
+
+    historicBatch = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .singleResult();
+
+    // then
+    assertThat(historicBatch.getRemovalTime()).isNull();
+
+    // clear database
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
   public void shouldNotSetRemovalTimeInHierarchy_BaseTimeEnd() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -928,6 +1196,39 @@ public class BatchSetRemovalTimeTest {
     // assume
     assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
     assertThat(historicProcessInstances.get(1).getRemovalTime()).isNull();
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().rootProcessInstances();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstancesAsync()
+        .byQuery(query)
+        .calculatedRemovalTime()
+        .hierarchical()
+        .executeAsync()
+    );
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isNull();
+  }
+
+  @Test
+  public void shouldClearRemovalTimeInHierarchy_BaseTimeEnd() {
+    // given
+    testRule.process().call().ttl(5).userTask().deploy().start();
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // assume
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNotNull();
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isNotNull();
+
+    testRule.getProcessEngineConfiguration()
+      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+      .initHistoryRemovalTime();
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().rootProcessInstances();
 
