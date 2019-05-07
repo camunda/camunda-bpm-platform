@@ -88,7 +88,7 @@ module.exports = [
             var columns = $(element).parents('.columns');
             var viewElement = $(element).parents('view');
             var headers = columns.find('.cell.top');
-            var bodies = columns.find('.cell.content');
+            var bodies = $('.tasks-list .content');
             var shown = $bdy.hasClass('list-column-close');
             var minHeight;
             viewElement.css('height', 'auto');
@@ -107,6 +107,7 @@ module.exports = [
 
             headers.height(columnTopHeight);
             bodies.css('top', columnTopHeight + 12);
+
             plannedRefresh = null;
           }, 100);
         }
