@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd.batch.removaltime;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
@@ -55,6 +56,7 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
     List<HistoricBatch> historicBatches = instanceQuery.list();
 
     ensureNotEmpty(BadUserRequestException.class, "historicBatches", historicBatches);
+    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME);
 
     List<String> historicBatchIds = new ArrayList<>();
     for (HistoricBatch historicBatch : historicBatches) {
