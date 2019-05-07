@@ -16,15 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
+
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 /**
  * @author Daniel Meyer
@@ -51,14 +51,16 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
     authorizationManager.validateResourceCompatibility(authorization);
 
     String operationType = null;
+    AuthorizationEntity previousValues = null;
     if(authorization.getId() == null) {
       authorizationManager.insert(authorization);
       operationType = UserOperationLogEntry.OPERATION_TYPE_CREATE;
     } else {
+      previousValues = commandContext.getDbEntityManager().selectById(AuthorizationEntity.class, authorization.getId());
       authorizationManager.update(authorization);
       operationType = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
     }
-    commandContext.getOperationLogManager().logAuthorizationOperation(operationType, authorization);
+    commandContext.getOperationLogManager().logAuthorizationOperation(operationType, authorization, previousValues);
     
     return authorization;
   }

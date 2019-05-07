@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -95,52 +96,69 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     identityService.clearAuthentication();
     Authorization authorization = 
-        createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, "testUserId", ProcessDefinitionPermissions.DELETE);
+        createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, "testUserId", Permissions.DELETE);
     assertEquals(0, query.count());
     identityService.setAuthentication(userId, Arrays.asList(groupId));
     
     // when
-    authorization.addPermission(ProcessDefinitionPermissions.READ);
+    authorization.addPermission(Permissions.READ);
+    authorization.setResource(Resources.PROCESS_INSTANCE);
+    authorization.setResourceId("abc123");
+    authorization.setGroupId("testGroupId");
+    authorization.setUserId(null);
     saveAuthorization(authorization);
     
     // then
-    assertEquals(6, query.count());
+    assertEquals(7, query.count());
     
     UserOperationLogEntry entry = query.property("permissionBits").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
-    assertEquals(String.valueOf(ProcessDefinitionPermissions.DELETE.getValue()|ProcessDefinitionPermissions.READ.getValue()), entry.getNewValue());
+    assertEquals(String.valueOf(Permissions.DELETE.getValue() | Permissions.READ.getValue()), entry.getNewValue());
+    assertEquals(String.valueOf(Permissions.DELETE.getValue()), entry.getOrgValue());
     
     entry = query.property("permissions").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
-    assertEquals(ProcessDefinitionPermissions.READ.getName() + ", " + ProcessDefinitionPermissions.DELETE.getName(), entry.getNewValue());
+    assertEquals(Permissions.READ.getName() + ", " + Permissions.DELETE.getName(), entry.getNewValue());
+    assertEquals(Permissions.DELETE.getName(), entry.getOrgValue());
     
     entry = query.property("type").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
     assertEquals(String.valueOf(Authorization.AUTH_TYPE_GRANT), entry.getNewValue());
+    assertEquals(String.valueOf(Authorization.AUTH_TYPE_GRANT), entry.getOrgValue());
     
     entry = query.property("resource").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
-    assertEquals(Resources.PROCESS_DEFINITION.resourceName(), entry.getNewValue());
+    assertEquals(Resources.PROCESS_INSTANCE.resourceName(), entry.getNewValue());
+    assertEquals(Resources.PROCESS_DEFINITION.resourceName(), entry.getOrgValue());
     
     entry = query.property("resourceId").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
-    assertEquals(Authorization.ANY, entry.getNewValue());
+    assertEquals("abc123", entry.getNewValue());
+    assertEquals(Authorization.ANY, entry.getOrgValue());
     
     entry = query.property("userId").singleResult();
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
     assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
     assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
-    assertEquals("testUserId", entry.getNewValue());
+    assertNull(entry.getNewValue());
+    assertEquals("testUserId", entry.getOrgValue());
+    
+    entry = query.property("groupId").singleResult();
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE, entry.getOperationType());
+    assertEquals(UserOperationLogEntry.CATEGORY_ADMIN, entry.getCategory());
+    assertEquals(EntityTypes.AUTHORIZATION, entry.getEntityType());
+    assertEquals("testGroupId", entry.getNewValue());
+    assertNull(entry.getOrgValue());
   }
   
   public void testLogCreatedOnAuthorizationDeletion() {

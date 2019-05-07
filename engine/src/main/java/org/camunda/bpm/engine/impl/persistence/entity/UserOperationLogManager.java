@@ -616,19 +616,19 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
   
-  public void logAuthorizationOperation(String operation, AuthorizationEntity authorization) {
+  public void logAuthorizationOperation(String operation, AuthorizationEntity authorization, AuthorizationEntity previousValues) {
     if (isUserOperationLogEnabled()) {
       List<PropertyChange> propertyChanges = new ArrayList<>();
-      propertyChanges.add(new PropertyChange("permissionBits", null, authorization.getPermissions()));
-      propertyChanges.add(new PropertyChange("permissions", null, getPermissionStringList(authorization)));
-      propertyChanges.add(new PropertyChange("type", null, authorization.getAuthorizationType()));
-      propertyChanges.add(new PropertyChange("resource", null, getResourceName(authorization.getResourceType())));
-      propertyChanges.add(new PropertyChange("resourceId", null, authorization.getResourceId()));
-      if (authorization.getUserId() != null) {
-        propertyChanges.add(new PropertyChange("userId", null, authorization.getUserId()));
+      propertyChanges.add(new PropertyChange("permissionBits", previousValues == null ? null : previousValues.getPermissions(), authorization.getPermissions()));
+      propertyChanges.add(new PropertyChange("permissions", previousValues == null ? null : getPermissionStringList(previousValues), getPermissionStringList(authorization)));
+      propertyChanges.add(new PropertyChange("type", previousValues == null ? null : previousValues.getAuthorizationType(), authorization.getAuthorizationType()));
+      propertyChanges.add(new PropertyChange("resource", previousValues == null ? null : getResourceName(previousValues.getResourceType()), getResourceName(authorization.getResourceType())));
+      propertyChanges.add(new PropertyChange("resourceId", previousValues == null ? null : previousValues.getResourceId(), authorization.getResourceId()));
+      if (authorization.getUserId() != null || (previousValues != null && previousValues.getUserId() != null)) {
+        propertyChanges.add(new PropertyChange("userId", previousValues == null ? null : previousValues.getUserId(), authorization.getUserId()));
       }
-      if (authorization.getGroupId() != null) {
-        propertyChanges.add(new PropertyChange("groupId", null, authorization.getGroupId()));
+      if (authorization.getGroupId() != null || (previousValues != null && previousValues.getGroupId() != null)) {
+        propertyChanges.add(new PropertyChange("groupId", previousValues == null ? null : previousValues.getGroupId(), authorization.getGroupId()));
       }
       
       UserOperationLogContext context = new UserOperationLogContext();
