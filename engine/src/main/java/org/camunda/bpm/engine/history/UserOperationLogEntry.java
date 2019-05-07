@@ -125,6 +125,8 @@ public interface UserOperationLogEntry {
   
   public static String OPERATION_TYPE_CREATE_INCIDENT = "CreateIncident";
 
+  public static String OPERATION_TYPE_SET_REMOVAL_TIME = "SetRemovalTime";
+
   public static String CATEGORY_ADMIN = "Admin";
   public static String CATEGORY_OPERATOR = "Operator";
   public static String CATEGORY_TASK_WORKER = "TaskWorker";

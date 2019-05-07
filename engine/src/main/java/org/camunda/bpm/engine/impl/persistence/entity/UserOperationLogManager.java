@@ -235,6 +235,10 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logProcessInstanceOperation(String operation, List<PropertyChange> propertyChanges) {
+    logProcessInstanceOperation(operation, null, null, null, propertyChanges);
+  }
+
   public void logProcessInstanceOperation(String operation, String processInstanceId, String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
@@ -523,17 +527,25 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   }
 
+  public void logBatchOperation(String operation, List<PropertyChange> propertyChange) {
+    logBatchOperation(operation, null, propertyChange);
+  }
+
   public void logBatchOperation(String operation, String batchId, PropertyChange propertyChange) {
+    logBatchOperation(operation, batchId, Collections.singletonList(propertyChange));
+  }
+
+  public void logBatchOperation(String operation, String batchId, List<PropertyChange> propertyChanges) {
     if(isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.BATCH)
           .batchId(batchId)
-          .propertyChanges(propertyChange)
+          .propertyChanges(propertyChanges)
           .category(UserOperationLogEntry.CATEGORY_OPERATOR);
-  
+
       context.addEntry(entryBuilder.create());
-  
+
       fireUserOperationLog(context);
     }
   }

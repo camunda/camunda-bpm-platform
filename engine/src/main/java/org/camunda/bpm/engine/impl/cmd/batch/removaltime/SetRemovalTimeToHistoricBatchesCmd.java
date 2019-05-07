@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
@@ -30,8 +31,10 @@ import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricBatchesAsyncBuilderImpl;
 import org.camunda.bpm.engine.impl.history.SetRemovalTimeToHistoricBatchesAsyncBuilderImpl.Mode;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -58,6 +61,9 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
     ensureNotEmpty(BadUserRequestException.class, "historicBatches", historicBatches);
     checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME);
 
+    writeUserOperationLog(commandContext, historicBatches.size(), builder.getMode(),
+      builder.getRemovalTime(), true);
+
     List<String> historicBatchIds = new ArrayList<>();
     for (HistoricBatch historicBatch : historicBatches) {
       historicBatchIds.add(historicBatch.getId());
@@ -74,6 +80,18 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
     batch.createSeedJob();
 
     return batch;
+  }
+
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances, Mode mode,
+                                       Date removalTime, boolean async) {
+    List<PropertyChange> propertyChanges = new ArrayList<>();
+    propertyChanges.add(new PropertyChange("mode", null, mode));
+    propertyChanges.add(new PropertyChange("removalTime", null, removalTime));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
+    propertyChanges.add(new PropertyChange("async", null, async));
+
+    commandContext.getOperationLogManager()
+      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, propertyChanges);
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
