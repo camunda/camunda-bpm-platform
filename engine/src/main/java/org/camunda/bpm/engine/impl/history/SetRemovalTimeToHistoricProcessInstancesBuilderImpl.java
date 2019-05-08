@@ -65,6 +65,11 @@ public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetR
     return this;
   }
 
+  public SetRemovalTimeToHistoricProcessInstancesBuilder clearedRemovalTime() {
+    this.mode = Mode.CLEARED_REMOVAL_TIME;
+    return this;
+  }
+
   public SetRemovalTimeToHistoricProcessInstancesBuilder hierarchical() {
     isHierarchical = true;
     return this;
@@ -93,7 +98,8 @@ public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetR
   public static enum Mode
   {
     CALCULATED_REMOVAL_TIME,
-    ABSOLUTE_REMOVAL_TIME;
+    ABSOLUTE_REMOVAL_TIME,
+    CLEARED_REMOVAL_TIME;
   }
 
   public boolean isHierarchical() {

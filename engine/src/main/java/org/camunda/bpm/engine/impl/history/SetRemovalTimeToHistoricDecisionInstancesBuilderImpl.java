@@ -66,6 +66,11 @@ public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements Set
     return this;
   }
 
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder clearedRemovalTime() {
+    mode = Mode.CLEARED_REMOVAL_TIME;
+    return this;
+  }
+
   public SetRemovalTimeToHistoricDecisionInstancesBuilder hierarchical() {
     isHierarchical = true;
     return this;
@@ -93,7 +98,8 @@ public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements Set
 
   public enum Mode {
     CALCULATED_REMOVAL_TIME,
-    ABSOLUTE_REMOVAL_TIME;
+    ABSOLUTE_REMOVAL_TIME,
+    CLEARED_REMOVAL_TIME;
   }
 
   public boolean isHierarchical() {

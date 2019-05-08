@@ -49,7 +49,7 @@ public interface SetRemovalTimeToHistoricProcessInstancesBuilder {
   SetRemovalTimeToHistoricProcessInstancesBuilder byIds(String... historicProcessInstanceIds);
 
   /**
-   * Sets the removal time to an absolute date or {@code null} (clears the removal time).
+   * Sets the removal time to an absolute date.
    *
    * @param removalTime supposed to be set to historic entities.
    * @return the builder.
@@ -66,6 +66,13 @@ public interface SetRemovalTimeToHistoricProcessInstancesBuilder {
    * @return the builder.
    */
   SetRemovalTimeToHistoricProcessInstancesBuilder calculatedRemovalTime();
+
+  /**
+   * <p> Sets the removal time to {@code null}.
+   *
+   * @return the builder.
+   */
+  SetRemovalTimeToHistoricProcessInstancesBuilder clearedRemovalTime();
 
   /**
    * Takes additionally those historic process instances into account that are part of

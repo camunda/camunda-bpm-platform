@@ -34,14 +34,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 /**
  * @author Tassilo Weidner
@@ -109,8 +106,13 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
     return new SetRemovalTimeBatchConfiguration(ids)
-      .setHasRemovalTime(builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME)
+      .setHasRemovalTime(hasRemovalTime(builder.getMode()))
       .setRemovalTime(builder.getRemovalTime());
+  }
+
+  protected boolean hasRemovalTime(Mode mode) {
+    return builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME ||
+      builder.getMode() == Mode.CLEARED_REMOVAL_TIME;
   }
 
   protected BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {

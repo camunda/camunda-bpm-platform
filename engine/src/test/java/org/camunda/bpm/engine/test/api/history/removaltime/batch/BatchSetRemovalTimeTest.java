@@ -1469,7 +1469,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
         .byQuery(query)
-        .absoluteRemovalTime(null)
+        .clearedRemovalTime()
         .executeAsync()
     );
 
@@ -1507,7 +1507,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
         .byQuery(query)
-        .absoluteRemovalTime(null)
+        .clearedRemovalTime()
         .executeAsync()
     );
 
@@ -1544,7 +1544,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricBatches()
         .byQuery(query)
-        .absoluteRemovalTime(null)
+        .clearedRemovalTime()
         .executeAsync()
     );
 
@@ -1580,7 +1580,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
         .byQuery(query)
-        .absoluteRemovalTime(null)
+        .clearedRemovalTime()
         .hierarchical()
         .executeAsync()
     );
@@ -1620,7 +1620,7 @@ public class BatchSetRemovalTimeTest {
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
         .byQuery(query)
-        .absoluteRemovalTime(null)
+        .clearedRemovalTime()
         .hierarchical()
         .executeAsync()
     );

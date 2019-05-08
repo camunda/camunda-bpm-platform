@@ -64,6 +64,11 @@ public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTim
     return this;
   }
 
+  public SetRemovalTimeToHistoricBatchesBuilder clearedRemovalTime() {
+    mode = Mode.CLEARED_REMOVAL_TIME;
+    return this;
+  }
+
   public Batch executeAsync() {
     return commandExecutor.execute(new SetRemovalTimeToHistoricBatchesCmd(this));
   }
@@ -87,7 +92,8 @@ public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTim
   public enum Mode
   {
     CALCULATED_REMOVAL_TIME,
-    ABSOLUTE_REMOVAL_TIME;
+    ABSOLUTE_REMOVAL_TIME,
+    CLEARED_REMOVAL_TIME;
   }
 
 }

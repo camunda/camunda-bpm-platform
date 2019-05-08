@@ -19,8 +19,6 @@ package org.camunda.bpm.engine.impl.cmd.batch.removaltime;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -110,8 +108,13 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
     return new SetRemovalTimeBatchConfiguration(ids)
       .setHierarchical(builder.isHierarchical())
-      .setHasRemovalTime(builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME)
+      .setHasRemovalTime(hasRemovalTime(builder.getMode()))
       .setRemovalTime(builder.getRemovalTime());
+  }
+
+  protected boolean hasRemovalTime(Mode mode) {
+    return builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME ||
+      builder.getMode() == Mode.CLEARED_REMOVAL_TIME;
   }
 
   protected BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {

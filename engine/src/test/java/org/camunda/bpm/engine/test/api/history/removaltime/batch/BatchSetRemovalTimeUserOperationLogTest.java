@@ -206,7 +206,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricProcessInstances()
       .byQuery(historicProcessInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -231,7 +231,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricProcessInstances()
       .byQuery(historicProcessInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -255,7 +255,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricProcessInstances()
       .byQuery(historicProcessInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -279,7 +279,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricProcessInstances()
       .byQuery(historicProcessInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .hierarchical()
       .executeAsync();
 
@@ -304,7 +304,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricProcessInstances()
       .byQuery(historicProcessInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -441,7 +441,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricDecisionInstances()
       .byQuery(historicDecisionInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -468,7 +468,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricDecisionInstances()
       .byQuery(historicDecisionInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -495,7 +495,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricDecisionInstances()
       .byQuery(historicDecisionInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -522,7 +522,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricDecisionInstances()
       .byQuery(historicDecisionInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .hierarchical()
       .executeAsync();
 
@@ -550,7 +550,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricDecisionInstances()
       .byQuery(historicDecisionInstanceQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -672,7 +672,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricBatches()
       .byQuery(historicBatchQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -696,7 +696,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricBatches()
       .byQuery(historicBatchQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
@@ -720,7 +720,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     // when
     historyService.setRemovalTimeToHistoricBatches()
       .byQuery(historicBatchQuery)
-      .absoluteRemovalTime(null)
+      .clearedRemovalTime()
       .executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()

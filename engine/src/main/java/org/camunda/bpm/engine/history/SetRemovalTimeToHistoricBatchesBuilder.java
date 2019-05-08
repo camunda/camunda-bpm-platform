@@ -50,7 +50,7 @@ public interface SetRemovalTimeToHistoricBatchesBuilder {
   SetRemovalTimeToHistoricBatchesBuilder byIds(String... historicBatchIds);
 
   /**
-   * Sets the removal time to an absolute date or {@code null} (clears the removal time).
+   * Sets the removal time to an absolute date.
    *
    * @param removalTime supposed to be set to historic entities.
    * @return the builder.
@@ -64,6 +64,13 @@ public interface SetRemovalTimeToHistoricBatchesBuilder {
    * @return the builder.
    */
   SetRemovalTimeToHistoricBatchesBuilder calculatedRemovalTime();
+
+  /**
+   * <p> Sets the removal time to {@code null}.
+   *
+   * @return the builder.
+   */
+  SetRemovalTimeToHistoricBatchesBuilder clearedRemovalTime();
 
   /**
    * Sets the removal time asynchronously as batch. The returned batch can be used to
