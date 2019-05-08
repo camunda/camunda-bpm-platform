@@ -255,7 +255,12 @@ public class CsrfPreventionFilter implements Filter {
 
           Cookie csrfCookie = getCSRFCookie(request);
           csrfCookie.setValue(token);
-          csrfCookie.setPath(request.getContextPath());
+
+          String contextPath = "/";
+          if (!request.getContextPath().isEmpty()) {
+            contextPath = request.getContextPath();
+          }
+          csrfCookie.setPath(contextPath);
 
           session.setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
           response.addCookie(csrfCookie);
