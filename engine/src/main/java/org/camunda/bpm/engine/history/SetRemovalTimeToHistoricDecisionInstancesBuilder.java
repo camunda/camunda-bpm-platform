@@ -41,6 +41,14 @@ public interface SetRemovalTimeToHistoricDecisionInstancesBuilder {
   SetRemovalTimeToHistoricDecisionInstancesBuilder byQuery(HistoricDecisionInstanceQuery historicDecisionInstanceQuery);
 
   /**
+   * Selects historic process instances by the given ids.
+   *
+   * @param historicProcessInstanceIds supposed to be affected.
+   * @return the builder.
+   */
+  SetRemovalTimeToHistoricDecisionInstancesBuilder byIds(String... historicProcessInstanceIds);
+
+  /**
    * Sets the removal time to an absolute date or {@code null} (clears the removal time).
    *
    * @param removalTime supposed to be set to historic entities.

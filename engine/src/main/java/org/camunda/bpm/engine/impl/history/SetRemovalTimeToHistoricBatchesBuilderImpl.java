@@ -22,7 +22,9 @@ import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
 import org.camunda.bpm.engine.impl.cmd.batch.removaltime.SetRemovalTimeToHistoricBatchesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Tassilo Weidner
@@ -30,17 +32,24 @@ import java.util.Date;
 public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTimeToHistoricBatchesBuilder {
 
   protected HistoricBatchQuery query;
-  protected Mode mode = null;
+  protected List<String> ids;
+  protected Mode mode;
   protected Date removalTime;
 
   protected CommandExecutor commandExecutor;
 
   public SetRemovalTimeToHistoricBatchesBuilderImpl(CommandExecutor commandExecutor) {
+    mode = null;
     this.commandExecutor = commandExecutor;
   }
 
   public SetRemovalTimeToHistoricBatchesBuilder byQuery(HistoricBatchQuery query) {
     this.query = query;
+    return this;
+  }
+
+  public SetRemovalTimeToHistoricBatchesBuilder byIds(String... ids) {
+    this.ids = Arrays.asList(ids);
     return this;
   }
 
@@ -61,6 +70,10 @@ public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTim
 
   public HistoricBatchQuery getQuery() {
     return query;
+  }
+
+  public List<String> getIds() {
+    return ids;
   }
 
   public Date getRemovalTime() {

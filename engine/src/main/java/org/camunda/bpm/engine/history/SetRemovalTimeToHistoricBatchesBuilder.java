@@ -42,6 +42,14 @@ public interface SetRemovalTimeToHistoricBatchesBuilder {
   SetRemovalTimeToHistoricBatchesBuilder byQuery(HistoricBatchQuery historicBatchQuery);
 
   /**
+   * Selects historic batches by the given ids.
+   *
+   * @param historicBatchIds supposed to be affected.
+   * @return the builder.
+   */
+  SetRemovalTimeToHistoricBatchesBuilder byIds(String... historicBatchIds);
+
+  /**
    * Sets the removal time to an absolute date or {@code null} (clears the removal time).
    *
    * @param removalTime supposed to be set to historic entities.

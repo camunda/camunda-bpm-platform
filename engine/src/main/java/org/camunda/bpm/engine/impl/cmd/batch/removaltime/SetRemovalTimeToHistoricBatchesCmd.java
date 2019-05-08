@@ -34,11 +34,14 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 /**
  * @author Tassilo Weidner
@@ -52,22 +55,32 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
   }
 
   public Batch execute(CommandContext commandContext) {
+    List<String> historicBatchIds = null;
+
+    List<String> instanceIds = builder.getIds();
     HistoricBatchQuery instanceQuery = builder.getQuery();
-    ensureNotNull(BadUserRequestException.class, "query", instanceQuery);
+    if ((instanceQuery == null && instanceIds == null) || (instanceQuery != null && instanceIds != null)) {
+      throw new BadUserRequestException("Either query or ids must be provided.");
+
+    } else if (instanceQuery != null) {
+      historicBatchIds = new ArrayList<>();
+
+      for (HistoricBatch historicBatch : instanceQuery.list()) {
+        historicBatchIds.add(historicBatch.getId());
+      }
+
+    } else {
+      historicBatchIds = instanceIds;
+
+    }
+
     ensureNotNull(BadUserRequestException.class, "removalTime", builder.getMode());
+    ensureNotEmpty(BadUserRequestException.class, "historicBatches", historicBatchIds);
 
-    List<HistoricBatch> historicBatches = instanceQuery.list();
-
-    ensureNotEmpty(BadUserRequestException.class, "historicBatches", historicBatches);
     checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME);
 
-    writeUserOperationLog(commandContext, historicBatches.size(), builder.getMode(),
+    writeUserOperationLog(commandContext, historicBatchIds.size(), builder.getMode(),
       builder.getRemovalTime(), true);
-
-    List<String> historicBatchIds = new ArrayList<>();
-    for (HistoricBatch historicBatch : historicBatches) {
-      historicBatchIds.add(historicBatch.getId());
-    }
 
     BatchEntity batch = createBatch(commandContext, historicBatchIds);
 

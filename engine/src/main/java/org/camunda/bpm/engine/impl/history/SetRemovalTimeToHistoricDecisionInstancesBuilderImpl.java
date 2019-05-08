@@ -19,10 +19,13 @@ package org.camunda.bpm.engine.impl.history;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.impl.cmd.batch.removaltime.SetRemovalTimeToHistoricDecisionInstancesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Tassilo Weidner
@@ -30,6 +33,7 @@ import java.util.Date;
 public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements SetRemovalTimeToHistoricDecisionInstancesBuilder {
 
   protected HistoricDecisionInstanceQuery query;
+  protected List<String> ids;
   protected Date removalTime;
   protected Mode mode = null;
   protected boolean isHierarchical;
@@ -42,6 +46,11 @@ public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements Set
 
   public SetRemovalTimeToHistoricDecisionInstancesBuilder byQuery(HistoricDecisionInstanceQuery query) {
     this.query = query;
+    return this;
+  }
+
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder byIds(String... ids) {
+    this.ids = ids !=  null ? Arrays.asList(ids) : null;
     return this;
   }
 
@@ -68,6 +77,10 @@ public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements Set
 
   public HistoricDecisionInstanceQuery getQuery() {
     return query;
+  }
+
+  public List<String> getIds() {
+    return ids;
   }
 
   public Date getRemovalTime() {

@@ -52,22 +52,32 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBase
   }
 
   public Batch execute(CommandContext commandContext) {
+    List<String> historicDecisionInstanceIds = null;
+
+    List<String> instanceIds = builder.getIds();
     HistoricDecisionInstanceQuery instanceQuery = builder.getQuery();
-    ensureNotNull(BadUserRequestException.class, "query", instanceQuery);
+    if ((instanceQuery == null && instanceIds == null) || (instanceQuery != null && instanceIds != null)) {
+      throw new BadUserRequestException("Either query or ids must be provided.");
+
+    } else if (instanceQuery != null) {
+      historicDecisionInstanceIds = new ArrayList<>();
+
+      for (HistoricDecisionInstance historicDecisionInstance : instanceQuery.list()) {
+        historicDecisionInstanceIds.add(historicDecisionInstance.getId());
+      }
+
+    } else {
+      historicDecisionInstanceIds = instanceIds;
+
+    }
+
     ensureNotNull(BadUserRequestException.class, "removalTime", builder.getMode());
+    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstances", historicDecisionInstanceIds);
 
-    List<HistoricDecisionInstance> historicDecisionInstances = instanceQuery.list();
-
-    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstances", historicDecisionInstances);
     checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME);
 
-    writeUserOperationLog(commandContext, historicDecisionInstances.size(), builder.getMode(), builder.getRemovalTime(),
+    writeUserOperationLog(commandContext, historicDecisionInstanceIds.size(), builder.getMode(), builder.getRemovalTime(),
       builder.isHierarchical(), true);
-
-    List<String> historicDecisionInstanceIds = new ArrayList<>();
-    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
-      historicDecisionInstanceIds.add(historicDecisionInstance.getId());
-    }
 
     BatchEntity batch = createBatch(commandContext, historicDecisionInstanceIds);
 

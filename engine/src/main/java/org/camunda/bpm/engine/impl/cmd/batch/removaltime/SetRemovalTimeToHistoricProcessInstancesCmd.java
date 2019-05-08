@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.impl.cmd.batch.removaltime;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -52,22 +54,32 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
   }
 
   public Batch execute(CommandContext commandContext) {
+    List<String> historicProcessInstanceIds = null;
+
+    List<String> instanceIds = builder.getIds();
     HistoricProcessInstanceQuery instanceQuery = builder.getQuery();
-    ensureNotNull(BadUserRequestException.class, "query", instanceQuery);
+    if ((instanceQuery == null && instanceIds == null) || (instanceQuery != null && instanceIds != null)) {
+      throw new BadUserRequestException("Either query or ids must be provided.");
+
+    } else if (instanceQuery != null) {
+      historicProcessInstanceIds = new ArrayList<>();
+
+      for (HistoricProcessInstance historicDecisionInstance : instanceQuery.list()) {
+        historicProcessInstanceIds.add(historicDecisionInstance.getId());
+      }
+
+    } else {
+      historicProcessInstanceIds = instanceIds;
+
+    }
+
     ensureNotNull(BadUserRequestException.class, "removalTime", builder.getMode());
+    ensureNotEmpty(BadUserRequestException.class, "historicProcessInstances", historicProcessInstanceIds);
 
-    List<HistoricProcessInstance> historicProcessInstances = instanceQuery.list();
-
-    ensureNotEmpty(BadUserRequestException.class, "historicProcessInstances", historicProcessInstances);
     checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME);
 
-    writeUserOperationLog(commandContext, historicProcessInstances.size(), builder.getMode(), builder.getRemovalTime(),
+    writeUserOperationLog(commandContext, historicProcessInstanceIds.size(), builder.getMode(), builder.getRemovalTime(),
       builder.isHierarchical(), true);
-
-    List<String> historicProcessInstanceIds = new ArrayList<>();
-    for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
-      historicProcessInstanceIds.add(historicProcessInstance.getId());
-    }
 
     BatchEntity batch = createBatch(commandContext, historicProcessInstanceIds);
 

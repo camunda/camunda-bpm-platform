@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -1884,6 +1885,124 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  public void shouldSetRemovalTime_ByIds() {
+    // given
+    testRule.process().call().userTask().deploy().start();
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // assume
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLive(5, "process", "rootProcess");
+
+    List<String> ids = new ArrayList<>();
+    for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
+      ids.add(historicProcessInstance.getId());
+    }
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstances()
+        .byIds(ids.toArray(new String[0]))
+        .calculatedRemovalTime()
+        .executeAsync()
+    );
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+    assertThat(historicProcessInstances.get(1).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ByIds() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+
+    // assume
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isNull();
+    assertThat(historicDecisionInstances.get(1).getRemovalTime()).isNull();
+    assertThat(historicDecisionInstances.get(2).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn(5, "dish-decision", "season", "guestCount");
+
+    List<String> ids = new ArrayList<>();
+    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
+      ids.add(historicDecisionInstance.getId());
+    }
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstances()
+        .byIds(ids.toArray(new String[0]))
+        .calculatedRemovalTime()
+        .executeAsync()
+    );
+
+    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+
+    // then
+    assertThat(historicDecisionInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+    assertThat(historicDecisionInstances.get(1).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+    assertThat(historicDecisionInstances.get(2).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  public void shouldSetRemovalTimeForBatch_ByIds() {
+    // given
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+
+    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    Batch batchTwo = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+
+    List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .list();
+
+    // assume
+    assertThat(historicBatches.get(0).getRemovalTime()).isNull();
+    assertThat(historicBatches.get(1).getRemovalTime()).isNull();
+
+    List<String> ids = new ArrayList<>();
+    for (HistoricBatch historicBatch : historicBatches) {
+      ids.add(historicBatch.getId());
+    }
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatches()
+        .byIds(ids.toArray(new String[0]))
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .executeAsync()
+    );
+
+    historicBatches = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .list();
+
+    // then
+    assertThat(historicBatches.get(0).getRemovalTime()).isEqualTo(REMOVAL_TIME);
+    assertThat(historicBatches.get(1).getRemovalTime()).isEqualTo(REMOVAL_TIME);
+
+    // clear database
+    managementService.deleteBatch(batchOne.getId(), true);
+    managementService.deleteBatch(batchTwo.getId(), true);
+  }
+
+  @Test
   public void shouldThrowBadUserRequestException() {
     // given
 
@@ -2065,7 +2184,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
-  public void shouldThrowExceptionIfNoQueryDefined()
+  public void shouldThrowExceptionIfNoQueryAndNoIdsDefined()
   {
     // given
     SetRemovalTimeToHistoricProcessInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricProcessInstances()
@@ -2073,14 +2192,14 @@ public class BatchSetRemovalTimeTest {
 
     // then
     thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("query is null");
+    thrown.expectMessage("Either query or ids must be provided.");
 
     // when
     batchBuilder.executeAsync();
   }
 
   @Test
-  public void shouldThrowExceptionIfNoQueryDefinedForStandaloneDecision()
+  public void shouldThrowExceptionIfNoQueryAndNoIdsDefinedForStandaloneDecision()
   {
     // given
     SetRemovalTimeToHistoricDecisionInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricDecisionInstances()
@@ -2088,14 +2207,14 @@ public class BatchSetRemovalTimeTest {
 
     // then
     thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("query is null");
+    thrown.expectMessage("Either query or ids must be provided.");
 
     // when
     batchBuilder.executeAsync();
   }
 
   @Test
-  public void shouldThrowExceptionIfNoQueryDefinedForBatch()
+  public void shouldThrowExceptionIfNoQueryAndNoIdsDefinedForBatch()
   {
     // given
     SetRemovalTimeToHistoricBatchesBuilder batchBuilder = historyService.setRemovalTimeToHistoricBatches()
@@ -2103,7 +2222,61 @@ public class BatchSetRemovalTimeTest {
 
     // then
     thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("query is null");
+    thrown.expectMessage("Either query or ids must be provided.");
+
+    // when
+    batchBuilder.executeAsync();
+  }
+
+  @Test
+  public void shouldThrowExceptionIfBothQueryAndIdsDefined() {
+    // given
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    SetRemovalTimeToHistoricProcessInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricProcessInstances()
+      .absoluteRemovalTime(new Date())
+      .byQuery(query)
+      .byIds("anId", "anotherId");
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("Either query or ids must be provided.");
+
+    // when
+    batchBuilder.executeAsync();
+  }
+
+  @Test
+  public void shouldThrowExceptionIfBothQueryAndIdsDefinedForStandaloneDecision() {
+    // given
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    SetRemovalTimeToHistoricDecisionInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricDecisionInstances()
+      .absoluteRemovalTime(new Date())
+      .byQuery(query)
+      .byIds("anId", "anotherId");
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("Either query or ids must be provided.");
+
+    // when
+    batchBuilder.executeAsync();
+  }
+
+  @Test
+  public void shouldThrowExceptionIfBothQueryAndIdsDefinedForBatch() {
+    // given
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery();
+
+    SetRemovalTimeToHistoricBatchesBuilder batchBuilder = historyService.setRemovalTimeToHistoricBatches()
+      .absoluteRemovalTime(new Date())
+      .byQuery(query)
+      .byIds("anId", "anotherId");
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("Either query or ids must be provided.");
 
     // when
     batchBuilder.executeAsync();

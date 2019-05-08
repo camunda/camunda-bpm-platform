@@ -117,23 +117,35 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   }
 
   public void updateHistoryTimeToLive(String key, int ttl) {
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
-      .processDefinitionKey(key)
-      .singleResult()
-      .getId();
+    updateHistoryTimeToLive(ttl, key);
+  }
 
-    engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitionId, ttl);
+  public void updateHistoryTimeToLive(int ttl, String... keys) {
+    for (String key : keys) {
+      String processDefinitionId = engineRule.getRepositoryService()
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(key)
+        .singleResult()
+        .getId();
+
+      engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitionId, ttl);
+    }
   }
 
   public void updateHistoryTimeToLiveDmn(String key, int ttl) {
-    String decisionDefinitionId = engineRule.getRepositoryService()
-      .createDecisionDefinitionQuery()
-      .decisionDefinitionKey(key)
-      .singleResult()
-      .getId();
+    updateHistoryTimeToLiveDmn(ttl, key);
+  }
 
-    engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, ttl);
+  public void updateHistoryTimeToLiveDmn(int ttl, String... keys) {
+    for (String key : keys) {
+      String decisionDefinitionId = engineRule.getRepositoryService()
+        .createDecisionDefinitionQuery()
+        .decisionDefinitionKey(key)
+        .singleResult()
+        .getId();
+
+      engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, ttl);
+    }
   }
 
   public class TestProcessBuilder {
