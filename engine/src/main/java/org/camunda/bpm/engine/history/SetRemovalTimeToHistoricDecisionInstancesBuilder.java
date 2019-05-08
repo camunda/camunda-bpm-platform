@@ -22,8 +22,6 @@ import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 
-import java.util.Date;
-
 /**
  * Fluent builder to set the removal time to historic decision instances and
  * all associated historic entities.
@@ -47,32 +45,6 @@ public interface SetRemovalTimeToHistoricDecisionInstancesBuilder {
    * @return the builder.
    */
   SetRemovalTimeToHistoricDecisionInstancesBuilder byIds(String... historicProcessInstanceIds);
-
-  /**
-   * Sets the removal time to an absolute date.
-   *
-   * @param removalTime supposed to be set to historic entities.
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricDecisionInstancesBuilder absoluteRemovalTime(Date removalTime);
-
-  /**
-   * <p> Calculates the removal time dynamically based on the respective decision definition time to
-   * live and the engine's removal time strategy.
-   *
-   * <p> In case {@link #hierarchical()} is enabled, the removal time is being calculated
-   * based on the base time and time to live of the historic root decision instance.
-   *
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricDecisionInstancesBuilder calculatedRemovalTime();
-
-  /**
-   * <p> Sets the removal time to {@code null}.
-   *
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricDecisionInstancesBuilder clearedRemovalTime();
 
   /**
    * Takes additionally historic decision instances into account that are part of

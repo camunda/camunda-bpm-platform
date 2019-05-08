@@ -49,6 +49,9 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricBatchesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
@@ -328,15 +331,15 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     return commandExecutor.execute(new GetHistoricExternalTaskLogErrorDetailsCmd(historicExternalTaskLogId));
   }
 
-  public SetRemovalTimeToHistoricProcessInstancesBuilder setRemovalTimeToHistoricProcessInstances() {
+  public SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder setRemovalTimeToHistoricProcessInstances() {
     return new SetRemovalTimeToHistoricProcessInstancesBuilderImpl(commandExecutor);
   }
 
-  public SetRemovalTimeToHistoricDecisionInstancesBuilder setRemovalTimeToHistoricDecisionInstances() {
+  public SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder setRemovalTimeToHistoricDecisionInstances() {
     return new SetRemovalTimeToHistoricDecisionInstancesBuilderImpl(commandExecutor);
   }
 
-  public SetRemovalTimeToHistoricBatchesBuilder setRemovalTimeToHistoricBatches() {
+  public SetRemovalTimeSelectModeForHistoricBatchesBuilder setRemovalTimeToHistoricBatches() {
     return new SetRemovalTimeToHistoricBatchesBuilderImpl(commandExecutor);
   }
 

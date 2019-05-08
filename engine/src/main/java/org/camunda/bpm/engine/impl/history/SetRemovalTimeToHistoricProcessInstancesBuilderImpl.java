@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.history;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.impl.cmd.batch.removaltime.SetRemovalTimeToHistoricProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -29,7 +30,7 @@ import java.util.List;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetRemovalTimeToHistoricProcessInstancesBuilder {
+public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder {
 
   protected HistoricProcessInstanceQuery query;
   protected List<String> ids;

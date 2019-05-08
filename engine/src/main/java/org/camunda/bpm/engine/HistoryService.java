@@ -61,6 +61,9 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricBatchesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -572,11 +575,11 @@ public interface HistoryService {
    * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#byQuery(HistoricProcessInstanceQuery)}.
    *
    * <p>An absolute time can be specified via
-   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#absoluteRemovalTime(Date)}.
+   * {@link SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
    * <p>As an alternative, the removal time can also be calculated via
-   * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#calculatedRemovalTime()}
+   * {@link SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
    * <p>To additionally take those historic process instances into account that are part of
@@ -588,7 +591,7 @@ public interface HistoryService {
    *
    * @since 7.11
    */
-  SetRemovalTimeToHistoricProcessInstancesBuilder setRemovalTimeToHistoricProcessInstances();
+  SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder setRemovalTimeToHistoricProcessInstances();
 
   /**
    * <p>Set a removal time to historic decision instances and
@@ -598,11 +601,11 @@ public interface HistoryService {
    * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#byQuery(HistoricDecisionInstanceQuery)}.
    *
    * <p>An absolute time can be specified via
-   * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#absoluteRemovalTime(Date)}.
+   * {@link SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
    * <p>As an alternative, the removal time can also be calculated via
-   * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#calculatedRemovalTime()}
+   * {@link SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
    * <p>To additionally take those historic decision instances into account that are part of
@@ -614,7 +617,7 @@ public interface HistoryService {
    *
    * @since 7.11
    */
-  SetRemovalTimeToHistoricDecisionInstancesBuilder setRemovalTimeToHistoricDecisionInstances();
+  SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder setRemovalTimeToHistoricDecisionInstances();
 
   /**
    * <p>Set a removal time to historic batches and all
@@ -624,11 +627,11 @@ public interface HistoryService {
    * {@link SetRemovalTimeToHistoricBatchesBuilder#byQuery(HistoricBatchQuery)}.
    *
    * <p>An absolute time can be specified via
-   * {@link SetRemovalTimeToHistoricBatchesBuilder#absoluteRemovalTime(Date)}.
+   * {@link SetRemovalTimeSelectModeForHistoricBatchesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
    * <p>As an alternative, the removal time can also be calculated via
-   * {@link SetRemovalTimeToHistoricBatchesBuilder#calculatedRemovalTime()}
+   * {@link SetRemovalTimeSelectModeForHistoricBatchesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
    * <p>To create the batch and complete the configuration chain, call
@@ -636,6 +639,6 @@ public interface HistoryService {
    *
    * @since 7.11
    */
-  SetRemovalTimeToHistoricBatchesBuilder setRemovalTimeToHistoricBatches();
+  SetRemovalTimeSelectModeForHistoricBatchesBuilder setRemovalTimeToHistoricBatches();
 
 }

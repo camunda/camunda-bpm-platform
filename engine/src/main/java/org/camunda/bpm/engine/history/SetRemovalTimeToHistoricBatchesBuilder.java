@@ -50,29 +50,6 @@ public interface SetRemovalTimeToHistoricBatchesBuilder {
   SetRemovalTimeToHistoricBatchesBuilder byIds(String... historicBatchIds);
 
   /**
-   * Sets the removal time to an absolute date.
-   *
-   * @param removalTime supposed to be set to historic entities.
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricBatchesBuilder absoluteRemovalTime(Date removalTime);
-
-  /**
-   * Calculates the removal time dynamically based on the time to
-   * live of the respective batch and the engine's removal time strategy.
-   *
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricBatchesBuilder calculatedRemovalTime();
-
-  /**
-   * <p> Sets the removal time to {@code null}.
-   *
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricBatchesBuilder clearedRemovalTime();
-
-  /**
    * Sets the removal time asynchronously as batch. The returned batch can be used to
    * track the progress of setting a removal time.
    *

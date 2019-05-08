@@ -85,8 +85,8 @@ public class SetRemovalTimeForHistoricDecisionInstancesBatchAuthorizationTest ex
 
     // when
     historyService.setRemovalTimeToHistoricDecisionInstances()
-      .byQuery(query)
       .absoluteRemovalTime(new Date())
+      .byQuery(query)
       .executeAsync();
 
     // then

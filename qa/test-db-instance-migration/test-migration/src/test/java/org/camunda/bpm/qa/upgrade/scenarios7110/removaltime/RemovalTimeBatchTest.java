@@ -67,8 +67,8 @@ public class RemovalTimeBatchTest {
     // when
     syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .absoluteRemovalTime(new Date())
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );

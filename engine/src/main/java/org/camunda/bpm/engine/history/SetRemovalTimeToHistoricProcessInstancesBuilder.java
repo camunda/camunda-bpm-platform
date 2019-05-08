@@ -49,32 +49,6 @@ public interface SetRemovalTimeToHistoricProcessInstancesBuilder {
   SetRemovalTimeToHistoricProcessInstancesBuilder byIds(String... historicProcessInstanceIds);
 
   /**
-   * Sets the removal time to an absolute date.
-   *
-   * @param removalTime supposed to be set to historic entities.
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricProcessInstancesBuilder absoluteRemovalTime(Date removalTime);
-
-  /**
-   * <p> Calculates the removal time dynamically based on the respective process definition time to
-   * live and the process engine's removal time strategy.
-   *
-   * <p> In case {@link #hierarchical()} is enabled, the removal time is being calculated
-   * based on the base time and time to live of the historic root process instance.
-   *
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricProcessInstancesBuilder calculatedRemovalTime();
-
-  /**
-   * <p> Sets the removal time to {@code null}.
-   *
-   * @return the builder.
-   */
-  SetRemovalTimeToHistoricProcessInstancesBuilder clearedRemovalTime();
-
-  /**
    * Takes additionally those historic process instances into account that are part of
    * the hierarchy of the given historic process instance.
    *

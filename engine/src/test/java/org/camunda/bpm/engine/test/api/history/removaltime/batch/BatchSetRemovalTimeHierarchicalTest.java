@@ -134,8 +134,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -175,8 +175,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -216,8 +216,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -266,8 +266,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -314,8 +314,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -361,8 +361,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -413,8 +413,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -460,8 +460,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -507,8 +507,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -541,8 +541,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -573,8 +573,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -604,8 +604,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -636,8 +636,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -668,8 +668,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -697,8 +697,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -728,8 +728,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -770,8 +770,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -805,8 +805,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -834,8 +834,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -872,8 +872,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -903,8 +903,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -938,8 +938,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -968,8 +968,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1005,8 +1005,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1039,8 +1039,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1077,8 +1077,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1119,8 +1119,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1163,8 +1163,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1212,8 +1212,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1256,8 +1256,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1300,8 +1300,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1349,8 +1349,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricProcessInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1393,8 +1393,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
@@ -1437,8 +1437,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // when
     testRule.syncExec(
       historyService.setRemovalTimeToHistoricDecisionInstances()
-        .byQuery(query)
         .calculatedRemovalTime()
+        .byQuery(query)
         .hierarchical()
         .executeAsync()
     );
