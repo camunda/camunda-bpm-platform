@@ -19,12 +19,9 @@ package org.camunda.bpm.engine.test.standalone.pvm;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.cmd.FoxDeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.EmbeddedSubProcess;
@@ -283,12 +280,7 @@ public class PvmEventTest extends PvmTestCase {
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
 
-    ExecutionImpl execution = (ExecutionImpl) processInstance;
-    FoxDeleteProcessInstanceCmd cmd = new FoxDeleteProcessInstanceCmd(null, null);
-    List<PvmExecutionImpl> collectExecutionToDelete = cmd.collectExecutionToDelete(execution);
-    for (PvmExecutionImpl interpretableExecution : collectExecutionToDelete) {
-      interpretableExecution.deleteCascade2("");
-    }
+    processInstance.deleteCascade("");
 
     List<String> expectedEvents = new ArrayList<String>();
     expectedEvents.add("start on ProcessDefinition(events)");

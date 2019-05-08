@@ -39,6 +39,7 @@ public abstract class PvmAtomicOperationActivityInstanceStart extends AbstractPv
     execution.incrementSequenceCounter();
     execution.activityInstanceStarting();
     execution.enterActivityInstance();
+    execution.setTransition(null);
 
     return execution;
   }

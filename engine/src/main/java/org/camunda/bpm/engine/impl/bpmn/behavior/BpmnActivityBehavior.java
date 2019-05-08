@@ -52,7 +52,7 @@ public class BpmnActivityBehavior {
    * parallel paths of executions are created.
    */
   public void performDefaultOutgoingBehavior(ActivityExecution activityExceution) {
-    performOutgoingBehavior(activityExceution, true, false, null);
+    performOutgoingBehavior(activityExceution, true, null);
   }
 
   /**
@@ -66,7 +66,7 @@ public class BpmnActivityBehavior {
    * be created.
    */
   public void performIgnoreConditionsOutgoingBehavior(ActivityExecution activityExecution) {
-    performOutgoingBehavior(activityExecution, false, false, null);
+    performOutgoingBehavior(activityExecution, false, null);
   }
 
   /**
@@ -77,17 +77,14 @@ public class BpmnActivityBehavior {
    * @param checkConditions
    *          Whether or not to check conditions before determining whether or
    *          not to take a transition.
-   * @param throwExceptionIfExecutionStuck
-   *          If true, an {@link ProcessEngineException} will be thrown in case no
-   *          transition could be found to leave the activity.
    */
   protected void performOutgoingBehavior(ActivityExecution execution,
-          boolean checkConditions, boolean throwExceptionIfExecutionStuck, List<ActivityExecution> reusableExecutions) {
+          boolean checkConditions, List<ActivityExecution> reusableExecutions) {
 
     LOG.leavingActivity(execution.getActivity().getId());
 
     String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
-    List<PvmTransition> transitionsToTake = new ArrayList<PvmTransition>();
+    List<PvmTransition> transitionsToTake = new ArrayList<>();
 
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
     for (PvmTransition outgoingTransition : outgoingTransitions) {
@@ -133,12 +130,7 @@ public class BpmnActivityBehavior {
         } else {
           LOG.missingOutgoingSequenceFlow(execution.getActivity().getId());
           execution.end(true);
-
-          if (throwExceptionIfExecutionStuck) {
-            throw LOG.stuckExecutionException(execution.getActivity().getId());
-          }
         }
-
       }
     }
   }

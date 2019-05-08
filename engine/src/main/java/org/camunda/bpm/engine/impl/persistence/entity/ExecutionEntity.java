@@ -71,7 +71,6 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
@@ -1479,13 +1478,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public void insert() {
     Context.getCommandContext().getExecutionManager().insertExecution(this);
-  }
-
-  @Override
-  public void deleteCascade2(String deleteReason) {
-    this.deleteReason = deleteReason;
-    this.deleteRoot = true;
-    performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
   }
 
   public int getRevisionNext() {

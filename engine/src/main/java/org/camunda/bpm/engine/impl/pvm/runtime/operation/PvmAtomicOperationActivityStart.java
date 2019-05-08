@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -53,4 +52,8 @@ public class PvmAtomicOperationActivityStart extends PvmAtomicOperationActivityI
     return "activity-start";
   }
 
+  @Override
+  public boolean shouldHandleFailureAsBpmnError() {
+    return true;
+  }
 }

@@ -52,4 +52,9 @@ public class PvmAtomicOperationTransitionNotifyListenerEnd extends PvmAtomicOper
   public String getCanonicalName() {
     return "transition-notify-listener-end";
   }
+
+  @Override
+  public boolean shouldHandleFailureAsBpmnError() {
+    return true;
+  }
 }

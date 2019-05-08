@@ -44,4 +44,8 @@ public class PvmAtomicOperationFireActivityEnd extends AbstractPvmEventAtomicOpe
     // nothing to do
   }
 
+  @Override
+  protected boolean isSkipNotifyListeners(PvmExecutionImpl execution) {
+    return execution.hasFailedOnEndListeners();
+  }
 }

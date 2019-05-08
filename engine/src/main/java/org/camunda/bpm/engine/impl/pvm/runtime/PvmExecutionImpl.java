@@ -41,7 +41,6 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.*;
-import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.tree.*;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -135,6 +134,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    * marks the current activity instance
    */
   protected int activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
+
+  protected boolean activityInstanceEndListenersFailed = false;
 
   // sequence counter ////////////////////////////////////////////////////////
   protected long sequenceCounter = 0;
@@ -351,6 +352,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
 
     performOperation(PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END);
+
   }
 
   @Override
@@ -570,12 +572,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     performOperation(PvmAtomicOperation.DELETE_CASCADE);
   }
 
-  public void deleteCascade2(String deleteReason) {
-    this.deleteReason = deleteReason;
-    setDeleteRoot(true);
-    performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
-  }
-
   public void executeEventHandlerActivity(ActivityImpl eventHandlerActivity) {
 
     // the target scope
@@ -778,6 +774,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
 
     PvmActivity activityImpl = activity;
+    this.isEnded = false;
+    this.isActive = true;
+
     switch (activityStartBehavior) {
       case CONCURRENT_IN_FLOW_SCOPE:
         this.nextActivity = activityImpl;
@@ -1233,6 +1232,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       initializeTimerDeclarations();
     }
 
+    activityInstanceEndListenersFailed = false;
+
   }
 
   public void activityInstanceStarting() {
@@ -1248,6 +1249,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.activityInstanceState = ENDING.getStateCode();
   }
 
+  public void activityInstanceEndListenerFailure() {
+    this.activityInstanceEndListenersFailed = true;
+  }
+
   protected abstract String generateActivityInstanceId(String activityId);
 
   @Override
@@ -1258,6 +1263,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     activityInstanceId = getParentActivityInstanceId();
 
     activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
+    activityInstanceEndListenersFailed = false;
   }
 
   @Override
@@ -1779,6 +1785,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public boolean isInState(ActivityInstanceState state) {
     return activityInstanceState == state.getStateCode();
+  }
+
+  public boolean hasFailedOnEndListeners() {
+    return activityInstanceEndListenersFailed;
   }
 
   public boolean isEventScope() {

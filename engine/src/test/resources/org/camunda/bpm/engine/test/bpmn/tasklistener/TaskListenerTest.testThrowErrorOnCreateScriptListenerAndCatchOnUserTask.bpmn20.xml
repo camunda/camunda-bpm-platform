@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="task1" />
+
+    <userTask id="task1">
+      <extensionElements>
+        <camunda:taskListener event="create">
+          <camunda:script scriptFormat="groovy">
+            import org.camunda.bpm.engine.delegate.BpmnError;
+            throw new BpmnError("208", "ups")
+          </camunda:script>
+        </camunda:taskListener>
+      </extensionElements>
+    </userTask>
+
+    <boundaryEvent id="BoundaryEvent" attachedToRef="task1">
+      <errorEventDefinition camunda:errorCodeVariable="208"/>
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="BoundaryEvent" targetRef="task3" />
+
+    <userTask id="task3" name="afterCatch"/>
+
+    <sequenceFlow sourceRef="task1" targetRef="task2" />
+
+    <userTask id="task2" name="afterThrow"/>
+
+    <sequenceFlow sourceRef="task2" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

@@ -54,4 +54,8 @@ public class PvmAtomicOperationActivityNotifyListenerEnd extends PvmAtomicOperat
     return "activity-notify-listener-end";
   }
 
+  @Override
+  public boolean shouldHandleFailureAsBpmnError() {
+    return true;
+  }
 }

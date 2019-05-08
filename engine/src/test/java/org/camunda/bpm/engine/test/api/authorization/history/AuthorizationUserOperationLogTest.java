@@ -91,7 +91,7 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     assertEquals("testGroupId", entry.getNewValue());
   }
   
-  public void testLogCreatedOnAuthorizationUpdate() {
+  public void test1LogCreatedOnAuthorizationUpdate() {
     // given
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     identityService.clearAuthentication();

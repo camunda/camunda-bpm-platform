@@ -35,4 +35,10 @@ public class PvmAtomicOperationTransitionNotifyListenerTake extends AbstractPvmA
   public boolean isAsyncCapable() {
     return true;
   }
+
+  @Override
+  public boolean shouldHandleFailureAsBpmnError() {
+    return true;
+  }
+
 }
