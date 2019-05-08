@@ -70,7 +70,7 @@ public class SetRemovalTimeForHistoricDecisionInstancesBatchAuthorizationTest ex
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldAuthorizeSetRemovalTimeForHistoricDecisionInstancesBatch() {
     // given
     setupHistory();

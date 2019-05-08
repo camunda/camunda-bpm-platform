@@ -63,7 +63,7 @@ public class SetRemovalTimeForHistoricBatchesBatchAuthorizationTest extends Batc
   }
 
   @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldAuthorizeSetRemovalTimeForHistoricBatchesBatch() {
     // given
     String batchId = engineRule.getHistoryService()
