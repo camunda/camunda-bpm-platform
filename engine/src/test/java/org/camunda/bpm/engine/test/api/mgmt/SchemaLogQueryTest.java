@@ -20,7 +20,9 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.schemaLogEntryByTimestamp;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
 import java.util.Date;
@@ -52,45 +54,37 @@ public class SchemaLogQueryTest {
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
   SchemaLogEntryEntity dummySchemaLogEntry;
+  long initialEntryCount;
 
   @Before
   public void init() {
     managementService = engineRule.getManagementService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    
+    initialEntryCount = managementService.createSchemaLogQuery().count();
     dummySchemaLogEntry = createDummySchemaLogEntry();
   }
 
   @Test
-  public void testQuerySchemaLogEntrySingleResult() {
-    // given a clean database
-
-    // when
-    SchemaLogEntry schemaLogEntry = managementService.createSchemaLogQuery().singleResult();
-
-    // then expect one entry
-    assertThat(schemaLogEntry.getId(), is("0"));
-    assertThat(schemaLogEntry.getTimestamp(), notNullValue());
-    assertThat(schemaLogEntry.getVersion(), notNullValue());
-  }
-
-  @Test
   public void testQuerySchemaLogEntryList() {
-    // given a clean database
+    // given
 
     // when
     List<SchemaLogEntry> schemaLogEntries = managementService.createSchemaLogQuery().list();
 
     // then expect one entry
-    assertThat(managementService.createSchemaLogQuery().count(), is(1L));
+    assertThat(managementService.createSchemaLogQuery().count(), is(greaterThan(0L)));
     SchemaLogEntry schemaLogEntry = schemaLogEntries.get(0);
     assertThat(schemaLogEntry.getId(), is("0"));
     assertThat(schemaLogEntry.getTimestamp(), notNullValue());
     assertThat(schemaLogEntry.getVersion(), notNullValue());
+    managementService.getProperties();
+    cleanupTable();
   }
 
   @Test
   public void testOrderByTimestamp() {
-    // given two schema log entries
+    // given (at least) two schema log entries
     populateTable();
 
     // then sorting works
@@ -102,7 +96,7 @@ public class SchemaLogQueryTest {
 
   @Test
   public void testFilterByVersion() {
-    // given two schema log entries
+    // given (at least) two schema log entries
     populateTable();
 
     // when
@@ -118,7 +112,7 @@ public class SchemaLogQueryTest {
 
   @Test
   public void testSortedPagedQuery() {
-    // given two schema log entries
+    // given (at least) two schema log entries
     populateTable();
 
     // then paging works
@@ -129,12 +123,12 @@ public class SchemaLogQueryTest {
 
     schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(1, 1);
     assertThat(schemaLogEntry.size(), is(1));
-    assertThat(schemaLogEntry.get(0).getId(), is("uniqueId"));
+    assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
 
     // descending order
     schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(0, 1);
     assertThat(schemaLogEntry.size(), is(1));
-    assertThat(schemaLogEntry.get(0).getId(), is("uniqueId"));
+    assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
 
     schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(1, 1);
     assertThat(schemaLogEntry.size(), is(1));
@@ -155,7 +149,7 @@ public class SchemaLogQueryTest {
         return null;
       }
     });
-    assertThat(managementService.createSchemaLogQuery().count(), is(2L));
+    assertThat(managementService.createSchemaLogQuery().count(), is(initialEntryCount + 1));
   }
 
   private void cleanupTable() {
@@ -168,7 +162,7 @@ public class SchemaLogQueryTest {
         return null;
       }
     });
-    assertThat(managementService.createSchemaLogQuery().count(), is(1L));
+    assertThat(managementService.createSchemaLogQuery().count(), is(initialEntryCount));
   }
 
   private SchemaLogEntryEntity createDummySchemaLogEntry() {

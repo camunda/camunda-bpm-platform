@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
@@ -38,7 +39,7 @@ public class SchemaLogQueryAuthorizationTest extends AuthorizationTest {
 
   @Test
   public void testSimpleQueryWithoutAuthorization() {
-    // given a clean database
+    // given
 
     // then
     assertThat(managementService.createSchemaLogQuery().list().size(), is(0));
@@ -46,19 +47,19 @@ public class SchemaLogQueryAuthorizationTest extends AuthorizationTest {
 
   @Test
   public void testCountQueryWithAuthorization() {
-    // given a clean database
+    // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // then
-    assertThat(managementService.createSchemaLogQuery().count(), is(1L));
+    assertThat(managementService.createSchemaLogQuery().count(), is(greaterThan(0L)));
   }
 
   @Test
   public void testQueryWithAuthorization() {
-    // given a clean database
+    // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // then
-    assertThat(managementService.createSchemaLogQuery().list().size(), is(1));
+    assertThat(managementService.createSchemaLogQuery().list().size(), is(greaterThan(0)));
   }
 }
