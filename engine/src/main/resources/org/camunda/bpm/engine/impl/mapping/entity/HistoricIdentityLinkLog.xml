@@ -288,4 +288,48 @@
       
     </where>
   </sql>
+
+  <resultMap id="optimizeHistoricIdentityLinkResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="time" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="operationType" column="OPERATION_TYPE_" jdbcType="VARCHAR"/>
+    <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="selectHistoricIdentityLinkPage" resultMap="optimizeHistoricIdentityLinkResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+
+    select RES.*, HTI.PROC_INST_ID_ FROM  (
+      ${optimizeLimitBeforeWithoutOffset}
+      select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_IDENTITYLINK HIL
+
+      <where>
+        <if test="parameter.occurredAfter != null">
+          and HIL.TIMESTAMP_ &gt; #{parameter.occurredAfter}
+        </if>
+        <if test="parameter.occurredAt != null">
+          and HIL.TIMESTAMP_ = #{parameter.occurredAt}
+        </if>
+        <if test="parameter.occurredAfter == null and parameter.occurredAt == null">
+          and HIL.TIMESTAMP_ is not null
+        </if>
+      </where>
+
+      ORDER BY HIL.TIMESTAMP_ ASC
+      ${optimizeLimitAfterWithoutOffset}) RES
+    inner join ${prefix}ACT_HI_TASKINST HTI
+      on RES.TASK_ID_ = HTI.ID_
+    ORDER BY RES.TIMESTAMP_ ASC
+  </select>
+
 </mapper>

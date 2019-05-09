@@ -16,27 +16,27 @@
  */
 package org.camunda.bpm.engine.impl.cmd.optimize;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 
 import java.util.Date;
 import java.util.List;
 
-public class OptimizeHistoricUserOperationsLogQueryCmd implements Command<List<UserOperationLogEntry>> {
+public class OptimizeHistoricIdentityLinkLogQueryCmd implements Command<List<OptimizeHistoricIdentityLinkLogEntity>> {
 
   protected Date occurredAfter;
   protected Date occurredAt;
   protected int maxResults;
 
-  public OptimizeHistoricUserOperationsLogQueryCmd(Date occurredAfter, Date occurredAt, int maxResults) {
+  public OptimizeHistoricIdentityLinkLogQueryCmd(Date occurredAfter, Date occurredAt, int maxResults) {
     this.occurredAfter = occurredAfter;
     this.occurredAt = occurredAt;
     this.maxResults = maxResults;
   }
 
-  public List<UserOperationLogEntry> execute(CommandContext commandContext) {
-    return commandContext.getOptimizeManager().getHistoricUserOperationLogs(occurredAfter, occurredAt, maxResults);
+  public List<OptimizeHistoricIdentityLinkLogEntity> execute(CommandContext commandContext) {
+    return commandContext.getOptimizeManager().getHistoricIdentityLinkLogs(occurredAfter, occurredAt, maxResults);
   }
 
 }

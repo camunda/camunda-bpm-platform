@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -115,6 +116,20 @@ public class OptimizeManager extends AbstractManager {
     params.put("maxResults", maxResults);
 
     return getDbEntityManager().selectList("selectHistoricUserOperationLogPage", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<OptimizeHistoricIdentityLinkLogEntity> getHistoricIdentityLinkLogs(Date occurredAfter,
+                                                                                 Date occurredAt,
+                                                                                 int maxResults) {
+    checkIsAuthorizedToReadHistoryOfProcessDefinitions();
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("occurredAfter", occurredAfter);
+    params.put("occurredAt", occurredAt);
+    params.put("maxResults", maxResults);
+
+    return getDbEntityManager().selectList("selectHistoricIdentityLinkPage", params);
   }
 
   private void checkIsAuthorizedToReadHistoryOfProcessDefinitions() {
