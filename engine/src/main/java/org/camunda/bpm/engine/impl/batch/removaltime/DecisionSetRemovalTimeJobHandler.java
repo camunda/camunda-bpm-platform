@@ -55,22 +55,24 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
 
         HistoricDecisionInstanceEntity instance = findDecisionInstanceById(instanceId, commandContext);
 
-        if (batchConfiguration.isHierarchical()) {
+        if (instance != null) {
+          if (batchConfiguration.isHierarchical()) {
 
-          String rootDecisionInstanceId = getRootDecisionInstance(instance);
+            String rootDecisionInstanceId = getRootDecisionInstance(instance);
 
-          HistoricDecisionInstanceEntity rootInstance = findDecisionInstanceById(rootDecisionInstanceId, commandContext);
+            HistoricDecisionInstanceEntity rootInstance = findDecisionInstanceById(rootDecisionInstanceId, commandContext);
 
-          Date removalTime = getOrCalculateRemovalTime(batchConfiguration, rootInstance, commandContext);
+            Date removalTime = getOrCalculateRemovalTime(batchConfiguration, rootInstance, commandContext);
 
-          addRemovalTimeToHierarchy(rootDecisionInstanceId, removalTime, commandContext);
+            addRemovalTimeToHierarchy(rootDecisionInstanceId, removalTime, commandContext);
 
-        } else {
-          Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
+          } else {
+            Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
 
-          if (removalTime != instance.getRemovalTime()) {
-            addRemovalTime(instanceId, removalTime, commandContext);
+            if (removalTime != instance.getRemovalTime()) {
+              addRemovalTime(instanceId, removalTime, commandContext);
 
+            }
           }
         }
       }

@@ -54,20 +54,22 @@ public class ProcessSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Set
 
       HistoricProcessInstanceEntity instance = findProcessInstanceById(instanceId, commandContext);
 
-      if (batchConfiguration.isHierarchical() && hasHierarchy(instance)) {
-        String rootProcessInstanceId = instance.getRootProcessInstanceId();
+      if (instance != null) {
+        if (batchConfiguration.isHierarchical() && hasHierarchy(instance)) {
+          String rootProcessInstanceId = instance.getRootProcessInstanceId();
 
-        HistoricProcessInstanceEntity rootInstance = findProcessInstanceById(rootProcessInstanceId, commandContext);
-        Date removalTime = getOrCalculateRemovalTime(batchConfiguration, rootInstance, commandContext);
+          HistoricProcessInstanceEntity rootInstance = findProcessInstanceById(rootProcessInstanceId, commandContext);
+          Date removalTime = getOrCalculateRemovalTime(batchConfiguration, rootInstance, commandContext);
 
-        addRemovalTimeToHierarchy(rootProcessInstanceId, removalTime, commandContext);
+          addRemovalTimeToHierarchy(rootProcessInstanceId, removalTime, commandContext);
 
-      } else {
-        Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
+        } else {
+          Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
 
-        if (removalTime != instance.getRemovalTime()) {
-          addRemovalTime(instanceId, removalTime, commandContext);
+          if (removalTime != instance.getRemovalTime()) {
+            addRemovalTime(instanceId, removalTime, commandContext);
 
+          }
         }
       }
     }

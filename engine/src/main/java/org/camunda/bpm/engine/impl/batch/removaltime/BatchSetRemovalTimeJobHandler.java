@@ -53,11 +53,13 @@ public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRe
 
       HistoricBatchEntity instance = findBatchById(instanceId, commandContext);
 
-      Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
+      if (instance != null) {
+        Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
 
-      if (removalTime != instance.getRemovalTime()) {
-        addRemovalTime(instanceId, removalTime, commandContext);
+        if (removalTime != instance.getRemovalTime()) {
+          addRemovalTime(instanceId, removalTime, commandContext);
 
+        }
       }
     }
   }

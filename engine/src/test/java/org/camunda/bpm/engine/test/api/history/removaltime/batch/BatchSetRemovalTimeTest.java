@@ -52,11 +52,13 @@ import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_NONE;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule.addDays;
+import static org.mockito.Matchers.contains;
 
 /**
  * @author Tassilo Weidner
@@ -1918,6 +1920,21 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  public void shouldThrowBadUserRequestException_NotExistingIds() {
+    // given
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("historicProcessInstances is empty");
+
+    // when
+    historyService.setRemovalTimeToHistoricProcessInstances()
+      .absoluteRemovalTime(REMOVAL_TIME)
+      .byIds("aNotExistingId", "anotherNotExistingId")
+      .executeAsync();
+  }
+
+  @Test
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
@@ -1961,6 +1978,21 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  public void shouldThrowBadUserRequestExceptionForStandaloneDecision_NotExistingIds() {
+    // given
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("historicDecisionInstances is empty");
+
+    // when
+    historyService.setRemovalTimeToHistoricDecisionInstances()
+      .absoluteRemovalTime(REMOVAL_TIME)
+      .byIds("aNotExistingId", "anotherNotExistingId")
+      .executeAsync();
+  }
+
+  @Test
   public void shouldSetRemovalTimeForBatch_ByIds() {
     // given
     String processInstanceId = testRule.process().serviceTask().deploy().start();
@@ -2000,6 +2032,21 @@ public class BatchSetRemovalTimeTest {
     // clear database
     managementService.deleteBatch(batchOne.getId(), true);
     managementService.deleteBatch(batchTwo.getId(), true);
+  }
+
+  @Test
+  public void shouldThrowBadUserRequestExceptionForBatch_NotExistingIds() {
+    // given
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("historicBatches is empty");
+
+    // when
+    historyService.setRemovalTimeToHistoricBatches()
+      .absoluteRemovalTime(REMOVAL_TIME)
+      .byIds("aNotExistingId", "anotherNotExistingId")
+      .executeAsync();
   }
 
   @Test

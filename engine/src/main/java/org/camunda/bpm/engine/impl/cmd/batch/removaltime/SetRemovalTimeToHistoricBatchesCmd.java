@@ -67,7 +67,7 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
       }
 
     } else {
-      historicBatchIds = instanceIds;
+      historicBatchIds = findHistoricInstanceIds(instanceIds, commandContext);
 
     }
 
@@ -90,6 +90,27 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
     batch.createSeedJob();
 
     return batch;
+  }
+
+  protected List<String> findHistoricInstanceIds(List<String> instanceIds, CommandContext commandContext) {
+    List<String> ids = new ArrayList<>();
+    for (String instanceId : instanceIds) {
+      HistoricBatch batch = createHistoricBatchQuery(commandContext)
+        .batchId(instanceId)
+        .singleResult();
+
+      if (batch != null) {
+        ids.add(batch.getId());
+      }
+    }
+
+    return ids;
+  }
+
+  protected HistoricBatchQuery createHistoricBatchQuery(CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration()
+      .getHistoryService()
+      .createHistoricBatchQuery();
   }
 
   protected void writeUserOperationLog(CommandContext commandContext, int numInstances, Mode mode,

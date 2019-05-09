@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -67,7 +68,7 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBase
       }
 
     } else {
-      historicDecisionInstanceIds = instanceIds;
+      historicDecisionInstanceIds = findHistoricInstanceIds(instanceIds, commandContext);
 
     }
 
@@ -90,6 +91,25 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBase
     batch.createSeedJob();
 
     return batch;
+  }
+
+  protected List<String> findHistoricInstanceIds(List<String> instanceIds, CommandContext commandContext) {
+    List<HistoricDecisionInstance> historicDecisionInstances = createHistoricDecisionInstanceQuery(commandContext)
+      .decisionInstanceIdIn(instanceIds.toArray(new String[0]))
+      .list();
+
+    List<String> ids = new ArrayList<>();
+    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
+      ids.add(historicDecisionInstance.getId());
+    }
+
+    return ids;
+  }
+
+  protected HistoricDecisionInstanceQuery createHistoricDecisionInstanceQuery(CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration()
+      .getHistoryService()
+      .createHistoricDecisionInstanceQuery();
   }
 
   protected void writeUserOperationLog(CommandContext commandContext, int numInstances, Mode mode, Date removalTime,
