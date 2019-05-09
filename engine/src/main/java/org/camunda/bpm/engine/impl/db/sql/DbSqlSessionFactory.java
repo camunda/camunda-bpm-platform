@@ -41,6 +41,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final String MYSQL = "mysql";
   public static final String POSTGRES = "postgres";
   public static final String MARIADB = "mariadb";
+  public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES, MARIADB};
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String,String>>();
 

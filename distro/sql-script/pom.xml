@@ -107,7 +107,7 @@
                   <outputDirectory>target/camunda-engine-${project.version}</outputDirectory>
                 </artifactItem>
               </artifactItems>
-              <includes>**/create/*.sql, **/drop/*.sql</includes>
+              <includes>**/create/*.sql, **/drop/*.sql, **/upgrade/*.sql</includes>
             </configuration>
           </execution>
         </executions>
@@ -214,7 +214,7 @@
                 <mkdir dir="target/sql/upgrade" />
 
                 <copy todir="target/sql/upgrade">
-                  <fileset dir="upgrade">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade">
                     <include name="*.sql" />
                   </fileset>
                 </copy>
@@ -234,125 +234,125 @@
                 <!-- create concatenated patch scripts for easier testing -->
                 <!-- db2 patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/db2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="db2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="db2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/db2_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="db2_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="db2_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/db2_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="db2_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="db2_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/db2_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="db2_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="db2_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <!-- h2 patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/h2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="h2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="h2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/h2_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="h2_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="h2_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/h2_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="h2_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="h2_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/h2_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="h2_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="h2_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <!-- mssql patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/mssql_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mssql_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mssql_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mssql_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mssql_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mssql_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mssql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mssql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mssql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mssql_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mssql_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mssql_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <!-- mysql patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/mysql_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mysql_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mysql_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mysql_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mysql_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mysql_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mysql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mysql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mysql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mysql_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mysql_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mysql_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <!-- mariadb patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/mariadb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mariadb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mariadb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mariadb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mariadb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mariadb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mariadb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mariadb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mariadb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/mariadb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="mariadb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="mariadb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <!-- oracle patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/oracle_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="oracle_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="oracle_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/oracle_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="oracle_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="oracle_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/oracle_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="oracle_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="oracle_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/oracle_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="oracle_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="oracle_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <!-- postgres patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/postgres_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="postgres_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="postgres_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/postgres_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="postgres_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="postgres_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/postgres_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="postgres_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="postgres_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <concat destfile="target/upgrade-test/sql/upgrade/postgres_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
-                  <fileset dir="upgrade" includes="postgres_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="postgres_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
                 <copy todir="target/upgrade-test/sql/upgrade">
-                  <fileset dir="upgrade">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade">
                     <include name="*.sql" />
                   </fileset>
                 </copy>
