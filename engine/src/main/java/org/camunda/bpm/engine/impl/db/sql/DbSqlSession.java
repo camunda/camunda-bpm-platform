@@ -36,7 +36,6 @@ import java.util.List;
 
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
