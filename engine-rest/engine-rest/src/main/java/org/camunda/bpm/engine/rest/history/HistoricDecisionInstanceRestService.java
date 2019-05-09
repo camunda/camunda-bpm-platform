@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.batch.removaltime.SetRemovalTimeToHistoricDecisionInstancesDto;
 import org.camunda.bpm.engine.rest.dto.history.batch.DeleteHistoricDecisionInstancesDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDecisionInstanceResource;
 
@@ -65,5 +66,11 @@ public interface HistoricDecisionInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto deleteAsync(DeleteHistoricDecisionInstancesDto dto);
+
+  @POST
+  @Path("/set-removal-time")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto setRemovalTimeAsync(SetRemovalTimeToHistoricDecisionInstancesDto dto);
 
 }

@@ -53,6 +53,9 @@ public class HistoricBatchQueryDto extends AbstractQueryDto<HistoricBatchQuery> 
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID_VALUE);
   }
 
+  public HistoricBatchQueryDto() {
+  }
+
   public HistoricBatchQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
   }

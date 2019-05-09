@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.rest.history;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DECISION_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DECISION_INSTANCE_ID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -30,15 +32,19 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +54,8 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceQueryDto;
@@ -73,6 +81,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
   protected static final String HISTORIC_DECISION_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/decision-instance";
   protected static final String HISTORIC_SINGLE_DECISION_INSTANCE_URL = HISTORIC_DECISION_INSTANCE_URL + "/{id}";
   protected static final String HISTORIC_DECISION_INSTANCES_DELETE_ASYNC_URL = HISTORIC_DECISION_INSTANCE_URL + "/delete";
+  protected static final String SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL = HISTORIC_DECISION_INSTANCE_URL + "/set-removal-time";
 
   protected HistoryService historyServiceMock;
   protected HistoricDecisionInstance historicInstanceMock;
@@ -86,7 +95,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
 
     historicInstanceMock = MockProvider.createMockHistoricDecisionInstance();
-    historicQueryMock = mock(HistoricDecisionInstanceQuery.class);
+    historicQueryMock = mock(HistoricDecisionInstanceQuery.class, RETURNS_DEEP_STUBS);
 
     when(historyServiceMock.createHistoricDecisionInstanceQuery()).thenReturn(historicQueryMock);
     when(historicQueryMock.decisionInstanceId(anyString())).thenReturn(historicQueryMock);
@@ -131,7 +140,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     String returnedDecisionRequirementsDefinitionKey = from(content).getString("decisionRequirementsDefinitionKey");
 
     assertThat(returnedHistoricDecisionInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID));
-    assertThat(returnedDecisionDefinitionId, is(MockProvider.EXAMPLE_DECISION_DEFINITION_ID));
+    assertThat(returnedDecisionDefinitionId, is(EXAMPLE_DECISION_DEFINITION_ID));
     assertThat(returnedDecisionDefinitionKey, is(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY));
     assertThat(returnedDecisionDefinitionName, is(MockProvider.EXAMPLE_DECISION_DEFINITION_NAME));
     assertThat(returnedEvaluationTime, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));
@@ -294,7 +303,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
   @Test
   public void testDeleteAsync() {
-    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_DECISION_INSTANCE_ID);
+    List<String> ids = Arrays.asList(EXAMPLE_DECISION_INSTANCE_ID);
 
     Batch batchEntity = MockProvider.createMockBatch();
 
@@ -361,7 +370,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     query.setDecisionDefinitionKey("decision");
     messageBodyJson.put("historicDecisionInstanceQuery", query);
 
-    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_DECISION_INSTANCE_ID);
+    List<String> ids = Arrays.asList(EXAMPLE_DECISION_INSTANCE_ID);
     messageBodyJson.put("historicDecisionInstanceIds", ids);
     messageBodyJson.put("deleteReason", "a-delete-reason");
 
@@ -386,6 +395,194 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
         .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(HISTORIC_DECISION_INSTANCES_DELETE_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_ByIds() {
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricDecisionInstances()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicDecisionInstanceIds", Collections.singletonList(EXAMPLE_DECISION_INSTANCE_ID));
+    payload.put("calculatedRemovalTime", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricDecisionInstances();
+
+    verify(builder).calculatedRemovalTime();
+    verify(builder).byIds(EXAMPLE_DECISION_INSTANCE_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_ByQuery() {
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricDecisionInstances()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("calculatedRemovalTime", true);
+    payload.put("historicDecisionInstanceQuery", Collections.singletonMap("decisionInstanceId", EXAMPLE_DECISION_INSTANCE_ID));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricDecisionInstances();
+
+    verify(historicQueryMock).decisionInstanceId(EXAMPLE_DECISION_INSTANCE_ID);
+
+    verify(builder).calculatedRemovalTime();
+    verify(builder).byIds(null);
+    verify(builder).byQuery(historicQueryMock);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_Absolute() {
+    Date removalTime = new Date();
+
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricDecisionInstances()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicDecisionInstanceIds", Collections.singletonList(EXAMPLE_DECISION_INSTANCE_ID));
+    payload.put("absoluteRemovalTime", removalTime);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricDecisionInstances();
+
+    verify(builder).absoluteRemovalTime(removalTime);
+    verify(builder).byIds(EXAMPLE_DECISION_INSTANCE_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldNotSetRemovalTime_Absolute() {
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricDecisionInstances()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicDecisionInstanceIds", Collections.singletonList(EXAMPLE_DECISION_INSTANCE_ID));
+    payload.put("absoluteRemovalTime", null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL);
+
+    SetRemovalTimeToHistoricDecisionInstancesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricDecisionInstances();
+
+    verify(builder).byIds(EXAMPLE_DECISION_INSTANCE_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldClearRemovalTime() {
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricDecisionInstances())
+      .thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicDecisionInstanceIds", Collections.singletonList(EXAMPLE_DECISION_INSTANCE_ID));
+    payload.put("clearedRemovalTime", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricDecisionInstances();
+
+    verify(builder).clearedRemovalTime();
+    verify(builder).byIds(EXAMPLE_DECISION_INSTANCE_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_Response() {
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricDecisionInstances()).thenReturn(builderMock);
+
+    Batch batchEntity = MockProvider.createMockBatch();
+    when(builderMock.executeAsync()).thenReturn(batchEntity);
+
+    Response response = given()
+      .contentType(ContentType.JSON)
+      .body(Collections.emptyMap())
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldSetRemovalTime_ThrowBadUserException() {
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricDecisionInstances()).thenReturn(builderMock);
+
+    doThrow(BadUserRequestException.class).when(builderMock).executeAsync();
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(Collections.emptyMap())
+    .then()
+      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_DECISION_INSTANCES_ASYNC_URL);
   }
 
   protected void verifyBatchJson(String batchJson) {

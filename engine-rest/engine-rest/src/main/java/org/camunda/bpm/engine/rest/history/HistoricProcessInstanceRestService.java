@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.history.batch.removaltime.SetRemovalTimeToHistoricProcessInstancesDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 
 @Path(HistoricProcessInstanceRestService.PATH)
@@ -96,6 +97,12 @@ public interface HistoricProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto deleteAsync(DeleteHistoricProcessInstancesDto dto);
+
+  @POST
+  @Path("/set-removal-time")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto setRemovalTimeAsync(SetRemovalTimeToHistoricProcessInstancesDto dto);
   
   @DELETE
   @Path("/{id}/variable-instances")

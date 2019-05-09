@@ -17,11 +17,13 @@
 package org.camunda.bpm.engine.rest.history;
 
 import static io.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_ID;
 import static org.camunda.bpm.engine.rest.util.JsonPathUtil.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -31,15 +33,21 @@ import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Response.Status;
 
+import io.restassured.http.ContentType;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricBatchesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.batch.HistoricBatchDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.JsonPathUtil;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -48,6 +56,11 @@ import org.mockito.InOrder;
 
 import io.restassured.response.Response;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 public class HistoricBatchRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
@@ -55,6 +68,7 @@ public class HistoricBatchRestServiceInteractionTest extends AbstractRestService
 
   protected static final String HISTORIC_BATCH_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/batch";
   protected static final String HISTORIC_SINGLE_BATCH_RESOURCE_URL = HISTORIC_BATCH_RESOURCE_URL + "/{id}";
+  protected static final String SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL = HISTORIC_BATCH_RESOURCE_URL + "/set-removal-time";
 
   protected HistoryService historyServiceMock;
   protected HistoricBatchQuery queryMock;
@@ -136,6 +150,208 @@ public class HistoricBatchRestServiceInteractionTest extends AbstractRestService
       .body("message", equalTo("Unable to delete historic batch with id '" + nonExistingId + "'"))
     .when()
       .delete(HISTORIC_SINGLE_BATCH_RESOURCE_URL);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_ByIds() {
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricBatchesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricBatches()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicBatchIds", Collections.singletonList(EXAMPLE_BATCH_ID));
+    payload.put("calculatedRemovalTime", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricBatches();
+
+    verify(builder).calculatedRemovalTime();
+    verify(builder).byIds(EXAMPLE_BATCH_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_ByQuery() {
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricBatchesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricBatches()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("calculatedRemovalTime", true);
+    payload.put("historicBatchQuery", Collections.singletonMap("batchId", EXAMPLE_BATCH_ID));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricBatches();
+
+    verify(queryMock).batchId(EXAMPLE_BATCH_ID);
+
+    verify(builder).calculatedRemovalTime();
+    verify(builder).byIds(null);
+    verify(builder).byQuery(queryMock);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_Absolute() {
+    Date removalTime = new Date();
+
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricBatchesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricBatches()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicBatchIds", Collections.singletonList(EXAMPLE_BATCH_ID));
+    payload.put("absoluteRemovalTime", removalTime);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricBatches();
+
+    verify(builder).absoluteRemovalTime(removalTime);
+    verify(builder).byIds(EXAMPLE_BATCH_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldNotSetRemovalTime_Absolute() {
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricBatchesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricBatches()).thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicBatchIds", Collections.singletonList(EXAMPLE_BATCH_ID));
+    payload.put("absoluteRemovalTime", null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL);
+
+    SetRemovalTimeToHistoricBatchesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricBatches();
+
+    verify(builder).byIds(EXAMPLE_BATCH_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldClearRemovalTime() {
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricBatchesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricBatches())
+      .thenReturn(builderMock);
+
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("historicBatchIds", Collections.singletonList(EXAMPLE_BATCH_ID));
+    payload.put("clearedRemovalTime", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(payload)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL);
+
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builder =
+      historyServiceMock.setRemovalTimeToHistoricBatches();
+
+    verify(builder).clearedRemovalTime();
+    verify(builder).byIds(EXAMPLE_BATCH_ID);
+    verify(builder).byQuery(null);
+    verify(builder).executeAsync();
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void shouldSetRemovalTime_Response() {
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricBatchesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricBatches()).thenReturn(builderMock);
+
+    Batch batchEntity = MockProvider.createMockBatch();
+    when(builderMock.executeAsync()).thenReturn(batchEntity);
+
+    Response response = given()
+      .contentType(ContentType.JSON)
+      .body(Collections.emptyMap())
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldSetRemovalTime_ThrowBadUserException() {
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builderMock =
+      mock(SetRemovalTimeSelectModeForHistoricBatchesBuilder.class, RETURNS_DEEP_STUBS);
+
+    when(historyServiceMock.setRemovalTimeToHistoricBatches()).thenReturn(builderMock);
+
+    doThrow(BadUserRequestException.class).when(builderMock).executeAsync();
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(Collections.emptyMap())
+    .then()
+      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(SET_REMOVAL_TIME_HISTORIC_BATCHES_ASYNC_URL);
+  }
+
+  protected void verifyBatchJson(String batchJson) {
+    BatchDto batch = JsonPathUtil.from(batchJson).getObject("", BatchDto.class);
+    assertNotNull("The returned batch should not be null.", batch);
+    assertEquals(MockProvider.EXAMPLE_BATCH_ID, batch.getId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batch.getType());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TOTAL_JOBS, batch.getTotalJobs());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED, batch.getBatchJobsPerSeed());
+    assertEquals(MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB, batch.getInvocationsPerBatchJob());
+    assertEquals(MockProvider.EXAMPLE_SEED_JOB_DEFINITION_ID, batch.getSeedJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
   }
 
   protected void verifyHistoricBatchJson(String historicBatchJson) {

@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.ReportResult;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.converter.ReportResultToCsvConverter;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceReportDto;
 import org.camunda.bpm.engine.rest.dto.history.ReportResultDto;
+import org.camunda.bpm.engine.rest.dto.history.batch.removaltime.SetRemovalTimeToHistoricProcessInstancesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
@@ -46,6 +48,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
   public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessInstanceRestService {
@@ -165,6 +168,48 @@ import java.util.List;
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
+  }
+
+  @Override
+  public BatchDto setRemovalTimeAsync(SetRemovalTimeToHistoricProcessInstancesDto dto) {
+    HistoryService historyService = processEngine.getHistoryService();
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = null;
+
+    if (dto.getHistoricProcessInstanceQuery() != null) {
+      historicProcessInstanceQuery = dto.getHistoricProcessInstanceQuery().toQuery(processEngine);
+
+    }
+
+    SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder builder =
+      historyService.setRemovalTimeToHistoricProcessInstances();
+
+    if (dto.isCalculatedRemovalTime()) {
+      builder.calculatedRemovalTime();
+
+    }
+
+    Date removalTime = dto.getAbsoluteRemovalTime();
+    if (dto.getAbsoluteRemovalTime() != null) {
+      builder.absoluteRemovalTime(removalTime);
+
+    }
+
+    if (dto.isClearedRemovalTime()) {
+      builder.clearedRemovalTime();
+
+    }
+
+    builder.byIds(dto.getHistoricProcessInstanceIds());
+    builder.byQuery(historicProcessInstanceQuery);
+
+    if (dto.isHierarchical()) {
+      builder.hierarchical();
+
+    }
+
+    Batch batch = builder.executeAsync();
+    return BatchDto.fromBatch(batch);
   }
 
   protected List<ReportResultDto> getReportResultAsJson(UriInfo uriInfo) {
