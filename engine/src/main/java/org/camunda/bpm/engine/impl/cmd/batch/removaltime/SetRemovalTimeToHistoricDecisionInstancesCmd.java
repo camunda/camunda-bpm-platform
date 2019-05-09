@@ -34,9 +34,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -53,22 +55,24 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBase
   }
 
   public Batch execute(CommandContext commandContext) {
-    List<String> historicDecisionInstanceIds = null;
+    Set<String> historicDecisionInstanceIds = new HashSet<>();
 
     List<String> instanceIds = builder.getIds();
     HistoricDecisionInstanceQuery instanceQuery = builder.getQuery();
-    if ((instanceQuery == null && instanceIds == null) || (instanceQuery != null && instanceIds != null)) {
-      throw new BadUserRequestException("Either query or ids must be provided.");
+    if (instanceQuery == null && instanceIds == null) {
+      throw new BadUserRequestException("Either query nor ids provided.");
 
-    } else if (instanceQuery != null) {
-      historicDecisionInstanceIds = new ArrayList<>();
+    }
 
+    if (instanceQuery != null) {
       for (HistoricDecisionInstance historicDecisionInstance : instanceQuery.list()) {
         historicDecisionInstanceIds.add(historicDecisionInstance.getId());
-      }
 
-    } else {
-      historicDecisionInstanceIds = findHistoricInstanceIds(instanceIds, commandContext);
+      }
+    }
+
+    if (instanceIds != null) {
+      historicDecisionInstanceIds.addAll(findHistoricInstanceIds(instanceIds, commandContext));
 
     }
 
@@ -80,7 +84,7 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd extends AbstractIDBase
     writeUserOperationLog(commandContext, historicDecisionInstanceIds.size(), builder.getMode(), builder.getRemovalTime(),
       builder.isHierarchical(), true);
 
-    BatchEntity batch = createBatch(commandContext, historicDecisionInstanceIds);
+    BatchEntity batch = createBatch(commandContext, new ArrayList<>(historicDecisionInstanceIds));
 
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();

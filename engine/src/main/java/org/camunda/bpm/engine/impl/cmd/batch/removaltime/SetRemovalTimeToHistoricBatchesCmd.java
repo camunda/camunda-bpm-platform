@@ -35,7 +35,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -52,22 +54,24 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
   }
 
   public Batch execute(CommandContext commandContext) {
-    List<String> historicBatchIds = null;
+    Set<String> historicBatchIds = new HashSet<>();
 
     List<String> instanceIds = builder.getIds();
     HistoricBatchQuery instanceQuery = builder.getQuery();
-    if ((instanceQuery == null && instanceIds == null) || (instanceQuery != null && instanceIds != null)) {
-      throw new BadUserRequestException("Either query or ids must be provided.");
+    if (instanceQuery == null && instanceIds == null) {
+      throw new BadUserRequestException("Either query nor ids provided.");
 
-    } else if (instanceQuery != null) {
-      historicBatchIds = new ArrayList<>();
+    }
 
+    if (instanceQuery != null) {
       for (HistoricBatch historicBatch : instanceQuery.list()) {
         historicBatchIds.add(historicBatch.getId());
-      }
 
-    } else {
-      historicBatchIds = findHistoricInstanceIds(instanceIds, commandContext);
+      }
+    }
+
+    if (instanceIds != null) {
+      historicBatchIds.addAll(findHistoricInstanceIds(instanceIds, commandContext));
 
     }
 
@@ -79,7 +83,7 @@ public class SetRemovalTimeToHistoricBatchesCmd extends AbstractIDBasedBatchCmd<
     writeUserOperationLog(commandContext, historicBatchIds.size(), builder.getMode(),
       builder.getRemovalTime(), true);
 
-    BatchEntity batch = createBatch(commandContext, historicBatchIds);
+    BatchEntity batch = createBatch(commandContext, new ArrayList<>(historicBatchIds));
 
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();

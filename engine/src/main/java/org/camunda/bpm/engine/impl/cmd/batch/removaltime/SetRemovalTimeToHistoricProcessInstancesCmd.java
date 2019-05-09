@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -53,22 +54,24 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
   }
 
   public Batch execute(CommandContext commandContext) {
-    List<String> historicProcessInstanceIds = null;
+    Set<String> historicProcessInstanceIds = new HashSet<>();
 
     List<String> instanceIds = builder.getIds();
     HistoricProcessInstanceQuery instanceQuery = builder.getQuery();
-    if ((instanceQuery == null && instanceIds == null) || (instanceQuery != null && instanceIds != null)) {
-      throw new BadUserRequestException("Either query or ids must be provided.");
+    if (instanceQuery == null && instanceIds == null) {
+      throw new BadUserRequestException("Either query nor ids provided.");
 
-    } else if (instanceQuery != null) {
-      historicProcessInstanceIds = new ArrayList<>();
+    }
 
+    if (instanceQuery != null) {
       for (HistoricProcessInstance historicDecisionInstance : instanceQuery.list()) {
         historicProcessInstanceIds.add(historicDecisionInstance.getId());
-      }
 
-    } else {
-      historicProcessInstanceIds = findHistoricInstanceIds(instanceIds, commandContext);
+      }
+    }
+
+    if (instanceIds != null) {
+      historicProcessInstanceIds.addAll(findHistoricInstanceIds(instanceIds, commandContext));
 
     }
 
@@ -80,7 +83,7 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
     writeUserOperationLog(commandContext, historicProcessInstanceIds.size(), builder.getMode(), builder.getRemovalTime(),
       builder.isHierarchical(), true);
 
-    BatchEntity batch = createBatch(commandContext, historicProcessInstanceIds);
+    BatchEntity batch = createBatch(commandContext, new ArrayList<>(historicProcessInstanceIds));
 
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();
