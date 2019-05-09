@@ -26,11 +26,13 @@ import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricActivit
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricProcessInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeCompletedHistoricTaskInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricDecisionInstanceQueryCmd;
+import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricIdentityLinkLogQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricUserOperationsLogQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeHistoricVariableUpdateQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricActivityInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricProcessInstanceQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.optimize.OptimizeRunningHistoricTaskInstanceQueryCmd;
+import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 
 import java.util.Date;
 import java.util.List;
@@ -74,6 +76,14 @@ public class OptimizeService extends ServiceImpl {
                                                                   int maxResults) {
     return commandExecutor.execute(
       new OptimizeHistoricUserOperationsLogQueryCmd(occurredAfter, occurredAt, maxResults)
+    );
+  }
+
+  public List<OptimizeHistoricIdentityLinkLogEntity> getHistoricIdentityLinkLogs(Date occurredAfter,
+                                                                                 Date occurredAt,
+                                                                                 int maxResults) {
+    return commandExecutor.execute(
+      new OptimizeHistoricIdentityLinkLogQueryCmd(occurredAfter, occurredAt, maxResults)
     );
   }
 

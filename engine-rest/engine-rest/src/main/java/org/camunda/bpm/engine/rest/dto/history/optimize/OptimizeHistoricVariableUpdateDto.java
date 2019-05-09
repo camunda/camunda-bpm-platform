@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableUpdateDto;
 
-public class HistoricOptimizeVariableUpdateDto extends HistoricVariableUpdateDto {
+public class OptimizeHistoricVariableUpdateDto extends HistoricVariableUpdateDto {
 
   protected long sequenceCounter;
 
@@ -32,8 +32,8 @@ public class HistoricOptimizeVariableUpdateDto extends HistoricVariableUpdateDto
     this.sequenceCounter = sequenceCounter;
   }
 
-  public static HistoricOptimizeVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
-    HistoricOptimizeVariableUpdateDto dto = new HistoricOptimizeVariableUpdateDto();
+  public static OptimizeHistoricVariableUpdateDto fromHistoricVariableUpdate(HistoricVariableUpdate historicVariableUpdate) {
+    OptimizeHistoricVariableUpdateDto dto = new OptimizeHistoricVariableUpdateDto();
     fromHistoricVariableUpdate(dto, historicVariableUpdate);
     fromHistoricDetail(historicVariableUpdate, dto);
     if (historicVariableUpdate instanceof HistoryEvent) {

@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
+
+import java.util.Date;
 
 public class HistoricIdentityLinkLogDto {
   protected String id;
@@ -89,6 +89,12 @@ public class HistoricIdentityLinkLogDto {
 
   public static HistoricIdentityLinkLogDto fromHistoricIdentityLink(HistoricIdentityLinkLog historicIdentityLink) {
     HistoricIdentityLinkLogDto dto = new HistoricIdentityLinkLogDto();
+    fromHistoricIdentityLink(dto, historicIdentityLink);
+    return dto;
+  }
+
+  public static void fromHistoricIdentityLink(HistoricIdentityLinkLogDto dto,
+                                              HistoricIdentityLinkLog historicIdentityLink) {
     dto.id = historicIdentityLink.getId();
     dto.assignerId = historicIdentityLink.getAssignerId();
     dto.groupId = historicIdentityLink.getGroupId();
@@ -102,7 +108,5 @@ public class HistoricIdentityLinkLogDto {
     dto.tenantId = historicIdentityLink.getTenantId();
     dto.removalTime = historicIdentityLink.getRemovalTime();
     dto.rootProcessInstanceId = historicIdentityLink.getRootProcessInstanceId();
-
-    return dto;
   }
 }

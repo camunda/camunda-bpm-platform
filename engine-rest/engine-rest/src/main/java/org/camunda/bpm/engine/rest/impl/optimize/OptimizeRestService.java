@@ -24,13 +24,15 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
-import org.camunda.bpm.engine.rest.dto.history.optimize.HistoricOptimizeVariableUpdateDto;
+import org.camunda.bpm.engine.rest.dto.history.optimize.OptimizeHistoricIdentityLinkLogDto;
+import org.camunda.bpm.engine.rest.dto.history.optimize.OptimizeHistoricVariableUpdateDto;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 
 import javax.ws.rs.GET;
@@ -176,6 +178,30 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
   }
 
   @GET
+  @Path("/identity-link-log")
+  public List<OptimizeHistoricIdentityLinkLogDto> getHistoricIdentityLinkLogs(@QueryParam("occurredAfter") String occurredAfterAsString,
+                                                                              @QueryParam("occurredAt") String occurredAtAsString,
+                                                                              @QueryParam("maxResults") int maxResults) {
+
+    Date occurredAfter = dateConverter.convertQueryParameterToType(occurredAfterAsString);
+    Date occurredAt = dateConverter.convertQueryParameterToType(occurredAtAsString);
+    maxResults = ensureValidMaxResults(maxResults);
+
+    ProcessEngineConfigurationImpl config =
+      (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+
+    List<OptimizeHistoricIdentityLinkLogEntity> operationLogEntries =
+      config.getOptimizeService().getHistoricIdentityLinkLogs(occurredAfter, occurredAt, maxResults);
+
+    List<OptimizeHistoricIdentityLinkLogDto> result = new ArrayList<>();
+    for (OptimizeHistoricIdentityLinkLogEntity logEntry : operationLogEntries) {
+      OptimizeHistoricIdentityLinkLogDto dto = OptimizeHistoricIdentityLinkLogDto.fromHistoricIdentityLink(logEntry);
+      result.add(dto);
+    }
+    return result;
+  }
+
+  @GET
   @Path("/process-instance/completed")
   public List<HistoricProcessInstanceDto> getCompletedHistoricProcessInstances(@QueryParam("finishedAfter") String finishedAfterAsString,
                                                                                @QueryParam("finishedAt") String finishedAtAsString,
@@ -221,7 +247,7 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
 
   @GET
   @Path("/variable-update")
-  public List<HistoricOptimizeVariableUpdateDto> getHistoricVariableUpdates(@QueryParam("occurredAfter") String occurredAfterAsString,
+  public List<OptimizeHistoricVariableUpdateDto> getHistoricVariableUpdates(@QueryParam("occurredAfter") String occurredAfterAsString,
                                                                             @QueryParam("occurredAt") String occurredAtAsString,
                                                                             @QueryParam("maxResults") int maxResults) {
     Date occurredAfter = dateConverter.convertQueryParameterToType(occurredAfterAsString);
@@ -233,10 +259,10 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
     List<HistoricVariableUpdate> historicVariableUpdates =
       config.getOptimizeService().getHistoricVariableUpdates(occurredAfter, occurredAt, maxResults);
 
-    List<HistoricOptimizeVariableUpdateDto> result = new ArrayList<>();
+    List<OptimizeHistoricVariableUpdateDto> result = new ArrayList<>();
     for (HistoricVariableUpdate instance : historicVariableUpdates) {
-      HistoricOptimizeVariableUpdateDto dto =
-        HistoricOptimizeVariableUpdateDto.fromHistoricVariableUpdate(instance);
+      OptimizeHistoricVariableUpdateDto dto =
+        OptimizeHistoricVariableUpdateDto.fromHistoricVariableUpdate(instance);
       result.add(dto);
     }
     return result;
