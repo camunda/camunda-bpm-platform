@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.init;
 
 /**
  * Tests {@link NonPaContextCacheTest1}, {@link NonPaContextCacheTest2}, {@link NonPaContextCacheTest3},
@@ -53,6 +54,9 @@ public class NonPaContextCacheTest2 extends AbstractContextCacheTest {
   public void setUp() {
     this.testName = "nonPaTest2";
     this.contextMap.put(this.testName, applicationContext.hashCode());
+
+    // ensure that Camunda BPM Assert is using the non-default engine
+    init(processEngine);
   }
 
   @Test

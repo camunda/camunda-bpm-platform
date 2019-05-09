@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.taskService;
 
 /**
  * @author Nikola Koevski
@@ -48,11 +51,26 @@ public abstract class AbstractContextCacheTest {
   protected String processEngineName;
 
   @Test
-  public void testDbIsolation() {
-    // do
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("TestProcess");
-    assertThat(instance).isNotNull();
+  public void testBpmAssert() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestProcess");
 
+    // then
+    assertThat(processInstance).isStarted()
+      .task().hasName("do something")
+      .isNotAssigned();
+
+    // finally
+    taskService().complete(task().getId());
+  }
+
+  @Test
+  public void testDbIsolation() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TestProcess");
+
+    // then
+    assertThat(processInstance).isNotNull();
     long numInstances = runtimeService.createProcessInstanceQuery().count();
     assertThat(numInstances).isEqualTo(1);
   }
@@ -60,12 +78,14 @@ public abstract class AbstractContextCacheTest {
   @Test
   public void testEngineName()
   {
+    // do
     assertThat(processEngine.getName()).isEqualTo(processEngineName);
   }
 
   @Test
   public void testEngineRegistration()
   {
+    // do
     ProcessEngine registeredEngine = ProcessEngines.getProcessEngine("default");
     assertThat(registeredEngine).isNotSameAs(processEngine);
   }

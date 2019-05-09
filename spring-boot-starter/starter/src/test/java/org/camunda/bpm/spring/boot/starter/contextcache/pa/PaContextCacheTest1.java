@@ -22,8 +22,9 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.init;
 
 /**
  * Tests {@link PaContextCacheTest1}, {@link PaContextCacheTest2}, {@link PaContextCacheTest3}
@@ -52,5 +53,8 @@ public class PaContextCacheTest1 extends AbstractContextCacheTest {
     this.testName = "paTest1";
 
     AbstractContextCacheTest.contextMap.put(this.testName, applicationContext.hashCode());
+
+    // ensure that Camunda BPM Assert is using the non-default engine
+    init(processEngine);
   }
 }
