@@ -69,7 +69,12 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
 
   @Override
   public FileValue readValue(ValueFields valueFields, boolean deserializeValue) {
-    FileValueBuilder builder = Variables.fileValue(valueFields.getTextValue());
+    String fileName = valueFields.getTextValue();
+    if (fileName == null) {
+      // ensure file name is not null
+      fileName = "";
+    }
+    FileValueBuilder builder = Variables.fileValue(fileName);
     if (valueFields.getByteArrayValue() != null) {
       builder.file(valueFields.getByteArrayValue());
     }
