@@ -50,7 +50,7 @@ public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTim
   }
 
   public SetRemovalTimeToHistoricBatchesBuilder byIds(String... ids) {
-    this.ids = Arrays.asList(ids);
+    this.ids = ids != null ? Arrays.asList(ids) : null;
     return this;
   }
 
