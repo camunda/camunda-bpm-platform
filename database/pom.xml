@@ -143,6 +143,7 @@
                 <dependency>
                   <groupId>com.ibm.db2.jcc</groupId>
                   <artifactId>db2jcc4</artifactId>
+                  <version>${version.db2}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -204,6 +205,7 @@
                 <dependency>
                   <groupId>com.h2database</groupId>
                   <artifactId>h2</artifactId>
+                  <version>${version.h2}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -246,6 +248,7 @@
                 <dependency>
                   <groupId>com.h2database</groupId>
                   <artifactId>h2</artifactId>
+                  <version>${version.h2}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -279,6 +282,7 @@
                 <dependency>
                   <groupId>org.mariadb.jdbc</groupId>
                   <artifactId>mariadb-java-client</artifactId>
+                  <version>${version.mariadb}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -318,6 +322,7 @@
                 <dependency>
                   <groupId>mysql</groupId>
                   <artifactId>mysql-connector-java</artifactId>
+                  <version>${version.mysql}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -353,6 +358,7 @@
                 <dependency>
                   <groupId>com.oracle.jdbc</groupId>
                   <artifactId>ojdbc14</artifactId>
+                  <version>${version.oracle-10}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -382,6 +388,7 @@
                 <dependency>
                   <groupId>com.oracle.jdbc</groupId>
                   <artifactId>ojdbc6</artifactId>
+                  <version>${version.oracle}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -411,6 +418,7 @@
                 <dependency>
                   <groupId>com.oracle.jdbc</groupId>
                   <artifactId>ojdbc7</artifactId>
+                  <version>${version.oracle}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -441,6 +449,7 @@
                 <dependency>
                   <groupId>com.oracle.jdbc</groupId>
                   <artifactId>ojdbc8</artifactId>
+                  <version>${version.oracle}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -476,6 +485,7 @@
                 <dependency>
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
+                  <version>${version.postgresql}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -516,6 +526,7 @@
                 <dependency>
                   <groupId>com.microsoft.sqlserver</groupId>
                   <artifactId>sqljdbc4</artifactId>
+                  <version>${version.sqlserver}</version>
                 </dependency>
               </dependencies>
             </plugin>
