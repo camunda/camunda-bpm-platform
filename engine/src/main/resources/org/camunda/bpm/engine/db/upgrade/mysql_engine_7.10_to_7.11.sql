@@ -61,3 +61,6 @@ create table ACT_GE_SCHEMA_LOG (
 
 insert into ACT_GE_SCHEMA_LOG
 values ('0', CURRENT_TIMESTAMP, '7.11.0');
+
+-- https://app.camunda.com/jira/browse/CAM-10275
+create index ACT_IDX_HI_IDENT_LINK_TIMESTAMP on ACT_HI_IDENTITYLINK(TIMESTAMP_);
