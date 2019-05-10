@@ -28,6 +28,9 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricBatchesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder;
+import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricBatchesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesBuilder;
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
@@ -2513,6 +2516,90 @@ public class BatchSetRemovalTimeTest {
 
     // clear database
     managementService.deleteBatch(batchOne.getId(), true);
+  }
+
+  @Test
+  public void ThrowBadUserRequestException_SelectMultipleModes_ModeCleared() {
+    // given
+    SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder builder = historyService.setRemovalTimeToHistoricProcessInstances();
+    builder.calculatedRemovalTime();
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
+
+    // when
+    builder.clearedRemovalTime();
+  }
+
+  @Test
+  public void ThrowBadUserRequestException_SelectMultipleModes_ModeAbsolute() {
+    // given
+    SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder builder = historyService.setRemovalTimeToHistoricProcessInstances();
+    builder.calculatedRemovalTime();
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
+
+    // when
+    builder.absoluteRemovalTime(new Date());
+  }
+
+  @Test
+  public void ThrowBadUserRequestExceptionForStandaloneDecision_SelectMultipleModes_ModeCleared() {
+    // given
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder = historyService.setRemovalTimeToHistoricDecisionInstances();
+    builder.calculatedRemovalTime();
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
+
+    // when
+    builder.clearedRemovalTime();
+  }
+
+  @Test
+  public void ThrowBadUserRequestExceptionForStandaloneDecision_SelectMultipleModes_ModeAbsolute() {
+    // given
+    SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder = historyService.setRemovalTimeToHistoricDecisionInstances();
+    builder.calculatedRemovalTime();
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
+
+    // when
+    builder.absoluteRemovalTime(new Date());
+  }
+
+  @Test
+  public void ThrowBadUserRequestExceptionForBatch_SelectMultipleModes_ModeCleared() {
+    // given
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builder = historyService.setRemovalTimeToHistoricBatches();
+    builder.calculatedRemovalTime();
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
+
+    // when
+    builder.clearedRemovalTime();
+  }
+
+  @Test
+  public void ThrowBadUserRequestExceptionForBatch_SelectMultipleModes_ModeAbsolute() {
+    // given
+    SetRemovalTimeSelectModeForHistoricBatchesBuilder builder = historyService.setRemovalTimeToHistoricBatches();
+    builder.calculatedRemovalTime();
+
+    // then
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
+
+    // when
+    builder.absoluteRemovalTime(new Date());
   }
 
 }
