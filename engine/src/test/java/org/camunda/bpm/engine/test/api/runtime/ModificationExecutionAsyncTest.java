@@ -149,7 +149,7 @@ public class ModificationExecutionAsyncTest {
 
   @After
   public void removeInstanceIds() {
-    helper.currentProcessInstances = new ArrayList<String>();
+    helper.currentProcessInstances = new ArrayList<>();
   }
 
   @After
@@ -772,7 +772,7 @@ public class ModificationExecutionAsyncTest {
       Batch batch = helper.startAfterAsync("process1", 10, "user1", processDefinition.getId());
       helper.executeSeedJob(batch);
 
-      testRule.waitForJobExecutorToProcessAllJobs();
+      testRule.executeAvailableJobs();
 
       // then all process instances where modified
       for (String processInstanceId : helper.currentProcessInstances) {
