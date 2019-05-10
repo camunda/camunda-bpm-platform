@@ -2400,4 +2400,119 @@ public class BatchSetRemovalTimeTest {
     managementService.deleteBatch(batchTwo.getId(), true);
   }
 
+  @Test
+  public void shouldSetRemovalTime_ExistingAndNotExistingId() {
+    // given
+    String processInstanceId = testRule.process().userTask().deploy().start();
+
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // assume
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLive(5, "process");
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+      .superProcessInstanceId(processInstanceId);
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstances()
+        .calculatedRemovalTime()
+        .byIds("notExistingId", processInstanceId)
+        .executeAsync()
+    );
+
+    historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+
+    // then
+    assertThat(historicProcessInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSetRemovalTimeForStandaloneDecision_ExistingAndNotExistingId() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKeyIn("season")
+      .singleResult();
+
+    // assume
+    assertThat(historicDecisionInstance.getRemovalTime()).isNull();
+
+    testRule.updateHistoryTimeToLiveDmn( 5, "season");
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("dish-decision");
+
+    String id = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("season")
+      .singleResult()
+      .getId();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstances()
+        .calculatedRemovalTime()
+        .byIds("notExistingId", id)
+        .executeAsync()
+    );
+
+    historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKeyIn("season")
+      .singleResult();
+
+    // then
+    assertThat(historicDecisionInstance.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+  }
+
+  @Test
+  public void shouldSetRemovalTimeForBatch_ExistingAndNotExistingId() {
+    // given
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .singleResult();
+
+    // assume
+    assertThat(historicBatch.getRemovalTime()).isNull();
+
+    ProcessEngineConfigurationImpl configuration = testRule.getProcessEngineConfiguration();
+    configuration.setBatchOperationHistoryTimeToLive("P5D");
+    configuration.initHistoryCleanup();
+
+    HistoricBatchQuery query = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .batchId(batchOne.getId());
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatches()
+        .calculatedRemovalTime()
+        .byIds("notExistingId", batchOne.getId())
+        .executeAsync()
+    );
+
+    historicBatch = historyService.createHistoricBatchQuery()
+      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
+      .singleResult();
+
+    // then
+    assertThat(historicBatch.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+
+    // clear database
+    managementService.deleteBatch(batchOne.getId(), true);
+  }
+
 }
