@@ -91,6 +91,12 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
     ClockUtil.reset();
 
+    clearDatabase();
+
+    super.finished(description);
+  }
+
+  public void clearDatabase() {
     if (!batchIds.isEmpty()) {
       for (String batchId : batchIds) {
         HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
@@ -102,8 +108,6 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
         }
       }
     }
-
-    super.finished(description);
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,7 +283,13 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   }
 
   public void syncExec(Batch batch) {
-    batchIds.add(batch.getId());
+    syncExec(batch, true);
+  }
+
+  public void syncExec(Batch batch, boolean isClear) {
+    if (isClear) {
+      batchIds.add(batch.getId());
+    }
 
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
 

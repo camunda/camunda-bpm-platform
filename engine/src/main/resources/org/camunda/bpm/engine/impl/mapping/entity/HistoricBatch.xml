@@ -304,7 +304,12 @@
         FROM ${prefix}ACT_HI_BATCH RES
         LEFT JOIN (
           <foreach index="key" item="value" collection="parameter" separator="UNION">
-            select ${constant.varchar.cast} as TYPE_, ${value} as HISTORY_TTL_
+            select ${constant.varchar.cast} as TYPE_,
+            <choose>
+              <when test="value == null">null</when>
+              <otherwise>${value}</otherwise>
+            </choose>
+            as HISTORY_TTL_
             ${dbSpecificDummyTable}
           </foreach>
         ) C ON C.TYPE_ = RES.TYPE_

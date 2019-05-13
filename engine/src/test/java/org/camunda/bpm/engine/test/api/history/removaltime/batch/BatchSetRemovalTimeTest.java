@@ -24,6 +24,9 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
+import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -2600,6 +2603,138 @@ public class BatchSetRemovalTimeTest {
 
     // when
     builder.absoluteRemovalTime(new Date());
+  }
+
+  @Test
+  public void shouldSeeCleanableButNotFinishedProcessInstanceInReport() {
+    // given
+    String processInstanceId = testRule.process().userTask().deploy().start();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstances()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byIds(processInstanceId)
+        .executeAsync()
+    );
+
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
+
+    // then
+    assertThat(report.getFinishedProcessInstanceCount()).isEqualTo(0);
+    assertThat(report.getCleanableProcessInstanceCount()).isEqualTo(1);
+    assertThat(report.getHistoryTimeToLive()).isNull();
+  }
+
+  @Test
+  public void shouldSeeCleanableAndFinishedProcessInstanceInReport() {
+    // given
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricProcessInstances()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byIds(processInstanceId)
+        .executeAsync()
+    );
+
+    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
+
+    // then
+    assertThat(report.getFinishedProcessInstanceCount()).isEqualTo(1);
+    assertThat(report.getCleanableProcessInstanceCount()).isEqualTo(1);
+    assertThat(report.getHistoryTimeToLive()).isNull();
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
+  })
+  public void shouldSeeCleanableAndFinishedDecisionInstanceInReport() {
+    // given
+    decisionService.evaluateDecisionByKey("dish-decision")
+      .variables(
+        Variables.createVariables()
+          .putValue("temperature", 32)
+          .putValue("dayType", "Weekend")
+      ).evaluate();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+      .decisionDefinitionKey("dish-decision");
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricDecisionInstances()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byQuery(query)
+        .executeAsync()
+    );
+
+    CleanableHistoricDecisionInstanceReportResult report = historyService.createCleanableHistoricDecisionInstanceReport()
+      .decisionDefinitionKeyIn("dish-decision")
+      .singleResult();
+
+    // then
+    assertThat(report.getFinishedDecisionInstanceCount()).isEqualTo(1);
+    assertThat(report.getCleanableDecisionInstanceCount()).isEqualTo(1);
+    assertThat(report.getHistoryTimeToLive()).isNull();
+  }
+
+  @Test
+  public void shouldSeeCleanableButNotFinishedBatchInReport() {
+    // given
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatches()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byIds(batchOne.getId())
+        .executeAsync()
+    );
+
+    testRule.clearDatabase();
+
+    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport().singleResult();
+
+    // then
+    assertThat(report.getFinishedBatchesCount()).isEqualTo(0);
+    assertThat(report.getCleanableBatchesCount()).isEqualTo(1);
+    assertThat(report.getHistoryTimeToLive()).isNull();
+
+    // clear database
+    managementService.deleteBatch(batchOne.getId(), true);
+  }
+
+  @Test
+  public void shouldSeeCleanableAndFinishedBatchInReport() {
+    // given
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+    Batch batchOne = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+
+    testRule.syncExec(batchOne, false);
+
+    // when
+    testRule.syncExec(
+      historyService.setRemovalTimeToHistoricBatches()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byIds(batchOne.getId())
+        .executeAsync()
+    );
+
+    testRule.clearDatabase();
+
+    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport().singleResult();
+
+    // then
+    assertThat(report.getFinishedBatchesCount()).isEqualTo(1);
+    assertThat(report.getCleanableBatchesCount()).isEqualTo(1);
+    assertThat(report.getHistoryTimeToLive()).isNull();
+
+    // clear database
+    historyService.deleteHistoricBatch(batchOne.getId());
   }
 
 }
