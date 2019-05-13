@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
 
   public void testUpdateCaseDefinitionIdInTask() {
+    // given
     final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(UUID.randomUUID().toString());
     final CaseDefinitionEntity caseDefinitionEntity2 = prepareCaseDefinition(UUID.randomUUID().toString());
 
@@ -46,9 +47,11 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
 
     task.setCaseDefinitionId(caseDefinitionEntity2.getId());
 
+    // when
     update(task);
     final TaskEntity updatedTask = findTask(task.getId());
 
+    // then
     assertThat(updatedTask.getCaseDefinitionId()).isEqualTo(caseDefinitionEntity2.getId());
 
     deleteTask(updatedTask);
@@ -57,6 +60,7 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
   }
 
   public void testUpdateCaseDefinitionIdInCaseExecutionEntity() {
+    // given
     final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(UUID.randomUUID().toString());
     final CaseDefinitionEntity caseDefinitionEntity2 = prepareCaseDefinition(UUID.randomUUID().toString());
 
@@ -73,8 +77,10 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
 
     assertThat(createdCaseExecution.getCaseDefinitionId()).isEqualTo(caseDefinitionEntity2.getId());
 
+    // when
     update(createdCaseExecution);
 
+    // then
     final CaseExecutionEntity updatedCaseExecution = findCaseExecution(createdCaseExecution.getId());
     assertThat(updatedCaseExecution.getCaseDefinitionId()).isEqualTo(caseDefinitionEntity2.getId());
 

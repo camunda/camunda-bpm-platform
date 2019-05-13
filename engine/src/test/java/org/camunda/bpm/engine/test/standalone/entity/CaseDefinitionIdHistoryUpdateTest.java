@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.entity;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 import java.util.Date;
 import java.util.UUID;
@@ -33,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CaseDefinitionIdHistoryUpdateTest extends PluggableProcessEngineTestCase {
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testUpdateCaseDefinitionIdInCaseExecutionEntity() {
     // given
     final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(UUID.randomUUID().toString());
