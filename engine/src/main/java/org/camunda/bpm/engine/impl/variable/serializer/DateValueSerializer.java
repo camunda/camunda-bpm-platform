@@ -40,13 +40,13 @@ public class DateValueSerializer extends PrimitiveValueSerializer<DateValue> {
     return Variables.dateValue((Date) untypedValue.getValue(), untypedValue.isTransient());
   }
 
-  public DateValue readValue(ValueFields valueFields) {
+  public DateValue readValue(ValueFields valueFields, boolean asTransientValue) {
     Long longValue = valueFields.getLongValue();
     Date dateValue = null;
     if (longValue!=null) {
       dateValue = new Date(longValue);
     }
-    return Variables.dateValue(dateValue);
+    return Variables.dateValue(dateValue, asTransientValue);
   }
 
   public void writeValue(DateValue typedValue, ValueFields valueFields) {

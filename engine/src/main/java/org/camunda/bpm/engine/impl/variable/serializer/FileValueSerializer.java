@@ -68,7 +68,7 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
   }
 
   @Override
-  public FileValue readValue(ValueFields valueFields, boolean deserializeValue) {
+  public FileValue readValue(ValueFields valueFields, boolean deserializeValue, boolean asTransientValue) {
     String fileName = valueFields.getTextValue();
     if (fileName == null) {
       // ensure file name is not null
@@ -88,6 +88,9 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
       builder.mimeType(mimeType);
       builder.encoding(encoding);
     }
+
+    builder.setTransient(asTransientValue);
+
     return builder.create();
   }
 
