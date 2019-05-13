@@ -103,11 +103,11 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
 
   @Override
   public TypedValue getTypedValue() {
-    return typedValueField.getTypedValue();
+    return typedValueField.getTypedValue(false);
   }
 
   public TypedValue getTypedValue(boolean deserializeValue) {
-    return typedValueField.getTypedValue(deserializeValue);
+    return typedValueField.getTypedValue(deserializeValue, false);
   }
 
   @Override

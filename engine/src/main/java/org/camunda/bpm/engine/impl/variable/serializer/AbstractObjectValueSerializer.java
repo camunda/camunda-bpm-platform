@@ -69,15 +69,21 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
     objectValue.setSerializationDataFormat(serializationDataFormat);
   }
 
-  protected ObjectValue createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields) {
+  protected ObjectValue createDeserializedValue(Object deserializedObject, String serializedStringValue,
+      ValueFields valueFields, boolean asTransientValue) {
     String objectTypeName = readObjectNameFromFields(valueFields);
-    return new ObjectValueImpl(deserializedObject, serializedStringValue, serializationDataFormat, objectTypeName, true);
+    ObjectValueImpl objectValue = new ObjectValueImpl(deserializedObject, serializedStringValue, serializationDataFormat, objectTypeName, true);
+    objectValue.setTransient(asTransientValue);
+    return objectValue;
   }
 
 
-  protected ObjectValue createSerializedValue(String serializedStringValue, ValueFields valueFields) {
+  protected ObjectValue createSerializedValue(String serializedStringValue, ValueFields valueFields,
+      boolean asTransientValue) {
     String objectTypeName = readObjectNameFromFields(valueFields);
-    return new ObjectValueImpl(null, serializedStringValue, serializationDataFormat, objectTypeName, false);
+    ObjectValueImpl objectValue = new ObjectValueImpl(null, serializedStringValue, serializationDataFormat, objectTypeName, false);
+    objectValue.setTransient(asTransientValue);
+    return objectValue;
   }
 
   protected String readObjectNameFromFields(ValueFields valueFields) {

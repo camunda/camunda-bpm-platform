@@ -130,7 +130,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   }
 
   public Object getPersistentState() {
-    List<Object> state = new ArrayList<Object>(8);
+    List<Object> state = new ArrayList<>(8);
     state.add(getSerializerName());
     state.add(textValue);
     state.add(textValue2);
@@ -152,11 +152,11 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   }
 
   public TypedValue getTypedValue() {
-    return typedValueField.getTypedValue();
+    return typedValueField.getTypedValue(false);
   }
 
   public TypedValue getTypedValue(boolean deserializeValue) {
-    return typedValueField.getTypedValue(deserializeValue);
+    return typedValueField.getTypedValue(deserializeValue, false);
   }
 
   public TypedValueSerializer<?> getSerializer() {

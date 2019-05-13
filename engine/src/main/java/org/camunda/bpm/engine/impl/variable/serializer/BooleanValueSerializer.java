@@ -40,7 +40,7 @@ public class BooleanValueSerializer extends PrimitiveValueSerializer<BooleanValu
     return Variables.booleanValue((Boolean) untypedValue.getValue(), untypedValue.isTransient());
   }
 
-  public BooleanValue readValue(ValueFields valueFields) {
+  public BooleanValue readValue(ValueFields valueFields, boolean asTransientValue) {
     Boolean boolValue = null;
     Long longValue = valueFields.getLongValue();
 
@@ -48,7 +48,7 @@ public class BooleanValueSerializer extends PrimitiveValueSerializer<BooleanValu
       boolValue = longValue.equals(TRUE);
     }
 
-    return Variables.booleanValue(boolValue);
+    return Variables.booleanValue(boolValue, asTransientValue);
   }
 
   public void writeValue(BooleanValue variableValue, ValueFields valueFields) {

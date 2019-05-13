@@ -66,11 +66,11 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
   public TypedValueField(ValueFields valueFields, boolean notifyOnImplicitUpdates) {
     this.valueFields = valueFields;
     this.notifyOnImplicitUpdates = notifyOnImplicitUpdates;
-    this.updateListeners = new ArrayList<TypedValueUpdateListener>();
+    this.updateListeners = new ArrayList<>();
   }
 
   public Object getValue() {
-    TypedValue typedValue = getTypedValue();
+    TypedValue typedValue = getTypedValue(false);
     if (typedValue != null) {
       return typedValue.getValue();
     } else {
@@ -78,11 +78,11 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     }
   }
 
-  public TypedValue getTypedValue() {
-    return getTypedValue(true);
+  public TypedValue getTypedValue(boolean asTransientValue) {
+    return getTypedValue(true, asTransientValue);
   }
 
-  public TypedValue getTypedValue(boolean deserializeValue) {
+  public TypedValue getTypedValue(boolean deserializeValue, boolean asTransientValue) {
     if (cachedValue != null && cachedValue instanceof SerializableValue && Context.getCommandContext() != null) {
       SerializableValue serializableValue = (SerializableValue) cachedValue;
       if(deserializeValue && !serializableValue.isDeserialized()) {
@@ -93,7 +93,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
     if (cachedValue == null && errorMessage == null) {
       try {
-        cachedValue = getSerializer().readValue(valueFields, deserializeValue);
+        cachedValue = getSerializer().readValue(valueFields, deserializeValue, asTransientValue);
 
         if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
           Context.getCommandContext().registerCommandContextListener(this);
