@@ -43,8 +43,6 @@ public class SchemaLogUpgradeScriptPatternTest extends SchemaLogTestCase {
      * postgres_engine_7.3_patch_7.3.2_to_7.3.3_1.sql,
      */
     for (String file : folderContents.get(UPGRADE_SCRIPT_FOLDER)) {
-      System.out.println(file);
-
       assertTrue("unexpected file format for file: " + file, file.endsWith(".sql"));
       // get rid of the .sql ending as it makes splitting easier
       file = file.substring(0, file.length() - 4);

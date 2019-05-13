@@ -16,11 +16,12 @@
  */
 package org.camunda.bpm.engine.test.standalone.db;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.File;
-import java.net.URL;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,9 +30,10 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * @author Miklas Boskamp
@@ -62,14 +64,19 @@ public class SchemaLogTestCase {
   }
 
   private List<String> readFolderContent(String path) {
-    ClassLoader classLoader = getClass().getClassLoader();
-    URL resource = classLoader.getResource(path);
-    assertThat(resource, CoreMatchers.notNullValue());
+    List<String> files = new ArrayList<String>();
+    try {
+      PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+      Resource[] resources = resolver.getResources("classpath:" + path + "/*");
+      assertThat(resources.length, greaterThan(0));
+      for (Resource res : resources) {
+        files.add(res.getFilename());
+      }
+    } catch (IOException e) {
+      fail("unable to load resources from " + path);
+    }
 
-    File folder = new File(resource.getFile());
-    assertTrue(folder.isDirectory());
-
-    return Arrays.asList(folder.list());
+    return files;
   }
 
   public boolean isMinorLevel(String version) {
