@@ -32,6 +32,14 @@
     </testResources>
   </build>
 
+  <!-- TODO: REMOVE AFTER 7.11 Release -->
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+    </dependency>
+  </dependencies>
+
   <profiles>
     <profile>
       <id>distro</id>
@@ -224,7 +232,7 @@
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
           <version>7.10.0</version>
-          <scope>test</scope>
+<!--           <scope>test</scope> -->
         </dependency>
         <dependency>
           <groupId>org.mockito</groupId>
