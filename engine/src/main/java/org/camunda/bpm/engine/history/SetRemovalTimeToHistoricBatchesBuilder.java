@@ -19,11 +19,10 @@ package org.camunda.bpm.engine.history;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
-
-import java.util.Date;
 
 /**
  * Fluent builder to set the removal time to historic batches and
@@ -54,8 +53,9 @@ public interface SetRemovalTimeToHistoricBatchesBuilder {
    * track the progress of setting a removal time.
    *
    * @throws BadUserRequestException when no historic batches could be found.
-   * @throws AuthorizationException when no {@link BatchPermissions#CREATE_BATCH_SET_REMOVAL_TIME} permission
-   * is granted on {@link Resources#BATCH}.
+   * @throws AuthorizationException
+   * when no {@link BatchPermissions#CREATE_BATCH_SET_REMOVAL_TIME CREATE_BATCH_SET_REMOVAL_TIME}
+   * or no permission {@link Permissions#CREATE CREATE} permission is granted on {@link Resources#BATCH}.
    *
    * @return the batch which sets the removal time asynchronously.
    */
