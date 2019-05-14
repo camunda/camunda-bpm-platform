@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -249,9 +250,14 @@ public class ModelElementTypeImpl implements ModelElementType {
     List<DomElement> elements = document.getElementsByNameNs(namespaceURI, typeName);
 
     if (elements.isEmpty()) {
-      String alternativeNamespaceURI = getModel().getAlternativeNamespace(namespaceURI);
-      if (alternativeNamespaceURI != null) {
-        elements = getElementsByNameNs(document, alternativeNamespaceURI);
+      Set<String> alternativeNamespaces = getModel().getAlternativeNamespaces(namespaceURI);
+
+      if (alternativeNamespaces != null)
+      {
+        Iterator<String> namespaceIt = alternativeNamespaces.iterator();
+        while (elements.isEmpty() && namespaceIt.hasNext()) {
+          elements = getElementsByNameNs(document, namespaceIt.next());
+        }
       }
     }
 

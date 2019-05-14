@@ -23,7 +23,9 @@ import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Base class for implementing primitive value attributes</p>
@@ -91,9 +93,14 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
     } else {
       value = modelElement.getAttributeValueNs(namespaceUri, attributeName);
       if(value == null) {
-        String alternativeNamespace = owningElementType.getModel().getAlternativeNamespace(namespaceUri);
-        if (alternativeNamespace != null) {
-          value = modelElement.getAttributeValueNs(alternativeNamespace, attributeName);
+        Set<String> alternativeNamespaces = owningElementType.getModel().getAlternativeNamespaces(namespaceUri);
+
+        if (alternativeNamespaces != null) {
+          Iterator<String> namespaceIt = alternativeNamespaces.iterator();
+
+          while (value == null && namespaceIt.hasNext()) {
+            value = modelElement.getAttributeValueNs(namespaceIt.next(), attributeName);
+          }
         }
       }
     }

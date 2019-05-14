@@ -20,6 +20,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * A model contains all defined types and the relationship between them.
@@ -83,5 +84,7 @@ public interface Model {
    * @return the alternative namespace URI or null if none is set
    */
   String getAlternativeNamespace(String actualNs);
+
+  Set<String> getAlternativeNamespaces(String actualNs);
 
 }

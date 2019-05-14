@@ -19,9 +19,12 @@ package org.camunda.bpm.model.xml.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.model.xml.Model;
+import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.impl.util.QName;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -39,7 +42,7 @@ public class ModelImpl implements Model {
   private final Map<Class<? extends ModelElementInstance>, ModelElementType> typesByClass = new HashMap<Class<? extends ModelElementInstance>, ModelElementType>();
   private final String modelName;
 
-  protected final Map<String, String> actualNsToAlternative = new HashMap<String, String>();
+  protected final Map<String, Set<String>> actualNsToAlternative = new HashMap<String, Set<String>>();
   protected final Map<String, String> alternativeNsToActual = new HashMap<String, String>();
 
   /**
@@ -58,10 +61,15 @@ public class ModelImpl implements Model {
    * @throws IllegalArgumentException if the alternative is already used or if the actual namespace has an alternative
    */
   public void declareAlternativeNamespace(String alternativeNs, String actualNs) {
-    if(actualNsToAlternative.containsKey(actualNs) || alternativeNsToActual.containsKey(alternativeNs)){
-      throw new IllegalArgumentException("Cannot register two alternatives for one namespace! Actual Ns: " + actualNs + " second alternative: " + alternativeNs);
+    Set<String> alternativeNamespaces = actualNsToAlternative.get(actualNs);
+    if (alternativeNamespaces == null)
+    {
+      // linked hash set for consistent iteration order
+      alternativeNamespaces = new LinkedHashSet<String>();
+      actualNsToAlternative.put(actualNs, alternativeNamespaces);
     }
-    actualNsToAlternative.put(actualNs, alternativeNs);
+
+    alternativeNamespaces.add(alternativeNs);
     alternativeNsToActual.put(alternativeNs, actualNs);
   }
 
@@ -73,8 +81,24 @@ public class ModelImpl implements Model {
     actualNsToAlternative.remove(actual);
   }
 
-  public String getAlternativeNamespace(String actualNs) {
+  public Set<String> getAlternativeNamespaces(String actualNs) {
     return actualNsToAlternative.get(actualNs);
+  }
+
+  @Override
+  public String getAlternativeNamespace(String actualNs) {
+    Set<String> alternatives = getAlternativeNamespaces(actualNs);
+
+    if (alternatives == null || alternatives.size() == 0) {
+      return null;
+    }
+    else if (alternatives.size() == 1) {
+      return alternatives.iterator().next();
+    }
+    else
+    {
+      throw new ModelException("There is more than one alternative namespace registered");
+    }
   }
 
   public String getActualNamespace(String alternativeNs) {

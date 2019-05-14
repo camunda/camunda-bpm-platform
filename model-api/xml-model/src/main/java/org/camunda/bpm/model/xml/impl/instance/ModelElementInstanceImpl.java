@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -129,10 +130,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
 
   public void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue,
                                   boolean isIdAttribute, boolean withReferenceUpdate) {
-    String namespaceForSetting = namespaceUri;
-    if (hasValueToBeSetForAlternativeNs(namespaceUri, attributeName)) {
-      namespaceForSetting = modelInstance.getModel().getAlternativeNamespace(namespaceUri);
-    }
+    String namespaceForSetting = determineNamespace(namespaceUri, attributeName);
     String oldValue = getAttributeValueNs(namespaceForSetting, attributeName);
     if (isIdAttribute) {
       domElement.setIdAttribute(namespaceForSetting, attributeName, xmlValue);
@@ -146,9 +144,27 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     }
   }
 
-  private boolean hasValueToBeSetForAlternativeNs(String namespaceUri, String attributeName) {
-    String alternativeNs = modelInstance.getModel().getAlternativeNamespace(namespaceUri);
-    return getAttributeValueNs(namespaceUri, attributeName) == null && alternativeNs != null && getAttributeValueNs(alternativeNs, attributeName) != null;
+  private String determineNamespace(String intendedNamespace, String attributeName) {
+    boolean isSetInIntendedNamespace = getAttributeValueNs(intendedNamespace, attributeName) != null;
+
+    if (isSetInIntendedNamespace) {
+      return intendedNamespace;
+    }
+    else {
+      Set<String> alternativeNamespaces = modelInstance.getModel().getAlternativeNamespaces(intendedNamespace);
+
+      if (alternativeNamespaces != null)
+      {
+        for (String alternativeNamespace : alternativeNamespaces) {
+          if (getAttributeValueNs(alternativeNamespace, attributeName) != null) {
+            return alternativeNamespace;
+          }
+        }
+      }
+
+      // default to intended namespace
+      return intendedNamespace;
+    }
   }
 
   public void removeAttribute(String attributeName) {
@@ -187,7 +203,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
 
   public ModelElementInstance getUniqueChildElementByNameNs(String namespaceUri, String elementName) {
     Model model = modelInstance.getModel();
-    List<DomElement> childElements = domElement.getChildElementsByNameNs(asSet(namespaceUri, model.getAlternativeNamespace(namespaceUri)), elementName);
+    List<DomElement> childElements = domElement.getChildElementsByNameNs(asSet(namespaceUri, model.getAlternativeNamespaces(namespaceUri)), elementName);
     if(!childElements.isEmpty()) {
       return ModelUtil.getModelElement(childElements.get(0), modelInstance);
     } else {
@@ -286,8 +302,8 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
       instances.addAll(getChildElementsByType(extendingType));
     }
     Model model = modelInstance.getModel();
-    String alternativeNamespace = model.getAlternativeNamespace(childElementType.getTypeNamespace());
-    List<DomElement> elements = domElement.getChildElementsByNameNs(asSet(childElementType.getTypeNamespace(), alternativeNamespace), childElementType.getTypeName());
+    Set<String> alternativeNamespaces = model.getAlternativeNamespaces(childElementType.getTypeNamespace());
+    List<DomElement> elements = domElement.getChildElementsByNameNs(asSet(childElementType.getTypeNamespace(), alternativeNamespaces), childElementType.getTypeName());
     instances.addAll(ModelUtil.getModelElementCollection(elements, modelInstance));
     return instances;
   }
@@ -361,8 +377,15 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     }
   }
 
-  protected <T> Set<T> asSet(T... elements){
-    return new HashSet<T>(Arrays.asList(elements));
+  protected <T> Set<T> asSet(T element, Set<T> elements){
+    Set<T> result = new HashSet<T>();
+    result.add(element);
+
+    if (elements != null) {
+      result.addAll(elements);
+    }
+
+    return result;
   }
 
   @Override
