@@ -65,8 +65,10 @@ public class HistoryCleanupStrategyConfigurationTest {
   @AfterClass
   public static void tearDown() {
     engineConfiguration
-      .setHistoryCleanupStrategy(null)
       .setHistoryRemovalTimeStrategy(null)
+      .initHistoryRemovalTime();
+    engineConfiguration
+      .setHistoryCleanupStrategy(null)
       .initHistoryCleanup();
   }
 
