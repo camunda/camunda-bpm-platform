@@ -17,6 +17,8 @@
 package org.camunda.spin.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -29,21 +31,26 @@ import org.camunda.spin.DataFormats;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
- * Note: The @RunWith and @PrepareForTest annotations are required by powermock to be able
- * to mock static methods provided by the JDK (i.e. ServiceLoader.load(..) in our case).
- * See https://code.google.com/p/powermock/wiki/MockSystem and
- * https://code.google.com/p/powermock/wiki/MockStatic
+ * Note: The @RunWith and @PrepareForTest annotations are required by powermock
+ * to be able to mock static methods provided by the JDK (i.e.
+ * ServiceLoader.load(..) in our case). See
+ * https://code.google.com/p/powermock/wiki/MockSystem and
+ * https://code.google.com/p/powermock/wiki/MockStatic 
+ * The @PowerMockIgnore annotation is necessary for JDK 9+ as the PowerMock
+ * class loader does not support modularity. See 
+ * https://github.com/powermock/powermock/issues/864
  *
  * @author Thorben Lindhauer
  */
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 public class DataFormatProviderTest {
 
   protected ServiceLoader<DataFormatProvider> mockServiceLoader;
@@ -57,11 +64,11 @@ public class DataFormatProviderTest {
     mockStatic(ServiceLoader.class);
 
     mockServiceLoader = mock(ServiceLoader.class);
-    when(ServiceLoader.load(Matchers.eq(DataFormatProvider.class), Matchers.any(ClassLoader.class)))
+    when(ServiceLoader.load(eq(DataFormatProvider.class), any(ClassLoader.class)))
       .thenReturn(mockServiceLoader);
 
     mockConfiguratorLoader = mock(ServiceLoader.class);
-    when(ServiceLoader.load(Matchers.eq(DataFormatConfigurator.class), Matchers.any(ClassLoader.class)))
+    when(ServiceLoader.load(eq(DataFormatConfigurator.class), any(ClassLoader.class)))
       .thenReturn(mockConfiguratorLoader);
   }
 
