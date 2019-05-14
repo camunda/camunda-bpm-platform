@@ -306,7 +306,7 @@
           <foreach index="key" item="value" collection="parameter" separator="UNION">
             select ${constant.varchar.cast} as TYPE_,
             <choose>
-              <when test="value == null">null</when>
+              <when test="value == null">${constant.integer.cast}</when>
               <otherwise>${value}</otherwise>
             </choose>
             as HISTORY_TTL_
