@@ -128,6 +128,38 @@ public class CsrfPreventionFilterTest {
   }
 
   @Test
+  public void testNonModifyingRequestTokenGenerationWithRootContextPath() throws IOException, ServletException {
+    // given
+    MockHttpSession session = new MockHttpSession();
+    MockHttpServletRequest nonModifyingRequest = new MockHttpServletRequest();
+    nonModifyingRequest.setMethod("GET");
+    nonModifyingRequest.setSession(session);
+
+    // set root context path in request
+    nonModifyingRequest.setRequestURI("/"  + nonModifyingRequestUrl);
+    nonModifyingRequest.setContextPath("");
+
+    // when
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    applyFilter(nonModifyingRequest, response);
+
+    // then
+    Cookie cookieToken = response.getCookie(CSRF_COOKIE_NAME);
+    String headerToken = (String) response.getHeader(CSRF_HEADER_NAME);
+
+    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+    Assert.assertNotNull(cookieToken);
+    Assert.assertNotNull(headerToken);
+
+    Assert.assertEquals("No Cookie Token!",false, cookieToken.getValue().isEmpty());
+    Assert.assertEquals("Cookie path should be root (/)", "/", cookieToken.getPath());
+
+    Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
+    Assert.assertEquals("Cookie and HTTP Header Tokens do not match!", cookieToken.getValue(), headerToken);
+  }
+
+  @Test
   public void testConsecutiveNonModifyingRequestTokens() throws IOException, ServletException {
     MockHttpSession session = new MockHttpSession();
 
