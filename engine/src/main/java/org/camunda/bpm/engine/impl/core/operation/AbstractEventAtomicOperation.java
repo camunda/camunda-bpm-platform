@@ -35,7 +35,6 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
   }
 
   public void execute(T execution) {
-    boolean shouldContinueListenerExecution = true;
     CoreModelElement scope = getScope(execution);
     List<DelegateListener<? extends BaseDelegateExecution>> listeners = getListeners(scope, execution);
     int listenerIndex = execution.getListenerIndex();
@@ -60,9 +59,7 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
           return;
         }
 
-        if(shouldContinueListenerExecution) {
-          execution.performOperationSync(this);
-        }
+        execution.performOperationSync(this);
       } else {
         resetListeners(execution);
 
