@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -61,6 +62,8 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   protected String tenantId = null;
   protected boolean isTenantIdSet = false;
+
+  protected boolean startMessagesOnly = false;
 
   public MessageCorrelationBuilderImpl(CommandExecutor commandExecutor, String messageName) {
     this(messageName);
@@ -200,24 +203,38 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   @Override
+  public MessageCorrelationBuilder startMessageOnly() {
+    startMessagesOnly = true;
+    return this;
+  }
+
+  @Override
   public void correlate() {
     correlateWithResult();
   }
 
   @Override
   public MessageCorrelationResult correlateWithResult() {
-    ensureProcessDefinitionIdNotSet();
-    ensureProcessInstanceAndTenantIdNotSet();
-
-    return execute(new CorrelateMessageCmd(this, false, false));
+    if (startMessagesOnly) {
+      ensureCorrelationVariablesNotSet();
+      ensureProcessDefinitionAndTenantIdNotSet();
+    } else {
+      ensureProcessDefinitionIdNotSet();
+      ensureProcessInstanceAndTenantIdNotSet();
+    }
+    return execute(new CorrelateMessageCmd(this, false, false, startMessagesOnly));
   }
 
   @Override
   public MessageCorrelationResultWithVariables correlateWithResultAndVariables(boolean deserializeValues) {
-    ensureProcessDefinitionIdNotSet();
-    ensureProcessInstanceAndTenantIdNotSet();
-
-    return execute(new CorrelateMessageCmd(this, true, deserializeValues));
+    if (startMessagesOnly) {
+      ensureCorrelationVariablesNotSet();
+      ensureProcessDefinitionAndTenantIdNotSet();
+    } else {
+      ensureProcessDefinitionIdNotSet();
+      ensureProcessInstanceAndTenantIdNotSet();
+    }
+    return execute(new CorrelateMessageCmd(this, true, deserializeValues, startMessagesOnly));
   }
 
   @Override
@@ -234,18 +251,32 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   @Override
   public List<MessageCorrelationResult> correlateAllWithResult() {
-    ensureProcessDefinitionIdNotSet();
-    ensureProcessInstanceAndTenantIdNotSet();
-
-    return (List) execute(new CorrelateAllMessageCmd(this, false, false));
+    if (startMessagesOnly) {
+      ensureCorrelationVariablesNotSet();
+      ensureProcessDefinitionAndTenantIdNotSet();
+      // only one result can be expected
+      MessageCorrelationResult result = execute(new CorrelateMessageCmd(this, false, false, startMessagesOnly));
+      return Arrays.asList(result);
+    } else {
+      ensureProcessDefinitionIdNotSet();
+      ensureProcessInstanceAndTenantIdNotSet();
+      return (List) execute(new CorrelateAllMessageCmd(this, false, false));
+    }
   }
 
   @Override
   public List<MessageCorrelationResultWithVariables> correlateAllWithResultAndVariables(boolean deserializeValues) {
-    ensureProcessDefinitionIdNotSet();
-    ensureProcessInstanceAndTenantIdNotSet();
-
-    return (List) execute(new CorrelateAllMessageCmd(this, true, deserializeValues));
+    if (startMessagesOnly) {
+      ensureCorrelationVariablesNotSet();
+      ensureProcessDefinitionAndTenantIdNotSet();
+      // only one result can be expected
+      MessageCorrelationResultWithVariables result = execute(new CorrelateMessageCmd(this, true, deserializeValues, startMessagesOnly));
+      return Arrays.asList(result);
+    } else {
+      ensureProcessDefinitionIdNotSet();
+      ensureProcessInstanceAndTenantIdNotSet();
+      return (List) execute(new CorrelateAllMessageCmd(this, true, deserializeValues));
+    }
   }
 
   public ProcessInstance correlateStartMessage() {

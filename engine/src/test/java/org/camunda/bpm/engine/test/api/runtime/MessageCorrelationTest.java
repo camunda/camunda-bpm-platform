@@ -1991,6 +1991,171 @@ public class MessageCorrelationTest {
     assertThat(returnedValue.getValueSerialized()).isEqualTo(serializedValue);
   }
 
+  @Test
+  public void testStartMessageOnlyFlag() {
+    deployTwoVersionsWithStartMessageEvent();
+
+    ProcessDefinition firstProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).singleResult();
+    ProcessDefinition secondProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(2).singleResult();
+
+    runtimeService.createMessageCorrelation("a")
+      .startMessageOnly()
+      .processDefinitionId(firstProcessDefinition.getId())
+      .processInstanceBusinessKey("first")
+      .correlate();
+
+    runtimeService.createMessageCorrelation("a")
+      .startMessageOnly()
+      .processDefinitionId(secondProcessDefinition.getId())
+      .processInstanceBusinessKey("second")
+      .correlate();
+
+    assertTwoInstancesAreStarted(firstProcessDefinition, secondProcessDefinition);
+  }
+
+  @Test
+  public void testStartMessageOnlyFlagAll() {
+    deployTwoVersionsWithStartMessageEvent();
+
+    ProcessDefinition firstProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).singleResult();
+    ProcessDefinition secondProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(2).singleResult();
+
+    runtimeService.createMessageCorrelation("a")
+      .startMessageOnly()
+      .processDefinitionId(firstProcessDefinition.getId())
+      .processInstanceBusinessKey("first")
+      .correlateAll();
+
+    runtimeService.createMessageCorrelation("a")
+      .startMessageOnly()
+      .processDefinitionId(secondProcessDefinition.getId())
+      .processInstanceBusinessKey("second")
+      .correlateAll();
+
+    assertTwoInstancesAreStarted(firstProcessDefinition, secondProcessDefinition);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
+  public void testStartMessageOnlyFlagWithResult() {
+    MessageCorrelationResult result = runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .setVariable("aKey", "aValue")
+      .startMessageOnly()
+      .correlateWithResult();
+
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("messageStartEvent")
+        .variableValueEquals("aKey", "aValue");
+    assertThat(processInstanceQuery.count()).isEqualTo(1);
+    assertThat(result.getProcessInstance().getId()).isEqualTo(processInstanceQuery.singleResult().getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
+  public void testStartMessageOnlyFlagWithVariablesInResult() {
+
+    MessageCorrelationResultWithVariables result = runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .setVariable("aKey", "aValue")
+      .startMessageOnly()
+      .correlateWithResultAndVariables(false);
+
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("messageStartEvent")
+        .variableValueEquals("aKey", "aValue");
+    assertThat(processInstanceQuery.count()).isEqualTo(1);
+    assertThat(result.getVariables().size()).isEqualTo(1);
+    assertThat(result.getVariables().getValueTyped("aKey").getValue()).isEqualTo("aValue");
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
+  public void testStartMessageOnlyFlagAllWithResult() {
+    List<MessageCorrelationResult> result = runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .setVariable("aKey", "aValue")
+      .startMessageOnly()
+      .correlateAllWithResult();
+
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("messageStartEvent")
+        .variableValueEquals("aKey", "aValue");
+    assertThat(processInstanceQuery.count()).isEqualTo(1);
+    assertThat(result.get(0).getProcessInstance().getId()).isEqualTo(processInstanceQuery.singleResult().getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
+  public void testStartMessageOnlyFlagAllWithVariablesInResult() {
+
+    List<MessageCorrelationResultWithVariables> results = runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .setVariable("aKey", "aValue")
+      .startMessageOnly()
+      .correlateAllWithResultAndVariables(false);
+
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("messageStartEvent")
+        .variableValueEquals("aKey", "aValue");
+    assertThat(processInstanceQuery.count()).isEqualTo(1);
+    MessageCorrelationResultWithVariables result = results.get(0);
+    assertThat(result.getVariables().size()).isEqualTo(1);
+    assertThat(result.getVariables().getValueTyped("aKey").getValue()).isEqualTo("aValue");
+  }
+
+  @Test
+  public void testFailStartMessageOnlyFlagWithCorrelationVariable() {
+    try {
+      runtimeService.createMessageCorrelation("a")
+        .startMessageOnly()
+        .processInstanceVariableEquals("var", "value")
+        .correlate();
+
+      fail("expected exception");
+    } catch (BadUserRequestException e){
+      testRule.assertTextPresent("Cannot specify correlation variables ", e.getMessage());
+    }
+  }
+
+  @Test
+  public void testFailStartMessageOnlyFlagWithCorrelationVariables() {
+    try {
+      runtimeService.createMessageCorrelation("a")
+        .startMessageOnly()
+        .processInstanceVariablesEqual(Variables
+              .createVariables()
+              .putValue("var1", "b")
+              .putValue("var2", "c"))
+        .correlateAll();
+
+      fail("expected exception");
+    } catch (BadUserRequestException e){
+      testRule.assertTextPresent("Cannot specify correlation variables ", e.getMessage());
+    }
+  }
+
+  protected void deployTwoVersionsWithStartMessageEvent() {
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+          .message("a")
+        .userTask("ut1")
+        .endEvent()
+        .done());
+
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+          .message("a")
+        .userTask("ut2")
+        .endEvent()
+        .done());
+  }
+
+  protected void assertTwoInstancesAreStarted(ProcessDefinition firstProcessDefinition, ProcessDefinition secondProcessDefinition) {
+    assertThat(runtimeService.createProcessInstanceQuery()
+        .processInstanceBusinessKey("first")
+        .processDefinitionId(firstProcessDefinition.getId())
+        .count())
+        .isEqualTo(1);
+    assertThat(runtimeService.createProcessInstanceQuery()
+        .processInstanceBusinessKey("second")
+        .processDefinitionId(secondProcessDefinition.getId())
+        .count())
+        .isEqualTo(1);
+  }
+
   public static class ChangeVariableDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {

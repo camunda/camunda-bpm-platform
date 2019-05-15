@@ -95,7 +95,7 @@ public interface MessageCorrelationBuilder {
 
   /**
    * <p>Correlate the message such that a process definition with the given id is selected.
-   * Is only supported for {@link #correlateStartMessage()}.</p>
+   * Is only supported for {@link #correlateStartMessage()} or {@link #startMessageOnly()} flag.</p>
    *
    * @param processDefinitionId the id of the process definition to correlate on.
    * @return the builder
@@ -164,6 +164,13 @@ public interface MessageCorrelationBuilder {
    * @return the builder
    */
   MessageCorrelationBuilder withoutTenantId();
+
+  /**
+   * Specify that only start message can be correlated.
+   *
+   * @return the builder
+   */
+  MessageCorrelationBuilder startMessageOnly();
 
   /**
    * Executes the message correlation.
