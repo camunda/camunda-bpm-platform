@@ -45,14 +45,14 @@ included in the JDKs up to version 10:
 Before version 2.2.0, the project existed as a community extension. Therefore the resources were located in different paths. You can find all the links below.
 
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - please DON'T create new issues here.
-* https://camunda.github.io/camunda-bpm-spring-boot-starter/[Documentation]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/2.2.0/docs/src/main/asciidoc/index.adoc[Documentation]
 
 ### 2.x
 
-* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_2_0[Release Notes 2.2.0]
-* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_1_2[Release Notes 2.1.2]
-* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_1_0[Release Notes 2.1.0]
-* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_0_0[Release Notes 2.0.0]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/8?closed=1[Release Notes 2.2.0]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/10?closed=1[Release Notes 2.1.2]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/6?closed=1[Release Notes 2.1.0]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/3?closed=1[Release Notes 2.0.0]
 
 ### 1.3.0
 
