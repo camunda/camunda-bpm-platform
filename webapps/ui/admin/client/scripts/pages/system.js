@@ -21,6 +21,8 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
 
+var angular = require('angular');
+
 var Controller = [
   '$scope',
   'page',
@@ -28,13 +30,15 @@ var Controller = [
   '$routeParams',
   'Views',
   '$translate',
+  '$injector',
   function(
     $scope,
     page,
     $location,
     $routeParams,
     Views,
-    $translate
+    $translate,
+    $injector
   ) {
 
     $scope.$root.showBreadcrumbs = true;
@@ -50,7 +54,23 @@ var Controller = [
       }
     ]);
 
-    $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'});
+    $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'})
+      .map(function(plugin) {
+        if (angular.isArray(plugin.access)) {
+          var fn = $injector.invoke(plugin.access);
+
+          fn(function(err, access) {
+            if (err) { throw err; }
+
+            plugin.accessible = access;
+          });
+        }
+        else {
+          plugin.accessible = true;
+        }
+
+        return plugin;
+      });
 
     var selectedProviderId = $routeParams.section;
     if(selectedProviderId) {
@@ -65,7 +85,6 @@ var Controller = [
       var path = $location.absUrl();
       return path.indexOf(link) != -1 ? 'active' : '';
     };
-
   }];
 
 module.exports = [ '$routeProvider', function($routeProvider) {
