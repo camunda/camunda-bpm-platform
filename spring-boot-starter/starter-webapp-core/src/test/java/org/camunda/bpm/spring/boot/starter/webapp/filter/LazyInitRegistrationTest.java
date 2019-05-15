@@ -36,12 +36,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LazyInitRegistration.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 public class LazyInitRegistrationTest {
 
   @Mock
@@ -153,7 +155,7 @@ public class LazyInitRegistrationTest {
     new LazyInitRegistration().setApplicationContext(applicationContextMock);
 
     assertEquals(LazyInitRegistration.APPLICATION_CONTEXT, applicationContextMock);
-    PowerMockito.verifyStatic();
+    PowerMockito.verifyStatic(LazyInitRegistration.class);
     LazyInitRegistration.lazyInit(lazyDelegateFilterMock);
   }
 }

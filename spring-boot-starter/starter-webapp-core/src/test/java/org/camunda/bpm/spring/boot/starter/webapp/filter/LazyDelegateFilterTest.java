@@ -37,11 +37,13 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LazyInitRegistration.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 public class LazyDelegateFilterTest {
 
   @Mock
@@ -61,7 +63,7 @@ public class LazyDelegateFilterTest {
     delegateFilter.init(filterConfigMock);
     assertSame(filterConfigMock, delegateFilter.filterConfig);
     verify(filterMock, times(0)).init(Mockito.any(FilterConfig.class));
-    PowerMockito.verifyStatic();
+    PowerMockito.verifyStatic(LazyInitRegistration.class);
     LazyInitRegistration.lazyInit(delegateFilter);
   }
 
@@ -109,7 +111,7 @@ public class LazyDelegateFilterTest {
   public void lazyInitRegistrationTest() {
     PowerMockito.mockStatic(LazyInitRegistration.class);
     LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<Filter>(filterMock.getClass());
-    PowerMockito.verifyStatic();
+    PowerMockito.verifyStatic(LazyInitRegistration.class);
     LazyInitRegistration.register(delegateFilter);
   }
 
