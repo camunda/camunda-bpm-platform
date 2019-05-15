@@ -16,7 +16,7 @@
       </bpmn:startEvent>
       <bpmn:serviceTask id="Task_1j2hlay" name="task1" camunda:expression="${true}">
         <bpmn:extensionElements>
-          <camunda:executionListener event="end">
+          <camunda:executionListener event="start">
             <camunda:script scriptFormat="groovy">
               import org.camunda.bpm.engine.delegate.BpmnError;
               throw new BpmnError("208", "business error");

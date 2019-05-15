@@ -780,6 +780,31 @@ public class ExecutionListenerTest {
   }
 
   @Test
+  public void testThrowBpmnErrorInStartListenerOfLastEventAndServiceTaskWithCatch() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask("userTask1")
+        .serviceTask("throw")
+          .camundaExpression("${true}")
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ThrowBPMNErrorDelegate.class.getName())
+        .boundaryEvent()
+        .error(ERROR_CODE)
+        .userTask("afterCatch")
+        .endEvent()
+        .done();
+
+    testHelper.deploy(model);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+    // when the listeners are invoked
+    taskService.complete(task.getId());
+
+    // then
+    verifyErrorGotCaught();
+  }
+
+  @Test
   public void testThrowBpmnErrorInEndListenerOfLastEventAndSubprocessWithCatch() {
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
@@ -791,6 +816,37 @@ public class ExecutionListenerTest {
             .serviceTask("throw")
               .camundaExpression("${true}")
               .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, ThrowBPMNErrorDelegate.class.getName())
+        .boundaryEvent()
+        .error(ERROR_CODE)
+        .userTask("afterCatch")
+        .moveToActivity("sub")
+        .userTask("afterSub")
+        .endEvent()
+        .done();
+
+    testHelper.deploy(model);
+
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+    // when the listeners are invoked
+    taskService.complete(task.getId());
+
+    // then
+    verifyErrorGotCaught();
+  }
+
+  @Test
+  public void testThrowBpmnErrorInStartListenerOfLastEventAndSubprocessWithCatch() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask("userTask1")
+        .subProcess("sub")
+          .embeddedSubProcess()
+            .startEvent("inSub")
+            .serviceTask("throw")
+              .camundaExpression("${true}")
+              .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ThrowBPMNErrorDelegate.class.getName())
         .boundaryEvent()
         .error(ERROR_CODE)
         .userTask("afterCatch")
@@ -981,6 +1037,36 @@ public class ExecutionListenerTest {
   }
 
   @Test
+  public void testThrowUncaughtBpmnErrorFromStartListenerShouldNotTriggerListenerAgain() {
+
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask("userTask1")
+        .serviceTask("throw")
+          .camundaExpression("${true}")
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ThrowBPMNErrorDelegate.class.getName())
+        .endEvent()
+        .done();
+
+    testHelper.deploy(model);
+
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+
+    // when the listeners are invoked
+    taskService.complete(task.getId());
+
+    // then
+
+    // the process has ended, because the error was not caught
+    assertEquals(0, runtimeService.createExecutionQuery().count());
+
+    // the listener was only called once
+    assertEquals(1, ThrowBPMNErrorDelegate.INVOCATIONS);
+  }
+
+  @Test
   public void testThrowBpmnErrorInEndListenerMessageCorrelationShouldNotTriggerPropagation() {
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
@@ -1063,7 +1149,7 @@ public class ExecutionListenerTest {
   }
 
   @Test
-  public void testThrowBpmnErrorInStartListenerOfStartEvenShouldNotTriggerPropagattion() {
+  public void testThrowBpmnErrorInProcessStartListenerShouldNotTriggerPropagation() {
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess(PROCESS_KEY);
     BpmnModelInstance model = processBuilder
@@ -1099,7 +1185,7 @@ public class ExecutionListenerTest {
   }
 
   @Test
-  public void testThrowBpmnErrorInEndListenerOfStartEvenShouldNotTriggerPropagattion() {
+  public void testThrowBpmnErrorInProcessEndListenerShouldNotTriggerPropagation() {
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess(PROCESS_KEY);
     BpmnModelInstance model = processBuilder
