@@ -30,3 +30,8 @@ create table ACT_GE_SCHEMA_LOG (
 
 insert into ACT_GE_SCHEMA_LOG
 values ('0', CURRENT_TIMESTAMP, '7.11.0');
+
+-- https://app.camunda.com/jira/browse/CAM-10129
+create index ACT_IDX_HI_OP_LOG_USER_ID on ACT_HI_OP_LOG(USER_ID_);
+create index ACT_IDX_HI_OP_LOG_OP_TYPE on ACT_HI_OP_LOG(OPERATION_TYPE_);
+create index ACT_IDX_HI_OP_LOG_ENTITY_TYPE on ACT_HI_OP_LOG(ENTITY_TYPE_);
