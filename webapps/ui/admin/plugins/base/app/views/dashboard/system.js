@@ -21,6 +21,8 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
 
+var angular = require('angular');
+
 module.exports = [
   'ViewsProvider',
   function(
@@ -34,30 +36,29 @@ module.exports = [
       controller: [
         '$scope',
         'Views',
+        '$injector',
         function(
           $scope,
-          Views
+          Views,
+          $injector
         ) {
-          $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'});
-        }],
-      access: [
-        'AuthorizationResource',
-        function(
-          AuthorizationResource
-        ) {
-          return function(cb) {
-            AuthorizationResource.check({
-              permissionName: 'ALL',
-              resourceName: 'authorization',
-              resourceType: 4
-            })
-              .$promise
-              .then(function(response) {
-                cb(null, response.authorized);
-              })
-              .catch(cb)
-            ;
-          };
+          $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'})
+            .map(function(plugin) {
+              if (angular.isArray(plugin.access)) {
+                var fn = $injector.invoke(plugin.access);
+
+                fn(function(err, access) {
+                  if (err) { throw err; }
+
+                  plugin.accessible = access;
+                });
+              }
+              else {
+                plugin.accessible = true;
+              }
+
+              return plugin;
+            });
         }],
 
       priority: 0

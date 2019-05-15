@@ -43,7 +43,7 @@ var Controller = [
     $scope.endDate =   dateFilter(now.getFullYear() + '-12-31T23:59:59.999', dateFormat);
     $scope.loadingState = 'INITIAL';
 
-    
+
     // sets loading state to error and updates error message
     function setLoadingError(error) {
       $scope.loadingState = 'ERROR';
@@ -107,6 +107,24 @@ module.exports = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
     label: 'EXECUTION_METRICS',
     template: template,
     controller: Controller,
-    priority: 900
+    priority: 900,
+    access: [
+      'AuthorizationResource',
+      function(
+        AuthorizationResource
+      ) {
+        return function(cb) {
+          AuthorizationResource.check({
+            permissionName: 'ALL',
+            resourceName: 'authorization',
+            resourceType: 4
+          })
+            .$promise
+            .then(function(response) {
+              cb(null, response.authorized);
+            })
+            .catch(cb);
+        };
+      }]
   });
 }];

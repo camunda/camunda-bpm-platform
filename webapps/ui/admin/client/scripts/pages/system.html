@@ -3,6 +3,7 @@
   <aside>
     <ul>
       <li ng-class="activeClass('section='+systemSettingsProvider.id)"
+          ng-if="!!systemSettingsProvider.accessible"
           ng-repeat="systemSettingsProvider in systemSettingsProviders">
         <a href="#/system/?section={{systemSettingsProvider.id}}">
           {{systemSettingsProvider.label | translate}}
