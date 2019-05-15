@@ -25,7 +25,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
-import org.camunda.bpm.engine.impl.cmd.CorrelateStartMessageCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
