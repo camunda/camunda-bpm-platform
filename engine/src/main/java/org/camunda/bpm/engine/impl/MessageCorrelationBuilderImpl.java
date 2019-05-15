@@ -280,10 +280,9 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public ProcessInstance correlateStartMessage() {
-    ensureCorrelationVariablesNotSet();
-    ensureProcessDefinitionAndTenantIdNotSet();
-
-    return execute(new CorrelateStartMessageCmd(this));
+    startMessageOnly();
+    MessageCorrelationResult result = correlateWithResult();
+    return result.getProcessInstance();
   }
 
   protected void ensureProcessDefinitionIdNotSet() {
