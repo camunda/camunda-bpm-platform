@@ -781,7 +781,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (entry != null) {
       String category = entry.getCategory();
       String processDefinitionKey = entry.getProcessDefinitionKey();
-      if (category != null || processDefinitionKey != null
+      if (category != null || processDefinitionKey != null) {
         CompositePermissionCheck permissionCheck = null;
         if (category == null) {
           // case (3)
