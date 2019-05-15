@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 
 public class ResourceTypeUtil {
 
@@ -43,6 +44,7 @@ public class ResourceTypeUtil {
     PERMISSION_ENUMS.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
     PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
     PERMISSION_ENUMS.put(Resources.TASK.resourceType(), TaskPermissions.class);
+    PERMISSION_ENUMS.put(Resources.OPERATION_LOG_CATEGORY.resourceType(), UserOperationLogCategoryPermissions.class);
 
     // the rest
     for (Resource resource : Resources.values()) {

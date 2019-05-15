@@ -169,6 +169,16 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
     saveAuthorization(authorization);
   }
+  
+  protected void createRevokeAuthorizationWithoutAuthentication(Resource resource, String resourceId, String userId, Permission... permissions) {
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+    identityService.clearAuthentication();
+    try {
+      createRevokeAuthorization(resource, resourceId, userId, permissions);
+    } finally {
+      identityService.setAuthentication(currentAuthentication);
+    }
+  }
 
   protected void createRevokeAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
     Authorization authorization = createRevokeAuthorization(resource, resourceId);

@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
@@ -730,7 +731,13 @@ public class AuthorizationManager extends AbstractManager {
   // user operation log query ///////////////////////////////
 
   public void configureUserOperationLogQuery(UserOperationLogQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    configureQuery(query);
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+          .atomicCheck(Resources.OPERATION_LOG_CATEGORY, "RES.CATEGORY_", READ)
+        .build();
+    addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
   // batch

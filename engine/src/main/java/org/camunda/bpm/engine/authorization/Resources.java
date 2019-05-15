@@ -42,7 +42,8 @@ public enum Resources implements Resource {
   BATCH(EntityTypes.BATCH, 13),
   DECISION_REQUIREMENTS_DEFINITION(EntityTypes.DECISION_REQUIREMENTS_DEFINITION, 14),
   REPORT(EntityTypes.REPORT, 15),
-  DASHBOARD(EntityTypes.DASHBOARD, 16);
+  DASHBOARD(EntityTypes.DASHBOARD, 16),
+  OPERATION_LOG_CATEGORY(EntityTypes.OPERATION_LOG_CATEGORY, 17);
 
   String name;
   int id;

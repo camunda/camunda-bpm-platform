@@ -225,7 +225,7 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, RES.CATEGORY_, '*'))
     </if>
 
     <where>
@@ -307,11 +307,8 @@
       
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <!-- may not exist in the context of a process definition -->
-        and (
-          (RES.PROC_DEF_KEY_ is not null
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-          ) or RES.PROC_DEF_KEY_ is null
-        )
+          or (CATEGORY_ IS NULL AND PROC_DEF_KEY_ IS NULL)
       </if>
 
     </where>

@@ -16,7 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
-import java.util.Arrays;
+import static org.camunda.bpm.engine.authorization.Resources.OPERATION_LOG_CATEGORY;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_ADMIN;
+import static org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions.READ;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -49,7 +52,8 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     assertEquals(0, query.count());
     
     // when
-    createGrantAuthorizationGroup(Resources.PROCESS_DEFINITION, Authorization.ANY, "testGroupId", ProcessDefinitionPermissions.DELETE);
+    createGrantAuthorizationGroup(PROCESS_DEFINITION, Authorization.ANY, "testGroupId", ProcessDefinitionPermissions.DELETE);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_ADMIN, userId, READ);
     
     // then
     assertEquals(6, query.count());
@@ -91,14 +95,13 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
     assertEquals("testGroupId", entry.getNewValue());
   }
   
-  public void test1LogCreatedOnAuthorizationUpdate() {
+  public void testLogCreatedOnAuthorizationUpdate() {
     // given
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    identityService.clearAuthentication();
     Authorization authorization = 
-        createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, "testUserId", Permissions.DELETE);
+        createGrantAuthorizationWithoutAuthentication(Resources.PROCESS_DEFINITION, Authorization.ANY, "testUserId", Permissions.DELETE);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_ADMIN, userId, READ);
     assertEquals(0, query.count());
-    identityService.setAuthentication(userId, Arrays.asList(groupId));
     
     // when
     authorization.addPermission(Permissions.READ);
@@ -164,11 +167,10 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
   public void testLogCreatedOnAuthorizationDeletion() {
     // given
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    identityService.clearAuthentication();
     Authorization authorization = 
-        createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, "testUserId", ProcessDefinitionPermissions.DELETE);
+        createGrantAuthorizationWithoutAuthentication(Resources.PROCESS_DEFINITION, Authorization.ANY, "testUserId", ProcessDefinitionPermissions.DELETE);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_ADMIN, userId, READ);
     assertEquals(0, query.count());
-    identityService.setAuthentication(userId, Arrays.asList(groupId));
     
     // when
     authorizationService.deleteAuthorization(authorization.getId());
@@ -215,6 +217,7 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
   
   public void testLogCreatedOnAuthorizationCreationWithExceedingPermissionStringList() {
     // given
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_ADMIN, userId, READ);
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     assertEquals(0, query.count());
     
@@ -236,6 +239,7 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
   
   public void testLogCreatedOnAuthorizationCreationWithAllPermission() {
     // given
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_ADMIN, userId, READ);
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     assertEquals(0, query.count());
     
@@ -257,6 +261,7 @@ public class AuthorizationUserOperationLogTest extends AuthorizationTest {
   
   public void testLogCreatedOnAuthorizationCreationWithNonePermission() {
     // given
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_ADMIN, userId, READ);
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     assertEquals(0, query.count());
     
