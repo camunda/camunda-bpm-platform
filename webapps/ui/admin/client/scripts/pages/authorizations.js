@@ -54,7 +54,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           13: $translate.instant('AUTHORIZATION_BATCH'),
           14: $translate.instant('AUTHORIZATION_DECISION_REQUIREMENTS_DEFINITION'),
           15: $translate.instant('AUTHORIZATION_REPORT'),
-          16: $translate.instant('AUTHORIZATION_DASHBOARD')
+          16: $translate.instant('AUTHORIZATION_DASHBOARD'),
+          17: $translate.instant('AUTHORIZATION_OPERATION_LOG')
         };
 
         pageService.breadcrumbsAdd([
@@ -81,7 +82,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           13: [ 'READ', 'UPDATE', 'CREATE', 'DELETE', 'READ_HISTORY', 'DELETE_HISTORY', 'CREATE_BATCH_MIGRATE_PROCESS_INSTANCES', 'CREATE_BATCH_MODIFY_PROCESS_INSTANCES', 'CREATE_BATCH_RESTART_PROCESS_INSTANCES', 'CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES', 'CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES', 'CREATE_BATCH_DELETE_DECISION_INSTANCES', 'CREATE_BATCH_SET_JOB_RETRIES', 'CREATE_BATCH_SET_REMOVAL_TIME', 'CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES', 'CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND' ],
           14: [ 'READ' ],
           15: [ 'ALL', 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
-          16: [ 'ALL', 'READ', 'UPDATE', 'CREATE', 'DELETE' ]
+          16: [ 'ALL', 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
+          17: [ 'READ', 'DELETE' ]
         };
 
         $scope.typeMap = {
