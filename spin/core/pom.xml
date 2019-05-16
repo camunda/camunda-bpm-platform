@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.camunda.spin</groupId>
     <artifactId>camunda-spin-root</artifactId>
-    <version>1.6.9-SNAPSHOT</version>
+    <version>1.6.8-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-spin-core</artifactId>
   <name>camunda Spin - core</name>
 
   <properties>
-    <powermock.version>2.0.2</powermock.version>
+    <powermock.version>1.5.6</powermock.version>
   </properties>
 
   <dependencies>
@@ -76,17 +76,10 @@
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito2</artifactId>
+      <artifactId>powermock-api-mockito</artifactId>
       <version>${powermock.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.23.2-GA</version>
-      <scope>test</scope>
-    </dependency>
-
 
   </dependencies>
 
@@ -105,6 +98,27 @@
               <argLine>-XX:PermSize=128m -XX:MaxPermSize=256m</argLine>
               <excludes>
                 <exclude>**/javascript/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- exclude the DataFormatProviderTest until PowerMock 2.0 is released: https://app.camunda.com/jira/browse/CAM-9309 -->
+    <profile>
+      <id>jdk-9-and-onwards</id>
+      <activation>
+        <jdk>[9,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>-XX:PermSize=128m -XX:MaxPermSize=256m</argLine>
+              <excludes>
+                <exclude>**/DataFormatProviderTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
