@@ -165,7 +165,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 1);// "revoke specific process definition" has no effect since task log is not related to a definition
     
     deleteTask(taskId, true);
   }
@@ -359,6 +359,54 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+  }
+  
+  public void testQuerySetAssigneeTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    setAssignee(taskId, "demo");
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
+    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+
+    // then
+    verifyQueryResults(query, 0);// "revoke process definition" wins over "grant all categories" since task log is related to the definition
+  }
+  
+  public void testQuerySetAssigneeTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeOnUnrelatedProcessDefinition() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    setAssignee(taskId, "demo");
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
+    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_CASE_KEY, userId, READ_HISTORY);
+
+    // when
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+
+    // then
+    verifyQueryResults(query, 2);// "revoke process definition" has no effect since task log is not related to the definition
+  }
+  
+  public void testQuerySetAssigneeTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    setAssignee(taskId, "demo");
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
+    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+
+    // then
+    verifyQueryResults(query, 0);// "revoke all process definitions" wins over "grant all categories"
   }
 
   // (case) human task /////////////////////////////
