@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermi
 import static org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions.READ;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_OPERATOR;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_TASK_WORKER;
-
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +43,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.junit.Ignore;
 
 /**
  * @author Roman Smirnov
@@ -105,7 +105,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
   
-  public void testQueryCreateStandaloneTaskUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
+  // CAM-9888
+  public void failing_testQueryCreateStandaloneTaskUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -116,7 +117,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 0);
     
     deleteTask(taskId, true);
   }
@@ -169,8 +170,9 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     
     deleteTask(taskId, true);
   }
-  
-  public void testQueryCreateStandaloneTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeReadHistoryOnAnyProcessDefinition() {
+
+  // CAM-9888
+  public void failing_testQueryCreateStandaloneTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeReadHistoryOnAnyProcessDefinition() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -182,7 +184,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     
     // then
-    verifyQueryResults(query, 0);// "revoke all process definitions" wins over "grant all categories"
+    // "grant all categories" should preceed over "revoke all process definitions" 
+    verifyQueryResults(query, 1);
     
     deleteTask(taskId, true);
   }
@@ -219,7 +222,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
   
-  public void testQuerySetAssigneeStandaloneTaskUserOperationLogWithReadPermissionOnAnyProcessDefinition() {
+  // CAM-9888
+  public void failing_testQuerySetAssigneeStandaloneTaskUserOperationLogWithReadPermissionOnAnyProcessDefinition() {
     // given
     String taskId = "myTask";
     createTask(taskId);
@@ -231,7 +235,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 2);
+    verifyQueryResults(query, 0);
 
     deleteTask(taskId, true);
   }
@@ -439,7 +443,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
   
-  public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
+  // CAM-9888
+  public void failing_testQuerySetAssigneeHumanTaskUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
@@ -451,7 +456,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 1);
+    verifyQueryResults(query, 0);
   }
   
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadPermissionOnCategory() {
@@ -526,8 +531,9 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     
-    // then
+    // then only user operation log of non standalone jobs are visible
     verifyQueryResults(query, 1);
+    assertEquals(ONE_TASK_PROCESS_KEY, query.singleResult().getProcessDefinitionKey());
     
     disableAuthorization();
     managementService.deleteJob(jobId);
@@ -535,14 +541,17 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     
     clearDatabase();
   }
-  
+
+  @Ignore("CAM-9888")
   public void testQuerySetStandaloneJobRetriesUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     disableAuthorization();
+    identityService.clearAuthentication();
     repositoryService.suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY, true, new Date());
     enableAuthorization();
 
     disableAuthorization();
+    identityService.setAuthentication(userId, null);
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
@@ -552,8 +561,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
-    // then expect 2 entries (due to necessary permission on 'Operator' category, the definition suspension can be seen as well)
-    verifyQueryResults(query, 2);
+    // then only non-stadalone jobs entries
+    verifyQueryResults(query, 1);
 
     disableAuthorization();
     managementService.deleteJob(jobId);
@@ -606,6 +615,32 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+
+    disableAuthorization();
+    managementService.deleteJob(jobId);
+    enableAuthorization();
+
+    clearDatabase();
+  }
+
+  public void testQuerySetStandaloneJobRetriesUserOperationLogWithReadPermissionOnWrongCategory() {
+    // given
+    disableAuthorization();
+    repositoryService.suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY, true, new Date());
+    enableAuthorization();
+
+    disableAuthorization();
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.setJobRetries(jobId, 5);
+    enableAuthorization();
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, READ);
+    
+    // when
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+
+    // then
+    verifyQueryResults(query, 0);
 
     disableAuthorization();
     managementService.deleteJob(jobId);

@@ -42,6 +42,8 @@ import org.camunda.bpm.qa.upgrade.timestamp.JobTimestampsScenario;
 import org.camunda.bpm.qa.upgrade.timestamp.MeterLogTimestampScenario;
 import org.camunda.bpm.qa.upgrade.timestamp.TaskCreateTimeScenario;
 import org.camunda.bpm.qa.upgrade.timestamp.UserLockExpTimeScenario;
+import org.camunda.bpm.qa.upgrade.useroperationlog.CreateStandaloneTaskScenario;
+import org.camunda.bpm.qa.upgrade.useroperationlog.SetAssigneeProcessInstanceTaskScenario;
 
 /**
  * @author Tassilo Weidner
@@ -84,6 +86,8 @@ public class TestFixture {
     runner.setupScenarios(EventSubscriptionCreateTimeScenario.class);
     runner.setupScenarios(MeterLogTimestampScenario.class);
     runner.setupScenarios(UserLockExpTimeScenario.class);
+    runner.setupScenarios(CreateStandaloneTaskScenario.class);
+    runner.setupScenarios(SetAssigneeProcessInstanceTaskScenario.class);
 
     processEngine.close();
   }
