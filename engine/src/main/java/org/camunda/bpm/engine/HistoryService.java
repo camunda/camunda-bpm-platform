@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -290,7 +291,14 @@ public interface HistoryService {
    * Deletes a user operation log entry. Does not cascade to any related entities.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           For entries related to process definition keys: If the user has
+   *           neither {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION} nor
+   *           {@link UserOperationLogCategoryPermissions#DELETE} permission on
+   *           {@link Resources#OPERATION_LOG_CATEGORY}. For entries not related
+   *           to process definition keys: If the user has no
+   *           {@link UserOperationLogCategoryPermissions#DELETE} permission on
+   *           {@link Resources#OPERATION_LOG_CATEGORY}.
    */
   void deleteUserOperationLogEntry(String entryId);
 
