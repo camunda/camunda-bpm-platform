@@ -31,8 +31,14 @@ var Batch = function(camAPI, localConf) {
     job: 'batch-job-sort'
   };
 
-  var runtimeSorting = this._loadLocal('runtime', { sortBy: 'batchId', sortOrder: 'asc' });
-  var historySorting = this._loadLocal('history', { sortBy: 'startTime', sortOrder: 'desc' });
+  var runtimeSorting = this._loadLocal('runtime', {
+    sortBy: 'batchId',
+    sortOrder: 'asc'
+  });
+  var historySorting = this._loadLocal('history', {
+    sortBy: 'startTime',
+    sortOrder: 'desc'
+  });
 
   this._batches = {
     runtime: {
@@ -56,7 +62,7 @@ var Batch = function(camAPI, localConf) {
     }
   };
 
-  var jobSorting = this._loadLocal('job', { sortBy: 'jobId', sortOrder: 'asc' });
+  var jobSorting = this._loadLocal('job', {sortBy: 'jobId', sortOrder: 'asc'});
 
   this._jobs = {
     state: 'INITIAL',
@@ -67,7 +73,7 @@ var Batch = function(camAPI, localConf) {
   };
 
   this.deleteModal = {
-    instance : null
+    instance: null
   };
 
   var self = this;
@@ -112,11 +118,10 @@ Batch.prototype._remove = function(params) {
   params.id = obj.data.id;
   var self = this;
   return this._sdk.resource('batch').delete(params, function(err) {
-
     self.deleteModal.instance && self.deleteModal.instance.close();
     self.deleteModal.instance = null;
 
-    if(err) {
+    if (err) {
       events.emit('batch:delete:failed', err);
     } else {
       events.emit('batch:delete:success');
@@ -130,7 +135,7 @@ Batch.prototype._remove = function(params) {
 
 var handleRetryResponse = function(context) {
   return function(err) {
-    if(err) {
+    if (err) {
       events.emit('job:retry:failed', err);
     } else {
       events.emit('job:retry:success');
@@ -141,23 +146,29 @@ var handleRetryResponse = function(context) {
 };
 
 Batch.prototype.retryAll = function() {
-  return this._sdk.resource('job-definition').setRetries({
-    id: this._batches.selection.data.batchJobDefinitionId,
-    retries: 1
-  }, handleRetryResponse(this));
+  return this._sdk.resource('job-definition').setRetries(
+    {
+      id: this._batches.selection.data.batchJobDefinitionId,
+      retries: 1
+    },
+    handleRetryResponse(this)
+  );
 };
 
 Batch.prototype.retryJob = function(job) {
-  return this._sdk.resource('job').setRetries({
-    id: job.id,
-    retries: 1
-  }, handleRetryResponse(this));
+  return this._sdk.resource('job').setRetries(
+    {
+      id: job.id,
+      retries: 1
+    },
+    handleRetryResponse(this)
+  );
 };
 
 Batch.prototype.deleteJob = function(job) {
   var self = this;
   return this._sdk.resource('job').delete(job.id, function(err) {
-    if(err) {
+    if (err) {
       events.emit('job:delete:failed', err);
     } else {
       events.emit('job:delete:success');
@@ -168,10 +179,21 @@ Batch.prototype.deleteJob = function(job) {
 };
 
 Batch.prototype.getProgressPercentage = function(batch, type) {
-  switch(type) {
-  case 'success': return 100 * batch.completedJobs / (batch.completedJobs + batch.remainingJobs);
-  case 'failed': return 100 * batch.failedJobs / (batch.completedJobs + batch.remainingJobs);
-  case 'remaining': return 100 * (batch.remainingJobs - batch.failedJobs) / (batch.completedJobs + batch.remainingJobs);
+  switch (type) {
+    case 'success':
+      return (
+        (100 * batch.completedJobs) /
+        (batch.completedJobs + batch.remainingJobs)
+      );
+    case 'failed':
+      return (
+        (100 * batch.failedJobs) / (batch.completedJobs + batch.remainingJobs)
+      );
+    case 'remaining':
+      return (
+        (100 * (batch.remainingJobs - batch.failedJobs)) /
+        (batch.completedJobs + batch.remainingJobs)
+      );
   }
 };
 
@@ -180,10 +202,13 @@ Batch.prototype.getProgressRoundedPercentage = function(batch, type) {
 };
 
 Batch.prototype.getProgressAbsolute = function(batch, type) {
-  switch(type) {
-  case 'success': return batch.completedJobs;
-  case 'failed': return batch.failedJobs;
-  case 'remaining': return batch.remainingJobs - batch.failedJobs;
+  switch (type) {
+    case 'success':
+      return batch.completedJobs;
+    case 'failed':
+      return batch.failedJobs;
+    case 'remaining':
+      return batch.remainingJobs - batch.failedJobs;
   }
 };
 
@@ -204,7 +229,7 @@ Batch.prototype.getJobCount = function() {
 };
 
 Batch.prototype.getLoadingState = function(type) {
-  if(type === 'jobs') {
+  if (type === 'jobs') {
     return this._jobs.state;
   }
   return this._batches[type].state;
@@ -231,7 +256,7 @@ Batch.prototype.getPageSize = function() {
 };
 
 Batch.prototype.getCurrentPage = function(type) {
-  if(type === 'jobs') {
+  if (type === 'jobs') {
     return this._jobs.currentPage;
   }
   return this._batches[type].currentPage;
@@ -246,17 +271,22 @@ Batch.prototype.toggleSuspension = function() {
   var selection = this.getSelection();
   selection.state = 'LOADING';
 
-  return this._sdk.resource('batch').suspended({
-    id: selection.id,
-    suspended: !selection.suspended
-  }, function(err) {
-    if (err) { throw err; } // notification?? but how?
-    self.loadDetails(selection.id, 'runtime');
-  });
+  return this._sdk.resource('batch').suspended(
+    {
+      id: selection.id,
+      suspended: !selection.suspended
+    },
+    function(err) {
+      if (err) {
+        throw err;
+      } // notification?? but how?
+      self.loadDetails(selection.id, 'runtime');
+    }
+  );
 };
 
 Batch.prototype.updatePage = function(type) {
-  if(type === 'job') {
+  if (type === 'job') {
     return this._loadFailedJobs(this.getSelection());
   }
   this._load(type);
@@ -274,9 +304,11 @@ Batch.prototype.loadPeriodically = function(interval) {
     self.load();
 
     // also update the state of the currently selected batch
-    if(self._batches.selection.state === 'LOADED' &&
-       self._batches.selection.type === 'runtime' &&
-       self._jobs.count === 0) {
+    if (
+      self._batches.selection.state === 'LOADED' &&
+      self._batches.selection.type === 'runtime' &&
+      self._jobs.count === 0
+    ) {
       self.loadDetails(self._batches.selection.data.id, 'runtime');
     }
   }, interval);
@@ -292,8 +324,7 @@ Batch.prototype.loadDetails = function(id, type) {
   obj.type = type;
   var self = this;
 
-  var cb = (function(err, data) {
-
+  var cb = function(err, data) {
     var loadingFailed = function(errMsg) {
       events.emit('load:details:failed');
 
@@ -306,15 +337,15 @@ Batch.prototype.loadDetails = function(id, type) {
 
       obj.state = 'LOADED';
 
-      if(type === 'runtime') {
+      if (type === 'runtime') {
         self._loadFailedJobs(obj.data);
       }
     };
 
-    if(err || typeof data.length !== 'undefined' && data.length === 0) {
+    if (err || (typeof data.length !== 'undefined' && data.length === 0)) {
       // if the runtime version of the batch was requested,
       // try again with history (it may have finished in the meantime)
-      if(type === 'runtime') {
+      if (type === 'runtime') {
         events.emit('details:switchToHistory');
         self.loadDetails(id, 'history');
       } else {
@@ -349,15 +380,15 @@ Batch.prototype.loadDetails = function(id, type) {
         loadingSuccessful();
       }
     }
-  }).bind(this);
+  }.bind(this);
 
-  switch(type) {
-  case 'runtime':
-    this._sdk.resource('batch').statistics({batchId: id}, cb);
-    break;
-  case 'history':
-    this._sdk.resource('history').singleBatch(id, cb);
-    break;
+  switch (type) {
+    case 'runtime':
+      this._sdk.resource('batch').statistics({batchId: id}, cb);
+      break;
+    case 'history':
+      this._sdk.resource('history').singleBatch(id, cb);
+      break;
   }
 };
 
@@ -373,31 +404,34 @@ Batch.prototype._loadFailedJobs = function(data) {
     noRetriesLeft: true,
     firstResult: (obj.currentPage - 1) * PAGE_SIZE,
     maxResults: PAGE_SIZE,
-    sorting: [ this._jobs.sorting ]
+    sorting: [this._jobs.sorting]
   };
 
-  this._sdk.resource('job').list(params, (function(err, data) {
-    if(err) {
-      obj.data = err.message;
-      obj.state = 'ERROR';
-    } else {
-      obj.data = data;
+  this._sdk.resource('job').list(
+    params,
+    function(err, data) {
+      if (err) {
+        obj.data = err.message;
+        obj.state = 'ERROR';
+      } else {
+        obj.data = data;
 
-      delete params.sorting;
+        delete params.sorting;
 
-      this._sdk.resource('job').count(params, function(err, data) {
-        obj.state = data ? 'LOADED' : 'EMPTY';
-        obj.count = data;
-        events.emit('load:jobs:completed');
-      });
-    }
-  }).bind(this));
+        this._sdk.resource('job').count(params, function(err, data) {
+          obj.state = data ? 'LOADED' : 'EMPTY';
+          obj.count = data;
+          events.emit('load:jobs:completed');
+        });
+      }
+    }.bind(this)
+  );
 };
 
 Batch.prototype._load = function(type) {
   var obj = this._batches[type];
 
-  if(!obj.data) {
+  if (!obj.data) {
     obj.state = 'LOADING';
   }
 
@@ -409,18 +443,18 @@ Batch.prototype._load = function(type) {
   var countCb = function(err, data) {
     obj.state = data.count ? 'LOADED' : 'EMPTY';
     obj.count = data.count;
-    events.emit('load:'+type+':completed');
+    events.emit('load:' + type + ':completed');
   };
   var cb = function(err, data) {
     obj.data = data.items || data;
-    if(typeof data.count !== 'undefined') {
-      countCb(err,data);
+    if (typeof data.count !== 'undefined') {
+      countCb(err, data);
     } else {
-      switch(type) {
-      case 'runtime':
-        return this._sdk.resource('batch').statisticsCount(params, countCb);
-      case 'history':
-        return this._sdk.resource('history').batchCount(params, countCb);
+      switch (type) {
+        case 'runtime':
+          return this._sdk.resource('batch').statisticsCount(params, countCb);
+        case 'history':
+          return this._sdk.resource('history').batchCount(params, countCb);
       }
     }
   }.bind(this);
@@ -430,15 +464,14 @@ Batch.prototype._load = function(type) {
     params.sortOrder = obj.sorting.sortOrder;
   }
 
-  switch(type) {
-  case 'runtime':
-    return this._sdk.resource('batch').statistics(params, cb);
-  case 'history':
-    params.completed = true;
-    return this._sdk.resource('history').batch(params, cb);
+  switch (type) {
+    case 'runtime':
+      return this._sdk.resource('batch').statistics(params, cb);
+    case 'history':
+      params.completed = true;
+      return this._sdk.resource('history').batch(params, cb);
   }
 };
-
 
 Batch.prototype.sortingKeys = [
   'id',

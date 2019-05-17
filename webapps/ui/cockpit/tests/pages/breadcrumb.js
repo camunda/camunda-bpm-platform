@@ -20,9 +20,10 @@
 var Base = require('./base');
 
 module.exports = Base.extend({
-
   crumb: function(index) {
-    return element(by.css('.cam-breadcrumb [data-index="' + index + '"] a.text'));
+    return element(
+      by.css('.cam-breadcrumb [data-index="' + index + '"] a.text')
+    );
   },
 
   selectCrumb: function(index) {
@@ -60,7 +61,8 @@ module.exports = Base.extend({
   activeCrumbDropdownSelect: function(what) {
     var self = this;
     return self.activeCrumbDropdownOpen().then(function() {
-      self.activeCrumbDropdown()
+      self
+        .activeCrumbDropdown()
         .element(by.cssContainingText('.dropdown-menu > li > a', what))
         .click();
     });

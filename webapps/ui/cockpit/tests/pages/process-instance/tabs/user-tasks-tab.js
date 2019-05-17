@@ -20,7 +20,6 @@
 var Table = require('./../../table');
 
 module.exports = Table.extend({
-
   tabRepeater: 'tabProvider in processInstanceTabs',
   tabIndex: 3,
   tabLabel: 'User Tasks',
@@ -56,5 +55,4 @@ module.exports = Table.extend({
   clickChangeUserIdentityLinksButton: function() {
     this.changeUserIdentityLinksButton().click();
   }
-
 });

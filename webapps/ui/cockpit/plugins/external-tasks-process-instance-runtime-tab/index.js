@@ -32,7 +32,10 @@ var ngModule = angular.module('cockpit.plugin.process-instance-runtime-tab', [
 
 ngModule.factory('externalTasks', externalTasks);
 
-ngModule.controller('ProcessInstanceRuntimeTabController', ProcessInstanceRuntimeTabController);
+ngModule.controller(
+  'ProcessInstanceRuntimeTabController',
+  ProcessInstanceRuntimeTabController
+);
 
 ngModule.config(viewConfig);
 

@@ -25,24 +25,33 @@ module.exports = [
       '$location',
       'routeUtil',
       function($scope, Views, $location, routeUtil) {
-        var providers = Views.getProviders({ component: $scope.id });
+        var providers = Views.getProviders({component: $scope.id});
         $scope.providers = providers;
 
-        var isActive = $scope.isActive = function(provider) {
+        var isActive = ($scope.isActive = function(provider) {
           return $location.path().indexOf('/' + provider.id) != -1;
-        };
+        });
 
         $scope.getUrl = function(provider) {
           var replacement = provider.id,
-              currentPath = $location.path(),
-              currentSearch = $location.search(),
-              keepSearchParams = !isActive(provider) ? provider.keepSearchParams : true;
+            currentPath = $location.path(),
+            currentSearch = $location.search(),
+            keepSearchParams = !isActive(provider)
+              ? provider.keepSearchParams
+              : true;
 
-          return '#' + routeUtil.replaceLastPathFragment(replacement, currentPath, currentSearch, keepSearchParams);
-
+          return (
+            '#' +
+            routeUtil.replaceLastPathFragment(
+              replacement,
+              currentPath,
+              currentSearch,
+              keepSearchParams
+            )
+          );
         };
-
-      }];
+      }
+    ];
 
     return {
       restrict: 'EAC',
@@ -58,4 +67,5 @@ module.exports = [
       replace: true,
       controller: ViewPillsController
     };
-  }];
+  }
+];

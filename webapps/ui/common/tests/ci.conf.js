@@ -17,11 +17,11 @@
 
 'use strict';
 
-var chai     = require('chai');
+var chai = require('chai');
 var promised = require('chai-as-promised');
 
 chai.use(promised);
-global.expect   = chai.expect;
+global.expect = chai.expect;
 
 process.env.PROSHOT_DIR = './target/screenshots';
 process.env.multi = 'xunit-file=- mocha-proshot=-';
@@ -29,16 +29,15 @@ process.env.multi = 'xunit-file=- mocha-proshot=-';
 var tested = process.env.TESTED || '*';
 
 exports.config = {
-
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
   allScriptsTimeout: 15000,
 
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
-    'browserName': 'chrome',
-    'loggingPrefs': {
-      'browser': 'ALL'
+    browserName: 'chrome',
+    loggingPrefs: {
+      browser: 'ALL'
     }
   },
 

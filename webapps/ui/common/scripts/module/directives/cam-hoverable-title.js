@@ -28,7 +28,9 @@ module.exports = function() {
       $attr.$observe('camHoverableTitle', function(title) {
         cleanUp();
 
-        removeHoverListener = HoverArea.addHoverListener(title, function(isHovered) {
+        removeHoverListener = HoverArea.addHoverListener(title, function(
+          isHovered
+        ) {
           if (isHovered) {
             $element.addClass(hoverClass);
           } else {

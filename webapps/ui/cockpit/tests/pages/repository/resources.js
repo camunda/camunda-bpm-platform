@@ -20,17 +20,22 @@
 var Page = require('./repository-view');
 
 module.exports = Page.extend({
-
   formElement: function() {
     return element(by.css('[cam-resources]'));
   },
 
   resourceList: function() {
-    return this.formElement().all(by.repeater('(delta, resource) in resources'));
+    return this.formElement().all(
+      by.repeater('(delta, resource) in resources')
+    );
   },
 
   getResourceIndex: function(resourceName) {
-    return this.findElementIndexInRepeater('(delta, resource) in resources', by.css('.name .resource'), resourceName).then(function(idx) {
+    return this.findElementIndexInRepeater(
+      '(delta, resource) in resources',
+      by.css('.name .resource'),
+      resourceName
+    ).then(function(idx) {
       return idx;
     });
   },
@@ -38,8 +43,14 @@ module.exports = Page.extend({
   selectResource: function(idxOrName) {
     var self = this;
     function callPageObject(idx) {
-      self.resourceList().get(idx).element(by.css('a')).click();
-      self.waitForElementToBeVisible(element(by.css('[cam-resource-meta] .name')));
+      self
+        .resourceList()
+        .get(idx)
+        .element(by.css('a'))
+        .click();
+      self.waitForElementToBeVisible(
+        element(by.css('[cam-resource-meta] .name'))
+      );
     }
 
     if (typeof idxOrName === 'number') {
@@ -50,7 +61,9 @@ module.exports = Page.extend({
   },
 
   resourceName: function(idx) {
-    return this.resourceList().get(idx).element(by.css('a')).getText();
+    return this.resourceList()
+      .get(idx)
+      .element(by.css('a'))
+      .getText();
   }
-
 });

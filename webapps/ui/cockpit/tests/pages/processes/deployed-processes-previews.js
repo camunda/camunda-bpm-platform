@@ -20,7 +20,6 @@
 var Base = require('./deployed-processes-plugin');
 
 module.exports = Base.extend({
-
   tabLabel: 'Previews',
 
   previewsObject: function() {
@@ -28,11 +27,15 @@ module.exports = Base.extend({
   },
 
   processesPreviews: function() {
-    return this.previewsObject().all(by.repeater('pd in processDefinitionData'));
+    return this.previewsObject().all(
+      by.repeater('pd in processDefinitionData')
+    );
   },
 
   selectProcess: function(item) {
-    return this.processesList().get(item).element(by.binding('{{ pd.name }}')).click();
+    return this.processesList()
+      .get(item)
+      .element(by.binding('{{ pd.name }}'))
+      .click();
   }
-
 });

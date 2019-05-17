@@ -19,79 +19,81 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments-sorting-choices.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-cockpit-deployments-sorting-choices.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-module.exports = ['$translate', function($translate) {
+module.exports = [
+  '$translate',
+  function($translate) {
+    return {
+      restrict: 'A',
+      scope: {
+        deploymentsData: '='
+      },
 
-  return {
+      template: template,
 
-    restrict: 'A',
-    scope: {
-      deploymentsData: '='
-    },
+      controller: [
+        '$scope',
+        'search',
+        function($scope, search) {
+          var deploymentsSortingData = ($scope.deploymentsSortingData = $scope.deploymentsData.newChild(
+            $scope
+          ));
 
-    template: template,
+          var uniqueProps = ($scope.uniqueProps = {
+            id: $translate.instant('REPOSITORY_DEPLOYMENTS_ID'),
+            name: $translate.instant('REPOSITORY_DEPLOYMENTS_NAME'),
+            deploymentTime: $translate.instant(
+              'REPOSITORY_DEPLOYMENTS_DEPLOYMENT_TIME'
+            )
+          });
 
-    controller: [
-      '$scope',
-      'search',
-      function(
-        $scope,
-        search
-      ) {
+          // utilities /////////////////////////////////////////////////////////////////
 
-        var deploymentsSortingData = $scope.deploymentsSortingData = $scope.deploymentsData.newChild($scope);
+          var updateSilently = function(params) {
+            search.updateSilently(params);
+          };
 
-        var uniqueProps = $scope.uniqueProps = {
-          id:               $translate.instant('REPOSITORY_DEPLOYMENTS_ID'),
-          name:             $translate.instant('REPOSITORY_DEPLOYMENTS_NAME'),
-          deploymentTime:   $translate.instant('REPOSITORY_DEPLOYMENTS_DEPLOYMENT_TIME')
-        };
+          var updateSorting = function(searchParam, value) {
+            var search = {};
+            search[searchParam] = value;
+            updateSilently(search);
+            deploymentsSortingData.changed('deploymentsSorting');
+          };
 
+          // observe data /////////////////////////////////////////////////////////////
 
-        // utilities /////////////////////////////////////////////////////////////////
+          deploymentsSortingData.observe('deploymentsSorting', function(
+            pagination
+          ) {
+            $scope.sorting = angular.copy(pagination);
+          });
 
-        var updateSilently = function(params) {
-          search.updateSilently(params);
-        };
+          // label ///////////////////////////////////////////////////////////////////
 
-        var updateSorting = function(searchParam, value) {
-          var search = {};
-          search[searchParam] = value;
-          updateSilently(search);
-          deploymentsSortingData.changed('deploymentsSorting');
-        };
+          $scope.byLabel = function(sortBy) {
+            return uniqueProps[sortBy];
+          };
 
-        // observe data /////////////////////////////////////////////////////////////
+          // sort order //////////////////////////////////////////////////////////////
 
-        deploymentsSortingData.observe('deploymentsSorting', function(pagination) {
-          $scope.sorting = angular.copy(pagination);
-        });
+          $scope.changeOrder = function() {
+            var value = $scope.sorting.sortOrder === 'asc' ? 'desc' : 'asc';
+            updateSorting('deploymentsSortOrder', value);
+          };
 
+          // sort by /////////////////////////////////////////////////////////////////
 
-        // label ///////////////////////////////////////////////////////////////////
-
-        $scope.byLabel = function(sortBy) {
-          return uniqueProps[sortBy];
-        };
-
-
-        // sort order //////////////////////////////////////////////////////////////
-
-        $scope.changeOrder = function() {
-          var value = $scope.sorting.sortOrder === 'asc' ? 'desc' : 'asc';
-          updateSorting('deploymentsSortOrder', value);
-        };
-
-
-        // sort by /////////////////////////////////////////////////////////////////
-
-        $scope.changeBy = function(by) {
-          updateSorting('deploymentsSortBy', by);
-        };
-
-      }]
-  };
-}];
+          $scope.changeBy = function(by) {
+            updateSorting('deploymentsSortBy', by);
+          };
+        }
+      ]
+    };
+  }
+];

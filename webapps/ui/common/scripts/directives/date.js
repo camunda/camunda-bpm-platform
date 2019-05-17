@@ -22,13 +22,13 @@ module.exports = function() {
     restrict: 'A',
     require: 'ngModel',
     link: function(scope, element, attrs, model) {
-
       var pattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
 
       var dateParser = function(value) {
-
         var isValidPattern = pattern.test(value);
-        var isValidValue = isValidPattern ? !isNaN(new Date(value).getTime()) : true;
+        var isValidValue = isValidPattern
+          ? !isNaN(new Date(value).getTime())
+          : true;
         model.$setValidity('datePattern', isValidPattern);
         model.$setValidity('dateValue', isValidValue);
         return value;
@@ -37,7 +37,6 @@ module.exports = function() {
       model.$parsers.push(dateParser);
 
       var dateFormatter = function(value) {
-
         // if the value is not set,
         // then ignore it!
         if (!value) {

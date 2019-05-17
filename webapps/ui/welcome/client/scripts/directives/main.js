@@ -18,8 +18,8 @@
 'use strict';
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    userProfile = require('./user-profile'),
-    customLinks = require('./custom-links');
+  userProfile = require('./user-profile'),
+  customLinks = require('./custom-links');
 
 var directivesModule = angular.module('cam.welcome.directives', []);
 

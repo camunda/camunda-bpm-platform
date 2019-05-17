@@ -24,11 +24,7 @@ module.exports = function(config, watchConf) {
 
   watchConf.webapp_common_lint = {
     options: options,
-    files: [
-      '<%= pkg.gruntConfig.pluginSourceDir %>/common/scripts/**/*.js'
-    ],
-    tasks: [
-      'newer:eslint:webapp_common'
-    ]
+    files: ['<%= pkg.gruntConfig.pluginSourceDir %>/common/scripts/**/*.js'],
+    tasks: ['newer:eslint:webapp_common']
   };
 };

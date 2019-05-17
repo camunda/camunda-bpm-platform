@@ -18,13 +18,14 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-inputs.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-sorting-inputs.html',
+  'utf8'
+);
 
 module.exports = [
   '$translate',
-  function(
-    $translate
-  ) {
+  function($translate) {
     return {
       restrict: 'AC',
 
@@ -41,22 +42,22 @@ module.exports = [
 
       controller: [
         '$scope',
-        function(
-          $scope
-        ) {
+        function($scope) {
           $scope.variableTypes = {
-            'Boolean':  $translate.instant('BOOLEAN'),
-            'Double':   $translate.instant('DOUBLE'),
-            'Date':     $translate.instant('DATE'),
-            'Integer':  $translate.instant('INTEGER'),
-            'Long':     $translate.instant('LONG'),
-            'Short':    $translate.instant('SHORT'),
-            'String':   $translate.instant('STRING')
+            Boolean: $translate.instant('BOOLEAN'),
+            Double: $translate.instant('DOUBLE'),
+            Date: $translate.instant('DATE'),
+            Integer: $translate.instant('INTEGER'),
+            Long: $translate.instant('LONG'),
+            Short: $translate.instant('SHORT'),
+            String: $translate.instant('STRING')
           };
 
           $scope.applySorting = function(evt) {
             $scope.applyHandler({$event: evt});
           };
-        }]
+        }
+      ]
     };
-  }];
+  }
+];

@@ -19,7 +19,7 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
+var DEFAULT_PAGES = {size: 50, total: 0, current: 1};
 
 module.exports = {
   initializePaginationInController: initializePaginationInController
@@ -35,7 +35,7 @@ module.exports = {
  * @returns {*}
  */
 function initializePaginationInController($scope, search, updateCallback) {
-  var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
+  var pages = ($scope.pages = angular.copy(DEFAULT_PAGES));
   pages.current = getCurrentPageFromSearch(search);
 
   $scope.$watch('pages.current', function(newValue, oldValue) {

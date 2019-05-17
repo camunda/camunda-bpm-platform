@@ -18,7 +18,10 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form-permission.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-filter-modal-form-permission.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
@@ -30,14 +33,8 @@ module.exports = [
   'camAPI',
   '$q',
   '$timeout',
-  function(
-    camAPI,
-    $q,
-    $timeout
-  ) {
-
+  function(camAPI, $q, $timeout) {
     return {
-
       restrict: 'A',
       require: '^camTasklistFilterModalForm',
       scope: {
@@ -77,7 +74,9 @@ module.exports = [
 
         var Authorization = camAPI.resource('authorization');
 
-        var filterAuthorizationData = $scope.filterModalFormData.newChild($scope);
+        var filterAuthorizationData = $scope.filterModalFormData.newChild(
+          $scope
+        );
 
         var _form = $scope.filterPermissionForm;
 
@@ -88,7 +87,7 @@ module.exports = [
 
         var NEW_DEFAULT_AUTHORIZATION = {
           resourceType: RESOURCE_TYPE,
-          permissions: [ 'READ' ]
+          permissions: ['READ']
         };
 
         var NEW_PERMISSION = {
@@ -96,7 +95,7 @@ module.exports = [
           id: null
         };
 
-        var newPermission = $scope.newPermission = copy(NEW_PERMISSION);
+        var newPermission = ($scope.newPermission = copy(NEW_PERMISSION));
 
         // register handler to show or hide the accordion hint /////////////////
 
@@ -106,59 +105,75 @@ module.exports = [
           return control && control.$error && control.$error.duplicate;
         };
 
-        parentCtrl.registerHintProvider('filterPermissionForm', showHintProvider);
+        parentCtrl.registerHintProvider(
+          'filterPermissionForm',
+          showHintProvider
+        );
 
         // provide ////////////////////////////////////////////////////////////////////////
 
-        filterAuthorizationData.provide('authorizations', ['filter', function(filter) {
-          var deferred = $q.defer();
+        filterAuthorizationData.provide('authorizations', [
+          'filter',
+          function(filter) {
+            var deferred = $q.defer();
 
-          if(!filter || !filter.id) {
-            // no filter
-            deferred.resolve([]);
+            if (!filter || !filter.id) {
+              // no filter
+              deferred.resolve([]);
+            } else {
+              Authorization.list(
+                {
+                  resourceType: RESOURCE_TYPE,
+                  resourceId: filter.id
+                },
+                function(err, resp) {
+                  if (err) {
+                    deferred.reject(err);
+                  } else {
+                    deferred.resolve(resp);
+                  }
+                }
+              );
+            }
 
+            return deferred.promise;
           }
-          else {
-
-            Authorization.list({
-              resourceType: RESOURCE_TYPE,
-              resourceId: filter.id
-            }, function(err, resp) {
-
-              if(err) {
-                deferred.reject(err);
-              }
-              else {
-                deferred.resolve(resp);
-              }
-
-            });
-          }
-
-          return deferred.promise;
-
-        }]);
+        ]);
 
         // observe ////////////////////////////////////////////////////////////////////////
 
-        $scope.authorizationState = filterAuthorizationData.observe('authorizations', function(_authorizations) {
-          authorizations = $scope.authorizations = copy(_authorizations) || [];
-          initializeAuthorizations(authorizations);
+        $scope.authorizationState = filterAuthorizationData.observe(
+          'authorizations',
+          function(_authorizations) {
+            authorizations = $scope.authorizations =
+              copy(_authorizations) || [];
+            initializeAuthorizations(authorizations);
 
-          globalAuthorization = getGlobalAuthorization(authorizations);
-          $scope.isGlobalReadAuthorization = hasReadPermission(globalAuthorization);
+            globalAuthorization = getGlobalAuthorization(authorizations);
+            $scope.isGlobalReadAuthorization = hasReadPermission(
+              globalAuthorization
+            );
 
-          groupAuthorizationMap = getAuthorziationMap(authorizations, 'groupId');
-          userAuthorizationMap = getAuthorziationMap(authorizations, 'userId');
-        });
+            groupAuthorizationMap = getAuthorziationMap(
+              authorizations,
+              'groupId'
+            );
+            userAuthorizationMap = getAuthorziationMap(
+              authorizations,
+              'userId'
+            );
+          }
+        );
 
         // handle global read permission ////////////////////////////////////////////////////
 
         $scope.globalReadAuthorizationChanged = function() {
           if ($scope.isGlobalReadAuthorization) {
-
             if (!globalAuthorization) {
-              globalAuthorization = angular.extend({ userId: '*', type: 0 }, NEW_DEFAULT_AUTHORIZATION);
+              globalAuthorization = angular.extend(
+                {userId: '*', type: 0},
+                NEW_DEFAULT_AUTHORIZATION
+              );
               authorizations.push(globalAuthorization);
             } else {
               addReadPermissionToAuthorization(globalAuthorization);
@@ -166,9 +181,7 @@ module.exports = [
 
             newPermission.id = null;
             validateNewPermission();
-          }
-          else {
-
+          } else {
             if (globalAuthorization) {
               removeReadPermissionFromAuthorization(globalAuthorization);
             }
@@ -188,10 +201,12 @@ module.exports = [
           }
         };
 
-        var validateNewPermission = $scope.validateNewPermission = function() {
+        var validateNewPermission = ($scope.validateNewPermission = function() {
           var control = getNewPermissionField();
           // new permission fields might not be present when this function is called
-          if (!control) { return; }
+          if (!control) {
+            return;
+          }
 
           control.$setValidity('authorization', true);
           control.$setValidity('duplicate', true);
@@ -199,36 +214,43 @@ module.exports = [
           var id = newPermission.id;
 
           if (id) {
-            var auths = newPermission.type === 'user' ? userAuthorizationMap : groupAuthorizationMap;
+            var auths =
+              newPermission.type === 'user'
+                ? userAuthorizationMap
+                : groupAuthorizationMap;
             var auth = auths[id];
 
             if (auth && hasReadPermission(auth)) {
               return control.$setValidity('duplicate', false);
             }
-
           }
-        };
+        });
 
         $scope.disableAddButton = function() {
           // when the new permission fields are not yet present,
           // the "Add permis." is aimed to make them visible
           // (see addReadPermission below)
-          if (!$scope.showNewPermissionFields) { return false; }
+          if (!$scope.showNewPermissionFields) {
+            return false;
+          }
 
           var control = getNewPermissionField();
 
-          return $scope.isGlobalReadAuthorization || !newPermission.id || (control && control.$error && control.$error.duplicate);
+          return (
+            $scope.isGlobalReadAuthorization ||
+            !newPermission.id ||
+            (control && control.$error && control.$error.duplicate)
+          );
         };
 
-
-        var addReadPermission = $scope.addReadPermission = function() {
+        var addReadPermission = ($scope.addReadPermission = function() {
           // the first click only adds the fields
           if (!$scope.showNewPermissionFields) {
             $scope.showNewPermissionFields = true;
 
             $timeout(function() {
               var element = $element[0].querySelector('.new-permission button');
-              if(element) {
+              if (element) {
                 element.focus();
               }
             });
@@ -240,7 +262,10 @@ module.exports = [
 
           var id = newPermission.id;
 
-          var auths = newPermission.type === 'user' ? userAuthorizationMap : groupAuthorizationMap;
+          var auths =
+            newPermission.type === 'user'
+              ? userAuthorizationMap
+              : groupAuthorizationMap;
           var auth = auths[id];
 
           if (auth) {
@@ -256,9 +281,8 @@ module.exports = [
             }
 
             authorizations.push(auth);
-          }
-          else {
-            auth = { type : 1 };
+          } else {
+            auth = {type: 1};
             var prop = newPermission.type === 'user' ? 'userId' : 'groupId';
             auth[prop] = id;
 
@@ -274,17 +298,16 @@ module.exports = [
 
           $timeout(function() {
             var element = $element[0].querySelector('.new-permission button');
-            if(element) {
+            if (element) {
               element.focus();
             }
           });
-        };
+        });
 
         $scope.keyPressed = function($event) {
           var keyCode = $event.keyCode;
 
           if (keyCode === 13) {
-
             if ($event.preventDefault) {
               // prevent executing switchType()
               $event.preventDefault();
@@ -292,7 +315,12 @@ module.exports = [
 
             var control = getNewPermissionField();
 
-            return newPermission.id && control && (!control.$error || !control.$error.duplicate) && addReadPermission();
+            return (
+              newPermission.id &&
+              control &&
+              (!control.$error || !control.$error.duplicate) &&
+              addReadPermission()
+            );
           }
         };
 
@@ -314,9 +342,7 @@ module.exports = [
           errors = [];
 
           if ($scope.isGlobalReadAuthorization) {
-
             for (var k = 0, auth; (auth = authorizations[k]); k++) {
-
               if (isGrantAuthorization(auth) && hasReadPermission(auth)) {
                 // remove read permission so that the corresponding
                 // authorizations will be updated or deleted
@@ -325,14 +351,19 @@ module.exports = [
             }
           }
 
-          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
+          for (
+            var i = 0, authorization;
+            (authorization = authorizations[i]);
+            i++
+          ) {
             var permissions = authorization.permissions;
             var $permissions = authorization.$permissions;
 
-            if (isGrantAuthorization(authorization) || isGlobalAuthorization(authorization)) {
-
+            if (
+              isGrantAuthorization(authorization) ||
+              isGlobalAuthorization(authorization)
+            ) {
               if (authorization.id) {
-
                 // array of permissions is empty -> delete authorization
                 if (!permissions.length && $permissions.length) {
                   // delete
@@ -340,9 +371,7 @@ module.exports = [
                     type: 'delete',
                     authorization: authorization
                   });
-                }
-                else {
-
+                } else {
                   // permissions changed -> update authorization
                   if (permissions.length !== $permissions.length) {
                     // update
@@ -352,9 +381,7 @@ module.exports = [
                     });
                   }
                 }
-              }
-              else {
-
+              } else {
                 // authorization.id is null and at least one permission
                 // has been added -> create authorization
                 if (permissions.length) {
@@ -368,17 +395,17 @@ module.exports = [
             }
           }
 
-          performSubmit(actions, filter).then(function() {
-            if (!errors || !errors.length) {
-              errors = null;
-            }
+          performSubmit(actions, filter)
+            .then(function() {
+              if (!errors || !errors.length) {
+                errors = null;
+              }
 
-            if (typeof callback === 'function') {
-              return callback(errors);
-            }
-
-          }).catch(angular.noop);
-
+              if (typeof callback === 'function') {
+                return callback(errors);
+              }
+            })
+            .catch(angular.noop);
         };
 
         function performSubmit(actions, filter) {
@@ -388,7 +415,6 @@ module.exports = [
           var count = actions.length;
 
           function submitAction(type, authorization) {
-
             var $permissions = authorization.$permissions;
 
             delete authorization.$permissions;
@@ -400,22 +426,23 @@ module.exports = [
               count = count - 1;
 
               if (!err) {
-
                 if (type === 'create') {
                   authorization.id = resp.id;
-                  authorization.permissions = copy(resp.permissions ||[]);
+                  authorization.permissions = copy(resp.permissions || []);
                   authorization.$permissions = copy(resp.permissions || []);
-                }
-                else {
+                } else {
                   if (type === 'delete') {
                     authorization.id = null;
                   }
 
-                  authorization.permissions = copy(authorization.permissions || []);
-                  authorization.$permissions = copy(authorization.permissions || []);
+                  authorization.permissions = copy(
+                    authorization.permissions || []
+                  );
+                  authorization.$permissions = copy(
+                    authorization.permissions || []
+                  );
                 }
-              }
-              else {
+              } else {
                 errors.push({
                   status: 'FILTER_FORM_PERMISSIONS_SAVE_ERROR',
                   error: err
@@ -428,16 +455,13 @@ module.exports = [
               if (count === 0) {
                 deferred.resolve();
               }
-
             };
 
             if (type === 'create') {
               Authorization.create(authorization, callback);
-            }
-            else if (type === 'update') {
+            } else if (type === 'update') {
               Authorization.update(authorization, callback);
-            }
-            else if (type === 'delete') {
+            } else if (type === 'delete') {
               Authorization.delete(authorization.id, callback);
             }
           }
@@ -465,7 +489,11 @@ module.exports = [
         // helper /////////////////////////////////////////////////////////////////////////
 
         function initializeAuthorizations(authorizations) {
-          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
+          for (
+            var i = 0, authorization;
+            (authorization = authorizations[i]);
+            i++
+          ) {
             // save the original permissions
             authorization.$permissions = copy(authorization.permissions || []);
           }
@@ -506,7 +534,11 @@ module.exports = [
         }
 
         function getGlobalAuthorization(authorizations) {
-          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
+          for (
+            var i = 0, authorization;
+            (authorization = authorizations[i]);
+            i++
+          ) {
             if (isGlobalAuthorization(authorization)) {
               return authorization;
             }
@@ -516,14 +548,18 @@ module.exports = [
         function getAuthorizationsWithReadPermissions(authorizations) {
           var result = [];
 
-          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
-
+          for (
+            var i = 0, authorization;
+            (authorization = authorizations[i]);
+            i++
+          ) {
             if (isGrantAuthorization(authorization)) {
-
-              if (!isGlobalUserOrGroupId(authorization) && hasReadPermission(authorization)) {
+              if (
+                !isGlobalUserOrGroupId(authorization) &&
+                hasReadPermission(authorization)
+              ) {
                 result.push(authorization);
               }
-
             }
           }
 
@@ -534,7 +570,11 @@ module.exports = [
           var _authorizations = getAuthorziations(authorizations, criteria);
           var obj = {};
 
-          for (var i = 0, authorization; (authorization = _authorizations[i]); i++) {
+          for (
+            var i = 0, authorization;
+            (authorization = _authorizations[i]);
+            i++
+          ) {
             var _criteria = authorization[criteria];
             obj[_criteria] = authorization;
           }
@@ -545,16 +585,19 @@ module.exports = [
         function getAuthorziations(authorizations, criteria) {
           var result = [];
 
-          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
-
+          for (
+            var i = 0, authorization;
+            (authorization = authorizations[i]);
+            i++
+          ) {
             if (isGrantAuthorization(authorization)) {
-
-              if (hasProperty(authorization, criteria) && !isGlobalUserOrGroupId(authorization)) {
+              if (
+                hasProperty(authorization, criteria) &&
+                !isGlobalUserOrGroupId(authorization)
+              ) {
                 result.push(authorization);
               }
-
             }
-
           }
 
           return result;
@@ -565,15 +608,13 @@ module.exports = [
             var permissions = authorization.permissions;
 
             if (!permissions || !permissions.length) {
-              authorization.permissions = [ 'READ' ];
-            }
-
-            else if (permissions && permissions.length === 1) {
-              authorization.permissions = authorization.permissions.concat([ 'READ' ]);
-            }
-
-            else {
-              authorization.permissions = [ 'ALL' ];
+              authorization.permissions = ['READ'];
+            } else if (permissions && permissions.length === 1) {
+              authorization.permissions = authorization.permissions.concat([
+                'READ'
+              ]);
+            } else {
+              authorization.permissions = ['ALL'];
             }
           }
         }
@@ -586,14 +627,11 @@ module.exports = [
               var permission = permissions[0];
 
               if (permission === 'ALL') {
-                authorization.permissions = [ 'UPDATE', 'DELETE' ];
-              }
-              else if (permission === 'READ') {
+                authorization.permissions = ['UPDATE', 'DELETE'];
+              } else if (permission === 'READ') {
                 authorization.permissions = [];
               }
-            }
-            else {
-
+            } else {
               authorization.permissions = [];
 
               for (var i = 0, perm; (perm = permissions[i]); i++) {
@@ -601,12 +639,10 @@ module.exports = [
                   authorization.permissions.push(perm);
                 }
               }
-
             }
           }
         }
-
       }
     };
-
-  }];
+  }
+];

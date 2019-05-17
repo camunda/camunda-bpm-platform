@@ -20,7 +20,6 @@
 var ActionBar = require('./../../action-bar');
 
 module.exports = ActionBar.extend({
-
   barRepeater: 'tabProvider in processInstanceActions',
 
   cancelInstanceButton: function() {
@@ -29,11 +28,15 @@ module.exports = ActionBar.extend({
 
   cancelInstance: function() {
     var modal = this.modal;
-    this.cancelInstanceButton().click().then(function() {
-      modal.cancelButton().click().then(function() {
-        modal.okButton().click();
+    this.cancelInstanceButton()
+      .click()
+      .then(function() {
+        modal
+          .cancelButton()
+          .click()
+          .then(function() {
+            modal.okButton().click();
+          });
       });
-    });
   }
-
 });

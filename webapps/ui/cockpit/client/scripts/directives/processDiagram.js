@@ -24,21 +24,29 @@ var template = fs.readFileSync(__dirname + '/processDiagram.html', 'utf8');
 var angular = require('camunda-commons-ui/vendor/angular');
 
 var DirectiveController = [
-  '$scope', '$compile', '$injector', 'Views', 'configuration',
-  function( $scope,   $compile, $injector, Views, configuration) {
-
+  '$scope',
+  '$compile',
+  '$injector',
+  'Views',
+  'configuration',
+  function($scope, $compile, $injector, Views, configuration) {
     $scope.bpmnJsConf = configuration.getBpmnJs();
 
-    $scope.vars = { read: [ 'processData', 'bpmnElement', 'pageData', 'viewer' ] };
-    var diagramPlugins = $scope.diagramProviderComponent ?  Views.getProviders({component: $scope.diagramProviderComponent}) : [];
+    $scope.vars = {read: ['processData', 'bpmnElement', 'pageData', 'viewer']};
+    var diagramPlugins = $scope.diagramProviderComponent
+      ? Views.getProviders({component: $scope.diagramProviderComponent})
+      : [];
 
-    $scope.overlayProviders = Views.getProviders({ component:  $scope.overlayProviderComponent });
+    $scope.overlayProviders = Views.getProviders({
+      component: $scope.overlayProviderComponent
+    });
 
-    var overlay = '<div class="bpmn-overlay"><div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="vars"></div></div>';
-    var actions = '<div class="action"><div view ng-repeat="actionProvider in actionProviders" provider="actionProvider" vars="vars"></div></div>';
+    var overlay =
+      '<div class="bpmn-overlay"><div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="vars"></div></div>';
+    var actions =
+      '<div class="action"><div view ng-repeat="actionProvider in actionProviders" provider="actionProvider" vars="vars"></div></div>';
 
-    var bpmnElements,
-        selection;
+    var bpmnElements, selection;
 
     $scope.$on('$destroy', function() {
       $scope.processDiagram = null;
@@ -67,8 +75,8 @@ var DirectiveController = [
     });
 
     /**
-    * If the process diagram changes, then the diagram will be rendered.
-    */
+     * If the process diagram changes, then the diagram will be rendered.
+     */
     $scope.$watch('processDiagram', function(newValue) {
       if (newValue && newValue.$loaded !== false) {
         bpmnElements = newValue.bpmnElements;
@@ -107,16 +115,22 @@ var DirectiveController = [
     };
 
     var isElementSelectable = function(element) {
-      return element.isSelectable || (
-        $scope.selectAll &&
-        element.$instanceOf('bpmn:FlowNode')
+      return (
+        element.isSelectable ||
+        ($scope.selectAll && element.$instanceOf('bpmn:FlowNode'))
       );
     };
 
     $scope.onClick = function(element, $event) {
       safeApply(function() {
-        if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id])) {
-          $scope.onElementClick({id: element.businessObject.id, $event: $event});
+        if (
+          bpmnElements[element.businessObject.id] &&
+          isElementSelectable(bpmnElements[element.businessObject.id])
+        ) {
+          $scope.onElementClick({
+            id: element.businessObject.id,
+            $event: $event
+          });
         } else {
           $scope.onElementClick({id: null, $event: $event});
         }
@@ -132,18 +146,32 @@ var DirectiveController = [
     }
 
     $scope.onMouseEnter = function(element) {
-      if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id])) {
-        $scope.control.getViewer().get('canvas').addMarker(element.businessObject.id, 'selectable');
+      if (
+        bpmnElements[element.businessObject.id] &&
+        isElementSelectable(bpmnElements[element.businessObject.id])
+      ) {
+        $scope.control
+          .getViewer()
+          .get('canvas')
+          .addMarker(element.businessObject.id, 'selectable');
         $scope.control.highlight(element.businessObject.id);
       }
     };
 
     $scope.onMouseLeave = function(element) {
-      if(bpmnElements[element.businessObject.id] &&
-      isElementSelectable(bpmnElements[element.businessObject.id]) &&
-      (!selection || selection.indexOf(element.businessObject.id) === -1) &&
-      (!selection || selection.indexOf(element.businessObject.id + '#multiInstanceBody') === -1)) {
-        $scope.control.getViewer().get('canvas').removeMarker(element.businessObject.id, 'selectable');
+      if (
+        bpmnElements[element.businessObject.id] &&
+        isElementSelectable(bpmnElements[element.businessObject.id]) &&
+        (!selection || selection.indexOf(element.businessObject.id) === -1) &&
+        (!selection ||
+          selection.indexOf(
+            element.businessObject.id + '#multiInstanceBody'
+          ) === -1)
+      ) {
+        $scope.control
+          .getViewer()
+          .get('canvas')
+          .removeMarker(element.businessObject.id, 'selectable');
         $scope.control.clearHighlight(element.businessObject.id);
       }
     };
@@ -155,10 +183,9 @@ var DirectiveController = [
     }
 
     function decorateBpmnElement(bpmnElement) {
-
       var elem = $scope.control.getElement(bpmnElement.id);
 
-      if(elem && $scope.overlayProviders && $scope.overlayProviders.length) {
+      if (elem && $scope.overlayProviders && $scope.overlayProviders.length) {
         var childScope = $scope.$new();
 
         childScope.bpmnElement = bpmnElement;
@@ -189,12 +216,14 @@ var DirectiveController = [
     /*------------------- Add actions ------------------------------------*/
 
     function addActions() {
-      $scope.actionProviders = Views.getProviders({ component:  $scope.actionProviderComponent });
+      $scope.actionProviders = Views.getProviders({
+        component: $scope.actionProviderComponent
+      });
       var actionElement = angular.element(actions);
       var childScope = $scope.$new();
       $compile(actionElement)(childScope);
-      $scope.control.addAction( {
-        html : actionElement
+      $scope.control.addAction({
+        html: actionElement
       });
     }
 
@@ -208,11 +237,13 @@ var DirectiveController = [
       if ($scope.control.isLoaded && $scope.control.isLoaded()) {
         if (selection) {
           angular.forEach(selection, function(elementId) {
-            if(elementId.indexOf('#multiInstanceBody') !== -1 &&
-  elementId.indexOf('#multiInstanceBody') === elementId.length - 18) {
+            if (
+              elementId.indexOf('#multiInstanceBody') !== -1 &&
+              elementId.indexOf('#multiInstanceBody') === elementId.length - 18
+            ) {
               elementId = elementId.substr(0, elementId.length - 18);
             }
-            if(bpmnElements[elementId]) {
+            if (bpmnElements[elementId]) {
               $scope.control.clearHighlight(elementId);
             }
           });
@@ -220,11 +251,13 @@ var DirectiveController = [
 
         if (newSelection) {
           angular.forEach(newSelection, function(elementId) {
-            if(elementId.indexOf('#multiInstanceBody') !== -1 &&
-  elementId.indexOf('#multiInstanceBody') === elementId.length - 18) {
+            if (
+              elementId.indexOf('#multiInstanceBody') !== -1 &&
+              elementId.indexOf('#multiInstanceBody') === elementId.length - 18
+            ) {
               elementId = elementId.substr(0, elementId.length - 18);
             }
-            if(bpmnElements[elementId]) {
+            if (bpmnElements[elementId]) {
               $scope.control.highlight(elementId);
             }
           });
@@ -245,17 +278,20 @@ var DirectiveController = [
     });
 
     function scrollToBpmnElement(bpmnElementId) {
-      if ($scope.control.isLoaded && $scope.control.isLoaded() && bpmnElementId) {
+      if (
+        $scope.control.isLoaded &&
+        $scope.control.isLoaded() &&
+        bpmnElementId
+      ) {
         scrollTo(bpmnElementId);
       }
     }
 
     function scrollTo(elementId) {
-      if(bpmnElements[elementId]) {
+      if (bpmnElements[elementId]) {
         $scope.control.scrollToElement(elementId);
       }
     }
-
   }
 ];
 

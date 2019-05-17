@@ -22,11 +22,11 @@ var Directive = function() {
     restrict: 'A',
     require: 'ngModel',
     link: function(scope, element, attrs, model) {
-
-      var pattern = attrs.integer ? /^-?[\d]+$/ : /^(0|(-?(((0|[1-9]\d*)\.\d+)|([1-9]\d*))))([eE][-+]?[0-9]+)?$/;
+      var pattern = attrs.integer
+        ? /^-?[\d]+$/
+        : /^(0|(-?(((0|[1-9]\d*)\.\d+)|([1-9]\d*))))([eE][-+]?[0-9]+)?$/;
 
       var numberParser = function(value) {
-
         var isValid = pattern.test(value);
         model.$setValidity('numeric', isValid);
 
@@ -36,7 +36,6 @@ var Directive = function() {
       model.$parsers.push(numberParser);
 
       var numberFormatter = function(value) {
-
         // if the value is not set,
         // then ignore it!
         if (value === undefined || value === null) {

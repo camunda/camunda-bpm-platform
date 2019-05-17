@@ -25,15 +25,18 @@ module.exports = function(config, browserifyConfig) {
         debug: true
       },
       watch: true,
-      transform: [ 'brfs' ],
+      transform: ['brfs'],
       postBundleCB: function(err, src, next) {
-
         console.log('post bundling', err);
 
         var buildMode = config.grunt.config('buildMode');
-        var livereloadPort = config.grunt.config('pkg.gruntConfig.livereloadPort');
+        var livereloadPort = config.grunt.config(
+          'pkg.gruntConfig.livereloadPort'
+        );
         if (buildMode !== 'prod' && livereloadPort) {
-          config.grunt.log.writeln('Enabling livereload for welcome on port: ' + livereloadPort);
+          config.grunt.log.writeln(
+            'Enabling livereload for welcome on port: ' + livereloadPort
+          );
           //var contents = grunt.file.read(data.path);
           var contents = src.toString();
 
@@ -45,10 +48,12 @@ module.exports = function(config, browserifyConfig) {
         } else {
           next(err, src);
         }
-
       }
     },
-    src: ['./<%= pkg.gruntConfig.welcomeSourceDir %>/scripts/camunda-welcome-ui.js'],
-    dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/scripts/camunda-welcome-ui.js'
+    src: [
+      './<%= pkg.gruntConfig.welcomeSourceDir %>/scripts/camunda-welcome-ui.js'
+    ],
+    dest:
+      '<%= pkg.gruntConfig.welcomeBuildTarget %>/scripts/camunda-welcome-ui.js'
   };
 };

@@ -69,7 +69,7 @@ module.exports = [
     // fields ///////////////////////////////////////////////////
 
     // init data depend for deployments data
-    var repositoryData = $scope.repositoryData =  dataDepend.create($scope);
+    var repositoryData = ($scope.repositoryData = dataDepend.create($scope));
 
     var deploymentsSortBy = getPropertyFromLocation('deploymentsSortBy');
     var deploymentsSortOrder = getPropertyFromLocation('deploymentsSortOrder');
@@ -93,119 +93,122 @@ module.exports = [
       repositoryData.set('deployments', deployments);
     });
 
-    repositoryData.provide('currentDeployment', ['deployments', function(deployments) {
-      deployments = deployments || [];
+    repositoryData.provide('currentDeployment', [
+      'deployments',
+      function(deployments) {
+        deployments = deployments || [];
 
-      var focused;
-      var _deploymentId = getPropertyFromLocation('deployment');
+        var focused;
+        var _deploymentId = getPropertyFromLocation('deployment');
 
-      for (var i = 0, deployment; (deployment = deployments[i]); i++) {
-
-        if (_deploymentId === deployment.id) {
-          focused = deployment;
-          break;
+        for (var i = 0, deployment; (deployment = deployments[i]); i++) {
+          if (_deploymentId === deployment.id) {
+            focused = deployment;
+            break;
+          }
+          // auto focus first deployment
+          if (!focused) {
+            focused = deployment;
+          }
         }
-        // auto focus first deployment
-        if(!focused) {
-          focused = deployment;
-        }
-      }
 
-      if (focused) {
-        deploymentId = focused.id;
+        if (focused) {
+          deploymentId = focused.id;
 
-        if (focused.id !== _deploymentId) {
+          if (focused.id !== _deploymentId) {
+            updateSilently({
+              deployment: focused.id,
+              resource: null,
+              viewbox: null
+            });
+            $location.replace();
+          }
+        } else {
           updateSilently({
-            deployment: focused.id,
+            deployment: null,
             resource: null,
             viewbox: null
           });
           $location.replace();
         }
 
+        return angular.copy(focused);
       }
-      else {
-        updateSilently({
-          deployment: null,
-          resource: null,
-          viewbox: null
-        });
-        $location.replace();
+    ]);
+
+    repositoryData.provide('resources', [
+      'currentDeployment',
+      function(currentDeployment) {
+        var deferred = $q.defer();
+
+        if (!currentDeployment || currentDeployment.id === null) {
+          deferred.resolve(null);
+        } else {
+          Deployment.getResources(currentDeployment.id, function(err, res) {
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(res);
+            }
+          });
+        }
+
+        return deferred.promise;
       }
+    ]);
 
-      return angular.copy(focused);
-    }]);
+    repositoryData.provide('resourceId', [
+      'resources',
+      function(resources) {
+        resourceId = getPropertyFromLocation('resource');
+        resourceName = getPropertyFromLocation('resourceName');
 
-    repositoryData.provide('resources', [ 'currentDeployment', function(currentDeployment) {
-      var deferred = $q.defer();
-
-      if(!currentDeployment || currentDeployment.id === null) {
-        deferred.resolve(null);
-      }
-      else {
-        Deployment.getResources(currentDeployment.id, function(err, res) {
-          if(err) {
-            deferred.reject(err);
-          }
-          else {
-            deferred.resolve(res);
-          }
-        });
-      }
-
-      return deferred.promise;
-    }]);
-
-    repositoryData.provide('resourceId', [ 'resources', function(resources) {
-      resourceId = getPropertyFromLocation('resource');
-      resourceName = getPropertyFromLocation('resourceName');
-
-      if (resourceId) {
-        return {
-          resourceId: resourceId
-        };
-      }
-      else if (resourceName) {
-        resources = resources || [];
-        for(var i=0, resource; (resource = resources[i]); i++) {
-          if (resource.name === resourceName) {
-            return {
-              resourceId: resource.id
-            };
+        if (resourceId) {
+          return {
+            resourceId: resourceId
+          };
+        } else if (resourceName) {
+          resources = resources || [];
+          for (var i = 0, resource; (resource = resources[i]); i++) {
+            if (resource.name === resourceName) {
+              return {
+                resourceId: resource.id
+              };
+            }
           }
         }
+
+        return {
+          resourceId: null
+        };
       }
+    ]);
 
-      return {
-        resourceId: null
-      };
+    repositoryData.provide('resource', [
+      'resourceId',
+      'currentDeployment',
+      function(resourceId, deployment) {
+        var deferred = $q.defer();
 
-    }]);
+        resourceId = resourceId.resourceId;
 
-    repositoryData.provide('resource', ['resourceId', 'currentDeployment', function(resourceId, deployment) {
-      var deferred = $q.defer();
+        if (typeof resourceId !== 'string') {
+          deferred.resolve(null);
+        } else if (!deployment || deployment.id === null) {
+          deferred.resolve(null);
+        } else {
+          Deployment.getResource(deployment.id, resourceId, function(err, res) {
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(res);
+            }
+          });
+        }
 
-      resourceId = resourceId.resourceId;
-
-      if(typeof resourceId !== 'string') {
-        deferred.resolve(null);
+        return deferred.promise;
       }
-      else if (!deployment || deployment.id === null) {
-        deferred.resolve(null);
-      }
-      else {
-        Deployment.getResource(deployment.id, resourceId, function(err, res) {
-          if(err) {
-            deferred.reject(err);
-          }
-          else {
-            deferred.resolve(res);
-          }
-        });
-      }
-
-      return deferred.promise;
-    }]);
+    ]);
 
     $scope.onDeployed = function() {
       $rootScope.$broadcast('cam-common:cam-searchable:query-force-change');
@@ -224,13 +227,20 @@ module.exports = [
       resourceId = getPropertyFromLocation('resource');
       resourceName = getPropertyFromLocation('resourceName');
 
-      if (deploymentsSortBy && oldDeploymentsSortBy !== deploymentsSortBy || deploymentsSortOrder && oldDeploymentsSortOrder !== deploymentsSortOrder) {
+      if (
+        (deploymentsSortBy && oldDeploymentsSortBy !== deploymentsSortBy) ||
+        (deploymentsSortOrder &&
+          oldDeploymentsSortOrder !== deploymentsSortOrder)
+      ) {
         repositoryData.changed('deploymentsSorting');
       } else if (deploymentId && oldDeploymentId !== deploymentId) {
         repositoryData.changed('currentDeployment');
-      } else if (resourceId && oldResourceId !== resourceId || resourceName && oldResourceName !== resourceName) {
+      } else if (
+        (resourceId && oldResourceId !== resourceId) ||
+        (resourceName && oldResourceName !== resourceName)
+      ) {
         repositoryData.changed('resourceId');
       }
     });
-
-  }];
+  }
+];

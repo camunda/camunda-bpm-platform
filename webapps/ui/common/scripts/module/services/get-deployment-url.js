@@ -18,18 +18,21 @@
 'use strict';
 
 module.exports = [
-  '$location', 'routeUtil',
+  '$location',
+  'routeUtil',
   function($location, routeUtil) {
     return function(deployment, resource) {
       var path = '#/repository';
 
       var searches = {
         deployment: deployment.id,
-        deploymentsQuery: JSON.stringify([{
-          type     : 'id',
-          operator : 'eq',
-          value    : deployment.id
-        }])
+        deploymentsQuery: JSON.stringify([
+          {
+            type: 'id',
+            operator: 'eq',
+            value: deployment.id
+          }
+        ])
       };
 
       if (resource) {

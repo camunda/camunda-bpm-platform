@@ -43,7 +43,6 @@ var template = fs.readFileSync(__dirname + '/quick-filter.html', 'utf8');
 var $ = require('jquery');
 
 module.exports = function() {
-
   /**
       determine if an element has to be schown
      */
@@ -52,13 +51,11 @@ module.exports = function() {
       return true;
     }
 
-    if (!!states.canceled ||
-          !!states.running ||
-          !!states.completed) {
+    if (!!states.canceled || !!states.running || !!states.completed) {
       if (
-        (!states.canceled  && $el.hasClass('state-canceled'))  ||
-          (!states.running   && $el.hasClass('state-running'))   ||
-          (!states.completed && $el.hasClass('state-completed'))
+        (!states.canceled && $el.hasClass('state-canceled')) ||
+        (!states.running && $el.hasClass('state-running')) ||
+        (!states.completed && $el.hasClass('state-completed'))
       ) {
         return false;
       }
@@ -108,12 +105,15 @@ module.exports = function() {
       scope.showStateFilter = typeof attrs.stateFilter !== 'undefined';
 
       scope.search = function() {
-
-        if (scope.quickFilters &&
-              scope.quickFilters.running && scope.quickFilters.running.$viewValue &&
-              scope.quickFilters.canceled && scope.quickFilters.canceled.$viewValue &&
-              scope.quickFilters.completed && scope.quickFilters.completed.$viewValue) {
-
+        if (
+          scope.quickFilters &&
+          scope.quickFilters.running &&
+          scope.quickFilters.running.$viewValue &&
+          scope.quickFilters.canceled &&
+          scope.quickFilters.canceled.$viewValue &&
+          scope.quickFilters.completed &&
+          scope.quickFilters.completed.$viewValue
+        ) {
           scope.quickFilters.running.$setViewValue(false);
           scope.quickFilters.running.$render();
           scope.quickFilters.canceled.$setViewValue(false);
@@ -122,12 +122,24 @@ module.exports = function() {
           scope.quickFilters.completed.$render();
         }
 
-        var searched = scope.showNameFilter && scope.quickFilters.name ? $.trim(scope.quickFilters.name.$viewValue) : '';
+        var searched =
+          scope.showNameFilter && scope.quickFilters.name
+            ? $.trim(scope.quickFilters.name.$viewValue)
+            : '';
 
         var states = {
-          running: !!scope.showStateFilter && !!scope.quickFilters.running && !!scope.quickFilters.running.$viewValue,
-          canceled: !!scope.showStateFilter && !!scope.quickFilters.canceled && !!scope.quickFilters.canceled.$viewValue,
-          completed: !!scope.showStateFilter && !!scope.quickFilters.completed && !!scope.quickFilters.completed.$viewValue
+          running:
+            !!scope.showStateFilter &&
+            !!scope.quickFilters.running &&
+            !!scope.quickFilters.running.$viewValue,
+          canceled:
+            !!scope.showStateFilter &&
+            !!scope.quickFilters.canceled &&
+            !!scope.quickFilters.canceled.$viewValue,
+          completed:
+            !!scope.showStateFilter &&
+            !!scope.quickFilters.completed &&
+            !!scope.quickFilters.completed.$viewValue
         };
 
         $(scope.itemSelector, $holder).each(function() {

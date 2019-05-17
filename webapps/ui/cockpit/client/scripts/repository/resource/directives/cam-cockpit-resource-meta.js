@@ -19,11 +19,13 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-cockpit-resource-meta.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-cockpit-resource-meta.html',
+  'utf8'
+);
 
 module.exports = [
   function() {
-
     return {
       scope: {
         resourceData: '=',
@@ -34,15 +36,11 @@ module.exports = [
 
       controller: [
         '$scope',
-        function(
-          $scope
-        ) {
-
-        // fields ////////////////////////////////////////////////////
+        function($scope) {
+          // fields ////////////////////////////////////////////////////
 
           var resourceMetaData = $scope.resourceData.newChild($scope);
           $scope.isDmnResource = $scope.control.isDmnResource;
-
 
           // observe //////////////////////////////////////////////////
 
@@ -59,7 +57,8 @@ module.exports = [
           resourceMetaData.observe('definitions', function(definitions) {
             $scope.definitions = definitions;
           });
-
         }
-      ]};
-  }];
+      ]
+    };
+  }
+];

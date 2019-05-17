@@ -22,24 +22,45 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/decision-instance.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    routeUtil = require('../../../../common/scripts/util/routeUtil');
+  routeUtil = require('../../../../common/scripts/util/routeUtil');
 
 require('angular-data-depend');
 
 var camCommons = require('camunda-commons-ui/lib');
 
-var ngModule = angular.module('cam.cockpit.pages.decisionInstance', ['dataDepend', camCommons.name]);
+var ngModule = angular.module('cam.cockpit.pages.decisionInstance', [
+  'dataDepend',
+  camCommons.name
+]);
 
 var Controller = [
-  '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionInstance', 'Views', 'search', '$translate',
-  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionInstance,   Views,   search, $translate
+  '$scope',
+  '$rootScope',
+  '$q',
+  'dataDepend',
+  'page',
+  'camAPI',
+  'decisionInstance',
+  'Views',
+  'search',
+  '$translate',
+  function(
+    $scope,
+    $rootScope,
+    $q,
+    dataDepend,
+    page,
+    camAPI,
+    decisionInstance,
+    Views,
+    search,
+    $translate
   ) {
-
     $scope.control = {};
 
     $scope.decisionInstance = decisionInstance;
 
-    var decisionData = $scope.decisionData = dataDepend.create($scope);
+    var decisionData = ($scope.decisionData = dataDepend.create($scope));
 
     // utilities ///////////////////////
 
@@ -48,44 +69,52 @@ var Controller = [
     $scope.hasCasePlugin = false;
     try {
       $scope.hasCasePlugin = !!angular.module('cockpit.plugin.case');
-    }
-    catch (e) {
+    } catch (e) {
       // do nothing
     }
 
+    var processInstancePlugins = Views.getProviders({
+      component: 'cockpit.processInstance.view'
+    });
 
-    var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
+    var hasHistoryPlugin =
+      processInstancePlugins.filter(function(plugin) {
+        return plugin.id === 'history';
+      }).length > 0;
 
-    var hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
-      return plugin.id === 'history';
-    }).length > 0;
-
-    if(hasHistoryPlugin) {
+    if (hasHistoryPlugin) {
       // if we have no history plugin, then just go to the runtime view
       $scope.processInstanceLink =
-        '#/process-instance/' + $scope.decisionInstance.processInstanceId + '/history' +
-        '?activityInstanceIds=' + $scope.decisionInstance.activityInstanceId +
-        '&activityIds=' + $scope.decisionInstance.activityId;
+        '#/process-instance/' +
+        $scope.decisionInstance.processInstanceId +
+        '/history' +
+        '?activityInstanceIds=' +
+        $scope.decisionInstance.activityInstanceId +
+        '&activityIds=' +
+        $scope.decisionInstance.activityId;
     } else {
       // if we have the history plugin, go to the history view and select the activity, that executed the decision
-      $scope.processInstanceLink = '#/process-instance/' + $scope.decisionInstance.processInstanceId;
+      $scope.processInstanceLink =
+        '#/process-instance/' + $scope.decisionInstance.processInstanceId;
     }
 
     // end utilities ///////////////////////
-
 
     // begin data definition //////////////////////
 
     decisionData.provide('tableXml', function() {
       var deferred = $q.defer();
 
-      decisionDefinitionService.getXml(decisionInstance.decisionDefinitionId, function(err, data) {
-        if(!err) {
-          deferred.resolve(data.dmnXml);
-        } else {
-          deferred.reject(err);
+      decisionDefinitionService.getXml(
+        decisionInstance.decisionDefinitionId,
+        function(err, data) {
+          if (!err) {
+            deferred.resolve(data.dmnXml);
+          } else {
+            deferred.reject(err);
+          }
         }
-      });
+      );
 
       return deferred.promise;
     });
@@ -93,19 +122,21 @@ var Controller = [
     decisionData.provide('decisionDefinition', function() {
       var deferred = $q.defer();
 
-      decisionDefinitionService.get(decisionInstance.decisionDefinitionId, function(err, data) {
-        if(!err) {
-          deferred.resolve(data);
-        } else {
-          deferred.reject(err);
+      decisionDefinitionService.get(
+        decisionInstance.decisionDefinitionId,
+        function(err, data) {
+          if (!err) {
+            deferred.resolve(data);
+          } else {
+            deferred.reject(err);
+          }
         }
-      });
+      );
 
       return deferred.promise;
     });
 
     // end data definition /////////////////////////
-
 
     // begin data usage ////////////////////////////
 
@@ -121,20 +152,25 @@ var Controller = [
       },
       {
         type: 'decisionDefinition',
-        label: decisionInstance.decisionDefinitionName || ((decisionInstance.decisionDefinitionKey || decisionInstance.decisionDefinitionId)),
-        href: '#/decision-definition/'+ decisionInstance.decisionDefinitionId
+        label:
+          decisionInstance.decisionDefinitionName ||
+          (decisionInstance.decisionDefinitionKey ||
+            decisionInstance.decisionDefinitionId),
+        href: '#/decision-definition/' + decisionInstance.decisionDefinitionId
       },
       {
         type: 'decisionInstance',
         label: decisionInstance.id,
-        href: '#/decision-instance/'+ decisionInstance.id
+        href: '#/decision-instance/' + decisionInstance.id
       }
     ]);
 
-    page.titleSet([
-      decisionInstance.id,
-      $translate.instant('DECISION_INSTANCE_INSTANCE_VIEW')
-    ].join(' | '));
+    page.titleSet(
+      [
+        decisionInstance.id,
+        $translate.instant('DECISION_INSTANCE_INSTANCE_VIEW')
+      ].join(' | ')
+    );
 
     decisionData.observe(['tableXml'], function(tableXml) {
       $scope.tableXml = tableXml;
@@ -150,60 +186,72 @@ var Controller = [
       var searches = {
         deployment: deploymentId,
         resourceName: $scope.decisionDefinition.resource,
-        deploymentsQuery: JSON.stringify([{
-          type     : 'id',
-          operator : 'eq',
-          value    : deploymentId
-        }])
+        deploymentsQuery: JSON.stringify([
+          {
+            type: 'id',
+            operator: 'eq',
+            value: deploymentId
+          }
+        ])
       };
 
-      return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
+      return routeUtil.redirectTo(path, searches, [
+        'deployment',
+        'resourceName',
+        'deploymentsQuery'
+      ]);
     };
 
     $scope.getActivitySearch = function(decisionInstance) {
-
-      return JSON.stringify([{
-        type: 'caseActivityIdIn',
-        operator: 'eq',
-        value: decisionInstance.activityId
-      }]);
-
+      return JSON.stringify([
+        {
+          type: 'caseActivityIdIn',
+          operator: 'eq',
+          value: decisionInstance.activityId
+        }
+      ]);
     };
 
     $scope.initializeTablePlugins = function() {
-      var tablePlugins = Views.getProviders({ component: 'cockpit.decisionInstance.table' });
+      var tablePlugins = Views.getProviders({
+        component: 'cockpit.decisionInstance.table'
+      });
 
       var initData = {
-        decisionInstance   : decisionInstance,
-        tableControl       : $scope.control
+        decisionInstance: decisionInstance,
+        tableControl: $scope.control
       };
 
-      for(var i = 0; i < tablePlugins.length; i++) {
-        if(typeof tablePlugins[i].initialize === 'function') {
+      for (var i = 0; i < tablePlugins.length; i++) {
+        if (typeof tablePlugins[i].initialize === 'function') {
           tablePlugins[i].initialize(initData);
         }
       }
     };
 
-    $scope.decisionInstanceVars = { read: [ 'decisionInstance', 'decisionData' ] };
-    $scope.decisionInstanceTabs = Views.getProviders({ component: 'cockpit.decisionInstance.tab' });
-    $scope.decisionInstanceActions = Views.getProviders({ component: 'cockpit.decisionInstance.action' });
-
+    $scope.decisionInstanceVars = {read: ['decisionInstance', 'decisionData']};
+    $scope.decisionInstanceTabs = Views.getProviders({
+      component: 'cockpit.decisionInstance.tab'
+    });
+    $scope.decisionInstanceActions = Views.getProviders({
+      component: 'cockpit.decisionInstance.action'
+    });
 
     // INITIALIZE PLUGINS
 
-    var decisionPlugins = (
-      Views.getProviders({ component: 'cockpit.decisionInstance.tab' })).concat(
-      Views.getProviders({ component: 'cockpit.decisionInstance.action' })
+    var decisionPlugins = Views.getProviders({
+      component: 'cockpit.decisionInstance.tab'
+    }).concat(
+      Views.getProviders({component: 'cockpit.decisionInstance.action'})
     );
 
     var initData = {
-      decisionInstance   : decisionInstance,
-      decisionData       : decisionData
+      decisionInstance: decisionInstance,
+      decisionData: decisionData
     };
 
-    for(var i = 0; i < decisionPlugins.length; i++) {
-      if(typeof decisionPlugins[i].initialize === 'function') {
+    for (var i = 0; i < decisionPlugins.length; i++) {
+      if (typeof decisionPlugins[i].initialize === 'function') {
         decisionPlugins[i].initialize(initData);
       }
     }
@@ -224,7 +272,10 @@ var Controller = [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.decisionInstance.tab', id: selectedTabId });
+        var provider = Views.getProvider({
+          component: 'cockpit.decisionInstance.tab',
+          id: selectedTabId
+        });
         if (provider && tabs.indexOf(provider) != -1) {
           $scope.selectedTab = provider;
           return;
@@ -239,15 +290,12 @@ var Controller = [
     }
 
     setDefaultTab($scope.decisionInstanceTabs);
-
-  }];
+  }
+];
 
 var RouteConfig = [
   '$routeProvider',
-  function(
-    $routeProvider
-  ) {
-
+  function($routeProvider) {
     $routeProvider.when('/decision-instance/:id', {
       redirectTo: function(params, currentPath, currentSearch) {
         var redirectUrl = currentPath + '/history';
@@ -256,58 +304,68 @@ var RouteConfig = [
       }
     });
 
-    $routeProvider
-      .when('/decision-instance/:id/history', {
-        template: template,
+    $routeProvider.when('/decision-instance/:id/history', {
+      template: template,
 
-        controller: Controller,
-        authentication: 'required',
-        resolve: {
-          decisionInstance: [ 'ResourceResolver', 'camAPI', '$q',
-            function(ResourceResolver, camAPI, $q) {
-              return ResourceResolver.getByRouteParam('id', {
-                name: 'decision instance',
-                resolve: function(id) {
-                  var deferred = $q.defer();
+      controller: Controller,
+      authentication: 'required',
+      resolve: {
+        decisionInstance: [
+          'ResourceResolver',
+          'camAPI',
+          '$q',
+          function(ResourceResolver, camAPI, $q) {
+            return ResourceResolver.getByRouteParam('id', {
+              name: 'decision instance',
+              resolve: function(id) {
+                var deferred = $q.defer();
 
-                  var historyService = camAPI.resource('history');
+                var historyService = camAPI.resource('history');
 
-                  historyService.decisionInstance({
+                historyService.decisionInstance(
+                  {
                     decisionInstanceId: id,
                     includeInputs: true,
                     includeOutputs: true,
                     disableBinaryFetching: true,
                     disableCustomObjectDeserialization: true
-                  }, function(err, data) {
-                    if(!err && data.length) {
+                  },
+                  function(err, data) {
+                    if (!err && data.length) {
                       deferred.resolve(data[0]);
                     } else {
-                      deferred.reject(err || {
-                        status: 404
-                      });
+                      deferred.reject(
+                        err || {
+                          status: 404
+                        }
+                      );
                     }
-                  });
+                  }
+                );
 
-                  return deferred.promise;
-                }
-              });
-            }]
-        },
-        reloadOnSearch: false
-      });
-  }];
+                return deferred.promise;
+              }
+            });
+          }
+        ]
+      },
+      reloadOnSearch: false
+    });
+  }
+];
 
-var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
-  ViewsProvider.registerDefaultView('cockpit.decisionInstance.view', {
-    id: 'history',
-    priority: 20,
-    label: 'History',
-    keepSearchParams: []
-  });
-}];
+var ViewConfig = [
+  'ViewsProvider',
+  function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.decisionInstance.view', {
+      id: 'history',
+      priority: 20,
+      label: 'History',
+      keepSearchParams: []
+    });
+  }
+];
 
-ngModule
-  .config(RouteConfig)
-  .config(ViewConfig);
+ngModule.config(RouteConfig).config(ViewConfig);
 
 module.exports = ngModule;

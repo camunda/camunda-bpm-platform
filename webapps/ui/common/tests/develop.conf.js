@@ -21,33 +21,32 @@
 TESTED=dashboard TESTED_APP=cockpit grunt test-e2e --protractorConfig=./ui/common/tests/develop.conf.js
 */
 
-var chai     = require('chai');
+var chai = require('chai');
 var promised = require('chai-as-promised');
 chai.use(promised);
-global.expect   = chai.expect;
+global.expect = chai.expect;
 
 var bail = typeof process.env.TEST_BAIL !== 'undefined';
 var tested = process.env.TESTED || '*';
 var testedApp = process.env.TESTED_APP || 'admin,tasklist,cockpit,welcome';
-testedApp = testedApp.indexOf(',') > -1 ? ('{' + testedApp + '}') : testedApp;
+testedApp = testedApp.indexOf(',') > -1 ? '{' + testedApp + '}' : testedApp;
 
-var specsPath = '../../'+ testedApp +'/tests/specs/' + tested + '-spec.js';
+var specsPath = '../../' + testedApp + '/tests/specs/' + tested + '-spec.js';
 console.info('Will run tests found in %s', specsPath, bail);
 
 exports.config = {
-
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
   allScriptsTimeout: 11000,
 
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
-    'browserName': 'chrome',
-    'chromeOptions': {
-      'args': ['start-maximized', 'enable-crash-reporter-for-testing']
+    browserName: 'chrome',
+    chromeOptions: {
+      args: ['start-maximized', 'enable-crash-reporter-for-testing']
     },
-    'loggingPrefs': {
-      'browser': 'ALL'
+    loggingPrefs: {
+      browser: 'ALL'
     }
   },
 
@@ -62,9 +61,7 @@ exports.config = {
   //
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
-  specs: [
-    specsPath
-  ],
+  specs: [specsPath],
 
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.

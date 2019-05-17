@@ -20,21 +20,34 @@
 var Base = require('./base');
 
 module.exports = Base.extend({
-
   diagramElement: function() {
     return element(by.css('[cam-widget-bpmn-viewer]'));
   },
 
   instancesBadgeFor: function(activityName) {
-    return element(by.css('[data-container-id="'+activityName+'"] .badge[uib-tooltip="Running Activity Instances"]'));
+    return element(
+      by.css(
+        '[data-container-id="' +
+          activityName +
+          '"] .badge[uib-tooltip="Running Activity Instances"]'
+      )
+    );
   },
 
   incidentsBadgeFor: function(activityName) {
-    return element(by.css('[data-container-id="'+activityName+'"] .badge[uib-tooltip="Open Incidents"]'));
+    return element(
+      by.css(
+        '[data-container-id="' +
+          activityName +
+          '"] .badge[uib-tooltip="Open Incidents"]'
+      )
+    );
   },
 
   diagramActivity: function(activityName) {
-    return element(by.css('*[data-element-id=' + '"' + activityName + '"' + ']'));
+    return element(
+      by.css('*[data-element-id=' + '"' + activityName + '"' + ']')
+    );
   },
 
   selectActivity: function(activityName) {
@@ -54,11 +67,16 @@ module.exports = Base.extend({
   },
 
   isActivitySuspended: function(activityName) {
-    return element(by.css('[data-container-id="'+activityName+'"] .badge[uib-tooltip="Suspended Job Definition"]'))
+    return element(
+      by.css(
+        '[data-container-id="' +
+          activityName +
+          '"] .badge[uib-tooltip="Suspended Job Definition"]'
+      )
+    )
       .getAttribute('class')
       .then(function(classes) {
         return classes.indexOf('ng-hide') === -1;
       });
   }
-
 });

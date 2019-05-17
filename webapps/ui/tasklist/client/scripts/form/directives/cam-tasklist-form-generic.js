@@ -18,7 +18,10 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-form-generic.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-form-generic.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 var $ = require('jquery');
@@ -27,14 +30,8 @@ module.exports = [
   'CamForm',
   'camAPI',
   '$timeout',
-  function(
-    CamForm,
-    camAPI,
-    $timeout
-  ) {
-
+  function(CamForm, camAPI, $timeout) {
     return {
-
       restrict: 'A',
 
       require: '^camTasklistForm',
@@ -44,39 +41,47 @@ module.exports = [
       template: template,
 
       link: function($scope, $element, attrs, formController) {
-      
         var formElement = $($element[0]).find('form');
         var camForm = null;
         var form = {
-          '$valid': false,
-          '$invalid': true
+          $valid: false,
+          $invalid: true
         };
 
         var $update = false;
 
-        $scope.$watch(function() {
-          return $update;
-        }, function(value) {
-          if (value) {
-            showForm(value, formController.getParams());
-            $update = false;
+        $scope.$watch(
+          function() {
+            return $update;
+          },
+          function(value) {
+            if (value) {
+              showForm(value, formController.getParams());
+              $update = false;
+            }
           }
-        });
+        );
 
-        $scope.$watch(function() {
-          return formController.getTasklistForm();
-        }, function(value) {
-          if (value) {
-            $update = true;
-            $scope.variables = [];
+        $scope.$watch(
+          function() {
+            return formController.getTasklistForm();
+          },
+          function(value) {
+            if (value) {
+              $update = true;
+              $scope.variables = [];
+            }
           }
-        });
+        );
 
-        $scope.$watch(function() {
-          return form && form.$valid;
-        }, function(value) {
-          formController.notifyFormValidated(!value);
-        });
+        $scope.$watch(
+          function() {
+            return form && form.$valid;
+          },
+          function(value) {
+            formController.notifyFormValidated(!value);
+          }
+        );
 
         function showForm(tasklistForm, params) {
           params = angular.copy(params);
@@ -108,10 +113,12 @@ module.exports = [
           form = camFormScope[formName];
           formController.notifyFormInitialized();
 
-          if($scope.options.autoFocus) {
+          if ($scope.options.autoFocus) {
             $timeout(function() {
-              var focusElement = _camForm.formElement[0].querySelectorAll('input')[0];
-              if(focusElement) {
+              var focusElement = _camForm.formElement[0].querySelectorAll(
+                'input'
+              )[0];
+              if (focusElement) {
                 focusElement.focus();
               }
             });
@@ -130,7 +137,6 @@ module.exports = [
         }
 
         var complete = function(callback) {
-
           function localCallback(error, result) {
             clearVariableManager();
             clearFields();
@@ -151,7 +157,7 @@ module.exports = [
         };
 
         formController.registerCompletionHandler(complete);
-
       }
     };
-  }];
+  }
+];

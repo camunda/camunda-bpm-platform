@@ -27,5 +27,8 @@ var _links = [
 module.exports = [
   '$window',
   function($window) {
-    return $window.camWelcomeConf && $window.camWelcomeConf.links ? $window.camWelcomeConf.links : _links;
-  }];
+    return $window.camWelcomeConf && $window.camWelcomeConf.links
+      ? $window.camWelcomeConf.links
+      : _links;
+  }
+];

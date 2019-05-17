@@ -23,31 +23,26 @@ module.exports = [
   'Notifications',
   'camAPI',
   'task',
-  function(
-    $scope,
-    $translate,
-    Notifications,
-    camAPI,
-    task
-  ) {
-
+  function($scope, $translate, Notifications, camAPI, task) {
     var Task = camAPI.resource('task');
 
-    $scope.comment = { message: '' };
+    $scope.comment = {message: ''};
 
     $scope.$on('$locationChangeSuccess', function() {
       $scope.$dismiss();
     });
 
     function errorNotification(src, err) {
-      $translate(src).then(function(translated) {
-        Notifications.addError({
-          status: translated,
-          message: (err ? err.message : ''),
-          exclusive: true,
-          scope: $scope
-        });
-      }).catch(function() {});
+      $translate(src)
+        .then(function(translated) {
+          Notifications.addError({
+            status: translated,
+            message: err ? err.message : '',
+            exclusive: true,
+            scope: $scope
+          });
+        })
+        .catch(function() {});
     }
 
     $scope.submit = function() {
@@ -59,4 +54,5 @@ module.exports = [
         $scope.$close();
       });
     };
-  }];
+  }
+];

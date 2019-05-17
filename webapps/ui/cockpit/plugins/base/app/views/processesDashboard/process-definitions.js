@@ -21,32 +21,44 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/process-definitions.html', 'utf8');
 
-module.exports = [ 'ViewsProvider', function(ViewsProvider) {
-  ViewsProvider.registerDefaultView('cockpit.processes.dashboard', {
-    id: 'process-definition',
-    label: 'Deployed Process Definitions',
-    template: template,
-    controller: [
-      '$scope',
-      'Views',
-      'camAPI',
-      'localConf',
-      '$translate',
-      function($scope, Views, camAPI, localConf, $translate) {
+module.exports = [
+  'ViewsProvider',
+  function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.processes.dashboard', {
+      id: 'process-definition',
+      label: 'Deployed Process Definitions',
+      template: template,
+      controller: [
+        '$scope',
+        'Views',
+        'camAPI',
+        'localConf',
+        '$translate',
+        function($scope, Views, camAPI, localConf, $translate) {
+          var processDefinitionService = camAPI.resource('process-definition');
 
-        var processDefinitionService = camAPI.resource('process-definition');
+          $scope.processesActions = Views.getProviders({
+            component: 'cockpit.processes.action'
+          });
+          $scope.hasActionPlugin = $scope.processesActions.length > 0;
 
-        $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
-        $scope.hasActionPlugin = $scope.processesActions.length > 0;
+          var processInstancePlugins = Views.getProviders({
+            component: 'cockpit.processInstance.view'
+          });
+          $scope.hasHistoryPlugin =
+            processInstancePlugins.filter(function(plugin) {
+              return plugin.id === 'history';
+            }).length > 0;
+          $scope.hasReportPlugin =
+            Views.getProviders({component: 'cockpit.report'}).length > 0;
+          $scope.hasSearchPlugin =
+            Views.getProviders({
+              component: 'cockpit.processes.dashboard',
+              id: 'search-process-instances'
+            }).length > 0;
 
-        var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
-        $scope.hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
-          return plugin.id === 'history';
-        }).length > 0;
-        $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
-        $scope.hasSearchPlugin = Views.getProviders( { component: 'cockpit.processes.dashboard', id: 'search-process-instances' }).length > 0;
-
-        $scope.headColumns = [
+          // prettier-ignore
+          $scope.headColumns = [
           { class: 'state',    request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_STATE')},
           { class: 'incidents',request: 'incidentCount', sortable: true,  content: $translate.instant('PLUGIN_PROCESS_DEF_INCIDENTS')},
           { class: 'instances',request: 'instances'    , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_RUNNING_INSTANCES')},
@@ -57,133 +69,156 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           { class: 'action',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_ACTION'), condition: $scope.hasActionPlugin}
         ];
 
-        // Default sorting
-        var defaultValue = { sortBy: 'label', sortOrder: 'asc', sortReverse: false};
+          // Default sorting
+          var defaultValue = {
+            sortBy: 'label',
+            sortOrder: 'asc',
+            sortReverse: false
+          };
 
+          $scope.sortObj = loadLocal(defaultValue);
 
+          // Update Table
+          $scope.onSortChange = function(sortObj) {
+            sortObj = sortObj || $scope.sortObj;
+            // transforms sortOrder to boolean required by anqular-sorting;
+            sortObj.sortReverse = sortObj.sortOrder !== 'asc';
+            saveLocal(sortObj);
+            $scope.sortObj = sortObj;
+          };
 
-        $scope.sortObj   = loadLocal(defaultValue);
+          var processData = $scope.processData.newChild($scope);
 
-        // Update Table
-        $scope.onSortChange = function(sortObj) {
-          sortObj = sortObj || $scope.sortObj;
-          // transforms sortOrder to boolean required by anqular-sorting;
-          sortObj.sortReverse = sortObj.sortOrder !== 'asc';
-          saveLocal(sortObj);
-          $scope.sortObj = sortObj;
-        };
-
-        var processData = $scope.processData.newChild($scope);
-
-        var getPDIncidentsCount = function(incidents) {
-          if(!incidents) { return 0;}
-          return incidents.reduce(function(sum, incident) {
-            return sum + incident.incidentCount;
-          }, 0);
-        };
-
-        $scope.loadingState = 'LOADING';
-
-
-        // only get count of process definitions
-        var countProcessDefinitions =  function() {
-          processDefinitionService.count({
-            latest: true
-          }, function(err, count) {
-            if (err) {
-              $scope.loadingState = 'ERROR';
+          var getPDIncidentsCount = function(incidents) {
+            if (!incidents) {
+              return 0;
             }
-            $scope.processDefinitionsCount = count;
-          });
-        };
+            return incidents.reduce(function(sum, incident) {
+              return sum + incident.incidentCount;
+            }, 0);
+          };
 
-        // get full list of process definitions and related resources
-        var listProcessDefinitions =  function() {
-          processDefinitionService.list({
-            latest: true
-          }, function(err, data) {
+          $scope.loadingState = 'LOADING';
 
-            // Add label for sorting
-            data.items.forEach(function(item) {
-              item.label = item.name || item.key;
-            });
+          // only get count of process definitions
+          var countProcessDefinitions = function() {
+            processDefinitionService.count(
+              {
+                latest: true
+              },
+              function(err, count) {
+                if (err) {
+                  $scope.loadingState = 'ERROR';
+                }
+                $scope.processDefinitionsCount = count;
+              }
+            );
+          };
 
-            $scope.processDefinitionData = data.items;
-            $scope.processDefinitionsCount = data.count;
-
-            $scope.loadingState = err? 'ERROR': 'LOADED';
-
-            processData.observe('processDefinitionStatistics', function(processDefinitionStatistics) {
-              $scope.statistics = processDefinitionStatistics;
-
-              $scope.statistics.forEach(function(statistic) {
-                var processDefId = statistic.definition.id;
-                var foundIds = $scope.processDefinitionData.filter(function(pd) {
-                  return pd.id === processDefId;
+          // get full list of process definitions and related resources
+          var listProcessDefinitions = function() {
+            processDefinitionService.list(
+              {
+                latest: true
+              },
+              function(err, data) {
+                // Add label for sorting
+                data.items.forEach(function(item) {
+                  item.label = item.name || item.key;
                 });
 
-                var foundObject = foundIds[0];
-                if(foundObject) {
-                  foundObject.incidents = statistic.incidents;
-                  foundObject.incidentCount = getPDIncidentsCount(foundObject.incidents);
-                  foundObject.instances = statistic.instances;
+                $scope.processDefinitionData = data.items;
+                $scope.processDefinitionsCount = data.count;
+
+                $scope.loadingState = err ? 'ERROR' : 'LOADED';
+
+                processData.observe('processDefinitionStatistics', function(
+                  processDefinitionStatistics
+                ) {
+                  $scope.statistics = processDefinitionStatistics;
+
+                  $scope.statistics.forEach(function(statistic) {
+                    var processDefId = statistic.definition.id;
+                    var foundIds = $scope.processDefinitionData.filter(function(
+                      pd
+                    ) {
+                      return pd.id === processDefId;
+                    });
+
+                    var foundObject = foundIds[0];
+                    if (foundObject) {
+                      foundObject.incidents = statistic.incidents;
+                      foundObject.incidentCount = getPDIncidentsCount(
+                        foundObject.incidents
+                      );
+                      foundObject.instances = statistic.instances;
+                    }
+                  });
+                });
+              }
+            );
+          };
+
+          $scope.definitionVars = {read: ['pd']};
+
+          var removeActionDeleteListener = $scope.$on(
+            'processes.action.delete',
+            function(event, definitionId) {
+              var definitions = $scope.processDefinitionData;
+
+              for (var i = 0; i < definitions.length; i++) {
+                if (definitions[i].id === definitionId) {
+                  definitions.splice(i, 1);
+                  break;
                 }
-              });
-            });
-          });
-        };
+              }
 
-        $scope.definitionVars = { read: [ 'pd' ] };
-
-        var removeActionDeleteListener = $scope.$on('processes.action.delete', function(event, definitionId) {
-
-          var definitions = $scope.processDefinitionData;
-
-          for (var i = 0; i < definitions.length; i++) {
-            if (definitions[i].id === definitionId) {
-              definitions.splice(i, 1);
-              break;
+              $scope.processDefinitionsCount = definitions.length;
             }
-          }
+          );
 
-          $scope.processDefinitionsCount = definitions.length;
-        });
+          $scope.$on('$destroy', function() {
+            removeActionDeleteListener();
+          });
 
-        $scope.$on('$destroy', function() {
-          removeActionDeleteListener();
-        });
+          $scope.incidentsLink =
+            '#/processes?searchQuery=%5B%7B%22type%22:%22PIincidentStatus%22,%22operator%22:' +
+            '%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,' +
+            '%22operator%22:%22eq%22,%22value%22:%22PD_KEY%22,%22name%22:%22%22%7D%5D#search-section';
 
-        $scope.incidentsLink = '#/processes?searchQuery=%5B%7B%22type%22:%22PIincidentStatus%22,%22operator%22:' +
-          '%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,' +
-          '%22operator%22:%22eq%22,%22value%22:%22PD_KEY%22,%22name%22:%22%22%7D%5D#search-section';
+          $scope.activeTab = 'list';
 
+          $scope.selectTab = function(tab) {
+            $scope.activeTab = tab;
+          };
 
-        $scope.activeTab = 'list';
-
-        $scope.selectTab = function(tab) {
-          $scope.activeTab = tab;
-        };
-
-        $scope.activeSection = localConf.get('processesDashboardActive', true);
-        // if tab is not active, it's enough to only get the count of process definitions
-        $scope.activeSection ? listProcessDefinitions() : countProcessDefinitions();
-
-        $scope.toggleSection = function toggleSection() {
+          $scope.activeSection = localConf.get(
+            'processesDashboardActive',
+            true
+          );
           // if tab is not active, it's enough to only get the count of process definitions
-          ($scope.activeSection === !$scope.activeSection) ? listProcessDefinitions() : countProcessDefinitions();
-          localConf.set('processesDashboardActive', $scope.activeSection);
-        };
+          $scope.activeSection
+            ? listProcessDefinitions()
+            : countProcessDefinitions();
 
-        function saveLocal(sortObj) {
-          localConf.set('sortProcessDefTab', sortObj);
+          $scope.toggleSection = function toggleSection() {
+            // if tab is not active, it's enough to only get the count of process definitions
+            $scope.activeSection === !$scope.activeSection
+              ? listProcessDefinitions()
+              : countProcessDefinitions();
+            localConf.set('processesDashboardActive', $scope.activeSection);
+          };
 
+          function saveLocal(sortObj) {
+            localConf.set('sortProcessDefTab', sortObj);
+          }
+          function loadLocal(defaultValue) {
+            return localConf.get('sortProcessDefTab', defaultValue);
+          }
         }
-        function loadLocal(defaultValue) {
-          return localConf.get('sortProcessDefTab', defaultValue);
-        }
+      ],
 
-      }],
-
-    priority: 0
-  });
-}];
+      priority: 0
+    });
+  }
+];

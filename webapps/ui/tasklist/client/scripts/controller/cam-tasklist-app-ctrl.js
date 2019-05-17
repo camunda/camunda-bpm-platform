@@ -18,15 +18,11 @@
 'use strict';
 
 var TasklistApp = (function() {
-
   function TasklistApp() {
-
     this.refreshProvider = null;
-
   }
 
   return TasklistApp;
-
 })();
 
 module.exports = [
@@ -35,14 +31,7 @@ module.exports = [
   '$window',
   '$interval',
   '$scope',
-  function(
-    camAPI,
-    configuration,
-    $window,
-    $interval,
-    $scope
-  ) {
-
+  function(camAPI, configuration, $window, $interval, $scope) {
     // create a new tasklistApp
     $scope.tasklistApp = new TasklistApp();
     $scope.appVendor = configuration.getAppVendor();
@@ -83,4 +72,5 @@ module.exports = [
     $scope.$on('$destroy', function() {
       $interval.cancel(refreshInterval);
     });
-  }];
+  }
+];

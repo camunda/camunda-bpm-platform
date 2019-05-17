@@ -26,12 +26,8 @@ require('camunda-commons-ui/vendor/prism');
 
 module.exports = [
   '$window',
-  function(
-    $window
-  ) {
-
+  function($window) {
     return {
-
       restrict: 'A',
 
       scope: {
@@ -42,18 +38,17 @@ module.exports = [
       template: template,
 
       link: function($scope, $element) {
-
         var Prism = $window.Prism;
 
         var Extensions = {
-          'js'         : 'javascript',
-          'html'       : 'markup',
-          'xml'        : 'markup',
-          'py'         : 'python',
-          'rb'         : 'ruby',
-          'bpmn'       : 'markup',
-          'cmmn'       : 'markup',
-          'dmn'        : 'markup'
+          js: 'javascript',
+          html: 'markup',
+          xml: 'markup',
+          py: 'python',
+          rb: 'ruby',
+          bpmn: 'markup',
+          cmmn: 'markup',
+          dmn: 'markup'
         };
 
         var name = $scope.name;
@@ -73,7 +68,6 @@ module.exports = [
           }
         });
       }
-
     };
-
-  }];
+  }
+];

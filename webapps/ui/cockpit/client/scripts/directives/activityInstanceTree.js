@@ -19,7 +19,10 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/activity-instance-tree.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/activity-instance-tree.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
@@ -32,16 +35,16 @@ function dashed(str) {
 }
 
 var iconNames = {
-  'start-event':                            'start-event-none',
-  'error-start-event':                      'start-event-error',
-  'cancel-end-event':                       'end-event-cancel',
-  'error-end-event':                        'end-event-error',
-  'none-end-event':                         'end-event-none',
-  'parallel-gateway':                       'gateway-parallel',
-  'exclusive-gateway':                      'gateway-xor',
-  'intermediate-compensation-throw-event':  'intermediate-event-throw-compensation'
+  'start-event': 'start-event-none',
+  'error-start-event': 'start-event-error',
+  'cancel-end-event': 'end-event-cancel',
+  'error-end-event': 'end-event-error',
+  'none-end-event': 'end-event-none',
+  'parallel-gateway': 'gateway-parallel',
+  'exclusive-gateway': 'gateway-xor',
+  'intermediate-compensation-throw-event':
+    'intermediate-event-throw-compensation'
 };
-
 
 var Directive = [
   '$compile',
@@ -62,12 +65,12 @@ var Directive = [
         scope.symbolIconName = function(str) {
           var name = dashed(str);
           name = iconNames[name] ? iconNames[name] : name;
-          return 'icon-'+ name;
+          return 'icon-' + name;
         };
 
         var $nodeElement = element,
-            nodeSelectedEventName = 'node.selected',
-            nodeOpenedEventName = 'node.opened';
+          nodeSelectedEventName = 'node.selected',
+          nodeOpenedEventName = 'node.opened';
 
         var orderChildrenBy = scope.orderChildrenBy();
 
@@ -80,7 +83,9 @@ var Directive = [
             return;
           }
 
-          var children = (newValue.childActivityInstances || []).concat(newValue.childTransitionInstances || []);
+          var children = (newValue.childActivityInstances || []).concat(
+            newValue.childTransitionInstances || []
+          );
 
           if (orderChildrenBy) {
             children = $filter('orderBy')(children, orderChildrenBy);
@@ -101,16 +106,22 @@ var Directive = [
 
         function handleNodeEvents($event, value) {
           var node = scope.node,
-              eventName = $event.name;
+            eventName = $event.name;
 
           if (!node) {
             return;
           }
 
-          if (eventName === nodeOpenedEventName || eventName === nodeSelectedEventName) {
+          if (
+            eventName === nodeOpenedEventName ||
+            eventName === nodeSelectedEventName
+          ) {
             if (node.id === value.parentActivityInstanceId) {
               node.isOpen = true;
-              if (node.parentActivityInstanceId && node.id !== node.parentActivityInstanceId) {
+              if (
+                node.parentActivityInstanceId &&
+                node.id !== node.parentActivityInstanceId
+              ) {
                 fireNodeEvent(nodeOpenedEventName, node);
               }
             }
@@ -119,7 +130,7 @@ var Directive = [
 
         function fireNodeEvent(name, node) {
           var id = node.id,
-              parentActivityInstanceId = node.parentActivityInstanceId;
+            parentActivityInstanceId = node.parentActivityInstanceId;
 
           scope.$emit(name, {
             id: id,
@@ -127,7 +138,10 @@ var Directive = [
           });
         }
 
-        scope.$watch('selection.activityInstanceIds', function(newValue, oldValue) {
+        scope.$watch('selection.activityInstanceIds', function(
+          newValue,
+          oldValue
+        ) {
           var node = scope.node;
 
           if (!node) {
@@ -168,7 +182,6 @@ var Directive = [
         };
 
         function createTreeNode(node) {
-
           withTemplate(function(template) {
             // if finished, show collapsed
             node.isOpen = node.endTime ? false : true;
@@ -192,9 +205,9 @@ var Directive = [
           var node = scope.node;
           node.isOpen = !node.isOpen;
         };
-
       }
     };
-  }];
+  }
+];
 
 module.exports = Directive;

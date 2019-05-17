@@ -22,7 +22,6 @@ var Page = require('./edit-base');
 var formElement = element(by.css('form[name="updateGroupMemberships"]'));
 
 module.exports = Page.extend({
-
   url: '/camunda/app/admin/default/#/users/:user?tab=groups',
 
   subHeader: function() {
@@ -34,7 +33,10 @@ module.exports = Page.extend({
   },
 
   groupId: function(idx) {
-    return this.groupList().get(idx).element(by.binding('{{group.id}}')).getText();
+    return this.groupList()
+      .get(idx)
+      .element(by.binding('{{group.id}}'))
+      .getText();
   },
 
   openAddGroupModal: function() {
@@ -48,6 +50,9 @@ module.exports = Page.extend({
   },
 
   removeGroup: function(idx) {
-    this.groupList().get(idx).element(by.css('[ng-click="removeGroup(group.id)"]')).click();
+    this.groupList()
+      .get(idx)
+      .element(by.css('[ng-click="removeGroup(group.id)"]'))
+      .click();
   }
 });

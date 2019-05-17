@@ -45,9 +45,8 @@ module.exports.processDefinition = new ProcessDefinitionPage();
 module.exports.decisionDefinition = new DecisionDefinitionPage();
 module.exports.processInstance = new ProcessInstancePage();
 module.exports.task = new TaskPage();
-module.exports.user= new UserPage();
+module.exports.user = new UserPage();
 module.exports.batch = new BatchPage();
 module.exports.tenant = new TenantPage();
 module.exports.tenantMembership = new TenantMembershipPage();
 module.exports.authentication = new AuthenticationPage();
-

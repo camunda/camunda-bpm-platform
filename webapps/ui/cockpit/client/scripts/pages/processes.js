@@ -44,32 +44,40 @@ var Controller = [
   ) {
     var $rootScope = $scope.$root;
 
-    var processData = $scope.processData = dataDepend.create($scope);
+    var processData = ($scope.processData = dataDepend.create($scope));
 
-    $scope.dashboardVars = { read: [ 'processData' ] };
-    $scope.dashboardProviders = Views.getProviders({ component: 'cockpit.processes.dashboard'});
+    $scope.dashboardVars = {read: ['processData']};
+    $scope.dashboardProviders = Views.getProviders({
+      component: 'cockpit.processes.dashboard'
+    });
 
-    Data.instantiateProviders('cockpit.dashboard.data', {$scope: $scope, processData : processData});
+    Data.instantiateProviders('cockpit.dashboard.data', {
+      $scope: $scope,
+      processData: processData
+    });
 
     // INITIALIZE PLUGINS
-    var dashboardPlugins = Views.getProviders({ component: 'cockpit.processes.dashboard' });
+    var dashboardPlugins = Views.getProviders({
+      component: 'cockpit.processes.dashboard'
+    });
 
     var initData = {
-      $scope      : $scope,
-      processData : processData
+      $scope: $scope,
+      processData: processData
     };
 
-    for(var i = 0; i < dashboardPlugins.length; i++) {
-      if(typeof dashboardPlugins[i].initialize === 'function') {
+    for (var i = 0; i < dashboardPlugins.length; i++) {
+      if (typeof dashboardPlugins[i].initialize === 'function') {
         dashboardPlugins[i].initialize(initData);
       }
     }
 
-
     var search = $location.search();
     if (search.targetPlugin) {
       $timeout(function() {
-        var el = angular.element('[data-plugin-id="' + search.targetPlugin + '"]');
+        var el = angular.element(
+          '[data-plugin-id="' + search.targetPlugin + '"]'
+        );
         if (el.length) {
           el[0].scrollIntoView();
         }
@@ -85,15 +93,19 @@ var Controller = [
     });
 
     page.titleSet($translate.instant('PROCESS_PROCESSES'));
-  }];
+  }
+];
 
-var RouteConfig = [ '$routeProvider', function($routeProvider) {
-  $routeProvider.when('/processes', {
-    template: template,
-    controller: Controller,
-    authentication: 'required',
-    reloadOnSearch: false
-  });
-}];
+var RouteConfig = [
+  '$routeProvider',
+  function($routeProvider) {
+    $routeProvider.when('/processes', {
+      template: template,
+      controller: Controller,
+      authentication: 'required',
+      reloadOnSearch: false
+    });
+  }
+];
 
 module.exports = RouteConfig;

@@ -20,7 +20,6 @@
 var Base = require('./../dashboard/dashboard-view');
 
 module.exports = Base.extend({
-
   pluginList: function() {
     return element.all(by.css('.decisions-dashboard'));
   },
@@ -30,7 +29,8 @@ module.exports = Base.extend({
   },
 
   decisionCountHeader: function() {
-    return this.pluginObject().element(by.binding('{{decisionCount}}')).getText();
+    return this.pluginObject()
+      .element(by.binding('{{decisionCount}}'))
+      .getText();
   }
-
 });

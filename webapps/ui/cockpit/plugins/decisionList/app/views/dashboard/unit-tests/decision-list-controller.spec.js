@@ -52,7 +52,7 @@ describe('cockpit.plugin.decisionList.views.dashboard DecisionListController', f
   it('should set initial loadingState to LOADING', function() {
     decisionList.getDecisionsLists.returns($q.when({}));
 
-    $controller('DecisionListController',  {
+    $controller('DecisionListController', {
       $scope: $scope,
       decisionList: decisionList
     });
@@ -68,12 +68,14 @@ describe('cockpit.plugin.decisionList.views.dashboard DecisionListController', f
       decisions = [1, 2, 3, 4];
       drds = ['a', 'b'];
 
-      decisionList.getDecisionsLists.returns($q.when({
-        decisions: decisions.slice(),
-        drds: drds.slice()
-      }));
+      decisionList.getDecisionsLists.returns(
+        $q.when({
+          decisions: decisions.slice(),
+          drds: drds.slice()
+        })
+      );
 
-      $controller('DecisionListController',  {
+      $controller('DecisionListController', {
         $scope: $scope,
         decisionList: decisionList
       });
@@ -101,9 +103,11 @@ describe('cockpit.plugin.decisionList.views.dashboard DecisionListController', f
     var error;
 
     beforeEach(function() {
-      decisionList.getDecisionsLists.returns($q.reject({
-        message: message
-      }));
+      decisionList.getDecisionsLists.returns(
+        $q.reject({
+          message: message
+        })
+      );
 
       try {
         $controller('DecisionListController', {
@@ -112,7 +116,7 @@ describe('cockpit.plugin.decisionList.views.dashboard DecisionListController', f
         });
 
         $rootScope.$digest();
-      } catch(_error) {
+      } catch (_error) {
         error = _error;
       }
     });

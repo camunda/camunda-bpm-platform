@@ -18,7 +18,10 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-form-embedded.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-form-embedded.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 var $ = require('jquery');
@@ -28,15 +31,8 @@ module.exports = [
   'camAPI',
   '$timeout',
   'Uri',
-  function(
-    CamForm,
-    camAPI,
-    $timeout,
-    Uri
-  ) {
-
+  function(CamForm, camAPI, $timeout, Uri) {
     return {
-
       restrict: 'A',
 
       require: '^camTasklistForm',
@@ -45,14 +41,14 @@ module.exports = [
 
       template: template,
 
-      link : function($scope, $element, attrs, formController) {
+      link: function($scope, $element, attrs, formController) {
         var container = $($element[0]).find('.form-container');
         var camForm = null;
         var initialVariables = null;
-        var form = $scope.form = {
-          '$valid': false,
-          '$invalid': true
-        };
+        var form = ($scope.form = {
+          $valid: false,
+          $invalid: true
+        });
 
         function clearVariableManager() {
           var variables = camForm.variableManager.variables;
@@ -75,18 +71,24 @@ module.exports = [
 
         $scope.$watch('asynchronousFormKey', handleAsynchronousFormKey, true);
 
-        $scope.$watch(function() {
-          return form && form.$valid;
-        }, function(value) {
-          formController.notifyFormValidated(!value);
-        });
+        $scope.$watch(
+          function() {
+            return form && form.$valid;
+          },
+          function(value) {
+            formController.notifyFormValidated(!value);
+          }
+        );
 
         // watch for changes in the form
-        $scope.$watch(function() {
-          return form && form.$dirty;
-        }, function(value) {
-          formController.notifyFormDirty(value);
-        });
+        $scope.$watch(
+          function() {
+            return form && form.$dirty;
+          },
+          function(value) {
+            formController.notifyFormDirty(value);
+          }
+        );
 
         function showForm(container, tasklistForm, params) {
           var formUrl = tasklistForm.key;
@@ -132,9 +134,11 @@ module.exports = [
         };
 
         $scope.$on('shortcut:focusForm', function() {
-          if(camForm) {
-            var focusElement = camForm.formElement[0].querySelectorAll('input')[0];
-            if(focusElement) {
+          if (camForm) {
+            var focusElement = camForm.formElement[0].querySelectorAll(
+              'input'
+            )[0];
+            if (focusElement) {
               focusElement.focus();
             }
           }
@@ -148,7 +152,7 @@ module.exports = [
 
         var localCallback = function(callback) {
           return function(err, result) {
-            if(err) {
+            if (err) {
               clearVariableManager();
             }
 
@@ -175,9 +179,7 @@ module.exports = [
         $scope.$on('authentication.login.required', function() {
           save();
         });
-
       }
-
     };
-
-  }];
+  }
+];

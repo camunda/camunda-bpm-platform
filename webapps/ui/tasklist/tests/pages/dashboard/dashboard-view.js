@@ -20,7 +20,6 @@
 var Base = require('./../base');
 
 module.exports = Base.extend({
-
   url: '/camunda/app/tasklist/default/#/',
 
   header: function() {

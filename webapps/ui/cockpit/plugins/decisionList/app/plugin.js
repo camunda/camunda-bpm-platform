@@ -25,6 +25,8 @@
 'use strict';
 
 var angular = require('angular'),
-    viewsModule = require('./views/main');
+  viewsModule = require('./views/main');
 
-module.exports = angular.module('cockpit.plugin.decisionList', [viewsModule.name]);
+module.exports = angular.module('cockpit.plugin.decisionList', [
+  viewsModule.name
+]);

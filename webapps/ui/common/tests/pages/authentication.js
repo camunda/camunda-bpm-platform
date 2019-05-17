@@ -20,7 +20,6 @@
 var Page = require('./page');
 
 module.exports = Page.extend({
-
   url: '/camunda/app/:webapp/default/#/login',
 
   formElement: function() {
@@ -34,8 +33,7 @@ module.exports = Page.extend({
   usernameInput: function(inputValue) {
     var inputField = this.formElement().element(by.model('username'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -43,8 +41,7 @@ module.exports = Page.extend({
   passwordInput: function(inputValue) {
     var inputField = this.formElement().element(by.model('password'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -71,5 +68,4 @@ module.exports = Page.extend({
     element(by.css('.account.dropdown > .dropdown-toggle')).click();
     element(by.css('.account.dropdown > .dropdown-menu > .logout > a')).click();
   }
-
 });

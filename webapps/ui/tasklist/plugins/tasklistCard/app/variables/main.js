@@ -26,21 +26,27 @@ var ngModule = angular.module('tasklist.plugin.tasklistCard.variables', [
   'angularMoment'
 ]);
 
-var tasklistCardVariablesPlugin = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
-  ViewsProvider.registerDefaultView('tasklist.card', {
-    id: 'tasklist-card-variables',
-    template: '<div cam-tasklist-variables ' +
-                'filter-properties="filterProperties" ' +
-                'variables="task._embedded.variable" ' +
-                'class="row variables"></div>',
-    controller: function() {},
-    priority: 200
-  });
-}];
-
+var tasklistCardVariablesPlugin = [
+  'ViewsProvider',
+  function PluginConfiguration(ViewsProvider) {
+    ViewsProvider.registerDefaultView('tasklist.card', {
+      id: 'tasklist-card-variables',
+      template:
+        '<div cam-tasklist-variables ' +
+        'filter-properties="filterProperties" ' +
+        'variables="task._embedded.variable" ' +
+        'class="row variables"></div>',
+      controller: function() {},
+      priority: 200
+    });
+  }
+];
 
 ngModule.config(tasklistCardVariablesPlugin);
 ngModule.directive('camTasklistVariables', camTasklistVariables);
-ngModule.controller('camTasklistVariablesDetailsModalCtrl', camTasklistVariablesDetailsModalCtrl);
+ngModule.controller(
+  'camTasklistVariablesDetailsModalCtrl',
+  camTasklistVariablesDetailsModalCtrl
+);
 
 module.exports = ngModule;

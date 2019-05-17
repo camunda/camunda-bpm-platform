@@ -29,17 +29,21 @@ module.exports = [
   '$location',
   'Views',
   function($scope, $injector, $location, Views) {
-    $scope.navbarVars = { read: [] };
+    $scope.navbarVars = {read: []};
 
     $scope.menuActions = [];
     $scope.dropdownActions = [];
 
-    Views.getProviders({ component: 'cockpit.navigation' }).forEach(function(plugin) {
+    Views.getProviders({component: 'cockpit.navigation'}).forEach(function(
+      plugin
+    ) {
       if (angular.isArray(plugin.access)) {
         var fn = $injector.invoke(plugin.access);
 
         fn(function(err, access) {
-          if (err) { throw err; }
+          if (err) {
+            throw err;
+          }
 
           plugin.accessible = access;
         });
@@ -50,13 +54,18 @@ module.exports = [
         plugin.accessible = true;
       }
 
-      (plugin.priority >= 0 ? $scope.menuActions : $scope.dropdownActions).push(plugin);
+      (plugin.priority >= 0 ? $scope.menuActions : $scope.dropdownActions).push(
+        plugin
+      );
     });
 
     $scope.activeClass = function(plugin) {
       var path = $location.absUrl();
-      return (typeof plugin.checkActive === 'function' ?
-        plugin.checkActive(path) :
-        checkActive(plugin, path)) ? 'active' : '';
+      return (typeof plugin.checkActive === 'function'
+      ? plugin.checkActive(path)
+      : checkActive(plugin, path))
+        ? 'active'
+        : '';
     };
-  }];
+  }
+];

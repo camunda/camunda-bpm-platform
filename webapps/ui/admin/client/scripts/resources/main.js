@@ -18,12 +18,12 @@
 'use strict';
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    userResource = require('./userResource'),
-    groupResource = require('./groupResource'),
-    groupMembershipResource = require('./groupMembershipResource'),
-    initialUserResource = require('./initialUserResource'),
-    metricsResource = require('./metricsResource'),
-    tenantResource = require('./tenantResource');
+  userResource = require('./userResource'),
+  groupResource = require('./groupResource'),
+  groupMembershipResource = require('./groupMembershipResource'),
+  initialUserResource = require('./initialUserResource'),
+  metricsResource = require('./metricsResource'),
+  tenantResource = require('./tenantResource');
 
 var ngModule = angular.module('admin.resources', []);
 

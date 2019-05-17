@@ -18,8 +18,14 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-task-meta.html', 'utf8');
-var editGroupsFormTemplate = fs.readFileSync(__dirname + '/../modals/cam-tasklist-groups-modal.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-task-meta.html',
+  'utf8'
+);
+var editGroupsFormTemplate = fs.readFileSync(
+  __dirname + '/../modals/cam-tasklist-groups-modal.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
@@ -29,13 +35,7 @@ module.exports = [
   'camAPI',
   'fixDate',
   'unfixDate',
-  function(
-    $modal,
-    $timeout,
-    camAPI,
-    fixDate,
-    unfixDate
-  ) {
+  function($modal, $timeout, camAPI, fixDate, unfixDate) {
     var Task = camAPI.resource('task');
 
     return {
@@ -53,8 +53,8 @@ module.exports = [
         var errorHandler = $scope.errorHandler() || function() {};
 
         /**
-       * observe task changes
-       */
+         * observe task changes
+         */
         taskMetaData.observe('task', function(task) {
           $scope.task = angular.copy(task);
 
@@ -68,10 +68,9 @@ module.exports = [
           $scope.assignee = angular.copy(assignee);
         });
 
-
         /**
-       * observe task changes
-       */
+         * observe task changes
+         */
         taskMetaData.observe('isAssignee', function(isAssignee) {
           $scope.isAssignee = isAssignee;
         });
@@ -86,14 +85,13 @@ module.exports = [
         });
 
         /**
-       * reload data after the task has been updated
-       */
+         * reload data after the task has been updated
+         */
         function reload() {
-
-        // we always refresh the state from the backend after we made a change.
-        // this has advantages:
-        // - limits the risk that our copy gets corrupted
-        // - we see changes made by other users faster
+          // we always refresh the state from the backend after we made a change.
+          // this has advantages:
+          // - limits the risk that our copy gets corrupted
+          // - we see changes made by other users faster
           taskMetaData.changed('task');
 
           // list of tasks must be reloaded as well:
@@ -108,7 +106,11 @@ module.exports = [
 
             updateTask();
 
-            document.querySelector('[cam-widget-inline-field].'+(propName.toLowerCase())+'-date').focus();
+            document
+              .querySelector(
+                '[cam-widget-inline-field].' + propName.toLowerCase() + '-date'
+              )
+              .focus();
           };
         }
 
@@ -117,7 +119,11 @@ module.exports = [
             $scope.task[propName] = null;
             updateTask();
 
-            document.querySelector('[cam-widget-inline-field].'+(propName.toLowerCase())+'-date').focus();
+            document
+              .querySelector(
+                '[cam-widget-inline-field].' + propName.toLowerCase() + '-date'
+              )
+              .focus();
           };
         }
 
@@ -139,12 +145,14 @@ module.exports = [
         }
 
         function focusAssignee() {
-          var el = document.querySelector('[cam-tasklist-task-meta] [cam-widget-inline-field][value="assignee.id"]');
-          if(el) {
+          var el = document.querySelector(
+            '[cam-tasklist-task-meta] [cam-widget-inline-field][value="assignee.id"]'
+          );
+          if (el) {
             el.focus();
           } else {
             el = document.querySelector('[cam-tasklist-task-meta] .claim');
-            if(el) {
+            if (el) {
               el.focus();
             }
           }
@@ -165,12 +173,16 @@ module.exports = [
           return function() {
             var el;
             setEditingState(property, false);
-            if(property === 'assignee') {
-              el = document.querySelector('[cam-tasklist-task-meta] [cam-widget-inline-field][value="assignee.id"]');
+            if (property === 'assignee') {
+              el = document.querySelector(
+                '[cam-tasklist-task-meta] [cam-widget-inline-field][value="assignee.id"]'
+              );
             } else {
-              el = document.querySelector('[cam-widget-inline-field].'+(property.toLowerCase())+'-date');
+              el = document.querySelector(
+                '[cam-widget-inline-field].' + property.toLowerCase() + '-date'
+              );
             }
-            if(el) {
+            if (el) {
               el.focus();
             }
           };
@@ -197,13 +209,12 @@ module.exports = [
           assignee: false
         };
 
-        $scope.now = (new Date()).toJSON();
+        $scope.now = new Date().toJSON();
 
         $scope.openDatepicker = function(evt) {
-          if(evt.keyCode === 13 && evt.target === evt.currentTarget) {
+          if (evt.keyCode === 13 && evt.target === evt.currentTarget) {
             // we can not trigger events in an event handler, because 'apply is already in progress' ;)
             $timeout(function() {
-
               // activate the inline edit field
               evt.target.firstChild.click();
             });
@@ -234,20 +245,23 @@ module.exports = [
           $scope.validAssignee = false;
           $scope.validationInProgress = true;
 
-          userResource.list({
-            maxResults: 1, // we don't do suggestions, yet
-            id: newId
-          }, function(err, results) {
-            if (newId !== targetElement.value) {
+          userResource.list(
+            {
+              maxResults: 1, // we don't do suggestions, yet
+              id: newId
+            },
+            function(err, results) {
+              if (newId !== targetElement.value) {
+                $scope.validationInProgress = false;
+                return validateAssignee(targetElement, done);
+              }
+
+              $scope.validAssignee = !err && results.length;
               $scope.validationInProgress = false;
-              return validateAssignee(targetElement, done);
+
+              done();
             }
-
-            $scope.validAssignee = !err && results.length;
-            $scope.validationInProgress = false;
-
-            done();
-          });
+          );
         }
 
         // this is used by the inline-field widget to allow or reject the change
@@ -260,7 +274,7 @@ module.exports = [
         $scope.editAssignee = function(evt) {
           $timeout(function() {
             validateAssignee(evt.target, function() {
-              if(evt.keyCode === 13 && evt.target === evt.currentTarget) {
+              if (evt.keyCode === 13 && evt.target === evt.currentTarget) {
                 evt.target.firstChild.click();
               }
             });
@@ -270,7 +284,6 @@ module.exports = [
         // ------------ END VALIDATION LOGIC --------------
 
         var notifications = {
-
           assigned: {
             error: 'ASSIGNED_ERROR'
           },
@@ -286,7 +299,6 @@ module.exports = [
           unclaimed: {
             error: 'UNCLAIM_ERROR'
           }
-
         };
 
         $scope.startEditingAssignee = notifyOnStartEditing('assignee');
@@ -308,72 +320,76 @@ module.exports = [
             if (!newAssignee) {
               if ($scope.isAssignee) {
                 unclaim();
-              }
-              else {
+              } else {
                 resetAssignee();
               }
-            }
-            else {
+            } else {
               setAssignee(newAssignee);
             }
           });
         };
 
-        var claim = $scope.claim = function() {
+        var claim = ($scope.claim = function() {
           var assignee = $scope.$root.authentication.name;
           Task.claim($scope.task.id, assignee, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
             notify('claimed')(err);
           });
-        };
+        });
         $scope.$on('shortcut:claimTask', claim);
 
-        var unclaim = $scope.unclaim = function() {
+        var unclaim = ($scope.unclaim = function() {
           Task.unclaim($scope.task.id, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
             notify('unclaimed')(err);
-          } );
-        };
+          });
+        });
 
-        var setAssignee = $scope.setAssignee = function(newAssignee) {
+        var setAssignee = ($scope.setAssignee = function(newAssignee) {
           Task.assignee($scope.task.id, newAssignee, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
             notify('assigned')(err);
           });
-        };
+        });
 
-        var resetAssignee = $scope.resetAssignee = function() {
+        var resetAssignee = ($scope.resetAssignee = function() {
           Task.assignee($scope.task.id, null, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
             notify('assigneeReseted')(err);
           });
-        };
+        });
 
         $scope.editGroups = function() {
           var groupsChanged;
 
-          $modal.open({
-          // creates a child scope of a provided scope
-            scope: $scope,
-            //TODO: extract filter edit modal class to super style sheet
-            windowClass: 'filter-edit-modal',
-            // size: 'md',
-            template: editGroupsFormTemplate,
-            controller: 'camGroupEditModalCtrl',
-            resolve: {
-              taskMetaData: function() { return taskMetaData; },
-              groupsChanged: function() {
-                return function() {
-                  groupsChanged = true;
-                };
-              },
-              errorHandler: function() { return $scope.errorHandler; }
-            }
-          }).result.then(dialogClosed, dialogClosed);
+          $modal
+            .open({
+              // creates a child scope of a provided scope
+              scope: $scope,
+              //TODO: extract filter edit modal class to super style sheet
+              windowClass: 'filter-edit-modal',
+              // size: 'md',
+              template: editGroupsFormTemplate,
+              controller: 'camGroupEditModalCtrl',
+              resolve: {
+                taskMetaData: function() {
+                  return taskMetaData;
+                },
+                groupsChanged: function() {
+                  return function() {
+                    groupsChanged = true;
+                  };
+                },
+                errorHandler: function() {
+                  return $scope.errorHandler;
+                }
+              }
+            })
+            .result.then(dialogClosed, dialogClosed);
 
           function dialogClosed() {
             if (groupsChanged) {
-              taskMetaData.set('taskId', { taskId: $scope.task.id });
+              taskMetaData.set('taskId', {taskId: $scope.task.id});
               taskMetaData.changed('taskList');
 
               // okay, here is where it gets ugly: since the groups have changed, a listener to the event we just fired
@@ -384,12 +400,10 @@ module.exports = [
                   document.querySelector('.meta .groups a').focus();
                 });
               });
-
             } else {
               document.querySelector('.meta .groups a').focus();
             }
           }
-
         };
 
         var doAfterGroupsLoaded = [];
@@ -408,7 +422,6 @@ module.exports = [
           doAfterAssigneeLoaded = [];
         });
 
-
         function notify(action) {
           var messages = notifications[action];
 
@@ -420,7 +433,7 @@ module.exports = [
             reload();
           };
         }
-
       }
     };
-  }];
+  }
+];

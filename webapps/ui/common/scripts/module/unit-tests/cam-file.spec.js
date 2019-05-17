@@ -63,9 +63,11 @@ describe('cam-common cam-file', function() {
   });
 
   it('should call onChange function with read files and $event', function() {
-    expect($scope.onChange.calledWith({
-      $event: $event,
-      files: files
-    })).to.eql(true);
+    expect(
+      $scope.onChange.calledWith({
+        $event: $event,
+        files: files
+      })
+    ).to.eql(true);
   });
 });

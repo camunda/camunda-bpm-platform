@@ -29,7 +29,6 @@
 
 var Filter = function() {
   return function(duration) {
-
     if (!duration) {
       return;
     }
@@ -57,7 +56,6 @@ var Filter = function() {
     }
 
     return result.join(', ');
-
   };
 
   function addValue(value, unit, array) {
@@ -68,6 +66,5 @@ var Filter = function() {
       array.push(result.join(' '));
     }
   }
-
 };
 module.exports = Filter;

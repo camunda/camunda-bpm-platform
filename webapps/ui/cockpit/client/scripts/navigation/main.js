@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    camHeaderViewsCtrl = require('./controllers/cam-header-views-ctrl');
+  camHeaderViewsCtrl = require('./controllers/cam-header-views-ctrl');
 
 var navigationModule = angular.module('cam.cockpit.navigation', []);
 

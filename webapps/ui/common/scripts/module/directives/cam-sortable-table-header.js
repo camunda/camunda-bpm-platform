@@ -32,41 +32,43 @@ var Directive = function() {
       sortOrder: '@defaultSortOrder',
       sortingId: '@'
     },
-    controller: ['$scope', 'localConf', function($scope, localConf) {
+    controller: [
+      '$scope',
+      'localConf',
+      function($scope, localConf) {
+        var sortingId = $scope.sortingId;
+        var defaultSorting = {
+          sortBy: $scope.sortBy,
+          sortOrder: $scope.sortOrder
+        };
 
-      var sortingId = $scope.sortingId;
-      var defaultSorting = { sortBy: $scope.sortBy, sortOrder: $scope.sortOrder };
+        var onSortInitialized = $scope.onSortInitialized || noop;
+        var onSortChange = $scope.onSortChange || noop;
 
-      var onSortInitialized = $scope.onSortInitialized || noop;
-      var onSortChange = $scope.onSortChange || noop;
+        var sorting = loadLocal();
+        onSortInitialized({sorting: sorting});
 
+        function loadLocal() {
+          return localConf.get(sortingId, defaultSorting);
+        }
 
-      var sorting = loadLocal();
-      onSortInitialized({sorting: sorting});
+        function saveLocal(sorting) {
+          localConf.set(sortingId, sorting);
+        }
 
-      function loadLocal() {
-        return localConf.get(sortingId, defaultSorting);
+        this.changeOrder = function(column) {
+          sorting.sortBy = column;
+          sorting.sortOrder = sorting.sortOrder === 'desc' ? 'asc' : 'desc';
+          saveLocal(sorting);
+          onSortChange({sorting: sorting});
+        };
+
+        this.getSorting = function() {
+          return sorting;
+        };
       }
-
-      function saveLocal(sorting) {
-        localConf.set(sortingId, sorting);
-      }
-
-      this.changeOrder = function(column) {
-        sorting.sortBy = column;
-        sorting.sortOrder = (sorting.sortOrder === 'desc') ? 'asc' : 'desc';
-        saveLocal(sorting);
-        onSortChange({ sorting: sorting });
-      };
-
-      this.getSorting = function() {
-        return sorting;
-      };
-
-    }]
+    ]
   };
 };
 
 module.exports = Directive;
-
-

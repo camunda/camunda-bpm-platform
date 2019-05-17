@@ -40,7 +40,6 @@ var Controller = [
     $translate,
     $injector
   ) {
-
     $scope.$root.showBreadcrumbs = true;
 
     page.titleSet($translate.instant('SYSTEM_SYSTEM_SETTINGS'));
@@ -54,43 +53,48 @@ var Controller = [
       }
     ]);
 
-    $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'})
-      .map(function(plugin) {
-        if (angular.isArray(plugin.access)) {
-          var fn = $injector.invoke(plugin.access);
+    $scope.systemSettingsProviders = Views.getProviders({
+      component: 'admin.system'
+    }).map(function(plugin) {
+      if (angular.isArray(plugin.access)) {
+        var fn = $injector.invoke(plugin.access);
 
-          fn(function(err, access) {
-            if (err) { throw err; }
+        fn(function(err, access) {
+          if (err) {
+            throw err;
+          }
 
-            plugin.accessible = access;
-          });
-        }
-        else {
-          plugin.accessible = true;
-        }
+          plugin.accessible = access;
+        });
+      } else {
+        plugin.accessible = true;
+      }
 
-        return plugin;
-      });
+      return plugin;
+    });
 
     var selectedProviderId = $routeParams.section;
-    if(selectedProviderId) {
+    if (selectedProviderId) {
       $scope.activeSettingsProvier = Views.getProviders({
         component: 'admin.system',
         id: $routeParams.section
       })[0];
     }
 
-
     $scope.activeClass = function(link) {
       var path = $location.absUrl();
       return path.indexOf(link) != -1 ? 'active' : '';
     };
-  }];
+  }
+];
 
-module.exports = [ '$routeProvider', function($routeProvider) {
-  $routeProvider.when('/system', {
-    template: template,
-    controller: Controller,
-    authentication: 'required'
-  });
-}];
+module.exports = [
+  '$routeProvider',
+  function($routeProvider) {
+    $routeProvider.when('/system', {
+      template: template,
+      controller: Controller,
+      authentication: 'required'
+    });
+  }
+];

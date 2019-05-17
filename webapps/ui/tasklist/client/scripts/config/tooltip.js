@@ -19,11 +19,10 @@
 
 module.exports = [
   '$uibTooltipProvider',
-  function(
-    $tooltipProvider
-  ) {
+  function($tooltipProvider) {
     $tooltipProvider.options({
       appendToBody: true,
       popupDelay: 500
     });
-  }];
+  }
+];

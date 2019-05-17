@@ -21,53 +21,74 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/setup.html', 'utf8');
 
-var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location', 'Uri', '$translate', function($scope, InitialUserResource, Notifications, $location, Uri, $translate) {
+var Controller = [
+  '$scope',
+  'InitialUserResource',
+  'Notifications',
+  '$location',
+  'Uri',
+  '$translate',
+  function(
+    $scope,
+    InitialUserResource,
+    Notifications,
+    $location,
+    Uri,
+    $translate
+  ) {
+    if (!/.*\/app\/admin\/([\w-]+)\/setup\/.*/.test($location.absUrl())) {
+      $location.path('/');
+      return;
+    }
 
-  if (!/.*\/app\/admin\/([\w-]+)\/setup\/.*/.test($location.absUrl())) {
-    $location.path('/');
-    return;
-  }
+    $scope.engineName = Uri.appUri(':engine');
 
-  $scope.engineName = Uri.appUri(':engine');
-
-  // data model for user profile
-  $scope.profile = {
-    id : '',
-    firstName : '',
-    lastName : '',
-    email : ''
-  };
-
-  $scope.created = false;
-
-  // data model for credentials
-  $scope.credentials = {
-    password : '',
-    password2 : '',
-    valid: true
-  };
-
-  $scope.createUser = function() {
-    var user = {
-      profile : $scope.profile,
-      credentials : { password : $scope.credentials.password }
+    // data model for user profile
+    $scope.profile = {
+      id: '',
+      firstName: '',
+      lastName: '',
+      email: ''
     };
 
-    InitialUserResource.create(user).$promise.then(
-      function() {
-        $scope.created = true;
-      },
-      function() {
-        Notifications.addError({ status: $translate.instant('NOTIFICATIONS_STATUS_ERROR'), message: $translate.instant('SETUP_COULD_NOT_CREATE_USER')});
-      }
-    ).catch(function() {});
-  };
+    $scope.created = false;
 
-}];
+    // data model for credentials
+    $scope.credentials = {
+      password: '',
+      password2: '',
+      valid: true
+    };
 
-module.exports = [ '$routeProvider', function($routeProvider) {
-  $routeProvider.when('/setup', {
-    template: template,
-    controller: Controller
-  });
-}];
+    $scope.createUser = function() {
+      var user = {
+        profile: $scope.profile,
+        credentials: {password: $scope.credentials.password}
+      };
+
+      InitialUserResource.create(user)
+        .$promise.then(
+          function() {
+            $scope.created = true;
+          },
+          function() {
+            Notifications.addError({
+              status: $translate.instant('NOTIFICATIONS_STATUS_ERROR'),
+              message: $translate.instant('SETUP_COULD_NOT_CREATE_USER')
+            });
+          }
+        )
+        .catch(function() {});
+    };
+  }
+];
+
+module.exports = [
+  '$routeProvider',
+  function($routeProvider) {
+    $routeProvider.when('/setup', {
+      template: template,
+      controller: Controller
+    });
+  }
+];

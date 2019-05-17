@@ -43,7 +43,6 @@ var Controller = [
     $translate,
     camAPI
   ) {
-
     $scope.isProcessInstance = isProcessInstance;
 
     $scope.variableTypes = [
@@ -60,15 +59,15 @@ var Controller = [
       'Xml'
     ];
 
-    var newVariable = $scope.newVariable = {
+    var newVariable = ($scope.newVariable = {
       name: null,
       type: 'String',
       value: null
-    };
+    });
 
     var PERFORM_SAVE = 'PERFORM_SAVE',
-        SUCCESS = 'SUCCESS',
-        FAIL = 'FAIL';
+      SUCCESS = 'SUCCESS',
+      FAIL = 'FAIL';
 
     var processInstance = camAPI.resource('process-instance');
     var caseInstance = camAPI.resource('case-instance');
@@ -81,17 +80,16 @@ var Controller = [
       $modalInstance.close($scope.status);
     };
 
-
-
-    var isValid = $scope.isValid = function() {
+    var isValid = ($scope.isValid = function() {
       // that's a pity... I do not get why,
       // but getting the form scope is.. kind of random
       // m2c: it has to do with the `click event`
       // Hate the game, not the player
       var formScope = angular.element('[name="addVariableForm"]').scope();
-      return (formScope && formScope.addVariableForm) ? formScope.addVariableForm.$valid : false;
-    };
-
+      return formScope && formScope.addVariableForm
+        ? formScope.addVariableForm.$valid
+        : false;
+    });
 
     $scope.save = function() {
       if (!isValid()) {
@@ -102,11 +100,11 @@ var Controller = [
 
       var data = angular.extend({}, newVariable);
 
-      if(data.type === 'Date') {
+      if (data.type === 'Date') {
         data.value = fixDate(data.value);
       }
 
-      var instanceAPI = (isProcessInstance ? processInstance : caseInstance);
+      var instanceAPI = isProcessInstance ? processInstance : caseInstance;
       instanceAPI
         .setVariable(instance.id, data)
         .then(function() {
@@ -114,7 +112,9 @@ var Controller = [
 
           Notifications.addMessage({
             status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
-            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ADD', { name: data.name }),
+            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ADD', {
+              name: data.name
+            }),
             exclusive: true
           });
         })
@@ -123,15 +123,17 @@ var Controller = [
 
           Notifications.addError({
             status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
-            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ERROR', {message: data.message}),
+            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ERROR', {
+              message: data.message
+            }),
             exclusive: true
           });
         });
     };
-  }];
+  }
+];
 
 module.exports = {
   template: template,
   controller: Controller
 };
-

@@ -18,9 +18,30 @@
 'use strict';
 
 module.exports = [
-  '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', '$uibModalInstance', 'authorizationToDelete', 'formatPermissions', 'getResource', 'getType',
-  function($scope,   $q,   $location,   Uri,   Notifications,   AuthorizationResource,   $modalInstance,   authorizationToDelete,   formatPermissions,   getResource,   getType) {
-
+  '$scope',
+  '$q',
+  '$location',
+  'Uri',
+  'Notifications',
+  'AuthorizationResource',
+  '$uibModalInstance',
+  'authorizationToDelete',
+  'formatPermissions',
+  'getResource',
+  'getType',
+  function(
+    $scope,
+    $q,
+    $location,
+    Uri,
+    Notifications,
+    AuthorizationResource,
+    $modalInstance,
+    authorizationToDelete,
+    formatPermissions,
+    getResource,
+    getType
+  ) {
     var DELETE_SUCCESS = 'SUCCESS';
 
     $scope.authorizationToDelete = authorizationToDelete;
@@ -38,8 +59,11 @@ module.exports = [
     };
 
     $scope.performDelete = function() {
-      AuthorizationResource.delete({ action: authorizationToDelete.id }).$promise.then(function() {
-        $scope.status = DELETE_SUCCESS;
-      }).catch(function() {});
+      AuthorizationResource.delete({action: authorizationToDelete.id})
+        .$promise.then(function() {
+          $scope.status = DELETE_SUCCESS;
+        })
+        .catch(function() {});
     };
-  }];
+  }
+];

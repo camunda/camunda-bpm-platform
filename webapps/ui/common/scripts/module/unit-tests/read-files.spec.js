@@ -36,19 +36,21 @@ describe('cam-common readFiles', function() {
 
   beforeEach(module(camCommon.name));
 
-  beforeEach(module(function($provide) {
-    readAsText = sinon.spy();
+  beforeEach(
+    module(function($provide) {
+      readAsText = sinon.spy();
 
-    $window = {
-      FileReader: function() {
-        reader = this;
+      $window = {
+        FileReader: function() {
+          reader = this;
 
-        this.readAsText = readAsText;
-      }
-    };
+          this.readAsText = readAsText;
+        }
+      };
 
-    $provide.value('$window', $window);
-  }));
+      $provide.value('$window', $window);
+    })
+  );
 
   beforeEach(inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -68,13 +70,12 @@ describe('cam-common readFiles', function() {
     var content = 'd';
     var file = '1.txt';
 
-    readFiles([file])
-      .then(function(files) {
-        expect(files[0].file).to.eql(file);
-        expect(files[0].content).to.eql(content);
+    readFiles([file]).then(function(files) {
+      expect(files[0].file).to.eql(file);
+      expect(files[0].content).to.eql(content);
 
-        done();
-      });
+      done();
+    });
 
     reader.onload({
       target: {
@@ -89,12 +90,11 @@ describe('cam-common readFiles', function() {
     var error = 'd';
     var file = '1.txt';
 
-    readFiles([file])
-      .catch(function(_error) {
-        expect(_error).to.eql(error);
+    readFiles([file]).catch(function(_error) {
+      expect(_error).to.eql(error);
 
-        done();
-      });
+      done();
+    });
 
     reader.onerror(error);
 

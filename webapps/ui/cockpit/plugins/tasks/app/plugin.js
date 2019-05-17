@@ -20,7 +20,7 @@
  */
 'use strict';
 
-var angular     = require('angular'),
-    viewsModule = require('./views/main');
+var angular = require('angular'),
+  viewsModule = require('./views/main');
 
 module.exports = angular.module('cockpit.plugin.tasks', [viewsModule.name]);

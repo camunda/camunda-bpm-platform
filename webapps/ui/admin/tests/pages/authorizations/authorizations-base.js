@@ -20,7 +20,6 @@
 var Page = require('./../base');
 
 module.exports = Page.extend({
-
   selectAuthorizationNavbarItem: function(navbarItem) {
     return element(by.cssContainingText('aside li', navbarItem)).click();
   },
@@ -62,11 +61,15 @@ module.exports = Page.extend({
   },
 
   authorizationIdentityType: function(idx) {
-    return this.getAuthorization(idx).element(by.css('.user.group > span:not(.ng-hide)')).getAttribute('tooltip');
+    return this.getAuthorization(idx)
+      .element(by.css('.user.group > span:not(.ng-hide)'))
+      .getAttribute('tooltip');
   },
 
   authorizationIdentity: function(idx) {
-    return this.getAuthorization(idx).element(by.css('.user.group')).getText();
+    return this.getAuthorization(idx)
+      .element(by.css('.user.group'))
+      .getText();
   },
 
   resourceInput: function(idx) {
@@ -74,7 +77,9 @@ module.exports = Page.extend({
   },
 
   authorizationResource: function(idx) {
-    return this.getAuthorization(idx).element(by.css('.resource-id')).getText();
+    return this.getAuthorization(idx)
+      .element(by.css('.resource-id'))
+      .getText();
   },
 
   createNewElement: function() {
@@ -82,15 +87,22 @@ module.exports = Page.extend({
   },
 
   editButton: function(idx) {
-    return this.getAuthorization(idx).element(by.cssContainingText('a', 'Edit'));
+    return this.getAuthorization(idx).element(
+      by.cssContainingText('a', 'Edit')
+    );
   },
 
   deleteButton: function(idx) {
-    return this.getAuthorization(idx).element(by.cssContainingText('a', 'Delete'));
+    return this.getAuthorization(idx).element(
+      by.cssContainingText('a', 'Delete')
+    );
   },
 
   authorizationType: function(authType) {
-    return element.all(by.css('.authorization-type')).last().element(by.cssContainingText('option', authType.toUpperCase()));
+    return element
+      .all(by.css('.authorization-type'))
+      .last()
+      .element(by.cssContainingText('option', authType.toUpperCase()));
   },
 
   identityButton: function() {
@@ -98,23 +110,27 @@ module.exports = Page.extend({
   },
 
   isIdentityButtonGroup: function() {
-    return this.identityButton().getAttribute('tooltip')
+    return this.identityButton()
+      .getAttribute('tooltip')
       .then(function(classes) {
         return classes.indexOf('Group') !== -1;
       });
   },
 
   identityIdInputFiled: function(inputValue) {
-    var inputField = this.createNewElement().element(by.model('authorization.identityId'));
+    var inputField = this.createNewElement().element(
+      by.model('authorization.identityId')
+    );
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   permissionsField: function() {
-    return this.createNewElement().element(by.css('.input-group .form-control-static'));
+    return this.createNewElement().element(
+      by.css('.input-group .form-control-static')
+    );
   },
 
   permissionsButton: function() {
@@ -122,7 +138,9 @@ module.exports = Page.extend({
   },
 
   permissionsDropdownList: function() {
-    return this.createNewElement().all(by.repeater('perm in availablePermissions'));
+    return this.createNewElement().all(
+      by.repeater('perm in availablePermissions')
+    );
   },
 
   selectPermission: function(index, permissionsType) {
@@ -132,51 +150,76 @@ module.exports = Page.extend({
       var that = this;
       permissionsType = index;
 
-      this.findElementIndexInRepeater('perm in availablePermissions', by.css('a'), permissionsType)
-        .then(function(idx) {
-          that.permissionsDropdownList().get(idx).click();
-        });
+      this.findElementIndexInRepeater(
+        'perm in availablePermissions',
+        by.css('a'),
+        permissionsType
+      ).then(function(idx) {
+        that
+          .permissionsDropdownList()
+          .get(idx)
+          .click();
+      });
     } else {
-      this.permissionsDropdownList(index).get(index).click();
+      this.permissionsDropdownList(index)
+        .get(index)
+        .click();
     }
   },
 
   selectPermissionFor: function(idx, permission) {
-    this.getAuthorization(idx).element(by.css('.permissions button')).click();
+    this.getAuthorization(idx)
+      .element(by.css('.permissions button'))
+      .click();
 
-    this.getAuthorization(idx).element(by.cssContainingText('.permissions a', permission)).click();
+    this.getAuthorization(idx)
+      .element(by.cssContainingText('.permissions a', permission))
+      .click();
   },
 
   authorizationPermissions: function(idx) {
-    return this.getAuthorization(idx).element(by.css('.permissions')).getText();
+    return this.getAuthorization(idx)
+      .element(by.css('.permissions'))
+      .getText();
   },
 
   resourceIdField: function(inputValue) {
-    var inputField = this.createNewElement().element(by.model('authorization.resourceId'));
+    var inputField = this.createNewElement().element(
+      by.model('authorization.resourceId')
+    );
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   submitNewAuthorizationButton: function() {
-    return this.createNewElement().element(by.css('[ng-click="confirmUpdateAuthorization(authorization)"]'));
+    return this.createNewElement().element(
+      by.css('[ng-click="confirmUpdateAuthorization(authorization)"]')
+    );
   },
 
   abortNewAuthorizationButton: function() {
-    return this.createNewElement().element(by.css('[ng-click="cancelUpdateAuthorization(authorization)"]'));
+    return this.createNewElement().element(
+      by.css('[ng-click="cancelUpdateAuthorization(authorization)"]')
+    );
   },
 
-  createNewAuthorization: function(authType, identityType, identityId, permissions, resourceId) {
+  createNewAuthorization: function(
+    authType,
+    identityType,
+    identityId,
+    permissions,
+    resourceId
+  ) {
     var that = this;
 
     this.createNewButton().click();
     this.authorizationType(authType).click();
     this.isIdentityButtonGroup().then(function(state) {
-      if (state && (identityType.toUpperCase() === 'USER')) {
+      if (state && identityType.toUpperCase() === 'USER') {
         that.identityButton().click();
-      } else if (!state && (identityType.toUpperCase() === 'GROUP')) {
+      } else if (!state && identityType.toUpperCase() === 'GROUP') {
         that.identityButton().click();
       }
     });
@@ -190,10 +233,13 @@ module.exports = Page.extend({
 
   deleteAuthorization: function(idx) {
     this.deleteButton(idx).click();
-    this.waitForElementToBeVisible(element(by.css('[ng-click="performDelete()"]')));
+    this.waitForElementToBeVisible(
+      element(by.css('[ng-click="performDelete()"]'))
+    );
     element(by.css('[ng-click="performDelete()"]')).click();
-    this.waitForElementToBeVisible(element(by.css('[ng-click="close(status)"]')));
+    this.waitForElementToBeVisible(
+      element(by.css('[ng-click="close(status)"]'))
+    );
     element(by.css('[ng-click="close(status)"]')).click();
   }
-
 });

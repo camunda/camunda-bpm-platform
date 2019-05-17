@@ -18,7 +18,10 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-form-plugin.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-task-detail-form-plugin.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
@@ -28,72 +31,69 @@ var Controller = [
   '$q',
   'camAPI',
   'assignNotification',
-  function(
-    $scope,
-    $location,
-    $q,
-    camAPI,
-    assignNotification
-  ) {
-
+  function($scope, $location, $q, camAPI, assignNotification) {
     // setup ///////////////////////////////////////////////////////////
 
     var Task = camAPI.resource('task');
 
     var errorHandler = $scope.errorHandler;
 
-    var DEFAULT_OPTIONS = $scope.options = {
+    var DEFAULT_OPTIONS = ($scope.options = {
       hideCompleteButton: false,
       hideLoadVariablesButton: false,
       disableCompleteButton: false,
       disableForm: false,
       disableAddVariableButton: false
-    };
+    });
 
     var taskFormData = $scope.taskData.newChild($scope);
 
-    taskFormData.provide('taskForm', ['task', function(task) {
-      var deferred = $q.defer();
+    taskFormData.provide('taskForm', [
+      'task',
+      function(task) {
+        var deferred = $q.defer();
 
-      if (!task || !task.id) {
-        return deferred.resolve(null);
+        if (!task || !task.id) {
+          return deferred.resolve(null);
+        }
+
+        Task.form(task.id, function(err, res) {
+          if (err) {
+            deferred.reject(err);
+          } else {
+            deferred.resolve(res);
+          }
+        });
+
+        return deferred.promise;
       }
-
-      Task.form(task.id, function(err, res) {
-
-        if(err) {
-          deferred.reject(err);
-        }
-        else {
-          deferred.resolve(res);
-        }
-      });
-
-      return deferred.promise;
-    }]);
+    ]);
 
     // observer ///////////////////////////////////////////////////////////
 
-    taskFormData.observe(['task', 'isAssignee', function(task, isAssignee) {
-      $scope.options = angular.copy(DEFAULT_OPTIONS);
+    taskFormData.observe([
+      'task',
+      'isAssignee',
+      function(task, isAssignee) {
+        $scope.options = angular.copy(DEFAULT_OPTIONS);
 
-      if (task && task.id) {
-        $scope.params = {
-          taskId : task.id,
-          caseDefinitionId: task.caseDefinitionId,
-          caseInstanceId: task.caseInstanceId,
-          processDefinitionId: task.processDefinitionId,
-          processInstanceId: task.processInstanceId
-        };
-      }
-      else {
-        $scope.params = null;
-      }
+        if (task && task.id) {
+          $scope.params = {
+            taskId: task.id,
+            caseDefinitionId: task.caseDefinitionId,
+            caseInstanceId: task.caseInstanceId,
+            processDefinitionId: task.processDefinitionId,
+            processInstanceId: task.processInstanceId
+          };
+        } else {
+          $scope.params = null;
+        }
 
-      $scope.options.disableCompleteButton = !isAssignee;
-      $scope.options.disableForm = !isAssignee;
-      $scope.options.disableAddVariableButton = !isAssignee;
-    }]);
+        $scope.options.disableCompleteButton = !isAssignee;
+        $scope.options.disableForm = !isAssignee;
+        $scope.options.disableAddVariableButton = !isAssignee;
+      }
+    ]);
 
     $scope.taskFormState = taskFormData.observe('taskForm', function(taskForm) {
       $scope.taskForm = angular.copy(taskForm);
@@ -124,12 +124,12 @@ var Controller = [
         return errorHandler('COMPLETE_ERROR', err);
       }
 
-      if($scope.task.processInstanceId) {
+      if ($scope.task.processInstanceId) {
         assignNotification({
           assignee: $scope.task.assignee,
           processInstanceId: $scope.task.processInstanceId
         });
-      } else if($scope.task.caseInstanceId) {
+      } else if ($scope.task.caseInstanceId) {
         assignNotification({
           assignee: $scope.task.assignee,
           caseInstanceId: $scope.task.caseInstanceId
@@ -138,10 +138,10 @@ var Controller = [
 
       clearTask();
     };
-  }];
+  }
+];
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
-
   ViewsProvider.registerDefaultView('tasklist.task.detail', {
     id: 'task-detail-form',
     label: 'FORM',

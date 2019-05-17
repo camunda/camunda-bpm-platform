@@ -18,7 +18,9 @@
 'use strict';
 
 module.exports = [
-  '$scope', 'Uri', 'exposeScopeProperties',
+  '$scope',
+  'Uri',
+  'exposeScopeProperties',
   ExternalTaskErrorMessageLink
 ];
 
@@ -29,10 +31,14 @@ function ExternalTaskErrorMessageLink($scope, Uri, exposeScopeProperties) {
 }
 
 ExternalTaskErrorMessageLink.prototype.getStacktraceUrl = function() {
-  var abstractUrl = 'engine://engine/:engine/external-task/' + this.taskId + '/errorDetails';
+  var abstractUrl =
+    'engine://engine/:engine/external-task/' + this.taskId + '/errorDetails';
 
   if (this.historic) {
-    abstractUrl = 'engine://engine/:engine/history/external-task-log/' + this.taskId + '/error-details';
+    abstractUrl =
+      'engine://engine/:engine/history/external-task-log/' +
+      this.taskId +
+      '/error-details';
   }
 
   return this.Uri.appUri(abstractUrl);

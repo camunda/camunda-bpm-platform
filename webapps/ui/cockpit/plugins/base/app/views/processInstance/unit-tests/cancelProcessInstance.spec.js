@@ -115,13 +115,15 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
 
   describe('subProcessInstances', function() {
     it('should provide sub process instances', function() {
-      expect(processData.provide.calledWith('subProcessInstances'))
-        .to.eql(true);
+      expect(processData.provide.calledWith('subProcessInstances')).to.eql(
+        true
+      );
     });
 
     it('should provide sub process instances count', function() {
-      expect(processData.provide.calledWith('subProcessInstancesCount'))
-        .to.eql(true);
+      expect(processData.provide.calledWith('subProcessInstancesCount')).to.eql(
+        true
+      );
     });
 
     it('should query and count process instances', function() {
@@ -131,14 +133,19 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
         superProcessInstance: processInstance.id
       });
 
-      expect(ProcessInstanceResource.count.calledWith({
-        superProcessInstance: processInstance.id
-      })).to.eql(true);
+      expect(
+        ProcessInstanceResource.count.calledWith({
+          superProcessInstance: processInstance.id
+        })
+      ).to.eql(true);
     });
 
     it('should observe sub processes', function() {
       expect(
-        processData.observe.calledWith(['subProcessInstancesCount', 'subProcessInstances'])
+        processData.observe.calledWith([
+          'subProcessInstancesCount',
+          'subProcessInstances'
+        ])
       ).to.eql(true);
     });
   });
@@ -147,14 +154,13 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
     it('should delete process instance with options', function() {
       $scope.cancelProcessInstance();
 
-      expect(processInstance.$delete.calledWith($scope.options))
-        .to.eql(true);
+      expect(processInstance.$delete.calledWith($scope.options)).to.eql(true);
     });
 
     it('should set status to success and notifiction when delete request succeded', function() {
       $scope.cancelProcessInstance();
 
-      var successCallback  = processInstance.$delete.lastCall.args[1];
+      var successCallback = processInstance.$delete.lastCall.args[1];
 
       successCallback();
 
@@ -171,18 +177,19 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
 
       $scope.cancelProcessInstance();
 
-      var failCallback  = processInstance.$delete.lastCall.args[2];
+      var failCallback = processInstance.$delete.lastCall.args[2];
 
       failCallback(err);
 
       expect($scope.status).to.eql('cancellationFailed');
       expect(
-        Notifications.addError
-          .calledWith({
-            status: 'Failed',
-            message: 'The cancellation of the process instance failed. ' + err.data.message,
-            exclusive: ['type']
-          })
+        Notifications.addError.calledWith({
+          status: 'Failed',
+          message:
+            'The cancellation of the process instance failed. ' +
+            err.data.message,
+          exclusive: ['type']
+        })
       ).to.eql(true);
     });
   });

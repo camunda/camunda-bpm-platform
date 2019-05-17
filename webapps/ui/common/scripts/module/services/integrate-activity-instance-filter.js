@@ -20,7 +20,9 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  'search',  '$location', 'searchWidgetUtils',
+  'search',
+  '$location',
+  'searchWidgetUtils',
   function(search, $location, searchWidgetUtils) {
     return function($scope, setDefaultTab, options) {
       var processData = $scope.processData;
@@ -32,13 +34,22 @@ module.exports = [
       $scope.filter = parseFilterFromUri();
       processData.provide('filter', parseFilterFromUri());
 
-      processData.observe(['filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], autoCompleteFilter);
+      processData.observe(
+        ['filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'],
+        autoCompleteFilter
+      );
 
       $scope.$on('$locationChangeSuccess', function() {
         var newFilter = parseFilterFromUri($scope.filter);
 
         if ($location.path().indexOf(processInstance.id) > -1) {
-          if (searchWidgetUtils.shouldUpdateFilter(newFilter, $scope.filter, ['activityIds', 'activityInstanceIds', 'page'])) {
+          if (
+            searchWidgetUtils.shouldUpdateFilter(newFilter, $scope.filter, [
+              'activityIds',
+              'activityInstanceIds',
+              'page'
+            ])
+          ) {
             processData.set('filter', newFilter);
           }
 
@@ -48,9 +59,18 @@ module.exports = [
 
       function parseFilterFromUri(lastFilter) {
         var params = search();
-        var activityInstanceIds = searchWidgetUtils.getActivityIdsFromUrlParams('activityInstanceIdIn', params);
-        var activityIds = params.activityIds ? params.activityIds.split(',') : [];
-        var ignoreActivityIds = shouldActivityIdsBeIgnored(lastFilter, activityIds, activityInstanceIds);
+        var activityInstanceIds = searchWidgetUtils.getActivityIdsFromUrlParams(
+          'activityInstanceIdIn',
+          params
+        );
+        var activityIds = params.activityIds
+          ? params.activityIds.split(',')
+          : [];
+        var ignoreActivityIds = shouldActivityIdsBeIgnored(
+          lastFilter,
+          activityIds,
+          activityInstanceIds
+        );
 
         // if activity ids haven't changed but instance ids have changed
         // then just ignore activity ids from url and let filter auto-complete them
@@ -67,28 +87,50 @@ module.exports = [
         };
       }
 
-      function shouldActivityIdsBeIgnored(lastFilter, activityIds, activityInstanceIds) {
-        return lastFilter && angular.equals(activityIds, lastFilter.activityIds) &&
-          !angular.equals(activityInstanceIds, lastFilter.activityInstanceIds);
+      function shouldActivityIdsBeIgnored(
+        lastFilter,
+        activityIds,
+        activityInstanceIds
+      ) {
+        return (
+          lastFilter &&
+          angular.equals(activityIds, lastFilter.activityIds) &&
+          !angular.equals(activityInstanceIds, lastFilter.activityInstanceIds)
+        );
       }
 
       function serializeFilterToUri(newFilter, replace) {
-        var activityInstanceIds = angular.isArray(newFilter.activityInstanceIds) ? newFilter.activityInstanceIds : [];
-        var activityIds = angular.isArray(newFilter.activityIds) ? newFilter.activityIds : [];
+        var activityInstanceIds = angular.isArray(newFilter.activityInstanceIds)
+          ? newFilter.activityInstanceIds
+          : [];
+        var activityIds = angular.isArray(newFilter.activityIds)
+          ? newFilter.activityIds
+          : [];
         var urlParams = search();
         var searches = JSON.parse(urlParams.searchQuery || '[]');
 
         //when there is no searchQuery present and there is no ids to add to searchQuery don't change anything
-        if (!urlParams.searchQuery && !activityInstanceIds.length && !activityIds.length) {
+        if (
+          !urlParams.searchQuery &&
+          !activityInstanceIds.length &&
+          !activityIds.length
+        ) {
           searches = null;
         } else {
-          searches = searchWidgetUtils.replaceActivitiesInSearchQuery(searches, 'activityInstanceIdIn', activityInstanceIds);
+          searches = searchWidgetUtils.replaceActivitiesInSearchQuery(
+            searches,
+            'activityInstanceIdIn',
+            activityInstanceIds
+          );
         }
 
-        search.updateSilently({
-          searchQuery: searches? JSON.stringify(searches) : null,
-          activityIds: activityIds.length ? activityIds.join(',') : null
-        }, replace);
+        search.updateSilently(
+          {
+            searchQuery: searches ? JSON.stringify(searches) : null,
+            activityIds: activityIds.length ? activityIds.join(',') : null
+          },
+          replace
+        );
 
         $scope.filter = newFilter;
       }
@@ -105,23 +147,27 @@ module.exports = [
        * @param  {Object} instanceIdToInstanceMap a activity instance id -> activity instance map
        * @param  {*} activityIdToInstancesMap a activity id -> activity instance map
        */
-      function autoCompleteFilter(newFilter, instanceIdToInstanceMap, activityIdToInstancesMap) {
+      function autoCompleteFilter(
+        newFilter,
+        instanceIdToInstanceMap,
+        activityIdToInstancesMap
+      ) {
         var activityIds = newFilter.activityIds || [],
-            activityInstanceIds = newFilter.activityInstanceIds || [],
-            page = parseInt(newFilter.page, 10) || null,
-            scrollToBpmnElement = newFilter.scrollToBpmnElement,
-            // if filter has been changed from outside this component,
-            // newFilter is different from cached filter
-            externalUpdate = newFilter !== $scope.filter,
-            completedFilter,
-            replace = newFilter.replace;
+          activityInstanceIds = newFilter.activityInstanceIds || [],
+          page = parseInt(newFilter.page, 10) || null,
+          scrollToBpmnElement = newFilter.scrollToBpmnElement,
+          // if filter has been changed from outside this component,
+          // newFilter is different from cached filter
+          externalUpdate = newFilter !== $scope.filter,
+          completedFilter,
+          replace = newFilter.replace;
 
         delete newFilter.replace;
 
         angular.forEach(activityInstanceIds, function(instanceId) {
           var instance = instanceIdToInstanceMap[instanceId] || {},
-              activityId = instance.activityId || instance.targetActivityId,
-              idx = activityIds.indexOf(activityId);
+            activityId = instance.activityId || instance.targetActivityId,
+            idx = activityIds.indexOf(activityId);
 
           if (idx === -1 && activityId) {
             activityIds.push(activityId);
@@ -130,11 +176,10 @@ module.exports = [
 
         angular.forEach(activityIds, function(activityId) {
           var instanceList = activityIdToInstancesMap[activityId],
-              foundOne = false,
-              instanceIds = [];
+            foundOne = false,
+            instanceIds = [];
 
           if (instanceList) {
-
             for (var i = 0, instance; (instance = instanceList[i]); i++) {
               var idx = activityInstanceIds.indexOf(instance.id);
 
@@ -154,15 +199,15 @@ module.exports = [
 
         // delete activity and activity instances which do not exist
         if (options.shouldRemoveActivityIds) {
-          for(var i = 0; i < activityIds.length; i++) {
-            if(!activityIdToInstancesMap[activityIds[i]]) {
+          for (var i = 0; i < activityIds.length; i++) {
+            if (!activityIdToInstancesMap[activityIds[i]]) {
               activityIds.splice(i, 1);
               i--;
             }
           }
         }
-        for(i = 0; i < activityInstanceIds.length; i++) {
-          if(!instanceIdToInstanceMap[activityInstanceIds[i]]) {
+        for (i = 0; i < activityInstanceIds.length; i++) {
+          if (!instanceIdToInstanceMap[activityInstanceIds[i]]) {
             activityInstanceIds.splice(i, 1);
             i--;
           }

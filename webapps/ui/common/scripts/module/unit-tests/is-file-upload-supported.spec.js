@@ -32,16 +32,18 @@ describe('cam-common isFileUploadSupported', function() {
 
   beforeEach(module(camCommon.name));
 
-  beforeEach(module(function($provide) {
-    FileReader = function() {};
-    FileReader.prototype.readAsText = function() {};
+  beforeEach(
+    module(function($provide) {
+      FileReader = function() {};
+      FileReader.prototype.readAsText = function() {};
 
-    var $window = {
-      FileReader: FileReader
-    };
+      var $window = {
+        FileReader: FileReader
+      };
 
-    $provide.value('$window', $window);
-  }));
+      $provide.value('$window', $window);
+    })
+  );
 
   beforeEach(inject(function($injector) {
     isFileUploadSupported = $injector.get('isFileUploadSupported');

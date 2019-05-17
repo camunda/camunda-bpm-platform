@@ -23,6 +23,4 @@ var factory = require('../../../common/tests/setup-factory.js'),
     operation = factory.operation;
 */
 
-module.exports = {
-
-};
+module.exports = {};

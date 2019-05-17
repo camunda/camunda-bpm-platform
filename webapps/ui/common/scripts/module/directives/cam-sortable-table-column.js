@@ -19,7 +19,10 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-sortable-table-column.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-sortable-table-column.html',
+  'utf8'
+);
 
 var Directive = function() {
   return {
@@ -32,7 +35,6 @@ var Directive = function() {
     require: '^^camSortableTableHeader',
     template: template,
     link: function($scope, element, attrs, ctrl) {
-
       // Order Icons
       $scope.orderClass = function(forColumn) {
         var sorting = ctrl.getSorting();
@@ -42,18 +44,18 @@ var Directive = function() {
           desc: 'chevron-down',
           asc: 'chevron-up'
         };
-        return 'glyphicon-' + (icons[forColumn === sorting.sortBy ? sorting.sortOrder : 'none']);
+        return (
+          'glyphicon-' +
+          icons[forColumn === sorting.sortBy ? sorting.sortOrder : 'none']
+        );
       };
 
       // On-click function to order Columns
       $scope.changeOrder = function(column) {
         ctrl.changeOrder(column);
       };
-
     }
   };
 };
 
 module.exports = Directive;
-
-

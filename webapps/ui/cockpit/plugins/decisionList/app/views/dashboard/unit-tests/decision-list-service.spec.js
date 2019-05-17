@@ -36,14 +36,16 @@ describe('cockpit.plugin.decisionList.views.dashboard decisionList service', fun
 
   beforeEach(module(testModule.name));
 
-  beforeEach(module(function($provide) {
-    camAPI = {
-      list: sinon.stub(),
-      resource: sinon.stub().returnsThis()
-    };
+  beforeEach(
+    module(function($provide) {
+      camAPI = {
+        list: sinon.stub(),
+        resource: sinon.stub().returnsThis()
+      };
 
-    $provide.value('camAPI', camAPI);
-  }));
+      $provide.value('camAPI', camAPI);
+    })
+  );
 
   beforeEach(inject(function(_decisionList_, _$rootScope_, _$q_) {
     decisionList = _decisionList_;

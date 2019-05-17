@@ -56,17 +56,17 @@ describe('cam-common.external-task ExternalTaskErrorMessageLink', function() {
 
   describe('getStacktraceUrl', function() {
     it('should create link to runtime error details for given task id', function() {
-      expect(
-        instance.getStacktraceUrl()
-      ).to.contain('/external-task/' + instance.taskId + '/errorDetails');
+      expect(instance.getStacktraceUrl()).to.contain(
+        '/external-task/' + instance.taskId + '/errorDetails'
+      );
     });
 
     it('should create link to history error details for given task id', function() {
       instance.historic = true;
 
-      expect(
-        instance.getStacktraceUrl()
-      ).to.contain('/history/external-task-log/' + instance.taskId + '/error-details');
+      expect(instance.getStacktraceUrl()).to.contain(
+        '/history/external-task-log/' + instance.taskId + '/error-details'
+      );
     });
   });
 });

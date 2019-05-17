@@ -22,7 +22,15 @@ var angular = require('angular');
 
 var template = fs.readFileSync(__dirname + '/instanceCount.html', 'utf8');
 
-module.exports = function($scope, control, processData, processDiagram, Loaders, $rootScope, callbacks) {
+module.exports = function(
+  $scope,
+  control,
+  processData,
+  processDiagram,
+  Loaders,
+  $rootScope,
+  callbacks
+) {
   // the getViewer() method only exists in the instance context, but not in the definition context.
   var viewer = control.getViewer ? control.getViewer() : control;
   var overlays = viewer.get('overlays');
@@ -65,7 +73,9 @@ module.exports = function($scope, control, processData, processDiagram, Loaders,
       }
     });
     callbacks.toggleIsLoading && callbacks.toggleIsLoading();
-    $rootScope.$broadcast('cockpit.plugin.base.views:diagram-plugins:instance-plugin-loaded');
+    $rootScope.$broadcast(
+      'cockpit.plugin.base.views:diagram-plugins:instance-plugin-loaded'
+    );
   });
 
   function getOverlayNodes(element, data) {
@@ -105,20 +115,21 @@ module.exports = function($scope, control, processData, processDiagram, Loaders,
       if (ctrl) {
         if (selected) {
           activityIds.splice(idx, 1);
-          if(multiInstance) {
-            activityIds.splice(activityIds.indexOf(activityId + '#multiInstanceBody'), 1);
+          if (multiInstance) {
+            activityIds.splice(
+              activityIds.indexOf(activityId + '#multiInstanceBody'),
+              1
+            );
           }
-
         } else {
           activityIds.push(activityId);
-          if(multiInstance) {
+          if (multiInstance) {
             activityIds.push(activityId + '#multiInstanceBody');
           }
         }
-
       } else {
         activityIds = [activityId];
-        if(multiInstance) {
+        if (multiInstance) {
           activityIds.push(activityId + '#multiInstanceBody');
         }
       }

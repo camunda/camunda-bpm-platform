@@ -20,16 +20,19 @@
 var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/custom-links.html', 'utf8');
 
-module.exports = ['customLinks', function(customLinks) {
-  return {
-    restrict: 'A',
+module.exports = [
+  'customLinks',
+  function(customLinks) {
+    return {
+      restrict: 'A',
 
-    template: template,
+      template: template,
 
-    replace: true,
+      replace: true,
 
-    link: function($scope) {
-      $scope.links = customLinks;
-    }
-  };
-}];
+      link: function($scope) {
+        $scope.links = customLinks;
+      }
+    };
+  }
+];

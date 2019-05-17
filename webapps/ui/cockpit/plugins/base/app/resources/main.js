@@ -18,8 +18,8 @@
 'use strict';
 
 var angular = require('angular'),
-    processDefinition = require('./processDefinition'),
-    processInstance = require('./processInstance');
+  processDefinition = require('./processDefinition'),
+  processInstance = require('./processInstance');
 
 var ngModule = angular.module('cockpit.plugin.base.resources', []);
 

@@ -20,14 +20,12 @@
 var Base = require('./../base');
 
 module.exports = Base.extend({
-
   url: '/camunda/app/admin/default/#/tenant-create',
 
   newTenantIdInput: function(inputValue) {
     var inputField = element(by.model('tenant.id'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -35,8 +33,7 @@ module.exports = Base.extend({
   newTenantNameInput: function(inputValue) {
     var inputField = element(by.model('tenant.name'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
