@@ -20,13 +20,14 @@
 var Page = require('./repository-view');
 
 module.exports = Page.extend({
-
   formElement: function() {
     return element(by.css('[cam-resource-wrapper]'));
   },
 
   noResourceInfoText: function() {
-    return this.formElement().element(by.css('.no-resource')).getText();
+    return this.formElement()
+      .element(by.css('.no-resource'))
+      .getText();
   },
 
   waitForResourceDetailView: function() {
@@ -35,7 +36,9 @@ module.exports = Page.extend({
   },
 
   resourceName: function() {
-    return this.formElement().element(by.css('h2.name')).getText();
+    return this.formElement()
+      .element(by.css('h2.name'))
+      .getText();
   },
 
   resourceVersionElement: function() {
@@ -69,5 +72,4 @@ module.exports = Page.extend({
   unkownResourceFormElement: function() {
     return element(by.css('.unkown-resource'));
   }
-
 });

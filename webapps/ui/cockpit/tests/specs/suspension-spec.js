@@ -25,14 +25,10 @@ var processesPage = require('../pages/processes');
 var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
-
 describe('Cockpit Suspsension Spec', function() {
-
   describe('process definition suspension', function() {
-
     before(function() {
       return testHelper(setupFile.setup1, function() {
-
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.goToSection('Processes');
@@ -41,7 +37,6 @@ describe('Cockpit Suspsension Spec', function() {
     });
 
     it('should suspend definition immediately', function() {
-
       // when
       definitionPage.suspension.suspendDefinition();
 
@@ -49,24 +44,18 @@ describe('Cockpit Suspsension Spec', function() {
       expect(definitionPage.isDefinitionSuspended()).to.eventually.be.true;
     });
 
-
     it('should active definition immediately', function() {
-
       // when
       definitionPage.suspension.activateDefinition();
 
       // then
       expect(definitionPage.isDefinitionSuspended()).to.eventually.be.false;
     });
-
   });
 
-
   describe('process instance suspension', function() {
-
     before(function() {
       return testHelper(setupFile.setup1, function() {
-
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.goToSection('Processes');
@@ -76,7 +65,6 @@ describe('Cockpit Suspsension Spec', function() {
     });
 
     it('should suspend instance', function() {
-
       // when
       instancePage.suspension.suspendInstance();
 
@@ -84,39 +72,32 @@ describe('Cockpit Suspsension Spec', function() {
       expect(instancePage.isInstanceSuspended()).to.eventually.be.true;
     });
 
-
     it('should validate suspended instance', function() {
-
       // when
       instancePage.navbarBrand().click();
       dashboardPage.goToSection('Processes');
       processesPage.deployedProcessesList.selectProcess(0);
 
       // then
-      expect(definitionPage.processInstancesTab.isInstanceSuspended(0)).to.eventually.be.true;
+      expect(definitionPage.processInstancesTab.isInstanceSuspended(0)).to
+        .eventually.be.true;
 
       // finaly
       definitionPage.processInstancesTab.selectInstanceId(0);
     });
 
-
     it('should active instance', function() {
-
       // when
       instancePage.suspension.activateInstance();
 
       // then
       expect(instancePage.isInstanceSuspended()).to.eventually.be.false;
     });
-
   });
 
-
   describe('job suspension', function() {
-
     before(function() {
       return testHelper(setupFile.setup1, function() {
-
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.goToSection('Processes');
@@ -126,33 +107,30 @@ describe('Cockpit Suspsension Spec', function() {
     });
 
     it('should suspend job definition immediately', function() {
-
       // when
       definitionPage.jobDefinitionsTab.suspendJobDefinition(0);
 
       // then
-      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to.eventually.be.true;
+      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to
+        .eventually.be.true;
     });
 
-
     it('should active job definition immediately', function() {
-
       // when
       definitionPage.jobDefinitionsTab.activateJobDefinition(0);
 
       // then
-      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to.eventually.be.false;
+      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to
+        .eventually.be.false;
     });
 
     it('should display suspension badge on suspension for second job for activity', function() {
-
       // when
       definitionPage.jobDefinitionsTab.suspendJobDefinition(1);
 
       // then
-      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to.eventually.be.true;
+      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to
+        .eventually.be.true;
     });
-
   });
-
 });

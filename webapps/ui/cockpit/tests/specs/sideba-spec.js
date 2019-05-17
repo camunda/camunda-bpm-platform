@@ -29,7 +29,6 @@ describe('Sidebar Maximize/Restore Spec', function() {
 
   before(function() {
     return testHelper(setupFile.setup1, function() {
-
       dashboardPage.navigateToWebapp('Cockpit');
       dashboardPage.authentication.userLogin('admin', 'admin');
       dashboardPage.goToSection('Decisions');
@@ -55,21 +54,19 @@ describe('Sidebar Maximize/Restore Spec', function() {
 
     var restored = getDimensions(diagram);
 
-    protractor.promise.all([
-      start,
-      maximized,
-      restored
-    ]).then(function(dimensions) {
-      var start = dimensions[0];
-      var maximized = dimensions[1];
-      var restored = dimensions[2];
+    protractor.promise
+      .all([start, maximized, restored])
+      .then(function(dimensions) {
+        var start = dimensions[0];
+        var maximized = dimensions[1];
+        var restored = dimensions[2];
 
-      expect(start).to.eql(restored);
-      expect(maximized.width).to.be.above(start.width);
-      expect(maximized.height).to.be.above(start.height);
+        expect(start).to.eql(restored);
+        expect(maximized.width).to.be.above(start.width);
+        expect(maximized.height).to.be.above(start.height);
 
-      done();
-    });
+        done();
+      });
   });
 });
 
@@ -85,14 +82,12 @@ function getDimensions(element) {
   var width = element.getCssValue('width');
   var height = element.getCssValue('height');
 
-  return protractor.promise
-    .all([width, height])
-    .then(function(dimensions) {
-      return {
-        width: extractPxNumber(dimensions[0]),
-        height: extractPxNumber(dimensions[1])
-      };
-    });
+  return protractor.promise.all([width, height]).then(function(dimensions) {
+    return {
+      width: extractPxNumber(dimensions[0]),
+      height: extractPxNumber(dimensions[1])
+    };
+  });
 }
 
 function extractPxNumber(value) {

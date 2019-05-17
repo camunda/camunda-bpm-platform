@@ -22,9 +22,7 @@ var tasklistTemplate = fs.readFileSync(__dirname + '/../index.html', 'utf8');
 
 module.exports = [
   '$routeProvider',
-  function(
-    $routeProvider
-  ) {
+  function($routeProvider) {
     $routeProvider
       .when('/', {
         template: tasklistTemplate,
@@ -35,4 +33,5 @@ module.exports = [
       .otherwise({
         redirectTo: '/'
       });
-  }];
+  }
+];

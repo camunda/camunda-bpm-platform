@@ -34,15 +34,19 @@ describe('cam-common createIsSearchQueryChangedFunction', function() {
 
   beforeEach(module(camCommon.name));
 
-  beforeEach(module(function($provide) {
-    search = sinon.stub().returns({
-      searchQuery: 'something'
-    });
-    $provide.value('search', search);
-  }));
+  beforeEach(
+    module(function($provide) {
+      search = sinon.stub().returns({
+        searchQuery: 'something'
+      });
+      $provide.value('search', search);
+    })
+  );
 
   beforeEach(inject(function($injector) {
-    createIsSearchQueryChangedFunction = $injector.get('createIsSearchQueryChangedFunction');
+    createIsSearchQueryChangedFunction = $injector.get(
+      'createIsSearchQueryChangedFunction'
+    );
   }));
 
   it('should create function', function() {
@@ -56,13 +60,14 @@ describe('cam-common createIsSearchQueryChangedFunction', function() {
     // let's run this function just to make difference between instances
     firstIsFn();
 
-    expect(
-      Boolean(
-        firstIsFn()
-      )
-    ).to.eql(false, 'expected first function not to dectect change');
-    expect(secondIsFn())
-      .to.eql(true, 'expected second function to dectect change');
+    expect(Boolean(firstIsFn())).to.eql(
+      false,
+      'expected first function not to dectect change'
+    );
+    expect(secondIsFn()).to.eql(
+      true,
+      'expected second function to dectect change'
+    );
   });
 
   describe('isSearchQueryChanged', function() {
@@ -75,10 +80,14 @@ describe('cam-common createIsSearchQueryChangedFunction', function() {
     it('should fetch current search params', function() {
       isSearchQueryChanged();
 
-      expect(search.calledOnce)
-        .to.eql(true, 'expected search to be called only once');
-      expect(search.firstCall.args.length)
-        .to.eql(0, 'expected search to be called without arguments');
+      expect(search.calledOnce).to.eql(
+        true,
+        'expected search to be called only once'
+      );
+      expect(search.firstCall.args.length).to.eql(
+        0,
+        'expected search to be called without arguments'
+      );
     });
 
     it('should return true after first run with changed search query', function() {

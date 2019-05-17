@@ -27,127 +27,128 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/variable.html', 'utf8');
 
-module.exports = ['typeUtils', function(typeUtils) {
-  return {
-    restrict: 'EAC',
-    scope: {
-      variable: '=',
-      form: '@',
-      readonly: '='
-    },
-    replace: true,
-    template: template,
-    link: function(scope, element) {
-
-      var inPlaceEdit = (element.attr('inline-edit') !== undefined),
+module.exports = [
+  'typeUtils',
+  function(typeUtils) {
+    return {
+      restrict: 'EAC',
+      scope: {
+        variable: '=',
+        form: '@',
+        readonly: '='
+      },
+      replace: true,
+      template: template,
+      link: function(scope, element) {
+        var inPlaceEdit = element.attr('inline-edit') !== undefined,
           oldVariableValue,
           oldVariableValueBoolean = true;
 
+        var getForm = function() {
+          return angular.element('[name="' + scope.form + '"]').scope()[
+            scope.form
+          ];
+        };
 
-      var getForm = function() {
-        return angular.element('[name="'+scope.form+'"]').scope()[scope.form];
-      };
+        var customJsonXmlValidator = function(type, value) {
+          var valid = typeUtils.isType(value, type);
+          getForm().$setValidity('customValidation', valid);
+        };
 
-      var customJsonXmlValidator = function(type, value) {
-        var valid = typeUtils.isType(value, type);
-        getForm().$setValidity('customValidation', valid);
-      };
+        scope.changeVariableValue = function() {
+          var type = scope.variable.type;
+          var newValue = scope.variable.value;
+          if (['Json', 'Xml'].indexOf(type) > -1) {
+            return customJsonXmlValidator(type, newValue);
+          }
+        };
 
-      scope.changeVariableValue = function() {
-        var type = scope.variable.type;
-        var newValue = scope.variable.value;
-        if(['Json', 'Xml'].indexOf(type) > -1) {
-          return customJsonXmlValidator(type, newValue);
-        }
-      };
+        scope.autofocus = !!(element.attr('autofocus') !== undefined);
 
+        scope.isBoolean = function(variable) {
+          return variable.type.toLowerCase() === 'boolean';
+        };
 
-      scope.autofocus = !!(element.attr('autofocus') !== undefined);
+        scope.isInteger = function(variable) {
+          return variable.type.toLowerCase() === 'integer';
+        };
 
-      scope.isBoolean = function(variable) {
-        return variable.type.toLowerCase() === 'boolean';
-      };
+        scope.isShort = function(variable) {
+          return variable.type.toLowerCase() === 'short';
+        };
 
-      scope.isInteger = function(variable) {
-        return variable.type.toLowerCase() === 'integer';
-      };
+        scope.isLong = function(variable) {
+          return variable.type.toLowerCase() === 'long';
+        };
 
-      scope.isShort = function(variable) {
-        return variable.type.toLowerCase() === 'short';
-      };
+        scope.isDouble = function(variable) {
+          return variable.type.toLowerCase() === 'double';
+        };
 
-      scope.isLong = function(variable) {
-        return variable.type.toLowerCase() === 'long';
-      };
+        scope.isFloat = function(variable) {
+          return variable.type.toLowerCase() === 'float';
+        };
 
-      scope.isDouble = function(variable) {
-        return variable.type.toLowerCase() === 'double';
-      };
+        scope.isString = function(variable) {
+          return variable.type.toLowerCase() === 'string';
+        };
 
-      scope.isFloat = function(variable) {
-        return variable.type.toLowerCase() === 'float';
-      };
+        scope.isDate = function(variable) {
+          return variable.type.toLowerCase() === 'date';
+        };
 
-      scope.isString = function(variable) {
-        return variable.type.toLowerCase() === 'string';
-      };
+        scope.isNull = function(variable) {
+          return variable.type.toLowerCase() === 'null';
+        };
 
-      scope.isDate = function(variable) {
-        return variable.type.toLowerCase() === 'date';
-      };
+        scope.isObject = function(variable) {
+          return variable.type.toLowerCase() === 'object';
+        };
 
-      scope.isNull = function(variable) {
-        return variable.type.toLowerCase() === 'null';
-      };
+        scope.isInPlaceEdit = function() {
+          return inPlaceEdit;
+        };
 
-      scope.isObject = function(variable) {
-        return variable.type.toLowerCase() === 'object';
-      };
+        scope.isJSON = function(variable) {
+          return variable.type.toLowerCase() === 'json';
+        };
 
-      scope.isInPlaceEdit = function() {
-        return inPlaceEdit;
-      };
+        scope.isXML = function(variable) {
+          return variable.type.toLowerCase() === 'xml';
+        };
 
-      scope.isJSON = function(variable) {
-        return variable.type.toLowerCase() === 'json';
-      };
+        scope.$watch('variable.type', function(newValue, oldValue) {
+          if (oldValue === newValue) {
+            return;
+          }
 
-      scope.isXML = function(variable) {
-        return variable.type.toLowerCase() === 'xml';
-      };
+          if (['Json', 'Xml'].indexOf(newValue) > -1) {
+            return customJsonXmlValidator(newValue, scope.variable.value);
+          }
 
-      scope.$watch('variable.type', function(newValue, oldValue) {
-        if (oldValue === newValue) {
-          return;
-        }
+          if (newValue.toLowerCase() === 'boolean') {
+            oldVariableValue = scope.variable.value;
 
-        if(['Json', 'Xml'].indexOf(newValue) > -1) {
-          return customJsonXmlValidator(newValue, scope.variable.value);
-        }
+            scope.variable.value = oldVariableValueBoolean;
+            return;
+          }
 
-        if (newValue.toLowerCase() === 'boolean') {
-          oldVariableValue = scope.variable.value;
+          if (oldValue.toLowerCase() === 'boolean') {
+            oldVariableValueBoolean = scope.variable.value;
 
-          scope.variable.value = oldVariableValueBoolean;
-          return;
-        }
+            scope.variable.value = oldVariableValue;
+            return;
+          }
 
-        if (oldValue.toLowerCase() === 'boolean') {
-          oldVariableValueBoolean = scope.variable.value;
+          if (newValue.toLowerCase() === 'null') {
+            scope.variable.value = null;
+          }
 
-          scope.variable.value = oldVariableValue;
-          return;
-        }
-
-        if(newValue.toLowerCase() === 'null') {
-          scope.variable.value = null;
-        }
-
-        if(newValue.toLowerCase() === 'object') {
-          scope.variable.valueInfo = scope.variable.valueInfo || {};
-        }
-      });
-
-    }
-  };
-}];
+          if (newValue.toLowerCase() === 'object') {
+            scope.variable.valueInfo = scope.variable.valueInfo || {};
+          }
+        });
+      }
+    };
+  }
+];

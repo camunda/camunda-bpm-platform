@@ -38,56 +38,57 @@ describe('cam-common getDeploymentUrl', function() {
 
   beforeEach(module(camCommon.name));
 
-  beforeEach(module(function($provide) {
-    searchParams = {
-      deploymentsSortBy: 'b',
-      deploymentsSortOrder: 'asc'
-    };
-    $location = {
-      search: sinon.stub().returns(searchParams)
-    };
-    $provide.value('$location', $location);
+  beforeEach(
+    module(function($provide) {
+      searchParams = {
+        deploymentsSortBy: 'b',
+        deploymentsSortOrder: 'asc'
+      };
+      $location = {
+        search: sinon.stub().returns(searchParams)
+      };
+      $provide.value('$location', $location);
 
-    url = 'some-url';
-    routeUtil = {
-      redirectTo: sinon.stub().returns(url)
-    };
-    $provide.value('routeUtil', routeUtil);
+      url = 'some-url';
+      routeUtil = {
+        redirectTo: sinon.stub().returns(url)
+      };
+      $provide.value('routeUtil', routeUtil);
 
-    deployment = {
-      id: 'dep-id'
-    };
-    resource = {
-      name: 'resource-name'
-    };
-  }));
+      deployment = {
+        id: 'dep-id'
+      };
+      resource = {
+        name: 'resource-name'
+      };
+    })
+  );
 
   beforeEach(inject(function($injector) {
     getDeploymentUrl = $injector.get('getDeploymentUrl');
   }));
 
   it('should return url', function() {
-    expect(
-      getDeploymentUrl(deployment, resource)
-    ).to.eql(url);
+    expect(getDeploymentUrl(deployment, resource)).to.eql(url);
   });
 
   it('should create url with correct searches', () => {
     getDeploymentUrl(deployment, resource);
 
-    expect(routeUtil.redirectTo.calledWith(
-      '#/repository',
-      {
+    expect(
+      routeUtil.redirectTo.calledWith('#/repository', {
         deployment: deployment.id,
-        deploymentsQuery: JSON.stringify([{
-          type     : 'id',
-          operator : 'eq',
-          value    : deployment.id
-        }]),
+        deploymentsQuery: JSON.stringify([
+          {
+            type: 'id',
+            operator: 'eq',
+            value: deployment.id
+          }
+        ]),
         deploymentsSortBy: searchParams.deploymentsSortBy,
         deploymentsSortOrder: searchParams.deploymentsSortOrder,
         resourceName: resource.name
-      }
-    )).to.eql(true);
+      })
+    ).to.eql(true);
   });
 });

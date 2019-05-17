@@ -19,7 +19,14 @@
 
 var sinon = require('sinon');
 
-var defaultResourceMethods = ['create', 'list', 'count', 'update', 'delete', 'get'];
+var defaultResourceMethods = [
+  'create',
+  'list',
+  'count',
+  'update',
+  'delete',
+  'get'
+];
 
 /**
  * Creates mocked camAPI instance, that has resource method that always returns fakeResource property of mocked camAPI.

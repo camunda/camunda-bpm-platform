@@ -20,14 +20,15 @@
 var Table = require('./../../table');
 
 module.exports = Table.extend({
-
   tabRepeater: 'tabProvider in processInstanceTabs',
   tabIndex: 2,
   tabLabel: 'Called Process Instances',
   tableRepeater: 'calledProcessInstance in calledProcessInstances',
 
   calledProcessInstance: function(item) {
-    return this.tableItem(item, '[title]').getAttribute('title').getText();
+    return this.tableItem(item, '[title]')
+      .getAttribute('title')
+      .getText();
   },
 
   selectCalledProcessInstance: function(item) {
@@ -49,5 +50,4 @@ module.exports = Table.extend({
   selectActivity: function(item) {
     return this.tableItem(item, '.activity').click();
   }
-
 });

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-var $ = window.jQuery = window.$ = require('jquery');
+var $ = (window.jQuery = window.$ = require('jquery'));
 var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
 var dataDepend = require('angular-data-depend');
@@ -28,4 +28,4 @@ window['camunda-bpm-sdk-js'] = sdk;
 window['angular-data-depend'] = dataDepend;
 window['moment'] = require('camunda-commons-ui/vendor/moment');
 window['events'] = require('events');
-window['cam-common']= require('../scripts/module');
+window['cam-common'] = require('../scripts/module');

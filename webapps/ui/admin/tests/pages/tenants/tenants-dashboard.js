@@ -20,7 +20,6 @@
 var Base = require('./../base');
 
 module.exports = Base.extend({
-
   url: '/camunda/app/admin/default/#/tenants',
 
   newTenantButton: function() {
@@ -32,19 +31,25 @@ module.exports = Base.extend({
   },
 
   tenantId: function(idx) {
-    return this.tenantList().get(idx).element(by.css('.tenant-id > a'));
+    return this.tenantList()
+      .get(idx)
+      .element(by.css('.tenant-id > a'));
   },
 
   tenantName: function(idx) {
-    return this.tenantList().get(idx).element(by.binding('{{ tenant.name }}'));
+    return this.tenantList()
+      .get(idx)
+      .element(by.binding('{{ tenant.name }}'));
   },
 
   selectTenantByEditLink: function(idx) {
-    return this.tenantList().get(idx).element(by.linkText('Edit')).click();
+    return this.tenantList()
+      .get(idx)
+      .element(by.linkText('Edit'))
+      .click();
   },
 
   selectTenantByNameLink: function(idx) {
     return this.tenantId(idx).click();
   }
-
 });

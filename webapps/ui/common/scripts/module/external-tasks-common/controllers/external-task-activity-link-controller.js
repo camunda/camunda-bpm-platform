@@ -20,14 +20,28 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  '$scope', 'exposeScopeProperties', 'search', '$location',
-  'params', 'searchWidgetUtils',
+  '$scope',
+  'exposeScopeProperties',
+  'search',
+  '$location',
+  'params',
+  'searchWidgetUtils',
   ExternalTaskActivityLink
 ];
 
-function ExternalTaskActivityLink($scope, exposeScopeProperties, search,
-  $location, params, searchWidgetUtils) {
-  exposeScopeProperties($scope, this, ['activityId', 'bpmnElements', 'searchQueryType']);
+function ExternalTaskActivityLink(
+  $scope,
+  exposeScopeProperties,
+  search,
+  $location,
+  params,
+  searchWidgetUtils
+) {
+  exposeScopeProperties($scope, this, [
+    'activityId',
+    'bpmnElements',
+    'searchQueryType'
+  ]);
 
   this.search = search;
   this.params = params;

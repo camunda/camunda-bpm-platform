@@ -20,14 +20,12 @@
 var Base = require('./../base');
 
 module.exports = Base.extend({
-
   url: '/camunda/app/admin/default/#/group-create',
 
   newGroupIdInput: function(inputValue) {
     var inputField = element(by.model('group.id'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -35,8 +33,7 @@ module.exports = Base.extend({
   newGroupNameInput: function(inputValue) {
     var inputField = element(by.model('group.name'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -44,8 +41,7 @@ module.exports = Base.extend({
   newGroupTypeInput: function(inputValue) {
     var inputField = element(by.model('group.type'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },

@@ -88,13 +88,15 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
     });
 
     it('should call externalTasks.getActiveExternalTasksForProcess with process instance id, pages and activityId', function() {
-      expect(externalTasks.getActiveExternalTasksForProcess.calledWith(
-        $scope.processInstance.id,
-        pages,
-        {
-          activityIdIn: activityIds
-        }
-      )).to.eql(true);
+      expect(
+        externalTasks.getActiveExternalTasksForProcess.calledWith(
+          $scope.processInstance.id,
+          pages,
+          {
+            activityIdIn: activityIds
+          }
+        )
+      ).to.eql(true);
     });
 
     it('should set tasks on instance', function(done) {
@@ -112,11 +114,13 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
 
       instance.onLoad(pages, []);
 
-      expect(externalTasks.getActiveExternalTasksForProcess.calledWith(
-        $scope.processInstance.id,
-        pages,
-        {}
-      )).to.eql(true);
+      expect(
+        externalTasks.getActiveExternalTasksForProcess.calledWith(
+          $scope.processInstance.id,
+          pages,
+          {}
+        )
+      ).to.eql(true);
     });
   });
 });

@@ -26,7 +26,10 @@ module.exports = [
       return function() {
         var searchQuery = search().searchQuery;
 
-        if (searchQuery !== lastSearchQuery && (lastSearchQuery || searchQuery !== '[]')) {
+        if (
+          searchQuery !== lastSearchQuery &&
+          (lastSearchQuery || searchQuery !== '[]')
+        ) {
           lastSearchQuery = searchQuery;
 
           return true;

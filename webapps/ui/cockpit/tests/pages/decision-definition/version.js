@@ -20,12 +20,15 @@
 var Base = require('./../base');
 
 module.exports = Base.extend({
-
   getVersion: function() {
-    this.waitForElementToBeVisible(element(by.css('.version-filter > .ng-scope')));
-    return element(by.css('.version-filter')).getText().then(function(text) {
-      return text.replace('Version\n', '');
-    });
+    this.waitForElementToBeVisible(
+      element(by.css('.version-filter > .ng-scope'))
+    );
+    return element(by.css('.version-filter'))
+      .getText()
+      .then(function(text) {
+        return text.replace('Version\n', '');
+      });
   },
 
   getDropdownButton: function() {
@@ -40,6 +43,4 @@ module.exports = Base.extend({
   getDropdownOption: function(idx) {
     return element.all(by.css('.version-filter li')).get(idx);
   }
-
-
 });

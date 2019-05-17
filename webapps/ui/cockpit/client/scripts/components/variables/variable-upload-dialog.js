@@ -19,7 +19,10 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/variable-upload-dialog.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/variable-upload-dialog.html',
+  'utf8'
+);
 
 var Controller = [
   '$uibModalInstance',
@@ -40,11 +43,10 @@ var Controller = [
     $translate,
     $cookies
   ) {
-
     var BEFORE_UPLOAD = 'beforeUpload',
-        PERFORM_UPLOAD = 'performUpload',
-        UPLOAD_SUCCESS = 'uploadSuccess',
-        UPLOAD_FAILED = 'uploadFailed';
+      PERFORM_UPLOAD = 'performUpload',
+      UPLOAD_SUCCESS = 'uploadSuccess',
+      UPLOAD_FAILED = 'uploadFailed';
 
     $scope.status = BEFORE_UPLOAD;
 
@@ -52,36 +54,31 @@ var Controller = [
 
     var file;
 
-
     $scope.$on('$routeChangeStart', function() {
       $modalInstance.dismiss();
     });
 
-
     $scope.upload = function() {
-
-    // progress listeners
+      // progress listeners
 
       function uploadProgress(evt) {
         $scope.$apply(function() {
           $scope.status = PERFORM_UPLOAD;
           if (evt.lengthComputable) {
-            $scope.progress = Math.round(evt.loaded * 100 / evt.total);
+            $scope.progress = Math.round((evt.loaded * 100) / evt.total);
           }
         });
       }
 
       function uploadComplete(xhr) {
         $scope.$apply(function() {
-
-          if(xhr.status === 204) {
+          if (xhr.status === 204) {
             $scope.status = UPLOAD_SUCCESS;
             Notifications.addMessage({
               status: $translate.instant('VARIABLE_UPLOAD_FILE'),
               message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ADD')
             });
-          }
-          else {
+          } else {
             $scope.status = UPLOAD_FAILED;
             Notifications.addError({
               status: $translate.instant('VARIABLE_UPLOAD_FILE'),
@@ -111,9 +108,13 @@ var Controller = [
       var xhr = new XMLHttpRequest();
 
       xhr.upload.addEventListener('progress', uploadProgress, false);
-      xhr.addEventListener('load', function() {
-        uploadComplete(xhr);
-      }, false);
+      xhr.addEventListener(
+        'load',
+        function() {
+          uploadComplete(xhr);
+        },
+        false
+      );
       xhr.addEventListener('error', uploadFailed, false);
       xhr.addEventListener('abort', uploadFailed, false);
       xhr.open('POST', Uri.appUri(basePath + '/data'));
@@ -124,14 +125,13 @@ var Controller = [
       }
 
       xhr.send(fd);
-
     };
 
     $scope.setFile = function(element) {
       file = element.files[0];
     };
-
-  }];
+  }
+];
 
 module.exports = {
   template: template,

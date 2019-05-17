@@ -17,7 +17,7 @@
 
 'use strict';
 /* jshint browserify: true */
-var $ = window.jQuery = window.$ = require('jquery');
+var $ = (window.jQuery = window.$ = require('jquery'));
 
 var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
@@ -33,7 +33,6 @@ var servicesModule = require('./services/main');
 var pluginsModule = require('./plugins/main');
 
 module.exports = function(pluginDependencies) {
-
   var ngDependencies = [
     'ng',
     'ngResource',
@@ -43,9 +42,11 @@ module.exports = function(pluginDependencies) {
     directivesModule.name,
     servicesModule.name,
     pluginsModule.name
-  ].concat(pluginDependencies.map(function(el) {
-    return el.ngModuleName;
-  }));
+  ].concat(
+    pluginDependencies.map(function(el) {
+      return el.ngModuleName;
+    })
+  );
 
   var appNgModule = angular.module(APP_NAME, ngDependencies);
 
@@ -63,13 +64,8 @@ module.exports = function(pluginDependencies) {
     'UriProvider',
     '$animateProvider',
     '$qProvider',
-    function(
-      $routeProvider,
-      UriProvider,
-      $animateProvider,
-      $qProvider
-    ) {
-      $routeProvider.otherwise({ redirectTo: '/welcome' });
+    function($routeProvider, UriProvider, $animateProvider, $qProvider) {
+      $routeProvider.otherwise({redirectTo: '/welcome'});
 
       UriProvider.replace(':appName', 'welcome');
       UriProvider.replace('app://', getUri('href'));
@@ -79,33 +75,50 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace('plugin://', getUri('welcome-api') + 'plugin/');
       UriProvider.replace('engine://', getUri('engine-api'));
 
-      UriProvider.replace(':engine', [ '$window', function($window) {
-        var uri = $window.location.href;
+      UriProvider.replace(':engine', [
+        '$window',
+        function($window) {
+          var uri = $window.location.href;
 
-        var match = uri.match(/\/app\/welcome\/([\w-]+)(|\/)/);
-        if (match) {
-          return match[1];
-        } else {
-          throw new Error('no process engine selected');
+          var match = uri.match(/\/app\/welcome\/([\w-]+)(|\/)/);
+          if (match) {
+            return match[1];
+          } else {
+            throw new Error('no process engine selected');
+          }
         }
-      }]);
+      ]);
 
       $animateProvider.classNameFilter(/angular-animate/);
 
       $qProvider.errorOnUnhandledRejections(false);
-    }];
+    }
+  ];
 
-  appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camWelcomeConf, 'Welcome'));
+  appNgModule.provider(
+    'configuration',
+    require('./../../../common/scripts/services/cam-configuration')(
+      window.camWelcomeConf,
+      'Welcome'
+    )
+  );
   appNgModule.controller('WelcomePage', require('./controllers/welcome-page'));
 
   appNgModule.config(ModuleConfig);
 
-  require('./../../../common/scripts/services/locales')(appNgModule, getUri('app-root'), 'welcome');
+  require('./../../../common/scripts/services/locales')(
+    appNgModule,
+    getUri('app-root'),
+    'welcome'
+  );
 
-  angular.bootstrap(document.documentElement, [ appNgModule.name, 'cam.welcome.custom' ]);
+  angular.bootstrap(document.documentElement, [
+    appNgModule.name,
+    'cam.welcome.custom'
+  ]);
 
   if (top !== window) {
-    window.parent.postMessage({ type: 'loadamd' }, '*');
+    window.parent.postMessage({type: 'loadamd'}, '*');
   }
 };
 
@@ -117,7 +130,6 @@ module.exports.exposePackages = function(container) {
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
 };
-
 
 /* live-reload
 // loads livereload client library (without breaking other scripts execution)

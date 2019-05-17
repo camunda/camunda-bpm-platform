@@ -20,7 +20,6 @@
 var Table = require('./../../table');
 
 module.exports = Table.extend({
-
   tabRepeater: 'tabProvider in processInstanceTabs',
   tabIndex: 1,
   tabLabel: 'Incidents',
@@ -39,7 +38,8 @@ module.exports = Table.extend({
   },
 
   incidentRetryAction: function(item) {
-    return this.incidentAction(item).element(by.css('.action-button[tooltip~="Retries"][tooltip$="Tasks"]'));
+    return this.incidentAction(item).element(
+      by.css('.action-button[tooltip~="Retries"][tooltip$="Tasks"]')
+    );
   }
-
 });

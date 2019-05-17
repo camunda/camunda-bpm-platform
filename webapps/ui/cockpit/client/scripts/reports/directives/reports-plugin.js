@@ -20,33 +20,30 @@
 var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/reports-plugin.html', 'utf8');
 
-module.exports = [function() {
+module.exports = [
+  function() {
+    return {
+      restrict: 'A',
+      scope: {
+        reportData: '='
+      },
 
-  return {
+      template: template,
 
-    restrict: 'A',
-    scope: {
-      reportData: '='
-    },
+      controller: [
+        '$scope',
+        function($scope) {
+          var reportPluginData = ($scope.reportPluginData = $scope.reportData.newChild(
+            $scope
+          ));
 
-    template: template,
+          reportPluginData.observe('plugin', function(plugin) {
+            $scope.plugin = plugin;
+          });
 
-    controller: [
-      '$scope',
-      function(
-        $scope
-      ) {
-
-        var reportPluginData = $scope.reportPluginData = $scope.reportData.newChild($scope);
-
-        reportPluginData.observe('plugin', function(plugin) {
-          $scope.plugin = plugin;
-        });
-
-        $scope.reportPluginVars = { read: [ 'reportPluginData' ] };
-
-      }]
-
-  };
-
-}];
+          $scope.reportPluginVars = {read: ['reportPluginData']};
+        }
+      ]
+    };
+  }
+];

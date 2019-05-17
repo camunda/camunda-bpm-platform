@@ -20,25 +20,20 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 /**
-   * A service to manage a page page.
-   *
-   * @name page
-   * @memberof cam.cockpit.services
-   * @type angular.service
-   *
-   * @module cam.cockpit.services.page
-   */
+ * A service to manage a page page.
+ *
+ * @name page
+ * @memberof cam.cockpit.services
+ * @type angular.service
+ *
+ * @module cam.cockpit.services.page
+ */
 
 module.exports = [
   '$rootScope',
   '$location',
   'camAPI',
-  function(
-    $rootScope,
-    $location,
-    camAPI
-  ) {
-
+  function($rootScope, $location, camAPI) {
     var page = {
       title: 'Camunda',
       breadcrumbs: []
@@ -54,12 +49,9 @@ module.exports = [
       headTitle.text([originalTitle, page.title].join(' | '));
     });
 
-
-
     $rootScope.isActivePage = function(pageName) {
       return $location.path().indexOf('/' + pageName) === 0 ? 'active' : '';
     };
-
 
     function getUserProfile(auth) {
       if (!auth || !auth.name) {
@@ -142,7 +134,8 @@ module.exports = [
        * @return {angular.Service} this  - the service
        */
       breadcrumbsInsertAt: function(index, crumb) {
-        page.breadcrumbs = page.breadcrumbs.slice(0, index)
+        page.breadcrumbs = page.breadcrumbs
+          .slice(0, index)
           .concat(angular.isArray(crumb) ? crumb : [crumb])
           .concat(page.breadcrumbs.slice(index + 1));
 
@@ -181,4 +174,5 @@ module.exports = [
         return this;
       }
     };
-  }];
+  }
+];

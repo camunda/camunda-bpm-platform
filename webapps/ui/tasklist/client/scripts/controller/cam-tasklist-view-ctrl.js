@@ -27,16 +27,7 @@ module.exports = [
   'search',
   'dataDepend',
   'camAPI',
-  function(
-    $scope,
-    $q,
-    $location,
-    $interval,
-    search,
-    dataDepend,
-    camAPI
-  ) {
-
+  function($scope, $q, $location, $interval, search, dataDepend, camAPI) {
     function getPropertyFromLocation(property) {
       var search = $location.search() || {};
       return search[property] || null;
@@ -47,7 +38,7 @@ module.exports = [
     }
 
     // init data depend for task list data
-    var tasklistData = $scope.tasklistData = dataDepend.create($scope);
+    var tasklistData = ($scope.tasklistData = dataDepend.create($scope));
     // get current task id from location
     var taskId = getPropertyFromLocation('task');
     var detailsTab = getPropertyFromLocation('detailsTab');
@@ -64,60 +55,66 @@ module.exports = [
     /**
      * Provides the list of filters
      */
-    tasklistData.provide('filters', [ function() {
-      var deferred = $q.defer();
+    tasklistData.provide('filters', [
+      function() {
+        var deferred = $q.defer();
 
-      Filter.list({
-        itemCount: false,
-        resoureType: 'Task'
-      }, function(err, res) {
-        if(err) {
-          deferred.reject(err);
+        Filter.list(
+          {
+            itemCount: false,
+            resoureType: 'Task'
+          },
+          function(err, res) {
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(res);
+            }
+          }
+        );
 
-        }
-        else {
-          deferred.resolve(res);
-        }
-      });
+        return deferred.promise;
+      }
+    ]);
 
-      return deferred.promise;
-    }]);
-
-    tasklistData.provide('currentFilter', ['filters', function(filters) {
-
-      var focused,
+    tasklistData.provide('currentFilter', [
+      'filters',
+      function(filters) {
+        var focused,
           filterId = getPropertyFromLocation('filter');
 
-      for (var i = 0, filter; (filter = filters[i]); i++) {
-
-        if (filterId === filter.id) {
-          focused = filter;
-          break;
+        for (var i = 0, filter; (filter = filters[i]); i++) {
+          if (filterId === filter.id) {
+            focused = filter;
+            break;
+          }
+          // auto focus first filter
+          if (
+            !focused ||
+            filter.properties.priority < focused.properties.priority
+          ) {
+            focused = filter;
+          }
         }
-        // auto focus first filter
-        if(!focused || filter.properties.priority < focused.properties.priority) {
-          focused = filter;
-        }
-      }
 
-      if(currentFilter && focused && currentFilter.id !== focused.id) {
-        var currentPage = getPropertyFromLocation('page');
-        if (currentPage) {
+        if (currentFilter && focused && currentFilter.id !== focused.id) {
+          var currentPage = getPropertyFromLocation('page');
+          if (currentPage) {
+            updateSilently({
+              page: '1'
+            });
+          }
+        }
+
+        if (focused && focused.id !== filterId) {
           updateSilently({
-            page: '1'
+            filter: focused.id
           });
         }
+
+        return angular.copy(focused);
       }
-
-      if(focused && focused.id !== filterId) {
-        updateSilently({
-          filter: focused.id
-        });
-      }
-
-      return angular.copy(focused);
-
-    }]);
+    ]);
 
     tasklistData.provide('searchQuery', {
       processVariables: [],
@@ -125,112 +122,111 @@ module.exports = [
       caseInstanceVariables: []
     });
 
-    tasklistData.provide('taskListQuery', ['currentFilter', 'searchQuery', function(currentFilter, searchQuery) {
-      if (!currentFilter) {
-        return null;
+    tasklistData.provide('taskListQuery', [
+      'currentFilter',
+      'searchQuery',
+      function(currentFilter, searchQuery) {
+        if (!currentFilter) {
+          return null;
+        }
+
+        var taskListQuery = angular.copy(searchQuery);
+
+        var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
+        var sorting = getPropertyFromLocation('sorting');
+        try {
+          sorting = JSON.parse(sorting);
+        } catch (err) {
+          sorting = [{}];
+        }
+        sorting = Array.isArray(sorting) && sorting.length ? sorting : [{}];
+        sorting[0].sortOrder = sorting[0].sortOrder || 'desc';
+        sorting[0].sortBy = sorting[0].sortBy || 'created';
+
+        taskListQuery.id = currentFilter.id;
+        taskListQuery.firstResult = firstResult;
+        taskListQuery.maxResults = 15;
+        taskListQuery.sorting = sorting;
+        taskListQuery.active = true;
+
+        return taskListQuery;
       }
-
-      var taskListQuery = angular.copy(searchQuery);
-
-      var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
-      var sorting = getPropertyFromLocation('sorting');
-      try {
-        sorting = JSON.parse(sorting);
-      }
-      catch (err) {
-        sorting = [{}];
-      }
-      sorting = (Array.isArray(sorting) && sorting.length) ? sorting : [{}];
-      sorting[0].sortOrder = sorting[0].sortOrder || 'desc';
-      sorting[0].sortBy = sorting[0].sortBy || 'created';
-
-      taskListQuery.id = currentFilter.id;
-      taskListQuery.firstResult = firstResult;
-      taskListQuery.maxResults = 15;
-      taskListQuery.sorting = sorting;
-      taskListQuery.active = true;
-
-      return taskListQuery;
-
-    }]);
+    ]);
 
     /**
-      * Provide the list of tasks
-      */
+     * Provide the list of tasks
+     */
 
     // Handeling of long-running requests
     // store state of last Request
     var lastRequestIsPending = false;
     var lastRequest;
 
-    tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
-      if(!lastRequestIsPending) {
-        var deferred = $q.defer();
-        lastRequest = deferred;
-        lastRequestIsPending = true;
+    tasklistData.provide('taskList', [
+      'taskListQuery',
+      function(taskListQuery) {
+        if (!lastRequestIsPending) {
+          var deferred = $q.defer();
+          lastRequest = deferred;
+          lastRequestIsPending = true;
 
-        if(!taskListQuery || taskListQuery.id === null) {
-          // no filter selected
-          lastRequestIsPending = false;
-          deferred.resolve({
-            count: 0,
-            _embedded : {}
-          });
-        }
-        else {
-          // filter selected
-          Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
+          if (!taskListQuery || taskListQuery.id === null) {
+            // no filter selected
             lastRequestIsPending = false;
-            if(err) {
-              deferred.reject(err);
-            }
-            else {
-              deferred.resolve(res);
-            }
-          });
+            deferred.resolve({
+              count: 0,
+              _embedded: {}
+            });
+          } else {
+            // filter selected
+            Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
+              lastRequestIsPending = false;
+              if (err) {
+                deferred.reject(err);
+              } else {
+                deferred.resolve(res);
+              }
+            });
+          }
+          return deferred.promise;
+        } else {
+          return lastRequest.promise;
         }
-        return deferred.promise;
       }
-      else {
-        return lastRequest.promise;
-      }
-    }]);
+    ]);
 
     /**
      * Provide current task id
      */
-    tasklistData.provide('taskId', { 'taskId' : taskId });
-
+    tasklistData.provide('taskId', {taskId: taskId});
 
     /**
      * Provide the current task or the value 'null' in case no task is selected
      */
-    tasklistData.provide('task', ['taskId', function(task) {
+    tasklistData.provide('task', [
+      'taskId',
+      function(task) {
+        var deferred = $q.defer();
 
-      var deferred = $q.defer();
+        var taskId = task.taskId;
 
-      var taskId = task.taskId;
+        if (typeof taskId !== 'string') {
+          deferred.resolve(null);
+        } else {
+          Task.get(taskId, function(err, res) {
+            if (err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(res);
+            }
+          });
+        }
 
-      if(typeof taskId !== 'string') {
-        deferred.resolve(null);
+        return deferred.promise;
       }
-      else {
-        Task.get(taskId, function(err, res) {
-          if(err) {
-            deferred.reject(err);
-          }
-          else {
-            deferred.resolve(res);
-          }
-
-        });
-      }
-
-      return deferred.promise;
-    }]);
+    ]);
 
     // observe //////////////////////////////////////////////////////////////////////////////
-
 
     tasklistData.observe('currentFilter', function(_currentFilter) {
       currentFilter = _currentFilter;
@@ -259,10 +255,11 @@ module.exports = [
       detailsTab = getPropertyFromLocation('detailsTab');
 
       if (oldTaskId !== taskId || oldDetailsTab === detailsTab) {
-        tasklistData.set('taskId', { 'taskId' : taskId });
+        tasklistData.set('taskId', {taskId: taskId});
       }
 
       currentFilter = null;
       tasklistData.changed('currentFilter');
     });
-  }];
+  }
+];

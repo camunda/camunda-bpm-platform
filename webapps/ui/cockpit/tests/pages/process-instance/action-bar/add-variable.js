@@ -20,7 +20,6 @@
 var ActionBar = require('./../../action-bar');
 
 module.exports = ActionBar.extend({
-
   barRepeater: 'tabProvider in processInstanceActions',
 
   addVariableButton: function() {
@@ -32,7 +31,9 @@ module.exports = ActionBar.extend({
   },
 
   variableNameInput: function(inputValue) {
-    var inputField = element(by.css('.modal-body .variable-name')).element(by.model('newVariable.name'));
+    var inputField = element(by.css('.modal-body .variable-name')).element(
+      by.model('newVariable.name')
+    );
 
     if (arguments.length !== 0) {
       return inputField.sendKeys(inputValue);
@@ -41,16 +42,21 @@ module.exports = ActionBar.extend({
   },
 
   variableTypeDropdown: function(type) {
-    return element(by.css('.modal-body [ng-model="newVariable.type"]'))
-      .element(by.cssContainingText('option', type));
+    return element(by.css('.modal-body [ng-model="newVariable.type"]')).element(
+      by.cssContainingText('option', type)
+    );
   },
 
   variableTypeDropdownSelectedItem: function() {
-    return element(by.css('.modal-body [ng-model="newVariable.type"] [selected="selected"]'));
+    return element(
+      by.css('.modal-body [ng-model="newVariable.type"] [selected="selected"]')
+    );
   },
 
   variableValueInput: function(inputValue) {
-    var inputField = element(by.css('.modal-body .variable-value')).element(by.model('variable.value'));
+    var inputField = element(by.css('.modal-body .variable-value')).element(
+      by.model('variable.value')
+    );
 
     if (arguments.length !== 0) {
       return inputField.sendKeys(inputValue);
@@ -60,19 +66,26 @@ module.exports = ActionBar.extend({
 
   variableValueRadio: function(value) {
     if (value) {
-      return element(by.css('.modal-body .variable-value .radio [ng-value="true"]')).click();
+      return element(
+        by.css('.modal-body .variable-value .radio [ng-value="true"]')
+      ).click();
     } else {
-      return element(by.css('.modal-body .variable-value .radio [ng-value="false"]')).click();
+      return element(
+        by.css('.modal-body .variable-value .radio [ng-value="false"]')
+      ).click();
     }
   },
 
   variableValueInfoLabel: function() {
-    return element(by.css('.modal-body .variable-value .invalid:not(.ng-hide)'));
+    return element(
+      by.css('.modal-body .variable-value .invalid:not(.ng-hide)')
+    );
   },
 
   objectNameInput: function(inputValue) {
-    var inputField = element(by.css('.modal-body .variable-value'))
-      .element(by.model('variable.valueInfo.objectTypeName'));
+    var inputField = element(by.css('.modal-body .variable-value')).element(
+      by.model('variable.valueInfo.objectTypeName')
+    );
 
     if (arguments.length !== 0) {
       return inputField.sendKeys(inputValue);
@@ -81,8 +94,9 @@ module.exports = ActionBar.extend({
   },
 
   objectFormatInput: function(inputValue) {
-    var inputField = element(by.css('.modal-body .variable-value'))
-      .element(by.model('variable.valueInfo.serializationDataFormat'));
+    var inputField = element(by.css('.modal-body .variable-value')).element(
+      by.model('variable.valueInfo.serializationDataFormat')
+    );
 
     if (arguments.length !== 0) {
       return inputField.sendKeys(inputValue);
@@ -91,8 +105,9 @@ module.exports = ActionBar.extend({
   },
 
   objectValueInput: function(inputValue) {
-    var inputField = element(by.css('.modal-body .variable-value'))
-      .element(by.model('variable.value'));
+    var inputField = element(by.css('.modal-body .variable-value')).element(
+      by.model('variable.value')
+    );
 
     if (arguments.length !== 0) {
       return inputField.sendKeys(inputValue);
@@ -112,30 +127,36 @@ module.exports = ActionBar.extend({
     var that = this;
 
     var submitFct = function() {
-      that.addButton().click().then(function() {
-        that.okButton().click();
-      });
+      that
+        .addButton()
+        .click()
+        .then(function() {
+          that.okButton().click();
+        });
     };
 
-    this.addVariableButton().click().then(function() {
-      that.variableNameInput(name);
-      that.variableTypeDropdown(type).click().then(function() {
-        if(value) {
-          if(typeof value === 'object') {
-            that.objectNameInput(value.objectTypeName);
-            that.objectFormatInput(value.serializationDataFormat);
-            that.objectValueInput(value.value).then(submitFct);
-          } else if(typeof value === 'boolean') {
-            that.variableValueRadio(value).then(submitFct);
-          } else {
-            that.variableValueInput(value).then(submitFct);
-          }
-        } else {
-          submitFct();
-        }
+    this.addVariableButton()
+      .click()
+      .then(function() {
+        that.variableNameInput(name);
+        that
+          .variableTypeDropdown(type)
+          .click()
+          .then(function() {
+            if (value) {
+              if (typeof value === 'object') {
+                that.objectNameInput(value.objectTypeName);
+                that.objectFormatInput(value.serializationDataFormat);
+                that.objectValueInput(value.value).then(submitFct);
+              } else if (typeof value === 'boolean') {
+                that.variableValueRadio(value).then(submitFct);
+              } else {
+                that.variableValueInput(value).then(submitFct);
+              }
+            } else {
+              submitFct();
+            }
+          });
       });
-    });
-  },
-
-
+  }
 });

@@ -30,9 +30,12 @@ module.exports = function() {
       decisions: '=',
       isDrdAvailable: '='
     },
-    controller: ['$scope', 'localConf','$translate',
+    controller: [
+      '$scope',
+      'localConf',
+      '$translate',
       function($scope, localConf, $translate) {
-
+        // prettier-ignore
         $scope.headColumns = [
           { class: 'name',     request: 'name'          , sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_NAME')},
           { class: 'tenant-id', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_DECISION_TABLE_TENANT_ID')},
@@ -40,8 +43,12 @@ module.exports = function() {
         ];
 
         // Default sorting
-        var defaultValue = { sortBy: 'name', sortOrder: 'asc', sortReverse: false};
-        $scope.sortObj   = loadLocal(defaultValue);
+        var defaultValue = {
+          sortBy: 'name',
+          sortOrder: 'asc',
+          sortReverse: false
+        };
+        $scope.sortObj = loadLocal(defaultValue);
 
         // Update Table
         $scope.onSortChange = function(sortObj) {
@@ -54,14 +61,11 @@ module.exports = function() {
 
         function saveLocal(sortObj) {
           localConf.set('sortDecDefTab', sortObj);
-
         }
         function loadLocal(defaultValue) {
           return localConf.get('sortDecDefTab', defaultValue);
         }
-
-
-
-      }]
+      }
+    ]
   };
 };

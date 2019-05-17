@@ -17,7 +17,7 @@
 
 'use strict';
 var angular = require('camunda-commons-ui/vendor/angular'),
-    CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
+  CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
 
 var apiModule = angular.module('cam.tasklist.client', []);
 
@@ -30,9 +30,8 @@ apiModule.factory('camAPI', [
   '$window',
   'Uri',
   function(camAPIHttpClient, $window, Uri) {
-
     var conf = {
-      apiUri:     'engine-rest/api/engine',
+      apiUri: 'engine-rest/api/engine',
       HttpClient: camAPIHttpClient,
       engine: Uri.appUri(':engine')
     };
@@ -43,6 +42,7 @@ apiModule.factory('camAPI', [
     }
 
     return new CamSDK.Client(conf);
-  }]);
+  }
+]);
 
 module.exports = apiModule;

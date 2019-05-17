@@ -20,7 +20,6 @@
 var Page = require('./filter-modal');
 
 module.exports = Page.extend({
-
   saveButton: function() {
     return this.formElement().element(by.css('[ng-click="submit()"]'));
   },
@@ -44,5 +43,4 @@ module.exports = Page.extend({
   deleteFilterButton: function() {
     return this.formElement().element(by.css('[ng-click="confirmDeletion()"]'));
   }
-
 });

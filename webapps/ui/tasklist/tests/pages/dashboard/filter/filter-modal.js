@@ -20,29 +20,32 @@
 var Base = require('./../../base');
 
 module.exports = Base.extend({
-
   formElement: function() {
     return element(by.css('.modal-content'));
   },
 
   formHeader: function() {
     return this.formElement()
-      .element(by.css('.modal-title')).getText();
+      .element(by.css('.modal-title'))
+      .getText();
   },
 
   notificationList: function() {
-    return this.formElement()
-      .all(by.repeater('notification in notifications'));
+    return this.formElement().all(by.repeater('notification in notifications'));
   },
 
   notificationStatus: function(idx) {
-    return this.notificationList().get(idx)
-      .element(by.css('.status')).getText();
+    return this.notificationList()
+      .get(idx)
+      .element(by.css('.status'))
+      .getText();
   },
 
   notificationMessage: function(idx) {
-    return this.notificationList().get(idx)
-      .element(by.css('.message')).getText();
+    return this.notificationList()
+      .get(idx)
+      .element(by.css('.message'))
+      .getText();
   },
 
   selectPanelByKey: function(key) {
@@ -66,35 +69,37 @@ module.exports = Base.extend({
   nameInput: function(inputValue) {
     var inputField = this.formElement().element(by.model('filter.name'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   colorPicker: function(inputValue) {
-    var inputField = this.formElement().element(by.model('filter.properties.color'));
+    var inputField = this.formElement().element(
+      by.model('filter.properties.color')
+    );
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   descriptionInput: function(inputValue) {
-    var inputField = this.formElement().element(by.model('filter.properties.description'));
+    var inputField = this.formElement().element(
+      by.model('filter.properties.description')
+    );
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   priorityInput: function(inputValue) {
-    var inputField = this.formElement().element(by.model('filter.properties.priority'));
+    var inputField = this.formElement().element(
+      by.model('filter.properties.priority')
+    );
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -109,22 +114,25 @@ module.exports = Base.extend({
   },
 
   permissionHelpText: function() {
-    return element(by.css('[is-open="accordion.permission"] .task-filter-hint.text-help')).getText();
+    return element(
+      by.css('[is-open="accordion.permission"] .task-filter-hint.text-help')
+    ).getText();
   },
 
   accessibleByAllUsersCheckBox: function() {
-    return this.permissionPageElement()
-      .element(by.model('isGlobalReadAuthorization'));
+    return this.permissionPageElement().element(
+      by.model('isGlobalReadAuthorization')
+    );
   },
 
   newPermissionPageElement: function() {
-    return this.permissionPageElement()
-      .element(by.css('.new-permission'));
+    return this.permissionPageElement().element(by.css('.new-permission'));
   },
 
   permissionList: function() {
-    return this.permissionPageElement()
-      .all(by.repeater('auth in getReadAuthorizations(authorizations)'));
+    return this.permissionPageElement().all(
+      by.repeater('auth in getReadAuthorizations(authorizations)')
+    );
   },
 
   addPermissionButton: function() {
@@ -134,14 +142,17 @@ module.exports = Base.extend({
   addPermission: function(type, id) {
     var that = this;
 
-    this.addPermissionButton().click().then(function() {
-      that.selectPermissionType(type);
-      that.permissionIdInput(id);
-    });
+    this.addPermissionButton()
+      .click()
+      .then(function() {
+        that.selectPermissionType(type);
+        that.permissionIdInput(id);
+      });
   },
 
   removePermissionButton: function(idx) {
-    return this.permissionList().get(idx)
+    return this.permissionList()
+      .get(idx)
       .element(by.css('[ng-click="removeReadPermission(auth)"]'));
   },
 
@@ -150,15 +161,16 @@ module.exports = Base.extend({
   },
 
   permissionTypeButton: function() {
-    return this.newPermissionPageElement()
-      .element(by.css('[ng-click="switchType()"]'));
+    return this.newPermissionPageElement().element(
+      by.css('[ng-click="switchType()"]')
+    );
   },
 
   selectPermissionType: function(permissionType) {
     var that = this;
 
     this.getPermissionType().then(function(currentType) {
-      if (currentType !== permissionType )  {
+      if (currentType !== permissionType) {
         that.permissionTypeButton().click();
       }
     });
@@ -166,9 +178,11 @@ module.exports = Base.extend({
 
   getPermissionType: function(idx) {
     if (arguments.length === 1) {
-      return this.permissionList().get(idx)
+      return this.permissionList()
+        .get(idx)
         .element(by.css('.fake-button .glyphicon'))
-        .getAttribute('class').then(function(classes) {
+        .getAttribute('class')
+        .then(function(classes) {
           if (classes.indexOf('glyphicon-user') !== -1) {
             return 'user';
           } else {
@@ -177,7 +191,8 @@ module.exports = Base.extend({
         });
     } else {
       return this.permissionTypeButton()
-        .getAttribute('tooltip').then(function(tooltips) {
+        .getAttribute('tooltip')
+        .then(function(tooltips) {
           if (tooltips.indexOf('user') !== -1) {
             return 'user';
           } else {
@@ -188,28 +203,30 @@ module.exports = Base.extend({
   },
 
   permissionIdInput: function(inputValue) {
-    var inputField = this.newPermissionPageElement()
-      .element(by.model('newPermission.id'));
+    var inputField = this.newPermissionPageElement().element(
+      by.model('newPermission.id')
+    );
 
-    if (arguments.length === 1)
-      inputField.sendKeys(inputValue);
+    if (arguments.length === 1) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   getPermissionId: function(idx) {
     if (arguments.length === 1) {
-      return this.permissionList().get(idx)
-        .element(by.css('.form-control-static')).getText();
+      return this.permissionList()
+        .get(idx)
+        .element(by.css('.form-control-static'))
+        .getText();
     } else {
-      return this.permissionIdInput()
-        .getAttribute('value');
+      return this.permissionIdInput().getAttribute('value');
     }
   },
 
   permissionIdHelpText: function() {
     return this.newPermissionPageElement()
-      .element(by.css('.help-block:not(.ng-hide)')).getText();
+      .element(by.css('.help-block:not(.ng-hide)'))
+      .getText();
   },
 
   // criteria
@@ -218,65 +235,89 @@ module.exports = Base.extend({
   },
 
   criteriaHelpText: function() {
-    return this.criteriaPageElement().element(by.css('.task-filter-hint.text-help')).getText();
+    return this.criteriaPageElement()
+      .element(by.css('.task-filter-hint.text-help'))
+      .getText();
   },
 
   addCriterionButton: function() {
-    return this.criteriaPageElement().element(by.css('[ng-click="addCriterion()"]'));
+    return this.criteriaPageElement().element(
+      by.css('[ng-click="addCriterion()"]')
+    );
   },
 
   removeCriterionButton: function(idx) {
-    return this.criterionList().get(idx).element(by.css('[ng-click="removeCriterion(delta)"]'));
+    return this.criterionList()
+      .get(idx)
+      .element(by.css('[ng-click="removeCriterion(delta)"]'));
   },
 
   criterionList: function() {
-    return this.criteriaPageElement().all(by.repeater('(delta, queryParam) in query'));
+    return this.criteriaPageElement().all(
+      by.repeater('(delta, queryParam) in query')
+    );
   },
 
   selectCriterionKey: function(item, group, key) {
-    this.criterionList().get(item).element(by.cssContainingText('optgroup[label="' + group + '"] > option', key)).click();
+    this.criterionList()
+      .get(item)
+      .element(
+        by.cssContainingText('optgroup[label="' + group + '"] > option', key)
+      )
+      .click();
   },
 
   criterionKeyInput: function(idx, inputKey) {
-    var inputField = this.criterionList().get(idx).element(by.model('queryParam.key'));
+    var inputField = this.criterionList()
+      .get(idx)
+      .element(by.model('queryParam.key'));
 
-    if (arguments.length === 2)
-      inputField.sendKeys(inputKey);
+    if (arguments.length === 2) inputField.sendKeys(inputKey);
 
     return inputField;
   },
 
   criterionKeyHelpText: function(idx) {
-    return this.criterionList().get(idx)
-      .element(by.css('.help-block:not(.ng-hide)')).getText();
+    return this.criterionList()
+      .get(idx)
+      .element(by.css('.help-block:not(.ng-hide)'))
+      .getText();
   },
 
   criterionValueInput: function(idx, inputValue) {
-    var inputField = this.criterionList().get(idx).element(by.model('queryParam.value'));
+    var inputField = this.criterionList()
+      .get(idx)
+      .element(by.model('queryParam.value'));
 
-    if (arguments.length === 2)
-      inputField.sendKeys(inputValue);
+    if (arguments.length === 2) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   includeAssignedTasksCheckbox: function() {
-    return this.criteriaPageElement().element(by.css('[ng-model="filter.includeAssignedTasks"]'));
+    return this.criteriaPageElement().element(
+      by.css('[ng-model="filter.includeAssignedTasks"]')
+    );
   },
-  
+
   addCriterion: function(group, key, value) {
     var self = this;
 
-    this.addCriterionButton().click().then(function() {
-      self.criterionList().count().then(function(items) {
-        items = items -1;
-        self.selectCriterionKey(items, group, key);
-        
-        if(value) {
-          self.criterionValueInput(items, value);
-        }
+    this.addCriterionButton()
+      .click()
+      .then(function() {
+        self
+          .criterionList()
+          .count()
+          .then(function(items) {
+            items = items - 1;
+            self.selectCriterionKey(items, group, key);
+
+            if (value) {
+              self.criterionValueInput(items, value);
+            }
+          });
       });
-    });
   },
 
   editCriterion: function(idx, group, key, value) {
@@ -292,45 +333,50 @@ module.exports = Base.extend({
 
   variableHelpText: function() {
     return element(by.css('[is-open="accordion.variable"]'))
-      .element(by.css('.task-filter-hint.text-help')).getText();
+      .element(by.css('.task-filter-hint.text-help'))
+      .getText();
   },
 
   showUndefinedVariablesCheckBox: function() {
-    return this.variablePageElement()
-      .element(by.model('filter.properties.showUndefinedVariable'));
+    return this.variablePageElement().element(
+      by.model('filter.properties.showUndefinedVariable')
+    );
   },
 
   addVariableButton: function() {
-    return this.variablePageElement()
-      .element(by.css('[ng-click="addVariable()"]'));
+    return this.variablePageElement().element(
+      by.css('[ng-click="addVariable()"]')
+    );
   },
 
   removeVariableButton: function(idx) {
-    return this.variableList().get(idx)
+    return this.variableList()
+      .get(idx)
       .element(by.css('[ng-click="removeVariable(delta)"]'));
   },
 
   variableList: function() {
-    return this.variablePageElement()
-      .all(by.repeater('(delta, variable) in variables'));
+    return this.variablePageElement().all(
+      by.repeater('(delta, variable) in variables')
+    );
   },
 
   variableNameInput: function(idx, inputValue) {
-    var inputField = this.variableList().get(idx)
+    var inputField = this.variableList()
+      .get(idx)
       .element(by.model('variable.name'));
 
-    if (arguments.length === 2)
-      inputField.sendKeys(inputValue);
+    if (arguments.length === 2) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   variableLabelInput: function(idx, inputValue) {
-    var inputField = this.variableList().get(idx)
+    var inputField = this.variableList()
+      .get(idx)
       .element(by.model('variable.label'));
 
-    if (arguments.length === 2)
-      inputField.sendKeys(inputValue);
+    if (arguments.length === 2) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -338,13 +384,17 @@ module.exports = Base.extend({
   addVariable: function(name, label) {
     var self = this;
 
-    this.addVariableButton().click().then(function() {
-      self.variableList().count().then(function(items) {
-        items = items -1;
-        self.variableNameInput(items, name);
-        self.variableLabelInput(items, label);
+    this.addVariableButton()
+      .click()
+      .then(function() {
+        self
+          .variableList()
+          .count()
+          .then(function(items) {
+            items = items - 1;
+            self.variableNameInput(items, name);
+            self.variableLabelInput(items, label);
+          });
       });
-    });
   }
-
 });

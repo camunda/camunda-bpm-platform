@@ -20,7 +20,6 @@
 var Page = require('./../dashboard-view');
 
 module.exports = Page.extend({
-
   formElement: function() {
     return element(by.css('[cam-tasklist-filters]'));
   },
@@ -34,27 +33,26 @@ module.exports = Page.extend({
   },
 
   findFilter: function(filterName) {
-
     this.filterList().then(function(arr) {
-
       for (var i = 0; i < arr.length; ++i) {
-
         arr[i].getText().then(function(text) {
-
           console.log(text);
-          if (filterName === text)
-            console.log('got you ' + text);
+          if (filterName === text) console.log('got you ' + text);
         });
       }
     });
   },
 
   selectFilter: function(item) {
-    return this.filterList().get(item).click();
+    return this.filterList()
+      .get(item)
+      .click();
   },
 
   filterStatus: function(item) {
-    return this.filterList().get(item).getAttribute('class');
+    return this.filterList()
+      .get(item)
+      .getAttribute('class');
   },
 
   isFilterSelected: function(item) {
@@ -67,7 +65,9 @@ module.exports = Page.extend({
   },
 
   filterNameElement: function(item) {
-    return this.filterList().get(item).element(by.binding('filter.name'));
+    return this.filterList()
+      .get(item)
+      .element(by.binding('filter.name'));
   },
 
   filterName: function(item) {
@@ -75,11 +75,17 @@ module.exports = Page.extend({
   },
 
   filterDescriptionElement: function(item) {
-    browser.actions().mouseMove(this.filterNameElement(item)).perform();
+    browser
+      .actions()
+      .mouseMove(this.filterNameElement(item))
+      .perform();
 
     browser.sleep(1000);
 
-    return this.filterList().get(item).element(by.css('.name')).getAttribute('tooltip');
+    return this.filterList()
+      .get(item)
+      .element(by.css('.name'))
+      .getAttribute('tooltip');
   },
 
   filterDescription: function(item) {
@@ -98,10 +104,11 @@ module.exports = Page.extend({
 
   editFilter: function(item) {
     var self = this;
-    this.selectFilter(item).element(by.css('[ng-click="openModal($event, filter)"]')).click();
+    this.selectFilter(item)
+      .element(by.css('[ng-click="openModal($event, filter)"]'))
+      .click();
     // browser.actions().mouseMove(this.filterNameElement(item)).perform().then(function() {
     //   self.filterList().get(item).element(by.css('[ng-click="openModal($event, filter)"]')).click();
     // });
   }
-
 });

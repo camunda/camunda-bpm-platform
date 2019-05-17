@@ -18,48 +18,48 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form-general.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-filter-modal-form-general.html',
+  'utf8'
+);
 
-module.exports = [function() {
+module.exports = [
+  function() {
+    return {
+      restrict: 'A',
+      require: '^camTasklistFilterModalForm',
+      scope: {
+        filter: '=',
+        accesses: '='
+      },
 
-  return {
+      template: template,
 
-    restrict: 'A',
-    require: '^camTasklistFilterModalForm',
-    scope: {
-      filter: '=',
-      accesses: '='
-    },
+      link: function($scope, $element, attrs, parentCtrl) {
+        // init //////////////////////////////////////////////////////////
 
-    template: template,
+        var _form = $scope.filterGeneralForm;
 
-    link: function($scope, $element, attrs, parentCtrl) {
+        var controls = [];
+        controls.push(_form.filterColor);
+        controls.push(_form.filterName);
+        controls.push(_form.filterPriority);
+        controls.push(_form.filterDescription);
+        controls.push(_form.filterRefresh);
 
-      // init //////////////////////////////////////////////////////////
+        // register hint provider ////////////////////////////////////////
 
-      var _form = $scope.filterGeneralForm;
-
-      var controls = [];
-      controls.push(_form.filterColor);
-      controls.push(_form.filterName);
-      controls.push(_form.filterPriority);
-      controls.push(_form.filterDescription);
-      controls.push(_form.filterRefresh);
-
-      // register hint provider ////////////////////////////////////////
-
-      var showHintProvider = function() {
-        for (var i = 0, control; (control = controls[i]); i++) {
-          if (control.$dirty && control.$invalid) {
-            return true;
+        var showHintProvider = function() {
+          for (var i = 0, control; (control = controls[i]); i++) {
+            if (control.$dirty && control.$invalid) {
+              return true;
+            }
           }
-        }
-        return false;
-      };
+          return false;
+        };
 
-      parentCtrl.registerHintProvider('filterGeneralForm', showHintProvider);
-    }
-
-  };
-
-}];
+        parentCtrl.registerHintProvider('filterGeneralForm', showHintProvider);
+      }
+    };
+  }
+];

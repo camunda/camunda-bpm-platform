@@ -20,7 +20,6 @@
 var Table = require('./../../table');
 
 module.exports = Table.extend({
-
   tabRepeater: 'tabProvider in decisionDefinitionTabs',
   tabIndex: 0,
   tabLabel: 'Decision Instances',
@@ -33,18 +32,21 @@ module.exports = Table.extend({
 
   selectProcessDefinitionKey: function(idx) {
     this.waitForElementToBeVisible(element(by.repeater(this.tableRepeater)));
-    return this.tableItem(idx, by.binding('decisionInstance.processDefinitionKey')).click();
+    return this.tableItem(
+      idx,
+      by.binding('decisionInstance.processDefinitionKey')
+    ).click();
   },
 
   selectProcessInstanceId: function(idx) {
     this.waitForElementToBeVisible(element(by.repeater(this.tableRepeater)));
-    return this.tableItem(idx, by.binding('decisionInstance.processInstanceId')).click();
+    return this.tableItem(
+      idx,
+      by.binding('decisionInstance.processInstanceId')
+    ).click();
   },
 
   instanceId: function(idx) {
     return this.tableItem(idx, '[title]').getAttribute('title');
-  },
-
-
-
+  }
 });

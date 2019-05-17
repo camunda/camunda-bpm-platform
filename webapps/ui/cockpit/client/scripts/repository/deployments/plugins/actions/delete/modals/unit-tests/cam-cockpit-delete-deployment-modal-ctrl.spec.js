@@ -93,8 +93,8 @@ describe('cockpit.repository.deployment.action deleteDeployment modal controller
     it('should perform delete deployment request', () => {
       $scope.deleteDeployment();
 
-      expect(camAPI.delete
-        .calledWith(deployment.id, {
+      expect(
+        camAPI.delete.calledWith(deployment.id, {
           cascade: false,
           skipCustomListeners: true,
           skipIoMappings: true
@@ -107,8 +107,8 @@ describe('cockpit.repository.deployment.action deleteDeployment modal controller
 
       $scope.deleteDeployment();
 
-      expect(camAPI.delete
-        .calledWith(deployment.id, {
+      expect(
+        camAPI.delete.calledWith(deployment.id, {
           cascade: false,
           skipCustomListeners: true,
           skipIoMappings: false

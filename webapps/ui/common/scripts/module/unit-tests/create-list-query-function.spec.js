@@ -40,10 +40,11 @@ describe('cam-common createListQueryFunction', function() {
     $rootScope = _$rootScope_;
     $q = _$q_;
 
-    getCount = sinon.stub()
-      .returns($q.when({
+    getCount = sinon.stub().returns(
+      $q.when({
         count: 1
-      }));
+      })
+    );
     getList = sinon.stub();
     query = createListQueryFunction(getCount, getList);
   }));
@@ -63,18 +64,22 @@ describe('cam-common createListQueryFunction', function() {
       current: 10,
       size: 100
     };
-    getCount.returns($q.when({
-      count: 200
-    }));
+    getCount.returns(
+      $q.when({
+        count: 200
+      })
+    );
 
-    query({}, pages)
-      .then(function(data) {
-        expect(data).to.contain.keys('count');
-        expect(data).not.to.contain.keys('list');
-        expect(getList.called).to.eql(false, 'expected getList to never have been called');
+    query({}, pages).then(function(data) {
+      expect(data).to.contain.keys('count');
+      expect(data).not.to.contain.keys('list');
+      expect(getList.called).to.eql(
+        false,
+        'expected getList to never have been called'
+      );
 
-        done();
-      });
+      done();
+    });
 
     $rootScope.$digest();
   });
@@ -87,22 +92,28 @@ describe('cam-common createListQueryFunction', function() {
     var params = {
       a: 1
     };
-    getCount.returns($q.when({
-      count: 20000000
-    }));
+    getCount.returns(
+      $q.when({
+        count: 20000000
+      })
+    );
 
-    query(params, pages)
-      .then(function(data) {
-        expect(data).to.contain.keys('count');
-        expect(data).to.contain.keys('list');
-        expect(getList.calledWith({
+    query(params, pages).then(function(data) {
+      expect(data).to.contain.keys('count');
+      expect(data).to.contain.keys('list');
+      expect(
+        getList.calledWith({
           a: params.a,
           firstResult: 900,
           maxResults: pages.size
-        })).to.eql(true, 'expected getList to be called with params and pagination');
+        })
+      ).to.eql(
+        true,
+        'expected getList to be called with params and pagination'
+      );
 
-        done();
-      });
+      done();
+    });
 
     $rootScope.$digest();
   });

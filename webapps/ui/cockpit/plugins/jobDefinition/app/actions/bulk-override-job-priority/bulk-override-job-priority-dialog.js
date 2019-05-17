@@ -20,35 +20,58 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$uibModalInstance', 'jobDefinitions', '$timeout', '$translate',
-  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions, $timeout, $translate) {
-
+  '$scope',
+  '$q',
+  'Notifications',
+  'JobDefinitionResource',
+  '$uibModalInstance',
+  'jobDefinitions',
+  '$timeout',
+  '$translate',
+  function(
+    $scope,
+    $q,
+    Notifications,
+    JobDefinitionResource,
+    $modalInstance,
+    jobDefinitions,
+    $timeout,
+    $translate
+  ) {
     $scope.hasNoJobDefinitions = jobDefinitions.length === 0;
     if ($scope.hasNoJobDefinitions) {
-      $modalInstance.opened.then(
-        $timeout(function() {
-          Notifications.addError({
-            status: 'Error',
-            message: 'This process definition has no job definitions associated with. The job priority cannot be overridden.',
-            exclusive: true
-          });
-        }, 0)).catch(angular.noop);
+      $modalInstance.opened
+        .then(
+          $timeout(function() {
+            Notifications.addError({
+              status: 'Error',
+              message:
+                'This process definition has no job definitions associated with. The job priority cannot be overridden.',
+              exclusive: true
+            });
+          }, 0)
+        )
+        .catch(angular.noop);
     }
 
     $scope.status;
     var FINISHED = 'FINISHED',
-        PERFORM = 'PERFORMING',
-        SUCCESS = 'SUCCESS',
-        FAILED = 'FAILED';
+      PERFORM = 'PERFORMING',
+      SUCCESS = 'SUCCESS',
+      FAILED = 'FAILED';
 
     var finishedWithFailures = false;
 
-    var summarizePages = $scope.summarizePages = { size: 5, total: jobDefinitions.length, current: 1 };
+    var summarizePages = ($scope.summarizePages = {
+      size: 5,
+      total: jobDefinitions.length,
+      current: 1
+    });
 
-    var data = $scope.data = {
+    var data = ($scope.data = {
       priority: null,
       includeJobs: false
-    };
+    });
 
     $scope.setJobPriority = true;
 
@@ -70,7 +93,7 @@ module.exports = [
       var count = summarizePages.size;
       var firstResult = (page - 1) * count;
 
-      var showJobDefinitions = $scope.showJobDefinitions = [];
+      var showJobDefinitions = ($scope.showJobDefinitions = []);
 
       for (var i = 0; i < count; i++) {
         var jobDefinition = jobDefinitions[i + firstResult];
@@ -92,43 +115,41 @@ module.exports = [
     function overrideJobPriority(jobDefinitions) {
       $scope.status = PERFORM;
 
-      doOverride(jobDefinitions).then(function() {
-        if (!finishedWithFailures) {
+      doOverride(jobDefinitions)
+        .then(function() {
+          if (!finishedWithFailures) {
+            if ($scope.setJobPriority) {
+              Notifications.addMessage({
+                status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+                message: $translate.instant('BULK_OVERRIDE_MESSAGE'),
+                exclusive: true
+              });
+            } else {
+              Notifications.addMessage({
+                status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+                message: $translate.instant('BULK_OVERRIDE_CLEARING_MESSAGE'),
+                exclusive: true
+              });
+            }
+          } else {
+            if ($scope.setJobPriority) {
+              Notifications.addError({
+                status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+                message: $translate.instant('BULK_OVERRIDE_ERROR_1'),
+                exclusive: true
+              });
+            } else {
+              Notifications.addError({
+                status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+                message: $translate.instant('BULK_OVERRIDE_ERROR_2'),
+                exclusive: true
+              });
+            }
+          }
 
-          if ($scope.setJobPriority) {
-            Notifications.addMessage({
-              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
-              message: $translate.instant('BULK_OVERRIDE_MESSAGE'),
-              exclusive: true
-            });
-          }
-          else {
-            Notifications.addMessage({
-              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
-              message: $translate.instant('BULK_OVERRIDE_CLEARING_MESSAGE'),
-              exclusive: true
-            });
-          }
-        }
-        else {
-          if ($scope.setJobPriority) {
-            Notifications.addError({
-              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
-              message: $translate.instant('BULK_OVERRIDE_ERROR_1'),
-              exclusive: true
-            });
-          }
-          else {
-            Notifications.addError({
-              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
-              message: $translate.instant('BULK_OVERRIDE_ERROR_2'),
-              exclusive: true
-            });
-          }
-        }
-
-        $scope.status = FINISHED;
-      }).catch(angular.noop);
+          $scope.status = FINISHED;
+        })
+        .catch(angular.noop);
     }
 
     function doOverride(jobDefinitions) {
@@ -138,31 +159,35 @@ module.exports = [
 
       function setJobPriority(jobDefinition) {
         jobDefinition.status = PERFORM;
-        JobDefinitionResource.setJobPriority({
-          id: jobDefinition.id
-        }, data, function() {
-          jobDefinition.status = SUCCESS;
+        JobDefinitionResource.setJobPriority(
+          {
+            id: jobDefinition.id
+          },
+          data,
+          function() {
+            jobDefinition.status = SUCCESS;
 
-          // we want to show a summarize, when all requests
-          // responded, that's why we uses a counter
-          count = count - 1;
-          if (count === 0) {
-            deferred.resolve();
+            // we want to show a summarize, when all requests
+            // responded, that's why we uses a counter
+            count = count - 1;
+            if (count === 0) {
+              deferred.resolve();
+            }
+          },
+          function(error) {
+            finishedWithFailures = true;
+
+            jobDefinition.status = FAILED;
+            jobDefinition.error = error;
+
+            // we want to show a summarize, when all requests
+            // responded, that's why we uses a counter
+            count = count - 1;
+            if (count === 0) {
+              deferred.resolve();
+            }
           }
-
-        }, function(error) {
-          finishedWithFailures = true;
-
-          jobDefinition.status = FAILED;
-          jobDefinition.error = error;
-
-          // we want to show a summarize, when all requests
-          // responded, that's why we uses a counter
-          count = count - 1;
-          if (count === 0) {
-            deferred.resolve();
-          }
-        });
+        );
       }
 
       for (var i = 0, jobDefinition; (jobDefinition = jobDefinitions[i]); i++) {
@@ -173,8 +198,15 @@ module.exports = [
     }
 
     $scope.isValid = function() {
-      var formScope = angular.element('[name="overrideJobPriorityForm"]').scope();
-      return !$scope.setJobPriority || ((formScope && formScope.overrideJobPriorityForm) ? formScope.overrideJobPriorityForm.$valid : false);
+      var formScope = angular
+        .element('[name="overrideJobPriorityForm"]')
+        .scope();
+      return (
+        !$scope.setJobPriority ||
+        (formScope && formScope.overrideJobPriorityForm
+          ? formScope.overrideJobPriorityForm.$valid
+          : false)
+      );
     };
 
     $scope.close = function(status) {
@@ -182,5 +214,5 @@ module.exports = [
       response.status = status;
       $modalInstance.close(response);
     };
-
-  }];
+  }
+];

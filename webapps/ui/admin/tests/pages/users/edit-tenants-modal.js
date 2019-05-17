@@ -20,7 +20,6 @@
 var Page = require('./edit-tenants');
 
 module.exports = Page.extend({
-
   pageHeader: function() {
     return element(by.css('.modal-header')).getText();
   },
@@ -30,15 +29,22 @@ module.exports = Page.extend({
   },
 
   selectTenant: function(idx) {
-    this.tenantList().get(idx).element(by.model('tenant.checked')).click();
+    this.tenantList()
+      .get(idx)
+      .element(by.model('tenant.checked'))
+      .click();
   },
 
   tenantId: function(idx) {
-    return this.tenantList().get(idx).element(by.css('.tenant-id a'));
+    return this.tenantList()
+      .get(idx)
+      .element(by.css('.tenant-id a'));
   },
 
   tenantName: function(idx) {
-    return this.tenantList().get(idx).element(by.css('.tenant-name'));
+    return this.tenantList()
+      .get(idx)
+      .element(by.css('.tenant-name'));
   },
 
   addSelectedTenantButton: function() {
@@ -63,9 +69,11 @@ module.exports = Page.extend({
 
     this.waitForElementToBeVisible(theElement, 5000);
     this.selectAllCheckbox().click();
-    this.addSelectedTenantButton().click().then(function() {
-      that.okButton().click();
-    });
+    this.addSelectedTenantButton()
+      .click()
+      .then(function() {
+        that.okButton().click();
+      });
   },
 
   addTenant: function(idx) {
@@ -74,9 +82,10 @@ module.exports = Page.extend({
 
     this.waitForElementToBeVisible(theElement, 5000);
     this.selectTenant(idx);
-    this.addSelectedTenantButton().click().then(function() {
-      that.okButton().click();
-    });
+    this.addSelectedTenantButton()
+      .click()
+      .then(function() {
+        that.okButton().click();
+      });
   }
-
 });

@@ -18,7 +18,7 @@
 'use strict';
 /* jshint browserify: true */
 var angular = require('camunda-commons-ui/vendor/angular'),
-    welcome = require('./welcome');
+  welcome = require('./welcome');
 
 var pagesModule = angular.module('cam.welcome.pages', []);
 

@@ -19,7 +19,10 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-inline-panel-property.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-inline-panel-property.html',
+  'utf8'
+);
 
 module.exports = function() {
   return {

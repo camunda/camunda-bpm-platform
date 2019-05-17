@@ -21,11 +21,7 @@ module.exports = [
   '$scope',
   'taskMetaData',
   'groupsChanged',
-  function(
-    $scope,
-    taskMetaData,
-    groupsChanged
-  ) {
+  function($scope, taskMetaData, groupsChanged) {
     // setup //////////////////////////////////////////////
 
     $scope.taskGroupsData = taskMetaData.newChild($scope);
@@ -35,5 +31,5 @@ module.exports = [
     $scope.$on('$locationChangeSuccess', function() {
       $scope.$dismiss();
     });
-
-  }];
+  }
+];

@@ -25,6 +25,6 @@
 'use strict';
 
 var angular = require('angular'),
-    viewsModule = require('./views/main');
+  viewsModule = require('./views/main');
 
 module.exports = angular.module('admin.plugin.base', [viewsModule.name]);

@@ -20,7 +20,6 @@
 module.exports = function() {
   return {
     link: function(scope, element) {
-
       var processData = scope.processData;
       var selectedActivityQuery = element.attr('cam-select-activity');
 
@@ -33,7 +32,6 @@ module.exports = function() {
       }
 
       element.on('click', function(event) {
-
         event.preventDefault();
 
         scope.$apply(function() {

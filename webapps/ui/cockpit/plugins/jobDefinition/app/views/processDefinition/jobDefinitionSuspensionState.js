@@ -20,25 +20,42 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$uibModalInstance', 'jobDefinition', '$translate', 'fixDate',
-  function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   jobDefinition, $translate, fixDate) {
-
+  '$scope',
+  '$http',
+  '$filter',
+  'Uri',
+  'Notifications',
+  '$uibModalInstance',
+  'jobDefinition',
+  '$translate',
+  'fixDate',
+  function(
+    $scope,
+    $http,
+    $filter,
+    Uri,
+    Notifications,
+    $modalInstance,
+    jobDefinition,
+    $translate,
+    fixDate
+  ) {
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
-        PERFORM_UPDATE = 'PERFORM_UDPATE',
-        UPDATE_SUCCESS = 'SUCCESS',
-        UPDATE_FAILED = 'FAIL';
+      PERFORM_UPDATE = 'PERFORM_UDPATE',
+      UPDATE_SUCCESS = 'SUCCESS',
+      UPDATE_FAILED = 'FAIL';
 
     var dateFilter = $filter('date'),
-        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
+      dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
     $scope.jobDefinition = jobDefinition;
 
     $scope.status = BEFORE_UPDATE;
 
     $scope.data = {
-      includeJobs : true,
-      executeImmediately : true,
-      executionDate : dateFilter(Date.now(), dateFormat)
+      includeJobs: true,
+      executeImmediately: true,
+      executionDate: dateFilter(Date.now(), dateFormat)
     };
 
     $scope.$on('$routeChangeStart', function() {
@@ -51,31 +68,70 @@ module.exports = [
       var data = {};
       data.suspended = !jobDefinition.suspended;
       data.includeJobs = $scope.data.includeJobs;
-      data.executionDate = !$scope.data.executeImmediately ? fixDate($scope.data.executionDate) : null;
+      data.executionDate = !$scope.data.executeImmediately
+        ? fixDate($scope.data.executionDate)
+        : null;
 
-      $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).then(function() {
-        $scope.status = UPDATE_SUCCESS;
+      $http
+        .put(
+          Uri.appUri(
+            'engine://engine/:engine/job-definition/' +
+              jobDefinition.id +
+              '/suspended/'
+          ),
+          data
+        )
+        .then(function() {
+          $scope.status = UPDATE_SUCCESS;
 
-        if ($scope.data.executeImmediately) {
-          Notifications.addMessage({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_MESSAGES_1'), 'exclusive': true });
-        } else {
-          Notifications.addMessage({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_MESSAGES_2'), 'exclusive': true });
-        }
+          if ($scope.data.executeImmediately) {
+            Notifications.addMessage({
+              status: $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'),
+              message: $translate.instant(
+                'PLUGIN_JOBDEFINITION_STATE_MESSAGES_1'
+              ),
+              exclusive: true
+            });
+          } else {
+            Notifications.addMessage({
+              status: $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'),
+              message: $translate.instant(
+                'PLUGIN_JOBDEFINITION_STATE_MESSAGES_2'
+              ),
+              exclusive: true
+            });
+          }
+        })
+        .catch(function(data) {
+          $scope.status = UPDATE_FAILED;
 
-      }).catch(function(data) {
-        $scope.status = UPDATE_FAILED;
-
-        if ($scope.data.executeImmediately) {
-          Notifications.addError({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_1', { message: data.data.message }), 'exclusive': true });
-        } else {
-          Notifications.addError({'status': $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_2', { message: data.data.message }), 'exclusive': true });
-        }
-      });
+          if ($scope.data.executeImmediately) {
+            Notifications.addError({
+              status: $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'),
+              message: $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_1', {
+                message: data.data.message
+              }),
+              exclusive: true
+            });
+          } else {
+            Notifications.addError({
+              status: $translate.instant('PLUGIN_JOBDEFINITION_STATE_STATUS'),
+              message: $translate.instant('PLUGIN_JOBDEFINITION_STATE_ERR_2', {
+                message: data.data.message
+              }),
+              exclusive: true
+            });
+          }
+        });
     };
 
     $scope.isValid = function() {
-      var formScope = angular.element('[name="updateSuspensionStateForm"]').scope();
-      return (formScope && formScope.updateSuspensionStateForm) ? formScope.updateSuspensionStateForm.$valid : false;
+      var formScope = angular
+        .element('[name="updateSuspensionStateForm"]')
+        .scope();
+      return formScope && formScope.updateSuspensionStateForm
+        ? formScope.updateSuspensionStateForm.$valid
+        : false;
     };
 
     $scope.close = function(status) {
@@ -87,7 +143,6 @@ module.exports = [
       response.executionDate = $scope.data.executionDate;
 
       $modalInstance.close(response);
-
     };
-
-  }];
+  }
+];

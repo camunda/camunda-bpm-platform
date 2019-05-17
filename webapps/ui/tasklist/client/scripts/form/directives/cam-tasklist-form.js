@@ -21,9 +21,9 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/cam-tasklist-form.html', 'utf8');
 
 var EMBEDDED_KEY = 'embedded:',
-    APP_KEY = 'app:',
-    ENGINE_KEY = 'engine:',
-    DEPLOYMENT_KEY = 'deployment:';
+  APP_KEY = 'app:',
+  ENGINE_KEY = 'engine:',
+  DEPLOYMENT_KEY = 'deployment:';
 
 function compact(arr) {
   var a = [];
@@ -38,43 +38,41 @@ function compact(arr) {
 var noop = function() {};
 
 module.exports = function() {
-
   return {
-
     restrict: 'A',
 
     scope: {
-      tasklistForm : '=',
+      tasklistForm: '=',
 
       /*
-         * current options are:
-         * - hideCompleteButton: to hide the complete button inside the form directive
-         * - disableCompleteButton: to disable or enable the complete button inside
-         *   the form directive
-         * - disableForm: to disable or enable the form
-         * - disableAddVariableButton: to disable or enable the 'Add Variable' button
-         *   inside a generic form
-         */
+       * current options are:
+       * - hideCompleteButton: to hide the complete button inside the form directive
+       * - disableCompleteButton: to disable or enable the complete button inside
+       *   the form directive
+       * - disableForm: to disable or enable the form
+       * - disableAddVariableButton: to disable or enable the 'Add Variable' button
+       *   inside a generic form
+       */
       options: '=',
 
       /*
-         * contains parameter like taskId, processDefinitionId, processDefinitionKey etc.
-         */
+       * contains parameter like taskId, processDefinitionId, processDefinitionKey etc.
+       */
       params: '=',
 
       /* will be used to make a callback when the form will be completed */
       onFormCompletionCallback: '&',
 
       /*
-         * will be used to register a completion handler, when the completion
-         * will be trigger from the outside of a form
-         */
+       * will be used to register a completion handler, when the completion
+       * will be trigger from the outside of a form
+       */
       onFormCompletion: '&',
 
       /*
-         * is a callback which will called when the validation state of the
-         * form changes (pass the flag '$invalid').
-         */
+       * is a callback which will called when the validation state of the
+       * form changes (pass the flag '$invalid').
+       */
       onFormValidation: '&'
     },
 
@@ -83,10 +81,7 @@ module.exports = function() {
     controller: [
       '$scope',
       'Uri',
-      function(
-        $scope,
-        Uri
-      ) {
+      function($scope, Uri) {
         $scope.taskRemoved = false;
         $scope.$on('taskremoved', function() {
           $scope.taskRemoved = true;
@@ -94,7 +89,8 @@ module.exports = function() {
 
         // setup //////////////////////////////////////////////////////////////////
 
-        $scope.onFormCompletionCallback = $scope.onFormCompletionCallback() || noop;
+        $scope.onFormCompletionCallback =
+          $scope.onFormCompletionCallback() || noop;
         $scope.onFormCompletion = $scope.onFormCompletion() || noop;
         $scope.onFormValidation = $scope.onFormValidation() || noop;
         $scope.completionHandler = noop;
@@ -127,7 +123,7 @@ module.exports = function() {
 
         function parseForm(form) {
           var key = form.key,
-              applicationContextPath = form.contextPath;
+            applicationContextPath = form.contextPath;
 
           // structure may be [embedded:][app:]formKey
           // structure may be [embedded:][deployment:]formKey
@@ -149,7 +145,10 @@ module.exports = function() {
 
           if (key.indexOf(APP_KEY) === 0) {
             if (applicationContextPath) {
-              key = compact([applicationContextPath, key.substring(APP_KEY.length)])
+              key = compact([
+                applicationContextPath,
+                key.substring(APP_KEY.length)
+              ])
                 .join('/')
                 // prevents multiple "/" in the URI
                 .replace(/\/([/]+)/, '/');
@@ -159,25 +158,27 @@ module.exports = function() {
                 message: 'EMPTY_CONTEXT_PATH'
               });
             }
-          }
-
-          else if (key.indexOf(DEPLOYMENT_KEY) === 0) {
+          } else if (key.indexOf(DEPLOYMENT_KEY) === 0) {
             if ($scope.params.taskId) {
-              key = Uri.appUri('engine://engine/:engine/task/' + $scope.params.taskId + '/deployed-form');
+              key = Uri.appUri(
+                'engine://engine/:engine/task/' +
+                  $scope.params.taskId +
+                  '/deployed-form'
+              );
             } else {
-              key = Uri.appUri('engine://engine/:engine/process-definition/' + $scope.params.processDefinitionId + '/deployed-start-form');
+              key = Uri.appUri(
+                'engine://engine/:engine/process-definition/' +
+                  $scope.params.processDefinitionId +
+                  '/deployed-start-form'
+              );
             }
 
             setAsynchronousFormKey(key);
-          }
-
-          else if(key.indexOf(ENGINE_KEY) === 0) {
+          } else if (key.indexOf(ENGINE_KEY) === 0) {
             // resolve relative prefix
             key = Uri.appUri(key);
             setAsynchronousFormKey(key);
-          }
-
-          else {
+          } else {
             setAsynchronousFormKey(key);
           }
 
@@ -186,34 +187,39 @@ module.exports = function() {
 
         // completion /////////////////////////////////////////////
 
-        var completionCallback = function(err, result)  {
+        var completionCallback = function(err, result) {
           $scope.onFormCompletionCallback(err, result);
           $scope.completeInProgress = false;
         };
 
-        var complete = $scope.complete = function() {
+        var complete = ($scope.complete = function() {
           $scope.completeInProgress = true;
           $scope.completionHandler(completionCallback);
-        };
+        });
 
         $scope.onFormCompletion(complete);
 
         $scope.showCompleteButton = function() {
-          return $scope.options &&
-                 !$scope.options.hideCompleteButton &&
-                 $scope.$loaded;
+          return (
+            $scope.options &&
+            !$scope.options.hideCompleteButton &&
+            $scope.$loaded
+          );
         };
 
-        var disableCompleteButton = $scope.disableCompleteButton = function() {
-          return $scope.taskRemoved || $scope.completeInProgress || $scope.$invalid ||
-            ($scope.options && $scope.options.disableCompleteButton);
-        };
+        var disableCompleteButton = ($scope.disableCompleteButton = function() {
+          return (
+            $scope.taskRemoved ||
+            $scope.completeInProgress ||
+            $scope.$invalid ||
+            ($scope.options && $scope.options.disableCompleteButton)
+          );
+        });
 
         var attemptComplete = function attemptComplete() {
           var canComplete = !disableCompleteButton();
           return canComplete && complete();
         };
-
 
         // save ///////////////////////////////////////////////////
 
@@ -250,7 +256,6 @@ module.exports = function() {
           $scope.$dirty = dirty;
         };
 
-
         this.getOptions = function() {
           return $scope.options || {};
         };
@@ -264,15 +269,15 @@ module.exports = function() {
         };
 
         this.registerCompletionHandler = function(fn) {
-          $scope.completionHandler = fn ||  noop;
+          $scope.completionHandler = fn || noop;
         };
 
         this.registerSaveHandler = function(fn) {
-          $scope.saveHandler = fn ||  noop;
+          $scope.saveHandler = fn || noop;
         };
 
         this.attemptComplete = attemptComplete;
-
-      }]
+      }
+    ]
   };
 };

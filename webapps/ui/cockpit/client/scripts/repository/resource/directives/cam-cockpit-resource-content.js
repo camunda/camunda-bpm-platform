@@ -19,12 +19,13 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-cockpit-resource-content.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-cockpit-resource-content.html',
+  'utf8'
+);
 
 module.exports = [
-
   function() {
-
     return {
       scope: {
         resourceData: '=',
@@ -36,10 +37,7 @@ module.exports = [
       controller: [
         '$scope',
         'configuration',
-        function(
-          $scope,
-          configuration
-        ) {
+        function($scope, configuration) {
           $scope.bpmnJsConf = configuration.getBpmnJs();
 
           // fields ////////////////////////////////////////////////////
@@ -55,7 +53,6 @@ module.exports = [
           $scope.isUnkownResource = $scope.control.isUnkownResource;
           $scope.imageLink = $scope.control.downloadLink;
 
-
           // observe //////////////////////////////////////////////////
 
           resourceContentData.observe('resource', function(_resource) {
@@ -65,14 +62,17 @@ module.exports = [
             resource = $scope.resource = _resource;
           });
 
-          resourceContentData.observe('currentDeployment', function(_deployment) {
+          resourceContentData.observe('currentDeployment', function(
+            _deployment
+          ) {
             $scope.deployment = _deployment;
           });
 
           resourceContentData.observe('binary', function(binary) {
             $scope.binary = (binary || {}).data;
           });
-
         }
-      ]};
-  }];
+      ]
+    };
+  }
+];

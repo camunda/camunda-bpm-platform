@@ -24,24 +24,31 @@ var LabelRow = function(node) {
 };
 
 LabelRow.prototype.getInputText = function(idx) {
-  return this.node.all(by.css('td.input')).get(idx).getText();
+  return this.node
+    .all(by.css('td.input'))
+    .get(idx)
+    .getText();
 };
 
 var RuleRow = function(node) {
   this.node = node;
 };
 RuleRow.prototype.getCellText = function(idx) {
-  return this.node.all(by.css('td')).get(idx).getText();
+  return this.node
+    .all(by.css('td'))
+    .get(idx)
+    .getText();
 };
 
 module.exports = Base.extend({
-
   tableElement: function() {
     return element(by.css('[cam-widget-dmn-viewer]'));
   },
 
   row: function(idx) {
-    return this.tableElement().all(by.css('tbody > tr')).get(idx);
+    return this.tableElement()
+      .all(by.css('tbody > tr'))
+      .get(idx);
   },
 
   labelRow: function() {
@@ -50,6 +57,5 @@ module.exports = Base.extend({
 
   ruleRow: function(idx) {
     return new RuleRow(this.row(idx));
-  },
-
+  }
 });

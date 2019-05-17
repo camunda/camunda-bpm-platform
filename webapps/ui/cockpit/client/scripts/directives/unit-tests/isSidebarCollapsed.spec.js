@@ -66,9 +66,11 @@ describe('isSidebarCollapsed', function() {
 
   it('should notifify callback of collapsed state', function() {
     expect(callbackFunc.calledOnce).to.eql(true);
-    expect(callbackFunc.calledWith({
-      collapsed: true
-    }));
+    expect(
+      callbackFunc.calledWith({
+        collapsed: true
+      })
+    );
   });
 
   it('should add restore, maximize and resize listeners', function() {

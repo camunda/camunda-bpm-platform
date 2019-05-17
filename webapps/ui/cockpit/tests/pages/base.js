@@ -20,7 +20,6 @@
 var Page = require('../../../common/tests/pages/page');
 
 module.exports = Page.extend({
-
   suspendedBadge: function() {
     return element(by.css('.ctn-header .badge'));
   },
@@ -38,7 +37,9 @@ module.exports = Page.extend({
   },
 
   navbarItemClick: function() {
-    return this.navbarItem().element(by.css('a')).click();
+    return this.navbarItem()
+      .element(by.css('a'))
+      .click();
   },
 
   navbarDropDown: function() {
@@ -59,6 +60,8 @@ module.exports = Page.extend({
   },
 
   goToSection: function(name) {
-    return this.navbar().element(by.cssContainingText('[ng-transclude] > ul > li a', name)).click();
+    return this.navbar()
+      .element(by.cssContainingText('[ng-transclude] > ul > li a', name))
+      .click();
   }
 });

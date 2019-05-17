@@ -22,20 +22,42 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/decision-definition.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    routeUtil = require('../../../../common/scripts/util/routeUtil'),
-    camCommons = require('camunda-commons-ui/lib');
+  routeUtil = require('../../../../common/scripts/util/routeUtil'),
+  camCommons = require('camunda-commons-ui/lib');
 
-var ngModule = angular.module('cam.cockpit.pages.decisionDefinition', ['dataDepend', camCommons.name]);
+var ngModule = angular.module('cam.cockpit.pages.decisionDefinition', [
+  'dataDepend',
+  camCommons.name
+]);
 
 var Controller = [
-  '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI',
-  'decisionDefinition', 'Views', 'search', 'isModuleAvailable', '$translate',
-  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,
-           decisionDefinition,   Views,   search, isModuleAvailable, $translate) {
-
+  '$scope',
+  '$rootScope',
+  '$q',
+  'dataDepend',
+  'page',
+  'camAPI',
+  'decisionDefinition',
+  'Views',
+  'search',
+  'isModuleAvailable',
+  '$translate',
+  function(
+    $scope,
+    $rootScope,
+    $q,
+    dataDepend,
+    page,
+    camAPI,
+    decisionDefinition,
+    Views,
+    search,
+    isModuleAvailable,
+    $translate
+  ) {
     $scope.control = {};
 
-    var decisionData = $scope.decisionData = dataDepend.create($scope);
+    var decisionData = ($scope.decisionData = dataDepend.create($scope));
 
     // utilities ///////////////////////
 
@@ -46,55 +68,62 @@ var Controller = [
 
     // end utilities ///////////////////////
 
-
     // begin data definition //////////////////////
 
     decisionData.provide('decisionDefinition', decisionDefinition);
 
-    decisionData.provide('tableXml', ['decisionDefinition', function(decisionDefinition) {
-      var deferred = $q.defer();
+    decisionData.provide('tableXml', [
+      'decisionDefinition',
+      function(decisionDefinition) {
+        var deferred = $q.defer();
 
-      var decisionDefinitionId = decisionDefinition.id;
+        var decisionDefinitionId = decisionDefinition.id;
 
-      decisionDefinitionService.getXml(decisionDefinitionId, function(err, data) {
-        if(!err) {
-          deferred.resolve(data.dmnXml);
-        } else {
-          deferred.reject(err);
-        }
-      });
+        decisionDefinitionService.getXml(decisionDefinitionId, function(
+          err,
+          data
+        ) {
+          if (!err) {
+            deferred.resolve(data.dmnXml);
+          } else {
+            deferred.reject(err);
+          }
+        });
 
-      return deferred.promise;
-    }]);
-
-    decisionData.provide('allDefinitions', [ 'decisionDefinition', function(decisionDefinition) {
-      var deferred = $q.defer();
-
-      var queryParams = {
-        key: decisionDefinition.key,
-        sortBy: 'version',
-        sortOrder: 'desc'
-      };
-
-      if(decisionDefinition.tenantId) {
-        queryParams.tenantIdIn = decisionDefinition.tenantId;
-      } else {
-        queryParams.withoutTenantId = true;
+        return deferred.promise;
       }
+    ]);
 
-      decisionDefinitionService.list(queryParams, function(err, data) {
-        if(!err) {
-          deferred.resolve(data);
+    decisionData.provide('allDefinitions', [
+      'decisionDefinition',
+      function(decisionDefinition) {
+        var deferred = $q.defer();
+
+        var queryParams = {
+          key: decisionDefinition.key,
+          sortBy: 'version',
+          sortOrder: 'desc'
+        };
+
+        if (decisionDefinition.tenantId) {
+          queryParams.tenantIdIn = decisionDefinition.tenantId;
         } else {
-          deferred.reject(err);
+          queryParams.withoutTenantId = true;
         }
-      });
 
-      return deferred.promise;
-    }]);
+        decisionDefinitionService.list(queryParams, function(err, data) {
+          if (!err) {
+            deferred.resolve(data);
+          } else {
+            deferred.reject(err);
+          }
+        });
+
+        return deferred.promise;
+      }
+    ]);
 
     // end data definition /////////////////////////
-
 
     // begin data usage ////////////////////////////
 
@@ -108,66 +137,79 @@ var Controller = [
     // BREADCRUMBS
     $rootScope.showBreadcrumbs = true;
 
-    $scope.breadcrumbData = decisionData.observe([ 'decisionDefinition' ], function(definition) {
-      page.breadcrumbsClear();
+    $scope.breadcrumbData = decisionData.observe(
+      ['decisionDefinition'],
+      function(definition) {
+        page.breadcrumbsClear();
 
-      page.breadcrumbsAdd([
-        {
-          label: $translate.instant('DECISION_DEFINITION_DECISIONS'),
-          href: '#/decisions'
-        },
-        {
-          type: 'decisionDefinition',
-          label: definition.name || definition.key || definition.id,
-          href: '#/decision-definition/'+ definition.id
-        }
-      ]);
+        page.breadcrumbsAdd([
+          {
+            label: $translate.instant('DECISION_DEFINITION_DECISIONS'),
+            href: '#/decisions'
+          },
+          {
+            type: 'decisionDefinition',
+            label: definition.name || definition.key || definition.id,
+            href: '#/decision-definition/' + definition.id
+          }
+        ]);
 
-      page.titleSet([
-        definition.name || definition.key || definition.id,
-        $translate.instant('DECISION_DEFINITION_DEFINITION_VIEW')
-      ].join(' | '));
-    });
+        page.titleSet(
+          [
+            definition.name || definition.key || definition.id,
+            $translate.instant('DECISION_DEFINITION_DEFINITION_VIEW')
+          ].join(' | ')
+        );
+      }
+    );
 
     decisionData.observe(['tableXml'], function(tableXml) {
       $scope.tableXml = tableXml;
     });
 
     $scope.initializeTablePlugins = function() {
-      var tablePlugins = Views.getProviders({ component: 'cockpit.decisionDefinition.table' });
+      var tablePlugins = Views.getProviders({
+        component: 'cockpit.decisionDefinition.table'
+      });
 
       var initData = {
-        decisionDefinition : decisionDefinition,
-        decisionData       : decisionData,
-        tableControl       : $scope.control
+        decisionDefinition: decisionDefinition,
+        decisionData: decisionData,
+        tableControl: $scope.control
       };
 
-      for(var i = 0; i < tablePlugins.length; i++) {
-        if(typeof tablePlugins[i].initialize === 'function') {
+      for (var i = 0; i < tablePlugins.length; i++) {
+        if (typeof tablePlugins[i].initialize === 'function') {
           tablePlugins[i].initialize(initData);
         }
       }
     };
 
-    $scope.decisionDefinitionVars = { read: [ 'decisionDefinition', 'decisionData' ] };
-    $scope.decisionDefinitionTabs = Views.getProviders({ component: 'cockpit.decisionDefinition.tab' });
-    $scope.decisionDefinitionActions = Views.getProviders({ component: 'cockpit.decisionDefinition.action' });
-
+    $scope.decisionDefinitionVars = {
+      read: ['decisionDefinition', 'decisionData']
+    };
+    $scope.decisionDefinitionTabs = Views.getProviders({
+      component: 'cockpit.decisionDefinition.tab'
+    });
+    $scope.decisionDefinitionActions = Views.getProviders({
+      component: 'cockpit.decisionDefinition.action'
+    });
 
     // INITIALIZE PLUGINS
 
-    var decisionPlugins = (
-      Views.getProviders({ component: 'cockpit.decisionDefinition.tab' })).concat(
-      Views.getProviders({ component: 'cockpit.decisionDefinition.action' })
+    var decisionPlugins = Views.getProviders({
+      component: 'cockpit.decisionDefinition.tab'
+    }).concat(
+      Views.getProviders({component: 'cockpit.decisionDefinition.action'})
     );
 
     var initData = {
-      decisionDefinition : decisionDefinition,
-      decisionData       : decisionData
+      decisionDefinition: decisionDefinition,
+      decisionData: decisionData
     };
 
-    for(var i = 0; i < decisionPlugins.length; i++) {
-      if(typeof decisionPlugins[i].initialize === 'function') {
+    for (var i = 0; i < decisionPlugins.length; i++) {
+      if (typeof decisionPlugins[i].initialize === 'function') {
         decisionPlugins[i].initialize(initData);
       }
     }
@@ -188,7 +230,10 @@ var Controller = [
       }
 
       if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.decisionDefinition.tab', id: selectedTabId });
+        var provider = Views.getProvider({
+          component: 'cockpit.decisionDefinition.tab',
+          id: selectedTabId
+        });
         if (provider && tabs.indexOf(provider) != -1) {
           $scope.selectedTab = provider;
           return;
@@ -211,24 +256,27 @@ var Controller = [
       var searches = {
         deployment: deploymentId,
         resourceName: decisionDefinition.resource,
-        deploymentsQuery: JSON.stringify([{
-          type     : 'id',
-          operator : 'eq',
-          value    : deploymentId
-        }])
+        deploymentsQuery: JSON.stringify([
+          {
+            type: 'id',
+            operator: 'eq',
+            value: deploymentId
+          }
+        ])
       };
 
-      return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
+      return routeUtil.redirectTo(path, searches, [
+        'deployment',
+        'resourceName',
+        'deploymentsQuery'
+      ]);
     };
-
-  }];
+  }
+];
 
 var RouteConfig = [
   '$routeProvider',
-  function(
-    $routeProvider
-  ) {
-
+  function($routeProvider) {
     $routeProvider
       .when('/decision-definition/:id', {
         redirectTo: function(params, currentPath, currentSearch) {
@@ -243,18 +291,22 @@ var RouteConfig = [
         controller: Controller,
         authentication: 'required',
         resolve: {
-          decisionDefinition: [ 'ResourceResolver', 'camAPI', '$q',
+          decisionDefinition: [
+            'ResourceResolver',
+            'camAPI',
+            '$q',
             function(ResourceResolver, camAPI, $q) {
               return ResourceResolver.getByRouteParam('id', {
                 name: 'decision definition',
                 resolve: function(id) {
-
                   var deferred = $q.defer();
 
-                  var decisionDefinitionService = camAPI.resource('decision-definition');
+                  var decisionDefinitionService = camAPI.resource(
+                    'decision-definition'
+                  );
 
                   decisionDefinitionService.get(id, function(err, data) {
-                    if(!err) {
+                    if (!err) {
                       deferred.resolve(data);
                     } else {
                       deferred.reject(err);
@@ -264,23 +316,26 @@ var RouteConfig = [
                   return deferred.promise;
                 }
               });
-            }]
+            }
+          ]
         },
         reloadOnSearch: false
       });
-  }];
+  }
+];
 
-var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
-  ViewsProvider.registerDefaultView('cockpit.decisionDefinition.view', {
-    id: 'history',
-    priority: 20,
-    label: 'History',
-    keepSearchParams: []
-  });
-}];
+var ViewConfig = [
+  'ViewsProvider',
+  function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.decisionDefinition.view', {
+      id: 'history',
+      priority: 20,
+      label: 'History',
+      keepSearchParams: []
+    });
+  }
+];
 
-ngModule
-  .config(RouteConfig)
-  .config(ViewConfig);
+ngModule.config(RouteConfig).config(ViewConfig);
 
 module.exports = ngModule;

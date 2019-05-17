@@ -141,7 +141,7 @@ describe('cam-common CamPaginationSearchIntegrationController', function() {
     $rootScope.$broadcast('cam-common:cam-searchable:query-force-change');
 
     expect(instance.resetPage.calledOnce).to.eql(true);
-    expect(instance.executeQueries .calledOnce).to.eql(true);
+    expect(instance.executeQueries.calledOnce).to.eql(true);
   });
 
   describe('onBlockedChange', function() {
@@ -183,9 +183,7 @@ describe('cam-common CamPaginationSearchIntegrationController', function() {
     it('should return truthy when search query changed and is not empty', function() {
       instance.lastSearchQueryString = 's2';
 
-      expect(Boolean(
-        instance.hasSearchQueryStringChanged()
-      )).to.eql(true);
+      expect(Boolean(instance.hasSearchQueryStringChanged())).to.eql(true);
     });
 
     it('should return falsy when last query is undefined and query is empty', function() {
@@ -193,17 +191,13 @@ describe('cam-common CamPaginationSearchIntegrationController', function() {
         searchQuery: '[]'
       });
 
-      expect(Boolean(
-        instance.hasSearchQueryStringChanged()
-      )).to.eql(false);
+      expect(Boolean(instance.hasSearchQueryStringChanged())).to.eql(false);
     });
 
     it('should return false when last query is the same as current', function() {
       instance.lastSearchQueryString = 's1';
 
-      expect(Boolean(
-        instance.hasSearchQueryStringChanged()
-      )).to.eql(false);
+      expect(Boolean(instance.hasSearchQueryStringChanged())).to.eql(false);
     });
   });
 
@@ -416,9 +410,7 @@ describe('cam-common CamPaginationSearchIntegrationController', function() {
 
   describe('executeQueries', function() {
     beforeEach(function() {
-      instance.onSearchChange = sinon.stub().returns(
-        $q.when(5)
-      );
+      instance.onSearchChange = sinon.stub().returns($q.when(5));
       instance.query = 'd';
       instance.blocked = false;
     });
@@ -427,18 +419,14 @@ describe('cam-common CamPaginationSearchIntegrationController', function() {
       instance.query = undefined;
       instance.executeQueries();
 
-      expect(
-        instance.onSearchChange.called
-      ).to.eql(false);
+      expect(instance.onSearchChange.called).to.eql(false);
     });
 
     it('should not execute search when blocked', function() {
       instance.locationChange = true;
       instance.executeQueries();
 
-      expect(
-        instance.locationChange
-      ).to.eql(false);
+      expect(instance.locationChange).to.eql(false);
     });
 
     it('should set pages total', function() {
@@ -446,9 +434,7 @@ describe('cam-common CamPaginationSearchIntegrationController', function() {
 
       $rootScope.$digest();
 
-      expect(
-        instance.pages.total
-      ).to.eql(5);
+      expect(instance.pages.total).to.eql(5);
     });
 
     it('should execute search with query and pages', function() {

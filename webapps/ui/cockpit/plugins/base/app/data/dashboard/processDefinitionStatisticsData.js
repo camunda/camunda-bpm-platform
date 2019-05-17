@@ -19,24 +19,36 @@
 
 var angular = require('angular');
 
-var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
+var Controller = [
+  '$scope',
+  'processData',
+  'ProcessDefinitionResource',
   function($scope, processData, ProcessDefinitionResource) {
-
     processData.provide('processDefinitionsWithRootIncidents', function() {
-      return ProcessDefinitionResource.queryStatistics({ rootIncidents: true }).$promise;
+      return ProcessDefinitionResource.queryStatistics({
+        rootIncidents: true
+      }).$promise;
     });
 
     processData.provide('processDefinitions', function() {
-      return ProcessDefinitionResource.queryStatistics({ incidents: true }).$promise;
+      return ProcessDefinitionResource.queryStatistics({
+        incidents: true
+      }).$promise;
     });
 
-    processData.provide('processDefinitionStatistics', ['processDefinitions', function(processDefinitions) {
-      return aggregateStatistics(processDefinitions);
-    }]);
+    processData.provide('processDefinitionStatistics', [
+      'processDefinitions',
+      function(processDefinitions) {
+        return aggregateStatistics(processDefinitions);
+      }
+    ]);
 
-    processData.provide('processDefinitionWithRootIncidentsStatistics', ['processDefinitionsWithRootIncidents', function(processDefinitions) {
-      return aggregateStatistics(processDefinitions);
-    }]);
+    processData.provide('processDefinitionWithRootIncidentsStatistics', [
+      'processDefinitionsWithRootIncidents',
+      function(processDefinitions) {
+        return aggregateStatistics(processDefinitions);
+      }
+    ]);
 
     /**
      * Returns an aggregated list over the statistics.
@@ -62,17 +74,20 @@ var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
 
       // iterate over assigned statistics
       angular.forEach(statistics, function(currentStatistic) {
-
         // get the statistics to the definition key of the current item
-        var statisticsForDefinition = statisticsResult[currentStatistic.definition.key];
+        var statisticsForDefinition =
+          statisticsResult[currentStatistic.definition.key];
 
-        if(!statisticsForDefinition) {
+        if (!statisticsForDefinition) {
           // create an array for tenants if not exists
           statisticsResult[currentStatistic.definition.key] = [];
         }
 
         // get the statistic for the tenant id of the current item
-        var statistic = statisticsResult[currentStatistic.definition.key][currentStatistic.definition.tenantId];
+        var statistic =
+          statisticsResult[currentStatistic.definition.key][
+            currentStatistic.definition.tenantId
+          ];
 
         if (!statistic) {
           // if there does not exists a statistic to the definition key
@@ -86,20 +101,24 @@ var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
           }
 
           // put the statistic into the map of statistics
-          statisticsResult[statistic.definition.key][currentStatistic.definition.tenantId] = statistic;
+          statisticsResult[statistic.definition.key][
+            currentStatistic.definition.tenantId
+          ] = statistic;
 
           // add the statistic to the result set
           result.push(statistic);
-
         } else {
-          if (currentStatistic.definition.version > statistic.definition.version) {
+          if (
+            currentStatistic.definition.version > statistic.definition.version
+          ) {
             // if the version of the current statistic, then create copy from them.
             statistic.definition = currentStatistic.definition;
             statistic.id = currentStatistic.id;
 
             // if there does not exist a name then set definition key
             // as the name of the definition.
-            statistic.definition.name = statistic.definition.name || statistic.definition.key;
+            statistic.definition.name =
+              statistic.definition.name || statistic.definition.key;
           }
 
           // Add the saved values to the corresponding values of the current statistic
@@ -111,10 +130,11 @@ var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
             var incidentCount = incident.incidentCount;
 
             var newIncident = true;
-            for(var i = 0; i < statistic.incidents.length; i++) {
+            for (var i = 0; i < statistic.incidents.length; i++) {
               var statisticIncident = statistic.incidents[i];
               if (statisticIncident.incidentType == incidentType) {
-                statisticIncident.incidentCount = incidentCount + statisticIncident.incidentCount;
+                statisticIncident.incidentCount =
+                  incidentCount + statisticIncident.incidentCount;
                 newIncident = false;
               }
             }
@@ -123,19 +143,16 @@ var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
               // merge the incidents
               statistic.incidents.push(incident);
             }
-
           });
-
         }
       });
 
       return result;
     };
-
-  }];
+  }
+];
 
 var Configuration = function PluginConfiguration(DataProvider) {
-
   DataProvider.registerData('cockpit.dashboard.data', {
     id: 'process-definition-statistics-data',
     controller: Controller

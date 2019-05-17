@@ -20,13 +20,14 @@
 var Page = require('./../dashboard-view');
 
 module.exports = Page.extend({
-
   formElement: function() {
     return element(by.css('[cam-tasklist-task]'));
   },
 
   noTaskInfoText: function() {
-    return this.formElement().element(by.css('.no-task')).getText();
+    return this.formElement()
+      .element(by.css('.no-task'))
+      .getText();
   },
 
   waitForTaskDetailView: function() {
@@ -35,11 +36,15 @@ module.exports = Page.extend({
   },
 
   taskName: function() {
-    return this.formElement().element(by.binding('task.name')).getText();
+    return this.formElement()
+      .element(by.binding('task.name'))
+      .getText();
   },
 
   processName: function() {
-    return this.formElement().element(by.binding('task._embedded.processDefinition[0].name')).getText();
+    return this.formElement()
+      .element(by.binding('task._embedded.processDefinition[0].name'))
+      .getText();
   },
 
   commentModalFormElement: function() {
@@ -51,16 +56,19 @@ module.exports = Page.extend({
   },
 
   commentInputField: function(inputValue) {
-    var inputField = this.commentModalFormElement().element(by.model('comment.message'));
+    var inputField = this.commentModalFormElement().element(
+      by.model('comment.message')
+    );
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
 
   commentSaveButton: function() {
-    return this.commentModalFormElement().element(by.css('[ng-click="submit()"]'));
+    return this.commentModalFormElement().element(
+      by.css('[ng-click="submit()"]')
+    );
   },
 
   addComment: function(comment) {
@@ -86,7 +94,9 @@ module.exports = Page.extend({
   },
 
   isTaskClaimed: function() {
-    return element(by.css('.task-card .assignee[ng-if="task.assignee"]')).isPresent();
+    return element(
+      by.css('.task-card .assignee[ng-if="task.assignee"]')
+    ).isPresent();
   },
 
   claimedUserField: function() {
@@ -109,7 +119,11 @@ module.exports = Page.extend({
     this.clickClaimedUserField();
     this.claimedUserFieldEditMode().clear();
     this.claimedUserFieldEditMode().sendKeys(userName);
-    element(by.css('body > .cam-widget-inline-field > [ng-click="applyChange($event);"]')).click();
+    element(
+      by.css(
+        'body > .cam-widget-inline-field > [ng-click="applyChange($event);"]'
+      )
+    ).click();
   },
 
   cancelEditClaimedUser: function() {
@@ -121,21 +135,33 @@ module.exports = Page.extend({
   },
 
   editDate: function(newTime, newDate) {
-    var datePickerButton = element(by.css('.cam-widget-inline-field.btn-group'));
-    var datePickerField = element(by.css('.cam-widget-inline-field.field-control'));
+    var datePickerButton = element(
+      by.css('.cam-widget-inline-field.btn-group')
+    );
+    var datePickerField = element(
+      by.css('.cam-widget-inline-field.field-control')
+    );
     this.waitForElementToBeVisible(datePickerField);
 
     if (newTime) {
       var timeValue = newTime.split(':');
       var timePickerElement = datePickerField.element(by.css('.timepicker'));
 
-      timePickerElement.element(by.model('hours')).clear().sendKeys(timeValue[0]);
-      timePickerElement.element(by.model('minutes')).clear().sendKeys(timeValue[1]);
+      timePickerElement
+        .element(by.model('hours'))
+        .clear()
+        .sendKeys(timeValue[0]);
+      timePickerElement
+        .element(by.model('minutes'))
+        .clear()
+        .sendKeys(timeValue[1]);
 
       // ToDo: implement date editing
     }
 
-    datePickerButton.element(by.css('[ng-click*="applyChange($event)"]')).click();
+    datePickerButton
+      .element(by.css('[ng-click*="applyChange($event)"]'))
+      .click();
     this.waitForElementToBeNotPresent(datePickerField);
   },
 
@@ -144,18 +170,27 @@ module.exports = Page.extend({
   },
 
   setFollowUpDate: function(newTime, newDate) {
-    this.followUpDateElement().element(by.css('[ng-click*="startEditing()"]')).click();
+    this.followUpDateElement()
+      .element(by.css('[ng-click*="startEditing()"]'))
+      .click();
     this.editDate(newTime, newDate);
     browser.sleep(500);
   },
 
   followUpDate: function() {
-    return this.followUpDateElement().element(by.css('.view-value')).getText();
+    return this.followUpDateElement()
+      .element(by.css('.view-value'))
+      .getText();
   },
 
   followUpDateTooltip: function() {
-    var tooltipTriggerer = this.followUpDateElement().element(by.css('[am-time-ago="task.followUp"]'));
-    browser.actions().mouseMove(tooltipTriggerer).perform();
+    var tooltipTriggerer = this.followUpDateElement().element(
+      by.css('[am-time-ago="task.followUp"]')
+    );
+    browser
+      .actions()
+      .mouseMove(tooltipTriggerer)
+      .perform();
 
     var tooltipWidget = element(by.css('body > [tooltip-popup]'));
     this.waitForElementToBeVisible(tooltipWidget);
@@ -167,18 +202,27 @@ module.exports = Page.extend({
   },
 
   setDueDate: function(newTime, newDate) {
-    this.dueDateElement().element(by.css('[ng-click*="startEditing()"]')).click();
+    this.dueDateElement()
+      .element(by.css('[ng-click*="startEditing()"]'))
+      .click();
     this.editDate(newTime, newDate);
     browser.sleep(500);
   },
 
   dueDate: function() {
-    return this.dueDateElement().element(by.css('.view-value')).getText();
+    return this.dueDateElement()
+      .element(by.css('.view-value'))
+      .getText();
   },
 
   dueDateTooltip: function() {
-    var tooltipTriggerer = this.dueDateElement().element(by.css('[am-time-ago="task.due"]'));
-    browser.actions().mouseMove(tooltipTriggerer).perform();
+    var tooltipTriggerer = this.dueDateElement().element(
+      by.css('[am-time-ago="task.due"]')
+    );
+    browser
+      .actions()
+      .mouseMove(tooltipTriggerer)
+      .perform();
 
     var tooltipWidget = element(by.css('body > [tooltip-popup]'));
     this.waitForElementToBeVisible(tooltipWidget);
@@ -188,5 +232,4 @@ module.exports = Page.extend({
   taskTenantIdField: function() {
     return this.formElement().element(by.css('.tenant-id'));
   }
-
 });

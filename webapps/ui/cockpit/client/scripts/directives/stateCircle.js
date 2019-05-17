@@ -30,14 +30,13 @@ module.exports = function() {
       function updateStateCircle() {
         var incidents = scope.$eval(attrs.incidents);
         var running = scope.$eval(attrs.running);
-        var incidentsForTypes = scope.$eval(attrs.incidentsForTypes) ||  [];
+        var incidentsForTypes = scope.$eval(attrs.incidentsForTypes) || [];
 
-        if(running) {
+        if (running) {
           return setStateToBlue();
         }
 
         if (!!incidents && incidents.length > 0) {
-
           // In that case 'incidentsForTypes.length === 0' means
           // that the state has to be set to red independent
           // from the incident type.
@@ -49,16 +48,15 @@ module.exports = function() {
 
           // In the other case we check whether there exist
           // at least one incident to one of the incident types.
-          for(var i = 0; i < incidents.length; i++) {
+          for (var i = 0; i < incidents.length; i++) {
             var incident = incidents[i];
 
-            if(incident.incidentType.indexOf(incidentsForTypes) != -1) {
+            if (incident.incidentType.indexOf(incidentsForTypes) != -1) {
               if (incident.incidentCount > 0) {
                 setStateToRed();
                 return;
               }
             }
-
           }
         }
         // If there does not exist any incident, the state is green.

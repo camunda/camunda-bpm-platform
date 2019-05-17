@@ -24,8 +24,26 @@ var template = fs.readFileSync(__dirname + '/template.html', 'utf8');
 
 module.exports = function(viewContext) {
   return [
-    '$scope', '$timeout', '$location', '$translate', 'search', 'control', 'processData', 'processDiagram', 'PluginProcessInstanceResource',
-    function($scope, $timeout, $location, $translate, search, control, processData, processDiagram, PluginProcessInstanceResource) {
+    '$scope',
+    '$timeout',
+    '$location',
+    '$translate',
+    'search',
+    'control',
+    'processData',
+    'processDiagram',
+    'PluginProcessInstanceResource',
+    function(
+      $scope,
+      $timeout,
+      $location,
+      $translate,
+      search,
+      control,
+      processData,
+      processDiagram,
+      PluginProcessInstanceResource
+    ) {
       /**
        * @returns {Array} BPMN Elements that are flow nodes
        */
@@ -48,13 +66,13 @@ module.exports = function(viewContext) {
        */
       function showCalledPInstances(activities) {
         var params = angular.copy(search());
-        viewContext === 'history' ?
-          params.detailsTab = TAB_NAME :
-          params.tab = TAB_NAME;
+        viewContext === 'history'
+          ? (params.detailsTab = TAB_NAME)
+          : (params.tab = TAB_NAME);
         search.updateSilently(params);
 
         $scope.processData.set('filter', {
-          activityIds: [ activities[0].activityId ],
+          activityIds: [activities[0].activityId],
           activityInstanceIds: activities.map(function(activity) {
             return activity.id;
           })
@@ -77,7 +95,7 @@ module.exports = function(viewContext) {
         var applyFunction = function() {
           arguments[0].apply(this, Array.prototype.slice.call(arguments, 1));
           var phase = $scope.$root.$$phase;
-          if(phase !== '$apply' && phase !== '$digest') {
+          if (phase !== '$apply' && phase !== '$digest') {
             $scope.$apply();
           }
         };
@@ -105,15 +123,19 @@ module.exports = function(viewContext) {
         };
 
         var redirectToCalledPInstance = function(activityInstance) {
-          var url = '/process-instance/' + activityInstance.calledProcessInstanceId + '/' + viewContext;
+          var url =
+            '/process-instance/' +
+            activityInstance.calledProcessInstanceId +
+            '/' +
+            viewContext;
           $location.url(url);
         };
 
         var clickListener = function() {
           buttonOverlay.tooltip('hide');
-          return activityInstances.length > 1 ?
-            applyFunction(showCalledPInstances, activityInstances):
-            applyFunction(redirectToCalledPInstance, activityInstances[0]);
+          return activityInstances.length > 1
+            ? applyFunction(showCalledPInstances, activityInstances)
+            : applyFunction(redirectToCalledPInstance, activityInstances[0]);
         };
 
         // attach diagramNode listeners
@@ -147,7 +169,9 @@ module.exports = function(viewContext) {
 
           overlaysNodes[id].tooltip({
             container: 'body',
-            title: $translate.instant('PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES'),
+            title: $translate.instant(
+              'PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES'
+            ),
             placement: 'top',
             animation: false
           });
@@ -181,8 +205,10 @@ module.exports = function(viewContext) {
        */
       var addOverlays = function(callActivityToInstancesMap) {
         Object.keys(callActivityToInstancesMap).map(function(id) {
-          return callActivityToInstancesMap[id][0].calledProcessInstanceId &&
-            addOverlayForSingleElement(id, callActivityToInstancesMap[id]);
+          return (
+            callActivityToInstancesMap[id][0].calledProcessInstanceId &&
+            addOverlayForSingleElement(id, callActivityToInstancesMap[id])
+          );
         });
       };
 
@@ -193,39 +219,57 @@ module.exports = function(viewContext) {
        */
       var getCallActivitiesMap = function(flowNodes, activityIdToInstancesMap) {
         return flowNodes.reduce(function(map, id) {
-          if(activityIdToInstancesMap[id] && activityIdToInstancesMap[id].length > 0) {
+          if (
+            activityIdToInstancesMap[id] &&
+            activityIdToInstancesMap[id].length > 0
+          ) {
             map[id] = activityIdToInstancesMap[id];
           }
           return map;
         }, {});
       };
 
-
-      if(viewContext === 'history') {
-        flowNodes.length && processData.observe('activityIdToInstancesMap', function(activityIdToInstancesMap) {
-          callActivityToInstancesMap = getCallActivitiesMap(flowNodes, activityIdToInstancesMap);
-          addOverlays(callActivityToInstancesMap);
-        });
+      if (viewContext === 'history') {
+        flowNodes.length &&
+          processData.observe('activityIdToInstancesMap', function(
+            activityIdToInstancesMap
+          ) {
+            callActivityToInstancesMap = getCallActivitiesMap(
+              flowNodes,
+              activityIdToInstancesMap
+            );
+            addOverlays(callActivityToInstancesMap);
+          });
       } else {
-        flowNodes.length && processData.observe(['activityIdToInstancesMap', 'processInstance'], function(activityIdToInstancesMap, processInstance) {
-          callActivityToInstancesMap = getCallActivitiesMap(flowNodes, activityIdToInstancesMap);
+        flowNodes.length &&
+          processData.observe(
+            ['activityIdToInstancesMap', 'processInstance'],
+            function(activityIdToInstancesMap, processInstance) {
+              callActivityToInstancesMap = getCallActivitiesMap(
+                flowNodes,
+                activityIdToInstancesMap
+              );
 
-          // For each callActivity, add calledProcessInstanceId to the first activity instance
-          //  this is done so that it can be used to redirect to the calledProcessInstance.
-          PluginProcessInstanceResource
-            .processInstances({ id: processInstance.id }, function(calledPInstances) {
-              calledPInstances.forEach(function(calledPInstance) {
-                var instances = callActivityToInstancesMap[calledPInstance.callActivityId];
-                if (instances && instances.length) {
-                  instances[0].calledProcessInstanceId = calledPInstance.id;
+              // For each callActivity, add calledProcessInstanceId to the first activity instance
+              //  this is done so that it can be used to redirect to the calledProcessInstance.
+              PluginProcessInstanceResource.processInstances(
+                {id: processInstance.id},
+                function(calledPInstances) {
+                  calledPInstances.forEach(function(calledPInstance) {
+                    var instances =
+                      callActivityToInstancesMap[
+                        calledPInstance.callActivityId
+                      ];
+                    if (instances && instances.length) {
+                      instances[0].calledProcessInstanceId = calledPInstance.id;
+                    }
+                  });
+                  return addOverlays(callActivityToInstancesMap);
                 }
-              });
-              return addOverlays(callActivityToInstancesMap);
-            });
-        });
-
+              );
+            }
+          );
       }
-
     }
   ];
 };

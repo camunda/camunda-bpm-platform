@@ -18,8 +18,8 @@
 'use strict';
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    camLayoutCtrl = require('./controllers/cam-layout-ctrl'),
-    camHeaderViewsCtrl = require('./controllers/cam-header-views-ctrl');
+  camLayoutCtrl = require('./controllers/cam-layout-ctrl'),
+  camHeaderViewsCtrl = require('./controllers/cam-header-views-ctrl');
 
 require('camunda-commons-ui/lib/util/index');
 

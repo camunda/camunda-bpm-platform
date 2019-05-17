@@ -22,7 +22,6 @@ module.exports = function(config, watchConf) {
     livereload: false
   };
 
-
   watchConf.cockpit_assets = {
     options: options,
     files: [
@@ -30,10 +29,7 @@ module.exports = function(config, watchConf) {
       '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/index.html',
       '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/favicon.ico'
     ],
-    tasks: [
-      'copy:cockpit_assets',
-      'copy:cockpit_index'
-    ]
+    tasks: ['copy:cockpit_assets', 'copy:cockpit_index']
   };
 
   watchConf.cockpit_styles = {
@@ -42,10 +38,7 @@ module.exports = function(config, watchConf) {
       '<%= pkg.gruntConfig.cockpitSourceDir %>/styles/**/*.{css,less}',
       '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.{css,less}'
     ],
-    tasks: [
-      'less:cockpit_styles',
-      'less:cockpit_styles_components'
-    ]
+    tasks: ['less:cockpit_styles', 'less:cockpit_styles_components']
   };
 
   watchConf.cockpit_plugin_styles = {
@@ -53,31 +46,20 @@ module.exports = function(config, watchConf) {
     files: [
       '<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/**/*.{css,less}'
     ],
-    tasks: [
-      'less:cockpit_plugin_styles'
-    ]
+    tasks: ['less:cockpit_plugin_styles']
   };
 
   watchConf.cockpit_scripts_lint = {
     options: options,
-    files: [
-      '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.js'
-    ],
-    tasks: [
-      'newer:eslint:cockpit_scripts'
-    ]
+    files: ['<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.js'],
+    tasks: ['newer:eslint:cockpit_scripts']
   };
 
   watchConf.cockpit_plugins_lint = {
     options: options,
-    files: [
-      '<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/**/*.js'
-    ],
-    tasks: [
-      'newer:eslint:cockpit_plugins'
-    ]
+    files: ['<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/**/*.js'],
+    tasks: ['newer:eslint:cockpit_plugins']
   };
-
 
   watchConf.cockpit_dist = {
     options: {

@@ -28,4 +28,3 @@ module.exports.general = new GeneralPage();
 module.exports.licenseKey = new LicenseKeyPage();
 module.exports.authentication = new AuthenticationPage();
 module.exports.executionMetrics = new MetricsPage();
-

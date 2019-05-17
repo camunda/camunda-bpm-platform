@@ -56,14 +56,20 @@ describe('cam-common CamPaginationController', function() {
   }));
 
   it('should initialize pagination', function() {
-    expect(paginationUtils.initializePaginationInController.calledOnce).to.eql(true);
+    expect(paginationUtils.initializePaginationInController.calledOnce).to.eql(
+      true
+    );
   });
 
   it('should expose total and pages scope properties', function() {
-    expect(exposeScopeProperties.calledWith($scope, instance,  ['total', 'pages'])).to.eql(true);
+    expect(
+      exposeScopeProperties.calledWith($scope, instance, ['total', 'pages'])
+    ).to.eql(true);
   });
 
   it('should fire initial pages change', function() {
-    expect($scope.onPaginationChange.calledWith({pages: $scope.pages})).to.eql(true);
+    expect($scope.onPaginationChange.calledWith({pages: $scope.pages})).to.eql(
+      true
+    );
   });
 });

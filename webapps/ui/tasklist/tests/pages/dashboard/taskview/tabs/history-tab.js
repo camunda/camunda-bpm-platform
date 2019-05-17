@@ -20,7 +20,6 @@
 var Tab = require('./tab');
 
 module.exports = Tab.extend({
-
   tabIndex: 1,
 
   historyFormElement: function() {
@@ -32,38 +31,60 @@ module.exports = Tab.extend({
   },
 
   eventType: function(item) {
-    return this.historyList().get(item).element(by.binding('event.type')).getText();
+    return this.historyList()
+      .get(item)
+      .element(by.binding('event.type'))
+      .getText();
   },
 
   operationTime: function(item) {
-    return this.historyList().get(item).element(by.binding('event.time')).getText();
+    return this.historyList()
+      .get(item)
+      .element(by.binding('event.time'))
+      .getText();
   },
 
   operationUser: function(item) {
-    return this.historyList().get(item).element(by.binding('event.userId')).getText();
+    return this.historyList()
+      .get(item)
+      .element(by.binding('event.userId'))
+      .getText();
   },
 
   commentMessage: function(item) {
-    return this.historyList().get(item).element(by.css('[nl2br="event.message"]')).getText();
+    return this.historyList()
+      .get(item)
+      .element(by.css('[nl2br="event.message"]'))
+      .getText();
   },
 
   historySubEventList: function(item) {
-    return this.historyList().get(item).all(by.repeater('subEvent in event.subEvents'));
+    return this.historyList()
+      .get(item)
+      .all(by.repeater('subEvent in event.subEvents'));
   },
 
   subEventType: function(item, subItem) {
     subItem = subItem || 0;
-    return this.historySubEventList(item).get(subItem).element(by.css('.event-property')).getText();
+    return this.historySubEventList(item)
+      .get(subItem)
+      .element(by.css('.event-property'))
+      .getText();
   },
 
   subEventNewValue: function(item, subItem) {
     subItem = subItem || 0;
-    return this.historySubEventList(item).get(subItem).element(by.binding('subEvent.newValue')).getText();
+    return this.historySubEventList(item)
+      .get(subItem)
+      .element(by.binding('subEvent.newValue'))
+      .getText();
   },
 
   subEventOriginalValue: function(item, subItem) {
     subItem = subItem || 0;
-    return this.historySubEventList(item).get(subItem).element(by.binding('subEvent.orgValue')).getText();
+    return this.historySubEventList(item)
+      .get(subItem)
+      .element(by.binding('subEvent.orgValue'))
+      .getText();
   }
-
 });

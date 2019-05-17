@@ -23,7 +23,7 @@ module.exports = function() {
   return function(moduleName) {
     try {
       return !!angular.module(moduleName);
-    } catch(err) {
+    } catch (err) {
       return false;
     }
   };

@@ -24,7 +24,6 @@ var dashboardPage = require('../pages/dashboard');
 var processesPage = require('../pages/processes');
 var definitionPage = require('../pages/process-definition');
 
-
 describe('Cockpit Process Definition Filter Spec', function() {
   afterEach(function() {
     definitionPage.search.clearSearch();
@@ -45,16 +44,27 @@ describe('Cockpit Process Definition Filter Spec', function() {
       definitionPage.search.createSearch('Variable', '=', '1.5', 'test');
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(2);
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(2);
     });
 
     it('should filter by string', function() {
       // when
-      definitionPage.search.createSearch('Variable', '=', 'abc dfg', 'myString');
+      definitionPage.search.createSearch(
+        'Variable',
+        '=',
+        'abc dfg',
+        'myString'
+      );
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(2);
-      expect(definitionPage.processInstancesTab.businessKey(1).getText()).to.eventually.eql('Instance2');
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(2);
+      expect(
+        definitionPage.processInstancesTab.businessKey(1).getText()
+      ).to.eventually.eql('Instance2');
     });
 
     it('should add like filter', function() {
@@ -62,8 +72,12 @@ describe('Cockpit Process Definition Filter Spec', function() {
       definitionPage.search.createSearch('Variable', 'like', '123', 'myString');
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('Instance1');
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(1);
+      expect(
+        definitionPage.processInstancesTab.businessKey(0).getText()
+      ).to.eventually.eql('Instance1');
     });
   });
 
@@ -79,11 +93,15 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
     it('should add business key filter', function() {
       // when
-      definitionPage.search.createSearch('Business Key',  'myBusinessKey');
+      definitionPage.search.createSearch('Business Key', 'myBusinessKey');
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('myBusinessKey');
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(1);
+      expect(
+        definitionPage.processInstancesTab.businessKey(0).getText()
+      ).to.eventually.eql('myBusinessKey');
     });
 
     it('should combine variable filter and business key filter', function() {
@@ -91,14 +109,20 @@ describe('Cockpit Process Definition Filter Spec', function() {
       definitionPage.search.createSearch('Variable', '>', '1.49', 'test');
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(2);
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(2);
 
       // when
       definitionPage.search.createSearch('Business Key', 'Instance1');
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('Instance1');
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(1);
+      expect(
+        definitionPage.processInstancesTab.businessKey(0).getText()
+      ).to.eventually.eql('Instance1');
     });
   });
 
@@ -118,21 +142,38 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
     it('should filter date', function() {
       // when
-      definitionPage.search.createSearch('Variable', '=', '2011-11-11T11:11:11', 'myDate');
+      definitionPage.search.createSearch(
+        'Variable',
+        '=',
+        '2011-11-11T11:11:11',
+        'myDate'
+      );
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('myBusinessKey');
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(1);
+      expect(
+        definitionPage.processInstancesTab.businessKey(0).getText()
+      ).to.eventually.eql('myBusinessKey');
     });
-
 
     it('should filter long variable', function() {
       // when
-      definitionPage.search.createSearch('Variable', '=', '1234567890987654321', 'extraLong');
+      definitionPage.search.createSearch(
+        'Variable',
+        '=',
+        '1234567890987654321',
+        'extraLong'
+      );
 
       // then
-      expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('Instance1');
+      expect(
+        definitionPage.processInstancesTab.table().count()
+      ).to.eventually.eql(1);
+      expect(
+        definitionPage.processInstancesTab.businessKey(0).getText()
+      ).to.eventually.eql('Instance1');
     });
   });
 });

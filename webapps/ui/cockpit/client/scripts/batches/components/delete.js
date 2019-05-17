@@ -20,10 +20,8 @@
 var events = require('./events');
 
 var Delete = function() {
-
   this.cascade = false;
   this.disable = false;
-
 };
 
 Delete.prototype.cancel = function() {

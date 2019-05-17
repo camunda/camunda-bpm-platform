@@ -17,20 +17,35 @@
 
 'use strict';
 module.exports = [
-  '$scope', '$location', 'Notifications', 'ProcessInstanceResource',
-  '$uibModalInstance', 'processInstance', 'processData', 'Views', '$translate',
+  '$scope',
+  '$location',
+  'Notifications',
+  'ProcessInstanceResource',
+  '$uibModalInstance',
+  'processInstance',
+  'processData',
+  'Views',
+  '$translate',
   'configuration',
-  function($scope,   $location,   Notifications,   ProcessInstanceResource,
-    $modalInstance,   processInstance,   processData,   Views, $translate,
-    configuration) {
-
+  function(
+    $scope,
+    $location,
+    Notifications,
+    ProcessInstanceResource,
+    $modalInstance,
+    processInstance,
+    processData,
+    Views,
+    $translate,
+    configuration
+  ) {
     var BEFORE_CANCEL = 'beforeCancellation',
-        PERFORM_CANCEL = 'performCancellation',
-        CANCEL_SUCCESS = 'cancellationSuccess',
-        CANCEL_FAILED = 'cancellationFailed';
+      PERFORM_CANCEL = 'performCancellation',
+      CANCEL_SUCCESS = 'cancellationSuccess',
+      CANCEL_FAILED = 'cancellationFailed';
 
     var SKIP_CUSTOM_LISTENERS = configuration.getSkipCustomListeners();
-    var SKIP_IO_MAPPINGS = $scope.SKIP_IO_MAPPINGS = configuration.getSkipIoMappings();
+    var SKIP_IO_MAPPINGS = ($scope.SKIP_IO_MAPPINGS = configuration.getSkipIoMappings());
 
     $scope.processInstance = processInstance;
 
@@ -48,13 +63,15 @@ module.exports = [
     });
 
     cancelProcessInstanceData.provide('subProcessInstances', function() {
-      return ProcessInstanceResource.query({
-        firstResult: 0,
-        maxResults: 5
-      }, {
-        superProcessInstance:
-        processInstance.id
-      }).$promise;
+      return ProcessInstanceResource.query(
+        {
+          firstResult: 0,
+          maxResults: 5
+        },
+        {
+          superProcessInstance: processInstance.id
+        }
+      ).$promise;
     });
 
     cancelProcessInstanceData.provide('subProcessInstancesCount', function() {
@@ -63,26 +80,41 @@ module.exports = [
       }).$promise;
     });
 
-    cancelProcessInstanceData.observe(['subProcessInstancesCount', 'subProcessInstances'], function(subProcessInstancesCount, subProcessInstances) {
-      $scope.subProcessInstancesCount = subProcessInstancesCount.count;
-      $scope.subProcessInstances = subProcessInstances;
+    cancelProcessInstanceData.observe(
+      ['subProcessInstancesCount', 'subProcessInstances'],
+      function(subProcessInstancesCount, subProcessInstances) {
+        $scope.subProcessInstancesCount = subProcessInstancesCount.count;
+        $scope.subProcessInstances = subProcessInstances;
 
-      $scope.status = BEFORE_CANCEL;
-    });
+        $scope.status = BEFORE_CANCEL;
+      }
+    );
 
     $scope.cancelProcessInstance = function() {
       $scope.status = PERFORM_CANCEL;
 
-      $scope.processInstance.$delete($scope.options, function() {
-        // success
-        $scope.status = CANCEL_SUCCESS;
-        Notifications.addMessage({'status': $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_DELETED'), 'message': $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_1')});
-
-      }, function(err) {
-        // failure
-        $scope.status = CANCEL_FAILED;
-        Notifications.addError({'status': $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_FAILED'), 'message': $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_2', { message: err.data.message }), 'exclusive': ['type']});
-      });
+      $scope.processInstance.$delete(
+        $scope.options,
+        function() {
+          // success
+          $scope.status = CANCEL_SUCCESS;
+          Notifications.addMessage({
+            status: $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_DELETED'),
+            message: $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_1')
+          });
+        },
+        function(err) {
+          // failure
+          $scope.status = CANCEL_FAILED;
+          Notifications.addError({
+            status: $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_FAILED'),
+            message: $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_2', {
+              message: err.data.message
+            }),
+            exclusive: ['type']
+          });
+        }
+      );
     };
 
     $scope.close = function(status) {
@@ -103,8 +135,7 @@ module.exports = [
           // keep search params
           search = $location.search();
           path = '/process-instance/' + processInstance.id + '/history';
-        }
-        else {
+        } else {
           // or redirect to the corresponding process definition overview.
           path = '/process-definition/' + processInstance.definitionId;
         }
@@ -114,4 +145,5 @@ module.exports = [
         $location.replace();
       }
     };
-  }];
+  }
+];

@@ -45,17 +45,15 @@ HoverArea.prototype.addHoverListener = function(title, listener) {
   this._listeners.push(entry);
   this._fireEntry(entry);
 
-  return (function() {
+  return function() {
     this._listeners = this._listeners.filter(function(entry) {
       return entry.listener !== listener;
     });
-  }).bind(this);
+  }.bind(this);
 };
 
 HoverArea.prototype._fireListeners = function() {
-  this._listeners.forEach(
-    this._fireEntry.bind(this)
-  );
+  this._listeners.forEach(this._fireEntry.bind(this));
 };
 
 HoverArea.prototype._fireEntry = function(entry) {

@@ -30,49 +30,48 @@ var Controller = [
   'page',
   '$injector',
   '$translate',
-  function(
-    $scope,
-    Views,
-    page,
-    $injector,
-    $translate
-  ) {
+  function($scope, Views, page, $injector, $translate) {
     var $rootScope = $scope.$root;
 
     $scope.dashboardPlugins = Views.getProviders({
       component: 'admin.dashboard.section'
-    })
-      .map(function(plugin) {
-        if (isArray(plugin.access)) {
-          var fn = $injector.invoke(plugin.access);
+    }).map(function(plugin) {
+      if (isArray(plugin.access)) {
+        var fn = $injector.invoke(plugin.access);
 
-          fn(function(err, access) {
-            if (err) { throw err; }
+        fn(function(err, access) {
+          if (err) {
+            throw err;
+          }
 
-            plugin.accessible = access;
-          });
-        }
+          plugin.accessible = access;
+        });
+      }
 
-        // accessible by default in case there's no callback
-        else {
-          plugin.accessible = true;
-        }
+      // accessible by default in case there's no callback
+      else {
+        plugin.accessible = true;
+      }
 
-        return plugin;
-      });
+      return plugin;
+    });
 
     $rootScope.showBreadcrumbs = false;
 
     page.breadcrumbsClear();
 
     page.titleSet($translate.instant('DASHBOARD_DASHBOARD'));
-  }];
+  }
+];
 
-module.exports = [ '$routeProvider', function($routeProvider) {
-  $routeProvider.when('/', {
-    template: template,
-    controller: Controller,
-    authentication: 'required',
-    reloadOnSearch: false
-  });
-}];
+module.exports = [
+  '$routeProvider',
+  function($routeProvider) {
+    $routeProvider.when('/', {
+      template: template,
+      controller: Controller,
+      authentication: 'required',
+      reloadOnSearch: false
+    });
+  }
+];

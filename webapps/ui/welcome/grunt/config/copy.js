@@ -17,34 +17,39 @@
 
 'use strict';
 
-var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
-var requireConfExp =  /require-conf.js$/;
+var commentLineExp = /^[\s]*<!-- (\/|#) (CE|EE)/;
+var requireConfExp = /require-conf.js$/;
 
 module.exports = function(config, copyConf) {
   var grunt = config.grunt;
 
   var path = require('path');
-  var now = (new Date()).getTime();
-  var version = grunt.file.readJSON(path.resolve(__dirname, '../../../../package.json')).version;
-  version = (version.indexOf('-SNAPSHOT') > -1 ? (version +'-'+ now) : version);
-
+  var now = new Date().getTime();
+  var version = grunt.file.readJSON(
+    path.resolve(__dirname, '../../../../package.json')
+  ).version;
+  version = version.indexOf('-SNAPSHOT') > -1 ? version + '-' + now : version;
 
   function prod() {
     return grunt.config('buildMode') === 'prod';
   }
 
   function cacheBust(content, srcpath) {
-    if (srcpath.slice(-4) !== 'html') { return content; }
+    if (srcpath.slice(-4) !== 'html') {
+      return content;
+    }
     return content.split('$GRUNT_CACHE_BUST').join(prod() ? version : now);
   }
 
   function fileProcessing(content, srcpath) {
-    if(prod()) {
+    if (prod()) {
       // removes the template comments
       content = content
-        .split('\n').filter(function(line) {
+        .split('\n')
+        .filter(function(line) {
           return !commentLineExp.test(line);
-        }).join('\n');
+        })
+        .join('\n');
     }
 
     content = cacheBust(content, srcpath);
@@ -60,10 +65,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: '<%= pkg.gruntConfig.welcomeSourceDir %>/scripts/',
-        src: [
-          'index.html',
-          'camunda-welcome-bootstrap.js'
-        ],
+        src: ['index.html', 'camunda-welcome-bootstrap.js'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/'
       }
     ]
@@ -83,9 +85,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: '<%= pkg.gruntConfig.welcomeSourceDir %>/',
-        src:  [
-          '{fonts,images}/**/*.*'
-        ],
+        src: ['{fonts,images}/**/*.*'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/assets'
       },
 
@@ -93,9 +93,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: '<%= pkg.gruntConfig.commonsUiDir %>/resources/img/',
-        src:  [
-          '*.*'
-        ],
+        src: ['*.*'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/assets/images'
       },
 
@@ -103,9 +101,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: '<%= pkg.gruntConfig.welcomeSourceDir %>/vendor/dojo',
-        src:  [
-          '**/*.*'
-        ],
+        src: ['**/*.*'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/assets/vendor'
       },
 
@@ -113,18 +109,14 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: 'node_modules/bootstrap/fonts',
-        src: [
-          '*.{eot,ttf,svg,woff,woff2}'
-        ],
+        src: ['*.{eot,ttf,svg,woff,woff2}'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/fonts/'
       },
       // bpmn fonts
       {
         expand: true,
         cwd: 'node_modules/bpmn-font/dist/font',
-        src: [
-          '*.{eot,ttf,svg,woff}'
-        ],
+        src: ['*.{eot,ttf,svg,woff}'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/fonts/'
       },
       // open sans

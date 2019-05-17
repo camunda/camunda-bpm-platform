@@ -25,8 +25,12 @@
 'use strict';
 
 var angular = require('angular'),
-    viewsModule = require('./views/main'),
-    resourcesModule = require('./resources/main'),
-    dataModule = require('./data/main');
+  viewsModule = require('./views/main'),
+  resourcesModule = require('./resources/main'),
+  dataModule = require('./data/main');
 
-module.exports = angular.module('cockpit.plugin.base', [viewsModule.name, resourcesModule.name, dataModule.name]);
+module.exports = angular.module('cockpit.plugin.base', [
+  viewsModule.name,
+  resourcesModule.name,
+  dataModule.name
+]);

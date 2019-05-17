@@ -62,18 +62,22 @@ var searchWidgetUtils = require('../util/search-widget-utils');
 // Optional Modules
 var externalTasksCommon = require('./external-tasks-common');
 
-var ngModule = angular.module('cam-common', [
-  externalTasksCommon.name
-]);
+var ngModule = angular.module('cam-common', [externalTasksCommon.name]);
 
 // Services
 ngModule.factory('isModuleAvailable', isModuleAvailable);
 ngModule.factory('exposeScopeProperties', exposeScopeProperties);
 ngModule.factory('Loaders', loaders);
-ngModule.factory('integrateActivityInstanceFilter', integrateActivityInstanceFilter);
+ngModule.factory(
+  'integrateActivityInstanceFilter',
+  integrateActivityInstanceFilter
+);
 ngModule.factory('params', params);
 ngModule.factory('createListQueryFunction', createListQueryFunction);
-ngModule.factory('createIsSearchQueryChangedFunction', createIsSearchQueryChangedFunction);
+ngModule.factory(
+  'createIsSearchQueryChangedFunction',
+  createIsSearchQueryChangedFunction
+);
 ngModule.factory('readFiles', readFiles);
 ngModule.factory('upload', upload);
 ngModule.factory('getDeploymentUrl', getDeploymentUrl);
@@ -99,7 +103,10 @@ ngModule.directive('camSortableTableColumn', camSortableTableColumn);
 ngModule.controller('HoverAreaController', HoverAreaController);
 ngModule.controller('CamPaginationController', CamPaginationController);
 ngModule.controller('CamTabsController', CamTabsController);
-ngModule.controller('CamPaginationSearchIntegrationController', CamPaginationSearchIntegrationController);
+ngModule.controller(
+  'CamPaginationSearchIntegrationController',
+  CamPaginationSearchIntegrationController
+);
 
 // Values
 ngModule.value('routeUtil', routeUtil);

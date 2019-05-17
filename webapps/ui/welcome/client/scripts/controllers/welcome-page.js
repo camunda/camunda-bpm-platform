@@ -22,4 +22,5 @@ module.exports = [
   function(configuration) {
     this.appVendor = configuration.getAppVendor();
     this.appName = configuration.getAppName();
-  }];
+  }
+];

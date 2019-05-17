@@ -54,7 +54,9 @@ describe('cam-common.external-tasks-common observeBpmnElements', function() {
   });
 
   it('should observe bpmnElements', function() {
-    expect(instance.processData.observe.calledWith('bpmnElements')).to.eql(true);
+    expect(instance.processData.observe.calledWith('bpmnElements')).to.eql(
+      true
+    );
   });
 
   it('should set bpmnElements on instance', function() {

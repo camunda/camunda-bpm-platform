@@ -20,7 +20,6 @@
 var Base = require('./../base');
 
 module.exports = Base.extend({
-
   url: '/camunda/app/cockpit/default/#/dashboard',
 
   pluginList: function() {
@@ -30,5 +29,4 @@ module.exports = Base.extend({
   plugin: function(idx) {
     return this.pluginList().get(idx);
   }
-
 });

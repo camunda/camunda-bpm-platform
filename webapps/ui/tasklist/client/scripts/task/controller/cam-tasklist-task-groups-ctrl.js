@@ -27,22 +27,16 @@ module.exports = [
   '$q',
   'Notifications',
   'camAPI',
-  function(
-    $scope,
-    $translate,
-    $q,
-    Notifications,
-    camAPI
-  ) {
+  function($scope, $translate, $q, Notifications, camAPI) {
     // setup //////////////////////////////////////////////
 
     var Task = camAPI.resource('task');
 
     var task = null;
 
-    var NEW_GROUP = { groupId : null, type: GROUP_TYPE };
+    var NEW_GROUP = {groupId: null, type: GROUP_TYPE};
 
-    var newGroup = $scope.newGroup =  angular.copy(NEW_GROUP);
+    var newGroup = ($scope.newGroup = angular.copy(NEW_GROUP));
 
     var taskGroupsData = $scope.taskGroupsData;
 
@@ -60,15 +54,18 @@ module.exports = [
       'REMOVE_GROUP_FAILED'
     ])
       .then(function(result) {
-        messages.failure            = result.FAILURE;
-        messages.initGroupsFailed   = result.INIT_GROUPS_FAILURE;
-        messages.addGroupFailed     = result.ADD_GROUP_FAILED;
-        messages.removeGroupFailed  = result.REMOVE_GROUP_FAILED;
-      }).catch(angular.noop);
+        messages.failure = result.FAILURE;
+        messages.initGroupsFailed = result.INIT_GROUPS_FAILURE;
+        messages.addGroupFailed = result.ADD_GROUP_FAILED;
+        messages.removeGroupFailed = result.REMOVE_GROUP_FAILED;
+      })
+      .catch(angular.noop);
 
     // observe ////////////////////////////////////////////////////////
 
-    $scope.modalGroupsState = taskGroupsData.observe('groups', function(groups) {
+    $scope.modalGroupsState = taskGroupsData.observe('groups', function(
+      groups
+    ) {
       $scope._groups = angular.copy(groups) || [];
       $scope.validateNewGroup();
     });
@@ -106,7 +103,6 @@ module.exports = [
         $scope._groups.push({id: newGroup.groupId});
 
         newGroup = $scope.newGroup = angular.copy(NEW_GROUP);
-
       });
     };
 
@@ -115,40 +111,46 @@ module.exports = [
 
       groupsChanged();
 
-      Task.identityLinksDelete(taskId, {type: GROUP_TYPE, groupId: group.id}, function(err) {
-        if (err) {
-          return Notifications.addError({
-            status: messages.failure,
-            message: messages.removeGroupFailed,
-            exclusive: true,
-            scope: $scope
-          });
-        }
+      Task.identityLinksDelete(
+        taskId,
+        {type: GROUP_TYPE, groupId: group.id},
+        function(err) {
+          if (err) {
+            return Notifications.addError({
+              status: messages.failure,
+              message: messages.removeGroupFailed,
+              exclusive: true,
+              scope: $scope
+            });
+          }
 
-        $scope._groups.splice(index, 1);
-      });
+          $scope._groups.splice(index, 1);
+        }
+      );
     };
 
     $scope.validateNewGroup = function() {
       delete newGroup.error;
 
       if ($scope.taskGroupForm && $scope.taskGroupForm.newGroup) {
-
         $scope.taskGroupForm.newGroup.$setValidity('duplicate', true);
 
         var newGroupId = newGroup.groupId;
 
         if (newGroupId) {
-          for(var i = 0, currentGroup; (currentGroup = $scope._groups[i]); i++) {
+          for (
+            var i = 0, currentGroup;
+            (currentGroup = $scope._groups[i]);
+            i++
+          ) {
             if (newGroupId === currentGroup.id) {
-              newGroup.error = { message: 'DUPLICATE_GROUP' };
+              newGroup.error = {message: 'DUPLICATE_GROUP'};
 
               $scope.taskGroupForm.newGroup.$setValidity('duplicate', false);
             }
           }
         }
       }
-
     };
 
     $scope.isValid = function() {
@@ -158,5 +160,5 @@ module.exports = [
 
       return true;
     };
-
-  }];
+  }
+];

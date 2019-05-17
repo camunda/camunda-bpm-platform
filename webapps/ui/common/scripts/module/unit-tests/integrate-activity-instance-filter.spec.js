@@ -41,27 +41,29 @@ describe('cam-common integrateActivityInstanceFilter', function() {
 
   beforeEach(module(testModule.name));
 
-  beforeEach(module(function($provide) {
-    activityIds = ['a1', 'as2'];
-    params = {
-      activityIds: activityIds.join(','),
-      page: '20'
-    };
-    search = sinon.stub().returns(params);
-    search.updateSilently = sinon.spy();
-    $location = {
-      path: sinon.stub()
-    };
-    searchWidgetUtils ={
-      replaceActivitiesInSearchQuery: sinon.stub(),
-      getActivityIdsFromUrlParams: sinon.stub().returns(activityIds),
-      shouldUpdateFilte: sinon.stub()
-    };
+  beforeEach(
+    module(function($provide) {
+      activityIds = ['a1', 'as2'];
+      params = {
+        activityIds: activityIds.join(','),
+        page: '20'
+      };
+      search = sinon.stub().returns(params);
+      search.updateSilently = sinon.spy();
+      $location = {
+        path: sinon.stub()
+      };
+      searchWidgetUtils = {
+        replaceActivitiesInSearchQuery: sinon.stub(),
+        getActivityIdsFromUrlParams: sinon.stub().returns(activityIds),
+        shouldUpdateFilte: sinon.stub()
+      };
 
-    $provide.value('search',search);
-    $provide.value('$location',$location);
-    $provide.value('searchWidgetUtils',searchWidgetUtils);
-  }));
+      $provide.value('search', search);
+      $provide.value('$location', $location);
+      $provide.value('searchWidgetUtils', searchWidgetUtils);
+    })
+  );
 
   beforeEach(inject(function(integrateActivityInstanceFilter) {
     processData = {
@@ -91,8 +93,12 @@ describe('cam-common integrateActivityInstanceFilter', function() {
   });
 
   it('should observe filter, instanceIdToInstanceMap, activityIdToInstancesMap', function() {
-    expect(processData.observe
-      .calledWith(['filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'])
+    expect(
+      processData.observe.calledWith([
+        'filter',
+        'instanceIdToInstanceMap',
+        'activityIdToInstancesMap'
+      ])
     ).to.eql(true);
   });
 
@@ -143,7 +149,7 @@ describe('cam-common integrateActivityInstanceFilter', function() {
       activityIdToInstancesMap = {
         'a1-activity': [
           {
-            id:'a1'
+            id: 'a1'
           },
           {
             id: 'a1-b'
@@ -157,9 +163,15 @@ describe('cam-common integrateActivityInstanceFilter', function() {
         activityInstanceIds: ['a1']
       };
 
-      autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+      autoCompleteFilter(
+        filter,
+        instanceIdToInstanceMap,
+        activityIdToInstancesMap
+      );
 
-      expect($scope.filter.activityIds).to.eql([instanceIdToInstanceMap.a1.activityId]);
+      expect($scope.filter.activityIds).to.eql([
+        instanceIdToInstanceMap.a1.activityId
+      ]);
     });
 
     it('should add activity instance id to filter based on activity id', function() {
@@ -167,7 +179,11 @@ describe('cam-common integrateActivityInstanceFilter', function() {
         activityIds: ['a1-activity']
       };
 
-      autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+      autoCompleteFilter(
+        filter,
+        instanceIdToInstanceMap,
+        activityIdToInstancesMap
+      );
 
       expect($scope.filter.activityInstanceIds).to.eql(['a1', 'a1-b']);
     });
@@ -179,9 +195,15 @@ describe('cam-common integrateActivityInstanceFilter', function() {
       };
       options.shouldRemoveActivityIds = true;
 
-      autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+      autoCompleteFilter(
+        filter,
+        instanceIdToInstanceMap,
+        activityIdToInstancesMap
+      );
 
-      expect($scope.filter.activityIds).to.eql([instanceIdToInstanceMap.a1.activityId]);
+      expect($scope.filter.activityIds).to.eql([
+        instanceIdToInstanceMap.a1.activityId
+      ]);
       expect($scope.filter.activityInstanceIds).to.eql(['a1', 'a1-b']);
     });
 
@@ -191,19 +213,26 @@ describe('cam-common integrateActivityInstanceFilter', function() {
         activityInstanceIds: ['c', 'a1', 'a1-b']
       };
 
-      autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+      autoCompleteFilter(
+        filter,
+        instanceIdToInstanceMap,
+        activityIdToInstancesMap
+      );
 
       expect($scope.filter.activityIds).to.eql(['b', 'a1-activity']);
       expect($scope.filter.activityInstanceIds).to.eql(['a1', 'a1-b']);
     });
-
 
     it('should scroll to last selected activity', function() {
       var filter = {
         activityIds: ['a1-activity']
       };
 
-      autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+      autoCompleteFilter(
+        filter,
+        instanceIdToInstanceMap,
+        activityIdToInstancesMap
+      );
 
       expect($scope.filter.scrollToBpmnElement).to.eql(filter.activityIds[0]);
     });
@@ -223,7 +252,11 @@ describe('cam-common integrateActivityInstanceFilter', function() {
       };
 
       $scope.filter = filter;
-      autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+      autoCompleteFilter(
+        filter,
+        instanceIdToInstanceMap,
+        activityIdToInstancesMap
+      );
 
       expect(processData.set.called).to.eql(false);
     });
@@ -247,25 +280,29 @@ describe('cam-common integrateActivityInstanceFilter', function() {
 
         search.returns(urlParams);
         searchWidgetUtils.replaceActivitiesInSearchQuery.returns('searchQuery');
-        autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+        autoCompleteFilter(
+          filter,
+          instanceIdToInstanceMap,
+          activityIdToInstancesMap
+        );
 
         params = search.updateSilently.lastCall.args[0];
       });
 
       it('should replace url if filter has replace flag set to true', function() {
-        expect(
-          search.updateSilently.lastCall.args[1]
-        ).to.eql(true);
+        expect(search.updateSilently.lastCall.args[1]).to.eql(true);
       });
 
       it('should not replace url if filter has no replace falsy replace flag', function() {
         filter.replace = false;
 
-        autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+        autoCompleteFilter(
+          filter,
+          instanceIdToInstanceMap,
+          activityIdToInstancesMap
+        );
 
-        expect(
-          search.updateSilently.lastCall.args[1]
-        ).to.eql(false);
+        expect(search.updateSilently.lastCall.args[1]).to.eql(false);
       });
 
       it('should create properly searchQuery in params', function() {

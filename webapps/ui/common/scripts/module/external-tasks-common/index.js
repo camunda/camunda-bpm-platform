@@ -40,11 +40,20 @@ ngModule.factory('observeBpmnElements', observeBpmnElements);
 // Components
 ngModule.directive('externalTaskActivityLink', externalTaskActivityLink);
 ngModule.directive('externalTasksTab', externalTasksTab);
-ngModule.directive('externalTaskErrorMessageLink', externalTaskErrorMessageLink);
+ngModule.directive(
+  'externalTaskErrorMessageLink',
+  externalTaskErrorMessageLink
+);
 
 // Controllers
-ngModule.controller('ExternalTaskActivityLinkController', ExternalTaskActivityLinkController);
+ngModule.controller(
+  'ExternalTaskActivityLinkController',
+  ExternalTaskActivityLinkController
+);
 ngModule.controller('ExternalTasksTabController', ExternalTasksTabController);
-ngModule.controller('ExternalTaskErrorMessageLinkController', ExternalTaskErrorMessageLinkController);
+ngModule.controller(
+  'ExternalTaskErrorMessageLinkController',
+  ExternalTaskErrorMessageLinkController
+);
 
 module.exports = ngModule;

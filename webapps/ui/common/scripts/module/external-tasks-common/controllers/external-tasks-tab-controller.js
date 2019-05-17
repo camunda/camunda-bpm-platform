@@ -20,7 +20,9 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  '$scope', 'exposeScopeProperties', 'search',
+  '$scope',
+  'exposeScopeProperties',
+  'search',
   ExternalTasksTabController
 ];
 
@@ -70,8 +72,8 @@ ExternalTasksTabController.prototype.loadTasks = function() {
   this.onLoad({
     pages: angular.copy(this.pages), //just a defensive copy
     activityIds: getActivityIdsFromFilter(this.filter)
-  })
-    .then((function(data) {
+  }).then(
+    function(data) {
       this.total = data.count;
 
       if (!data.list) {
@@ -79,7 +81,8 @@ ExternalTasksTabController.prototype.loadTasks = function() {
       } else {
         this.loadingState = 'LOADED';
       }
-    }).bind(this));
+    }.bind(this)
+  );
 };
 
 function getActivityIdsFromFilter(filter) {

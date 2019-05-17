@@ -43,9 +43,7 @@ CamTabs.prototype.initializeVars = function($scope) {
 };
 
 CamTabs.prototype.getProviders = function(Views, $scope) {
-  return Views
-    .getProviders($scope.providerParams)
-    .sort(compareProviders);
+  return Views.getProviders($scope.providerParams).sort(compareProviders);
 };
 
 function compareProviders(providerA, providerB) {
@@ -65,7 +63,10 @@ CamTabs.prototype.onLocationChange = function() {
 };
 
 CamTabs.prototype.isTabSelectionChangedInUrl = function(params) {
-  return angular.isString(params.tab) && (!this.selected || params.tab !== this.selected.id);
+  return (
+    angular.isString(params.tab) &&
+    (!this.selected || params.tab !== this.selected.id)
+  );
 };
 
 CamTabs.prototype.selectTab = function(tabProvider) {

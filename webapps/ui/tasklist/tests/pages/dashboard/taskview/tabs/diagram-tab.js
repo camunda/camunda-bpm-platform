@@ -20,7 +20,6 @@
 var Tab = require('./tab');
 
 module.exports = Tab.extend({
-
   tabIndex: 2,
 
   diagramFormElement: function() {
@@ -28,7 +27,9 @@ module.exports = Tab.extend({
   },
 
   diagramActivity: function(activityName) {
-    return element(by.css('*[data-element-id=' + '"' + activityName + '"' + ']'));
+    return element(
+      by.css('*[data-element-id=' + '"' + activityName + '"' + ']')
+    );
   },
 
   isActivitySelected: function(activityName) {
@@ -41,5 +42,4 @@ module.exports = Tab.extend({
         return classes.indexOf('highlight') !== -1;
       });
   }
-
 });

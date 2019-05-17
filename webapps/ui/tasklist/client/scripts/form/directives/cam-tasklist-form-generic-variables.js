@@ -18,147 +18,164 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-form-generic-variables.html', 'utf8');
+var template = fs.readFileSync(
+  __dirname + '/cam-tasklist-form-generic-variables.html',
+  'utf8'
+);
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function(camAPI, Notifications, $translate, unfixDate) {
+module.exports = [
+  'camAPI',
+  'Notifications',
+  '$translate',
+  'unfixDate',
+  function(camAPI, Notifications, $translate, unfixDate) {
+    return {
+      restrict: 'A',
 
-  return {
+      require: '^camTasklistForm',
 
-    restrict: 'A',
+      template: template,
 
-    require: '^camTasklistForm',
+      link: function($scope, $element, attrs, formController) {
+        /**
+         * initial setup
+         */
 
-    template: template,
+        var Task = camAPI.resource('task');
+        var ProcessInstance = camAPI.resource('process-instance');
+        var CaseInstance = camAPI.resource('case-instance');
 
-    link: function($scope, $element, attrs, formController) {
-
-      /**
-       * initial setup
-       */
-
-      var Task = camAPI.resource('task');
-      var ProcessInstance = camAPI.resource('process-instance');
-      var CaseInstance = camAPI.resource('case-instance');
-
-      $scope.showBusinessKey = false;
-
-      var emptyVariable = {
-        name:   '',
-        value:  '',
-        type:   ''
-      };
-
-      var variableTypes = $scope.variableTypes = {
-        'Boolean':  'checkbox', // handled via switch in HTML template
-        'Integer':  'text',
-        'Long':     'text',
-        'Short':    'text',
-        'Double':   'text',
-        'String':   'text',
-        'Date':     'text'
-      };
-
-      /**
-       * determine type of task and handle business key based on it
-       */
-
-      var params = formController.getParams();
-      var id = params.processInstanceId || params.caseInstanceId;
-
-      if(!params.processDefinitionId && !params.caseDefinitionId) {
         $scope.showBusinessKey = false;
-      } else if(id) {
-        $scope.readonly = true;
-        var resource = params.processInstanceId ? ProcessInstance : CaseInstance;
-        resource.get(id)
-          .then(function(res) {
-            if(res.businessKey) {
-              $scope.showBusinessKey = true;
-              $scope.businessKey = res.businessKey;
-            }
-          }).catch(angular.noop);
-      } else {
-        $scope.showBusinessKey = true;
-      }
 
-      /**
-       * scope methods
-       */
+        var emptyVariable = {
+          name: '',
+          value: '',
+          type: ''
+        };
 
-      $scope.$watch('tasklistForm', function() {
-        $scope.variablesLoaded = false;
-      });
-
-      $scope.addVariable = function() {
-        var newVariable = angular.copy(emptyVariable);
-        $scope.variables.push(newVariable);
-      };
-
-      $scope.removeVariable = function(delta) {
-        var vars = [];
-
-        angular.forEach($scope.variables, function(variable, d) {
-          if (d != delta) {
-            vars.push(variable);
-          }
+        var variableTypes = ($scope.variableTypes = {
+          Boolean: 'checkbox', // handled via switch in HTML template
+          Integer: 'text',
+          Long: 'text',
+          Short: 'text',
+          Double: 'text',
+          String: 'text',
+          Date: 'text'
         });
 
-        $scope.variables = vars;
-      };
+        /**
+         * determine type of task and handle business key based on it
+         */
 
-      $scope.getVariableNames = function() {
-        return $scope.variables.map(function(variable) {
-          return variable.name;
-        });
-      };
+        var params = formController.getParams();
+        var id = params.processInstanceId || params.caseInstanceId;
 
-      $scope.loadVariables = function() {
-        $scope.variablesLoaded = true;
-        Task.formVariables({
-          id: formController.getParams().taskId,
-          deserializeValues: false
-        }, function(err, result) {
-          if(err) {
-            $scope.variablesLoaded = false;
-            return $translate('LOAD_VARIABLES_FAILURE').then(function(translated) {
-              Notifications.addError({
-                status: translated,
-                message: err.message,
-                scope: $scope
-              });
-            }).catch(angular.noop);
-          }
-
-          var variableAdded = false;
-          angular.forEach(result, function(value, name) {
-            if(variableTypes[value.type]) {
-              var parsedValue = value.value;
-
-              if(value.type === 'Date') {
-                parsedValue = unfixDate(parsedValue);
+        if (!params.processDefinitionId && !params.caseDefinitionId) {
+          $scope.showBusinessKey = false;
+        } else if (id) {
+          $scope.readonly = true;
+          var resource = params.processInstanceId
+            ? ProcessInstance
+            : CaseInstance;
+          resource
+            .get(id)
+            .then(function(res) {
+              if (res.businessKey) {
+                $scope.showBusinessKey = true;
+                $scope.businessKey = res.businessKey;
               }
-              $scope.variables.push({
-                name : name,
-                value: parsedValue,
-                type:  value.type,
-                fixedName : true
-              });
-              variableAdded = true;
+            })
+            .catch(angular.noop);
+        } else {
+          $scope.showBusinessKey = true;
+        }
+
+        /**
+         * scope methods
+         */
+
+        $scope.$watch('tasklistForm', function() {
+          $scope.variablesLoaded = false;
+        });
+
+        $scope.addVariable = function() {
+          var newVariable = angular.copy(emptyVariable);
+          $scope.variables.push(newVariable);
+        };
+
+        $scope.removeVariable = function(delta) {
+          var vars = [];
+
+          angular.forEach($scope.variables, function(variable, d) {
+            if (d != delta) {
+              vars.push(variable);
             }
           });
-          if(!variableAdded) {
-            $translate('NO_TASK_VARIABLES').then(function(translated) {
-              Notifications.addMessage({
-                duration: 5000,
-                status: translated,
-                scope: $scope
+
+          $scope.variables = vars;
+        };
+
+        $scope.getVariableNames = function() {
+          return $scope.variables.map(function(variable) {
+            return variable.name;
+          });
+        };
+
+        $scope.loadVariables = function() {
+          $scope.variablesLoaded = true;
+          Task.formVariables(
+            {
+              id: formController.getParams().taskId,
+              deserializeValues: false
+            },
+            function(err, result) {
+              if (err) {
+                $scope.variablesLoaded = false;
+                return $translate('LOAD_VARIABLES_FAILURE')
+                  .then(function(translated) {
+                    Notifications.addError({
+                      status: translated,
+                      message: err.message,
+                      scope: $scope
+                    });
+                  })
+                  .catch(angular.noop);
+              }
+
+              var variableAdded = false;
+              angular.forEach(result, function(value, name) {
+                if (variableTypes[value.type]) {
+                  var parsedValue = value.value;
+
+                  if (value.type === 'Date') {
+                    parsedValue = unfixDate(parsedValue);
+                  }
+                  $scope.variables.push({
+                    name: name,
+                    value: parsedValue,
+                    type: value.type,
+                    fixedName: true
+                  });
+                  variableAdded = true;
+                }
               });
-            }).catch(angular.noop);
-          }
-        });
-      };
-    }
-  };
-}];
+              if (!variableAdded) {
+                $translate('NO_TASK_VARIABLES')
+                  .then(function(translated) {
+                    Notifications.addMessage({
+                      duration: 5000,
+                      status: translated,
+                      scope: $scope
+                    });
+                  })
+                  .catch(angular.noop);
+              }
+            }
+          );
+        };
+      }
+    };
+  }
+];

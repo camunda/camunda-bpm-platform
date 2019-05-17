@@ -18,10 +18,14 @@
 'use strict';
 
 module.exports = [
-  '$scope', 'decisionList', 'Views', //'localConf', '$translate',
+  '$scope',
+  'decisionList',
+  'Views', //'localConf', '$translate',
   function($scope, decisionList, Views /*, localConf, $translate*/) {
     $scope.loadingState = 'LOADING';
-    $scope.drdDashboard = Views.getProvider({ component: 'cockpit.plugin.drd.dashboard' });
+    $scope.drdDashboard = Views.getProvider({
+      component: 'cockpit.plugin.drd.dashboard'
+    });
     $scope.isDrdDashboardAvailable = !!$scope.drdDashboard;
 
     decisionList
@@ -42,6 +46,6 @@ module.exports = [
         throw err;
       });
 
-    $scope.drdDashboardVars = { read: [ 'drdsCount', 'drds'] };
+    $scope.drdDashboardVars = {read: ['drdsCount', 'drds']};
   }
 ];

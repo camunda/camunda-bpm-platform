@@ -20,7 +20,6 @@
 var Page = require('./system-base');
 
 module.exports = Page.extend({
-
   url: '/camunda/app/admin/default/#/system?section=system-settings-metrics',
 
   flowNodesResult: function() {
@@ -34,8 +33,7 @@ module.exports = Page.extend({
   startDateField: function(inputValue) {
     var inputField = element(by.model('startDate'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },
@@ -43,8 +41,7 @@ module.exports = Page.extend({
   endDateField: function(inputValue) {
     var inputField = element(by.model('endDate'));
 
-    if (arguments.length !== 0)
-      inputField.sendKeys(inputValue);
+    if (arguments.length !== 0) inputField.sendKeys(inputValue);
 
     return inputField;
   },

@@ -24,7 +24,9 @@ var DecisionListController = require('./controllers/decision-list');
 var decisionListService = require('./services/decision-list');
 var decisionsTableComponent = require('./components/decisions-table');
 
-var ngModule = angular.module('cockpit.plugin.decisionList.views.dashboard', [camCommon.name]);
+var ngModule = angular.module('cockpit.plugin.decisionList.views.dashboard', [
+  camCommon.name
+]);
 
 ngModule.config(decisionList);
 
