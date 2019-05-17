@@ -19,7 +19,6 @@ package org.camunda.bpm.qa.upgrade.useroperationlog;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
@@ -35,11 +34,10 @@ public class CreateStandaloneTaskScenario {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
         IdentityService identityService = engine.getIdentityService();
-        User user = identityService.newUser("jane208");
-        identityService.saveUser(user);
-        identityService.setAuthentication(user.getId(), null);
+        identityService.setAuthentication("jane02", null);
 
         TaskService taskService = engine.getTaskService();
+
         String taskId = "myTaskForUserOperationLog";
         Task task = taskService.newTask(taskId);
         taskService.saveTask(task);

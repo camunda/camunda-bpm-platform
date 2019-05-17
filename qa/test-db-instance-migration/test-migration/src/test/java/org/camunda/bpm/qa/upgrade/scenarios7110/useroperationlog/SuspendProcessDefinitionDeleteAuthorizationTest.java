@@ -17,10 +17,17 @@
 package org.camunda.bpm.qa.upgrade.scenarios7110.useroperationlog;
 
 
+import static org.camunda.bpm.engine.authorization.Resources.OPERATION_LOG_CATEGORY;
+import static org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions.DELETE;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_TASK_WORKER;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -38,7 +45,7 @@ import org.junit.Test;
  * @author Yana.Vasileva
  *
  */
-public class SetAssigneeProcessInstanceTaskAuthorizationTest {
+public class SuspendProcessDefinitionDeleteAuthorizationTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
@@ -48,17 +55,19 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
   protected ProcessEngineConfigurationImpl engineConfiguration;
 
   @Before
-  public void assignServices() {
+  public void setUp() {
     historyService = engineRule.getHistoryService();
     authorizationService = engineRule.getAuthorizationService();
     engineConfiguration = engineRule.getProcessEngineConfiguration();
-    engineRule.getIdentityService().setAuthenticatedUserId("mary");
+
+    engineRule.getIdentityService().setAuthenticatedUserId("jane");
   }
 
   @After
   public void tearDown() {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
     engineRule.getIdentityService().clearAuthentication();
+
     List<Authorization> auths = authorizationService.createAuthorizationQuery().list();
     for (Authorization authorization : auths) {
       authorizationService.deleteAuthorization(authorization.getId());
@@ -68,48 +77,83 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
   @Test
   public void testWithoutAuthorization() {
     // given
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
+        .processDefinitionKey("timerBoundaryProcess")
+        .afterTimestamp(new Date(1549110000000l));
+
+    // assume
+    assertTrue(query.count() == 1);
+
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
 
-    // when
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery().processDefinitionKey("oneTaskProcess_userOpLog");
-
-    // then
-    assertEquals(1, query.count());
+    try {
+      // when
+      historyService.deleteUserOperationLogEntry(query.list().get(0).getId());
+      fail("Exception expected: It should not be possible to delete the user operation log");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTrue(message.contains("jane"));
+      assertTrue(message.contains(DELETE.getName()));
+      assertTrue(message.contains(OPERATION_LOG_CATEGORY.resourceName()));
+      assertTrue(message.contains(CATEGORY_TASK_WORKER));
+    }
   }
-
+  
   @Test
-  public void testWithReadHistoryPermissionOnAnyProcessDefinition() {
+  public void testWithDeleteHistoryPermissionOnAnyProcessDefinition() {
     // given
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
+        .processDefinitionKey("timerBoundaryProcess")
+        .beforeTimestamp(new Date(1549110000000l));
+
+    // assume
+    assertTrue(query.count() == 1 || query.count() == 2);
+
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("mary");
-    auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
+    auth.setUserId("jane");
+    auth.setPermissions(new Permissions[] {Permissions.DELETE_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("*");
 
     authorizationService.saveAuthorization(auth);
+    String logId = query.list().get(0).getId();
+    String jobId = query.list().get(0).getJobId();
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
     // when
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery().processDefinitionKey("oneTaskProcess_userOpLog");
+    historyService.deleteUserOperationLogEntry(logId);
 
     // then
-    assertEquals(1, query.count());
+    assertEquals(0, query.jobId(jobId).count());
   }
 
   @Test
-  public void testWithReadHistoryPermissionOnProcessDefinition() {
+  public void testWithDeleteHistoryPermissionOnProcessDefinition() {
     // given
-    Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("mary");
-    auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
-    auth.setResource(Resources.PROCESS_DEFINITION);
-    auth.setResourceId("oneTaskProcess_userOpLog");
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
+        .processDefinitionKey("timerBoundaryProcess")
+        .beforeTimestamp(new Date(1549110000000l));
 
+    // assume
+    assertTrue(query.count() == 1 || query.count() == 2);
+
+    String logId = query.list().get(0).getId();
+    String jobId = query.list().get(0).getJobId();
+    Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    auth.setUserId("jane");
+    auth.setPermissions(new Permissions[] {Permissions.DELETE_HISTORY});
+    auth.setResource(Resources.PROCESS_DEFINITION);
+    auth.setResourceId("timerBoundaryProcess");
+    
     authorizationService.saveAuthorization(auth);
+
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
     // when
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery().processDefinitionKey("oneTaskProcess_userOpLog");
+    historyService.deleteUserOperationLogEntry(logId);
 
     // then
-    assertEquals(1, query.count());
+    assertEquals(0, query.jobId(jobId).count());
   }
 }

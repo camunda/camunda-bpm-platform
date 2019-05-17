@@ -18,7 +18,7 @@ package org.camunda.bpm.qa.upgrade.scenarios7110.useroperationlog;
 
 
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertNull;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationService;
@@ -38,7 +38,7 @@ import org.junit.Test;
  * @author Yana.Vasileva
  *
  */
-public class SetAssigneeProcessInstanceTaskAuthorizationTest {
+public class CreateStandaloneTaskDeleteAuthorizationTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
@@ -48,17 +48,20 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
   protected ProcessEngineConfigurationImpl engineConfiguration;
 
   @Before
-  public void assignServices() {
+  public void setUp() {
     historyService = engineRule.getHistoryService();
     authorizationService = engineRule.getAuthorizationService();
     engineConfiguration = engineRule.getProcessEngineConfiguration();
-    engineRule.getIdentityService().setAuthenticatedUserId("mary");
+
+    engineRule.getIdentityService().setAuthenticatedUserId("jane");
+    
   }
 
   @After
   public void tearDown() {
-    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
+    engineConfiguration.setAuthorizationEnabled(false);
     engineRule.getIdentityService().clearAuthentication();
+
     List<Authorization> auths = authorizationService.createAuthorizationQuery().list();
     for (Authorization authorization : auths) {
       authorizationService.deleteAuthorization(authorization.getId());
@@ -66,50 +69,28 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
   }
 
   @Test
-  public void testWithoutAuthorization() {
+  public void testWithDeleteHistoryPermissionOnAnyProcessDefinition() {
     // given
-    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
-
-    // when
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery().processDefinitionKey("oneTaskProcess_userOpLog");
-
-    // then
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery().taskId("myTaskForUserOperationLogDel");
+    
+    // assume
     assertEquals(1, query.count());
-  }
 
-  @Test
-  public void testWithReadHistoryPermissionOnAnyProcessDefinition() {
-    // given
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("mary");
-    auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
+    auth.setUserId("jane");
+    auth.setPermissions(new Permissions[] {Permissions.DELETE_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("*");
 
     authorizationService.saveAuthorization(auth);
-    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+    engineConfiguration.setAuthorizationEnabled(true);
+    
     // when
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery().processDefinitionKey("oneTaskProcess_userOpLog");
+    historyService.deleteUserOperationLogEntry(query.singleResult().getId());
 
     // then
-    assertEquals(1, query.count());
+    assertNull(historyService.createUserOperationLogQuery().taskId("myTaskForUserOperationLogDel").singleResult());
   }
 
-  @Test
-  public void testWithReadHistoryPermissionOnProcessDefinition() {
-    // given
-    Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("mary");
-    auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
-    auth.setResource(Resources.PROCESS_DEFINITION);
-    auth.setResourceId("oneTaskProcess_userOpLog");
 
-    authorizationService.saveAuthorization(auth);
-    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
-    // when
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery().processDefinitionKey("oneTaskProcess_userOpLog");
-
-    // then
-    assertEquals(1, query.count());
-  }
 }

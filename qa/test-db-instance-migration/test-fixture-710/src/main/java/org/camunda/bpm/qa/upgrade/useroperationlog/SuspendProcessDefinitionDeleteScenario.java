@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.qa.upgrade.useroperationlog;
 
-import java.util.List;
+import java.util.Date;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
@@ -30,28 +30,34 @@ import org.camunda.bpm.qa.upgrade.ScenarioSetup;
  * @author Yana.Vasileva
  *
  */
-public class SetAssigneeProcessInstanceTaskScenario {
+public class SuspendProcessDefinitionDeleteScenario {
 
   @Deployment
   public static String deploy() {
-    return "org/camunda/bpm/qa/upgrade/useroperationlog/oneTaskProcess.bpmn20.xml";
+    return "org/camunda/bpm/qa/upgrade/useroperationlog/timerBoundaryEventProcess.bpmn20.xml";
   }
 
-  @DescribesScenario("createUserOperationLogEntries")
+  @DescribesScenario("createUserOperationLogEntriesForDelete")
   public static ScenarioSetup createUserOperationLogEntries() {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
+        String processInstanceBusinessKey = "SuspendProcessDefinitionDeleteScenario";
+        ProcessInstance processInstance1 = engine.getRuntimeService().startProcessInstanceByKey("timerBoundaryProcess", processInstanceBusinessKey);
+        ProcessInstance processInstance2 = engine.getRuntimeService().startProcessInstanceByKey("timerBoundaryProcess", processInstanceBusinessKey);
+        ProcessInstance processInstance3 = engine.getRuntimeService().startProcessInstanceByKey("timerBoundaryProcess", processInstanceBusinessKey);
+        
         IdentityService identityService = engine.getIdentityService();
-        String processInstanceBusinessKey = "SetAssigneeProcessInstanceTaskScenario";
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_userOpLog", processInstanceBusinessKey);
+        identityService.setAuthentication("jane01", null);
 
-        identityService.setAuthentication("mary02", null);
+        engine.getProcessEngineConfiguration().setAuthorizationEnabled(false);
+        ClockUtil.setCurrentTime(new Date(1549000000000l));
+        engine.getRuntimeService().suspendProcessInstanceById(processInstance1.getId());
+        ClockUtil.setCurrentTime(new Date(1549100000000l));
+        engine.getRuntimeService().suspendProcessInstanceById(processInstance2.getId());
+        ClockUtil.setCurrentTime(new Date(1549200000000l));
+        engine.getRuntimeService().suspendProcessInstanceById(processInstance3.getId());
 
-        TaskService taskService = engine.getTaskService();
-        List<Task> list = taskService.createTaskQuery().processInstanceBusinessKey(processInstanceBusinessKey).list();
-        Task task = list.get(0);
-        taskService.setAssignee(task.getId(), "john");
-
+        ClockUtil.reset();
         identityService.clearAuthentication();
       }
     };

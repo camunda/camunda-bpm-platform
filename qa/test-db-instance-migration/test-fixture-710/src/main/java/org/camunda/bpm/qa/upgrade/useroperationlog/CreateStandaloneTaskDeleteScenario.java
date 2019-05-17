@@ -16,13 +16,10 @@
  */
 package org.camunda.bpm.qa.upgrade.useroperationlog;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 
@@ -30,27 +27,20 @@ import org.camunda.bpm.qa.upgrade.ScenarioSetup;
  * @author Yana.Vasileva
  *
  */
-public class SetAssigneeProcessInstanceTaskScenario {
+public class CreateStandaloneTaskDeleteScenario {
 
-  @Deployment
-  public static String deploy() {
-    return "org/camunda/bpm/qa/upgrade/useroperationlog/oneTaskProcess.bpmn20.xml";
-  }
-
-  @DescribesScenario("createUserOperationLogEntries")
+  @DescribesScenario("createUserOperationLogEntriesForDelete")
   public static ScenarioSetup createUserOperationLogEntries() {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
         IdentityService identityService = engine.getIdentityService();
-        String processInstanceBusinessKey = "SetAssigneeProcessInstanceTaskScenario";
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_userOpLog", processInstanceBusinessKey);
-
-        identityService.setAuthentication("mary02", null);
+        identityService.setAuthentication("mary01", null);
 
         TaskService taskService = engine.getTaskService();
-        List<Task> list = taskService.createTaskQuery().processInstanceBusinessKey(processInstanceBusinessKey).list();
-        Task task = list.get(0);
-        taskService.setAssignee(task.getId(), "john");
+
+        String taskId = "myTaskForUserOperationLogDel";
+        Task task = taskService.newTask(taskId);
+        taskService.saveTask(task);
 
         identityService.clearAuthentication();
       }

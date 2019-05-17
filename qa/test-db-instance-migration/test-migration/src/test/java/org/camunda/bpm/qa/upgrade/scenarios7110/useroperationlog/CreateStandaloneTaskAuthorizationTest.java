@@ -19,6 +19,8 @@ package org.camunda.bpm.qa.upgrade.scenarios7110.useroperationlog;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -46,24 +48,32 @@ public class CreateStandaloneTaskAuthorizationTest {
   protected ProcessEngineConfigurationImpl engineConfiguration;
 
   @Before
-  public void assignServices() {
+  public void setUp() {
     historyService = engineRule.getHistoryService();
     authorizationService = engineRule.getAuthorizationService();
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
-    engineRule.getIdentityService().setAuthenticatedUserId("jane208");
-    
+    engineRule.getIdentityService().setAuthenticatedUserId("jane");
   }
 
   @After
   public void tearDown() {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
+    engineRule.getIdentityService().clearAuthentication();
+
+
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().list();
+    for (Authorization authorization : auths) {
+      authorizationService.deleteAuthorization(authorization.getId());
+    }
   }
 
   @Test
   public void testWithoutAuthorization() {
     // given
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
+    // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery().taskId("myTaskForUserOperationLog");
 
     // then
@@ -74,7 +84,7 @@ public class CreateStandaloneTaskAuthorizationTest {
   public void testWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("baloo");
+    auth.setUserId("jane");
     auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("*");
@@ -92,7 +102,7 @@ public class CreateStandaloneTaskAuthorizationTest {
   public void testWithReadHistoryPermissionOnProcessDefinition() {
     // given
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("baloo");
+    auth.setUserId("jane");
     auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("something");
