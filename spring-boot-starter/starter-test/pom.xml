@@ -12,7 +12,7 @@
   <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
 
   <properties>
-    <camunda-assert.version>3.0.0-alpha1</camunda-assert.version>
+    <camunda-assert.version>4.0.0-alpha1</camunda-assert.version>
   </properties>
 
   <dependencies>
