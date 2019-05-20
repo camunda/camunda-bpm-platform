@@ -62,10 +62,12 @@ module.exports = function(pluginDependencies) {
     '$routeProvider',
     'UriProvider',
     '$animateProvider',
+    '$qProvider',
     function(
       $routeProvider,
       UriProvider,
-      $animateProvider
+      $animateProvider,
+      $qProvider
     ) {
       $routeProvider.otherwise({ redirectTo: '/welcome' });
 
@@ -89,6 +91,8 @@ module.exports = function(pluginDependencies) {
       }]);
 
       $animateProvider.classNameFilter(/angular-animate/);
+
+      $qProvider.errorOnUnhandledRejections(false);
     }];
 
   appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camWelcomeConf, 'Welcome'));
