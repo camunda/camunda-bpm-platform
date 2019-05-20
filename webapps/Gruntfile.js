@@ -131,6 +131,35 @@ module.exports = function(grunt) {
   require('./ui/admin/grunt/config/watch')(config, watchConf);
   require('./ui/common/grunt/config/watch')(config, watchConf);
 
+  var babelConf = {};
+  require('./grunt/config/babel')(config, babelConf, {
+    appName: 'cockpit',
+    files: {
+      '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/camunda-cockpit-ui.js': '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/camunda-cockpit-ui.js',
+      '<%= pkg.gruntConfig.pluginBuildTarget %>/cockpit/app/plugin.js': '<%= pkg.gruntConfig.pluginBuildTarget %>/cockpit/app/plugin.js',
+    }
+  });
+  require('./grunt/config/babel')(config, babelConf, {
+    appName: 'tasklist',
+    files: {
+      '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/camunda-tasklist-ui.js':  '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/camunda-tasklist-ui.js',
+      '<%= pkg.gruntConfig.pluginBuildTarget %>/tasklist/app/plugin.js':  '<%= pkg.gruntConfig.pluginBuildTarget %>/tasklist/app/plugin.js'
+    }
+  });
+  require('./grunt/config/babel')(config, babelConf, {
+    appName: 'admin',
+    files: {
+      '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/camunda-admin-ui.js':  '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/camunda-admin-ui.js',
+      '<%= pkg.gruntConfig.pluginBuildTarget %>/admin/app/plugin.js': '<%= pkg.gruntConfig.pluginBuildTarget %>/admin/app/plugin.js'
+    }
+  });
+  require('./grunt/config/babel')(config, babelConf, {
+    appName: 'welcome',
+    files: {
+      '<%= pkg.gruntConfig.welcomeBuildTarget %>/scripts/camunda-welcome-ui.js': '<%= pkg.gruntConfig.welcomeBuildTarget %>/scripts/camunda-welcome-ui.js'
+    }
+  });
+
   var uglifyConf = {};
   require('./grunt/config/uglify')(config, uglifyConf);
   require('./ui/welcome/grunt/config/uglify')(config, uglifyConf);
@@ -162,6 +191,8 @@ module.exports = function(grunt) {
     localescompile:   localesConf,
 
     uglify:           uglifyConf,
+
+    babel:            babelConf,
 
     clean:            require('./grunt/config/clean')(config),
 
@@ -238,7 +269,9 @@ grunt.registerTask('build', function(mode, app) {
     }
 
     if(grunt.config.data.buildMode === 'prod') {
-      tasksToRun.push('uglify');
+      tasksToRun.push(
+        'babel',
+        'uglify');
     }
 
     grunt.task.run(tasksToRun);
