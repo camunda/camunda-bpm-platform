@@ -47,30 +47,30 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ExampleTestCompatibility extends DmnModelTest {
+public class ExampleCompatibilityTest extends DmnModelTest {
 
   public static final String EXAMPLE_DMN = "org/camunda/bpm/model/dmn/Example.dmn";
 
   private final DmnModelInstance originalModelInstance;
-  
+
    @Parameterized.Parameters(name="Namespace: {0}")
    public static Collection<Object[]> parameters(){
      return Arrays.asList(new Object[][]{
-         {Dmn.readModelFromStream(ExampleTestCompatibility.class.getResourceAsStream("Example.dmn"))},
+         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("Example.dmn"))},
          // for compatibility reasons we gotta check the old namespace, too
-         {Dmn.readModelFromStream(ExampleTestCompatibility.class.getResourceAsStream("ExampleCompatibility.dmn"))}
+         {Dmn.readModelFromStream(ExampleCompatibilityTest.class.getResourceAsStream("ExampleCompatibility.dmn"))}
      });
    }
 
-  public ExampleTestCompatibility(DmnModelInstance originalModelInstance) {
+  public ExampleCompatibilityTest(DmnModelInstance originalModelInstance) {
     this.originalModelInstance = originalModelInstance;
-  }  
-  
+  }
+
   @Before
-  public void parseModel() {  
+  public void parseModel() {
     modelInstance = originalModelInstance.clone();
   }
-  
+
   @Test
   public void shouldGetElements() {
 
@@ -108,7 +108,7 @@ public class ExampleTestCompatibility extends DmnModelTest {
     assertElementIsEqualToId(decisionTable, "decisionTable");
 
     // Input clauses
-    List<Input> inputs = new ArrayList<Input>(decisionTable.getInputs());
+    List<Input> inputs = new ArrayList<>(decisionTable.getInputs());
     assertThat(inputs).hasSize(2);
     Iterator<Input> inputIterator = inputs.iterator();
 
@@ -132,7 +132,7 @@ public class ExampleTestCompatibility extends DmnModelTest {
     assertThat(inputExpression.getTypeRef()).isEqualTo("double");
 
     // Output clause
-    List<Output> outputs = new ArrayList<Output>(decisionTable.getOutputs());
+    List<Output> outputs = new ArrayList<>(decisionTable.getOutputs());
     assertThat(outputs).hasSize(2);
 
     // 1. Output clause
@@ -152,16 +152,16 @@ public class ExampleTestCompatibility extends DmnModelTest {
     assertThat(output.getTypeRef()).isEqualTo("string");
 
     // Rules
-    List<Rule> rules = new ArrayList<Rule>(decisionTable.getRules());
+    List<Rule> rules = new ArrayList<>(decisionTable.getRules());
 
     // 1. Rule
     Rule rule = rules.get(0);
     assertThat(rule.getId()).isEqualTo("rule1");
-    List<InputEntry> inputEntries = new ArrayList<InputEntry>(rule.getInputEntries());
+    List<InputEntry> inputEntries = new ArrayList<>(rule.getInputEntries());
     assertThat(inputEntries).hasSize(2);
     assertThat(inputEntries.get(0).getText().getTextContent()).isEqualTo("\"bronze\"");
     assertThat(inputEntries.get(1).getText().getTextContent()).isEmpty();
-    List<OutputEntry> outputEntries = new ArrayList<OutputEntry>(rule.getOutputEntries());
+    List<OutputEntry> outputEntries = new ArrayList<>(rule.getOutputEntries());
     assertThat(outputEntries).hasSize(2);
     assertThat(outputEntries.get(0).getText().getTextContent()).isEqualTo("\"notok\"");
     assertThat(outputEntries.get(1).getText().getTextContent()).isEqualTo("\"work on your status first, as bronze you're not going to get anything\"");
@@ -169,11 +169,11 @@ public class ExampleTestCompatibility extends DmnModelTest {
     // 2. Rule
     rule = rules.get(1);
     assertThat(rule.getId()).isEqualTo("rule2");
-    inputEntries = new ArrayList<InputEntry>(rule.getInputEntries());
+    inputEntries = new ArrayList<>(rule.getInputEntries());
     assertThat(inputEntries).hasSize(2);
     assertThat(inputEntries.get(0).getText().getTextContent()).isEqualTo("\"silver\"");
     assertThat(inputEntries.get(1).getText().getTextContent()).isEqualTo("< 1000");
-    outputEntries = new ArrayList<OutputEntry>(rule.getOutputEntries());
+    outputEntries = new ArrayList<>(rule.getOutputEntries());
     assertThat(outputEntries).hasSize(2);
     assertThat(outputEntries.get(0).getText().getTextContent()).isEqualTo("\"ok\"");
     assertThat(outputEntries.get(1).getText().getTextContent()).isEqualTo("\"you little fish will get what you want\"");
@@ -181,11 +181,11 @@ public class ExampleTestCompatibility extends DmnModelTest {
     // 3. Rule
     rule = rules.get(2);
     assertThat(rule.getId()).isEqualTo("rule3");
-    inputEntries = new ArrayList<InputEntry>(rule.getInputEntries());
+    inputEntries = new ArrayList<>(rule.getInputEntries());
     assertThat(inputEntries).hasSize(2);
     assertThat(inputEntries.get(0).getText().getTextContent()).isEqualTo("\"silver\"");
     assertThat(inputEntries.get(1).getText().getTextContent()).isEqualTo(">= 1000");
-    outputEntries = new ArrayList<OutputEntry>(rule.getOutputEntries());
+    outputEntries = new ArrayList<>(rule.getOutputEntries());
     assertThat(outputEntries).hasSize(2);
     assertThat(outputEntries.get(0).getText().getTextContent()).isEqualTo("\"notok\"");
     assertThat(outputEntries.get(1).getText().getTextContent()).isEqualTo("\"you took too much man, you took too much!\"");
@@ -193,11 +193,11 @@ public class ExampleTestCompatibility extends DmnModelTest {
     // 4. Rule
     rule = rules.get(3);
     assertThat(rule.getId()).isEqualTo("rule4");
-    inputEntries = new ArrayList<InputEntry>(rule.getInputEntries());
+    inputEntries = new ArrayList<>(rule.getInputEntries());
     assertThat(inputEntries).hasSize(2);
     assertThat(inputEntries.get(0).getText().getTextContent()).isEqualTo("\"gold\"");
     assertThat(inputEntries.get(1).getText().getTextContent()).isEmpty();
-    outputEntries = new ArrayList<OutputEntry>(rule.getOutputEntries());
+    outputEntries = new ArrayList<>(rule.getOutputEntries());
     assertThat(outputEntries).hasSize(2);
     assertThat(outputEntries.get(0).getText().getTextContent()).isEqualTo("\"ok\"");
     assertThat(outputEntries.get(1).getText().getTextContent()).isEqualTo("\"you get anything you want\"");

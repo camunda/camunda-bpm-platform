@@ -43,9 +43,9 @@
       </dependency>
 
       <dependency>
-        <groupId>xmlunit</groupId>
-        <artifactId>xmlunit</artifactId>
-        <version>1.6</version>
+        <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-core</artifactId>
+        <version>2.6.2</version>
       </dependency>
 
     </dependencies>
@@ -71,8 +71,8 @@
     </dependency>
 
     <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

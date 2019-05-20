@@ -20,22 +20,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
 import org.camunda.bpm.model.dmn.instance.NamedElement;
+import org.camunda.bpm.model.dmn.util.Java9CDataWhitespaceFilter;
 import org.camunda.bpm.model.dmn.util.ParseDmnModelRule;
 import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.Document;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 public abstract class DmnModelTest {
 
@@ -100,12 +101,18 @@ public abstract class DmnModelTest {
     Document actualDocument = docBuilder.parse(actualFile);
     Document expectedDocument = docBuilder.parse(expectedFile);
 
-    Diff diff = new Diff(expectedDocument, actualDocument);
-    if (!diff.similar()) {
-      diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
-      DetailedDiff detailedDiff = new DetailedDiff(diff);
-      String failMsg = "XML differs:\n" + detailedDiff.getAllDifferences() + "\n\nActual XML:\n" + Dmn.convertToString(modelInstance);
+    Diff diff = DiffBuilder.compare(expectedDocument).withTest(actualDocument)
+      .withNodeFilter(new Java9CDataWhitespaceFilter())
+      .checkForSimilar()
+      .build();
+
+    if (diff.hasDifferences()) {
+
+      String failMsg = "XML differs:\n" + diff.getDifferences() +
+          "\n\nActual XML:\n" + Dmn.convertToString(modelInstance);
       fail(failMsg);
+
+      fail("not similar: " + diff.toString());
     }
   }
 
