@@ -67,13 +67,15 @@ module.exports = function(pluginDependencies) {
     '$uibTooltipProvider',
     '$locationProvider',
     '$animateProvider',
+    '$qProvider',
     function(
       $routeProvider,
       UriProvider,
       $modalProvider,
       $tooltipProvider,
       $locationProvider,
-      $animateProvider
+      $animateProvider,
+      $qProvider
     ) {
       $routeProvider.otherwise({ redirectTo: '/' });
 
@@ -110,6 +112,8 @@ module.exports = function(pluginDependencies) {
       $locationProvider.hashPrefix('');
 
       $animateProvider.classNameFilter(/angular-animate/);
+
+      $qProvider.errorOnUnhandledRejections(false);
     }];
 
   appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camAdminConf, 'Admin'));
