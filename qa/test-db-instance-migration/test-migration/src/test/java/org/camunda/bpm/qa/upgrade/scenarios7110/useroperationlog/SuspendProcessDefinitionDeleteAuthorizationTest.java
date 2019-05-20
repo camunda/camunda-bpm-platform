@@ -17,9 +17,8 @@
 package org.camunda.bpm.qa.upgrade.scenarios7110.useroperationlog;
 
 
-import static org.camunda.bpm.engine.authorization.Resources.OPERATION_LOG_CATEGORY;
-import static org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions.DELETE;
-import static org.camunda.bpm.engine.history.UserOperationLogEntry.CATEGORY_TASK_WORKER;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -33,6 +32,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -82,21 +82,22 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
         .afterTimestamp(new Date(1549110000000l));
 
     // assume
-    assertTrue(query.count() == 1);
+    assertEquals(1L, query.count());
+    UserOperationLogEntry entry = query.singleResult();
 
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
 
     try {
       // when
-      historyService.deleteUserOperationLogEntry(query.list().get(0).getId());
+      historyService.deleteUserOperationLogEntry(entry.getId());
       fail("Exception expected: It should not be possible to delete the user operation log");
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
       assertTrue(message.contains("jane"));
-      assertTrue(message.contains(DELETE.getName()));
-      assertTrue(message.contains(OPERATION_LOG_CATEGORY.resourceName()));
-      assertTrue(message.contains(CATEGORY_TASK_WORKER));
+      assertTrue(message.contains(DELETE_HISTORY.getName()));
+      assertTrue(message.contains(PROCESS_DEFINITION.resourceName()));
+      assertTrue(message.contains("timerBoundaryProcess"));
     }
   }
   
