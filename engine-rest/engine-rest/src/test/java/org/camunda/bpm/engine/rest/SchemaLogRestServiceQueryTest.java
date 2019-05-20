@@ -40,6 +40,9 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import io.restassured.response.Response;
+import io.restassured.specification.ResponseSpecification;
+
 /**
  * @author Miklas Boskamp
  *
@@ -93,8 +96,8 @@ public class SchemaLogRestServiceQueryTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(MediaType.APPLICATION_JSON)
-        .body("schemaLogEntries[0].version", is(SCHEMA_LOG_ENTRY_MOCK_VERSION))
-        .body("schemaLogEntries[0].timestamp", notNullValue())
+        .body("[0].version", is(SCHEMA_LOG_ENTRY_MOCK_VERSION))
+        .body("[0].timestamp", notNullValue())
       .when().get(SCHEMA_LOG_URL);
 
     verify(mockedQuery).version(SCHEMA_LOG_ENTRY_MOCK_VERSION);
@@ -109,15 +112,17 @@ public class SchemaLogRestServiceQueryTest extends AbstractRestServiceTest {
     params.put("sortBy", "timestamp");
     params.put("sortOrder", "asc");
 
-    given()
+    ResponseSpecification body = given()
       .contentType(MediaType.APPLICATION_JSON)
       .body(params)
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(MediaType.APPLICATION_JSON)
-        .body("schemaLogEntries[0].version", is(SCHEMA_LOG_ENTRY_MOCK_VERSION))
-        .body("schemaLogEntries[0].timestamp", notNullValue())
+        .body("[0].version", is(SCHEMA_LOG_ENTRY_MOCK_VERSION))
+        .body("[0].timestamp", notNullValue());
+    Response post = body
       .when().post(SCHEMA_LOG_URL);
+    System.out.println(post.asString());
     
     verify(mockedQuery).version(SCHEMA_LOG_ENTRY_MOCK_VERSION);
     verify(mockedQuery).orderByTimestamp();

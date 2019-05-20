@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -26,7 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.rest.dto.SchemaLogDto;
+import org.camunda.bpm.engine.rest.dto.SchemaLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.SchemaLogQueryDto;
 
 /**
@@ -40,11 +42,11 @@ public interface SchemaLogRestService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  SchemaLogDto getSchemaLog(@Context Request request, @Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
+  List<SchemaLogEntryDto> getSchemaLog(@Context Request request, @Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  SchemaLogDto querySchemaLog(SchemaLogQueryDto dto, @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+  List<SchemaLogEntryDto> querySchemaLog(SchemaLogQueryDto dto, @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 }

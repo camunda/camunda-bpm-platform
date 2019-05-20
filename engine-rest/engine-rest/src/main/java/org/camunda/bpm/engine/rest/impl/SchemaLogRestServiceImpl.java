@@ -24,7 +24,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.management.SchemaLogQuery;
 import org.camunda.bpm.engine.rest.SchemaLogRestService;
-import org.camunda.bpm.engine.rest.dto.SchemaLogDto;
+import org.camunda.bpm.engine.rest.dto.SchemaLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.SchemaLogQueryDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,12 +39,12 @@ public class SchemaLogRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   @Override
-  public SchemaLogDto getSchemaLog(Request request, UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+  public List<SchemaLogEntryDto> getSchemaLog(Request request, UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     return querySchemaLog(new SchemaLogQueryDto(getObjectMapper(), uriInfo.getQueryParameters()), firstResult, maxResults);
   }
 
   @Override
-  public SchemaLogDto querySchemaLog(SchemaLogQueryDto dto, Integer firstResult, Integer maxResults) {
+  public List<SchemaLogEntryDto> querySchemaLog(SchemaLogQueryDto dto, Integer firstResult, Integer maxResults) {
     SchemaLogQuery query = dto.toQuery(processEngine);
     List<SchemaLogEntry> schemaLogEntries;
     if (firstResult != null || maxResults != null) {
@@ -52,7 +52,7 @@ public class SchemaLogRestServiceImpl extends AbstractRestProcessEngineAware imp
     } else {
       schemaLogEntries = query.list();
     }
-    return SchemaLogDto.fromSchemaLogEntries(schemaLogEntries);
+    return SchemaLogEntryDto.fromSchemaLogEntries(schemaLogEntries);
   }
 
   protected List<SchemaLogEntry> executePaginatedQuery(SchemaLogQuery query, Integer firstResult, Integer maxResults) {
