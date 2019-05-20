@@ -47,6 +47,8 @@ import org.junit.Test;
  */
 public class SuspendProcessDefinitionDeleteAuthorizationTest {
 
+  private static final String USER_ID = "jane" + "SuspendProcessDefinitionDelete";
+
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
 
@@ -60,7 +62,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     authorizationService = engineRule.getAuthorizationService();
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
-    engineRule.getIdentityService().setAuthenticatedUserId("jane");
+    engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
   }
 
   @After
@@ -68,7 +70,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
     engineRule.getIdentityService().clearAuthentication();
 
-    List<Authorization> auths = authorizationService.createAuthorizationQuery().list();
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn(USER_ID).list();
     for (Authorization authorization : auths) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
@@ -94,7 +96,7 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTrue(message.contains("jane"));
+      assertTrue(message.contains(USER_ID));
       assertTrue(message.contains(DELETE_HISTORY.getName()));
       assertTrue(message.contains(PROCESS_DEFINITION.resourceName()));
       assertTrue(message.contains("timerBoundaryProcess"));
@@ -112,21 +114,21 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     assertTrue(query.count() == 1 || query.count() == 2);
 
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("jane");
+    auth.setUserId(USER_ID);
     auth.setPermissions(new Permissions[] {Permissions.DELETE_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("*");
 
     authorizationService.saveAuthorization(auth);
     String logId = query.list().get(0).getId();
-    String jobId = query.list().get(0).getJobId();
+    String processInstanceId = query.list().get(0).getProcessInstanceId();
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
 
     // when
     historyService.deleteUserOperationLogEntry(logId);
 
     // then
-    assertEquals(0, query.jobId(jobId).count());
+    assertEquals(0, query.processInstanceId(processInstanceId).count());
   }
 
   @Test
@@ -140,9 +142,9 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     assertTrue(query.count() == 1 || query.count() == 2);
 
     String logId = query.list().get(0).getId();
-    String jobId = query.list().get(0).getJobId();
+    String processInstanceId = query.list().get(0).getProcessInstanceId();
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("jane");
+    auth.setUserId(USER_ID);
     auth.setPermissions(new Permissions[] {Permissions.DELETE_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("timerBoundaryProcess");
@@ -155,6 +157,6 @@ public class SuspendProcessDefinitionDeleteAuthorizationTest {
     historyService.deleteUserOperationLogEntry(logId);
 
     // then
-    assertEquals(0, query.jobId(jobId).count());
+    assertEquals(0, query.processInstanceId(processInstanceId).count());
   }
 }

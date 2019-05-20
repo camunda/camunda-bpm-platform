@@ -40,6 +40,8 @@ import org.junit.Test;
  */
 public class CreateStandaloneTaskAuthorizationTest {
 
+  private static final String USER_ID = "jane" + "CreateStandaloneTask";
+
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
 
@@ -53,7 +55,7 @@ public class CreateStandaloneTaskAuthorizationTest {
     authorizationService = engineRule.getAuthorizationService();
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
-    engineRule.getIdentityService().setAuthenticatedUserId("jane");
+    engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
   }
 
   @After
@@ -62,7 +64,7 @@ public class CreateStandaloneTaskAuthorizationTest {
     engineRule.getIdentityService().clearAuthentication();
 
 
-    List<Authorization> auths = authorizationService.createAuthorizationQuery().list();
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn(USER_ID).list();
     for (Authorization authorization : auths) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
@@ -84,7 +86,7 @@ public class CreateStandaloneTaskAuthorizationTest {
   public void testWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("jane");
+    auth.setUserId(USER_ID);
     auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("*");
@@ -102,7 +104,7 @@ public class CreateStandaloneTaskAuthorizationTest {
   public void testWithReadHistoryPermissionOnProcessDefinition() {
     // given
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("jane");
+    auth.setUserId(USER_ID);
     auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("something");

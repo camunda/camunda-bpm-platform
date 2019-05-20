@@ -40,6 +40,8 @@ import org.junit.Test;
  */
 public class CreateStandaloneTaskDeleteAuthorizationTest {
 
+  private static final String USER_ID = "jane" + "CreateStandaloneTaskDelete";
+
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
 
@@ -53,7 +55,7 @@ public class CreateStandaloneTaskDeleteAuthorizationTest {
     authorizationService = engineRule.getAuthorizationService();
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
-    engineRule.getIdentityService().setAuthenticatedUserId("jane");
+    engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
     
   }
 
@@ -62,7 +64,7 @@ public class CreateStandaloneTaskDeleteAuthorizationTest {
     engineConfiguration.setAuthorizationEnabled(false);
     engineRule.getIdentityService().clearAuthentication();
 
-    List<Authorization> auths = authorizationService.createAuthorizationQuery().list();
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn(USER_ID).list();
     for (Authorization authorization : auths) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
@@ -77,7 +79,7 @@ public class CreateStandaloneTaskDeleteAuthorizationTest {
     assertEquals(1, query.count());
 
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("jane");
+    auth.setUserId(USER_ID);
     auth.setPermissions(new Permissions[] {Permissions.DELETE_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("*");

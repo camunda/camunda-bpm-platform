@@ -40,6 +40,8 @@ import org.junit.Test;
  */
 public class SetAssigneeProcessInstanceTaskAuthorizationTest {
 
+  private static final String USER_ID = "jane" + "SetAssigneeProcessInstanceTask";
+
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
 
@@ -52,14 +54,14 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
     historyService = engineRule.getHistoryService();
     authorizationService = engineRule.getAuthorizationService();
     engineConfiguration = engineRule.getProcessEngineConfiguration();
-    engineRule.getIdentityService().setAuthenticatedUserId("mary");
+    engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
   }
 
   @After
   public void tearDown() {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
     engineRule.getIdentityService().clearAuthentication();
-    List<Authorization> auths = authorizationService.createAuthorizationQuery().list();
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn(USER_ID).list();
     for (Authorization authorization : auths) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
@@ -81,7 +83,7 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
   public void testWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("mary");
+    auth.setUserId(USER_ID);
     auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("*");
@@ -99,7 +101,7 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
   public void testWithReadHistoryPermissionOnProcessDefinition() {
     // given
     Authorization auth = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    auth.setUserId("mary");
+    auth.setUserId(USER_ID);
     auth.setPermissions(new Permissions[] {Permissions.READ_HISTORY});
     auth.setResource(Resources.PROCESS_DEFINITION);
     auth.setResourceId("oneTaskProcess_userOpLog");
