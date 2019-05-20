@@ -536,7 +536,13 @@
   </sql>
 
   <!-- reusable authorization check for queries. -->
-  <sql id="queryAuthorizationCheck">    
+  <sql id="queryAuthorizationCheck">
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">    
+        AND <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheckWithoutPrefix"/>
+      </if>
+  </sql>
+  
+  <sql id="queryAuthorizationCheckWithoutPrefix">
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <choose>
           <when test="authCheck.revokeAuthorizationCheckEnabled">
@@ -544,10 +550,10 @@
             <bind name="authUserId" value="authCheck.authUserId" />
             <bind name="authGroupIds" value="authCheck.authGroupIds" />        
             <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
-            AND (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />) = 1
+            (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />) = 1
           </when> 
           <otherwise>
-            AND AUTH.RESOURCE_ID_ IS NOT NULL 
+            AUTH.RESOURCE_ID_ IS NOT NULL 
             <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size() > 0"> 
               AND
               <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.compositeChecks" separator="AND">

@@ -307,8 +307,10 @@
       
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <!-- may not exist in the context of a process definition -->
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-          or (CATEGORY_ IS NULL AND PROC_DEF_KEY_ IS NULL)
+          and ( 
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheckWithoutPrefix"/>
+            or ( RES.CATEGORY_ IS NULL AND RES.PROC_DEF_KEY_ IS NULL )
+          )
       </if>
 
     </where>
