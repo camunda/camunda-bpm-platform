@@ -76,7 +76,7 @@ public class SetAssigneeProcessInstanceTaskAuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery().processDefinitionKey("oneTaskProcess_userOpLog");
 
     // then
-    assertEquals(1, query.count());
+    assertEquals(0, query.count());
   }
 
   @Test

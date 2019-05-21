@@ -39,7 +39,7 @@ public class TaskFilterVariablesScenario {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
         // boolean filter
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
+        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_710",
           "TaskFilterVariablesScenario_filterBooleanVariable",
           Variables.createVariables().putValue("booleanVariable", true));
 
@@ -52,7 +52,7 @@ public class TaskFilterVariablesScenario {
         engine.getFilterService().saveFilter(filter);
 
         // int filter
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
+        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_710",
           "TaskFilterVariablesScenario_filterIntVariable",
           Variables.createVariables().putValue("intVariable", 7));
 
@@ -65,7 +65,7 @@ public class TaskFilterVariablesScenario {
         engine.getFilterService().saveFilter(filter);
 
         // int out of range filter
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
+        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_710",
           "TaskFilterVariablesScenario_filterIntOutOfRangeVariable",
           Variables.createVariables().putValue("longVariable", Integer.MAX_VALUE+1L));
 
@@ -78,7 +78,7 @@ public class TaskFilterVariablesScenario {
         engine.getFilterService().saveFilter(filter);
 
         // double filter
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
+        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_710",
           "TaskFilterVariablesScenario_filterDoubleVariable",
           Variables.createVariables().putValue("doubleVariable", 88.89D));
 
@@ -91,7 +91,7 @@ public class TaskFilterVariablesScenario {
         engine.getFilterService().saveFilter(filter);
 
         // string filter
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
+        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_710",
           "TaskFilterVariablesScenario_filterStringVariable",
           Variables.createVariables().putValue("stringVariable", "aVariableValue"));
 
@@ -104,7 +104,7 @@ public class TaskFilterVariablesScenario {
         engine.getFilterService().saveFilter(filter);
 
         // filter null
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
+        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess_710",
           "TaskFilterVariablesScenario_filterNullVariable",
         Variables.createVariables().putValue("nullVariable", null));
 

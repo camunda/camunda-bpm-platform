@@ -215,6 +215,8 @@
                     <!-- now perform the schema migrations -->
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
+                    <!-- delete global grant authorizations created with the engine script -->
+                    <srcFile>src/main/resources/org/camunda/bpm/qa/upgrade/alldb_engine_delete_global_auth.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>

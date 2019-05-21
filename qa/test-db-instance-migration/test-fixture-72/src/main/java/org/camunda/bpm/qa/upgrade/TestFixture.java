@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.qa.upgrade.scenarios.authorization.AuthorizationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NonInterruptingBoundaryEventScenario;
@@ -128,17 +127,6 @@ public class TestFixture {
 
     // event-based gateway
     runner.setupScenarios(EventBasedGatewayScenario.class);
-
-    processEngine.close();
-
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("camunda.auth.cfg.xml");
-    processEngine = processEngineConfiguration.buildProcessEngine();
-
-    // register test scenarios
-    runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
-
-    runner.setupScenarios(AuthorizationScenario.class);
 
     processEngine.close();
   }
