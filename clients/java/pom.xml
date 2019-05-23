@@ -7,7 +7,7 @@
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-external-task-client-root</artifactId>
   <inceptionYear>2018</inceptionYear>
-  <version>1.2.0</version>
+  <version>1.3.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -84,7 +84,7 @@
     <url>http://github.com/camunda/camunda-external-task-client-java</url>
     <connection>scm:git:git@github.com:camunda/camunda-external-task-client-java.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-external-task-client-java.git</developerConnection>
-    <tag>1.2.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
