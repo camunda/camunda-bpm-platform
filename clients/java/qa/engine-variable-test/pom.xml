@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>qa</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
   </parent>
 
   <dependencies>
