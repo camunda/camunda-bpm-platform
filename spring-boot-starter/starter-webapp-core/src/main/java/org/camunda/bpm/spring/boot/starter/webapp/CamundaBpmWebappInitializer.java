@@ -84,16 +84,16 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
     servletContext.addListener(new WelcomeContainerBootstrap());
     servletContext.addListener(new HttpSessionMutexListener());
 
-    registerFilter("Authentication Filter", AuthenticationFilter.class, "/*");
-    registerFilter("Security Filter", LazySecurityFilter.class, singletonMap("configFile", properties.getWebapp().getSecurityConfigFile()), "/*");
-    registerFilter("CsrfPreventionFilter", CsrfPreventionFilter.class, properties.getWebapp().getCsrf().getInitParams(),"/*");
-    registerFilter("HttpHeaderSecurity", HttpHeaderSecurityFilter.class, Collections.EMPTY_MAP,"/*");
+    registerFilter("Authentication Filter", AuthenticationFilter.class, "/api/*", "/app/*");
+    registerFilter("Security Filter", LazySecurityFilter.class, singletonMap("configFile", properties.getWebapp().getSecurityConfigFile()), "/api/*", "/app/*");
+    registerFilter("CsrfPreventionFilter", CsrfPreventionFilter.class, properties.getWebapp().getCsrf().getInitParams(),"/api/*", "/app/*");
+    registerFilter("HttpHeaderSecurity", HttpHeaderSecurityFilter.class, Collections.EMPTY_MAP,"/api/*", "/app/*");
 
-    registerFilter("Engines Filter", LazyProcessEnginesFilter.class, "/app/*");
+    registerFilter("Engines Filter", LazyProcessEnginesFilter.class, "/api/*", "/app/*");
 
-    registerFilter("EmptyBodyFilter", EmptyBodyFilter.class, "/api/*");
+    registerFilter("EmptyBodyFilter", EmptyBodyFilter.class, "/api/*", "/app/*");
 
-    registerFilter("CacheControlFilter", CacheControlFilter.class, "/api/*");
+    registerFilter("CacheControlFilter", CacheControlFilter.class, "/api/*", "/app/*");
 
     registerServlet("Cockpit Api", CockpitApplication.class, "/api/cockpit/*");
     registerServlet("Admin Api", AdminApplication.class, "/api/admin/*");
