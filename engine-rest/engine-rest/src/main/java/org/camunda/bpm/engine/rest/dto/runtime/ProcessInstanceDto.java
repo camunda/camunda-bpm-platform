@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest.dto.runtime;
 
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
+import org.camunda.bpm.engine.rest.util.BusinessUriUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class ProcessInstanceDto extends LinkableDto {
@@ -24,6 +25,7 @@ public class ProcessInstanceDto extends LinkableDto {
   private String id;
   private String definitionId;
   private String businessKey;
+  private String businessUri;
   private String caseInstanceId;
   private boolean ended;
   private boolean suspended;
@@ -36,6 +38,9 @@ public class ProcessInstanceDto extends LinkableDto {
     this.id = instance.getId();
     this.definitionId = instance.getProcessDefinitionId();
     this.businessKey = instance.getBusinessKey();
+    if ((this.definitionId != null) && (this.businessKey != null)) {
+      this.businessUri = BusinessUriUtil.getBusinessUri(getDefinitionId(), getBusinessKey());
+    }
     this.caseInstanceId = instance.getCaseInstanceId();
     this.ended = instance.isEnded();
     this.suspended = instance.isSuspended();
@@ -52,6 +57,10 @@ public class ProcessInstanceDto extends LinkableDto {
 
   public String getBusinessKey() {
     return businessKey;
+  }
+  
+  public String getBusinessUri() {
+    return businessUri;
   }
 
   public String getCaseInstanceId() {
