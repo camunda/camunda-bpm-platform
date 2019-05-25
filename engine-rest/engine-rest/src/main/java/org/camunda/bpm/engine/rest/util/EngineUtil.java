@@ -27,45 +27,45 @@ import java.util.ServiceLoader;
 
 public class EngineUtil {
 
-    /**
-     * Look up the process engine from the {@link ProcessEngineProvider}. If engineName is null, the default engine is returned.
-     * @param engineName
-     * @return
-     */
+  /**
+   * Look up the process engine from the {@link ProcessEngineProvider}. If engineName is null, the default engine is returned.
+   * @param engineName
+   * @return
+   */
   public static ProcessEngine lookupProcessEngine(String engineName) {
 
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
-        if(iterator.hasNext()) {
+    if(iterator.hasNext()) {
       ProcessEngineProvider provider = iterator.next();
-            if (engineName == null) {
-                return provider.getDefaultProcessEngine();
-            } else {
-                return provider.getProcessEngine(engineName);
-            }
-        } else {
-            throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
-        }
+      if (engineName == null) {
+        return provider.getDefaultProcessEngine();
+      } else {
+        return provider.getProcessEngine(engineName);
+      }
+    } else {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
     }
+  }
 
-    public static ProcessEngine lookupProcessEngineByDefinitionId(final String processDefinitionId) {
+  public static ProcessEngine lookupProcessEngineByDefinitionId(final String processDefinitionId) {
 
-        final ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
-        final Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
+    final ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
+    final Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
-        if (iterator.hasNext()) {
-            final ProcessEngineProvider provider = iterator.next();
-            for (final String engineName : provider.getProcessEngineNames()) {
-                final ProcessEngine engine = provider.getProcessEngine(engineName);
-                final ProcessDefinition definition = engine.getRepositoryService().createProcessDefinitionQuery()
-                        .processDefinitionId(processDefinitionId).singleResult();
-                if (definition != null) {
-                    return engine;
-                }
-            }
+    if (iterator.hasNext()) {
+      final ProcessEngineProvider provider = iterator.next();
+      for (final String engineName : provider.getProcessEngineNames()) {
+        final ProcessEngine engine = provider.getProcessEngine(engineName);
+        final ProcessDefinition definition = engine.getRepositoryService().createProcessDefinitionQuery()
+           .processDefinitionId(processDefinitionId).singleResult();
+        if (definition != null) {
+          return engine;
         }
-        throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the " + ProcessEngineProvider.class + "- SPI for the process definition '" + processDefinitionId + "'.");
+      }
     }
+    throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the " + ProcessEngineProvider.class + "- SPI for the process definition '" + processDefinitionId + "'.");
+  }
 
 }
