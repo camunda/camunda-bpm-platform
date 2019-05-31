@@ -30,7 +30,7 @@
     <version.logback>1.1.2</version.logback>
     <version.mockito>1.9.5</version.mockito>
 
-    <camunda.version.old>7.10.0</camunda.version.old>
+    <camunda.version.old>7.11.0</camunda.version.old>
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
 
