@@ -12,7 +12,7 @@
   <name>camunda BPM - QA - test new schema with old engine</name>
 
   <properties>
-    <camunda.old.engine.version>7.10.0</camunda.old.engine.version>
+    <camunda.old.engine.version>7.11.0</camunda.old.engine.version>
   </properties>
 
   <build>
@@ -105,46 +105,41 @@
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
-            <version>7.10.0</version>
+            <version>7.11.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-engine</artifactId>
-            <version>7.10.0</version>
+            <version>7.11.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-xml-model</artifactId>
-            <version>7.10.0</version>
+            <version>7.11.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-bpmn-model</artifactId>
-            <version>7.10.0</version>
+            <version>7.11.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-cmmn-model</artifactId>
-            <version>7.10.0</version>
+            <version>7.11.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-dmn-model</artifactId>
-            <version>7.10.0</version>
+            <version>7.11.0</version>
           </dependency>
           <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
             <version>3.4.4</version>
           </dependency>
-		  <!-- legacy dependency which was provided by the parent pom up to 7.10.x -->
-          <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
-          </dependency>
+
          </dependencies>
       </dependencyManagement>
 
@@ -231,12 +226,26 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
-          <version>7.10.0</version>
+          <version>7.11.0</version>
 <!--           <scope>test</scope> -->
         </dependency>
         <dependency>
           <groupId>org.mockito</groupId>
           <artifactId>mockito-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.8.1</version>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.assertj</groupId>
+          <artifactId>assertj-core</artifactId>
+          <version>2.9.1</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

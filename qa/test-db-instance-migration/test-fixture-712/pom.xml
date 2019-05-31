@@ -3,18 +3,52 @@
 
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
-    <artifactId>camunda-qa-db-rolling-update</artifactId>
+    <artifactId>camunda-qa-db-instance-migration</artifactId>
     <version>7.12.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-db-create-new-engine</artifactId>
+  <artifactId>camunda-qa-upgrade-test-fixture-712</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update - create new engine</name>
+  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.12.0</name>
 
   <properties>
+    <!-- comment when 7.X is released -->
     <camunda.version.current>${project.version}</camunda.version.current>
     <camunda.version.previous>7.11.0</camunda.version.previous>
   </properties>
+
+  <!-- uncomment when 7.X is released -->
+  <!-- <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>7.X.0</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-bpmn-model</artifactId>
+        <version>7.X.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-cmmn-model</artifactId>
+        <version>7.X.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-dmn-model</artifactId>
+        <version>7.X.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-xml-model</artifactId>
+        <version>7.X.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement> -->
 
   <dependencies>
     <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
@@ -22,11 +56,28 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
+      <!--<version>7.12.0</version>-->
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-spin</artifactId>
+      <!--<version>7.12.0</version>-->
     </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
-      <artifactId>camunda-qa-db-rolling-update-util</artifactId>
+      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
@@ -63,6 +114,8 @@
                     <groupId>org.camunda.bpm.distro</groupId>
                     <artifactId>camunda-sql-scripts</artifactId>
                     <version>${camunda.version.current}</version>
+                    <!-- Replace after 7.12.0 release -->
+                    <!--<version>7.12.0</version>-->
                     <type>test-jar</type>
                     <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                     <overWrite>true</overWrite>
@@ -78,7 +131,7 @@
 
   <profiles>
     <profile>
-      <id>rolling-update</id>
+      <id>instance-migration</id>
       <build>
         <plugins>
           <plugin>
@@ -102,7 +155,8 @@
 
                     <mkdir dir="${current.sql.upgrade.dir}/" />
 
-                    <!-- concatenated patches for last minor version -->
+                    <!-- concanated patches for last minor version -->
+                    <!-- 7.11.0 is on a clean state so we can again use the concanated patches -->
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql" />
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql" />
 
@@ -137,6 +191,8 @@
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
                   <versionString>${camunda.version.current}</versionString>
+                  <!-- Replace after 7.12.0 release -->
+                  <!--<versionString>7.12.0</versionString>-->
                 </configuration>
               </execution>
               <execution>
@@ -165,6 +221,7 @@
                 <configuration>
                   <srcFiles>
                     <!-- now patch old version of the schema -->
+                    <!--<srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.x_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.y.sql</srcFile>-->
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql</srcFile>
                   </srcFiles>
@@ -184,6 +241,7 @@
                   </srcFiles>
                 </configuration>
               </execution>
+              <!-- example: patch-current-schema
               <execution>
                 <id>patch-current-schema</id>
                 <phase>test-compile</phase>
@@ -192,43 +250,19 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- now perform the schema migrations -->
-                    <!-- now patch new version of the schema, apply any patches explicitly -->
-                    <!-- example:
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql</srcFile>
-                    -->
+                    // now patch current version of the schema
+                    // example for aggregate patching of current version
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
-            </executions>
-          </plugin>
-
-
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <configuration>
-              <cleanupDaemonThreads>false</cleanupDaemonThreads>
-              <includeProjectDependencies>true</includeProjectDependencies>
-              <includePluginDependencies>false</includePluginDependencies>
-              <classpathScope>test</classpathScope>
-            </configuration>
-            <executions>
-              <execution>
-                <id>create-test-fixture</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.qa.rolling.update.TestNewEngineMain</mainClass>
-                  <includePluginDependencies>false</includePluginDependencies>
-                </configuration>
-              </execution>
+              -->
             </executions>
           </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
+
 </project>

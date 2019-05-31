@@ -37,7 +37,7 @@
     <version.postgresql>9.3-1102-jdbc4</version.postgresql>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.10.0</camunda.version.old>
+    <camunda.version.old>7.11.0</camunda.version.old>
   </properties>
 
   <dependencyManagement>
