@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.form.FormDataImpl;
 import org.camunda.bpm.engine.impl.form.FormFieldImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -83,7 +84,13 @@ public class FormFieldHandler {
     // value
     TypedValue value = variableScope.getVariableTyped(id);
     if(value != null) {
-      formField.setValue(type.convertToFormValue(value));
+      final TypedValue formValue;
+      try {
+        formValue = type.convertToFormValue(value);
+      } catch (Exception exception) {
+        throw new FormFieldValidationException(id, "failed to convert '" + id + "'", exception);
+      }
+      formField.setValue(formValue);
     }
     else {
       // first, need to convert to model value since the default value may be a String Constant specified in the model xml.
