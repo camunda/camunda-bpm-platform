@@ -518,6 +518,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptCompilation = true;
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
+  protected String datePattern = "dd/MM/yyyy";
 
   protected boolean cmmnEnabled = true;
   protected boolean dmnEnabled = true;
@@ -1803,6 +1804,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return dmnEngine;
   }
 
+  public void setDatePattern(String datePattern) {
+    this.datePattern = datePattern;
+  }
+  
+  public String getDatePattern() {
+    return datePattern;
+  }
+
   public void setDmnEngine(DmnEngine dmnEngine) {
     this.dmnEngine = dmnEngine;
   }
@@ -2082,7 +2091,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       formTypes = new FormTypes();
       formTypes.addFormType(new StringFormType());
       formTypes.addFormType(new LongFormType());
-      formTypes.addFormType(new DateFormType("dd/MM/yyyy"));
+      formTypes.addFormType(new DateFormType(datePattern));
       formTypes.addFormType(new BooleanFormType());
     }
     if (customFormTypes != null) {
