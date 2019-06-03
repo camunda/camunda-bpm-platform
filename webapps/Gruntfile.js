@@ -220,7 +220,7 @@ module.exports = function(grunt) {
   });
 
   require('./grunt/tasks/compileLibs')(grunt, true);
-  require('./node_modules/camunda-bpm-webapp/grunt/tasks/license-header')(grunt, false);
+  require('./grunt/tasks/license-header')(grunt, false);
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
   require('camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname);
   require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt, __dirname);
