@@ -76,13 +76,6 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
   public void dbSchemaCreate() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
-    HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
-    if ( (!processEngineConfiguration.isDbHistoryUsed())
-         && (!configuredHistoryLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE))
-       ) {
-      throw LOG.databaseHistoryLevelException(configuredHistoryLevel.getName());
-    }
-
     if (isEngineTablePresent()) {
       String dbVersion = getDbVersion();
       if (!ProcessEngine.VERSION.equals(dbVersion)) {

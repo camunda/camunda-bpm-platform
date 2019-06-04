@@ -87,10 +87,10 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutorSchemaOperations = processEngineConfiguration.getCommandExecutorSchemaOperations();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
-    this.historyLevel = processEngineConfiguration.getHistoryLevel();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
 
     executeSchemaOperations();
+    this.historyLevel = processEngineConfiguration.getHistoryLevel();
 
     if (name == null) {
       LOG.processEngineCreated(ProcessEngines.NAME_DEFAULT);

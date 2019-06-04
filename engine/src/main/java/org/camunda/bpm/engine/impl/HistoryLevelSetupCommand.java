@@ -42,6 +42,9 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
     determineAutoHistoryLevel(processEngineConfiguration, databaseHistoryLevel);
 
     HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
+    if (!processEngineConfiguration.isDbHistoryUsed() && !configuredHistoryLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      throw LOG.databaseHistoryLevelException(configuredHistoryLevel.getName());
+    }
 
     if (databaseHistoryLevel == null) {
 

@@ -795,7 +795,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   @Override
   public ProcessEngine buildProcessEngine() {
     init();
-    processEngine = new ProcessEngineImpl(this);
+    processEngine = initProcessEngine();
     invokePostProcessEngineBuild(processEngine);
     return processEngine;
   }
@@ -817,7 +817,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initFormTypes();
     initFormFieldValidators();
     initScripting();
-    initDmnEngine();
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
@@ -825,7 +824,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initServices();
     initIdGenerator();
     initFailedJobCommandFactory();
-    initDeployers();
     initJobProvider();
     initExternalTaskPriorityProvider();
     initBatchHandlers();
@@ -1044,11 +1042,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       plugin.postInit(this);
     }
   }
+  
+  protected ProcessEngineImpl initProcessEngine() {
+    return new ProcessEngineImpl(this);
+  }
 
   protected void invokePostProcessEngineBuild(ProcessEngine engine) {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
       plugin.postProcessEngineBuild(engine);
     }
+    initDmnEngine();
+    initDeployers();
   }
 
 

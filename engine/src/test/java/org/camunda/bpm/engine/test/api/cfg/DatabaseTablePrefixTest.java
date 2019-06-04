@@ -108,8 +108,7 @@ public class DatabaseTablePrefixTest {
   private static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
 
     @Override
-    public ProcessEngine buildProcessEngine() {
-      init();
+    protected ProcessEngineImpl initProcessEngine() {
       return new NoSchemaProcessEngineImpl(this);
     }
 
