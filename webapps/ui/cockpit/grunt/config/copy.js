@@ -130,7 +130,7 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd:
-          'node_modules/camunda-commons-ui/dmn-js/node_modules/dmn-js/dist/assets/dmn-font/font/',
+          'node_modules/camunda-commons-ui/node_modules/dmn-js/dist/assets/dmn-font/font/',
         src: ['*.{eot,svg,ttf,woff,woff2}'],
         dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
       },
