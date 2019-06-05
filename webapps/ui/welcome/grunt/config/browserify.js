@@ -25,7 +25,23 @@ module.exports = function(config, browserifyConfig) {
         debug: true
       },
       watch: true,
-      transform: ['brfs'],
+      transform: [
+        'brfs',
+        ['babelify',
+        {
+          global: true,
+          compact: false,
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                targets:
+                  'ie 11, last 1 chrome version, last 1 firefox version, last 1 edge version',
+                forceAllTransforms: true
+              }
+            ]
+          ]
+        }]],
       postBundleCB: function(err, src, next) {
         console.log('post bundling', err);
 
