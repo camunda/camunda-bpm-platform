@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
+import org.camunda.bpm.engine.authorization.OptimizePermissions;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
@@ -45,6 +46,7 @@ public class ResourceTypeUtil {
     PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
     PERMISSION_ENUMS.put(Resources.TASK.resourceType(), TaskPermissions.class);
     PERMISSION_ENUMS.put(Resources.OPERATION_LOG_CATEGORY.resourceType(), UserOperationLogCategoryPermissions.class);
+    PERMISSION_ENUMS.put(Resources.OPTIMIZE.resourceType(), OptimizePermissions.class);
 
     // the rest
     for (Resource resource : Resources.values()) {
