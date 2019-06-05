@@ -189,7 +189,6 @@ module.exports = function(grunt) {
     }
   });
 
-  require('./grunt/tasks/compileLibs')(grunt, true);
   require('./grunt/tasks/license-header')(grunt, false);
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
   require('camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname);
@@ -227,7 +226,6 @@ grunt.registerTask('build', function(mode, app) {
 
 
     tasksToRun.push(
-      'compileLibs',
       'clean',
       'ensureLibs',
       'persistify',
