@@ -17,7 +17,7 @@
 
 'use strict';
 
-var BpmnIO = require('camunda-commons-ui/vendor/bpmn-js');
+var BpmnIO = require('bpmn-js');
 
 var Service = [
   '$q',
