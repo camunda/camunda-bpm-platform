@@ -39,4 +39,8 @@ public class CamundaBpmRestJerseyAutoConfiguration {
     return new FetchAndLockContextListener();
   }
 
+  @Bean
+  public CamundaBpmRestInitializer camundaBpmRestInitializer() {
+    return new CamundaBpmRestInitializer();
+  }
 }
