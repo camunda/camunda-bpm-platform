@@ -372,8 +372,13 @@
                 <exclude>**/AsyncEmailTaskTest.java</exclude>
                 <exclude>**/EmailSendTaskTest.java</exclude>
                 <exclude>**/EmailServiceTaskTest.java</exclude>
-                
+
+                <!-- Exclude test classes because resources are not available in the old-engine classpath -->
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+                <exclude>**/ProcessDiagramParseTest.java</exclude>
+
+                <!-- Exclude test class because old-engine tests old engine version with new db schema version -->
+                <exclude>**/SchemaLogEnsureSqlScriptTest.java</exclude>
 
                 <exclude>**/ManagementServiceTableCountTest.java</exclude>
               </excludes>
