@@ -123,6 +123,8 @@ public class SchemaLogQueryTest {
   public void testSortedPagedQuery() {
     // given (at least) two schema log entries
     populateTable();
+    // in case of tests that upgrade the schema there are more than two entries we want to check the last page.
+    int count = (int) managementService.createSchemaLogQuery().count();
 
     // then paging works
     // ascending order
@@ -130,7 +132,7 @@ public class SchemaLogQueryTest {
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is("0"));
 
-    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(1, 1);
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(count - 1, 1);
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
 
@@ -139,9 +141,6 @@ public class SchemaLogQueryTest {
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
 
-    // in case of tests that upgrade the schema there are more than two entries.
-    // We want to check the last page.
-    int count = (int) managementService.createSchemaLogQuery().count();
     schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(count - 1, 1);
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is("0"));
