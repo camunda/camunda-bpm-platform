@@ -107,7 +107,13 @@ module.exports = function(ngModule, appRoot, appName) {
         suffix: '.json',
         callback: function(err, data, locale) {
           if (!err && data && data.dateLocales) {
-            moment.updateLocale(locale || fallback, data.dateLocales);
+            var abbreviation = locale || fallback;
+            if (moment.locales().indexOf(abbreviation) > -1) {
+              moment.updateLocale(abbreviation, data.dateLocales);
+            } else {
+              // Define new locale if it does not exist yet
+              moment.defineLocale(abbreviation, data.dateLocales);
+            }
           }
         }
       });
