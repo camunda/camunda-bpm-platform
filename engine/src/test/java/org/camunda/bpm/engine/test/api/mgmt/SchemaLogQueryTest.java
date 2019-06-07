@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 
 import java.util.Date;
@@ -60,25 +61,28 @@ public class SchemaLogQueryTest {
   public void init() {
     managementService = engineRule.getManagementService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-    
+
     initialEntryCount = managementService.createSchemaLogQuery().count();
     dummySchemaLogEntry = createDummySchemaLogEntry();
   }
 
   @Test
   public void testQuerySchemaLogEntryList() {
-    // given
+    // given (at least) one schema log entry
 
     // when
     List<SchemaLogEntry> schemaLogEntries = managementService.createSchemaLogQuery().list();
 
-    // then expect one entry
+    // then expect (at least) one entry
     assertThat(managementService.createSchemaLogQuery().count(), is(greaterThan(0L)));
-    SchemaLogEntry schemaLogEntry = schemaLogEntries.get(0);
-    assertThat(schemaLogEntry.getId(), is("0"));
-    assertThat(schemaLogEntry.getTimestamp(), notNullValue());
-    assertThat(schemaLogEntry.getVersion(), notNullValue());
-    managementService.getProperties();
+
+    // in case of tests that upgrade the schema there are more than one entry
+    for (SchemaLogEntry schemaLogEntry : schemaLogEntries) {
+      assertThat(Integer.parseInt(schemaLogEntry.getId()), greaterThanOrEqualTo(0));
+      assertThat(schemaLogEntry.getTimestamp(), notNullValue());
+      assertThat(schemaLogEntry.getVersion(), notNullValue());
+    }
+
     cleanupTable();
   }
 
@@ -110,6 +114,11 @@ public class SchemaLogQueryTest {
     cleanupTable();
   }
 
+  /**
+   * There should always be an entry with id "0" that has the oldest timestamp
+   * and thus should be at the beginning/end of the list. (according to the
+   * ordering)
+   */
   @Test
   public void testSortedPagedQuery() {
     // given (at least) two schema log entries
@@ -130,7 +139,10 @@ public class SchemaLogQueryTest {
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
 
-    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(1, 1);
+    // in case of tests that upgrade the schema there are more than two entries.
+    // We want to check the last page.
+    int count = (int) managementService.createSchemaLogQuery().count();
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(count - 1, 1);
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is("0"));
 
