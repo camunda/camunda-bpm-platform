@@ -25,8 +25,7 @@ module.exports = function(config, browserifyConfig) {
         debug: true
       },
       watch: true,
-      transform: ['brfs',
-      [
+      transform: [[
         'babelify',
         {
           global: true,
@@ -42,7 +41,9 @@ module.exports = function(config, browserifyConfig) {
             ]
           ]
         }
-      ]],
+      ],
+      ['brfs', {global: true}]
+      ],
       postBundleCB: function(err, src, next) {
         var buildMode = config.grunt.config('buildMode');
         var livereloadPort = config.grunt.config(
@@ -75,7 +76,6 @@ module.exports = function(config, browserifyConfig) {
     options: {
       watch: true,
       transform: [
-        'brfs',
         [
           'exposify',
           {
@@ -109,7 +109,8 @@ module.exports = function(config, browserifyConfig) {
               ]
             ]
           }
-        ]
+        ],
+        ['brfs', {global: true}]
       ],
       browserifyOptions: {
         standalone: 'AdminPlugins',
