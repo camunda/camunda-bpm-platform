@@ -26,7 +26,6 @@ module.exports = function(config, browserifyConfig) {
       },
       watch: true,
       transform: [
-        'brfs',
         ['babelify',
         {
           global: true,
@@ -41,7 +40,8 @@ module.exports = function(config, browserifyConfig) {
               }
             ]
           ]
-        }]],
+        }],
+        ['brfs', {global: true}]],
       postBundleCB: function(err, src, next) {
         console.log('post bundling', err);
 
