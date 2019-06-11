@@ -56,9 +56,12 @@ import org.xmlunit.util.Predicate;
  */
 public class Java9CDataWhitespaceFilter implements Predicate<Node> {
 
+  /**
+   * @return false to remove the node from the comparison
+   */
   @Override
   public boolean test(Node toTest) {
-    return isWhitespaceSurroundingCData(toTest);
+    return !isWhitespaceSurroundingCData(toTest);
   }
 
   private boolean isWhitespaceSurroundingCData(Node node) {
@@ -72,13 +75,13 @@ public class Java9CDataWhitespaceFilter implements Predicate<Node> {
         Node child1 = children.item(1);
         Node child2 = children.item(2);
 
-        return !(isTextNode(child0) && isCDataSection(child1) && isTextNode(child2));
+        return isTextNode(child0) && isCDataSection(child1) && isTextNode(child2);
       } else {
-        return true;
+        return false;
       }
 
     } else {
-      return true;
+      return false;
     }
   }
 
