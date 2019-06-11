@@ -16,6 +16,27 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -57,11 +78,8 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -70,30 +88,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Frederik Heremans
@@ -378,12 +372,15 @@ public class TaskServiceTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testProcessAttachmentsOneProcessExecution() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
       // create attachment
-      Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+      Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more",
+          "http://weather.com");
 
       assertEquals("weatherforcast", attachment.getName());
       assertEquals("temperatures and more", attachment.getDescription());
@@ -393,22 +390,27 @@ public class TaskServiceTest {
       assertEquals("http://weather.com", attachment.getUrl());
       assertNull(taskService.getAttachmentContent(attachment.getId()));
     }
+  }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoParallelTasksProcess.bpmn20.xml" })
   public void testProcessAttachmentsTwoProcessExecutions() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoParallelTasksProcess");
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoParallelTasksProcess");
 
-    // create attachment
-    Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", "http://weather.com");
+      // create attachment
+      Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more",
+          "http://weather.com");
 
-    assertEquals("weatherforcast", attachment.getName());
-    assertEquals("temperatures and more", attachment.getDescription());
-    assertEquals("web page", attachment.getType());
-    assertNull(attachment.getTaskId());
-    assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
-    assertEquals("http://weather.com", attachment.getUrl());
-    assertNull(taskService.getAttachmentContent(attachment.getId()));
+      assertEquals("weatherforcast", attachment.getName());
+      assertEquals("temperatures and more", attachment.getDescription());
+      assertEquals("web page", attachment.getType());
+      assertNull(attachment.getTaskId());
+      assertEquals(processInstance.getId(), attachment.getProcessInstanceId());
+      assertEquals("http://weather.com", attachment.getUrl());
+      assertNull(taskService.getAttachmentContent(attachment.getId()));
+    }
   }
 
   @Test
