@@ -616,7 +616,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected ResourceAuthorizationProvider resourceAuthorizationProvider;
 
-  protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<ProcessEnginePlugin>();
+  protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<>();
 
   protected HistoryEventProducer historyEventProducer;
 
@@ -625,7 +625,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
   protected HistoryEventHandler historyEventHandler;
-  
+
   protected PermissionProvider permissionProvider;
 
   protected boolean isExecutionTreePrefetchEnabled = true;
@@ -734,7 +734,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Date historyCleanupBatchWindowStartTimeAsDate;
   protected Date historyCleanupBatchWindowEndTimeAsDate;
 
-  protected Map<Integer, BatchWindowConfiguration> historyCleanupBatchWindows = new HashMap<Integer, BatchWindowConfiguration>();
+  protected Map<Integer, BatchWindowConfiguration> historyCleanupBatchWindows = new HashMap<>();
 
   //shortcuts for batch windows configuration available to be configured from XML
   protected String mondayHistoryCleanupBatchWindowStartTime;
@@ -756,7 +756,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int historyCleanupDegreeOfParallelism = 1;
 
   protected String historyTimeToLive;
-  
+
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
@@ -912,7 +912,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       throw LOG.invalidPropertyValue("historyCleanupBatchThreshold", String.valueOf(historyCleanupBatchThreshold),
           "History cleanup batch threshold cannot be negative.");
     }
-    
+
     initHistoryTimeToLive();
 
     initBatchOperationsHistoryTimeToLive();
@@ -965,7 +965,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       historyCleanupBatchWindows.put(Calendar.SUNDAY, new BatchWindowConfiguration(sundayHistoryCleanupBatchWindowStartTime, sundayHistoryCleanupBatchWindowEndTime));
     }
   }
-  
+
   protected void initHistoryTimeToLive() {
     try {
       ParseUtil.parseHistoryTimeToLive(historyTimeToLive);
@@ -982,7 +982,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     if (batchOperationsForHistoryCleanup == null) {
-      batchOperationsForHistoryCleanup = new HashMap<String, String>();
+      batchOperationsForHistoryCleanup = new HashMap<>();
     } else {
       for (String batchOperation : batchOperationsForHistoryCleanup.keySet()) {
         String timeToLive = batchOperationsForHistoryCleanup.get(batchOperation);
@@ -1007,7 +1007,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
-    parsedBatchOperationsForHistoryCleanup = new HashMap<String, Integer>();
+    parsedBatchOperationsForHistoryCleanup = new HashMap<>();
     if (batchOperationsForHistoryCleanup != null) {
       for (String operation : batchOperationsForHistoryCleanup.keySet()) {
         Integer historyTimeToLive = ParseUtil.parseHistoryTimeToLive(batchOperationsForHistoryCleanup.get(operation));
@@ -1059,7 +1059,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       failedJobCommandFactory = new DefaultFailedJobCommandFactory();
     }
     if (postParseListeners == null) {
-      postParseListeners = new ArrayList<BpmnParseListener>();
+      postParseListeners = new ArrayList<>();
     }
     postParseListeners.add(new DefaultFailedJobParseListener());
 
@@ -1069,7 +1069,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initIncidentHandlers() {
     if (incidentHandlers == null) {
-      incidentHandlers = new HashMap<String, IncidentHandler>();
+      incidentHandlers = new HashMap<>();
 
       DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
       incidentHandlers.put(failedJobIncidentHandler.getIncidentHandlerType(), failedJobIncidentHandler);
@@ -1088,7 +1088,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initBatchHandlers() {
     if (batchHandlers == null) {
-      batchHandlers = new HashMap<String, BatchJobHandler<?>>();
+      batchHandlers = new HashMap<>();
 
       MigrationBatchJobHandler migrationHandler = new MigrationBatchJobHandler();
       batchHandlers.put(migrationHandler.getType(), migrationHandler);
@@ -1156,9 +1156,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initCommandInterceptorsTxRequired() {
     if (commandInterceptorsTxRequired == null) {
       if (customPreCommandInterceptorsTxRequired != null) {
-        commandInterceptorsTxRequired = new ArrayList<CommandInterceptor>(customPreCommandInterceptorsTxRequired);
+        commandInterceptorsTxRequired = new ArrayList<>(customPreCommandInterceptorsTxRequired);
       } else {
-        commandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
+        commandInterceptorsTxRequired = new ArrayList<>();
       }
       commandInterceptorsTxRequired.addAll(getDefaultCommandInterceptorsTxRequired());
       if (customPostCommandInterceptorsTxRequired != null) {
@@ -1171,9 +1171,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initCommandInterceptorsTxRequiresNew() {
     if (commandInterceptorsTxRequiresNew == null) {
       if (customPreCommandInterceptorsTxRequiresNew != null) {
-        commandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>(customPreCommandInterceptorsTxRequiresNew);
+        commandInterceptorsTxRequiresNew = new ArrayList<>(customPreCommandInterceptorsTxRequiresNew);
       } else {
-        commandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
+        commandInterceptorsTxRequiresNew = new ArrayList<>();
       }
       commandInterceptorsTxRequiresNew.addAll(getDefaultCommandInterceptorsTxRequiresNew());
       if (customPostCommandInterceptorsTxRequiresNew != null) {
@@ -1509,7 +1509,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initSessionFactories() {
     if (sessionFactories == null) {
-      sessionFactories = new HashMap<Class<?>, SessionFactory>();
+      sessionFactories = new HashMap<>();
 
       initPersistenceProviders();
 
@@ -1585,7 +1585,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initPersistenceProviders() {
     ensurePrefixAndSchemaFitToegether(databaseTablePrefix, databaseSchema);
-    dbSqlSessionFactory = new DbSqlSessionFactory();
+    dbSqlSessionFactory = new DbSqlSessionFactory(jdbcBatchProcessing);
     dbSqlSessionFactory.setDatabaseType(databaseType);
     dbSqlSessionFactory.setIdGenerator(idGenerator);
     dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
@@ -1624,7 +1624,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       migrationInstructionGenerator = new DefaultMigrationInstructionGenerator(migrationActivityMatcher);
     }
 
-    List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
+    List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<>();
     if (customPreMigrationActivityValidators != null) {
       migrationActivityValidators.addAll(customPreMigrationActivityValidators);
     }
@@ -1639,7 +1639,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initMigrationInstructionValidators() {
     if (migrationInstructionValidators == null) {
-      migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>();
+      migrationInstructionValidators = new ArrayList<>();
       if (customPreMigrationInstructionValidators != null) {
         migrationInstructionValidators.addAll(customPreMigrationInstructionValidators);
       }
@@ -1652,7 +1652,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initMigratingActivityInstanceValidators() {
     if (migratingActivityInstanceValidators == null) {
-      migratingActivityInstanceValidators = new ArrayList<MigratingActivityInstanceValidator>();
+      migratingActivityInstanceValidators = new ArrayList<>();
       if (customPreMigratingActivityInstanceValidators != null) {
         migratingActivityInstanceValidators.addAll(customPreMigratingActivityInstanceValidators);
       }
@@ -1666,14 +1666,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initMigratingTransitionInstanceValidators() {
     if (migratingTransitionInstanceValidators == null) {
-      migratingTransitionInstanceValidators = new ArrayList<MigratingTransitionInstanceValidator>();
+      migratingTransitionInstanceValidators = new ArrayList<>();
       migratingTransitionInstanceValidators.addAll(getDefaultMigratingTransitionInstanceValidators());
     }
   }
 
   protected void initMigratingCompensationInstanceValidators() {
     if (migratingCompensationInstanceValidators == null) {
-      migratingCompensationInstanceValidators = new ArrayList<MigratingCompensationInstanceValidator>();
+      migratingCompensationInstanceValidators = new ArrayList<>();
 
       migratingCompensationInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
       migratingCompensationInstanceValidators.add(new NoUnmappedCompensationStartEventValidator());
@@ -1700,7 +1700,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initDeployers() {
     if (this.deployers == null) {
-      this.deployers = new ArrayList<Deployer>();
+      this.deployers = new ArrayList<>();
       if (customPreDeployers != null) {
         this.deployers.addAll(customPreDeployers);
       }
@@ -1710,7 +1710,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
     if (deploymentCache == null) {
-      List<Deployer> deployers = new ArrayList<Deployer>();
+      List<Deployer> deployers = new ArrayList<>();
       if (customPreDeployers != null) {
         deployers.addAll(customPreDeployers);
       }
@@ -1726,7 +1726,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected Collection<? extends Deployer> getDefaultDeployers() {
-    List<Deployer> defaultDeployers = new ArrayList<Deployer>();
+    List<Deployer> defaultDeployers = new ArrayList<>();
 
     BpmnDeployer bpmnDeployer = getBpmnDeployer();
     defaultDeployers.add(bpmnDeployer);
@@ -1772,7 +1772,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
-    List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
+    List<BpmnParseListener> defaultListeners = new ArrayList<>();
     if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListeners.add(new HistoryParseListener(historyEventProducer));
     }
@@ -1811,7 +1811,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected List<CmmnTransformListener> getDefaultCmmnTransformListeners() {
-    List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
+    List<CmmnTransformListener> defaultListener = new ArrayList<>();
     if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListener.add(new CmmnHistoryTransformListener(cmmnHistoryEventProducer));
     }
@@ -1858,7 +1858,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       jobExecutor = new DefaultJobExecutor();
     }
 
-    jobHandlers = new HashMap<String, JobHandler>();
+    jobHandlers = new HashMap<>();
     TimerExecuteNestedActivityJobHandler timerExecuteNestedActivityJobHandler = new TimerExecuteNestedActivityJobHandler();
     jobHandlers.put(timerExecuteNestedActivityJobHandler.getType(), timerExecuteNestedActivityJobHandler);
 
@@ -1943,7 +1943,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     if (historyLevels == null) {
-      historyLevels = new ArrayList<HistoryLevel>();
+      historyLevels = new ArrayList<>();
       historyLevels.add(HistoryLevel.HISTORY_LEVEL_NONE);
       historyLevels.add(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
       historyLevels.add(HistoryLevel.HISTORY_LEVEL_AUDIT);
@@ -2097,7 +2097,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initFormEngines() {
     if (formEngines == null) {
-      formEngines = new HashMap<String, FormEngine>();
+      formEngines = new HashMap<>();
       // html form engine = default form engine
       FormEngine defaultFormEngine = new HtmlFormEngine();
       formEngines.put(null, defaultFormEngine); // default form engine is looked up with null
@@ -2148,7 +2148,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initScripting() {
     if (resolverFactories == null) {
-      resolverFactories = new ArrayList<ResolverFactory>();
+      resolverFactories = new ArrayList<>();
       resolverFactories.add(new MocksResolverFactory());
       resolverFactories.add(new VariableScopeResolverFactory());
       resolverFactories.add(new BeansResolverFactory());
@@ -2161,7 +2161,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       scriptFactory = new ScriptFactory();
     }
     if (scriptEnvResolvers == null) {
-      scriptEnvResolvers = new ArrayList<ScriptEnvResolver>();
+      scriptEnvResolvers = new ArrayList<>();
     }
     if (scriptingEnvironment == null) {
       scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers, scriptingEngines);
@@ -2218,7 +2218,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initEventHandlers() {
     if (eventHandlers == null) {
-      eventHandlers = new HashMap<String, EventHandler>();
+      eventHandlers = new HashMap<>();
 
       SignalEventHandler signalEventHander = new SignalEventHandler();
       eventHandlers.put(signalEventHander.getEventHandlerType(), signalEventHander);
@@ -2242,7 +2242,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initCommandCheckers() {
     if (commandCheckers == null) {
-      commandCheckers = new ArrayList<CommandChecker>();
+      commandCheckers = new ArrayList<>();
 
       // add the default command checkers
       commandCheckers.add(new TenantCommandChecker());
@@ -2274,7 +2274,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initBeans() {
     if (beans == null) {
-      beans = new HashMap<Object, Object>();
+      beans = new HashMap<>();
     }
   }
 
@@ -2356,7 +2356,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initDeploymentRegistration() {
     if (registeredDeployments == null) {
-      registeredDeployments = new CopyOnWriteArraySet<String>();
+      registeredDeployments = new CopyOnWriteArraySet<>();
     }
   }
 
@@ -2375,7 +2375,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resourceAuthorizationProvider = new DefaultAuthorizationProvider();
     }
   }
-  
+
   protected void initPermissionProvider() {
     if (permissionProvider == null) {
       permissionProvider = new DefaultPermissionProvider();
@@ -2402,13 +2402,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initAdminGroups() {
     if (adminGroups == null) {
-      adminGroups = new ArrayList<String>();
+      adminGroups = new ArrayList<>();
     }
     if (adminGroups.isEmpty() || !(adminGroups.contains(Groups.CAMUNDA_ADMIN))) {
       adminGroups.add(Groups.CAMUNDA_ADMIN);
     }
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
 
   @Override
@@ -3442,11 +3442,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setResourceAuthorizationProvider(ResourceAuthorizationProvider resourceAuthorizationProvider) {
     this.resourceAuthorizationProvider = resourceAuthorizationProvider;
   }
-  
+
   public PermissionProvider getPermissionProvider() {
     return permissionProvider;
   }
-  
+
   public void setPermissionProvider(PermissionProvider permissionProvider) {
     this.permissionProvider = permissionProvider;
   }
@@ -3871,7 +3871,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public List<MigrationActivityValidator> getDefaultMigrationActivityValidators() {
-    List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
+    List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<>();
     migrationActivityValidators.add(SupportedActivityValidator.INSTANCE);
     migrationActivityValidators.add(SupportedPassiveEventTriggerActivityValidator.INSTANCE);
     migrationActivityValidators.add(NoCompensationHandlerActivityValidator.INSTANCE);
@@ -3912,7 +3912,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public List<MigrationInstructionValidator> getDefaultMigrationInstructionValidators() {
-    List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>();
+    List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<>();
     migrationInstructionValidators.add(new SameBehaviorInstructionValidator());
     migrationInstructionValidators.add(new SameEventTypeValidator());
     migrationInstructionValidators.add(new OnlyOnceMappedActivityInstructionValidator());
@@ -3960,7 +3960,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public List<MigratingActivityInstanceValidator> getDefaultMigratingActivityInstanceValidators() {
-    List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators = new ArrayList<MigratingActivityInstanceValidator>();
+    List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators = new ArrayList<>();
 
     migratingActivityInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
     migratingActivityInstanceValidators.add(new VariableConflictActivityInstanceValidator());
@@ -3970,7 +3970,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public List<MigratingTransitionInstanceValidator> getDefaultMigratingTransitionInstanceValidators() {
-    List<MigratingTransitionInstanceValidator> migratingTransitionInstanceValidators = new ArrayList<MigratingTransitionInstanceValidator>();
+    List<MigratingTransitionInstanceValidator> migratingTransitionInstanceValidators = new ArrayList<>();
 
     migratingTransitionInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
     migratingTransitionInstanceValidators.add(new AsyncAfterMigrationValidator());
@@ -4180,11 +4180,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
   }
-  
+
   public String getHistoryTimeToLive() {
     return historyTimeToLive;
   }
-  
+
   public void setHistoryTimeToLive(String historyTimeToLive) {
     this.historyTimeToLive = historyTimeToLive;
   }

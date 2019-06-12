@@ -36,11 +36,6 @@ public class DbEntityOperation extends DbOperation {
 
   protected Set<String> flushRelevantEntityReferences;
 
-  /**
-   * Indicates whether the operation failed to execute due to OptimisticLocking
-   */
-  protected boolean failed = false;
-
   public void recycle() {
     entity = null;
     super.recycle();
@@ -53,14 +48,6 @@ public class DbEntityOperation extends DbOperation {
   public void setEntity(DbEntity dbEntity) {
     this.entityType = dbEntity.getClass();
     this.entity = dbEntity;
-  }
-
-  public void setFailed(boolean failed) {
-    this.failed = failed;
-  }
-
-  public boolean isFailed() {
-    return failed;
   }
 
   public void setFlushRelevantEntityReferences(Set<String> flushRelevantEntityReferences) {

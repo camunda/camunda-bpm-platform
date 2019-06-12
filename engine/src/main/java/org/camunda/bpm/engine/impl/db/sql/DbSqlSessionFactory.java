@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.db.sql;
 
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,48 +44,48 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final String MARIADB = "mariadb";
   public static final String[] SUPPORTED_DATABASES = {MSSQL, DB2, ORACLE, H2, MYSQL, POSTGRES, MARIADB};
 
-  protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String,String>>();
+  protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificLimitBeforeStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificLimitAfterStatements = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificLimitBeforeStatements = new HashMap<>();
+  public static final Map<String, String> databaseSpecificLimitAfterStatements = new HashMap<>();
   //limit statements that can be used to select first N rows without OFFSET
-  public static final Map<String, String> databaseSpecificLimitBeforeWithoutOffsetStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificLimitAfterWithoutOffsetStatements = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificLimitBeforeWithoutOffsetStatements = new HashMap<>();
+  public static final Map<String, String> databaseSpecificLimitAfterWithoutOffsetStatements = new HashMap<>();
   // limitAfter statements that can be used with subqueries
-  public static final Map<String, String> databaseSpecificInnerLimitAfterStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificLimitBetweenFilterStatements = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificInnerLimitAfterStatements = new HashMap<>();
+  public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<>();
+  public static final Map<String, String> databaseSpecificLimitBetweenFilterStatements = new HashMap<>();
 
-  public static final Map<String, String> optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements = new HashMap<String, String>();
-  public static final Map<String, String> optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements = new HashMap<String, String>();
+  public static final Map<String, String> optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements = new HashMap<>();
+  public static final Map<String, String> optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificEscapeChar = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificEscapeChar = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<>();
+  public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificBitAnd1 = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificBitAnd1 = new HashMap<>();
+  public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<>();
+  public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificDatepart1 = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificDatepart2 = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificDatepart3 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDatepart1 = new HashMap<>();
+  public static final Map<String, String> databaseSpecificDatepart2 = new HashMap<>();
+  public static final Map<String, String> databaseSpecificDatepart3 = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDummyTable = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificIfNull = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificIfNull = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificTrueConstant = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificFalseConstant = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificTrueConstant = new HashMap<>();
+  public static final Map<String, String> databaseSpecificFalseConstant = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificDistinct = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDistinct = new HashMap<>();
 
-  public static final Map<String, Map<String, String>> dbSpecificConstants = new HashMap<String, Map<String, String>>();
+  public static final Map<String, Map<String, String>> dbSpecificConstants = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<>();
 
-  public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<>();
 
   static {
 
@@ -123,8 +124,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDaysComparator.put(H2, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
     databaseSpecificCollationForCaseSensitivity.put(H2, "");
-    
-    HashMap<String, String> constants = new HashMap<String, String>();
+
+    HashMap<String, String> constants = new HashMap<>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
     constants.put("constant_for_update", "for update");
@@ -208,7 +209,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       addDatabaseSpecificStatement(mysqlLikeDatabase, "updateHistoricIncidentsByProcessInstanceId", "updateHistoricIncidentsByProcessInstanceId_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "updateIdentityLinkLogByProcessInstanceId", "updateIdentityLinkLogByProcessInstanceId_mysql");
 
-      constants = new HashMap<String, String>();
+      constants = new HashMap<>();
       constants.put("constant.event", "'event'");
       constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
       constants.put("constant_for_update", "for update");
@@ -296,7 +297,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_postgres_or_db2");
     addDatabaseSpecificStatement(POSTGRES, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_postgres_or_db2");
 
-    constants = new HashMap<String, String>();
+    constants = new HashMap<>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
     constants.put("constant_for_update", "for update");
@@ -368,7 +369,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(ORACLE, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_oracle");
     addDatabaseSpecificStatement(ORACLE, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_oracle");
 
-    constants = new HashMap<String, String>();
+    constants = new HashMap<>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
     constants.put("constant_for_update", "for update");
@@ -444,7 +445,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(DB2, "deleteByteArraysByRemovalTime", "deleteByteArraysByRemovalTime_postgres_or_db2");
     addDatabaseSpecificStatement(DB2, "deleteHistoricBatchesByRemovalTime", "deleteHistoricBatchesByRemovalTime_postgres_or_db2");
 
-    constants = new HashMap<String, String>();
+    constants = new HashMap<>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "CAST(CONCAT(CONCAT(COALESCE(NEW_VALUE_,''), '_|_'), COALESCE(PROPERTY_,'')) as varchar(255))");
     constants.put("constant_for_update", "for read only with rs use and keep update locks");
@@ -506,7 +507,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(MSSQL, "selectEventSubscriptionsByExecutionAndType", "selectEventSubscriptionsByExecutionAndType_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricDecisionInstancesByNativeQuery", "selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2");
 
-    constants = new HashMap<String, String>();
+    constants = new HashMap<>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ + '_|_' + PROPERTY_");
     constants.put("constant.datepart.quarter", "QUARTER");
@@ -531,21 +532,33 @@ public class DbSqlSessionFactory implements SessionFactory {
   protected SqlSessionFactory sqlSessionFactory;
   protected IdGenerator idGenerator;
   protected Map<String, String> statementMappings;
-  protected Map<Class<?>,String>  insertStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  updateStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  deleteStatements = new ConcurrentHashMap<Class<?>, String>();
-  protected Map<Class<?>,String>  selectStatements = new ConcurrentHashMap<Class<?>, String>();
+  protected Map<Class<?>,String>  insertStatements = new ConcurrentHashMap<>();
+  protected Map<Class<?>,String>  updateStatements = new ConcurrentHashMap<>();
+  protected Map<Class<?>,String>  deleteStatements = new ConcurrentHashMap<>();
+  protected Map<Class<?>,String>  selectStatements = new ConcurrentHashMap<>();
   protected boolean isDbIdentityUsed = true;
   protected boolean isDbHistoryUsed = true;
   protected boolean cmmnEnabled = true;
   protected boolean dmnEnabled = true;
+
+  protected boolean jdbcBatchProcessing;
+
+  public DbSqlSessionFactory(boolean jdbcBatchProcessing) {
+    this.jdbcBatchProcessing = jdbcBatchProcessing;
+  }
 
   public Class< ? > getSessionType() {
     return DbSqlSession.class;
   }
 
   public Session openSession() {
-    return new DbSqlSession(this);
+    return jdbcBatchProcessing ? new BatchDbSqlSession(this) : new SimpleDbSqlSession(this);
+  }
+
+  public DbSqlSession openSession(Connection connection, String catalog, String schema) {
+    return jdbcBatchProcessing ?
+        new BatchDbSqlSession(this, connection, catalog, schema) :
+        new SimpleDbSqlSession(this, connection, catalog, schema);
   }
 
   // insert, update and delete statements /////////////////////////////////////
@@ -582,7 +595,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   protected static void addDatabaseSpecificStatement(String databaseType, String activitiStatement, String ibatisStatement) {
     Map<String, String> specificStatements = databaseSpecificStatements.get(databaseType);
     if (specificStatements == null) {
-      specificStatements = new HashMap<String, String>();
+      specificStatements = new HashMap<>();
       databaseSpecificStatements.put(databaseType, specificStatements);
     }
     specificStatements.put(activitiStatement, ibatisStatement);

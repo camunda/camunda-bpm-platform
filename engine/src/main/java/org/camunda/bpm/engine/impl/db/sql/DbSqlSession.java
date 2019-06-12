@@ -33,6 +33,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -43,23 +44,27 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
-
 /**
- *
- * @author Tom Baeyens
- * @author Joram Barrez
- * @author Daniel Meyer
- * @author Sebastian Menski
- * @author Roman Smirnov
- *
- */
-public class DbSqlSession extends AbstractPersistenceSession {
+*
+* @author Tom Baeyens
+* @author Joram Barrez
+* @author Daniel Meyer
+* @author Sebastian Menski
+* @author Roman Smirnov
+*
+*/
+public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -83,11 +88,6 @@ public class DbSqlSession extends AbstractPersistenceSession {
       .openSession(connection);
     this.connectionMetadataDefaultCatalog = catalog;
     this.connectionMetadataDefaultSchema = schema;
-  }
-
-  @Override
-  public List<BatchResult> flushOperations() {
-    return sqlSession.flushStatements();
   }
 
   // select ////////////////////////////////////////////
@@ -127,12 +127,113 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // Id using the DbIdGenerator while performing a deployment.
     if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
-      if (!Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
-        sqlSession.update(mappedStatement, parameter);
+      executeSelectForUpdate(mappedStatement, parameter);
+    }
+  }
+
+  protected abstract void executeSelectForUpdate(String statement, Object parameter);
+
+  protected void entityUpdatePerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+    if (failure != null) {
+      operation.setRowsAffected(0);
+      operation.setFailure(failure);
+
+      if (isConcurrentModificationException(operation, failure)) {
+        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
       } else {
-        sqlSession.selectList(mappedStatement, parameter);
+        operation.setState(State.FAILED_ERROR);
+      }
+    } else {
+      DbEntity dbEntity = operation.getEntity();
+
+      if (dbEntity instanceof HasDbRevision) {
+        if (rowsAffected != 1) {
+          // failed with optimistic locking
+          operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
+        } else {
+          // increment revision of our copy
+          HasDbRevision versionedObject = (HasDbRevision) dbEntity;
+          versionedObject.setRevision(versionedObject.getRevisionNext());
+          operation.setState(State.APPLIED);
+        }
+      } else {
+        operation.setState(State.APPLIED);
       }
     }
+  }
+
+  protected void bulkUpdatePerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+
+    bulkOperationPerformed(operation, rowsAffected, failure);
+  }
+
+  protected void bulkDeletePerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+
+    bulkOperationPerformed(operation, rowsAffected, failure);
+  }
+
+  protected void bulkOperationPerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+
+    if (failure != null) {
+      operation.setFailure(failure);
+      operation.setState(State.FAILED_ERROR);
+    } else {
+      operation.setRowsAffected(rowsAffected);
+      operation.setState(State.APPLIED);
+    }
+  }
+
+  protected void entityDeletePerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+    if (failure != null) {
+      operation.setRowsAffected(0);
+      operation.setFailure(failure);
+
+      if (isConcurrentModificationException(operation, failure)) {
+        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
+      } else {
+        operation.setState(State.FAILED_ERROR);
+      }
+    } else {
+      operation.setRowsAffected(rowsAffected);
+
+      DbEntity dbEntity = operation.getEntity();
+
+      // It only makes sense to check for optimistic locking exceptions for objects that actually have a revision
+      if (dbEntity instanceof HasDbRevision && rowsAffected == 0) {
+        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
+      } else {
+        operation.setState(State.APPLIED);
+      }
+    }
+  }
+
+  protected boolean isConcurrentModificationException(DbOperation failedOperation, Throwable cause) {
+
+    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
+    boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
+
+    if (isVariableIntegrityViolation) {
+
+      return true;
+    } else if (
+      isConstraintViolation
+      && failedOperation instanceof DbEntityOperation
+      && ((DbEntityOperation) failedOperation).getEntity() instanceof HasDbReferences
+      && (failedOperation.getOperationType().equals(DbOperationType.INSERT)
+      || failedOperation.getOperationType().equals(DbOperationType.UPDATE))
+      ) {
+
+      DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
+      for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {
+        DbEntity referencedEntity = selectById(reference.getValue(), reference.getKey());
+        if (referencedEntity == null) {
+
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   // insert //////////////////////////////////////////
@@ -149,52 +250,37 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
     // execute the insert
     executeInsertEntity(insertStatement, dbEntity);
-
-    // perform post insert actions on entity
-    entityInserted(dbEntity);
   }
 
   protected void executeInsertEntity(String insertStatement, Object parameter) {
     LOG.executeDatabaseOperation("INSERT", parameter);
     sqlSession.insert(insertStatement, parameter);
-
-    // set revision of our copy to 1
-    if (parameter instanceof HasDbRevision) {
-      HasDbRevision versionedObject = (HasDbRevision) parameter;
-      versionedObject.setRevision(1);
-    }
   }
 
-  protected void entityInserted(final DbEntity entity) {
-    // nothing to do
+  protected void entityInsertPerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+    DbEntity entity = operation.getEntity();
+
+    if (failure != null) {
+      operation.setRowsAffected(0);
+      operation.setFailure(failure);
+
+      if (isConcurrentModificationException(operation, failure)) {
+        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
+      } else {
+        operation.setState(State.FAILED_ERROR);
+      }
+    } else {
+      // set revision of our copy to 1
+      if (entity instanceof HasDbRevision) {
+        HasDbRevision versionedObject = (HasDbRevision) entity;
+        versionedObject.setRevision(1);
+      }
+
+      operation.setState(State.APPLIED);
+    }
   }
 
   // delete ///////////////////////////////////////////
-
-  @Override
-  protected void deleteEntity(DbEntityOperation operation) {
-
-    final DbEntity dbEntity = operation.getEntity();
-
-    // get statement
-    String deleteStatement = dbSqlSessionFactory.getDeleteStatement(dbEntity.getClass());
-    ensureNotNull("no delete statement for " + dbEntity.getClass() + " in the ibatis mapping files", "deleteStatement", deleteStatement);
-
-    LOG.executeDatabaseOperation("DELETE", dbEntity);
-
-    // execute the delete
-    int nrOfRowsDeleted = executeDelete(deleteStatement, dbEntity);
-    operation.setRowsAffected(nrOfRowsDeleted);
-
-    // It only makes sense to check for optimistic locking exceptions for objects that actually have a revision
-    if (dbEntity instanceof HasDbRevision && nrOfRowsDeleted == 0) {
-      operation.setFailed(true);
-      return;
-    }
-
-    // perform post delete action
-    entityDeleted(dbEntity);
-  }
 
   protected int executeDelete(String deleteStatement, Object parameter) {
     // map the statement
@@ -202,58 +288,8 @@ public class DbSqlSession extends AbstractPersistenceSession {
     return sqlSession.delete(deleteStatement, parameter);
   }
 
-  protected void entityDeleted(final DbEntity entity) {
-    // nothing to do
-  }
-
-  @Override
-  protected void deleteBulk(DbBulkOperation operation) {
-    String statement = operation.getStatement();
-    Object parameter = operation.getParameter();
-
-    LOG.executeDatabaseBulkOperation("DELETE", statement, parameter);
-
-    int rowsAffected = executeDelete(statement, parameter);
-    operation.setRowsAffected(rowsAffected);
-  }
-
   // update ////////////////////////////////////////
 
-  @Override
-  protected void updateEntity(DbEntityOperation operation) {
-
-    final DbEntity dbEntity = operation.getEntity();
-
-    String updateStatement = dbSqlSessionFactory.getUpdateStatement(dbEntity);
-    ensureNotNull("no update statement for " + dbEntity.getClass() + " in the ibatis mapping files", "updateStatement", updateStatement);
-
-    LOG.executeDatabaseOperation("UPDATE", dbEntity);
-
-    if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
-      // execute update
-      executeUpdate(updateStatement, dbEntity);
-    } else {
-      // execute update
-      int numOfRowsUpdated = executeUpdate(updateStatement, dbEntity);
-
-      if (dbEntity instanceof HasDbRevision) {
-        if (numOfRowsUpdated != 1) {
-          // failed with optimistic locking
-          operation.setFailed(true);
-          return;
-        } else {
-          // increment revision of our copy
-          HasDbRevision versionedObject = (HasDbRevision) dbEntity;
-          versionedObject.setRevision(versionedObject.getRevisionNext());
-        }
-      }
-    }
-
-    // perform post update action
-    entityUpdated(dbEntity);
-  }
-
-  @Override
   public int executeUpdate(String updateStatement, Object parameter) {
     updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
     return sqlSession.update(updateStatement, parameter);
@@ -271,24 +307,17 @@ public class DbSqlSession extends AbstractPersistenceSession {
     return sqlSession.update(updateStmt, parameter);
   }
 
-  protected void entityUpdated(final DbEntity entity) {
-    // nothing to do
-  }
-
-  @Override
-  protected void updateBulk(DbBulkOperation operation) {
-    String statement = operation.getStatement();
-    Object parameter = operation.getParameter();
-
-    LOG.executeDatabaseBulkOperation("UPDATE", statement, parameter);
-
-    executeUpdate(statement, parameter);
-  }
-
   // flush ////////////////////////////////////////////////////////////////////
 
   public void flush() {
-    // nothing to do
+  }
+
+  public void flushOperations() {
+    flushBatchOperations();
+  }
+
+  public List<BatchResult> flushBatchOperations() {
+    return sqlSession.flushStatements();
   }
 
   public void close() {

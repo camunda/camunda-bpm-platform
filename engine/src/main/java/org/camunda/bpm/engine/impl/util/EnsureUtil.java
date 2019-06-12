@@ -179,6 +179,12 @@ public final class EnsureUtil {
     }
   }
 
+  public static void ensureLessThan(String message, String variable, long value1, long value2) {
+    if (value1 >= value2) {
+      throw generateException(ProcessEngineException.class, message, variable, "is not less than" + value2);
+    }
+  }
+
   public static void ensureGreaterThanOrEqual(String variableName, long value1, long value2) {
     ensureGreaterThanOrEqual("", variableName, value1, value2);
   }
@@ -347,6 +353,13 @@ public final class EnsureUtil {
 
     if (!PATTERN.matcher(resourceId).matches()) {
       throw generateException(ProcessEngineException.class, resourceType + " has an invalid id", "'" + resourceId + "'", "is not a valid resource identifier.");
+    }
+  }
+
+
+  public static void ensureTrue(String message, boolean value) {
+    if (!value) {
+      throw new ProcessEngineException(message);
     }
   }
 

@@ -46,10 +46,6 @@ public class DbBulkOperation extends DbOperation {
     super.recycle();
   }
 
-  public boolean isFailed() {
-    return false;
-  }
-
   public Object getParameter() {
     return parameter;
   }
