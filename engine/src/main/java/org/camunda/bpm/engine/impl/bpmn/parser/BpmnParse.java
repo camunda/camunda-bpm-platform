@@ -1464,7 +1464,7 @@ public class BpmnParse extends Parse {
       if (!linkName.equals(elementName)) {
         // this is valid - but not a good practice (as it is really confusing
         // for the reader of the process model) - hence we log a warning
-        addWarning("Link Event named '" + elementName + "' containes link event definition with name '" + linkName
+        addWarning("Link Event named '" + elementName + "' contains link event definition with name '" + linkName
             + "' - it is recommended to use the same name for both.", intermediateEventElement);
       }
 
