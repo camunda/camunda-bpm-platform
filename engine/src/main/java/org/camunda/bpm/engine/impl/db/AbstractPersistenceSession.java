@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 public abstract class AbstractPersistenceSession implements PersistenceSession {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
-  protected List<EntityLoadListener> listeners = new ArrayList<EntityLoadListener>(1);
+  protected List<EntityLoadListener> listeners = new ArrayList<>(1);
 
   public void executeDbOperation(DbOperation operation) {
     switch(operation.getOperationType()) {

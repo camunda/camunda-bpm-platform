@@ -32,7 +32,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
   @Override
   protected void setUp() throws Exception {
-    controllableCommands = new ArrayList<ControllableCommand<?>>();
+    controllableCommands = new ArrayList<>();
     super.setUp();
   }
 

@@ -137,7 +137,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   public void setJobDuedate(String jobId, Date newDuedate) {
     commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate));
   }
-  
+
   public void recalculateJobDuedate(String jobId, boolean creationDateBased) {
     commandExecutor.execute(new RecalculateJobDuedateCmd(jobId, creationDateBased));
   }
@@ -179,7 +179,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
       public String execute(CommandContext commandContext) {
         commandContext.getAuthorizationManager().checkCamundaAdmin();
         DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-        DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
+        DbSqlSession dbSqlSession = dbSqlSessionFactory.openSession(connection, catalog, schema);
         commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
         dbSqlSession.dbSchemaUpdate();
 
@@ -213,7 +213,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
       public Set<String> execute(CommandContext commandContext) {
         commandContext.getAuthorizationManager().checkCamundaAdmin();
         Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
-        return new HashSet<String>(registeredDeployments);
+        return new HashSet<>(registeredDeployments);
       }
     });
   }
