@@ -38,9 +38,8 @@ public abstract class HistoryTaskListener implements TaskListener {
   protected final HistoryEventProducer eventProducer;
   protected HistoryLevel historyLevel;
 
-  public HistoryTaskListener(HistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
+  public HistoryTaskListener(HistoryEventProducer historyEventProducer) {
     this.eventProducer = historyEventProducer;
-    this.historyLevel = historyLevel;
   }
 
   public void notify(DelegateTask task) {
@@ -63,6 +62,12 @@ public abstract class HistoryTaskListener implements TaskListener {
 
     }
 
+  }
+  
+  protected void ensureHistoryLevelInitialized() {
+    if (historyLevel == null) {
+      historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    }
   }
 
   protected abstract HistoryEvent createHistoryEvent(DelegateTask task, ExecutionEntity execution);

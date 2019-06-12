@@ -1774,7 +1774,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
     if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
-      defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
+      defaultListeners.add(new HistoryParseListener(historyEventProducer));
     }
     if (isMetricsEnabled) {
       defaultListeners.add(new MetricsBpmnParseListener());
@@ -1813,7 +1813,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<CmmnTransformListener> getDefaultCmmnTransformListeners() {
     List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
     if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
-      defaultListener.add(new CmmnHistoryTransformListener(historyLevel, cmmnHistoryEventProducer));
+      defaultListener.add(new CmmnHistoryTransformListener(cmmnHistoryEventProducer));
     }
     if (isMetricsEnabled) {
       defaultListener.add(new MetricsCmmnTransformListener());
@@ -2176,7 +2176,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
 
       dmnEngineConfiguration = new DmnEngineConfigurationBuilder(dmnEngineConfiguration)
-          .historyLevel(historyLevel)
           .dmnHistoryEventProducer(dmnHistoryEventProducer)
           .scriptEngineResolver(scriptingEngines)
           .expressionManager(expressionManager)
