@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.Collection;
 
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -56,8 +57,15 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   }
 
   public void exceptionWhileExecutingJob(String nextJobId, Throwable t) {
-    logWarn(
-        "006", "Exception while executing job {}: ", nextJobId, t);
+    if(t instanceof OptimisticLockingException && !isDebugEnabled()) {
+      logWarn(
+          "006", 
+          "Exception while closing command context: {} To see the full stacktrace set logging level to WARNING.", 
+          t.getClass().getSimpleName());
+    } else {
+      logWarn(
+          "006", "Exception while executing job {}: ", nextJobId, t);
+    }
   }
 
   public void couldNotDeterminePriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
