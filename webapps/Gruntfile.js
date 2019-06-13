@@ -145,6 +145,7 @@ module.exports = function(grunt) {
   require('./ui/cockpit/grunt/config/eslint')(config, eslintConf);
   require('./ui/common/grunt/config/eslint')(config, eslintConf);
 
+  require('./grunt/tasks/license-book')(grunt);
 
   grunt.initConfig({
     buildMode:        'dev',
