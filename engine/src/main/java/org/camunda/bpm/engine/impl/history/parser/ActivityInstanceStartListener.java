@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.history.parser;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
@@ -28,11 +27,12 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
  */
 public class ActivityInstanceStartListener extends HistoryExecutionListener {
 
-  public ActivityInstanceStartListener(HistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
-    super(historyEventProducer, historyLevel);
+  public ActivityInstanceStartListener(HistoryEventProducer historyEventProducer) {
+    super(historyEventProducer);
   }
 
   protected HistoryEvent createHistoryEvent(DelegateExecution execution) {
+    ensureHistoryLevelInitialized();
     if(historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_START, execution)) {
       return eventProducer.createActivityInstanceStartEvt(execution);
     } else {

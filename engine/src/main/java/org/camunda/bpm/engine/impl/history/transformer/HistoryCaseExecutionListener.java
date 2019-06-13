@@ -31,9 +31,8 @@ public abstract class HistoryCaseExecutionListener implements CaseExecutionListe
   protected CmmnHistoryEventProducer eventProducer;
   protected HistoryLevel historyLevel;
 
-  public HistoryCaseExecutionListener(CmmnHistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
+  public HistoryCaseExecutionListener(CmmnHistoryEventProducer historyEventProducer) {
     eventProducer = historyEventProducer;
-    this.historyLevel = historyLevel;
   }
 
   public void notify(DelegateCaseExecution caseExecution) throws Exception {
@@ -45,6 +44,12 @@ public abstract class HistoryCaseExecutionListener implements CaseExecutionListe
         .handleEvent(historyEvent);
     }
 
+  }
+  
+  protected void ensureHistoryLevelInitialized() {
+    if (historyLevel == null) {
+      historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    }
   }
 
   protected abstract HistoryEvent createHistoryEvent(DelegateCaseExecution caseExecution);

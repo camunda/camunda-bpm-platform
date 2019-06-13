@@ -40,9 +40,8 @@ public abstract class HistoryExecutionListener implements ExecutionListener {
   protected final HistoryEventProducer eventProducer;
   protected HistoryLevel historyLevel;
 
-  public HistoryExecutionListener(HistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
+  public HistoryExecutionListener(HistoryEventProducer historyEventProducer) {
     this.eventProducer = historyEventProducer;
-    this.historyLevel = historyLevel;
   }
 
   public void notify(DelegateExecution execution) throws Exception {
@@ -59,6 +58,12 @@ public abstract class HistoryExecutionListener implements ExecutionListener {
       historyEventHandler.handleEvent(historyEvent);
     }
 
+  }
+  
+  protected void ensureHistoryLevelInitialized() {
+    if (historyLevel == null) {
+      historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    }
   }
 
   protected abstract HistoryEvent createHistoryEvent(DelegateExecution execution);

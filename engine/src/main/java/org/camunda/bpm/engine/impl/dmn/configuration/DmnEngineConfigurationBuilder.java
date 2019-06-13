@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionDefinitionHandler;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionRequirementsDefinitionTransformHandler;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionEvaluationListener;
 import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionEvaluationListener;
@@ -46,7 +45,6 @@ public class DmnEngineConfigurationBuilder {
 
   protected final DefaultDmnEngineConfiguration dmnEngineConfiguration;
 
-  protected HistoryLevel historyLevel;
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
   protected DmnScriptEngineResolver scriptEngineResolver;
   protected ExpressionManager expressionManager;
@@ -58,12 +56,6 @@ public class DmnEngineConfigurationBuilder {
     ensureNotNull("dmnEngineConfiguration", dmnEngineConfiguration);
 
     this.dmnEngineConfiguration = dmnEngineConfiguration;
-  }
-
-  public DmnEngineConfigurationBuilder historyLevel(HistoryLevel historyLevel) {
-    this.historyLevel = historyLevel;
-
-    return this;
   }
 
   public DmnEngineConfigurationBuilder dmnHistoryEventProducer(DmnHistoryEventProducer dmnHistoryEventProducer) {
@@ -119,7 +111,7 @@ public class DmnEngineConfigurationBuilder {
     ensureNotNull("dmnHistoryEventProducer", dmnHistoryEventProducer);
     // note that the history level may be null - see CAM-5165
 
-    HistoryDecisionEvaluationListener historyDecisionEvaluationListener = new HistoryDecisionEvaluationListener(dmnHistoryEventProducer, historyLevel);
+    HistoryDecisionEvaluationListener historyDecisionEvaluationListener = new HistoryDecisionEvaluationListener(dmnHistoryEventProducer);
 
     List<DmnDecisionEvaluationListener> customPostDecisionEvaluationListeners = dmnEngineConfiguration
         .getCustomPostDecisionEvaluationListeners();
