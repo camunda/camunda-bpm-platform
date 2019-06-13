@@ -17,7 +17,6 @@
     <module>bom</module>
     <module>logging</module>
     <module>utils</module>
-    <module>typed-values</module>
   </modules>
 
   <properties>

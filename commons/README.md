@@ -9,7 +9,7 @@ camunda commons is a collection of shared libraries used by camunda open source 
 
 * [camunda commons logging][logging]
 * [camunda commons utils][utils]
-* [camunda commons typed values][typed-values]
+* ~~camunda commons typed values~~ - migrated to [camunda-bpm-platform][typed-values]
 
 
 ## Getting started
@@ -44,7 +44,7 @@ Now you can reference individual commons projects:
 
 ### Which Java (JRE) Version is required?
 
-Java JRE 1.6+ is required.
+Java JRE 1.7+ is required.
 
 ## License:
 
@@ -52,5 +52,4 @@ The source files in this repository are made available under the <a href="LICENS
 
 [logging]: logging/
 [utils]: utils/
-[typed-values]: typed-values/
-
+[typed-values]: https://github.com/camunda/camunda-bpm-platform/tree/master/typed-values
