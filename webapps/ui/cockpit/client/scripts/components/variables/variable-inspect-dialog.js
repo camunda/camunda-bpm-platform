@@ -185,6 +185,7 @@ var Controller = [
         $scope.$apply(function() {
           if (xhr.status === 204) {
             $scope.status = CHANGE_SUCCESS;
+            updateVariable();
             addMessage(variable);
           } else {
             $scope.status = BEFORE_CHANGE;
@@ -209,6 +210,22 @@ var Controller = [
       );
       xhr.open('POST', Uri.appUri(basePath + '/data'));
       xhr.send(fd);
+    }
+
+    function updateVariable() {
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener(
+        'load',
+        function() {
+          if (xhr.status === 200) {
+            var json = JSON.parse(xhr.response);
+            variable.value = json.value;
+          }
+        },
+        false
+      );
+      xhr.open('GET', Uri.appUri(basePath + '?deserializeValue=false'));
+      xhr.send();
     }
 
     function loadDeserializedValue() {
