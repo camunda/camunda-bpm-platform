@@ -24,7 +24,8 @@ module.exports = [
   '$q',
   '$rootScope',
   '$cookies',
-  function($window, $q, $rootScope, $cookies) {
+  '$http',
+  function($window, $q, $rootScope, $cookies, $http) {
     return function(url, files, fields) {
       var deferred = $q.defer();
 
@@ -60,40 +61,7 @@ module.exports = [
         })
       );
 
-      var req = new $window.XMLHttpRequest();
-
-      req.onload = function(evt) {
-        if (evt.target.readyState === 4) {
-          if (evt.target.status === 200) {
-            deferred.resolve(JSON.parse(evt.target.responseText));
-          } else if (evt.target.status === 401) {
-            // broadcast that the authentication changed
-            $rootScope.$broadcast('authentication.changed', null);
-            // set authentication to null
-            $rootScope.authentication = null;
-            // broadcast event that a login is required
-            // proceeds a redirect to /login
-            $rootScope.$broadcast('authentication.login.required');
-
-            deferred.reject(evt);
-          } else {
-            deferred.reject(evt);
-          }
-        }
-      };
-
-      req.open('post', url, true);
-
       var sBoundary = '---------------------------' + Date.now().toString(16);
-      req.setRequestHeader(
-        'Content-Type',
-        'multipart/form-data; boundary=' + sBoundary
-      );
-
-      var token = $cookies.get('XSRF-TOKEN');
-      if (token) {
-        req.setRequestHeader('X-XSRF-TOKEN', token);
-      }
 
       var sData =
         '--' +
@@ -104,7 +72,28 @@ module.exports = [
         sBoundary +
         '--\r\n';
 
-      req.send(sData);
+      $http
+        .post(url, sData, {
+          transformRequest: angular.identity,
+          headers: {
+            'Content-Type': 'multipart/form-data; boundary=' + sBoundary
+          }
+        })
+        .then(function(res) {
+          deferred.resolve(res.data);
+        })
+        .catch(function(err) {
+          if (err.status === 401) {
+            // broadcast that the authentication changed
+            $rootScope.$broadcast('authentication.changed', null);
+            // set authentication to null
+            $rootScope.authentication = null;
+            // broadcast event that a login is required
+            // proceeds a redirect to /login
+            $rootScope.$broadcast('authentication.login.required');
+          }
+          deferred.reject(err);
+        });
 
       return deferred.promise;
     };

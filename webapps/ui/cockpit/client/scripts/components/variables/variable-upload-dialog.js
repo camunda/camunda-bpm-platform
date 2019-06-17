@@ -19,6 +19,8 @@
 
 var fs = require('fs');
 
+var angular = require('angular');
+
 var template = fs.readFileSync(
   __dirname + '/variable-upload-dialog.html',
   'utf8'
@@ -33,6 +35,7 @@ var Controller = [
   'variable',
   '$translate',
   '$cookies',
+  '$http',
   function(
     $modalInstance,
     $scope,
@@ -41,7 +44,8 @@ var Controller = [
     basePath,
     variable,
     $translate,
-    $cookies
+    $cookies,
+    $http
   ) {
     var BEFORE_UPLOAD = 'beforeUpload',
       PERFORM_UPLOAD = 'performUpload',
@@ -62,41 +66,35 @@ var Controller = [
       // progress listeners
 
       function uploadProgress(evt) {
-        $scope.$apply(function() {
-          $scope.status = PERFORM_UPLOAD;
-          if (evt.lengthComputable) {
-            $scope.progress = Math.round((evt.loaded * 100) / evt.total);
-          }
-        });
+        $scope.status = PERFORM_UPLOAD;
+        if (evt.lengthComputable) {
+          $scope.progress = Math.round((evt.loaded * 100) / evt.total);
+        }
       }
 
       function uploadComplete(xhr) {
-        $scope.$apply(function() {
-          if (xhr.status === 204) {
-            $scope.status = UPLOAD_SUCCESS;
-            Notifications.addMessage({
-              status: $translate.instant('VARIABLE_UPLOAD_FILE'),
-              message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ADD')
-            });
-          } else {
-            $scope.status = UPLOAD_FAILED;
-            Notifications.addError({
-              status: $translate.instant('VARIABLE_UPLOAD_FILE'),
-              message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ERR'),
-              exclusive: true
-            });
-          }
-        });
-      }
-
-      function uploadFailed() {
-        $scope.$apply(function() {
+        if (xhr.status === 204) {
+          $scope.status = UPLOAD_SUCCESS;
+          Notifications.addMessage({
+            status: $translate.instant('VARIABLE_UPLOAD_FILE'),
+            message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ADD')
+          });
+        } else {
           $scope.status = UPLOAD_FAILED;
           Notifications.addError({
             status: $translate.instant('VARIABLE_UPLOAD_FILE'),
             message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ERR'),
             exclusive: true
           });
+        }
+      }
+
+      function uploadFailed() {
+        $scope.status = UPLOAD_FAILED;
+        Notifications.addError({
+          status: $translate.instant('VARIABLE_UPLOAD_FILE'),
+          message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ERR'),
+          exclusive: true
         });
       }
 
@@ -105,26 +103,16 @@ var Controller = [
       fd.append('data', file);
       fd.append('valueType', variable.type);
 
-      var xhr = new XMLHttpRequest();
-
-      xhr.upload.addEventListener('progress', uploadProgress, false);
-      xhr.addEventListener(
-        'load',
-        function() {
-          uploadComplete(xhr);
-        },
-        false
-      );
-      xhr.addEventListener('error', uploadFailed, false);
-      xhr.addEventListener('abort', uploadFailed, false);
-      xhr.open('POST', Uri.appUri(basePath + '/data'));
-
-      var token = $cookies.get('XSRF-TOKEN');
-      if (token) {
-        xhr.setRequestHeader('X-XSRF-TOKEN', token);
-      }
-
-      xhr.send(fd);
+      $http
+        .post(Uri.appUri(basePath + '/data'), fd, {
+          transformRequest: angular.identity,
+          headers: {'Content-Type': undefined},
+          uploadEventHandlers: {
+            progress: uploadProgress
+          }
+        })
+        .then(uploadComplete)
+        .catch(uploadFailed);
     };
 
     $scope.setFile = function(element) {
