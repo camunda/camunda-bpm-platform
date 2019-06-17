@@ -17,7 +17,7 @@
 package org.camunda.bpm.webapp.impl.security.filter.headersec;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.webapp.impl.security.filter.headersec.util.HeaderSecRule;
+import org.camunda.bpm.webapp.impl.util.HeaderRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -34,101 +34,101 @@ import static org.junit.Assert.assertThat;
 public class XssProtectionTest {
 
   @Rule
-  public HeaderSecRule headerSecRule = new HeaderSecRule();
+  public HeaderRule headerRule = new HeaderRule();
 
   @Test
   public void shouldConfigureEnabledByDefault() {
     // given
-    headerSecRule.startServer("web.xml");
+    headerRule.startServer("web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
     // then
-    assertThat(headerSecRule.getHeader(HEADER_NAME), is(BLOCK.getHeaderValue()));
+    assertThat(headerRule.getHeader(HEADER_NAME), is(BLOCK.getHeaderValue()));
   }
 
   @Test
   public void shouldConfigureDisabled() {
     // given
-    headerSecRule.startServer("xss/disabled_web.xml");
+    headerRule.startServer("xss/disabled_web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
     // then
-    assertThat(headerSecRule.headerExists(HEADER_NAME), is(false));
+    assertThat(headerRule.headerExists(HEADER_NAME), is(false));
   }
 
   @Test
   public void shouldConfigureDisabledIgnoreCase() {
     // given
-    headerSecRule.startServer("xss/disabled_ignore_case_web.xml");
+    headerRule.startServer("xss/disabled_ignore_case_web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
     // then
-    assertThat(headerSecRule.headerExists(HEADER_NAME), is(false));
+    assertThat(headerRule.headerExists(HEADER_NAME), is(false));
   }
 
   @Test
   public void shouldConfigureCustomValue() {
     // given
-    headerSecRule.startServer("xss/custom_value_web.xml");
+    headerRule.startServer("xss/custom_value_web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
     // then
-    assertThat(headerSecRule.getHeader(HEADER_NAME), is("aCustomValue"));
+    assertThat(headerRule.getHeader(HEADER_NAME), is("aCustomValue"));
   }
 
   @Test
   public void shouldConfigureOptionSanitize() {
     // given
-    headerSecRule.startServer("xss/option_sanitize_web.xml");
+    headerRule.startServer("xss/option_sanitize_web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
     // then
-    assertThat(headerSecRule.getHeader(HEADER_NAME), is(SANITIZE.getHeaderValue()));
+    assertThat(headerRule.getHeader(HEADER_NAME), is(SANITIZE.getHeaderValue()));
   }
 
   @Test
   public void shouldConfigureOptionSanitizeIgnoreCase() {
     // given
-    headerSecRule.startServer("xss/option_sanitize_ignore_case_web.xml");
+    headerRule.startServer("xss/option_sanitize_ignore_case_web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
     // then
-    assertThat(headerSecRule.getHeader(HEADER_NAME), is(SANITIZE.getHeaderValue()));
+    assertThat(headerRule.getHeader(HEADER_NAME), is(SANITIZE.getHeaderValue()));
   }
 
   @Test
   public void shouldConfigureOptionBlock() {
     // given
-    headerSecRule.startServer("xss/option_block_web.xml");
+    headerRule.startServer("xss/option_block_web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
     // then
-    assertThat(headerSecRule.getHeader(HEADER_NAME), is(BLOCK.getHeaderValue()));
+    assertThat(headerRule.getHeader(HEADER_NAME), is(BLOCK.getHeaderValue()));
   }
 
   @Test
   public void shouldThrowExceptionOnSetBothParamsOptionAndValue() {
     // given
-    headerSecRule.startServer("xss/option_and_value_web.xml");
+    headerRule.startServer("xss/option_and_value_web.xml", "headersec");
 
     // when
-    headerSecRule.performRequest();
+    headerRule.performRequest();
 
-    Throwable expectedException = headerSecRule.getException();
+    Throwable expectedException = headerRule.getException();
 
     // then
     assertThat(expectedException, instanceOf(ProcessEngineException.class));
@@ -138,9 +138,9 @@ public class XssProtectionTest {
   @Test
   public void shouldThrowExceptionOnNonExistingOption() {
     // given
-    headerSecRule.startServer("xss/option_non_existing_web.xml");
+    headerRule.startServer("xss/option_non_existing_web.xml", "headersec");
 
-    Throwable expectedException = headerSecRule.getException();
+    Throwable expectedException = headerRule.getException();
 
     // then
     assertThat(expectedException, instanceOf(ProcessEngineException.class));
