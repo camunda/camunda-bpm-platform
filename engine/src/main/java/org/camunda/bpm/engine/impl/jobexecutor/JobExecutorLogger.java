@@ -61,7 +61,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
       logWarn(
           "006", 
           "Exception while executing job {}: {}. To see the full stacktrace set logging level to DEBUG.", 
-          t.getClass().getSimpleName());
+          nextJobId, t.getClass().getSimpleName());
     } else {
       logWarn(
           "006", "Exception while executing job {}: ", nextJobId, t);
