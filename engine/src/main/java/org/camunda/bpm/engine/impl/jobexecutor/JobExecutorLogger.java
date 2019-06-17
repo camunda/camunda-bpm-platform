@@ -60,7 +60,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
     if(t instanceof OptimisticLockingException && !isDebugEnabled()) {
       logWarn(
           "006", 
-          "Exception while closing command context: {} To see the full stacktrace set logging level to WARNING.", 
+          "Exception while executing job {}: {}. To see the full stacktrace set logging level to DEBUG.", 
           t.getClass().getSimpleName());
     } else {
       logWarn(
