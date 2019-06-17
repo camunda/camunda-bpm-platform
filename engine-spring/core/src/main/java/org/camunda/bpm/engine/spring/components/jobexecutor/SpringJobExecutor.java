@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.springframework.core.task.TaskExecutor;
 
