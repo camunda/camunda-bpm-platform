@@ -102,6 +102,7 @@ public class CsrfPreventionFilter implements Filter {
 
   private final Set<String> entryPoints = new HashSet<String>();
 
+  protected CsrfPreventionCookieConfigurator cookieConfigurator = new CsrfPreventionCookieConfigurator();
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -129,6 +130,9 @@ public class CsrfPreventionFilter implements Filter {
       if (!isBlank(customEntryPoints)) {
         setEntryPoints(customEntryPoints);
       }
+
+      cookieConfigurator.parseParams(filterConfig);
+
     } catch (ClassNotFoundException e) {
       throw new ServletException("Cannot instantiate CSRF Prevention filter: Random class not found.", e);
     } catch (InstantiationException e) {
@@ -263,7 +267,11 @@ public class CsrfPreventionFilter implements Filter {
           csrfCookie.setPath(contextPath);
 
           session.setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
+
+          cookieConfigurator.applyServletConfig(csrfCookie);
           response.addCookie(csrfCookie);
+          cookieConfigurator.applyCustomConfig(response);
+
           response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
         }
       }
