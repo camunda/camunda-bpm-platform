@@ -172,6 +172,7 @@ var Controller = [
       })
         .then(function() {
           $scope.status = CHANGE_SUCCESS;
+          updateVariable();
           addMessage(variable);
         })
         .catch(function() {
@@ -181,51 +182,33 @@ var Controller = [
     }
 
     function updateDeserializedValue(variable, newValue) {
-      function callback(xhr) {
-        $scope.$apply(function() {
-          if (xhr.status === 204) {
-            $scope.status = CHANGE_SUCCESS;
-            updateVariable();
-            addMessage(variable);
-          } else {
-            $scope.status = BEFORE_CHANGE;
-            addError(variable);
-          }
-        });
-      }
-
       // update deserialized
       // create HTML 5 form upload
       var fd = new FormData();
       fd.append('data', new Blob([newValue], {type: 'application/json'}));
       fd.append('type', variable.valueInfo.objectTypeName);
 
-      var xhr = new XMLHttpRequest();
-      xhr.addEventListener(
-        'load',
-        function() {
-          callback(xhr);
-        },
-        false
-      );
-      xhr.open('POST', Uri.appUri(basePath + '/data'));
-      xhr.send(fd);
+      $http
+        .post(Uri.appUri(basePath + '/data'), fd, {
+          transformRequest: angular.identity,
+          headers: {'Content-Type': undefined}
+        })
+        .then(function() {
+          $scope.status = CHANGE_SUCCESS;
+          updateVariable();
+          addMessage(variable);
+        });
     }
 
     function updateVariable() {
-      var xhr = new XMLHttpRequest();
-      xhr.addEventListener(
-        'load',
-        function() {
-          if (xhr.status === 200) {
-            var json = JSON.parse(xhr.response);
-            variable.value = json.value;
-          }
-        },
-        false
-      );
-      xhr.open('GET', Uri.appUri(basePath + '?deserializeValue=false'));
-      xhr.send();
+      $http({
+        method: 'GET',
+        url: Uri.appUri(basePath + '?deserializeValue=false')
+      })
+        .then(function(res) {
+          variable.value = res.data.value;
+        })
+        .catch(angular.noop);
     }
 
     function loadDeserializedValue() {
