@@ -111,8 +111,6 @@ public abstract class DmnModelTest {
       String failMsg = "XML differs:\n" + diff.getDifferences() +
           "\n\nActual XML:\n" + Dmn.convertToString(modelInstance);
       fail(failMsg);
-
-      fail("not similar: " + diff.toString());
     }
   }
 
