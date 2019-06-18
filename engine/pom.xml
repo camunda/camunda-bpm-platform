@@ -752,6 +752,7 @@
                      the same except for the whole unit test suite -->
                 <exclude>**/DatabaseTablePrefixTest.java</exclude>
                 <exclude>**/DeploymentTest.java</exclude>
+				<exclude>**/DeploymentAutoHistoryTest.java</exclude>
                 <exclude>**/CustomHistoryLevelUserOperationLogTest.java</exclude>
                 <exclude>**/CustomHistoryLevelWithoutUserOperationLogTest.java</exclude>
                 <exclude>**/CustomHistoryLevelIncidentTest.java</exclude>
