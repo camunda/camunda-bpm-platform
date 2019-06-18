@@ -20,15 +20,9 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
 
 import javax.servlet.FilterConfig;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.Collection;
 
 public class CsrfPreventionCookieConfigurator {
-
-  protected static final String SET_COOKIE_HEADER_NAME = "Set-Cookie";
-  protected static final String SAME_SITE_FIELD_NAME = ";SameSite=";
 
   protected static final String ENABLE_SECURE_PARAM = "enableSecureCookie";
   protected static final String DISABLE_SAME_SITE_PARAM = "disableSameSiteCookie";
@@ -82,31 +76,20 @@ public class CsrfPreventionCookieConfigurator {
     }
   }
 
-  public void applyServletConfig(Cookie cookie) {
-    cookie.setSecure(isSecureCookieEnabled);
-  }
+  public String getConfig() {
+    StringBuilder stringBuilder = new StringBuilder();
 
-  public void applyCustomConfig(HttpServletResponse response) {
-    Collection<String> cookieHeaderValues = response.getHeaders(SET_COOKIE_HEADER_NAME);
-
-    if (!cookieHeaderValues.isEmpty()) {
-      for (String cookieHeaderValue : cookieHeaderValues) {
-
-        if (!isSameSiteCookieDisabled && !isEmpty(cookieHeaderValue)
-          && isCsrfCookie(cookieHeaderValue)) {
-
-          cookieHeaderValue += SAME_SITE_FIELD_NAME + sameSiteCookieValue;
-
-          response.setHeader(SET_COOKIE_HEADER_NAME, cookieHeaderValue);
-
-          break;
-        }
-      }
+    if (!isSameSiteCookieDisabled) {
+      stringBuilder
+        .append(CsrfConstants.CSRF_SAME_SITE_FIELD_NAME)
+        .append(sameSiteCookieValue);
     }
-  }
 
-  protected boolean isCsrfCookie(String cookieHeaderValue) {
-    return cookieHeaderValue.startsWith(CsrfConstants.CSRF_TOKEN_COOKIE_NAME);
+    if (isSecureCookieEnabled) {
+      stringBuilder.append(CsrfConstants.CSRF_SECURE_FLAG_NAME);
+    }
+
+    return stringBuilder.toString();
   }
 
   protected boolean isEmpty(String string) {

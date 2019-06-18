@@ -44,8 +44,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants.CSRF_PATH_FIELD_NAME;
+import static org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants.CSRF_SET_COOKIE_HEADER_NAME;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
@@ -117,9 +119,7 @@ public class CsrfPreventionFilterTest {
       .withNoArguments()
       .thenReturn(cookieConfigurator);
 
-    doNothing()
-      .when(cookieConfigurator)
-      .applyCustomConfig(any(HttpServletResponse.class));
+    doReturn("").when(cookieConfigurator).getConfig();
   }
 
   protected void setupFilter() throws ServletException {
@@ -137,14 +137,16 @@ public class CsrfPreventionFilterTest {
   public void testNonModifyingRequestTokenGeneration() throws IOException, ServletException {
     MockHttpServletResponse response = performNonModifyingRequest(nonModifyingRequestUrl, new MockHttpSession());
 
-    Cookie cookieToken = response.getCookie(CSRF_COOKIE_NAME);
+    String cookieToken = (String) response.getHeader(CSRF_SET_COOKIE_HEADER_NAME);
     String headerToken = (String) response.getHeader(CSRF_HEADER_NAME);
 
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
-    Assert.assertEquals("No Cookie Token!",false, cookieToken.getValue().isEmpty());
+
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/camunda");
+
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
-    Assert.assertEquals("Cookie and HTTP Header Tokens do not match!", cookieToken.getValue(), headerToken);
+    assertThat(cookieToken).contains(headerToken);
   }
 
   @Test
@@ -164,7 +166,7 @@ public class CsrfPreventionFilterTest {
     applyFilter(nonModifyingRequest, response);
 
     // then
-    Cookie cookieToken = response.getCookie(CSRF_COOKIE_NAME);
+    String cookieToken = (String) response.getHeader(CSRF_SET_COOKIE_HEADER_NAME);
     String headerToken = (String) response.getHeader(CSRF_HEADER_NAME);
 
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -172,11 +174,10 @@ public class CsrfPreventionFilterTest {
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
 
-    Assert.assertEquals("No Cookie Token!",false, cookieToken.getValue().isEmpty());
-    Assert.assertEquals("Cookie path should be root (/)", "/", cookieToken.getPath());
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/");
 
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
-    Assert.assertEquals("Cookie and HTTP Header Tokens do not match!", cookieToken.getValue(), headerToken);
+    assertThat(cookieToken).contains(headerToken);
   }
 
   @Test

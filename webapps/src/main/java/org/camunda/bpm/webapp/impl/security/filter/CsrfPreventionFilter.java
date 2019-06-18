@@ -31,7 +31,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -257,20 +256,20 @@ public class CsrfPreventionFilter implements Filter {
         if (session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME) == null) {
           String token = generateCSRFToken();
 
-          Cookie csrfCookie = getCSRFCookie(request);
-          csrfCookie.setValue(token);
+          String csrfCookieValue = CsrfConstants.CSRF_TOKEN_COOKIE_NAME + "=" + token;
 
           String contextPath = "/";
           if (!request.getContextPath().isEmpty()) {
             contextPath = request.getContextPath();
           }
-          csrfCookie.setPath(contextPath);
+
+          csrfCookieValue += CsrfConstants.CSRF_PATH_FIELD_NAME + contextPath;
 
           session.setAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME, token);
 
-          cookieConfigurator.applyServletConfig(csrfCookie);
-          response.addCookie(csrfCookie);
-          cookieConfigurator.applyCustomConfig(response);
+          csrfCookieValue += cookieConfigurator.getConfig();
+
+          response.addHeader(CsrfConstants.CSRF_SET_COOKIE_HEADER_NAME, csrfCookieValue);
 
           response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
         }
@@ -399,19 +398,6 @@ public class CsrfPreventionFilter implements Filter {
 
   private String getCSRFTokenHeader(HttpServletRequest request) {
     return request.getHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME);
-  }
-
-  private Cookie getCSRFCookie(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(CsrfConstants.CSRF_TOKEN_COOKIE_NAME)) {
-          return cookie;
-        }
-      }
-    }
-
-    return new Cookie(CsrfConstants.CSRF_TOKEN_COOKIE_NAME, null);
   }
 
   private Object getSessionMutex(HttpSession session) {
