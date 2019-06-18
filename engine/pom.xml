@@ -621,6 +621,7 @@
               <excludes>
                 <exclude>org/camunda/bpm/*/impl/**</exclude>
                 <exclude>org/camunda/bpm/engine/test/ProcessEngineRule</exclude>
+                <exclude>camundajar/**/*</exclude>
               </excludes>
             </configuration>
             <executions>
