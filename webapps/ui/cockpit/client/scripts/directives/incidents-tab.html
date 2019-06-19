@@ -25,7 +25,7 @@
           using the clipboard widget but it comes from an API endpoint...
         -->
         <a ng-if="incident.rootCauseIncidentMessage"
-           href="{{ getJobStacktraceUrl(incident) }}"
+           ng-click="viewVariable(incident)"
            target="_blank"
            uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
            tooltip-placement="top"
