@@ -25,7 +25,6 @@ camunda BPM platform provides a rich set of components centered around the BPM l
 
 #### Process Design
  * camunda modeler - A [standalone desktop application](https://github.com/camunda/camunda-modeler) that allows business users and developers to design & configure processes.
- * camunda cycle - Enables BPMN 2.0 based Roundtrip between Business and IT parties involved in a project. Allows to use any BPMN 2.0 modeling tool with camunda BPM.
 
 #### Process Operations
  * camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
