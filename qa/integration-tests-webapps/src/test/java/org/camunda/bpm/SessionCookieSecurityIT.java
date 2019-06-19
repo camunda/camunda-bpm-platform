@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MultivaluedMap;
+
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +32,7 @@ public class SessionCookieSecurityIT extends AbstractWebappIntegrationTest {
 
   @Override
   protected String getApplicationContextPath() {
-    return "camunda/api/admin/auth/user/default/login/tasklist";
+    return "camunda/app/tasklist/default/";
   }
 
   @Before
@@ -46,9 +47,7 @@ public class SessionCookieSecurityIT extends AbstractWebappIntegrationTest {
 
     // when
     ClientResponse response = client.resource(APP_BASE_PATH)
-        .type("application/x-www-form-urlencoded")
-        .entity("username=demo&password=demo")
-        .post(ClientResponse.class);
+        .get(ClientResponse.class);
 
     // then
     assertEquals(200, response.getStatus());
