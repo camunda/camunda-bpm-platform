@@ -21,6 +21,10 @@ var angular = require('angular');
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
+var inspectTemplate = fs.readFileSync(
+  __dirname + '/incidents-tab-stacktrace.html',
+  'utf8'
+);
 
 var Directive = [
   '$http',
@@ -31,80 +35,33 @@ var Directive = [
   'Views',
   '$translate',
   'localConf',
-  function($http, $q, $modal, search, Uri, Views, $translate, localConf) {
+  '$location',
+  function(
+    $http,
+    $q,
+    $modal,
+    search,
+    Uri,
+    Views,
+    $translate,
+    localConf,
+    $location
+  ) {
     var Link = function linkFunction(scope) {
       // ordered available columns
+      // prettier-ignore
       var availableColumns = [
-        {
-          class: 'state',
-          request: 'incidentState',
-          sortable: true,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_STATE')
-        },
-        {
-          class: 'message',
-          request: 'incidentMessage',
-          sortable: true,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')
-        },
-        {
-          class: 'process-instance',
-          request: 'processInstanceId',
-          sortable: false,
-          content: $translate.instant(
-            'PLUGIN_INCIDENTS_TAB_MESSAGE_PROCESS_INSTANCE'
-          )
-        },
-        {
-          class: 'create-time',
-          request: 'createTime',
-          sortable: true,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_CREATE_TIME')
-        },
-        {
-          class: 'end-time',
-          request: 'endTime',
-          sortable: true,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_END_TIME')
-        },
-        {
-          class: 'timestamp',
-          request: 'incidentTimestamp',
-          sortable: true,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_TIMESTAMP')
-        },
-        {
-          class: 'activity',
-          request: 'activityId',
-          sortable: true,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTIVITY')
-        },
-        {
-          class: 'cause instance-id uuid',
-          request: 'causeIncidentProcessInstanceId',
-          sortable: false,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')
-        },
-        {
-          class: 'cause-root instance-id uuid',
-          request: 'rootCauseIncidentProcessInstanceId',
-          sortable: false,
-          content: $translate.instant(
-            'PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID'
-          )
-        },
-        {
-          class: 'type',
-          request: 'incidentType',
-          sortable: true,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_TYPE')
-        },
-        {
-          class: 'action',
-          request: '',
-          sortable: false,
-          content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTION')
-        }
+        {class: 'state', request: 'incidentState', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_STATE')},
+        {class: 'message', request: 'incidentMessage', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')},
+        {class: 'process-instance', request: 'processInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE_PROCESS_INSTANCE')},
+        {class: 'create-time', request: 'createTime', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CREATE_TIME')},
+        {class: 'end-time', request: 'endTime', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_END_TIME')},
+        {class: 'timestamp', request: 'incidentTimestamp', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TIMESTAMP')},
+        {class: 'activity', request: 'activityId', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTIVITY')},
+        {class: 'cause instance-id uuid', request: 'causeIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')},
+        {class: 'cause-root instance-id uuid', request: 'rootCauseIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID')},
+        {class: 'type', request: 'incidentType', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TYPE')},
+        {class: 'action', request: '', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTION')}
       ];
 
       scope.onSortChange = updateView;
@@ -310,6 +267,44 @@ var Directive = [
 
       function loadLocal(defaultValue) {
         return localConf.get(scope.localConfKey, defaultValue);
+      }
+
+      scope.viewVariable = function(incident) {
+        $location.search('incident', incident.rootCauseIncidentConfiguration);
+
+        $http.get(scope.getJobStacktraceUrl(incident)).then(function(res) {
+          $modal
+            .open({
+              template: inspectTemplate,
+              controller: [
+                '$scope',
+                'variable',
+                function($scope, variable) {
+                  $scope.variable = variable;
+                  $scope.readonly = true;
+                }
+              ],
+              size: 'lg',
+              resolve: {
+                variable: function() {
+                  return {
+                    value: res.data,
+                    url: scope.getJobStacktraceUrl(incident)
+                  };
+                }
+              }
+            })
+            .result.catch(angular.noop)
+            .finally(function() {
+              $location.search('incident', null);
+            });
+        });
+      };
+
+      if ($location.search().incident) {
+        scope.viewVariable({
+          rootCauseIncidentConfiguration: $location.search().incident
+        });
       }
     };
 
