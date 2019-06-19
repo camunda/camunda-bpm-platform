@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.junit.Assert.assertTrue;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.authorization.OptimizePermissions;
@@ -63,14 +64,13 @@ public class OptimizeAuthorizationTest {
     authRule.enableAuthorization(USER_ID);
 
     // then
-    authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.EDIT, Resources.OPTIMIZE);
-    authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.SHARE, Resources.OPTIMIZE);
+    assertTrue(authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.EDIT, Resources.OPTIMIZE));
+    assertTrue(authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.SHARE, Resources.OPTIMIZE));
   }
 
   @After
   public void tearDown() {
     authRule.disableAuthorization();
     authRule.deleteUsersAndGroups();
-    processEngineConfiguration.setDisabledPermissions(null);
   }
 }
