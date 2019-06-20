@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.rest;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anySetOf;
@@ -923,15 +923,15 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).leafProcessInstances();
   }
-  
+
   @Test
   public void testQueryLeafProcessInstancesAsPost() {
     Map<String, Object> params =new HashMap<String, Object>();
     params.put("leafProcessInstances", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(params)
@@ -940,7 +940,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).leafProcessInstances();
   }
 
@@ -986,7 +986,7 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     verify(mockedQuery).withIncident();
   }
-  
+
   @Test
   public void testQueryProcessInstanceWithIncidentAsPost() {
     Map<String, Object> params = new HashMap<String, Object>();
@@ -1000,7 +1000,67 @@ public class ProcessInstanceRestServiceQueryTest extends
         .statusCode(Status.OK.getStatusCode())
       .when()
         .post(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).withIncident();
+  }
+
+  @Test
+  public void testProcessDefinitionKeyInParameter() {
+    given()
+      .queryParam("processDefinitionKeyIn", MockProvider.EXAMPLE_KEY_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionKeyIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testProcessDefinitionKeyInPostParameter() {
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("processDefinitionKeyIn", MockProvider.EXAMPLE_KEY_LIST.split(","));
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionKeyIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testProcessDefinitionKeyNotInParameter() {
+    given()
+      .queryParam("processDefinitionKeyNotIn", MockProvider.EXAMPLE_KEY_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionKeyNotIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testProcessDefinitionKeyNotInPostParameter() {
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("processDefinitionKeyNotIn", MockProvider.EXAMPLE_KEY_LIST.split(","));
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionKeyNotIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockedQuery).list();
   }
 }

@@ -59,6 +59,8 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   private String deploymentId;
   private String processDefinitionKey;
+  private List<String> processDefinitionKeys;
+  private List<String> processDefinitionKeyNotIn;
   private String businessKey;
   private String businessKeyLike;
   private String caseInstanceId;
@@ -117,6 +119,24 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam("processDefinitionKey")
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public List<String> getProcessDefinitionKeys() {
+    return processDefinitionKeys;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionKeyIn", converter = StringListConverter.class)
+  public void setProcessDefinitionKeyIn(List<String> processDefinitionKeys) {
+    this.processDefinitionKeys = processDefinitionKeys;
+  }
+
+  public List<String> getProcessDefinitionKeyNotIn() {
+    return processDefinitionKeyNotIn;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionKeyNotIn", converter = StringListConverter.class)
+  public void setProcessDefinitionKeyNotIn(List<String> processDefinitionKeys) {
+    this.processDefinitionKeyNotIn = processDefinitionKeys;
   }
 
   public String getBusinessKey() {
@@ -336,6 +356,12 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
+    }
+    if (processDefinitionKeys != null && !processDefinitionKeys.isEmpty()) {
+      query.processDefinitionKeyIn(processDefinitionKeys.toArray(new String[processDefinitionKeys.size()]));
+    }
+    if (processDefinitionKeyNotIn != null && !processDefinitionKeyNotIn.isEmpty()) {
+      query.processDefinitionKeyNotIn(processDefinitionKeyNotIn.toArray(new String[processDefinitionKeyNotIn.size()]));
     }
     if (deploymentId != null) {
       query.deploymentId(deploymentId);
