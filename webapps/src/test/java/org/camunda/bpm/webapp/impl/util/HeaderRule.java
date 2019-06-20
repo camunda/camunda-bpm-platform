@@ -52,6 +52,11 @@ public class HeaderRule extends ExternalResource {
   }
 
   public void startServer(String webDescriptor, String scope) {
+    startServer(webDescriptor, scope, "/camunda");
+  }
+
+  public void startServer(String webDescriptor, String scope, String contextPath) {
+    webAppContext.setContextPath(contextPath);
     webAppContext.setResourceBase("/");
     webAppContext.setDescriptor("src/test/resources/WEB-INF/" + scope + "/" + webDescriptor);
 
@@ -70,7 +75,7 @@ public class HeaderRule extends ExternalResource {
 
   public void performRequestWithHeader(String name, String value) {
     try {
-      connection = new URL("http://localhost:" + SERVER_PORT + "/").openConnection();
+      connection = new URL("http://localhost:" + SERVER_PORT + "/camunda").openConnection();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

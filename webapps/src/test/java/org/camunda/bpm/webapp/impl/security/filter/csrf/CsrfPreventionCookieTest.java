@@ -37,10 +37,19 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getCookieHeader())
-      .doesNotContain(";HttpOnly")
-      .contains(";SameSite=Strict")
-      .doesNotContain(";Secure");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=Strict");
+  }
+
+  @Test
+  public void shouldConfigureRootContextPath() {
+    // given
+    headerRule.startServer("web.xml", "csrf", "/");
+
+    // when
+    headerRule.performRequest();
+
+    // then
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Strict");
   }
 
   @Test
@@ -52,7 +61,7 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getCookieHeader()).contains(";Secure");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=Strict;Secure");
   }
 
   @Test
@@ -64,7 +73,7 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getCookieHeader()).doesNotContain(";SameSite");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda");
   }
 
   @Test
@@ -76,7 +85,7 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getCookieHeader()).contains(";SameSite=Strict");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=Strict");
   }
 
   @Test
@@ -88,7 +97,7 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getCookieHeader()).contains(";SameSite=Lax");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=Lax");
   }
 
   @Test
@@ -100,7 +109,7 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getCookieHeader()).contains(";SameSite=aCustomValue");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=aCustomValue");
   }
 
   @Test
@@ -144,9 +153,7 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getCookieHeader())
-      .contains(";SameSite=Lax")
-      .contains(";Secure");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=Lax;Secure");
   }
 
   @Test
@@ -158,9 +165,7 @@ public class CsrfPreventionCookieTest {
     headerRule.performRequestWithHeader("Cookie", "XSRF-TOKEN=aToken");
 
     // then
-    assertThat(headerRule.getCookieHeader())
-      .contains(";SameSite=Strict")
-      .doesNotContain(";Secure");
+    assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=Strict");
   }
 
 }
