@@ -25,12 +25,12 @@ import java.util.Arrays;
 public class CsrfPreventionCookieConfigurator {
 
   protected static final String ENABLE_SECURE_PARAM = "enableSecureCookie";
-  protected static final String DISABLE_SAME_SITE_PARAM = "disableSameSiteCookie";
+  protected static final String ENABLE_SAME_SITE_PARAM = "enableSameSiteCookie";
   protected static final String SAME_SITE_OPTION_PARAM = "sameSiteCookieOption";
   protected static final String SAME_SITE_VALUE_PARAM = "sameSiteCookieValue";
 
   protected boolean isSecureCookieEnabled;
-  protected boolean isSameSiteCookieDisabled;
+  protected boolean isSameSiteCookieEnabled;
 
   protected String sameSiteCookieValue;
 
@@ -41,9 +41,11 @@ public class CsrfPreventionCookieConfigurator {
       isSecureCookieEnabled = Boolean.valueOf(enableSecureCookie);
     }
 
-    String disableSameSiteCookie = filterConfig.getInitParameter(DISABLE_SAME_SITE_PARAM);
-    if (!isEmpty(disableSameSiteCookie)) {
-      isSameSiteCookieDisabled = Boolean.valueOf(disableSameSiteCookie);
+    String enableSameSiteCookie = filterConfig.getInitParameter(ENABLE_SAME_SITE_PARAM);
+    if (!isEmpty(enableSameSiteCookie)) {
+      isSameSiteCookieEnabled = Boolean.valueOf(enableSameSiteCookie);
+    } else {
+      isSameSiteCookieEnabled = true; // default
     }
 
     String sameSiteCookieValue = filterConfig.getInitParameter(SAME_SITE_VALUE_PARAM);
@@ -79,7 +81,7 @@ public class CsrfPreventionCookieConfigurator {
   public String getConfig() {
     StringBuilder stringBuilder = new StringBuilder();
 
-    if (!isSameSiteCookieDisabled) {
+    if (isSameSiteCookieEnabled) {
       stringBuilder
         .append(CsrfConstants.CSRF_SAME_SITE_FIELD_NAME)
         .append(sameSiteCookieValue);

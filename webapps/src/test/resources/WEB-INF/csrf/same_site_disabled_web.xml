@@ -10,8 +10,8 @@
     <filter-name>CsrfPreventionFilter</filter-name>
     <filter-class>org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter</filter-class>
     <init-param>
-      <param-name>disableSameSiteCookie</param-name>
-      <param-value>true</param-value>
+      <param-name>enableSameSiteCookie</param-name>
+      <param-value>false</param-value>
     </init-param>
   </filter>
   <filter-mapping>
