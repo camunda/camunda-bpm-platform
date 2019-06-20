@@ -77,9 +77,8 @@ module.exports = [
             14: $translate.instant(
               'AUTHORIZATION_DECISION_REQUIREMENTS_DEFINITION'
             ),
-            15: $translate.instant('AUTHORIZATION_REPORT'),
-            16: $translate.instant('AUTHORIZATION_DASHBOARD'),
-            17: $translate.instant('AUTHORIZATION_OPERATION_LOG')
+            17: $translate.instant('AUTHORIZATION_OPERATION_LOG'),
+            18: $translate.instant('AUTHORIZATION_OPTIMIZE')
           };
 
           pageService.breadcrumbsAdd([
@@ -169,9 +168,8 @@ module.exports = [
               'CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND'
             ],
             14: ['READ'],
-            15: ['ALL', 'READ', 'UPDATE', 'CREATE', 'DELETE'],
-            16: ['ALL', 'READ', 'UPDATE', 'CREATE', 'DELETE'],
-            17: ['READ', 'DELETE']
+            17: ['READ', 'DELETE'],
+            18: ['EDIT', 'SHARE']
           };
 
           $scope.typeMap = {
