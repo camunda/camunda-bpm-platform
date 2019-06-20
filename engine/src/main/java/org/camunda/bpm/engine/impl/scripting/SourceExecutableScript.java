@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.context.Context;
  * A script which is provided as source code.
  *
  * @author Daniel Meyer
+ * @author Ryan Johnston
  *
  */
 public class SourceExecutableScript extends CompiledExecutableScript {
