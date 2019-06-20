@@ -270,7 +270,10 @@ var Directive = [
       }
 
       scope.viewVariable = function(incident) {
-        $location.search('incident', incident.rootCauseIncidentConfiguration);
+        $location.search(
+          'incidentStacktrace',
+          incident.rootCauseIncidentConfiguration
+        );
 
         $http.get(scope.getJobStacktraceUrl(incident)).then(function(res) {
           $modal
@@ -296,14 +299,14 @@ var Directive = [
             })
             .result.catch(angular.noop)
             .finally(function() {
-              $location.search('incident', null);
+              $location.search('incidentStacktrace', null);
             });
         });
       };
 
-      if ($location.search().incident) {
+      if ($location.search().incidentStacktrace) {
         scope.viewVariable({
-          rootCauseIncidentConfiguration: $location.search().incident
+          rootCauseIncidentConfiguration: $location.search().incidentStacktrace
         });
       }
     };
