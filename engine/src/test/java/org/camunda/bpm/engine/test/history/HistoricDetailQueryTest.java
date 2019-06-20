@@ -16,6 +16,17 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
@@ -28,6 +39,7 @@ import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -40,16 +52,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  *
@@ -72,7 +74,8 @@ public class HistoricDetailQueryTest {
   protected ManagementService managementService;
   protected HistoryService historyService;
   protected TaskService taskService;
-  private IdentityService identityService;
+  protected IdentityService identityService;
+  protected CaseService caseService;
 
   @Before
   public void initServices() {
@@ -81,6 +84,7 @@ public class HistoricDetailQueryTest {
     historyService = engineRule.getHistoryService();
     taskService = engineRule.getTaskService();
     identityService = engineRule.getIdentityService();
+    caseService = engineRule.getCaseService();
   }
 
   @Test
@@ -164,6 +168,30 @@ public class HistoricDetailQueryTest {
 
     assertEquals(0, query.list().size());
     assertEquals(0, query.count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByExecutionIdAndProcessInstanceId() {
+    // given
+    startProcessInstance(PROCESS_KEY);
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    String processInstanceId = task.getProcessInstanceId();
+    String executionId = task.getExecutionId();
+    String taskId = task.getId();
+
+    taskService.resolveTask(taskId, getVariables());
+
+    // when
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
+        .processInstanceId(processInstanceId)
+        .executionId(executionId);
+
+    //then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
   }
 
   @Test
@@ -497,6 +525,23 @@ public class HistoricDetailQueryTest {
     } catch (ProcessEngineException e) {
       // then fails
     }
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceIdAndCaseExecutionId() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+    caseService.setVariable(caseInstanceId, "myVariable", 1);
+
+    // when
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
+        .caseInstanceId(caseInstanceId)
+        .caseExecutionId(caseInstanceId);
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
   }
 
   protected VariableMap getVariables() {
