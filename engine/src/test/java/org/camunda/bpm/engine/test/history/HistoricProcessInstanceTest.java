@@ -22,10 +22,13 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicP
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionVersion;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1619,6 +1622,94 @@ public class HistoricProcessInstanceTest {
     assertNotNull(calledProcessInstance);
     assertEquals(1, historicProcInstances.size());
     assertEquals(calledProcessInstance.getId(), historicProcInstances.get(0).getId());
+  }
+
+  @Test
+  public void testQueryWithProcessDefinitionKeyIn() {
+    // given
+    deployment(ProcessModels.ONE_TASK_PROCESS);
+    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+
+    deployment(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASKS_PROCESS"));
+    runtimeService.startProcessInstanceByKey("ONE_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("ONE_TASKS_PROCESS");
+
+    deployment(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+
+    // assume
+    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(9l));
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKeyIn("ONE_TASKS_PROCESS", "TWO_TASKS_PROCESS");
+
+    // then
+    assertThat(query.count(), is(6l));
+    assertThat(query.list().size(), is(6));
+  }
+
+  @Test
+  public void testQueryWithInvalidProcessDefinitionKeyIn() {
+    // given
+    deployment(ProcessModels.ONE_TASK_PROCESS);
+    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+
+    deployment(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASKS_PROCESS"));
+    runtimeService.startProcessInstanceByKey("ONE_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("ONE_TASKS_PROCESS");
+
+    deployment(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
+
+    // assume
+    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(9l));
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKeyIn("ONE_TASKS_PROCESS", "TWO_TASKS_PROCESS");
+
+    // then
+    assertThat(query.count(), is(6l));
+    assertThat(query.list().size(), is(6));
+  }
+
+  @Test
+  public void testQueryByInvalidProcessDefinitionKeyIn() {
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKeyIn(ProcessModels.PROCESS_KEY, null);
+      fail();
+    }
+    catch(ProcessEngineException expected) {
+    }
+
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKeyIn((String) null);
+      fail();
+    }
+    catch(ProcessEngineException expected) {
+    }
+
+    deployment(ProcessModels.ONE_TASK_PROCESS);
+    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKeyIn("not-existing-key");
+
+    assertThat(query.count(), is(0l));
+    assertThat(query.list().size(), is(0));
   }
 
   protected void deployment(String... resources) {

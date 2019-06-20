@@ -289,6 +289,13 @@
       <if test="processDefinitionKey != null">
         and DEF.KEY_ = #{processDefinitionKey}
       </if>
+      <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
+        and DEF.KEY_ in
+        <foreach item="item" index="index" collection="processDefinitionKeys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="processDefinitionName != null">
         and DEF.NAME_ = #{processDefinitionName}
       </if>
