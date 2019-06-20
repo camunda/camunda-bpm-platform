@@ -58,6 +58,14 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery processDefinitionKey(String processDefinitionKey);
 
   /**
+   * Select the process instances for any given process definition keys.
+   */
+  ProcessInstanceQuery processDefinitionKeyIn(String... processDefinitionKeys);
+
+  /** Select historic process instances that don't have a process-definition of which the key is present in the given list */
+  ProcessInstanceQuery processDefinitionKeyNotIn(String... processDefinitionKeys);
+
+  /**
    * Selects the process instances which are defined by a process definition
    * with the given id.
    */

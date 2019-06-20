@@ -47,6 +47,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String processDefinitionId;
   protected Set<String> processInstanceIds;
   protected String processDefinitionKey;
+  protected String[] processDefinitionKeys;
+  protected String[] processDefinitionKeyNotIn;
   protected String deploymentId;
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
@@ -113,6 +115,18 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public ProcessInstanceQueryImpl processDefinitionKey(String processDefinitionKey) {
     ensureNotNull("Process definition key", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public ProcessInstanceQuery processDefinitionKeyIn(String... processDefinitionKeys) {
+    ensureNotNull("processDefinitionKeys", (Object[]) processDefinitionKeys);
+    this.processDefinitionKeys = processDefinitionKeys;
+    return this;
+  }
+
+  public ProcessInstanceQuery processDefinitionKeyNotIn(String... processDefinitionKeys) {
+    ensureNotNull("processDefinitionKeyNotIn", (Object[]) processDefinitionKeys);
+    this.processDefinitionKeyNotIn = processDefinitionKeys;
     return this;
   }
 
@@ -245,7 +259,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     isRootProcessInstances = true;
     return this;
   }
-  
+
   public ProcessInstanceQuery leafProcessInstances() {
     if(subProcessInstanceId != null) {
       throw new ProcessEngineException("Invalid query usage: cannot set both leafProcessInstances and subProcessInstanceId");
@@ -311,6 +325,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+
+  public String[] getProcessDefinitionKeys() {
+    return processDefinitionKeys;
+  }
+
+  public String[] getProcessDefinitionKeyNotIn() {
+    return processDefinitionKeyNotIn;
   }
 
   public String getDeploymentId() {
