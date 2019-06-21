@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -47,6 +48,10 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instances that are defined by a process
    * definition with the given key.  */
   HistoricProcessInstanceQuery processDefinitionKey(String processDefinitionKey);
+
+  /** Only select historic process instances that are defined by any given process
+   * definition key.  */
+  HistoricProcessInstanceQuery processDefinitionKeyIn(String... processDefinitionKeys);
 
   /** Only select historic process instances that don't have a process-definition of which the key is present in the given list */
   HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys);

@@ -16,6 +16,19 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByBusinessKey;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByProcessDefinitionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByProcessInstanceId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -53,18 +67,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByProcessDefinitionId;
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByProcessInstanceId;
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByBusinessKey;
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Joram Barrez
@@ -180,6 +182,118 @@ public class ProcessInstanceQueryTest {
       fail();
     } catch (ProcessEngineException e) {
       // Exception is expected
+    }
+  }
+
+  @Test
+  public void testQueryByProcessDefinitionKeyIn() {
+    // given (deploy another process)
+    ProcessDefinition oneTaskProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    String oneTaskProcessDefinitionId = oneTaskProcessDefinition.getId();
+    runtimeService.startProcessInstanceById(oneTaskProcessDefinitionId);
+    runtimeService.startProcessInstanceById(oneTaskProcessDefinitionId);
+
+    // assume
+    assertThat(runtimeService.createProcessInstanceQuery().count(), is(7l));
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+      .processDefinitionKeyIn(PROCESS_DEFINITION_KEY, PROCESS_DEFINITION_KEY_2);
+
+    // then
+    assertThat(query.count(), is(5l));
+    assertThat(query.list().size(), is(5));
+  }
+
+  @Test
+  public void testQueryByNonExistingProcessDefinitionKeyIn() {
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+      .processDefinitionKeyIn("not-existing-key");
+
+    // then
+    assertThat(query.count(), is(0l));
+    assertThat(query.list().size(), is(0));
+  }
+
+  @Test
+  public void testQueryByOneInvalidProcessDefinitionKeyIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyIn((String) null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
+    }
+  }
+
+  @Test
+  public void testQueryByMultipleInvalidProcessDefinitionKeyIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY, null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // Exception is expected
+    }
+  }
+
+  @Test
+  public void testQueryByProcessDefinitionKeyNotIn() {
+    // given (deploy another process)
+    ProcessDefinition oneTaskProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    String oneTaskProcessDefinitionId = oneTaskProcessDefinition.getId();
+    runtimeService.startProcessInstanceById(oneTaskProcessDefinitionId);
+    runtimeService.startProcessInstanceById(oneTaskProcessDefinitionId);
+
+    // assume
+    assertThat(runtimeService.createProcessInstanceQuery().count(), is(7l));
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+      .processDefinitionKeyNotIn(PROCESS_DEFINITION_KEY, PROCESS_DEFINITION_KEY_2);
+
+    // then
+    assertThat(query.count(), is(2l));
+    assertThat(query.list().size(), is(2));
+  }
+
+  @Test
+  public void testQueryByNonExistingProcessDefinitionKeyNotIn() {
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+      .processDefinitionKeyNotIn("not-existing-key");
+
+    // then
+    assertThat(query.count(), is(5l));
+    assertThat(query.list().size(), is(5));
+  }
+
+  @Test
+  public void testQueryByOneInvalidProcessDefinitionKeyNotIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyNotIn((String) null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
+    }
+  }
+
+  @Test
+  public void testQueryByMultipleInvalidProcessDefinitionKeyNotIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyNotIn(PROCESS_DEFINITION_KEY, null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
     }
   }
 
@@ -1261,7 +1375,7 @@ public class ProcessInstanceQueryTest {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryWithIncident() {
     ProcessInstance instanceWithIncident = runtimeService.startProcessInstanceByKey("failingProcess");
-    ProcessInstance instanceWithoutIncident = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     testHelper.executeAvailableJobs();
 

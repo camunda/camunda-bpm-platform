@@ -16,14 +16,17 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
@@ -36,7 +39,7 @@ import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
-import static java.lang.Boolean.TRUE;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricProcessInstanceQuery> {
 
@@ -71,6 +74,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Set<String> processInstanceIds;
   private String processDefinitionId;
   private String processDefinitionKey;
+  private List<String> processDefinitionKeys;
   private String processDefinitionName;
   private String processDefinitionNameLike;
   private List<String> processDefinitionKeyNotIn;
@@ -149,6 +153,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam("processDefinitionKey")
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionKeyIn", converter = StringListConverter.class)
+  public void setProcessDefinitionKeyIn(List<String> processDefinitionKeys) {
+    this.processDefinitionKeys = processDefinitionKeys;
   }
 
   @CamundaQueryParam(value = "processDefinitionKeyNotIn", converter = StringListConverter.class)
@@ -359,6 +368,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
+    }
+    if (processDefinitionKeys != null && !processDefinitionKeys.isEmpty()) {
+      query.processDefinitionKeyIn(processDefinitionKeys.toArray(new String[processDefinitionKeys.size()]));
     }
     if (processDefinitionName != null) {
       query.processDefinitionName(processDefinitionName);

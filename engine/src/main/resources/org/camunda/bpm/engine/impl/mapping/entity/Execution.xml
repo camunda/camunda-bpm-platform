@@ -240,6 +240,20 @@
       <if test="processDefinitionKey != null">
         and P.KEY_ = #{processDefinitionKey}
       </if>
+      <if test="processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0">
+        and P.KEY_ in
+        <foreach item="item" index="index" collection="processDefinitionKeys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processDefinitionKeyNotIn != null &amp;&amp; processDefinitionKeyNotIn.length > 0">
+        and P.KEY_ not in
+        <foreach item="item" index="index" collection="processDefinitionKeyNotIn"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="deploymentId != null">
         and P.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
