@@ -159,20 +159,34 @@ module.exports = [
 
     // Handeling of long-running requests
     // store state of last Request
-    var lastRequestIsPending = false;
-    var lastRequest;
+    var lastRequest = $q.defer();
+    var lastQuery = {};
+
+    // trigger reloading of the tasks if the query changes
+    tasklistData.observe('taskListQuery', function(taskListQuery) {
+      var lastRequestIsPending = lastRequest.promise.$$state.status === 0;
+      if (
+        lastRequestIsPending &&
+        JSON.stringify(taskListQuery) !== JSON.stringify(lastQuery)
+      ) {
+        tasklistData.changed('taskList');
+      }
+    });
 
     tasklistData.provide('taskList', [
       'taskListQuery',
       function(taskListQuery) {
-        if (!lastRequestIsPending) {
+        var lastRequestIsPending = lastRequest.promise.$$state.status === 0;
+        if (
+          !lastRequestIsPending ||
+          JSON.stringify(taskListQuery) !== JSON.stringify(lastQuery)
+        ) {
           var deferred = $q.defer();
           lastRequest = deferred;
-          lastRequestIsPending = true;
+          lastQuery = taskListQuery;
 
           if (!taskListQuery || taskListQuery.id === null) {
             // no filter selected
-            lastRequestIsPending = false;
             deferred.resolve({
               count: 0,
               _embedded: {}
@@ -180,7 +194,6 @@ module.exports = [
           } else {
             // filter selected
             Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
-              lastRequestIsPending = false;
               if (err) {
                 deferred.reject(err);
               } else {
