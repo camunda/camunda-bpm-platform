@@ -1502,7 +1502,7 @@ public class HistoricProcessInstanceTest {
   public void testHistoricProcInstQueryWithExecutedActivityIdsNull() {
     try {
       historyService.createHistoricProcessInstanceQuery()
-      .executedActivityIdIn(null).list();
+      .executedActivityIdIn((String[]) null).list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("activity ids is null"));
@@ -1550,7 +1550,7 @@ public class HistoricProcessInstanceTest {
   public void testHistoricProcInstQueryWithActiveActivityIdsNull() {
     try {
       historyService.createHistoricProcessInstanceQuery()
-      .activeActivityIdIn(null).list();
+      .activeActivityIdIn((String[]) null).list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("activity ids is null"));
@@ -1655,61 +1655,42 @@ public class HistoricProcessInstanceTest {
   }
 
   @Test
-  public void testQueryWithInvalidProcessDefinitionKeyIn() {
+  public void testQueryByNonExistingProcessDefinitionKeyIn() {
     // given
     deployment(ProcessModels.ONE_TASK_PROCESS);
     runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
-    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
-    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
-
-    deployment(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASKS_PROCESS"));
-    runtimeService.startProcessInstanceByKey("ONE_TASKS_PROCESS");
-    runtimeService.startProcessInstanceByKey("ONE_TASKS_PROCESS");
-
-    deployment(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
-    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
-    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
-    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
-    runtimeService.startProcessInstanceByKey("TWO_TASKS_PROCESS");
-
-    // assume
-    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(9l));
 
     // when
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKeyIn("ONE_TASKS_PROCESS", "TWO_TASKS_PROCESS");
+      .processDefinitionKeyIn("not-existing-key");
 
     // then
-    assertThat(query.count(), is(6l));
-    assertThat(query.list().size(), is(6));
+    assertThat(query.count(), is(0l));
+    assertThat(query.list().size(), is(0));
   }
 
   @Test
-  public void testQueryByInvalidProcessDefinitionKeyIn() {
+  public void testQueryByOneInvalidProcessDefinitionKeyIn() {
     try {
-      historyService.createHistoricProcessInstanceQuery()
-        .processDefinitionKeyIn(ProcessModels.PROCESS_KEY, null);
-      fail();
-    }
-    catch(ProcessEngineException expected) {
-    }
-
-    try {
+      // when
       historyService.createHistoricProcessInstanceQuery()
         .processDefinitionKeyIn((String) null);
       fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
     }
-    catch(ProcessEngineException expected) {
+  }
+
+  @Test
+  public void testQueryByMultipleInvalidProcessDefinitionKeyIn() {
+    try {
+      // when
+      historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKeyIn(ProcessModels.PROCESS_KEY, null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
     }
-
-    deployment(ProcessModels.ONE_TASK_PROCESS);
-    runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
-
-    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKeyIn("not-existing-key");
-
-    assertThat(query.count(), is(0l));
-    assertThat(query.list().size(), is(0));
   }
 
   protected void deployment(String... resources) {

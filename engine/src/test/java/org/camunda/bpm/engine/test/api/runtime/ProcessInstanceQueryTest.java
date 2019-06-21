@@ -207,28 +207,38 @@ public class ProcessInstanceQueryTest {
   }
 
   @Test
-  public void testQueryByInvalidProcessDefinitionKeyIn() {
-    try {
-      runtimeService.createProcessInstanceQuery()
-        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY, null);
-      fail();
-    }
-    catch(ProcessEngineException expected) {
-    }
-
-    try {
-      runtimeService.createProcessInstanceQuery()
-        .processDefinitionKeyIn((String) null);
-      fail();
-    }
-    catch(ProcessEngineException expected) {
-    }
-
+  public void testQueryByNonExistingProcessDefinitionKeyIn() {
+    // when
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
       .processDefinitionKeyIn("not-existing-key");
 
+    // then
     assertThat(query.count(), is(0l));
     assertThat(query.list().size(), is(0));
+  }
+
+  @Test
+  public void testQueryByOneInvalidProcessDefinitionKeyIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyIn((String) null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
+    }
+  }
+
+  @Test
+  public void testQueryByMultipleInvalidProcessDefinitionKeyIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY, null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // Exception is expected
+    }
   }
 
   @Test
@@ -253,28 +263,38 @@ public class ProcessInstanceQueryTest {
   }
 
   @Test
-  public void testQueryByInvalidProcessDefinitionKeyNotIn() {
-    try {
-      runtimeService.createProcessInstanceQuery()
-        .processDefinitionKeyNotIn(PROCESS_DEFINITION_KEY, null);
-      fail();
-    }
-    catch(ProcessEngineException expected) {
-    }
-
-    try {
-      runtimeService.createProcessInstanceQuery()
-        .processDefinitionKeyNotIn((String) null);
-      fail();
-    }
-    catch(ProcessEngineException expected) {
-    }
-
+  public void testQueryByNonExistingProcessDefinitionKeyNotIn() {
+    // when
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
       .processDefinitionKeyNotIn("not-existing-key");
 
+    // then
     assertThat(query.count(), is(5l));
     assertThat(query.list().size(), is(5));
+  }
+
+  @Test
+  public void testQueryByOneInvalidProcessDefinitionKeyNotIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyNotIn((String) null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
+    }
+  }
+
+  @Test
+  public void testQueryByMultipleInvalidProcessDefinitionKeyNotIn() {
+    try {
+      // when
+      runtimeService.createProcessInstanceQuery()
+        .processDefinitionKeyNotIn(PROCESS_DEFINITION_KEY, null);
+      fail();
+    } catch(ProcessEngineException expected) {
+      // then Exception is expected
+    }
   }
 
   @Test
@@ -1355,7 +1375,7 @@ public class ProcessInstanceQueryTest {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryWithIncident() {
     ProcessInstance instanceWithIncident = runtimeService.startProcessInstanceByKey("failingProcess");
-    ProcessInstance instanceWithoutIncident = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     testHelper.executeAvailableJobs();
 
