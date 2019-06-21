@@ -14,19 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.util;
+package org.camunda.bpm.spring.boot.starter.property.csrf;
 
-import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.camunda.bpm.spring.boot.starter.property.CsrfProperties;
+import org.camunda.bpm.spring.boot.starter.property.ParsePropertiesHelper;
+import org.junit.Test;
+import org.springframework.test.context.TestPropertySource;
 
-@SpringBootApplication
-@EnableConfigurationProperties(CamundaBpmProperties.class)
-public class TestApplication {
+import static org.assertj.core.api.Assertions.assertThat;
 
-  public static void main(String[] args) {
-    SpringApplication.run(TestApplication.class, args);
+@TestPropertySource(properties = {
+  "camunda.bpm.webapp.csrf.enableSecureCookie=false"
+})
+public class CookieSecureDisabledTest extends ParsePropertiesHelper {
+
+  @Test
+  public void shouldCheckSecureCookieDisabled() {
+    CsrfProperties properties = webapp.getCsrf();
+
+    assertThat(properties.isEnableSecureCookie()).isFalse();
+    assertThat(properties.getInitParams()).doesNotContainKey("enableSecureCookie");
   }
 
 }

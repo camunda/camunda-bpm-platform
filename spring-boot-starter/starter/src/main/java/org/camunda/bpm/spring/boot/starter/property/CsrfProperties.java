@@ -34,6 +34,10 @@ public class CsrfProperties {
   private Integer denyStatus = null;
   private String randomClass = null;
   private List<String> entryPoints = new ArrayList<>();
+  protected boolean enableSecureCookie = false;
+  protected boolean enableSameSiteCookie = true;
+  protected String sameSiteCookieOption;
+  protected String sameSiteCookieValue;
 
   public String getTargetOrigin() {
     return targetOrigin;
@@ -67,8 +71,40 @@ public class CsrfProperties {
     this.entryPoints = entryPoints;
   }
 
+  public boolean isEnableSecureCookie() {
+    return enableSecureCookie;
+  }
+
+  public void setEnableSecureCookie(boolean enableSecureCookie) {
+    this.enableSecureCookie = enableSecureCookie;
+  }
+
+  public boolean isEnableSameSiteCookie() {
+    return enableSameSiteCookie;
+  }
+
+  public void setEnableSameSiteCookie(boolean enableSameSiteCookie) {
+    this.enableSameSiteCookie = enableSameSiteCookie;
+  }
+
+  public String getSameSiteCookieOption() {
+    return sameSiteCookieOption;
+  }
+
+  public void setSameSiteCookieOption(String sameSiteCookieOption) {
+    this.sameSiteCookieOption = sameSiteCookieOption;
+  }
+
+  public String getSameSiteCookieValue() {
+    return sameSiteCookieValue;
+  }
+
+  public void setSameSiteCookieValue(String sameSiteCookieValue) {
+    this.sameSiteCookieValue = sameSiteCookieValue;
+  }
+
   public Map<String, String> getInitParams() {
-    Map<String, String> initParams = new HashMap<>(4);
+    Map<String, String> initParams = new HashMap<>();
 
     if (StringUtils.isNotBlank(targetOrigin)) {
       initParams.put("targetOrigin", targetOrigin);
@@ -86,6 +122,22 @@ public class CsrfProperties {
       initParams.put("entryPoints", StringUtils.join(entryPoints, ","));
     }
 
+    if (enableSecureCookie) { // only add param if it's true; default is false
+      initParams.put("enableSecureCookie", String.valueOf(enableSecureCookie));
+    }
+
+    if (!enableSameSiteCookie) { // only add param if it's false; default is true
+      initParams.put("enableSameSiteCookie", String.valueOf(enableSameSiteCookie));
+    }
+
+    if (StringUtils.isNotBlank(sameSiteCookieOption)) {
+      initParams.put("sameSiteCookieOption", sameSiteCookieOption);
+    }
+
+    if (StringUtils.isNotBlank(sameSiteCookieValue)) {
+      initParams.put("sameSiteCookieValue", sameSiteCookieValue);
+    }
+
     return initParams;
   }
 
@@ -96,6 +148,10 @@ public class CsrfProperties {
       .add("denyStatus='" + denyStatus + '\'')
       .add("randomClass='" + randomClass + '\'')
       .add("entryPoints='" + entryPoints + '\'')
+      .add("enableSecureCookie='" + enableSecureCookie + '\'')
+      .add("enableSameSiteCookie='" + enableSameSiteCookie + '\'')
+      .add("sameSiteCookieOption='" + sameSiteCookieOption + '\'')
+      .add("sameSiteCookieValue='" + sameSiteCookieValue + '\'')
       .toString();
   }
 }

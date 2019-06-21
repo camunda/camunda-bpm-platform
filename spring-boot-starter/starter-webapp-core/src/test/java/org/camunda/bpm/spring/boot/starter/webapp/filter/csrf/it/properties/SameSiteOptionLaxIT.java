@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it;
+package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.properties;
 
 import org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.util.TestApplication;
@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.net.URLConnection;
@@ -31,7 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CsrfPreventionIT {
+@TestPropertySource(properties = {
+  "camunda.bpm.webapp.csrf.sameSiteCookieOption=lax"
+})
+public class SameSiteOptionLaxIT {
 
   @Rule
   public HeaderRule headerRule = new HeaderRule();
@@ -40,26 +44,13 @@ public class CsrfPreventionIT {
   int port;
 
   @Test
-  public void shouldSetCookieWebapp() {
+  public void shouldSetSameSiteCookieOptionLax() {
     URLConnection connection = headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
 
     String xsrfCookieValue = headerRule.getXsrfCookieValue(connection);
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader(connection);
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Strict");
-    assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
-
-    assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
-  }
-
-  @Test
-  public void shouldSetCookieWebappRest() {
-    URLConnection connection = headerRule.performRequest("http://localhost:" + port + "/api/engine/engine/");
-
-    String xsrfCookieValue = headerRule.getXsrfCookieValue(connection);
-    String xsrfTokenHeader = headerRule.getXsrfTokenHeader(connection);
-
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Strict");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
