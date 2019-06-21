@@ -181,6 +181,7 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, 
    * Provides access to the current {@link UserTask} Element from the Bpmn Model.
    * @return the current {@link UserTask} Element from the Bpmn Model.
    */
+  @Override
   public UserTask getBpmnModelElementInstance();
 
   /**
@@ -188,6 +189,12 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, 
    * if the task belongs to no single tenant.
    */
   String getTenantId();
+
+  /** Follow-up date of the task. */
+  Date getFollowUpDate();
+
+  /** Change follow-up date of the task. */
+  void setFollowUpDate(Date followUpDate);
 
   /**
    * set status to complete.
