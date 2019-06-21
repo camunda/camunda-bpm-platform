@@ -16,7 +16,9 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -185,13 +187,13 @@ public class HistoricDetailQueryTest {
     taskService.resolveTask(taskId, getVariables());
 
     // when
-    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
+    HistoricDetail detail = historyService.createHistoricDetailQuery()
         .processInstanceId(processInstanceId)
-        .executionId(executionId);
+        .executionId(executionId).singleResult();
 
     //then
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
+    assertThat(detail.getProcessInstanceId(), is(processInstanceId));
+    assertThat(detail.getExecutionId(), is(executionId));
   }
 
   @Test
@@ -535,13 +537,13 @@ public class HistoricDetailQueryTest {
     caseService.setVariable(caseInstanceId, "myVariable", 1);
 
     // when
-    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
+    HistoricDetail detail = historyService.createHistoricDetailQuery()
         .caseInstanceId(caseInstanceId)
-        .caseExecutionId(caseInstanceId);
+        .caseExecutionId(caseInstanceId).singleResult();
 
     // then
-    assertEquals(1, query.list().size());
-    assertEquals(1, query.count());
+    assertThat(detail.getCaseInstanceId(), is(caseInstanceId));
+    assertThat(detail.getCaseExecutionId(), is(caseInstanceId));
   }
 
   protected VariableMap getVariables() {
