@@ -1036,7 +1036,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
         .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyProcessInstanceIdSetInvovation();
+    verifyProcessInstanceIdSetInvocation();
   }
 
   @Test
@@ -1052,7 +1052,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
         .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyProcessInstanceIdSetInvovation();
+    verifyProcessInstanceIdSetInvocation();
   }
 
   private Map<String, Set<String>> getCompleteProcessInstanceIdSetQueryParameters() {
@@ -1067,7 +1067,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     return parameters;
   }
 
-  private void verifyProcessInstanceIdSetInvovation() {
+  private void verifyProcessInstanceIdSetInvocation() {
     Map<String, Set<String>> parameters = getCompleteProcessInstanceIdSetQueryParameters();
 
     verify(mockedQuery).processInstanceIds(parameters.get("processInstanceIds"));
@@ -1084,7 +1084,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
         .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyProcessDefinitionKeyNotInListInvovation();
+    verifyProcessDefinitionKeyNotInListInvocation();
   }
 
   @Test
@@ -1100,7 +1100,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
         .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyProcessDefinitionKeyNotInListInvovation();
+    verifyProcessDefinitionKeyNotInListInvocation();
   }
 
   private Map<String, List<String>> getCompleteProcessDefinitionKeyNotInListQueryParameters() {
@@ -1115,7 +1115,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     return parameters;
   }
 
-  private void verifyProcessDefinitionKeyNotInListInvovation() {
+  private void verifyProcessDefinitionKeyNotInListInvocation() {
     Map<String, List<String>> parameters = getCompleteProcessDefinitionKeyNotInListQueryParameters();
 
     verify(mockedQuery).processDefinitionKeyNotIn(parameters.get("processDefinitionKeyNotIn"));
@@ -1132,7 +1132,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
         .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyProcessDefinitionKeyInListInvovation();
+    verifyProcessDefinitionKeyInListInvocation();
   }
 
   @Test
@@ -1148,7 +1148,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
         .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyProcessDefinitionKeyInListInvovation();
+    verifyProcessDefinitionKeyInListInvocation();
   }
 
   private Map<String, List<String>> getCompleteProcessDefinitionKeyInListQueryParameters() {
@@ -1163,7 +1163,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     return parameters;
   }
 
-  private void verifyProcessDefinitionKeyInListInvovation() {
+  private void verifyProcessDefinitionKeyInListInvocation() {
     Map<String, List<String>> parameters = getCompleteProcessDefinitionKeyInListQueryParameters();
     List<String> value = parameters.get("processDefinitionKeyIn");
 
@@ -1571,7 +1571,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   public void testExecutedActivityIdIn() {
 
     given()
-      .queryParameter(QUERY_PARAM_EXECUTED_ACTIVITY_IDS, "1,2")
+      .queryParam(QUERY_PARAM_EXECUTED_ACTIVITY_IDS, "1,2")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -1600,7 +1600,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   public void testActiveActivityIdIn() {
 
     given()
-      .queryParameter(QUERY_PARAM_ACTIVE_ACTIVITY_IDS, "1,2")
+      .queryParam(QUERY_PARAM_ACTIVE_ACTIVITY_IDS, "1,2")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
