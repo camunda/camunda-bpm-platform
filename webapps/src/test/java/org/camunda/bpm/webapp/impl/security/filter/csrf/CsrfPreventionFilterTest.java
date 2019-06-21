@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter.csrf;
 
-import org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionCookieConfigurator;
 import org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,9 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockFilterConfig;
@@ -47,15 +44,11 @@ import java.util.Collection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants.CSRF_PATH_FIELD_NAME;
 import static org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants.CSRF_SET_COOKIE_HEADER_NAME;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
-
 /**
  * @author Nikola Koevski
  */
 @RunWith(Parameterized.class)
 @PowerMockIgnore("javax.security.*")
-@PrepareForTest(CsrfPreventionFilter.class)
 public class CsrfPreventionFilterTest {
 
   protected static final String SERVICE_PATH = "/camunda";
@@ -108,18 +101,7 @@ public class CsrfPreventionFilterTest {
 
   @Before
   public void setup() throws Exception {
-    createMocks();
     setupFilter();
-  }
-
-  protected void createMocks() throws Exception {
-    CsrfPreventionCookieConfigurator cookieConfigurator = PowerMockito.mock(CsrfPreventionCookieConfigurator.class);
-
-    whenNew(CsrfPreventionCookieConfigurator.class)
-      .withNoArguments()
-      .thenReturn(cookieConfigurator);
-
-    doReturn("").when(cookieConfigurator).getConfig();
   }
 
   protected void setupFilter() throws ServletException {
@@ -143,7 +125,7 @@ public class CsrfPreventionFilterTest {
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
 
-    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/camunda");
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/camunda;SameSite=Strict");
 
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
     assertThat(cookieToken).contains(headerToken);
@@ -174,7 +156,7 @@ public class CsrfPreventionFilterTest {
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
 
-    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/");
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}" + CSRF_PATH_FIELD_NAME + "/;SameSite=Strict");
 
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
     assertThat(cookieToken).contains(headerToken);
