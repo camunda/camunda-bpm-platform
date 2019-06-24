@@ -50,7 +50,7 @@ public class SequentialJobAcquisitionTest {
   private static final String PROCESS_RESOURCE = RESOURCE_BASE + "/IntermediateTimerEventTest.testCatchingTimerEvent.bpmn20.xml";
 
   private JobExecutor jobExecutor = new DefaultJobExecutor();
-  private List<ProcessEngine> createdProcessEngines = new ArrayList<ProcessEngine>();
+  private List<ProcessEngine> createdProcessEngines = new ArrayList<>();
 
   @After
   public void stopJobExecutor() {
