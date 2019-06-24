@@ -72,7 +72,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected ProcessEngine processEngine;
 
   protected String deploymentId;
-  protected Set<String> deploymentIds = new HashSet<String>();
+  protected Set<String> deploymentIds = new HashSet<>();
 
   protected Throwable exception;
 
@@ -106,8 +106,9 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     try {
 
       boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
-      // ignore test case when current history level is too low
-      if (hasRequiredHistoryLevel) {
+      boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, getClass(), getName());
+      // ignore test case when current history level is too low or database doesn't match
+      if (hasRequiredHistoryLevel && runsWithRequiredDatabase) {
 
         deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
 
@@ -397,7 +398,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   protected List<ActivityInstance> getInstancesForActivityId(ActivityInstance activityInstance, String activityId) {
-    List<ActivityInstance> result = new ArrayList<ActivityInstance>();
+    List<ActivityInstance> result = new ArrayList<>();
     if(activityInstance.getActivityId().equals(activityId)) {
       result.add(activityInstance);
     }
