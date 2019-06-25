@@ -17,7 +17,8 @@
 
 'use strict';
 
-var BpmnIO = require('bpmn-js/lib/NavigatedViewer').default;
+var BpmnIO = require('camunda-commons-ui/node_modules/bpmn-js/lib/NavigatedViewer')
+  .default;
 
 var Service = [
   '$q',
