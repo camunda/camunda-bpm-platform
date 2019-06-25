@@ -198,7 +198,7 @@
   <sql id="AtomicExclusiveJobs">
     RES.EXCLUSIVE_ = ${trueConstant}
           and not exists(
-            select J2.* from ${prefix}ACT_RU_JOB J2
+            select J2.ID_ from ${prefix}ACT_RU_JOB J2
             where J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                                           -- from the same proc. inst.
             and (J2.EXCLUSIVE_ = ${trueConstant})                                                              -- also exclusive
             and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})  -- in progress
