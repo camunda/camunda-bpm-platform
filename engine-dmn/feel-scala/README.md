@@ -1,6 +1,6 @@
 # FEEL Engine Factory
 
-An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine](https://github.com/camunda/camunda-engine-dmn) SPI for FEEL engines. It can be used for the standalone or the embedded DMN engine.
+An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine](https://github.com/camunda/camunda-engine-dmn) SPI for FEEL engines. It replaces the default Camunda FEEL engine. Works with standalone or embedded DMN engine.
 
 ## Usage
 
