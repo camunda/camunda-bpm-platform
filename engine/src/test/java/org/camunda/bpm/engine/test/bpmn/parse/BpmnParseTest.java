@@ -941,13 +941,36 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testFeatureSecureProcessingRejectsDefinition() {
+  public void testFeatureSecureProcessingRejectsDefinitionDueToAttributeLimit() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionFSP");
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
-      fail("Attribute Number Limit should have been exceeded while parsing the model!");
+      fail("Exception expected: Attribute Number Limit should have been exceeded while parsing the model!");
     } catch (ProcessEngineException e) {
       assertTextPresent("JAXP00010002", e.getMessage());
+    }
+  }
+
+  public void testFeatureSecureProcessingAcceptsDefinitionWhenAttributeLimitOverridden() {
+    System.setProperty("jdk.xml.elementAttributeLimit", "0");
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionFSP");
+      deploymentId = repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy().getId();
+      assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+    } finally {
+      System.clearProperty("jdk.xml.elementAttributeLimit");
+    }
+  }
+
+  public void testFeatureSecureProcessingCannotOverrideExternalSchemaAccess() {
+    // system property will have no effect, schema access still allowed
+    System.setProperty("javax.xml.accessExternalSchema", "");
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseIntermediateConditionalEvent");
+      deploymentId = repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy().getId();
+      assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+    } finally {
+      System.clearProperty("javax.xml.accessExternalSchema");
     }
   }
 }
