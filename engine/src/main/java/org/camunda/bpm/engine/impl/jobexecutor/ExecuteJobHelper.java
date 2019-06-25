@@ -30,9 +30,9 @@ public class ExecuteJobHelper {
 
     @Override
     public void exceptionWhileExecutingJob(String jobId, Throwable exception) {
-
-      // Default behavior, just log exception
-      LOG.exceptionWhileExecutingJob(jobId, exception);
+      
+      // Default behavior, don't log exception. It is logged in ExecuteJobsRunnable#run.
+      // hook for custom logging handler
     }
 
   };
@@ -47,23 +47,18 @@ public class ExecuteJobHelper {
 
   public static void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector, Command<Void> cmd) {
     try {
-
       commandExecutor.execute(cmd);
-
     } catch (RuntimeException exception) {
       handleJobFailure(nextJobId, jobFailureCollector, exception);
       // throw the original exception to indicate the ExecuteJobCmd failed
       throw exception;
-
     } catch (Throwable exception) {
       handleJobFailure(nextJobId, jobFailureCollector, exception);
       // wrap the exception and throw it to indicate the ExecuteJobCmd failed
       throw LOG.wrapJobExecutionFailure(jobFailureCollector, exception);
-
     } finally {
       invokeJobListener(commandExecutor, jobFailureCollector);
     }
-
   }
 
   protected static void invokeJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {

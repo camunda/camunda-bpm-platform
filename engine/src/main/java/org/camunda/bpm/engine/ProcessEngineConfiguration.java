@@ -381,6 +381,22 @@ public abstract class ProcessEngineConfiguration {
    */
   protected List<String> disabledPermissions = Collections.emptyList();
 
+  /**
+   * If the value of this flag is set to <code>true</code> exceptions that occur
+   * during command execution and are handled within the engine will not be logged.
+   * This flag does not affect exceptions during job execution. See 
+   * {@link #enableReducedJobExceptionLogging}.
+   */
+  protected boolean enableReducedCmdExceptionLogging = false;
+
+  /**
+   * If the value of this flag is set to <code>true</code> exceptions that occur
+   * during the execution of a job that still has retries left will not be logged.
+   * If the job does not have any retries left, the exception will still be logged
+   * on logging level ERROR. Also see {@link #enableReducedCmdExceptionLogging}.
+   */
+  protected boolean enableReducedJobExceptionLogging = false;
+
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
   }
@@ -867,8 +883,9 @@ public abstract class ProcessEngineConfiguration {
     return defaultNumberOfRetries;
   }
 
-  public void setDefaultNumberOfRetries(int defaultNumberOfRetries) {
+  public ProcessEngineConfiguration setDefaultNumberOfRetries(int defaultNumberOfRetries) {
     this.defaultNumberOfRetries = defaultNumberOfRetries;
+    return this;
   }
 
   public ValueTypeResolver getValueTypeResolver() {
@@ -968,6 +985,24 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setPasswordPolicy(PasswordPolicy passwordPolicy) {
     this.passwordPolicy = passwordPolicy;
+    return this;
+  }
+
+  public boolean isEnableReducedCmdExceptionLogging() {
+    return enableReducedCmdExceptionLogging;
+  }
+
+  public ProcessEngineConfiguration setEnableReducedCmdExceptionLogging(boolean enableReducedCmdExceptionLogging) {
+    this.enableReducedCmdExceptionLogging = enableReducedCmdExceptionLogging;
+    return this;
+  }
+
+  public boolean isEnableReducedJobExceptionLogging() {
+    return enableReducedJobExceptionLogging;
+  }
+
+  public ProcessEngineConfiguration setEnableReducedJobExceptionLogging(boolean enableReducedJobExceptionLogging) {
+    this.enableReducedJobExceptionLogging = enableReducedJobExceptionLogging;
     return this;
   }
 }
