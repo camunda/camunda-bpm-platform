@@ -844,7 +844,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
     assertNull(timeToLive);
   }
-  
+
   public void testParseProcessDefinitionWithoutTtlWithConfigDefault() {
     processEngineConfiguration.setHistoryTimeToLive("6");
     try {
@@ -853,7 +853,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
       assertNotNull(processDefinitions);
       assertEquals(1, processDefinitions.size());
-  
+
       Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
       assertNotNull(timeToLive);
       assertEquals(6, timeToLive.intValue());
@@ -862,7 +862,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
     }
   }
-  
+
   public void testParseProcessDefinitionWithoutTtlWithMalformedConfigDefault() {
     processEngineConfiguration.setHistoryTimeToLive("PP555DDD");
     try {
@@ -875,7 +875,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       processEngineConfiguration.setHistoryTimeToLive(null);
     }
   }
-  
+
   public void testParseProcessDefinitionWithoutTtlWithInvalidConfigDefault() {
     processEngineConfiguration.setHistoryTimeToLive("invalidValue");
     try {
@@ -888,7 +888,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       processEngineConfiguration.setHistoryTimeToLive(null);
     }
   }
-  
+
   public void testParseProcessDefinitionWithoutTtlWithNegativeConfigDefault() {
     processEngineConfiguration.setHistoryTimeToLive("-6");
     try {
@@ -938,6 +938,16 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("cvc-datatype-valid.1.2.1: ''", e.getMessage());
       assertTextPresent("cvc-type.3.1.3: The value ''", e.getMessage());
+    }
+  }
+
+  public void testFeatureSecureProcessingRejectsDefinition() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionFSP");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Attribute Number Limit should have been exceeded while parsing the model!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("JAXP00010002", e.getMessage());
     }
   }
 }
