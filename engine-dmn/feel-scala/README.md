@@ -1,46 +1,48 @@
 # FEEL Engine Factory
 
-Provide an integration of the FEEL engine for Camunda BPM using the SPI of the [Camunda DMN engine](https://github.com/camunda/camunda-engine-dmn). It can be used for the standalone or the embedded DMN engine.
+An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine](https://github.com/camunda/camunda-engine-dmn) SPI for FEEL engines. It can be used for the standalone or the embedded DMN engine.
 
-## How to use it?
+## Usage
 
-Add the factory including the FEEL engine to your project by copying the [jar file](https://github.com/camunda/feel-scala/releases) _(feel-engine-factory-${VERSION}-complete.jar)_ or adding the project as dependency.
+1) Add the dependency to your project:
 
-```xml
-<dependency>
-  <groupId>org.camunda.bpm.extension.feel.scala</groupId>
-  <artifactId>feel-engine-factory</artifactId>
-  <version>${VERSION}</version>
-</dependency>
-```
+  ```xml
+  <dependency>
+    <groupId>org.camunda.bpm.extension.feel.scala</groupId>
+    <artifactId>feel-engine-factory</artifactId>
+    <version>${VERSION}</version>
+  </dependency>
+  ```
 
-Then, replace the default FEEL engine factory in your [DMN engine configuration](https://docs.camunda.org/manual/latest/user-guide/dmn-engine/embed/#customize-expression-and-script-resolving).
+  Or copy the [jar file](https://github.com/camunda/feel-scala/releases) _(feel-engine-factory-${VERSION}-complete.jar)_ directly.
 
-### Using the DMN Engine Configuration
+2) Replace the default FEEL engine factory in your [DMN engine configuration](https://docs.camunda.org/manual/latest/user-guide/dmn-engine/embed/#customize-expression-and-script-resolving).
 
-```java
-DefaultDmnEngineConfiguration dmnEngineConfig = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration(); 
-dmnEngineConfig.setFeelEngineFactory(new CamundaFeelEngineFactory());
-// more configs ...
-DmnEngine engine = dmnEngineConfig.buildEngine();
-```
+  ### Via DMN Engine Configuration
 
-### Using the Process Engine Spring XML Configuration
+  ```java
+  DefaultDmnEngineConfiguration dmnEngineConfig = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration(); 
+  dmnEngineConfig.setFeelEngineFactory(new CamundaFeelEngineFactory());
+  // more configs ...
+  DmnEngine engine = dmnEngineConfig.buildEngine();
+  ```
 
-```xml
-<bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration">
-  
-  <property name="dmnEngineConfiguration">
-    <bean class="org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration">
-      <property name="feelEngineFactory">
-        <bean class="org.camunda.feel.integration.CamundaFeelEngineFactory" />
-      </property>
-    </bean>
-  </property>  
-  
-  <!-- more configs -->
-</bean>
-```
+  ### Via Process Engine Spring XML Configuration
+
+  ```xml
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+    <property name="dmnEngineConfiguration">
+      <bean class="org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration">
+        <property name="feelEngineFactory">
+          <bean class="org.camunda.feel.integration.CamundaFeelEngineFactory" />
+        </property>
+      </bean>
+    </property>  
+
+    <!-- more configs -->
+  </bean>
+  ```
 
 ### Configure the default Expression Languages
 
@@ -66,33 +68,3 @@ or
 > Using Camunda BPM < 7.7.0
 
 You have to set the default expression language to `feel-scala` instead of `feel`. This uses the FEEL engine as script engine to avoid a previous bug. 
-
-## How to build it?
-
-You can build the project with [SBT](http://www.scala-sbt.org) or [Maven](http://maven.apache.org).
-
-### Using SBT
-
-In the root directory:
-
-Run the tests with
-```
-sbt factory/test
-```
-
-Build the jar including all dependencies with
-```
-sbt factory/assemply
-```
-
-### Using Maven
-
-Run the tests with
-```
-mvn test
-```
-
-Build the jar including all dependencies with
-```
-mvn install
-```
