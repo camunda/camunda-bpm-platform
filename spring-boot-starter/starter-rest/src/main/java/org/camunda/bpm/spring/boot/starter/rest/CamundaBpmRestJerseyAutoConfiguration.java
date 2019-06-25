@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.jersey.JerseyAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.JerseyApplicationPath;
 import org.springframework.context.annotation.Bean;
 
 @AutoConfigureBefore({ JerseyAutoConfiguration.class })
@@ -40,7 +41,7 @@ public class CamundaBpmRestJerseyAutoConfiguration {
   }
 
   @Bean
-  public CamundaBpmRestInitializer camundaBpmRestInitializer() {
-    return new CamundaBpmRestInitializer();
+  public CamundaBpmRestInitializer camundaBpmRestInitializer(JerseyApplicationPath applicationPath) {
+    return new CamundaBpmRestInitializer(applicationPath);
   }
 }

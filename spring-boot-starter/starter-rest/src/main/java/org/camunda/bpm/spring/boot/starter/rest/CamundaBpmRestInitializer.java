@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.rest.filter.CacheControlFilter;
 import org.camunda.bpm.engine.rest.filter.EmptyBodyFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.web.servlet.JerseyApplicationPath;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 import javax.servlet.DispatcherType;
@@ -43,15 +44,20 @@ public class CamundaBpmRestInitializer implements ServletContextInitializer {
 
   private ServletContext servletContext;
 
-  public CamundaBpmRestInitializer() {
+  private JerseyApplicationPath applicationPath;
+
+  public CamundaBpmRestInitializer(JerseyApplicationPath applicationPath) {
+    this.applicationPath = applicationPath;
   }
 
   @Override
   public void onStartup(ServletContext servletContext) throws ServletException {
     this.servletContext = servletContext;
 
-    registerFilter("EmptyBodyFilter", EmptyBodyFilter.class, "/rest/*");
-    registerFilter("CacheControlFilter", CacheControlFilter.class, "/rest/*");
+    String restApiPathPattern = applicationPath.getUrlMapping();
+
+    registerFilter("EmptyBodyFilter", EmptyBodyFilter.class, restApiPathPattern);
+    registerFilter("CacheControlFilter", CacheControlFilter.class, restApiPathPattern);
   }
 
   private FilterRegistration registerFilter(final String filterName, final Class<? extends Filter> filterClass, final String... urlPatterns) {
