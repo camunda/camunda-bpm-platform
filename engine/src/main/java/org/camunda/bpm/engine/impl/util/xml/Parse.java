@@ -142,6 +142,7 @@ public class Parse extends DefaultHandler {
       }
 
       SAXParser saxParser = parser.getSaxParser();
+      saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
       if (schemaResource != null) {
         saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
         saxParser.setProperty(JAXP_SCHEMA_SOURCE, schemaResource);
