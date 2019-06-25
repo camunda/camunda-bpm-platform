@@ -18,7 +18,7 @@ An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine]
 
 2) Replace the default FEEL engine factory in your [DMN engine configuration](https://docs.camunda.org/manual/latest/user-guide/dmn-engine/embed/#customize-expression-and-script-resolving).
 
-    Via DMN Engine Configuration:
+    ### Via DMN Engine Configuration:
 
     ```java
     DefaultDmnEngineConfiguration dmnEngineConfig = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration(); 
@@ -27,7 +27,7 @@ An integration of the FEEL engine for Camunda BPM using the [Camunda DMN engine]
     DmnEngine engine = dmnEngineConfig.buildEngine();
     ```
 
-    Via Process Engine Spring XML Configuration:
+    ### Via Process Engine Spring XML Configuration:
 
     ```xml
     <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration">
