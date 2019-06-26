@@ -28,6 +28,8 @@
     "angular-route": "1.7.8",
     "bootstrap": "3.4.1",
     "bpmn-font": "0.8.0",
+    "bpmn-js": "3.2.1",
+    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
     "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#master",
     "cmmn-js": "0.18.1",
