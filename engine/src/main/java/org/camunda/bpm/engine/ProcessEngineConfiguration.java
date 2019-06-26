@@ -883,9 +883,8 @@ public abstract class ProcessEngineConfiguration {
     return defaultNumberOfRetries;
   }
 
-  public ProcessEngineConfiguration setDefaultNumberOfRetries(int defaultNumberOfRetries) {
+  public void setDefaultNumberOfRetries(int defaultNumberOfRetries) {
     this.defaultNumberOfRetries = defaultNumberOfRetries;
-    return this;
   }
 
   public ValueTypeResolver getValueTypeResolver() {
