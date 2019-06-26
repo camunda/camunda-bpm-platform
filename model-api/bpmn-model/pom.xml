@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm.model</groupId>
   <artifactId>camunda-bpmn-model</artifactId>
-  <version>7.12.0-SNAPSHOT</version>
+  <version>7.12.0-alpha1</version>
   <name>camunda BPM - BPMN Model API</name>
   <inceptionYear>2014</inceptionYear>
   <packaging>jar</packaging>
@@ -188,7 +188,7 @@
     <url>https://github.com/camunda/camunda-bpmn-model</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpmn-model.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpmn-model.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.12.0-alpha1</tag>
   </scm>
 
   <issueManagement>
