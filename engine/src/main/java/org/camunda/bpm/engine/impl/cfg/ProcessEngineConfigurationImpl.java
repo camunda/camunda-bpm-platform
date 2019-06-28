@@ -625,7 +625,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
 
   protected HistoryEventHandler historyEventHandler;
-  
+
   protected PermissionProvider permissionProvider;
 
   protected boolean isExecutionTreePrefetchEnabled = true;
@@ -756,7 +756,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int historyCleanupDegreeOfParallelism = 1;
 
   protected String historyTimeToLive;
-  
+
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
@@ -912,7 +912,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       throw LOG.invalidPropertyValue("historyCleanupBatchThreshold", String.valueOf(historyCleanupBatchThreshold),
           "History cleanup batch threshold cannot be negative.");
     }
-    
+
     initHistoryTimeToLive();
 
     initBatchOperationsHistoryTimeToLive();
@@ -965,7 +965,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       historyCleanupBatchWindows.put(Calendar.SUNDAY, new BatchWindowConfiguration(sundayHistoryCleanupBatchWindowStartTime, sundayHistoryCleanupBatchWindowEndTime));
     }
   }
-  
+
   protected void initHistoryTimeToLive() {
     try {
       ParseUtil.parseHistoryTimeToLive(historyTimeToLive);
@@ -1342,14 +1342,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       LOG.debugDatabaseType(databaseType);
 
     } catch (SQLException e) {
-      e.printStackTrace();
+      LOG.databaseConnectionAccessException(e);
     } finally {
       try {
         if (connection != null) {
           connection.close();
         }
       } catch (SQLException e) {
-        e.printStackTrace();
+        LOG.databaseConnectionCloseException(e);
       }
     }
   }
@@ -2375,7 +2375,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resourceAuthorizationProvider = new DefaultAuthorizationProvider();
     }
   }
-  
+
   protected void initPermissionProvider() {
     if (permissionProvider == null) {
       permissionProvider = new DefaultPermissionProvider();
@@ -2408,7 +2408,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       adminGroups.add(Groups.CAMUNDA_ADMIN);
     }
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
 
   @Override
@@ -3442,11 +3442,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setResourceAuthorizationProvider(ResourceAuthorizationProvider resourceAuthorizationProvider) {
     this.resourceAuthorizationProvider = resourceAuthorizationProvider;
   }
-  
+
   public PermissionProvider getPermissionProvider() {
     return permissionProvider;
   }
-  
+
   public void setPermissionProvider(PermissionProvider permissionProvider) {
     this.permissionProvider = permissionProvider;
   }
@@ -4180,11 +4180,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
   }
-  
+
   public String getHistoryTimeToLive() {
     return historyTimeToLive;
   }
-  
+
   public void setHistoryTimeToLive(String historyTimeToLive) {
     this.historyTimeToLive = historyTimeToLive;
   }
