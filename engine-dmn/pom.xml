@@ -1,0 +1,177 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.dmn</groupId>
+    <artifactId>camunda-engine-dmn-bom</artifactId>
+    <version>7.12.0-SNAPSHOT</version>
+    <relativePath>bom</relativePath>
+  </parent>
+
+  <artifactId>camunda-engine-dmn-root</artifactId>
+  <name>camunda DMN - engine - root</name>
+  <inceptionYear>2015</inceptionYear>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>bom</module>
+    <module>engine</module>
+    <module>feel-api</module>
+    <module>feel-juel</module>
+  </modules>
+
+  <properties>
+    <version.assertj>1.7.1</version.assertj>
+    <version.commons>1.7.1</version.commons>
+    <version.groovy>2.4.13</version.groovy>
+    <version.juel>2.2.7</version.juel>
+    <version.junit>4.12</version.junit>
+    <version.joda-time>2.1</version.joda-time>
+    <version.logback>1.1.2</version.logback>
+    <version.mockito>1.9.5</version.mockito>
+
+    <camunda.version.old>7.11.0</camunda.version.old>
+
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+
+  </properties>
+
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.camunda.commons</groupId>
+        <artifactId>camunda-commons-bom</artifactId>
+        <version>${version.commons}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-typed-value</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-dmn-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.odysseus.juel</groupId>
+        <artifactId>juel-api</artifactId>
+        <version>${version.juel}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.odysseus.juel</groupId>
+        <artifactId>juel-impl</artifactId>
+        <version>${version.juel}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.odysseus.juel</groupId>
+        <artifactId>juel-spi</artifactId>
+        <version>${version.juel}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>${version.joda-time}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${version.assertj}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${version.mockito}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${version.logback}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <version>${version.groovy}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.17</version>
+          <configuration>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Export-Package>org.camunda.bpm.dmn*</Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>license-header-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <scm>
+    <url>https://github.com/camunda/camunda-engine-dmn</url>
+    <connection>scm:git:git@github.com:camunda/camunda-engine-dmn.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-engine-dmn.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+</project>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions"
+             name="camunda"
+             expressionLanguage="juel"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision" name="decision">
+    <decisionTable id="decisionTable" hitPolicy="RULE ORDER">
+      <input id="input">
+        <inputExpression />
+      </input>
+      <output id="output1" name="firstOutput" />
+      <output id="output2" name="secondOutput" />
+      <rule id="noOutputValueRule">
+        <inputEntry id="noOutputValueInput">
+          <text>noOutputValue</text>
+        </inputEntry>
+        <outputEntry/>
+        <outputEntry/>
+      </rule>
+      <rule id="singleOutputValueRule">
+        <inputEntry id="singleOutputValueInput">
+          <text>singleOutputValue</text>
+        </inputEntry>
+        <outputEntry id="singleOutputValueOutput">
+          <text>"singleValue"</text>
+        </outputEntry>
+        <outputEntry/>
+      </rule>
+      <rule id="multipleOutputValuesRule">
+        <inputEntry id="multipleOutputValuesInput">
+          <text>multipleOutputValues</text>
+        </inputEntry>
+        <outputEntry id="multipleOutputValuesOutput1">
+          <text>"multipleValues1"</text>
+        </outputEntry>
+        <outputEntry id="multipleOutputValuesOutput2">
+          <text>"multipleValues2"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="selfLoop"
+             name="Self Loop"
+             namespace="decisionWithRequiredDecisionTransform">
+  <decision id="buyProduct" name="buyProduct">
+     <informationRequirement>
+      <requiredDecision href="#buyProduct" />
+    </informationRequirement>
+    <decisionTable id="buyLenovoDecisionTable">
+      <input id="input2">
+        <inputExpression><text>computerType</text></inputExpression>
+      </input>
+      <output id="computerModel" name="" typeRef="string" />
+      <rule id="rule2">
+        <inputEntry id="inputEntry2"><text>Lenovo</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2"><text>notebook</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+ </decision> 
+</definitions>

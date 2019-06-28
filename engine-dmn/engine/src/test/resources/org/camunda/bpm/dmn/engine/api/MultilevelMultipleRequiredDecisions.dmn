@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="multiLevelMultipleRequiredDecisions"
+             name="multi level multiple decisions"
+             namespace="decisionWithRequiredDecisionTransform">
+  <decision id="A" name="A">
+     <informationRequirement>
+      <requiredDecision href="#B" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#C" />
+    </informationRequirement>
+    <decisionTable id="buyLenovoDecisionTable">
+      <input id="input2">
+        <inputExpression><text>computerType</text></inputExpression>
+      </input>
+      <output id="computerModel" name="" typeRef="string" />
+      <rule id="rule3">
+        <inputEntry id="inputEntry3"><text>Lenovo</text>
+        </inputEntry>
+        <outputEntry id="outputEntry3"><text>notebook</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+ </decision> 
+
+  <decision id="B" name="B">
+    <informationRequirement>
+      <requiredDecision href="#D" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#E" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#F" />
+    </informationRequirement>
+    <decisionTable id="buyComputerDecisionTable">
+      <input id="input1">
+        <inputExpression><text>type</text></inputExpression>
+      </input>
+      <output id="computerType" name="" typeRef="string" />
+      <rule id="rule2">
+        <inputEntry id="inputEntry2"><text>Computer</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2"><text>notebook</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="C" name="C">
+    <informationRequirement>
+      <requiredDecision href="#G" />
+    </informationRequirement>
+    <decisionTable id="buyElectronicDecisionTable">
+      <input id="input">
+        <inputExpression><text>requirement</text></inputExpression>
+      </input>
+      <output id="type" name="" typeRef="string" />
+      <rule id="rule1">
+        <inputEntry id="inputEntry1"><text>Electronic</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1"><text>Computer</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="D" name="D">
+  <informationRequirement>
+      <requiredDecision href="#X" />
+    </informationRequirement>
+    <decisionTable id="four">
+      <input id="four1">
+        <inputExpression><text>requirement</text></inputExpression>
+      </input>
+      <output id="four2" name="" typeRef="string" />
+      <rule id="rule4">
+        <inputEntry id="inputEntry4"><text>Electronic</text>
+        </inputEntry>
+        <outputEntry id="outputEntry4"><text>Computer</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="E" name="E">
+   <informationRequirement>
+      <requiredDecision href="#X" />
+    </informationRequirement>
+    <decisionTable id="five">
+      <input id="five1">
+        <inputExpression><text>requirement</text></inputExpression>
+      </input>
+      <output id="five2" name="" typeRef="string" />
+      <rule id="rule5">
+        <inputEntry id="inputEntry5"><text>Electronic</text>
+        </inputEntry>
+        <outputEntry id="outputEntry5"><text>Computer</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="F" name="F">
+    <decisionTable id="six">
+      <input id="six1">
+        <inputExpression><text>requirement</text></inputExpression>
+      </input>
+      <output id="six2" name="" typeRef="string" />
+      <rule id="rule6">
+        <inputEntry id="inputEntry6"><text>Electronic</text>
+        </inputEntry>
+        <outputEntry id="outputEntry6"><text>Computer</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="G" name="G">
+    <decisionTable id="seven">
+      <input id="seven1">
+        <inputExpression><text>requirement</text></inputExpression>
+      </input>
+      <output id="seven2" name="" typeRef="string" />
+      <rule id="rule7">
+        <inputEntry id="inputEntry7"><text>Electronic</text>
+        </inputEntry>
+        <outputEntry id="outputEntry7"><text>Computer</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  <decision id="X" name="x">
+    <decisionTable>
+      <input id="x1">
+        <inputExpression><text>x</text></inputExpression>
+      </input>
+      <output id="x2" name="" typeRef="string" />
+      <rule id="x3">
+      <inputEntry id="x5"><text>X</text>
+        </inputEntry>
+         <outputEntry id="x4"><text>X</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+</definitions>

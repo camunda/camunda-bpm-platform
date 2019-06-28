@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn11.xsd" id="dish" name="Dish" namespace="test-drg">
+  <decision id="dish-decision" name="Dish Decision">
+    <informationRequirement>
+      <requiredDecision href="#guestCount" />
+    </informationRequirement>
+    <decisionTable id="dishDecisionTable">
+      <input id="guestCountInput" label="">
+        <inputExpression id="guestCountInputExpression">
+          <text>guestCount.size()</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Dish" name="desiredDish" typeRef="string" />
+      <rule id="row-445981423-4">
+        <inputEntry id="UnaryTests_0wa71sy" expressionLanguage="juel">
+          <text>cellInput == 1</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_09ggol9">
+          <text><![CDATA["Steak"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="guestCount" name="Guest Count">
+    <decisionTable id="guestCountDecisionTable" hitPolicy="COLLECT">
+      <input id="typeOfDayInput" label="Type of day">
+        <inputExpression id="typeOfDayInputExpression" typeRef="string">
+          <text>dayType</text>
+        </inputExpression>
+      </input>
+      <output id="guestCountOutput" label="Guest count" name="guestCount" typeRef="integer" />
+      <rule id="row-495762709-8">
+        <inputEntry id="UnaryTests_0l72u8n">
+          <text><![CDATA["WeekDay"]]></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0wuwqaz">
+          <text>4</text>
+        </outputEntry>
+      </rule>
+
+    </decisionTable>
+  </decision>
+</definitions>

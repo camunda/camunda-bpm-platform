@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             name="camunda"
+             namespace="http://camunda.org/schema/1.0/dmn">
+
+  <decision id="a" name="Decision A">
+    <variable name="a" typeRef="integer" />
+    <informationRequirement>
+      <requiredDecision href="#b" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#c" />
+    </informationRequirement>
+    <literalExpression expressionLanguage="groovy">
+      <text>b + c</text>
+    </literalExpression>
+  </decision>
+  
+  <decision id="b" name="Decision B">
+    <variable name="b" typeRef="integer" />
+    <literalExpression expressionLanguage="groovy">
+      <text>1 + 2</text>
+    </literalExpression>
+  </decision>
+
+  <decision id="c" name="Decision C">
+    <variable name="c" typeRef="integer" />
+    <literalExpression expressionLanguage="groovy">
+      <text>2 * 3</text>
+    </literalExpression>
+  </decision>
+
+</definitions>
