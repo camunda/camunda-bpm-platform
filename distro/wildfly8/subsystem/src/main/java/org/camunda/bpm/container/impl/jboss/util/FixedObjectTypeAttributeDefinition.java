@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 /**
  * Fix value type validation for ObjectTypeAttributeDefinition containing a map as value type.
@@ -39,6 +40,8 @@ import java.util.ResourceBundle;
  * @author Christian Lipphardt
  */
 public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefinition {
+
+  private static final Logger LOG = Logger.getLogger(FixedObjectTypeAttributeDefinition.class.getName());
 
   public FixedObjectTypeAttributeDefinition(AbstractAttributeDefinitionBuilder<?, ? extends ObjectTypeAttributeDefinition> builder, String suffix, AttributeDefinition[] valueTypes) {
     super(builder, suffix, valueTypes);
@@ -69,9 +72,9 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
         }
       }
     } catch (NoSuchFieldException e) {
-      e.printStackTrace();
+      LOG.warning("Could not access 'valueTypes', the attribute is added nonetheless");
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      LOG.warning("Could not access 'valueTypes', the attribute is added nonetheless");
     }
   }
 

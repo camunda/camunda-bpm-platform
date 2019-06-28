@@ -1342,14 +1342,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       LOG.debugDatabaseType(databaseType);
 
     } catch (SQLException e) {
-      e.printStackTrace();
+      LOG.databaseConnectionAccessException(e);
     } finally {
       try {
         if (connection != null) {
           connection.close();
         }
       } catch (SQLException e) {
-        e.printStackTrace();
+        LOG.databaseConnectionCloseException(e);
       }
     }
   }
