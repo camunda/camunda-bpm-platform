@@ -21,8 +21,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
@@ -62,7 +60,6 @@ public abstract class AbstractModelParser {
     dbf.setIgnoringElementContentWhitespace(false);
     dbf.setNamespaceAware(true);
     protectAgainstXxeAttacks(dbf);
-    enableSecureProcessing(dbf);
   }
 
   /**
@@ -92,15 +89,6 @@ public abstract class AbstractModelParser {
 
     dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
-  }
-
-  private void enableSecureProcessing(final DocumentBuilderFactory dbf) {
-    try {
-      dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-      dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
-    } catch (ParserConfigurationException ignored) {
-      // ignored
-    }
   }
 
   public ModelInstance parseModelFromStream(InputStream inputStream) {
