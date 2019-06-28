@@ -166,7 +166,7 @@ public class JobManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<JobEntity> findNextJobsToExecute(Page page) {
+  public List<AcquirableJobEntity> findNextJobsToExecute(Page page) {
     Map<String,Object> params = new HashMap<String, Object>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);

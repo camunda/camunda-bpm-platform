@@ -146,18 +146,45 @@
     <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
   </resultMap>
 
+  <resultMap id="acquirableJobResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
+    <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
+    <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
+    <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
+    <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+  </resultMap>
+
+
   <!-- JOB SELECT (FOR TIMER AND MESSAGE) -->
 
   <select id="selectJob" parameterType="string" resultMap="jobResultMap">
     select * from ${prefix}ACT_RU_JOB where ID_ = #{id}
   </select>
 
-  <select id="selectNextJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+  <select id="selectNextJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="acquirableJobResultMap">
     <bind name="orderingProperties" value="parameter.orderingProperties" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select
-      RES.* ${limitBetween}
+    select RES.ID_,
+      RES.REV_,
+      RES.LOCK_EXP_TIME_,
+      RES.LOCK_OWNER_,
+      RES.DUEDATE_,
+      RES.DEPLOYMENT_ID_,
+      RES.PROCESS_INSTANCE_ID_,
+      RES.EXCLUSIVE_,
+      RES.RETRIES_,
+      RES.PRIORITY_,
+      RES.TYPE_,
+      RES.SUSPENSION_STATE_
+    ${limitBetweenAcquisition}
     from ${prefix}ACT_RU_JOB RES
 
     where (RES.RETRIES_ &gt; 0)
@@ -645,6 +672,26 @@
             SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
         </set>
         where ID_= #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+
+    <!-- ACQUIRABLE JOB UPDATE -->
+    <update id="updateAcquirableJob" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity">
+      update ${prefix}ACT_RU_JOB
+      <set>
+          REV_ =  #{revisionNext, jdbcType=INTEGER},
+          LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
+          LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+          DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
+          DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
+          PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+          EXCLUSIVE_ = #{exclusive, jdbcType=BOOLEAN},
+          RETRIES_ = #{retries, jdbcType=INTEGER},
+          PRIORITY_ = #{priority, jdbcType=BIGINT},
+          TYPE_ = #{type, jdbcType=VARCHAR},
+          SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      </set>
+      where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 

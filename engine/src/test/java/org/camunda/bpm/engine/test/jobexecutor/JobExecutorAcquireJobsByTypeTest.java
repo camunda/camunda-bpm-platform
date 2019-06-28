@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
@@ -89,12 +90,16 @@ public class JobExecutorAcquireJobsByTypeTest extends AbstractJobExecutorAcquire
     // increment clock so that timer events are acquirable
     incrementClock(70);
 
-    List<JobEntity> acquirableJobs = findAcquirableJobs();
+    List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
     assertEquals(4, acquirableJobs.size());
-    assertTrue(acquirableJobs.get(0) instanceof TimerEntity);
-    assertTrue(acquirableJobs.get(1) instanceof TimerEntity);
-    assertTrue(acquirableJobs.get(2) instanceof MessageEntity);
-    assertTrue(acquirableJobs.get(3) instanceof MessageEntity);
+    JobEntity timerJob1 = (JobEntity) managementService.createJobQuery().jobId(acquirableJobs.get(0).getId()).singleResult();
+    JobEntity timerJob2 = (JobEntity) managementService.createJobQuery().jobId(acquirableJobs.get(1).getId()).singleResult();
+    JobEntity messageJob1 = (JobEntity) managementService.createJobQuery().jobId(acquirableJobs.get(2).getId()).singleResult();
+    JobEntity messageJob2 = (JobEntity) managementService.createJobQuery().jobId(acquirableJobs.get(3).getId()).singleResult();
+    assertEquals(TimerEntity.TYPE, timerJob1.getType());
+    assertEquals(TimerEntity.TYPE, timerJob2.getType());
+    assertEquals(MessageEntity.TYPE, messageJob1.getType());
+    assertEquals(MessageEntity.TYPE, messageJob2.getType());
   }
 
 }

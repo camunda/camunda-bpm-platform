@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -61,9 +62,10 @@ public class DbEntityCacheKeyMapping {
   public static DbEntityCacheKeyMapping defaultEntityCacheKeyMapping() {
     DbEntityCacheKeyMapping mapping = new DbEntityCacheKeyMapping();
 
+    mapping.registerEntityCacheKey(JobEntity.class, AcquirableJobEntity.class);
     // subclasses of JobEntity
-    mapping.registerEntityCacheKey(MessageEntity.class, JobEntity.class);
-    mapping.registerEntityCacheKey(TimerEntity.class, JobEntity.class);
+    mapping.registerEntityCacheKey(MessageEntity.class, AcquirableJobEntity.class);
+    mapping.registerEntityCacheKey(TimerEntity.class, AcquirableJobEntity.class);
 
     // subclasses of HistoricDetailEventEntity
     mapping.registerEntityCacheKey(HistoricFormPropertyEntity.class, HistoricDetailEventEntity.class);

@@ -81,6 +81,9 @@ public class DbEntityCache {
     CachedDbEntity cachedDbEntity = getCachedEntity(cacheKey, id);
     if(cachedDbEntity != null) {
       DbEntity dbEntity = cachedDbEntity.getEntity();
+      if (!type.isAssignableFrom(dbEntity.getClass())) {
+        throw LOG.entityCacheLookupException(type, id, dbEntity.getClass(), null);
+      }
       try {
         return (T) dbEntity;
       } catch(ClassCastException e) {
@@ -102,7 +105,7 @@ public class DbEntityCache {
       for (CachedDbEntity cachedEntity : entities.values()) {
         if (type != cacheKey) {
           // if the cacheKey of this type differs from the actual type,
-          // not all cached entites with the key should be returned.
+          // not all cached entities with the key should be returned.
           // Then we only add those entities whose type matches the argument type.
           if (type.isAssignableFrom(cachedEntity.getClass())) {
             result.add((T) cachedEntity.getEntity());

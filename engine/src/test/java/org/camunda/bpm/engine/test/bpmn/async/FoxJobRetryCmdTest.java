@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -275,7 +276,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertNotNull(pi);
 
     // a job is acquirable
-    List<JobEntity> acquirableJobs = findAndLockAcquirableJobs();
+    List<AcquirableJobEntity> acquirableJobs = findAndLockAcquirableJobs();
     assertEquals(1, acquirableJobs.size());
 
     // execute job
@@ -817,13 +818,13 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     return dateFormat.parse(dateString);
   }
 
-  protected List<JobEntity> findAndLockAcquirableJobs() {
-    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
+  protected List<AcquirableJobEntity> findAndLockAcquirableJobs() {
+    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
 
       @Override
-      public List<JobEntity> execute(CommandContext commandContext) {
-        List<JobEntity> jobs = commandContext.getJobManager().findNextJobsToExecute(new Page(0, 100));
-        for (JobEntity job : jobs) {
+      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
+        List<AcquirableJobEntity> jobs = commandContext.getJobManager().findNextJobsToExecute(new Page(0, 100));
+        for (AcquirableJobEntity job : jobs) {
           job.setLockOwner("test");
         }
         return jobs;

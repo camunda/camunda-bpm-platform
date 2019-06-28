@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +64,7 @@ public class JobExecutorAcquireJobsByPriorityAndDueDateTest extends AbstractJobE
     incrementClock(1);
     String instance4 = startProcess("jobPrioProcess", "task2");
 
-    List<JobEntity> acquirableJobs = findAcquirableJobs();
+    List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
     assertEquals(4, acquirableJobs.size());
     assertEquals(instance1, acquirableJobs.get(0).getProcessInstanceId());
     assertEquals(instance3, acquirableJobs.get(1).getProcessInstanceId());

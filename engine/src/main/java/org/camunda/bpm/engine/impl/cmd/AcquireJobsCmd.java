@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import java.util.*;
@@ -55,13 +55,13 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
     acquiredJobs = new AcquiredJobs(numJobsToAcquire);
 
-    List<JobEntity> jobs = commandContext
+    List<AcquirableJobEntity> jobs = commandContext
       .getJobManager()
       .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
     Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<String, List<String>>();
 
-    for (JobEntity job : jobs) {
+    for (AcquirableJobEntity job : jobs) {
 
       lockJob(job);
 
@@ -92,7 +92,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     return acquiredJobs;
   }
 
-  protected void lockJob(JobEntity job) {
+  protected void lockJob(AcquirableJobEntity job) {
     String lockOwner = jobExecutor.getLockOwner();
     job.setLockOwner(lockOwner);
 
@@ -105,14 +105,14 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
   }
 
   public Class<? extends DbEntity> getEntityType() {
-    return JobEntity.class;
+    return AcquirableJobEntity.class;
   }
 
   public void failedOperation(DbOperation operation) {
     if (operation instanceof DbEntityOperation) {
 
       DbEntityOperation entityOperation = (DbEntityOperation) operation;
-      if(JobEntity.class.isAssignableFrom(entityOperation.getEntityType())) {
+      if(AcquirableJobEntity.class.isAssignableFrom(entityOperation.getEntityType())) {
         // could not lock the job -> remove it from list of acquired jobs
         acquiredJobs.removeJobId(entityOperation.getEntity().getId());
       }
