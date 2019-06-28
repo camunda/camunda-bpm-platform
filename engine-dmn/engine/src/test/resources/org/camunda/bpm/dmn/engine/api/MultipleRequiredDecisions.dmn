@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="multipleRequiredDecisions"
+             name="multiple required decisions"
+             namespace="decisionWithRequiredDecisionTransform">
+  <decision id="car" name="car">
+     <informationRequirement>
+      <requiredDecision href="#carPrice" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#carSpeed" />
+    </informationRequirement>
+    <decisionTable id="carDecisionTable">
+      <input id="input2">
+        <inputExpression><text>carType</text></inputExpression>
+      </input>
+      <output id="output2" name="comfortability" typeRef="string" />
+      <rule id="rule2">
+        <inputEntry id="inputEntry2"><text>BMW</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2"><text>Comfortable</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+ </decision> 
+
+  <decision id="carPrice" name="carPrice">
+    <decisionTable id="carPriceDecisionTable">
+      <input id="input1">
+        <inputExpression><text>price</text></inputExpression>
+      </input>
+      <output id="output1" name="carType" typeRef="string" />
+      <rule id="rule1">
+        <inputEntry id="inputEntry1"><text>expensive</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1"><text>BMW</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="carSpeed" name="carSpeed">
+    <decisionTable id="carSpeedDecisionTable">
+      <input id="input3">
+        <inputExpression><text>speed</text></inputExpression>
+      </input>
+      <output id="carType" name="carType" typeRef="string" />
+      <rule id="rule3">
+        <inputEntry id="inputEntry3"><text>150mph</text>
+        </inputEntry>
+        <outputEntry id="outputEntry3"><text>BMW</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

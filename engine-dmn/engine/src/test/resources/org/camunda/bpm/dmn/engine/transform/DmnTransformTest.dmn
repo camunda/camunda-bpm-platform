@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="dmnTransform"
+             name="Dmn Tranform"
+             namespace="decisionWithRequiredDecisionTransform"
+             xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn">
+
+  <decision id="decision1" name="camunda">
+    <decisionTable id="decisionTable1">
+      <input id="input1" label="camunda" camunda:inputVariable="camunda">
+        <inputExpression id="inputExpression" typeRef="string" expressionLanguage="camunda">
+          <text>camunda</text>
+        </inputExpression>
+      </input>
+      <input id="input2">
+        <inputExpression>
+          <text/>
+        </inputExpression>
+      </input>
+      <output id="output1" label="camunda" name="camunda" typeRef="string" />
+      <output id="output2" name="out2"/>
+      <rule id="rule">
+        <inputEntry id="inputEntry" label="camunda" expressionLanguage="camunda">
+          <text>camunda</text>
+        </inputEntry>
+        <inputEntry>
+          <text/>
+        </inputEntry>
+        <outputEntry id="outputEntry" label="camunda" expressionLanguage="camunda">
+          <text>camunda</text>
+        </outputEntry>
+        <outputEntry>
+          <text/>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="decision2" name="ignored" />
+  <decision id="decision3" name="camunda">
+    <decisionTable id="decisionTable2" hitPolicy="FIRST">
+      <output id="output3"/>
+    </decisionTable>
+  </decision>
+
+</definitions>

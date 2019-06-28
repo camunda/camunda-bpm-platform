@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="buy-decision"
+             name="Buy Decision"
+             namespace="decisionWithRequiredDecisionTransform">
+  <decision id="buyProduct" name="buyProduct">
+     <informationRequirement>
+      <requiredDecision href="#buyComputer" />
+    </informationRequirement>
+    <decisionTable id="buyLenovoDecisionTable">
+      <input id="input2">
+        <inputExpression><text>computerType</text></inputExpression>
+      </input>
+      <output id="computerModel" name="" typeRef="string" />
+      <rule id="rule3">
+        <inputEntry id="inputEntry3"><text>Lenovo</text>
+        </inputEntry>
+        <outputEntry id="outputEntry3"><text>notebook</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+ </decision> 
+
+  <decision id="buyComputer" name="buyComputer">
+    <informationRequirement>
+      <requiredDecision href="#buyElectronic" />
+    </informationRequirement>
+    <decisionTable id="buyComputerDecisionTable">
+      <input id="input1">
+        <inputExpression><text>type</text></inputExpression>
+      </input>
+      <output id="computerType" name="" typeRef="string" />
+      <rule id="rule2">
+        <inputEntry id="inputEntry2"><text>Computer</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2"><text>notebook</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="buyElectronic" name="buyElectronic">
+    <decisionTable id="buyElectronicDecisionTable">
+      <input id="input">
+        <inputExpression><text>requirement</text></inputExpression>
+      </input>
+      <output id="type" name="" typeRef="string" />
+      <rule id="rule1">
+        <inputEntry id="inputEntry1"><text>Electronic</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1"><text>Computer</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  
+  
+</definitions>

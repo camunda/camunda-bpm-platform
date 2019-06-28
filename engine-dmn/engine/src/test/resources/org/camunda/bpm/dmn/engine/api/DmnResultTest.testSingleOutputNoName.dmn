@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions"
+             name="camunda"
+             expressionLanguage="juel"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision" name="decision">
+    <decisionTable id="decisionTable" hitPolicy="RULE ORDER">
+      <output id="output1" />
+      <rule id="rule1">
+        <outputEntry>
+          <text>"outputValue"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
