@@ -21,8 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -49,6 +47,8 @@ public class Parse extends DefaultHandler {
   private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
   private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
   private static final String XXE_PROCESSING = "http://xml.org/sax/features/external-general-entities";
+
+  private static final String NEW_LINE = System.getProperty("line.separator");
 
   protected Parser parser;
   protected String name;
@@ -132,17 +132,14 @@ public class Parse extends DefaultHandler {
     try {
       InputStream inputStream = streamSource.getInputStream();
 
-      SAXParserFactory saxParserFactory = parser.getSaxParserFactory();
-      saxParserFactory.setFeature(XXE_PROCESSING, enableXxeProcessing);
-      saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      parser.getSaxParserFactory().setFeature(XXE_PROCESSING, enableXxeProcessing);
 
       if (schemaResource == null) { // must be done before parser is created
-        saxParserFactory.setNamespaceAware(false);
-        saxParserFactory.setValidating(false);
+        parser.getSaxParserFactory().setNamespaceAware(false);
+        parser.getSaxParserFactory().setValidating(false);
       }
 
       SAXParser saxParser = parser.getSaxParser();
-      saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
       if (schemaResource != null) {
         saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
         saxParser.setProperty(JAXP_SCHEMA_SOURCE, schemaResource);
