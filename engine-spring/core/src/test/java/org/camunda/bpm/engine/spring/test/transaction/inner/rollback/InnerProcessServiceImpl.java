@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.spring.test.transaction.inner.rollback;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.spring.util.EngineSpringUtil;
+import org.camunda.bpm.engine.context.ProcessEngineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +29,14 @@ public class InnerProcessServiceImpl implements InnerProcessService {
   @Transactional(value = "transactionManager", propagation = Propagation.REQUIRES_NEW, rollbackFor = {Throwable.class})
   public void startInnerProcess(DelegateExecution execution) {
 
-    execution.getProcessEngineServices().getRuntimeService()
-      .startProcessInstanceByKey("InnerTxNestedTransactionTest");
+    try {
+      ProcessEngineContext.requiresNew();
+      execution.getProcessEngineServices().getRuntimeService()
+        .startProcessInstanceByKey("InnerTxNestedTransactionTest");
+    } finally {
+      ProcessEngineContext.clear();
+    }
 
-    throw new RuntimeException("Nested Transaction Failed error!");
+    throw new RuntimeException("Inner Transaction Fails and Rolls back error!");
   }
 }
