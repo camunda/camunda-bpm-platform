@@ -20,7 +20,7 @@ import org.assertj.core.api.AbstractListAssert;
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 
-public class DmnDecisionTableResultAssert extends AbstractListAssert<DmnDecisionTableResultAssert, DmnDecisionTableResult, DmnDecisionRuleResult> {
+public class DmnDecisionTableResultAssert extends AbstractListAssert<DmnDecisionTableResultAssert, DmnDecisionTableResult, DmnDecisionRuleResult, DmnDecisionRuleResultAssert> {
 
   public DmnDecisionTableResultAssert(DmnDecisionTableResult decisionTableResult) {
     super(decisionTableResult, DmnDecisionTableResultAssert.class);
@@ -34,4 +34,10 @@ public class DmnDecisionTableResultAssert extends AbstractListAssert<DmnDecision
     return new DmnDecisionRuleResultAssert(singleResult);
   }
 
+  @Override
+  protected DmnDecisionRuleResultAssert toAssert(DmnDecisionRuleResult value, String description) {
+    info.description(description, "");
+
+    return new DmnDecisionRuleResultAssert(value);
+  }
 }
