@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
-    <version>3.3</version>
+    <version>3.6</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
@@ -40,17 +40,4 @@
     </dependencies>
   </dependencyManagement>
 
-  <scm>
-    <url>https://github.com/camunda/camunda-engine-dmn</url>
-    <connection>scm:git:git@github.com:camunda/camunda-engine-dmn.git</connection>
-    <developerConnection>scm:git:git@github.com:camunda/camunda-engine-dmn.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <repositories>
-    <repository>
-      <id>fix-maven-snapshots-issue-with-nexus</id>
-      <url>allow-resolving-snapshots</url>
-    </repository>
-  </repositories>
 </project>

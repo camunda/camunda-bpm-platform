@@ -25,6 +25,12 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <executions>
           <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>cleanVersions</goal>
+            </goals>
+          </execution>
+          <execution>
             <id>bundle-manifest</id>
             <phase>process-classes</phase>
             <goals>
