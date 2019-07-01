@@ -214,6 +214,9 @@
             <resource>
               <directory>target/camunda-webapp-jboss-unpacked/</directory>
             </resource>
+            <resource>
+              <directory>../../license</directory>
+            </resource>
           </webResources>
           <overlays>
             <overlay>

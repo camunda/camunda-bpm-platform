@@ -218,6 +218,9 @@
             <resource>
               <directory>target/camunda-webapp-tomcat-unpacked/</directory>
             </resource>
+            <resource>
+              <directory>../../license</directory>
+            </resource>
           </webResources>
           <overlays>
             <overlay>

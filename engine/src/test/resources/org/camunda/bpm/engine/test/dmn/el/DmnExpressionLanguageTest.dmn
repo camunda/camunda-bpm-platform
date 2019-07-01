@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
+             id="testExpressions" name="testExpressions"
+             expressionLanguage="JUEL"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision_1" name="Decision 1">
+    <decisionTable id="decisionTable_1">
+      <input id="input_1" camunda:inputVariable="te">
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text>${testExpr}</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" typeRef="string" />
+      <rule id="rule_1">
+        <inputEntry>
+          <text>${te == "TestProperty"}</text>
+        </inputEntry>
+        <outputEntry expressionLanguage="JUEL">
+          <text>${a.b}</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_2">
+        <inputEntry>
+          <text>${te == "TestListIndex"}</text>
+        </inputEntry>
+        <outputEntry expressionLanguage="JUEL">
+          <text>${a[0]}</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

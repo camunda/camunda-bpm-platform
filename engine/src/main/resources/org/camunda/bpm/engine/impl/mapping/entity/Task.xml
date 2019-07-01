@@ -235,8 +235,12 @@
     <bind name="CD_JOIN" value="false" />
     <bind name="CE_JOIN" value="false" />
     <bind name="E1_JOIN" value="false" />
+    <bind name="JOIN_TYPE" value="'inner join'" />
 
     <foreach collection="queries" item="query">
+      <if test="query.isOrQueryActive">
+        <bind name="JOIN_TYPE" value="'left join'" />
+      </if>
       <if test="query != null &amp;&amp; (query.candidateUser != null || query.candidateGroups != null || query.involvedUser != null || query.withCandidateGroups || query.withCandidateUsers)">
         <bind name="I_JOIN" value="true" />
       </if>
@@ -260,19 +264,19 @@
     </foreach>
 
     <if test="I_JOIN">
-      inner join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
+      ${JOIN_TYPE} ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
     </if>
     <if test="D_JOIN">
-      inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+      ${JOIN_TYPE} ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
     </if>
     <if test="E_JOIN">
-      inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
+      ${JOIN_TYPE} ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
     </if>
     <if test="CD_JOIN">
-      inner join ${prefix}ACT_RE_CASE_DEF CD on RES.CASE_DEF_ID_ = CD.ID_
+      ${JOIN_TYPE} ${prefix}ACT_RE_CASE_DEF CD on RES.CASE_DEF_ID_ = CD.ID_
     </if>
     <if test="CE_JOIN">
-      inner join ${prefix}ACT_RU_CASE_EXECUTION CE on RES.CASE_INST_ID_ = CE.ID_
+      ${JOIN_TYPE} ${prefix}ACT_RU_CASE_EXECUTION CE on RES.CASE_INST_ID_ = CE.ID_
     </if>
     <if test="E1_JOIN">
       left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_

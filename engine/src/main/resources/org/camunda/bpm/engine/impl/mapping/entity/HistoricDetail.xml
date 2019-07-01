@@ -321,16 +321,16 @@
         RES.ID_ = #{detailId}
       </if>
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="caseInstanceId != null">
-        RES.CASE_INST_ID_ = #{caseInstanceId}
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
       <if test="executionId != null">
-        RES.EXECUTION_ID_ = #{executionId}
+        and RES.EXECUTION_ID_ = #{executionId}
       </if>
       <if test="caseExecutionId != null">
-        RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
+        and RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
       </if>
       <if test="activityId != null">
         and RES.ACT_INST_ID_ = #{activityId}
