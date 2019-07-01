@@ -142,15 +142,17 @@ public class Parse extends DefaultHandler {
       }
 
       SAXParser saxParser = parser.getSaxParser();
-      saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
+      try {
+        saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
+      } catch (Exception e) {
+        // ignore unavailable option
+      }
       if (schemaResource != null) {
         saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
         saxParser.setProperty(JAXP_SCHEMA_SOURCE, schemaResource);
       }
       saxParser.parse(inputStream, new ParseHandler(this));
-
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.parsingFailureException(name, e);
     }
 
