@@ -20,7 +20,7 @@
 
 var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./process-setup');
-var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
+var CamSDK = require('camunda-bpm-sdk-js');
 
 var dashboardPage = require('../pages/dashboard');
 var processesPage = require('../pages/processes');
