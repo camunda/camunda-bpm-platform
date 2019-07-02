@@ -2,16 +2,20 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>camunda Commons - Typed Values</name>
+  <groupId>org.camunda.commons</groupId>
   <artifactId>camunda-commons-typed-values</artifactId>
+  <name>camunda Commons - Typed Values</name>
 
   <parent>
-    <groupId>org.camunda.commons</groupId>
-    <artifactId>camunda-commons-root</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-database-settings</artifactId>
+    <relativePath>../database</relativePath>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
 
   <properties>
+    <!-- on 7.12 release this property should be removed and
+    camunda.version.old from camunda-database-settigns used -->
     <version.old>1.7.1</version.old>
   </properties>
 
@@ -48,6 +52,8 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
         <configuration>
+          <!-- After 7.12 release, use camunda.version.old -->
+          <!--<comparisonVersion>${camunda.version.old}</comparisonVersion>-->
           <comparisonVersion>${version.old}</comparisonVersion>
           <logResults>true</logResults>
           <excludes>
