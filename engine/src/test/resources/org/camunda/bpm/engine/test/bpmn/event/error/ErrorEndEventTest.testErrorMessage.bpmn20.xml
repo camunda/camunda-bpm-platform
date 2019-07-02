@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0oqh0b5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.1.2">
+  <bpmn:process id="testErrorMessage" isExecutable="true">
+    <bpmn:startEvent id="startEvent">
+      <bpmn:outgoing>SequenceFlow_03rx5z0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:subProcess id="subProcess">
+      <bpmn:incoming>SequenceFlow_03rx5z0</bpmn:incoming>
+      <bpmn:startEvent id="subProcessStartEvent">
+        <bpmn:outgoing>SequenceFlow_0ux5vdg</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_0ux5vdg" sourceRef="subProcessStartEvent" targetRef="errorEndEvent" />
+      <bpmn:endEvent id="errorEndEvent">
+        <bpmn:incoming>SequenceFlow_0ux5vdg</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="Error_1lp3g0b" />
+      </bpmn:endEvent>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent id="errorBoundaryEvent" attachedToRef="subProcess">
+      <bpmn:outgoing>SequenceFlow_03npqei</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_1lp3g0b" camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_03rx5z0" sourceRef="startEvent" targetRef="subProcess" />
+    <bpmn:sequenceFlow id="SequenceFlow_03npqei" sourceRef="errorBoundaryEvent" targetRef="task" />
+    <bpmn:userTask id="task" name="task">
+      <bpmn:incoming>SequenceFlow_03npqei</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0da6ii3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="endEvent">
+      <bpmn:incoming>SequenceFlow_0da6ii3</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0da6ii3" sourceRef="task" targetRef="endEvent" />
+  </bpmn:process>
+  <bpmn:error id="Error_1lp3g0b" name="ErrorWithMessage" errorCode="123" camunda:errorMessage="This is the error message indicating what went wrong." />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testErrorMessage">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEvent">
+        <dc:Bounds x="152" y="163" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_0nsizoa_di" bpmnElement="subProcess" isExpanded="true">
+        <dc:Bounds x="235" y="81" width="180" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_09lxo0l_di" bpmnElement="errorBoundaryEvent">
+        <dc:Bounds x="397" y="263" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_03rx5z0_di" bpmnElement="SequenceFlow_03rx5z0">
+        <di:waypoint x="188" y="181" />
+        <di:waypoint x="235" y="181" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1ya04mz_di" bpmnElement="subProcessStartEvent">
+        <dc:Bounds x="261" y="160" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ux5vdg_di" bpmnElement="SequenceFlow_0ux5vdg">
+        <di:waypoint x="297" y="178" />
+        <di:waypoint x="347" y="178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1k2gfc1_di" bpmnElement="errorEndEvent">
+        <dc:Bounds x="347" y="160" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_03npqei_di" bpmnElement="SequenceFlow_03npqei">
+        <di:waypoint x="433" y="281" />
+        <di:waypoint x="466" y="281" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_005znd6_di" bpmnElement="task">
+        <dc:Bounds x="466" y="241" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0atc9gc_di" bpmnElement="endEvent">
+        <dc:Bounds x="612" y="263" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0da6ii3_di" bpmnElement="SequenceFlow_0da6ii3">
+        <di:waypoint x="566" y="281" />
+        <di:waypoint x="612" y="281" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
