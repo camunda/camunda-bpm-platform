@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter.headersec;
 
+import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentTypeOptionsProvider;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.XssProtectionProvider;
 
@@ -39,6 +40,7 @@ public class HttpHeaderSecurityFilter implements Filter {
   protected final List<HeaderSecurityProvider> headerSecurityProviders = new ArrayList<HeaderSecurityProvider>() {{
 
     add(new XssProtectionProvider());
+    add(new ContentTypeOptionsProvider());
 
   }};
 
