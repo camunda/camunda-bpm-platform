@@ -87,7 +87,12 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
     registerFilter("Authentication Filter", AuthenticationFilter.class, "/api/*", "/app/*");
     registerFilter("Security Filter", LazySecurityFilter.class, singletonMap("configFile", properties.getWebapp().getSecurityConfigFile()), "/api/*", "/app/*");
     registerFilter("CsrfPreventionFilter", SpringBootCsrfPreventionFilter.class, properties.getWebapp().getCsrf().getInitParams(),"/api/*", "/app/*");
-    registerFilter("HttpHeaderSecurity", HttpHeaderSecurityFilter.class, Collections.EMPTY_MAP,"/api/*", "/app/*");
+
+    Map<String, String> headerSecurityProperties = properties.getWebapp()
+      .getHeaderSecurity()
+      .getInitParams();
+
+    registerFilter("HttpHeaderSecurity", HttpHeaderSecurityFilter.class, headerSecurityProperties,"/api/*", "/app/*");
 
     registerFilter("Engines Filter", LazyProcessEnginesFilter.class, "/api/*", "/app/*");
 

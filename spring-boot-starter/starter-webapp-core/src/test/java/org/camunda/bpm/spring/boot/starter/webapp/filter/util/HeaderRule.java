@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.util;
+package org.camunda.bpm.spring.boot.starter.webapp.filter.util;
 
 import org.junit.rules.ExternalResource;
 
@@ -26,7 +26,28 @@ import java.util.Map;
 
 public class HeaderRule extends ExternalResource {
 
+  public static final String PORT_PLACEHOLDER_WEBAPP_URL = "{PORT}";
+  public static final String WEBAPP_URL = "http://localhost:" + PORT_PLACEHOLDER_WEBAPP_URL + "/app/tasklist/default";
+
+  protected Integer port = null;
   protected URLConnection connection = null;
+
+  public HeaderRule() {
+  }
+
+  public HeaderRule(int port) {
+    this.port = port;
+  }
+
+  @Override
+  protected void after() {
+    port = null;
+    connection = null;
+  }
+
+  public URLConnection performRequest() {
+    return performRequest(WEBAPP_URL.replace(PORT_PLACEHOLDER_WEBAPP_URL, String.valueOf(port)));
+  }
 
   public URLConnection performRequest(String url) {
     try {
@@ -45,8 +66,7 @@ public class HeaderRule extends ExternalResource {
   }
 
   public List<String> getCookieHeaders() {
-    Map<String, List<String>> headerFields = connection.getHeaderFields();
-    return headerFields.get("Set-Cookie");
+    return getHeaders("Set-Cookie");
   }
 
   public String getHeaderXsrfToken() {
@@ -69,5 +89,17 @@ public class HeaderRule extends ExternalResource {
     return "";
   }
 
+  public List<String> getHeaders(String name) {
+    Map<String, List<String>> headerFields = connection.getHeaderFields();
+    return headerFields.get(name);
+  }
+
+  public String getHeader(String name) {
+    return getHeaders(name).get(0);
+  }
+
+  public boolean headerExists(String name) {
+    return getHeaders(name) != null;
+  }
 
 }

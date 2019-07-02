@@ -14,46 +14,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.properties;
+package org.camunda.bpm.spring.boot.starter.webapp.filter.headersec.it;
 
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.net.URLConnection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(properties = {
-  "camunda.bpm.webapp.csrf.enableSameSiteCookie=false"
-})
-public class SameSiteDisabledIT {
+public class HttpHeaderSecurityDefaultsIT {
 
   @Rule
-  public HeaderRule headerRule = new HeaderRule();
+  public HeaderRule headerRule;
 
   @LocalServerPort
-  int port;
+  public int port;
+
+  @Before
+  public void assignRule() {
+    headerRule = new HeaderRule(port);
+  }
 
   @Test
-  public void shouldDisableSameSiteCookie() {
-    URLConnection connection = headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
+  public void shouldCheckDefaultOfXssProtectionHeader() {
+    // given
 
-    String xsrfCookieValue = headerRule.getXsrfCookieValue(connection);
-    String xsrfTokenHeader = headerRule.getXsrfTokenHeader(connection);
+    // when
+    headerRule.performRequest();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/");
-    assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
+    // then
+    assertThat(headerRule.getHeader("X-XSS-Protection")).isEqualTo("1; mode=block");
+  }
 
-    assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
+  @Test
+  public void shouldCheckDefaultOfContentSecurityPolicyHeader() {
+    // given
+
+    // when
+    headerRule.performRequest();
+
+    // then
+    assertThat(headerRule.getHeader("Content-Security-Policy")).isEqualTo("base-uri 'self'");
+  }
+
+  @Test
+  public void shouldCheckDefaultOfContentTypeOptions() {
+    // given
+
+    // when
+    headerRule.performRequest();
+
+    // then
+    assertThat(headerRule.getHeader("X-Content-Type-Options")).isEqualTo("nosniff");
   }
 
 }

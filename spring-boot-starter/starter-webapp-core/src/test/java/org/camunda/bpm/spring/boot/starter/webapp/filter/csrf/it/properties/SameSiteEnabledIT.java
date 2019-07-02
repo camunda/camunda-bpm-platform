@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.properties;
 
-import org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.util.HeaderRule;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.util.TestApplication;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;

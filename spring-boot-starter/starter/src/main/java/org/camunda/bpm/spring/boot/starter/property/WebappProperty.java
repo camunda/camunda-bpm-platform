@@ -16,12 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.property;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.joinOn;
 
@@ -34,6 +29,9 @@ public class WebappProperty {
 
   @NestedConfigurationProperty
   private CsrfProperties csrf = new CsrfProperties();
+
+  @NestedConfigurationProperty
+  protected HeaderSecurityProperties headerSecurity = new HeaderSecurityProperties();
 
   public boolean isIndexRedirectEnabled() {
     return indexRedirectEnabled;
@@ -67,6 +65,14 @@ public class WebappProperty {
     this.csrf = csrf;
   }
 
+  public HeaderSecurityProperties getHeaderSecurity() {
+    return headerSecurity;
+  }
+
+  public void setHeaderSecurity(HeaderSecurityProperties headerSecurity) {
+    this.headerSecurity = headerSecurity;
+  }
+
   @Override
   public String toString() {
     return joinOn(this.getClass())
@@ -74,6 +80,7 @@ public class WebappProperty {
       .add("webjarClasspath='" + webjarClasspath + '\'')
       .add("securityConfigFile='" + securityConfigFile + '\'')
       .add("csrf='" + csrf + '\'')
+      .add("headerSecurityProperties='" + headerSecurity + '\'')
       .toString();
   }
 }

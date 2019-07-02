@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.webapp.filter.csrf.it.util;
+package org.camunda.bpm.spring.boot.starter.webapp.filter.util;
 
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.SpringApplication;
