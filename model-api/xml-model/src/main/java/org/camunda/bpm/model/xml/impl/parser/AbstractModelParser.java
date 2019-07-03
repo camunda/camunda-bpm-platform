@@ -97,7 +97,7 @@ public abstract class AbstractModelParser {
   private void enableSecureProcessing(final DocumentBuilderFactory dbf) {
     try {
       dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-      dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
+      dbf.setAttribute("http://javax.xml.XMLConstants/property/accessExternalSchema", "file,http,https,jar,wsjar");
     } catch (ParserConfigurationException | IllegalArgumentException ignored) {
       // ignored
     }
