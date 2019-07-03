@@ -168,7 +168,10 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                      <regexpmapper from="^(org.camunda.commons.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                      <mapper>
+                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-(utils|logging)-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${version.camunda.commons}.jar" handledirsep="yes" />
+                        <regexpmapper from="^(org.camunda.commons.*)\/((camunda-commons-typed-values-)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                      </mapper>
                     </chainedmapper>
                   </mapper>
                 </copy>
