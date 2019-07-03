@@ -40,4 +40,10 @@
     </dependencies>
   </dependencyManagement>
 
+  <repositories>
+    <repository>
+      <id>fix-maven-snapshots-issue-with-nexus</id>
+      <url>allow-resolving-snapshots</url>
+    </repository>
+  </repositories>
 </project>
