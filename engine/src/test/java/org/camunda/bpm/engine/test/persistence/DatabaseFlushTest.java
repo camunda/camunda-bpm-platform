@@ -34,13 +34,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 public class DatabaseFlushTest extends ConcurrencyTestCase {
 
-  public static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn
-      .createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
-
   public static final BpmnModelInstance GW_PROCESS = Bpmn
       .createExecutableProcess("process")
       .startEvent()
