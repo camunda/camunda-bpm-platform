@@ -143,7 +143,7 @@ public class Parse extends DefaultHandler {
 
       SAXParser saxParser = parser.getSaxParser();
       try {
-        saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http,https");
+        saxParser.setProperty("http://javax.xml.XMLConstants/property/accessExternalSchema", "file,http,https,jar,wsjar");
       } catch (Exception e) {
         // ignore unavailable option
       }
