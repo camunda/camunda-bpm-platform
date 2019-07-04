@@ -499,6 +499,9 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <forkCount>0.5C</forkCount>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -507,7 +510,6 @@
               <failIfNoTests>false</failIfNoTests>
               <trimStackTrace>false</trimStackTrace>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <forkCount>0.5C</forkCount>
               <reuseForks>true</reuseForks>
               <systemPropertyVariables>
                 <jdbcUrl>jdbc:h2:mem:camunda_${surefire.forkNumber};DB_CLOSE_DELAY=1000</jdbcUrl>
