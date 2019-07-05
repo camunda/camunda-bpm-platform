@@ -155,7 +155,7 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
-    <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
+    <result property="retriesFromPersistence" column="RETRIES_" jdbcType="INTEGER" />
     <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
     <result property="type" column="TYPE_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>

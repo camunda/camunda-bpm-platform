@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.List;
@@ -39,7 +40,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -128,14 +128,14 @@ public class AcquirableJobCacheTest {
   @Test
   public void testFetchAcquirableJobWhenTimerEntityIsCached() {
     // given
-    BpmnModelInstance process = Bpmn.createExecutableProcess("startTimer")
+    BpmnModelInstance process = Bpmn.createExecutableProcess("timer")
       .startEvent()
       .userTask("userTask")
         .boundaryEvent()
         .timerWithDate("2016-02-11T12:13:14Z")
       .done();
     testRule.deploy(process);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimer");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timer");
     Execution execution = runtimeService.createExecutionQuery().activityId("userTask").singleResult();
 
     // when

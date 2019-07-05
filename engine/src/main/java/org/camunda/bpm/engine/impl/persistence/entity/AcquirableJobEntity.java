@@ -22,8 +22,12 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 
 public class AcquirableJobEntity implements DbEntity, HasDbRevision {
+
+  public static final boolean DEFAULT_EXCLUSIVE = true;
+  public static final int DEFAULT_RETRIES = 3;
 
   protected String id;
   protected int revision;
@@ -35,12 +39,12 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
   protected String deploymentId;
   protected String processInstanceId = null;
 
-  protected boolean isExclusive;
-  protected int retries;
-  protected long priority;
+  protected boolean isExclusive = DEFAULT_EXCLUSIVE;
+  protected int retries = DEFAULT_RETRIES;
+  protected long priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
   protected String type;
   // entity is active by default
-  protected int suspensionState;
+  protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
 
   @Override
@@ -48,6 +52,11 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("lockOwner", lockOwner);
     persistentState.put("lockExpirationTime", lockExpirationTime);
+    persistentState.put("retries", retries);
+    persistentState.put("duedate", duedate);
+    persistentState.put("suspensionState", suspensionState);
+    persistentState.put("deploymentId", deploymentId);
+    persistentState.put("priority", priority);
     return persistentState;
   }
 
@@ -117,7 +126,8 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     return retries;
   }
 
-  public void setRetries(int retries) {
+  // special setter for MyBatis which does not influence incidents
+  public void setRetriesFromPersistence(int retries) {
     this.retries = retries;
   }
 
@@ -153,8 +163,12 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     return type;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    return result;
   }
 
 

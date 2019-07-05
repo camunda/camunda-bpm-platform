@@ -38,7 +38,6 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -62,31 +61,12 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  public static final boolean DEFAULT_EXCLUSIVE = true;
-  public static final int DEFAULT_RETRIES = 3;
-
   private static final long serialVersionUID = 1L;
 
-  protected String id;
-  protected int revision;
-
-  protected Date duedate;
-
-  protected String lockOwner = null;
-  protected Date lockExpirationTime = null;
-
   protected String executionId = null;
-  protected String processInstanceId = null;
 
   protected String processDefinitionId = null;
   protected String processDefinitionKey = null;
-
-  protected boolean isExclusive = DEFAULT_EXCLUSIVE;
-
-  protected int retries = DEFAULT_RETRIES;
-
-  // entity is active by default
-  protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
   protected String jobHandlerType = null;
   protected String jobHandlerConfiguration = null;
@@ -96,11 +76,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   protected String exceptionMessage;
 
-  protected String deploymentId;
-
   protected String jobDefinitionId;
-
-  protected long priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   protected String tenantId;
 
@@ -198,29 +174,19 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     removeFailedJobIncident(incidentResolved);
   }
 
+  @Override
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
+    Map<String, Object> persistentState = (HashMap) super.getPersistentState();
     persistentState.put("executionId", executionId);
-    persistentState.put("lockOwner", lockOwner);
-    persistentState.put("lockExpirationTime", lockExpirationTime);
-    persistentState.put("retries", retries);
-    persistentState.put("duedate", duedate);
     persistentState.put("exceptionMessage", exceptionMessage);
-    persistentState.put("suspensionState", suspensionState);
     persistentState.put("processDefinitionId", processDefinitionId);
     persistentState.put("jobDefinitionId", jobDefinitionId);
-    persistentState.put("deploymentId", deploymentId);
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
-    persistentState.put("priority", priority);
     persistentState.put("tenantId", tenantId);
     if(exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
     return persistentState;
-  }
-
-  public int getRevisionNext() {
-    return revision+1;
   }
 
   public void setExecution(ExecutionEntity execution) {
@@ -254,6 +220,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   // getters and setters //////////////////////////////////////////////////////
 
+  @Override
   public String getExecutionId() {
     return executionId;
   }
@@ -276,10 +243,6 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
   }
 
-  public int getRetries() {
-    return retries;
-  }
-
   public void setRetries(int retries) {
     // if retries should be set to a negative value set it to 0
     if (retries < 0) {
@@ -298,11 +261,6 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     if(retries == 0 && this.retries > 0) {
       createFailedJobIncident();
     }
-    this.retries = retries;
-  }
-
-  // special setter for MyBatis which does not influence incidents
-  public void setRetriesFromPersistence(int retries) {
     this.retries = retries;
   }
 
@@ -374,42 +332,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     return ExceptionUtil.getExceptionStacktrace(byteArray);
   }
 
-  public void setSuspensionState(int state) {
-    this.suspensionState = state;
-  }
-
-  public int getSuspensionState() {
-    return suspensionState;
-  }
-
-  public boolean isSuspended() {
-    return suspensionState == SuspensionState.SUSPENDED.getStateCode();
-  }
-
-  public String getLockOwner() {
-    return lockOwner;
-  }
-
-  public void setLockOwner(String claimedBy) {
-    this.lockOwner = claimedBy;
-  }
-
-  public Date getLockExpirationTime() {
-    return lockExpirationTime;
-  }
-
-  public void setLockExpirationTime(Date claimedUntil) {
-    this.lockExpirationTime = claimedUntil;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
+  @Override
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -418,35 +341,13 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     this.processDefinitionId = processDefinitionId;
   }
 
+  @Override
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
-  }
-  public boolean isExclusive() {
-    return isExclusive;
-  }
-
-  public void setExclusive(boolean isExclusive) {
-    this.isExclusive = isExclusive;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public Date getDuedate() {
-    return duedate;
-  }
-
-  public void setDuedate(Date duedate) {
-    this.duedate = duedate;
   }
 
   public void setExceptionStacktrace(String exception) {
@@ -493,18 +394,12 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     this.jobHandlerConfiguration = jobHandlerConfiguration;
   }
 
-  public int getRevision() {
-    return revision;
-  }
-
-  public void setRevision(int revision) {
-    this.revision = revision;
-  }
-
+  @Override
   public String getExceptionMessage() {
     return exceptionMessage;
   }
 
+  @Override
   public String getJobDefinitionId() {
     return jobDefinitionId;
   }
@@ -559,14 +454,6 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
   }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
-
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-
   public boolean isInInconsistentLockState() {
     return (lockOwner != null && lockExpirationTime == null)
         || (retries == 0 && (lockOwner != null || lockExpirationTime != null));
@@ -586,14 +473,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     this.activityId = activityId;
   }
 
-  public long getPriority() {
-    return priority;
-  }
-
-  public void setPriority(long priority) {
-    this.priority = priority;
-  }
-
+  @Override
   public String getTenantId() {
     return tenantId;
   }
@@ -602,6 +482,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     this.tenantId = tenantId;
   }
 
+  @Override
   public Date getCreateTime() {
     return createTime;
   }
@@ -637,14 +518,6 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
   }
 
   public abstract String getType();
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    return result;
-  }
 
   @Override
   public boolean equals(Object obj) {
