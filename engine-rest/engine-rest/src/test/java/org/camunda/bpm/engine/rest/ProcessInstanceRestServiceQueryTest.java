@@ -48,7 +48,6 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -84,7 +83,7 @@ public class ProcessInstanceRestServiceQueryTest extends
   }
 
   private ProcessInstanceQuery setUpMockInstanceQuery(List<ProcessInstance> mockedInstances) {
-    ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQueryImpl.class);
+    ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQuery.class);
     when(sampleInstanceQuery.list()).thenReturn(mockedInstances);
     when(sampleInstanceQuery.count()).thenReturn((long) mockedInstances.size());
     when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(sampleInstanceQuery);
@@ -364,7 +363,6 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
     verify(mockedQuery).variableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
-
   }
 
   @Test
@@ -1072,6 +1070,9 @@ public class ProcessInstanceRestServiceQueryTest extends
   @Test
   public void testOrQuery() {
     // given
+    ProcessInstanceQuery mockedQuery = mock(ProcessInstanceQueryImpl.class);
+    when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(mockedQuery);
+
     ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
 
     ProcessInstanceQueryDto orQuery = new ProcessInstanceQueryDto();
