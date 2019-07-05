@@ -32,8 +32,7 @@
           {{ incident.rootCauseIncidentMessage }}
         </a>
         <a ng-if="!incident.rootCauseIncidentMessage"
-           href="{{ getJobStacktraceUrl(incident) }}"
-           target="_blank"
+           ng-click="viewVariable(incident)"
            uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
            tooltip-placement="top">
           <i>Message is null.</i>
