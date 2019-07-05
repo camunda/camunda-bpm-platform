@@ -54,6 +54,8 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String NO_INFORMATION_REQUIREMENT_ATTRIBUTE_DMN = "org/camunda/bpm/dmn/engine/api/NoInformationRequirementAttribute.dmn";
   public static final String MISSING_DECISION_REQUIREMENT_DIAGRAM_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingDrdId.dmn";
 
+  public static final String DMN12_NO_INPUT_DMN = "org/camunda/bpm/dmn/engine/api/dmn12/NoInput.dmn";
+
   @Test
   public void shouldParseDecisionFromInputStream() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
@@ -272,6 +274,13 @@ public class ParseDecisionTest extends DmnEngineTest {
         .hasMessageContaining("DMN-02017")
         .hasMessageContaining("DRD with Missing Id");
     }
+  }
+
+  @Test
+  public void shouldParseDecisionFromInputStream_Dmn12() {
+    InputStream inputStream = IoUtil.fileAsStream(DMN12_NO_INPUT_DMN);
+    decision = dmnEngine.parseDecision("decision", inputStream);
+    assertDecision(decision, "decision");
   }
 
   protected void assertDecision(DmnDecision decision, String key) {

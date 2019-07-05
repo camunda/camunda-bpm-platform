@@ -42,18 +42,19 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   public static final String FEEL_EXPRESSION_LANGUAGE = DmnModelConstants.FEEL_NS;
   public static final String FEEL_EXPRESSION_LANGUAGE_ALTERNATIVE = "feel";
+  public static final String FEEL_EXPRESSION_LANGUAGE_DMN12 = DmnModelConstants.FEEL12_NS;
   public static final String JUEL_EXPRESSION_LANGUAGE = "juel";
 
   protected DmnEngineMetricCollector engineMetricCollector;
 
-  protected List<DmnDecisionTableEvaluationListener> customPreDecisionTableEvaluationListeners = new ArrayList<DmnDecisionTableEvaluationListener>();
-  protected List<DmnDecisionTableEvaluationListener> customPostDecisionTableEvaluationListeners = new ArrayList<DmnDecisionTableEvaluationListener>();
+  protected List<DmnDecisionTableEvaluationListener> customPreDecisionTableEvaluationListeners = new ArrayList<>();
+  protected List<DmnDecisionTableEvaluationListener> customPostDecisionTableEvaluationListeners = new ArrayList<>();
   protected List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners;
 
   // Decision evaluation listeners
   protected List<DmnDecisionEvaluationListener> decisionEvaluationListeners;
-  protected List<DmnDecisionEvaluationListener> customPreDecisionEvaluationListeners = new ArrayList<DmnDecisionEvaluationListener>();
-  protected List<DmnDecisionEvaluationListener> customPostDecisionEvaluationListeners = new ArrayList<DmnDecisionEvaluationListener>();
+  protected List<DmnDecisionEvaluationListener> customPreDecisionEvaluationListeners = new ArrayList<>();
+  protected List<DmnDecisionEvaluationListener> customPostDecisionEvaluationListeners = new ArrayList<>();
 
   protected DmnScriptEngineResolver scriptEngineResolver;
   protected ElProvider elProvider;
@@ -89,7 +90,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   }
 
   protected void initDecisionTableEvaluationListener() {
-    List<DmnDecisionTableEvaluationListener> listeners = new ArrayList<DmnDecisionTableEvaluationListener>();
+    List<DmnDecisionTableEvaluationListener> listeners = new ArrayList<>();
     if (customPreDecisionTableEvaluationListeners != null && !customPreDecisionTableEvaluationListeners.isEmpty()) {
       listeners.addAll(customPreDecisionTableEvaluationListeners);
     }
@@ -101,7 +102,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   }
 
   protected void initDecisionEvaluationListener() {
-    List<DmnDecisionEvaluationListener> listeners = new ArrayList<DmnDecisionEvaluationListener>();
+    List<DmnDecisionEvaluationListener> listeners = new ArrayList<>();
     if (customPreDecisionEvaluationListeners != null && !customPreDecisionEvaluationListeners.isEmpty()) {
       listeners.addAll(customPreDecisionEvaluationListeners);
     }
@@ -115,7 +116,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   }
 
   protected Collection<? extends DmnDecisionEvaluationListener> getDefaultDmnDecisionEvaluationListeners() {
-    List<DmnDecisionEvaluationListener> defaultListeners = new ArrayList<DmnDecisionEvaluationListener>();
+    List<DmnDecisionEvaluationListener> defaultListeners = new ArrayList<>();
 
     if (engineMetricCollector instanceof DmnDecisionEvaluationListener) {
       defaultListeners.add((DmnDecisionEvaluationListener) engineMetricCollector);
