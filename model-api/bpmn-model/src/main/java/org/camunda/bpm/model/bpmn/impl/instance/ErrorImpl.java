@@ -36,6 +36,7 @@ public class ErrorImpl extends RootElementImpl implements Error {
 
   protected static Attribute<String> nameAttribute;
   protected static Attribute<String> errorCodeAttribute;
+  protected static Attribute<String> camundaErrorMessageAttribute;
   
   protected static AttributeReference<ItemDefinition> structureRefAttribute;
   
@@ -54,6 +55,9 @@ public class ErrorImpl extends RootElementImpl implements Error {
 
     errorCodeAttribute = typeBuilder.stringAttribute(BPMN_ATTRIBUTE_ERROR_CODE)
       .build();
+
+    camundaErrorMessageAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_ERROR_MESSAGE).namespace(CAMUNDA_NS)
+        .build();
 
     structureRefAttribute = typeBuilder.stringAttribute(BPMN_ATTRIBUTE_STRUCTURE_REF)
       .qNameAttributeReference(ItemDefinition.class)
@@ -80,6 +84,14 @@ public class ErrorImpl extends RootElementImpl implements Error {
 
   public void setErrorCode(String errorCode) {
     errorCodeAttribute.setValue(this, errorCode);
+  }
+
+  public String getCamundaErrorMessage() {
+    return camundaErrorMessageAttribute.getValue(this);
+  }
+
+  public void setCamundaErrorMessage(String camundaErrorMessage) {
+    camundaErrorMessageAttribute.setValue(this, camundaErrorMessage);
   }
 
   public ItemDefinition getStructure() {

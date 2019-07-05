@@ -57,7 +57,14 @@ public abstract class AbstractErrorEventDefinitionBuilder<B extends AbstractErro
    * Sets the error attribute with errorCode.
    */
   public B error(String errorCode) {
-    element.setError(findErrorForNameAndCode(errorCode));
+    return error(errorCode, null);
+  }
+  
+  /**
+   * Sets the error attribute with errorCode and errorMessage.
+   */
+  public B error(String errorCode, String errorMessage) {
+    element.setError(findErrorForNameAndCode(errorCode, errorMessage));
     return myself;
   }
 

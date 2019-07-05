@@ -31,6 +31,10 @@ public interface Error extends RootElement {
 
   void setErrorCode(String errorCode);
 
+  String getCamundaErrorMessage();
+
+  void setCamundaErrorMessage(String camundaErrorMessage);
+
   ItemDefinition getStructure();
 
   void setStructure(ItemDefinition structure);

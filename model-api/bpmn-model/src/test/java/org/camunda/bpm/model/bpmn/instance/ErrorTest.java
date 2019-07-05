@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.model.bpmn.instance;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -36,6 +38,7 @@ public class ErrorTest extends BpmnModelElementInstanceTest {
     return Arrays.asList(
       new AttributeAssumption("name"),
       new AttributeAssumption("errorCode"),
+      new AttributeAssumption(CAMUNDA_NS, "errorMessage"),
       new AttributeAssumption("structureRef")
     );
   }

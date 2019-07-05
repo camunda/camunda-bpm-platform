@@ -215,4 +215,6 @@
     </parallelGateway>
 
   </process>
+
+  <error id="error" camunda:errorMessage="test" />
 </definitions>

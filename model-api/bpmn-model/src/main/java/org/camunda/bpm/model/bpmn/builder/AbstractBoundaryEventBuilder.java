@@ -64,9 +64,23 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
    * @return the builder object
    */
   public B error(String errorCode) {
-    ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode);
-    element.getEventDefinitions().add(errorEventDefinition);
+    return error(errorCode, null);
+  }
 
+  /**
+   * Sets an error definition for the given error code. If already an error
+   * with this code exists it will be used, otherwise a new error with the 
+   * given error message is created.
+   *
+   * @param errorCode the code of the error
+   * @param errorMessage the error message that is used when a new error needs
+   *        to be created
+   * @return the builder object
+   */
+  public B error(String errorCode, String errorMessage) {
+    ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode, errorMessage);
+    element.getEventDefinitions().add(errorEventDefinition);
+    
     return myself;
   }
 

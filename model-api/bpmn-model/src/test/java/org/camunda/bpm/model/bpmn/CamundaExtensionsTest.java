@@ -75,6 +75,7 @@ import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.Error;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Expression;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
@@ -138,6 +139,7 @@ public class CamundaExtensionsTest {
   private String namespace;
   private BpmnModelInstance originalModelInstance;
   private BpmnModelInstance modelInstance;
+  private Error error;
 
   @Parameters(name="Namespace: {0}")
   public static Collection<Object[]> parameters(){
@@ -168,6 +170,7 @@ public class CamundaExtensionsTest {
     endEvent = modelInstance.getModelElementById(END_EVENT_ID);
     messageEventDefinition = (MessageEventDefinition) endEvent.getEventDefinitions().iterator().next();
     parallelGateway = modelInstance.getModelElementById("parallelGateway");
+    error = modelInstance.getModelElementById("error");
   }
 
   @Test
@@ -461,6 +464,13 @@ public class CamundaExtensionsTest {
   public void testErrorMessageVariable(){
     ErrorEventDefinition errorEventDefinition = startEvent.getChildElementsByType(ErrorEventDefinition.class).iterator().next();
     assertThat(errorEventDefinition.getAttributeValueNs(namespace, CAMUNDA_ATTRIBUTE_ERROR_MESSAGE_VARIABLE)).isEqualTo("errorMessageVariable");
+  }
+
+  @Test
+  public void testErrorMessage() {
+    assertThat(error.getCamundaErrorMessage()).isEqualTo(TEST_STRING_XML);
+    error.setCamundaErrorMessage(TEST_STRING_API);
+    assertThat(error.getCamundaErrorMessage()).isEqualTo(TEST_STRING_API);
   }
 
   @Test

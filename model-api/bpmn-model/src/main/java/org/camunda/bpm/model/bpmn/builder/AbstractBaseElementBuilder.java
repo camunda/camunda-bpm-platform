@@ -177,7 +177,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return null;
   }
 
-  protected Error findErrorForNameAndCode(String errorCode) {
+  protected Error findErrorForNameAndCode(String errorCode, String errorMessage) {
     Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
     for (Error error : errors) {
       if (errorCode.equals(error.getErrorCode())) {
@@ -190,6 +190,9 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     Definitions definitions = modelInstance.getDefinitions();
     Error error = createChild(definitions, Error.class);
     error.setErrorCode(errorCode);
+    if(errorMessage != null && !errorMessage.equals("")) {
+      error.setCamundaErrorMessage(errorMessage);
+    }
 
     return error;
   }
@@ -198,9 +201,13 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
     return errorEventDefinition;
   }
-
+  
   protected ErrorEventDefinition createErrorEventDefinition(String errorCode) {
-    Error error = findErrorForNameAndCode(errorCode);
+    return createErrorEventDefinition(errorCode, null);
+  }
+
+  protected ErrorEventDefinition createErrorEventDefinition(String errorCode, String errorMessage) {
+    Error error = findErrorForNameAndCode(errorCode, errorMessage);
     ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
     errorEventDefinition.setError(error);
     return errorEventDefinition;

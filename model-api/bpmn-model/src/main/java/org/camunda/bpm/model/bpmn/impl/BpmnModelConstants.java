@@ -442,6 +442,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_EVENT = "event";
   public static final String CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE = "errorCodeVariable";
   public static final String CAMUNDA_ATTRIBUTE_ERROR_MESSAGE_VARIABLE = "errorMessageVariable";
+  public static final String CAMUNDA_ATTRIBUTE_ERROR_MESSAGE = "errorMessage";
   public static final String CAMUNDA_ATTRIBUTE_EXCLUSIVE = "exclusive";
   public static final String CAMUNDA_ATTRIBUTE_EXPRESSION = "expression";
   public static final String CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS = "formHandlerClass";
