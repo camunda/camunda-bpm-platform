@@ -20,6 +20,7 @@ module.exports = function(config, uglifyConfig) {
 
   uglifyConfig.webapp_libraries = {
     files: {
+      '<%= pkg.gruntConfig.libTargetDir %>/deps.js': ['<%= pkg.gruntConfig.libTargetDir %>/deps.js'],
       '<%= pkg.gruntConfig.libTargetDir %>/ngDefine.js': ['<%= pkg.gruntConfig.libTargetDir %>/ngDefine.js'],
       '<%= pkg.gruntConfig.libTargetDir %>/globalize.js': ['<%= pkg.gruntConfig.libTargetDir %>/globalize.js'],
       '<%= pkg.gruntConfig.libTargetDir %>/require.js': ['<%= pkg.gruntConfig.libTargetDir %>/require.js']
