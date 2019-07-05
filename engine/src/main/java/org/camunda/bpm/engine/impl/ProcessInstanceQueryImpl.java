@@ -475,6 +475,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return isLeafProcessInstances;
   }
 
+  public String[] getTenantIds() {
+    return tenantIds;
+  }
+
   @Override
   public ProcessInstanceQuery or() {
     if (this != queries.get(0)) {
