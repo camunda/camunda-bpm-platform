@@ -158,13 +158,22 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- dmn engine -->
+      <!-- dmn engine dependencies
+       -->
       <dependency>
         <groupId>org.camunda.bpm.dmn</groupId>
-        <artifactId>camunda-engine-dmn-bom</artifactId>
+        <artifactId>camunda-engine-dmn</artifactId>
         <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.dmn</groupId>
+        <artifactId>camunda-engine-feel-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.dmn</groupId>
+        <artifactId>camunda-engine-feel-juel</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
