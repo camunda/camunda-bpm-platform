@@ -514,20 +514,20 @@
                 ${queryType} SELF.TENANT_ID_ is null
               </if>
             </if>
-
-            <if test="query.authCheck.shouldPerformAuthorizatioCheck &amp;&amp; query.authCheck.authUserId != null">
-              ${queryType} (
-              (SELF.PROC_DEF_KEY_ is not null
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-              ) or SELF.PROC_DEF_KEY_ is null
-              )
-            </if>
-
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
           </trim>
         </trim>
         )
       </foreach>
+
+      <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+        and (
+        (SELF.PROC_DEF_KEY_ is not null
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+        ) or SELF.PROC_DEF_KEY_ is null
+        )
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
     </where>
 
     ) RES
