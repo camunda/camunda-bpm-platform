@@ -556,6 +556,7 @@
                 <exclude>**/JdbcStatementTimeoutTest.java</exclude>
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
                 <exclude>**/ConcurrentDeploymentTest.java</exclude>
+                <exclude>**/DatabaseFlushTest.java</exclude>
                 <exclude>**/*TestCase.java</exclude>
               </excludes>
             </configuration>
