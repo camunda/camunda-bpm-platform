@@ -55,7 +55,7 @@ public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<Hist
       List<String> byteArrayIds = getByteArrayIds(historicVariableUpdates);
       if (!byteArrayIds.isEmpty()) {
         // pre-fetch all byte arrays into dbEntityCache to avoid (n+1) number of queries
-        commandContext.getOptimizeManager().getHistoricVariableUpdateByteArrays(byteArrayIds);
+        commandContext.getOptimizeManager().fetchHistoricVariableUpdateByteArrays(byteArrayIds);
       }
 
       resolveTypedValues(historicVariableUpdates);
@@ -72,7 +72,7 @@ public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<Hist
   }
 
   protected List<String> getByteArrayIds(List<HistoricVariableUpdate> variableUpdates) {
-    List<String> byteArrayIds = new ArrayList<String>();
+    List<String> byteArrayIds = new ArrayList<>();
 
     for (HistoricVariableUpdate variableUpdate : variableUpdates) {
       if (isHistoricDetailVariableInstanceUpdateEntity(variableUpdate)) {

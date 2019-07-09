@@ -94,14 +94,23 @@ public class CollectionUtil {
   }
 
   /**
-   * Chops a list into non-view sublists of length partitionSize.
+   * Chops a list into non-view sublists of length partitionSize. Note: the argument list
+   * may be included in the result.
    */
   public static <T> List<List<T>> partition(List<T> list, final int partitionSize) {
     List<List<T>> parts = new ArrayList<>();
+
     final int listSize = list.size();
-    for (int i = 0; i < listSize; i += partitionSize) {
-      parts.add(new ArrayList<>(list.subList(i, Math.min(listSize, i + partitionSize))));
+
+    if (listSize <= partitionSize) {
+      // no need for partitioning
+      parts.add(list);
+    } else {
+      for (int i = 0; i < listSize; i += partitionSize) {
+        parts.add(new ArrayList<>(list.subList(i, Math.min(listSize, i + partitionSize))));
+      }
     }
+
     return parts;
   }
 
