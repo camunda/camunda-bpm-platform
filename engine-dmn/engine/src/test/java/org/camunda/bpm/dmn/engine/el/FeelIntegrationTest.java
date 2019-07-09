@@ -47,6 +47,7 @@ import org.junit.Test;
 public class FeelIntegrationTest extends DmnEngineTest {
 
   protected static final String DMN = "org/camunda/bpm/dmn/engine/el/FeelIntegrationTest.dmn";
+  protected static final String DMN_12 = "org/camunda/bpm/dmn/engine/el/dmn12/FeelIntegrationTest.dmn";
 
   protected FeelEngine feelEngineSpy;
 
@@ -123,6 +124,12 @@ public class FeelIntegrationTest extends DmnEngineTest {
       assertThat(e).hasMessageStartingWith("FEEL-01016");
       verify(feelEngineSpy).evaluateSimpleExpression(anyString(), any(VariableContext.class));
     }
+  }
+
+  @Test
+  @DecisionResource(resource = DMN_12)
+  public void testFeelInputExpression_Dmn12() {
+    testFeelInputExpression();
   }
 
   @Test
