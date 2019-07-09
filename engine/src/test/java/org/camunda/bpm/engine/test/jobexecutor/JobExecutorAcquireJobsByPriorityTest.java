@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,7 +63,7 @@ public class JobExecutorAcquireJobsByPriorityTest extends AbstractJobExecutorAcq
     // make timers due
     incrementClock(61);
 
-    List<JobEntity> acquirableJobs = findAcquirableJobs();
+    List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
     assertEquals(20, acquirableJobs.size());
     for (int i = 0; i < 5; i++) {
       assertEquals(10, acquirableJobs.get(i).getPriority());

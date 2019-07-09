@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -89,7 +89,7 @@ public class JobExecutorAcquireJobsByTypeAndDueDateTest extends AbstractJobExecu
     assertTrue(timerJob1.getDuedate().before(timerJob2.getDuedate()));
     assertTrue(timerJob2.getDuedate().before(messageJob2.getDuedate()));
 
-    List<JobEntity> acquirableJobs = findAcquirableJobs();
+    List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
     assertEquals(4, acquirableJobs.size());
     assertEquals(timerJob1.getId(), acquirableJobs.get(0).getId());
     assertEquals(timerJob2.getId(), acquirableJobs.get(1).getId());

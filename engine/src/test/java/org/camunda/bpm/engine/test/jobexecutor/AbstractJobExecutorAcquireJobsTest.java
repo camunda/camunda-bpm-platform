@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
@@ -81,11 +81,11 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
     ClockUtil.reset();
   }
 
-  protected List<JobEntity> findAcquirableJobs() {
-    return configuration.getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
+  protected List<AcquirableJobEntity> findAcquirableJobs() {
+    return configuration.getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
 
       @Override
-      public List<JobEntity> execute(CommandContext commandContext) {
+      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
         return commandContext
           .getJobManager()
           .findNextJobsToExecute(new Page(0, 100));

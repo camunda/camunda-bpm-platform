@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.junit.Before;
@@ -67,7 +67,7 @@ public class JobExecutorAcquireJobsDefaultTest extends AbstractJobExecutorAcquir
   public void testJobDueDateValue() {
     // when
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
-    List<JobEntity> jobList = findAcquirableJobs();
+    List<AcquirableJobEntity> jobList = findAcquirableJobs();
 
     // then
     assertEquals(1, jobList.size());

@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -103,11 +103,11 @@ public class DeploymentAwareJobExecutorForOracleTest {
     findAcquirableJobs();
   }
 
-  protected List<JobEntity> findAcquirableJobs() {
-    return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
+  protected List<AcquirableJobEntity> findAcquirableJobs() {
+    return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
 
       @Override
-      public List<JobEntity> execute(CommandContext commandContext) {
+      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
         return commandContext
           .getJobManager()
           .findNextJobsToExecute(new Page(0, 100));
