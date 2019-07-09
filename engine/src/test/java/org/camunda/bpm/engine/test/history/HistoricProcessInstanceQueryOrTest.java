@@ -682,6 +682,7 @@ public class HistoricProcessInstanceQueryOrTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void shouldReturnByProcessDefinitionIdOrIncidentType() {
     // given
