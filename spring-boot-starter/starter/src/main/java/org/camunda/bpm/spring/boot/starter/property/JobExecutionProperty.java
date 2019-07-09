@@ -32,8 +32,8 @@ public class JobExecutionProperty {
 
   private int corePoolSize = 3;
   private int maxPoolSize = 10;
+  private int queueCapacity = 3;
   private Integer keepAliveSeconds;
-  private Integer queueCapacity;
 
   /*
    * properties for job executor
@@ -87,11 +87,11 @@ public class JobExecutionProperty {
     this.keepAliveSeconds = keepAliveSeconds;
   }
 
-  public Integer getQueueCapacity() {
+  public int getQueueCapacity() {
     return queueCapacity;
   }
 
-  public void setQueueCapacity(Integer queueCapacity) {
+  public void setQueueCapacity(int queueCapacity) {
     this.queueCapacity = queueCapacity;
   }
 

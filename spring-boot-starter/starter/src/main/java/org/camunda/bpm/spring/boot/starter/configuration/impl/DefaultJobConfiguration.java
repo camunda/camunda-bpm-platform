@@ -82,16 +82,16 @@ public class DefaultJobConfiguration extends AbstractCamundaConfiguration implem
     public static TaskExecutor camundaTaskExecutor(CamundaBpmProperties properties) {
       int corePoolSize = properties.getJobExecution().getCorePoolSize();
       int maxPoolSize = properties.getJobExecution().getMaxPoolSize();
+      int queueCapacity = properties.getJobExecution().getQueueCapacity();
 
       final ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
       threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
       threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);
+      threadPoolTaskExecutor.setQueueCapacity(queueCapacity);
 
       Optional.ofNullable(properties.getJobExecution().getKeepAliveSeconds())
         .ifPresent(threadPoolTaskExecutor::setKeepAliveSeconds);
-      Optional.ofNullable(properties.getJobExecution().getQueueCapacity())
-        .ifPresent(threadPoolTaskExecutor::setQueueCapacity);
 
       LOG.configureJobExecutorPool(corePoolSize, maxPoolSize);
       return threadPoolTaskExecutor;

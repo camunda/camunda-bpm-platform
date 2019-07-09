@@ -38,11 +38,13 @@ public abstract class ParsePropertiesHelper {
   protected MetricsProperty metrics;
   protected ApplicationProperty application;
   protected WebappProperty webapp;
+  protected JobExecutionProperty jobExecution;
 
   @PostConstruct
   public void init() {
     metrics = properties.getMetrics();
     application = properties.getApplication();
     webapp = properties.getWebapp();
+    jobExecution = properties.getJobExecution();
   }
 }
