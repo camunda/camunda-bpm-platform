@@ -163,6 +163,10 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     return type;
   }
 
+  public void setType(String type) {
+    this.type = type;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -170,7 +174,6 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     return result;
   }
-
 
   @Override
   public boolean equals(Object obj) {
