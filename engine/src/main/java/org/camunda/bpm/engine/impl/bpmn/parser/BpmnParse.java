@@ -432,7 +432,7 @@ public class BpmnParse extends Parse {
 
       String errorMessage = errorElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "errorMessage");
       if(errorMessage != null) {
-        error.setErrorMessage(errorMessage);
+        error.setErrorMessageExpression(expressionManager.createExpression(errorMessage));
       }
 
       errors.put(id, error);
@@ -2887,7 +2887,7 @@ public class BpmnParse extends Parse {
           }
           activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_ERROR);
           if(error != null) {
-            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode(), error.getErrorMessage()));
+            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode(), error.getErrorMessageExpression()));
           } else {
             activity.setActivityBehavior(new ErrorEndEventActivityBehavior(errorRef, null));
           }

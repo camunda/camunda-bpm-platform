@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.impl.el.Expression;
 
 
 /**
@@ -29,7 +30,7 @@ public class Error {
   
   protected String id;
   protected String errorCode;
-  private String errorMessage;
+  private Expression errorMessageExpression;
 
   public String getId() {
     return id;
@@ -47,11 +48,11 @@ public class Error {
     this.errorCode = errorCode;
   }
 
-  public String getErrorMessage() {
-    return errorMessage;
+  public Expression getErrorMessageExpression() {
+    return errorMessageExpression;
   }
 
-  public void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
+  public void setErrorMessageExpression(Expression errorMessageExpression) {
+    this.errorMessageExpression = errorMessageExpression;
   }
 }
