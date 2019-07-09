@@ -23,9 +23,11 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -38,9 +40,18 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 public class OptimizeManager extends AbstractManager {
 
-  @SuppressWarnings("unchecked")
-  public List<ByteArrayEntity> getHistoricVariableUpdateByteArrays(List<String> byteArrayIds) {
-    return (List<ByteArrayEntity>) getDbEntityManager().selectList("selectByteArrays", byteArrayIds);
+  /**
+   * Loads the byte arrays into the cache; does currently not return a list
+   * because it is not needed by the calling code and we can avoid concatenating
+   * lists in the implementation that way.
+   */
+  public void fetchHistoricVariableUpdateByteArrays(List<String> byteArrayIds) {
+
+    List<List<String>> partitions = CollectionUtil.partition(byteArrayIds, DbSqlSessionFactory.MAXIMUM_NUMBER_PARAMS);
+
+    for (List<String> partition : partitions) {
+      getDbEntityManager().selectList("selectByteArrays", partition);
+    }
   }
 
   @SuppressWarnings("unchecked")

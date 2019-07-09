@@ -88,6 +88,12 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<>();
 
+  /*
+   * On SQL server, the overall maximum number of parameters in a prepared statement
+   * is 2100.
+   */
+  public static final int MAXIMUM_NUMBER_PARAMS = 2000;
+
   static {
 
     String defaultOrderBy = "order by ${internalOrderBy}";
