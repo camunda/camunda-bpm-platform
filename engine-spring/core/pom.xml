@@ -94,11 +94,6 @@
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.assert</groupId>
-      <artifactId>camunda-bpm-assert-assertj2</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.hibernate</groupId>

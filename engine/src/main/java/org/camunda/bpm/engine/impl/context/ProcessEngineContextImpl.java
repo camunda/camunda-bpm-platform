@@ -18,7 +18,12 @@ package org.camunda.bpm.engine.impl.context;
 
 public class ProcessEngineContextImpl {
 
-  protected static ThreadLocal<Boolean> commandContextNew = new ThreadLocal<>();
+  protected static ThreadLocal<Boolean> commandContextNew = new ThreadLocal<Boolean>() {
+    @Override
+    protected Boolean initialValue() {
+      return Boolean.FALSE;
+    }
+  };
 
   public static boolean get() {
     return commandContextNew.get();
@@ -36,6 +41,6 @@ public class ProcessEngineContextImpl {
   }
 
   public static void clear() {
-    commandContextNew.remove();
+    commandContextNew.set(false);
   }
 }

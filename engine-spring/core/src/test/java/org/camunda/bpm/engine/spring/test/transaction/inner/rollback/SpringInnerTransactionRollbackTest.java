@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.spring.test.transaction.inner.rollback;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.assertThat;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
