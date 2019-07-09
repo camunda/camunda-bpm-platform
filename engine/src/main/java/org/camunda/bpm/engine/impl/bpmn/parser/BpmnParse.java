@@ -430,6 +430,11 @@ public class BpmnParse extends Parse {
         error.setErrorCode(errorCode);
       }
 
+      String errorMessage = errorElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "errorMessage");
+      if(errorMessage != null) {
+        error.setErrorMessage(errorMessage);
+      }
+
       errors.put(id, error);
     }
   }
@@ -2882,9 +2887,9 @@ public class BpmnParse extends Parse {
           }
           activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_ERROR);
           if(error != null) {
-            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode()));
+            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode(), error.getErrorMessage()));
           } else {
-            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(errorRef));
+            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(errorRef, null));
           }
         }
       } else if (cancelEventDefinition != null) {
