@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.springboot.project</groupId>
+    <artifactId>qa-webapp</artifactId>
+    <version>3.4.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
+  </parent>
+
+  <packaging>pom</packaging>
+
+  <artifactId>qa-webapp-runtimes</artifactId>
+
+  <properties>
+    <version.selenium>2.45.0</version.selenium>
+    <version.jersey-json>1.15</version.jersey-json>
+    <version.h2>1.4.199</version.h2>
+    <version.glassfish-jaxb>2.3.1</version.glassfish-jaxb>
+    <version.jersey-apache-client>1.15</version.jersey-apache-client>
+    <version.junit>4.12</version.junit>
+
+    <http.port>58080</http.port>
+    <http.ctx-path.webapp/>
+    <http.ctx-path.rest>rest/</http.ctx-path.rest>
+  </properties>
+
+  <modules>
+    <module>community</module>
+    <module>enterprise</module>
+  </modules>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa</groupId>
+      <artifactId>camunda-qa-integration-tests-webapps</artifactId>
+      <version>${camunda.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.springboot.project</groupId>
+      <artifactId>qa-webapp-invoice-example</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${version.h2}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>${version.glassfish-jaxb}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-apache-client4</artifactId>
+      <version>${version.jersey-apache-client}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${version.selenium}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-server</artifactId>
+      <version>${version.selenium}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-remote-driver</artifactId>
+      <version>${version.selenium}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>${version.selenium}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-api</artifactId>
+      <version>${version.selenium}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-support</artifactId>
+      <version>${version.selenium}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-json</artifactId>
+      <version>${version.jersey-json}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+          <configuration>
+            <mainClass>org.camunda.bpm.qa.Application</mainClass>
+          </configuration>
+          <executions>
+            <execution>
+              <id>pre-integration-test</id>
+              <goals>
+                <goal>start</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>post-integration-test</id>
+              <goals>
+                <goal>stop</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.0.0-M3</version>
+          <configuration>
+            <dependenciesToScan>
+              <dependency>org.camunda.bpm.qa:camunda-qa-integration-tests-webapps</dependency>
+            </dependenciesToScan>
+          </configuration>
+          <executions>
+            <execution>
+              <id>default-test</id>
+              <configuration>
+                <skip>true</skip>
+              </configuration>
+            </execution>
+            <execution>
+              <id>integration-tests</id>
+              <phase>integration-test</phase>
+              <goals>
+                <goal>test</goal>
+              </goals>
+              <configuration>
+                <skipTests>false</skipTests>
+                <includes>
+                  <include>**/*IT.*</include>
+                </includes>
+
+                <!-- [Google Chrome is missing]
+                     See https://app.camunda.com/jira/browse/CAM-10604
+                 -->
+                <excludes>
+                  <exclude>**/DashboardIT.*</exclude>
+                  <exclude>**/TasklistIT.*</exclude>
+                </excludes>
+                <!-- [/Google Chrome is missing] -->
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+</project>

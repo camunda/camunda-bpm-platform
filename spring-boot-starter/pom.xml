@@ -22,6 +22,7 @@
     <module>starter-webapp-core</module>
     <module>starter-webapp</module>
     <module>starter-test</module>
+    <module>starter-qa</module>
   </modules>
 
   <properties>
