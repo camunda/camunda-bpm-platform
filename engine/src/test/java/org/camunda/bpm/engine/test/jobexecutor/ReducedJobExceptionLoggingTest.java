@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.WatchLogger;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -41,13 +40,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class ReducedJobExceptionLoggingTest {
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().watch("org.camunda.bpm.engine.context", Level.DEBUG);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(loggingRule);
@@ -68,7 +68,6 @@ public class ReducedJobExceptionLoggingTest {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
-  @WatchLogger(loggerNames = { "org.camunda.bpm.engine.context" }, level = "DEBUG")
   public void shouldLogAllFailingJobExceptions() {
     // given
     processEngineConfiguration.setEnableReducedJobExceptionLogging(false);
@@ -94,7 +93,6 @@ public class ReducedJobExceptionLoggingTest {
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
-  @WatchLogger(loggerNames = { "org.camunda.bpm.engine.context" }, level = "DEBUG")
   public void shouldLogOnlyOneFailingJobException() {
     // given
     processEngineConfiguration.setEnableReducedJobExceptionLogging(true);

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.logging;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -124,6 +126,7 @@ public class ProcessEngineLoggingRuleTest {
     testLogLevel(persistenceLog, Level.DEBUG);
     testLogLevel(processAppLogger, Level.INFO);
     testLogLevel(jobExecutorLogger, Level.ERROR);
+    assertThat(containerLog.size(), is(0));
   }
 
   @Test
@@ -134,7 +137,6 @@ public class ProcessEngineLoggingRuleTest {
     List<ILoggingEvent> fullLog = loggingRule.getLog();
     ILoggingEvent previousLogEntry = null;
     for (ILoggingEvent logEntry : fullLog) {
-      System.out.println(logEntry.getTimeStamp() + " - " + logEntry.getLoggerName() + " - " + logEntry.getLevel());
       if(previousLogEntry != null) {
         assertTrue(previousLogEntry.getTimeStamp() <= logEntry.getTimeStamp());
       }
