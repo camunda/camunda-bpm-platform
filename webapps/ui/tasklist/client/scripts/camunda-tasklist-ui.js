@@ -17,6 +17,9 @@
 
 'use strict';
 
+// DOM Polyfills
+require('dom4');
+
 var $ = (window.jQuery = window.$ = require('jquery'));
 
 var commons = require('camunda-commons-ui/lib');

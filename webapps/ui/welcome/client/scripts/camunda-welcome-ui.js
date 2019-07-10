@@ -16,6 +16,10 @@
  */
 
 'use strict';
+
+// DOM Polyfills
+require('dom4');
+
 /* jshint browserify: true */
 var $ = (window.jQuery = window.$ = require('jquery'));
 
