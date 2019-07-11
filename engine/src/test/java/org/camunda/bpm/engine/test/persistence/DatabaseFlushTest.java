@@ -60,6 +60,8 @@ public class DatabaseFlushTest extends ConcurrencyTestCase {
    * incomplete runtime flush and the database got into an inconsistent
    * state.
    */
+  // note: This test is also excluded via pom.xml on MariaDB Galera cluster
+  // due to instability; see CAM-10576
   @RequiredDatabase(excludes = DbSqlSessionFactory.DB2)
   public void testNoIncompleteFlushOnConstraintViolation()
   {
