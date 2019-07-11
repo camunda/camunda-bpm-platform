@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.test.logging;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -27,9 +29,6 @@ import org.camunda.bpm.engine.test.WatchLogger;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.RuleChain;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
@@ -41,13 +40,11 @@ public class ProcessEngineLoggingRuleTest {
   private static final String PROCESS_APPLICATION_LOGGER = "org.camunda.bpm.application"; //07
   private static final String JOB_EXECUTOR_LOGGER = "org.camunda.bpm.engine.jobexecutor"; //14
 
-  public ExpectedException exceptionRule = ExpectedException.none();
+  @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
                                                       .watch(PERSISTENCE_LOGGER, CONTAINER_INTEGRATION_LOGGER)
                                                         .level(Level.DEBUG)
                                                       .watch(PROCESS_APPLICATION_LOGGER, Level.INFO);
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(loggingRule).around(exceptionRule);
 
   @Test
   public void testWithoutAnnotation() {
@@ -59,10 +56,16 @@ public class ProcessEngineLoggingRuleTest {
     List<ILoggingEvent> persistenceLog = loggingRule.getLog(PERSISTENCE_LOGGER);
     List<ILoggingEvent> containerLog = loggingRule.getLog(CONTAINER_INTEGRATION_LOGGER);
     List<ILoggingEvent> processAppLogger = loggingRule.getLog(PROCESS_APPLICATION_LOGGER);
-    exceptionRule.expect(RuntimeException.class);
-    List<ILoggingEvent> jobExecutorLogger = loggingRule.getLog(JOB_EXECUTOR_LOGGER);
+    RuntimeException expectedException = null;
+    try {
+      List<ILoggingEvent> jobExecutorLogger = loggingRule.getLog(JOB_EXECUTOR_LOGGER);
+    } catch (RuntimeException e) {
+      expectedException = e;
+    }
 
     // then
+    assertNotNull(expectedException);
+    assertThat(expectedException.getMessage(), containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
     testLogLevel(persistenceLog, Level.DEBUG);
     testLogLevel(containerLog, Level.DEBUG);
     testLogLevel(processAppLogger, Level.INFO);
@@ -79,10 +82,16 @@ public class ProcessEngineLoggingRuleTest {
     List<ILoggingEvent> persistenceLog = loggingRule.getLog(PERSISTENCE_LOGGER);
     List<ILoggingEvent> containerLog = loggingRule.getLog(CONTAINER_INTEGRATION_LOGGER);
     List<ILoggingEvent> processAppLogger = loggingRule.getLog(PROCESS_APPLICATION_LOGGER);
-    exceptionRule.expectMessage(ProcessEngineLoggingRule.NOT_WATCHING_ERROR);
-    List<ILoggingEvent> jobExecutorLogger = loggingRule.getLog(JOB_EXECUTOR_LOGGER);
+    RuntimeException expectedException = null;
+    try {
+      List<ILoggingEvent> jobExecutorLogger = loggingRule.getLog(JOB_EXECUTOR_LOGGER);
+    } catch (RuntimeException e) {
+      expectedException = e;
+    }
 
     // then
+    assertNotNull(expectedException);
+    assertThat(expectedException.getMessage(), containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
     testLogLevel(persistenceLog, Level.DEBUG);
     testLogLevel(containerLog, Level.WARN);
     testLogLevel(processAppLogger, Level.INFO);
@@ -116,16 +125,22 @@ public class ProcessEngineLoggingRuleTest {
     // when
     logSomethingOnAllLevels();
 
+    
     List<ILoggingEvent> persistenceLog = loggingRule.getLog(PERSISTENCE_LOGGER);
-    exceptionRule.expectMessage(ProcessEngineLoggingRule.NOT_WATCHING_ERROR);
     List<ILoggingEvent> containerLog = loggingRule.getLog(CONTAINER_INTEGRATION_LOGGER);
     List<ILoggingEvent> processAppLogger = loggingRule.getLog(PROCESS_APPLICATION_LOGGER);
-    List<ILoggingEvent> jobExecutorLogger = loggingRule.getLog(JOB_EXECUTOR_LOGGER);
+    RuntimeException expectedException = null;
+    try {
+      List<ILoggingEvent> jobExecutorLogger = loggingRule.getLog(JOB_EXECUTOR_LOGGER);
+    } catch (RuntimeException e) {
+      expectedException = e;
+    }
 
     // then
+    assertNotNull(expectedException);
+    assertThat(expectedException.getMessage(), containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
     testLogLevel(persistenceLog, Level.DEBUG);
     testLogLevel(processAppLogger, Level.INFO);
-    testLogLevel(jobExecutorLogger, Level.ERROR);
     assertThat(containerLog.size(), is(0));
   }
 
