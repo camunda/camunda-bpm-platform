@@ -36,7 +36,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { TestApplication.class }, webEnvironment = WebEnvironment.NONE)
+@SpringBootTest(classes = { TestApplication.class },
+  webEnvironment = WebEnvironment.NONE,
+  properties = {
+    "camunda.bpm.generate-unique-process-application-name=true",
+    "spring.datasource.generate-unique-name=true",
+  })
 @ActiveProfiles("nojpa")
 public class CamundaNoJpaAutoConfigurationIT extends AbstractCamundaAutoConfigurationIT {
 
