@@ -138,7 +138,7 @@ public class ProcessEngineLogger extends BaseLogger {
   }
 
   public static boolean shouldLogCmdException(ProcessEngineConfiguration processEngineConfiguration) {
-    return !processEngineConfiguration.isEnableReducedCmdExceptionLogging();
+    return processEngineConfiguration.isEnableCmdExceptionLogging();
   }
 
   public void processEngineCreated(String name) {

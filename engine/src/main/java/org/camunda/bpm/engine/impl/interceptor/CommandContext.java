@@ -202,7 +202,7 @@ public class CommandContext {
             // fire command failed (must not fail itself)
             fireCommandFailed(commandInvocationContext.getThrowable());
 
-            if(shouldLogException()) {
+            if(shouldLogCmdException()) {
               if (shouldLogInfo(commandInvocationContext.getThrowable())) {
                 LOG.infoException(commandInvocationContext.getThrowable());
               }
@@ -237,13 +237,8 @@ public class CommandContext {
     return exception instanceof OptimisticLockingException || exception instanceof BadUserRequestException;
   }
 
-  protected boolean shouldLogException() {
-    JobEntity job = Context.getCommandContext().getCurrentJob();
-    if(job == null) {
+  protected boolean shouldLogCmdException() {
       return ProcessEngineLogger.shouldLogCmdException(processEngineConfiguration);
-    } else {
-      return ProcessEngineLogger.shouldLogJobException(processEngineConfiguration, job);
-    }
   }
 
   protected void fireCommandContextClose() {
