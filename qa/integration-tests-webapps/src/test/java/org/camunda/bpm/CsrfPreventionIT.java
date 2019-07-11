@@ -26,17 +26,12 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class CsrfPreventionIT extends AbstractWebappIntegrationTest {
-
-  @Override
-  protected String getApplicationContextPath() {
-    return "camunda/app/tasklist/default/";
-  }
+public class CsrfPreventionIT extends AbstractWebIntegrationTest {
 
   @Before
-  public void preventRaceConditions() throws InterruptedException {
-    // just wait some seconds before starting because of Wildfly / Cargo race conditions
-    Thread.sleep(5 * 1000);
+  public void createClient() throws Exception {
+    preventRaceConditions();
+    createClient(getWebappCtxPath());
   }
 
   @Test(timeout=10000)
@@ -44,7 +39,7 @@ public class CsrfPreventionIT extends AbstractWebappIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(APP_BASE_PATH)
+    ClientResponse response = client.resource(APP_BASE_PATH + TASKLIST_PATH)
         .get(ClientResponse.class);
 
     // then

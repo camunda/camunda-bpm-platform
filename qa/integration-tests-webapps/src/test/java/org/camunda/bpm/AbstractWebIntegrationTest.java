@@ -23,9 +23,9 @@ import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.openqa.selenium.chrome.ChromeDriverService;
 
 import java.util.logging.Logger;
@@ -36,9 +36,30 @@ import java.util.logging.Logger;
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractWebappIntegrationTest {
+public abstract class AbstractWebIntegrationTest {
 
-  private final static Logger LOGGER = Logger.getLogger(AbstractWebappIntegrationTest.class.getName());
+  protected String TASKLIST_PATH = "app/tasklist/default/";
+
+  protected String appUrl;
+  protected TestUtil testUtil;
+
+  protected TestProperties testProperties;
+
+  @Before
+  public void before() throws Exception {
+    testProperties = new TestProperties(48080);
+    testUtil = new TestUtil(testProperties);
+  }
+
+  protected String getWebappCtxPath() {
+    return testProperties.getStringProperty("http.ctx-path.webapp", null);
+  }
+
+  protected String getRestCtxPath() {
+    return testProperties.getStringProperty("http.ctx-path.rest", null);
+  }
+
+  private final static Logger LOGGER = Logger.getLogger(AbstractWebIntegrationTest.class.getName());
 
   public static final String HOST_NAME = "localhost";
   public String httpPort;
@@ -47,15 +68,12 @@ public abstract class AbstractWebappIntegrationTest {
   public ApacheHttpClient4 client;
   public DefaultHttpClient defaultHttpClient;
 
-  protected TestProperties testProperties;
   protected static ChromeDriverService service;
 
-  @Before
-  public void createClient() throws Exception {
+  public void createClient(String ctxPath) throws Exception {
     testProperties = new TestProperties();
 
-    String applicationContextPath = getApplicationContextPath();
-    APP_BASE_PATH = testProperties.getApplicationPath("/" + applicationContextPath);
+    APP_BASE_PATH = testProperties.getApplicationPath("/" + ctxPath);
     LOGGER.info("Connecting to application "+APP_BASE_PATH);
 
     ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
@@ -73,11 +91,9 @@ public abstract class AbstractWebappIntegrationTest {
     client.destroy();
   }
 
-  /**
-   * <p>subclasses must override this method and provide the local context path of the application they are testing.</p>
-   *
-   * <p>Example: <code>cycle/</code></p>
-   */
-  protected abstract String getApplicationContextPath();
+  public void preventRaceConditions() throws InterruptedException {
+    // just wait some seconds before starting because of Wildfly / Cargo race conditions
+    Thread.sleep(5 * 1000);
+  }
 
 }

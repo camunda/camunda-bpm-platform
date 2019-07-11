@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.tasklist;
 
-
 import org.camunda.bpm.AbstractWebappUiIntegrationTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -24,16 +23,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
 public class TasklistIT extends AbstractWebappUiIntegrationTest {
-
-  public TasklistIT() {
-    super("/camunda/app/tasklist");
-  }
 
   @Test
   public void testLogin() {
-    driver.get(appUrl + "/#/login");
+    driver.get(appUrl + "app/tasklist/#/login");
 
     WebDriverWait wait = new WebDriverWait(driver, 10);
 
