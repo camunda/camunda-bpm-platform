@@ -43,7 +43,7 @@ public class ErrorPageIT extends AbstractWebappIntegrationTest {
     assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
     assertEquals(MediaType.TEXT_HTML, response.getType().toString());
     assertTrue(response.getEntity(String.class).contains("Camunda"));
-    assertTrue(response.getEntity(String.class).contains("File Not Found"));
+    assertTrue(response.getEntity(String.class).contains("Not Found"));
 
     // cleanup
     response.close();
