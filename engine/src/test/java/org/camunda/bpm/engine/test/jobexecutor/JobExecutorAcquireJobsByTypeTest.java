@@ -91,10 +91,14 @@ public class JobExecutorAcquireJobsByTypeTest extends AbstractJobExecutorAcquire
 
     List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
     assertEquals(4, acquirableJobs.size());
-    assertEquals(TimerEntity.TYPE, acquirableJobs.get(0).getType());
-    assertEquals(TimerEntity.TYPE, acquirableJobs.get(1).getType());
-    assertEquals(MessageEntity.TYPE, acquirableJobs.get(2).getType());
-    assertEquals(MessageEntity.TYPE, acquirableJobs.get(3).getType());
+    assertTrue(findJobById(acquirableJobs.get(0).getId()) instanceof TimerEntity);
+    assertTrue(findJobById(acquirableJobs.get(1).getId()) instanceof TimerEntity);
+    assertTrue(findJobById(acquirableJobs.get(2).getId()) instanceof MessageEntity);
+    assertTrue(findJobById(acquirableJobs.get(3).getId()) instanceof MessageEntity);
+  }
+
+  protected Job findJobById(String id) {
+    return managementService.createJobQuery().jobId(id).singleResult();
   }
 
 }

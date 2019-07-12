@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -61,12 +62,19 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
+  public static final int DEFAULT_RETRIES = 3;
+
   private static final long serialVersionUID = 1L;
 
   protected String executionId = null;
 
   protected String processDefinitionId = null;
   protected String processDefinitionKey = null;
+
+  protected int retries = DEFAULT_RETRIES;
+
+  // entity is active by default
+  protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
   protected String jobHandlerType = null;
   protected String jobHandlerConfiguration = null;
@@ -76,7 +84,11 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   protected String exceptionMessage;
 
+  protected String deploymentId;
+
   protected String jobDefinitionId;
+
+  protected long priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   protected String tenantId;
 
@@ -178,10 +190,14 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
   public Object getPersistentState() {
     Map<String, Object> persistentState = (HashMap) super.getPersistentState();
     persistentState.put("executionId", executionId);
+    persistentState.put("retries", retries);
     persistentState.put("exceptionMessage", exceptionMessage);
+    persistentState.put("suspensionState", suspensionState);
     persistentState.put("processDefinitionId", processDefinitionId);
     persistentState.put("jobDefinitionId", jobDefinitionId);
+    persistentState.put("deploymentId", deploymentId);
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
+    persistentState.put("priority", priority);
     persistentState.put("tenantId", tenantId);
     if(exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
@@ -243,6 +259,11 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
   }
 
+  @Override
+  public int getRetries() {
+    return retries;
+  }
+
   public void setRetries(int retries) {
     // if retries should be set to a negative value set it to 0
     if (retries < 0) {
@@ -261,6 +282,11 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     if(retries == 0 && this.retries > 0) {
       createFailedJobIncident();
     }
+    this.retries = retries;
+  }
+
+  // special setter for MyBatis which does not influence incidents
+  public void setRetriesFromPersistence(int retries) {
     this.retries = retries;
   }
 
@@ -330,6 +356,19 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
   public String getExceptionStacktrace() {
     ByteArrayEntity byteArray = getExceptionByteArray();
     return ExceptionUtil.getExceptionStacktrace(byteArray);
+  }
+
+  public void setSuspensionState(int state) {
+    this.suspensionState = state;
+  }
+
+  public int getSuspensionState() {
+    return suspensionState;
+  }
+
+  @Override
+  public boolean isSuspended() {
+    return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
 
   @Override
@@ -454,6 +493,15 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
   }
 
+  @Override
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
+  }
+
   public boolean isInInconsistentLockState() {
     return (lockOwner != null && lockExpirationTime == null)
         || (retries == 0 && (lockOwner != null || lockExpirationTime != null));
@@ -471,6 +519,15 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @Override
+  public long getPriority() {
+    return priority;
+  }
+
+  public void setPriority(long priority) {
+    this.priority = priority;
   }
 
   @Override

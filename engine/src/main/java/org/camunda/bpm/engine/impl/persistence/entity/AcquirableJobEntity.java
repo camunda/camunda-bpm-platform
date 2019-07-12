@@ -22,12 +22,10 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 
 public class AcquirableJobEntity implements DbEntity, HasDbRevision {
 
   public static final boolean DEFAULT_EXCLUSIVE = true;
-  public static final int DEFAULT_RETRIES = 3;
 
   protected String id;
   protected int revision;
@@ -36,15 +34,9 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
   protected Date lockExpirationTime = null;
   protected Date duedate;
 
-  protected String deploymentId;
   protected String processInstanceId = null;
 
   protected boolean isExclusive = DEFAULT_EXCLUSIVE;
-  protected int retries = DEFAULT_RETRIES;
-  protected long priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
-  protected String type;
-  // entity is active by default
-  protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
 
   @Override
@@ -52,32 +44,33 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("lockOwner", lockOwner);
     persistentState.put("lockExpirationTime", lockExpirationTime);
-    persistentState.put("retries", retries);
     persistentState.put("duedate", duedate);
-    persistentState.put("suspensionState", suspensionState);
-    persistentState.put("deploymentId", deploymentId);
-    persistentState.put("priority", priority);
     return persistentState;
   }
 
+  @Override
   public int getRevisionNext() {
     return revision + 1;
   }
 
   // getters and setters //////////////////////////////////////////////////////
 
+  @Override
   public String getId() {
     return id;
   }
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }
 
+  @Override
   public int getRevision() {
     return revision;
   }
 
+  @Override
   public void setRevision(int revision) {
     this.revision = revision;
   }
@@ -122,51 +115,6 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
     this.isExclusive = isExclusive;
   }
 
-  public int getRetries() {
-    return retries;
-  }
-
-  // special setter for MyBatis which does not influence incidents
-  public void setRetriesFromPersistence(int retries) {
-    this.retries = retries;
-  }
-
-  public int getSuspensionState() {
-    return suspensionState;
-  }
-
-  public void setSuspensionState(int suspensionState) {
-    this.suspensionState = suspensionState;
-  }
-
-  public boolean isSuspended() {
-    return suspensionState == SuspensionState.SUSPENDED.getStateCode();
-  }
-
-  public String getDeploymentId() {
-    return deploymentId;
-  }
-
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-
-  public long getPriority() {
-    return priority;
-  }
-
-  public void setPriority(long priority) {
-    this.priority = priority;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -200,13 +148,8 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
         + ", lockOwner=" + lockOwner
         + ", lockExpirationTime=" + lockExpirationTime
         + ", duedate=" + duedate
-        + ", deploymentId=" + deploymentId
         + ", processInstanceId=" + processInstanceId
         + ", isExclusive=" + isExclusive
-        + ", retries=" + retries
-        + ", priority=" + priority
-        + ", type=" + type
-        + ", suspensionState=" + suspensionState
         + "]";
   }
 
