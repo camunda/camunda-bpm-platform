@@ -36,7 +36,7 @@
     "dmn-js": "6.3.3",
     "dom4": "2.1.5",
     "events": "3.0.0",
-    "jquery": "3.3.1",
+    "jquery": "3.4.1",
     "jquery-ui": "1.12.1",
     "mousetrap": "1.6.3",
     "requirejs": "2.3.6",
