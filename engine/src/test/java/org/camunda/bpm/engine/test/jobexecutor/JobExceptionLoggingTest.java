@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -27,13 +28,13 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -94,6 +95,7 @@ public class JobExceptionLoggingTest {
       Thread.sleep(6000);
     } catch (InterruptedException e) {
     }
+    jobExecutor.shutdown();
 
     List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
     List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
@@ -117,6 +119,7 @@ public class JobExceptionLoggingTest {
       Thread.sleep(6000);
     } catch (InterruptedException e) {
     }
+    jobExecutor.shutdown();
 
     List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
     List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
@@ -129,7 +132,7 @@ public class JobExceptionLoggingTest {
   @Test
   public void shouldNotLogExceptionWhenApiCall() {
     // given
-    String jobId = processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
+    final String jobId = processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
       public String execute(CommandContext commandContext) {
         MessageEntity message = new MessageEntity();
         message.setJobHandlerType(TweetNestedCommandExceptionHandler.TYPE);
@@ -151,12 +154,20 @@ public class JobExceptionLoggingTest {
     // then
     // make sure the exceptions is thrown...
     assertNotNull(expectedException);
-    assertThat(expectedException.getMessage(), Matchers.containsString("nested command exception"));
+    assertThat(expectedException.getMessage(), containsString("nested command exception"));
     // ...but not logged
     assertThat(jobLog.size(), is(0));
     assertThat(ctxLog.size(), is(0));
 
     // clean
     managementService.deleteJob(jobId);
+
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+        return null;
+      }
+    });
   }
 }

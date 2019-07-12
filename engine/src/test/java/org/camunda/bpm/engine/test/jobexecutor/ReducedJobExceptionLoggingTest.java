@@ -80,6 +80,7 @@ public class ReducedJobExceptionLoggingTest {
     try {
       Thread.sleep(6000);
     } catch (InterruptedException e) {}
+    processEngineConfiguration.getJobExecutor().shutdown();
 
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
 
@@ -100,6 +101,7 @@ public class ReducedJobExceptionLoggingTest {
     try {
       Thread.sleep(6000);
     } catch (InterruptedException e) {}
+    processEngineConfiguration.getJobExecutor().shutdown();
 
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
 
