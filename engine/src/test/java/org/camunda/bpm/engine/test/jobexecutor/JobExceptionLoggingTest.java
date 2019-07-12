@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
@@ -73,6 +74,10 @@ public class JobExceptionLoggingTest {
     processEngineConfiguration.setDefaultNumberOfRetries(3);
     processEngineConfiguration.setEnableCmdExceptionLogging(false);
     processEngineConfiguration.getJobHandlers().remove(cmdExceptionHandler.getType());
+    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("testProcess").list();
+    for (Job job : jobs) {
+      managementService.deleteJob(job.getId());
+    }
   }
 
   @Test

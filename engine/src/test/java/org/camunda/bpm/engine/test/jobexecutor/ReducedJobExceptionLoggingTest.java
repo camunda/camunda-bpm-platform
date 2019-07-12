@@ -21,8 +21,10 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -46,17 +48,23 @@ public class ReducedJobExceptionLoggingTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(loggingRule);
 
   private RuntimeService runtimeService;
+  private ManagementService managementService;
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
   public void init() {
     runtimeService = engineRule.getRuntimeService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    managementService = engineRule.getProcessEngine().getManagementService();
   }
 
   @After
   public void tearDown() {
     processEngineConfiguration.setEnableReducedJobExceptionLogging(false);
+    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("failingProcess").list();
+    for (Job job : jobs) {
+      managementService.deleteJob(job.getId());
+    }
   }
 
   @Test
