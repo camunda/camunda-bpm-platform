@@ -17,8 +17,11 @@
 package org.camunda.bpm;
 
 import org.camunda.bpm.util.SeleniumScreenshotRule;
-import org.camunda.bpm.util.TestUtil;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -29,21 +32,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 
-public class AbstractWebappUiIntegrationTest {
+public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest {
 
   protected static WebDriver driver;
 
-  protected String appUrl;
-  protected TestProperties testProperties;
-  protected TestUtil testUtil;
-  protected String contextPath;
-
   @Rule
   public SeleniumScreenshotRule screenshotRule = new SeleniumScreenshotRule(driver);
-
-  public AbstractWebappUiIntegrationTest(String contextPath) {
-    this.contextPath = contextPath;
-  }
 
   @BeforeClass
   public static void createDriver() {
@@ -66,14 +60,6 @@ public class AbstractWebappUiIntegrationTest {
     driver = new ChromeDriver(chromeDriverService);
   }
 
-  @Before
-  public void before() throws Exception {
-    testProperties = new TestProperties(48080);
-    appUrl = testProperties.getApplicationPath(contextPath);
-
-    testUtil = new TestUtil(testProperties);
-  }
-
   public static ExpectedCondition<Boolean> currentURIIs(final URI pageURI) {
 
     return new ExpectedCondition<Boolean>() {
@@ -87,6 +73,13 @@ public class AbstractWebappUiIntegrationTest {
       }
     };
 
+  }
+
+  @Before
+  public void createClient() throws Exception {
+    preventRaceConditions();
+    createClient(getWebappCtxPath());
+    appUrl = testProperties.getApplicationPath("/" + getWebappCtxPath());
   }
 
   @After

@@ -28,17 +28,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SessionCookieSecurityIT extends AbstractWebappIntegrationTest {
-
-  @Override
-  protected String getApplicationContextPath() {
-    return "camunda/app/tasklist/default/";
-  }
+public class SessionCookieSecurityIT extends AbstractWebIntegrationTest {
 
   @Before
-  public void preventRaceConditions() throws InterruptedException {
-    // just wait some seconds before starting because of Wildfly / Cargo race conditions
-    Thread.sleep(5 * 1000);
+  public void createClient() throws Exception {
+    preventRaceConditions();
+    createClient(getWebappCtxPath());
   }
 
   @Test(timeout=10000)
@@ -46,7 +41,7 @@ public class SessionCookieSecurityIT extends AbstractWebappIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(APP_BASE_PATH)
+    ClientResponse response = client.resource(APP_BASE_PATH + TASKLIST_PATH)
         .get(ClientResponse.class);
 
     // then

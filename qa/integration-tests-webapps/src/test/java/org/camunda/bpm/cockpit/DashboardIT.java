@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.cockpit;
 
-
 import org.camunda.bpm.AbstractWebappUiIntegrationTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -27,16 +26,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-
 public class DashboardIT extends AbstractWebappUiIntegrationTest {
-
-  public DashboardIT() {
-    super("/camunda/app/cockpit");
-  }
 
   @Test
   public void testLogin() throws URISyntaxException {
-    driver.get(appUrl+"/#/login");
+    driver.get(appUrl + "app/cockpit/#/login");
 
     WebDriverWait wait = new WebDriverWait(driver, 10);
 
@@ -52,7 +46,7 @@ public class DashboardIT extends AbstractWebappUiIntegrationTest {
     wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".deployed .processes .value"), "1"));
     wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".deployed .processes .stats-label"), "Process Definitions"));
 
-    wait.until(currentURIIs(new URI(appUrl + "/default/#/dashboard")));
+    wait.until(currentURIIs(new URI(appUrl + "app/cockpit/default/#/dashboard")));
   }
 
 }

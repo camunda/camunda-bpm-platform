@@ -19,17 +19,19 @@ package org.camunda.bpm.rest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-import org.camunda.bpm.AbstractWebappIntegrationTest;
+import org.apache.commons.io.IOUtils;
+import org.camunda.bpm.AbstractWebIntegrationTest;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +39,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
-public class RestIT extends AbstractWebappIntegrationTest {
+public class RestIT extends AbstractWebIntegrationTest {
 
   private static final String ENGINE_DEFAULT_PATH = "engine/default";
 
@@ -56,14 +58,10 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
   private final static Logger log = Logger.getLogger(RestIT.class.getName());
 
-  protected String getApplicationContextPath() {
-    return "engine-rest/";
-  }
-
-  @BeforeClass
-  public static void setup() throws InterruptedException {
-    // just wait some seconds before starting because of Wildfly / Cargo race conditions
-    Thread.sleep(5 * 1000);
+  @Before
+  public void createClient() throws Exception {
+    preventRaceConditions();
+    createClient(getRestCtxPath());
   }
 
   @Test

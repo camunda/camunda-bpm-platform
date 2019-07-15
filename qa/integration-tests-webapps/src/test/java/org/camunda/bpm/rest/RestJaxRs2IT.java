@@ -26,9 +26,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
-import org.camunda.bpm.AbstractWebappIntegrationTest;
+import org.camunda.bpm.AbstractWebIntegrationTest;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -49,19 +50,15 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RestJaxRs2IT extends AbstractWebappIntegrationTest {
+public class RestJaxRs2IT extends AbstractWebIntegrationTest {
 
   private static final String ENGINE_DEFAULT_PATH = "engine/default";
   private static final String FETCH_AND_LOCK_PATH = ENGINE_DEFAULT_PATH + "/external-task/fetchAndLock";
 
-  protected String getApplicationContextPath() {
-    return "engine-rest/";
-  }
-
-  @BeforeClass
-  public static void setup() throws InterruptedException {
-    // just wait some seconds before starting because of Wildfly / Cargo race conditions
-    Thread.sleep(5 * 1000);
+  @Before
+  public void createClient() throws Exception {
+    preventRaceConditions();
+    createClient(getRestCtxPath());
   }
 
   @Test(timeout=10000)
