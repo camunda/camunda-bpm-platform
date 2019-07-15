@@ -22,15 +22,16 @@ import static org.junit.Assert.assertTrue;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.ClientResponse;
 
 public class ErrorPageIT extends AbstractWebIntegrationTest {
 
-  @Override
-  protected String getApplicationContextPath() {
-    return "camunda/";
+  @Before
+  public void createClient() throws Exception {
+    createClient(getWebappCtxPath());
   }
 
   @Test
@@ -42,8 +43,9 @@ public class ErrorPageIT extends AbstractWebIntegrationTest {
     // then
     assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
     assertEquals(MediaType.TEXT_HTML, response.getType().toString());
-    assertTrue(response.getEntity(String.class).contains("Camunda"));
-    assertTrue(response.getEntity(String.class).contains("Not Found"));
+    String responseEntity = response.getEntity(String.class);
+    assertTrue(responseEntity.contains("Camunda"));
+    assertTrue(responseEntity.contains("Not Found"));
 
     // cleanup
     response.close();
@@ -58,8 +60,9 @@ public class ErrorPageIT extends AbstractWebIntegrationTest {
     // then
     assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     assertEquals(MediaType.TEXT_HTML, response.getType().toString());
-    assertTrue(response.getEntity(String.class).contains("Camunda"));
-    assertTrue(response.getEntity(String.class).contains("Internal Server Error"));
+    String responceEntity = response.getEntity(String.class);
+    assertTrue(responceEntity.contains("Camunda"));
+    assertTrue(responceEntity.contains("Internal Server Error"));
 
     // cleanup
     response.close();
