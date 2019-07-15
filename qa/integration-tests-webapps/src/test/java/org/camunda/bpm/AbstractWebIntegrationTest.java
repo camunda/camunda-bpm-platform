@@ -38,12 +38,21 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractWebIntegrationTest {
 
+  private final static Logger LOGGER = Logger.getLogger(AbstractWebIntegrationTest.class.getName());
+
   protected String TASKLIST_PATH = "app/tasklist/default/";
+  public static final String HOST_NAME = "localhost";
+  public String APP_BASE_PATH;
 
   protected String appUrl;
   protected TestUtil testUtil;
-
   protected TestProperties testProperties;
+
+  protected static ChromeDriverService service;
+
+  public ApacheHttpClient4 client;
+  public DefaultHttpClient defaultHttpClient;
+  public String httpPort;
 
   @Before
   public void before() throws Exception {
@@ -51,24 +60,10 @@ public abstract class AbstractWebIntegrationTest {
     testUtil = new TestUtil(testProperties);
   }
 
-  protected String getWebappCtxPath() {
-    return testProperties.getStringProperty("http.ctx-path.webapp", null);
+  @After
+  public void destroyClient() {
+    client.destroy();
   }
-
-  protected String getRestCtxPath() {
-    return testProperties.getStringProperty("http.ctx-path.rest", null);
-  }
-
-  private final static Logger LOGGER = Logger.getLogger(AbstractWebIntegrationTest.class.getName());
-
-  public static final String HOST_NAME = "localhost";
-  public String httpPort;
-  public String APP_BASE_PATH;
-
-  public ApacheHttpClient4 client;
-  public DefaultHttpClient defaultHttpClient;
-
-  protected static ChromeDriverService service;
 
   public void createClient(String ctxPath) throws Exception {
     testProperties = new TestProperties();
@@ -86,14 +81,16 @@ public abstract class AbstractWebIntegrationTest {
     HttpConnectionParams.setSoTimeout(params, 10 * 60 * 1000);
   }
 
-  @After
-  public void destroyClient() {
-    client.destroy();
-  }
-
   public void preventRaceConditions() throws InterruptedException {
     // just wait some seconds before starting because of Wildfly / Cargo race conditions
     Thread.sleep(5 * 1000);
   }
 
+  protected String getWebappCtxPath() {
+    return testProperties.getStringProperty("http.ctx-path.webapp", null);
+  }
+
+  protected String getRestCtxPath() {
+    return testProperties.getStringProperty("http.ctx-path.rest", null);
+  }
 }
