@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import com.sun.jersey.api.client.ClientResponse;
 
-public class ErrorPageIT extends AbstractWebappIntegrationTest {
+public class ErrorPageIT extends AbstractWebIntegrationTest {
 
   @Override
   protected String getApplicationContextPath() {
