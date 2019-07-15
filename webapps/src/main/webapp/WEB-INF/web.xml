@@ -228,4 +228,15 @@
     <url-pattern>/api/welcome/*</url-pattern>
   </servlet-mapping>
 
+  <!-- default error page -->
+  <error-page>
+    <!-- Missing resource -->
+    <error-code>404</error-code>
+    <location>/error-404-page.html</location>
+  </error-page>
+  <error-page>
+    <!-- Uncaught exception -->
+    <error-code>500</error-code>
+    <location>/error-500-page.html</location>
+  </error-page>
 </web-app>
