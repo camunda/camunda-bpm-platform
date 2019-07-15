@@ -33,7 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 public class ProcessEngineContextTest {
@@ -53,6 +52,7 @@ public class ProcessEngineContextTest {
   @Before
   public void setUp() {
     testHelper.deploy(SIMPLE_PROCESS);
+    engineRule.getRuntimeService().startProcessInstanceByKey(SIMPLE_PROCESS_KEY);
   }
 
   @Test
@@ -73,15 +73,15 @@ public class ProcessEngineContextTest {
           new NestedCommand<Void>() {
             @Override
             public Void call() {
-
-              List<ProcessInstance> processInstanceList = engineRule.getRuntimeService()
-                .createProcessInstanceQuery()
-                .processDefinitionKey(SIMPLE_PROCESS_KEY)
-                .list();
-
               // then
               // the nested CommandContext should be new
-              assertThat(getOuterCommandContext()).isNotEqualTo(nestedCommandContext);
+              assertThat(getOuterCommandContext()).isNotEqualTo(commandContext);
+              /*
+               the queried Process Instance object in the nested command
+               should be different from the queried PI object of the
+               outer command (new CommandContext and fresh DB cache)
+               */
+              assertThat(getNestedPiObject()).isNotEqualTo(getOuterCommand().getOuterPiObject());
 
               return null;
             }
@@ -109,16 +109,15 @@ public class ProcessEngineContextTest {
               new NestedCommand<Void>() {
                 @Override
                 public Void call() {
-
-                  List<ProcessInstance> processInstanceList = engineRule.getRuntimeService()
-                    .createProcessInstanceQuery()
-                    .processDefinitionKey(SIMPLE_PROCESS_KEY)
-                    .list();
-
                   // then
-                  // assertThat(processInstanceList).isNotEmpty();
                   // the outer CommandContext should be reused
-                  assertThat(getOuterCommandContext()).isEqualTo(nestedCommandContext);
+                  assertThat(getOuterCommandContext()).isEqualTo(getCommandContext());
+                  /*
+                   the queried Process Instance object in the nested command
+                   should be the same from the queried PI object of the outer
+                   command (shared CommandContext and DB cache)
+                   */
+                  assertThat(getNestedPiObject()).isEqualTo(getOuterCommand().getOuterPiObject());
 
                   return null;
                 }
@@ -131,21 +130,25 @@ public class ProcessEngineContextTest {
 
   protected class OuterCommand<T> implements Command<T> {
 
+    protected CommandContext commandContext;
     protected NestedCommand<T> nestedCommand;
     protected Boolean requiresNew;
+    protected ProcessInstance outerPiObject;
 
     public OuterCommand(NestedCommand<T> nestedCommand, Boolean requiresNew) {
       this.nestedCommand = nestedCommand;
+      this.nestedCommand.setOuterCommand(this);
       this.requiresNew = requiresNew;
     }
 
     @Override
     public T execute(final CommandContext commandContext) {
-
-      engineRule.getRuntimeService().startProcessInstanceByKey(SIMPLE_PROCESS_KEY);
-
       // make the outer CommandContext available
-      nestedCommand.setOuterCommandContext(commandContext);
+      this.commandContext = commandContext;
+      this.outerPiObject = engineRule.getRuntimeService()
+          .createProcessInstanceQuery()
+          .processDefinitionKey(SIMPLE_PROCESS_KEY)
+          .singleResult();
 
       if (requiresNew) {
         try {
@@ -153,35 +156,51 @@ public class ProcessEngineContextTest {
             @Override
             public T call() {
 
-              return commandContext.getProcessEngineConfiguration()
-                .getCommandExecutorTxRequired()
-                .execute(nestedCommand);
+              return executeNestedCommand();
             }
           });
         } catch (Exception e) {
           fail("Test failed with exception: " + e.getMessage());
         }
       } else {
-        return commandContext.getProcessEngineConfiguration()
-          .getCommandExecutorTxRequired()
-          .execute(nestedCommand);
+        return executeNestedCommand();
       }
 
       return null;
+    }
+
+    protected T executeNestedCommand() {
+      return commandContext.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired()
+        .execute(nestedCommand);
+    }
+
+    public ProcessInstance getOuterPiObject() {
+      return outerPiObject;
+    }
+
+    public CommandContext getCommandContext() {
+      return commandContext;
     }
   }
 
   protected abstract class NestedCommand<T> implements Command<T>, Callable<T>{
 
-    CommandContext nestedCommandContext;
-    CommandContext outerCommandContext;
+    CommandContext commandContext;
+    OuterCommand outerCommand;
+    protected ProcessInstance nestedPiObject;
 
     public abstract T call();
 
     @Override
     public T execute(CommandContext commandContext) {
       // make the nested CommandContext available
-      this.nestedCommandContext = commandContext;
+      this.commandContext = commandContext;
+
+      this.nestedPiObject = engineRule.getRuntimeService()
+        .createProcessInstanceQuery()
+        .processDefinitionKey(SIMPLE_PROCESS_KEY)
+        .singleResult();
 
       try {
         return call();
@@ -192,20 +211,24 @@ public class ProcessEngineContextTest {
       return null;
     }
 
-    public CommandContext getNestedCommandContext() {
-      return nestedCommandContext;
+    public OuterCommand getOuterCommand() {
+      return outerCommand;
     }
 
-    public void setNestedCommandContext(CommandContext nestedCommandContext) {
-      this.nestedCommandContext = nestedCommandContext;
+    public void setOuterCommand(OuterCommand outerCommand) {
+      this.outerCommand = outerCommand;
     }
 
     public CommandContext getOuterCommandContext() {
-      return outerCommandContext;
+      return getOuterCommand().getCommandContext();
     }
 
-    public void setOuterCommandContext(CommandContext outerCommandContext) {
-      this.outerCommandContext = outerCommandContext;
+    public CommandContext getCommandContext() {
+      return commandContext;
+    }
+
+    public ProcessInstance getNestedPiObject() {
+      return nestedPiObject;
     }
   }
 }

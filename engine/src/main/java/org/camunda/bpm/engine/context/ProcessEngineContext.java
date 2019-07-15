@@ -21,8 +21,29 @@ import org.camunda.bpm.engine.impl.context.ProcessEngineContextImpl;
 import java.util.concurrent.Callable;
 
 /**
- * <p>A utility to declare a new Process Engine Context in order
- * for database operations to be separated in a new transaction.</p>
+ * <p>When a Process Engine API call is performed, the engine
+ * will create a Process Engine Context. The context caches queries
+ * to the database, so that multiple operations on the same entity do not
+ * result in multiple database queries. This also means that the changes
+ * to these entities are accumulated and are flushed to the database
+ * as soon as the Process Engine API call returns (however, the current
+ * transaction might be committed at a later time).</p>
+ *
+ * <p>If a Process Engine API call is nested into another call, the
+ * default behaviour is to reuse the existing Process Engine Context.
+ * This means that the nested call will have access to the same cached
+ * entities and the changes made to them.
+ *
+ * When the nested call needs to be executed in a new transaction, it is
+ * possible to create a new Process Engine Context for it. In this case, the
+ * nested call will use a new cache for the database queries, independent of
+ * the previous (outer) call. When the nested call returns, the changes are
+ * flushed to the database independently of the Process Engine Context of the
+ * outer call.</p>
+ *
+ * <p>The <code>ProcessEngineContext</code> is a utility class to declare a
+ * new Process Engine Context in order for database operations in a nested
+ * Process Engine API call to be separated in a new transaction.</p>
  *
  * Example on declaring a new Process Engine Context:
  *
