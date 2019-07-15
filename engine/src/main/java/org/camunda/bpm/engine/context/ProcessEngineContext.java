@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.context;
 
 import org.camunda.bpm.engine.impl.context.ProcessEngineContextImpl;
 
+import java.util.concurrent.Callable;
+
 /**
  * <p>A utility to declare a new Process Engine Context in order
  * for database operations to be separated in a new transaction.</p>
@@ -53,5 +55,33 @@ public class ProcessEngineContext {
    */
   public static void clear() {
     ProcessEngineContextImpl.clear();
+  }
+
+  /**
+   * <p>Takes a callable and executes all engine API invocations
+   * within that callable in a new Process Engine Context</p>
+   *
+   * An alternative to calling:
+   *
+   * <code>
+   *   try {
+   *     requiresNew();
+   *     callable.call();
+   *   } finally {
+   *     clear();
+   *   }
+   * </code>
+   *
+   * @param callable the callable to execute
+   * @return what is defined by the callable passed to the method
+   * @throws Exception
+   */
+  public static <T> T withNewProcessEngineContext(Callable<T> callable) throws Exception {
+    try {
+      requiresNew();
+      return callable.call();
+    } finally {
+      clear();
+    }
   }
 }
