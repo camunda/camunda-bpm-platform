@@ -432,7 +432,7 @@ public class BpmnParse extends Parse {
 
       String errorMessage = errorElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "errorMessage");
       if(errorMessage != null) {
-        error.setErrorMessageExpression(expressionManager.createExpression(errorMessage));
+        error.setErrorMessageExpression(createParameterValueProvider(errorMessage, expressionManager));
       }
 
       errors.put(id, error);

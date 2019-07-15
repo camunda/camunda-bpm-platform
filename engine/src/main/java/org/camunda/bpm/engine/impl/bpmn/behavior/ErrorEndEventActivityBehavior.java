@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
-import org.camunda.bpm.engine.impl.el.Expression;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 
@@ -28,9 +28,9 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
   protected String errorCode;
-  private Expression errorMessageExpression;
+  private ParameterValueProvider errorMessageExpression;
 
-  public ErrorEndEventActivityBehavior(String errorCode, Expression errorMessage) {
+  public ErrorEndEventActivityBehavior(String errorCode, ParameterValueProvider errorMessage) {
     this.errorCode = errorCode;
     this.errorMessageExpression = errorMessage;
   }
@@ -47,11 +47,11 @@ public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior 
     this.errorCode = errorCode;
   }
 
-  public Expression getErrorMessageExpression() {
+  public ParameterValueProvider getErrorMessageExpression() {
     return errorMessageExpression;
   }
 
-  public void setErrorMessageExpression(Expression errorMessage) {
+  public void setErrorMessageExpression(ParameterValueProvider errorMessage) {
     this.errorMessageExpression = errorMessage;
   }
 }
