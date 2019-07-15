@@ -186,6 +186,7 @@
                 <excludes>
                   <exclude>**/DashboardIT.*</exclude>
                   <exclude>**/TasklistIT.*</exclude>
+                  <exclude>**/ErrorPageIT.*</exclude>
                 </excludes>
                 <!-- [/Google Chrome is missing] -->
               </configuration>
