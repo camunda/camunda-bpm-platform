@@ -79,7 +79,7 @@
     "license-checker": "25.0.1",
     "lint-staged": "8.1.7",
     "load-grunt-tasks": "4.0.0",
-    "lodash": "4.17.11",
+    "lodash": "4.17.14",
     "mkdirp": "0.5.1",
     "mocha": "6.0.2",
     "mocha-multi": "1.0.1",
