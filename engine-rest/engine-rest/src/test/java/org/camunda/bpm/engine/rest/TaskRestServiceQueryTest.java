@@ -402,6 +402,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .queryParam("processDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processDefinitionKeyIn")))
       .queryParam("processInstanceBusinessKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceBusinessKeyIn")))
       .queryParam("tenantIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("tenantIdIn")))
+      .queryParam("assigneeIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("assigneeIn")))
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
@@ -440,6 +441,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String[] processDefinitionKeys = { "aProcessDefinitionKey", "anotherProcessDefinitionKey" };
     String[] processInstanceBusinessKeys = { "aBusinessKey", "anotherBusinessKey" };
     String[] tenantIds = { MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID };
+    String[] assigneeIn = { MockProvider.EXAMPLE_USER_ID, "anAssignee" };
 
 
     parameters.put("activityInstanceIdIn", activityInstanceIds);
@@ -447,6 +449,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("processDefinitionKeyIn", processDefinitionKeys);
     parameters.put("processInstanceBusinessKeyIn", processInstanceBusinessKeys);
     parameters.put("tenantIdIn", tenantIds);
+    parameters.put("assigneeIn", assigneeIn);
 
     return parameters;
   }
@@ -551,6 +554,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).processDefinitionKeyIn(stringArrayParameters.get("processDefinitionKeyIn"));
     verify(mockQuery).processInstanceBusinessKeyIn(stringArrayParameters.get("processInstanceBusinessKeyIn"));
     verify(mockQuery).tenantIdIn(stringArrayParameters.get("tenantIdIn"));
+    verify(mockQuery).taskAssigneeIn(stringArrayParameters.get("assigneeIn"));
   }
 
   private void verifyBooleanParameterQueryInvocation() {
