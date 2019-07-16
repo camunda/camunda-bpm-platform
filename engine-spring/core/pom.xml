@@ -12,7 +12,7 @@
   </parent>
 
   <properties>
-    <version.hibernate>3.3.2.GA</version.hibernate>
+    <version.hibernate>5.2.18.Final</version.hibernate>
   </properties>
 
   <dependencies>
