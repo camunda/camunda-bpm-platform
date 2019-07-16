@@ -124,6 +124,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String assigneeExpression;
   private String assigneeLike;
   private String assigneeLikeExpression;
+  private String[] assigneeIn;
   private String candidateGroup;
   private String candidateGroupExpression;
   private String candidateUser;
@@ -303,6 +304,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("assigneeLike")
   public void setAssigneeLike(String assigneeLike) {
     this.assigneeLike = assigneeLike;
+  }
+
+  @CamundaQueryParam(value = "assigneeIn", converter = StringArrayConverter.class)
+  public void setAssigneeIn(String[] assigneeIn) {
+    this.assigneeIn = assigneeIn;
   }
 
   @CamundaQueryParam("assigneeLikeExpression")
@@ -740,6 +746,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return assigneeLike;
   }
 
+  public String[] getAssigneeIn() {
+    return assigneeIn;
+  }
+
   public String getAssigneeLikeExpression() {
     return assigneeLikeExpression;
   }
@@ -1058,6 +1068,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (assigneeLikeExpression != null) {
       query.taskAssigneeLikeExpression(assigneeLikeExpression);
+    }
+    if (assigneeIn != null && assigneeIn.length > 0) {
+      query.taskAssigneeIn(assigneeIn);
     }
     if (candidateGroup != null) {
       query.taskCandidateGroup(candidateGroup);
