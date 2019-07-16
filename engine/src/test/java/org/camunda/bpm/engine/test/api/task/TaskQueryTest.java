@@ -374,6 +374,60 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testQueryByAssigneeInPositive() {
+    // given
+    String[] assignees = {"fozzie", "john", "mary"};
+
+    // when
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeIn(assignees);
+
+    // then
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+  }
+
+  public void testQueryByAssigneeInNegative() {
+    // given
+    String[] assignees = {"kermit", "gonzo"};
+
+    // when
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeIn(assignees);
+
+    // then
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
+  public void testQueryByAssigneeAndAssigneeIn () {
+    // given
+    String assignee = "fozzie";
+    String[] assignees = {"fozzie", "john", "mary"};
+
+    // when
+    TaskQuery query = taskService.createTaskQuery()
+      .taskAssignee(assignee).taskAssigneeIn(assignees);
+
+    // then
+    assertEquals(1, query.count());
+    assertEquals(1, query.list().size());
+  }
+
+  public void testQueryByAssigneeInNull() {
+    // given
+    String[] assignees = null;
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    try {
+      query.taskAssigneeIn(assignees);
+      fail("Exception expected");
+    } catch (Exception ex) {
+      assertEquals("Assignees is null", ex.getMessage());
+    }
+  }
+
   public void testQueryByUnassigned() {
     TaskQuery query = taskService.createTaskQuery().taskUnassigned();
     assertEquals(10, query.count());
