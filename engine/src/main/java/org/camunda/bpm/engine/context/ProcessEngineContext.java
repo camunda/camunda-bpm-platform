@@ -22,8 +22,8 @@ import java.util.concurrent.Callable;
 
 /**
  * <p>When a Process Engine API call is performed, the engine
- * will create a Process Engine Context. The context caches queries
- * to the database, so that multiple operations on the same entity do not
+ * will create a Process Engine Context. The context caches database
+ * entities, so that multiple operations on the same entity do not
  * result in multiple database queries. This also means that the changes
  * to these entities are accumulated and are flushed to the database
  * as soon as the Process Engine API call returns (however, the current
@@ -32,18 +32,20 @@ import java.util.concurrent.Callable;
  * <p>If a Process Engine API call is nested into another call, the
  * default behaviour is to reuse the existing Process Engine Context.
  * This means that the nested call will have access to the same cached
- * entities and the changes made to them.
+ * entities and the changes made to them.</p>
  *
- * When the nested call needs to be executed in a new transaction, it is
- * possible to create a new Process Engine Context for it. In this case, the
- * nested call will use a new cache for the database queries, independent of
- * the previous (outer) call. When the nested call returns, the changes are
- * flushed to the database independently of the Process Engine Context of the
- * outer call.</p>
+ * <p>When the nested call is to be executed in a new transaction, a new Process
+ * Engine Context needs to be created for its execution. In this case, the
+ * nested call will use a new cache for the database entities, independent of
+ * the previous (outer) call cache. This means that, the changes in the cache of
+ * one call are invisible to the other call and vice versa. When the nested call
+ * returns, the changes are flushed to the database independently of the Process
+ * Engine Context of the outer call.</p>
  *
- * <p>The <code>ProcessEngineContext</code> is a utility class to declare a
- * new Process Engine Context in order for database operations in a nested
- * Process Engine API call to be separated in a new transaction.</p>
+ * <p>The <code>ProcessEngineContext</code> is a utility class to declare to
+ * the Process Engine that a new Process Engine Context needs to be created
+ * in order for the database operations in a nested Process Engine API call
+ * to be separated in a new transaction.</p>
  *
  * Example on declaring a new Process Engine Context:
  *
@@ -61,10 +63,12 @@ public class ProcessEngineContext {
   /**
    * Declares to the Process Engine that a new, separate context,
    * bound to the current thread, needs to be created for all subsequent
-   * Process Engine database operations.
+   * Process Engine database operations. The method should always be used
+   * in a try-finally block to ensure that {@link #clear()} is called
+   * under any circumstances.
    *
-   * The method should always be used in a try-finally block
-   * to ensure that {@link #clear()} is called under any circumstances.
+   * Please see the {@link ProcessEngineContext} class documentation for
+   * a more detailed description on the purpose of this method.
    */
   public static void requiresNew() {
     ProcessEngineContextImpl.set(true);
@@ -72,7 +76,9 @@ public class ProcessEngineContext {
 
   /**
    * Declares to the Process Engine that the new Context created
-   * by the {@link #requiresNew()} method can be closed.
+   * by the {@link #requiresNew()} method can be closed. Please
+   * see the {@link ProcessEngineContext} class documentation for
+   * a more detailed description on the purpose of this method.
    */
   public static void clear() {
     ProcessEngineContextImpl.clear();
@@ -80,7 +86,9 @@ public class ProcessEngineContext {
 
   /**
    * <p>Takes a callable and executes all engine API invocations
-   * within that callable in a new Process Engine Context</p>
+   * within that callable in a new Process Engine Context. Please
+   * see the {@link ProcessEngineContext} class documentation for
+   * a more detailed description on the purpose of this method.</p>
    *
    * An alternative to calling:
    *
