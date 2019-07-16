@@ -149,16 +149,9 @@
   <resultMap id="acquirableJobResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
-    <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
     <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
-    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
-    <result property="retriesFromPersistence" column="RETRIES_" jdbcType="INTEGER" />
-    <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
-    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
-    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
   </resultMap>
 
 
@@ -174,16 +167,9 @@
     ${limitBefore}
     select RES.ID_,
       RES.REV_,
-      RES.LOCK_EXP_TIME_,
-      RES.LOCK_OWNER_,
       RES.DUEDATE_,
-      RES.DEPLOYMENT_ID_,
       RES.PROCESS_INSTANCE_ID_,
-      RES.EXCLUSIVE_,
-      RES.RETRIES_,
-      RES.PRIORITY_,
-      RES.TYPE_,
-      RES.SUSPENSION_STATE_
+      RES.EXCLUSIVE_
     ${limitBetweenAcquisition}
     from ${prefix}ACT_RU_JOB RES
 
@@ -683,13 +669,8 @@
           LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
           DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
-          DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
           PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR},
           EXCLUSIVE_ = #{exclusive, jdbcType=BOOLEAN},
-          RETRIES_ = #{retries, jdbcType=INTEGER},
-          PRIORITY_ = #{priority, jdbcType=BIGINT},
-          TYPE_ = #{type, jdbcType=VARCHAR},
-          SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
       </set>
       where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}

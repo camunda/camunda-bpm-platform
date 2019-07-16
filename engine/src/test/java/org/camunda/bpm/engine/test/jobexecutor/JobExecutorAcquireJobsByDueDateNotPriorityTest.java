@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,14 +55,19 @@ public class JobExecutorAcquireJobsByDueDateNotPriorityTest extends AbstractJobE
     List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
     assertEquals(4, acquirableJobs.size());
 
-    assertEquals(5, (int) acquirableJobs.get(0).getPriority());
+    assertEquals(5, (int) findJobById(acquirableJobs.get(0).getId()).getPriority());
     assertEquals(instance1, acquirableJobs.get(0).getProcessInstanceId());
-    assertEquals(10, (int) acquirableJobs.get(1).getPriority());
+    assertEquals(10, (int) findJobById(acquirableJobs.get(1).getId()).getPriority());
     assertEquals(instance2, acquirableJobs.get(1).getProcessInstanceId());
-    assertEquals(5, (int) acquirableJobs.get(2).getPriority());
+    assertEquals(5, (int) findJobById(acquirableJobs.get(2).getId()).getPriority());
     assertEquals(instance3, acquirableJobs.get(2).getProcessInstanceId());
-    assertEquals(10, (int) acquirableJobs.get(3).getPriority());
+    assertEquals(10, (int) findJobById(acquirableJobs.get(3).getId()).getPriority());
     assertEquals(instance4, acquirableJobs.get(3).getProcessInstanceId());
+  }
+
+
+  protected Job findJobById(String id) {
+    return managementService.createJobQuery().jobId(id).singleResult();
   }
 
 }
