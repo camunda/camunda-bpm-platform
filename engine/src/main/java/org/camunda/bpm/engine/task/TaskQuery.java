@@ -104,6 +104,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery taskAssigneeLikeExpression(String assigneeLikeExpression);
 
+  /** Only select tasks which are assigned to one of the given users. */
+  TaskQuery taskAssigneeIn(String... assignees);
+
   /** Only select tasks for which the given user is the owner. */
   TaskQuery taskOwner(String owner);
 

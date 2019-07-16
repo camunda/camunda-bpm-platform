@@ -61,6 +61,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Integer maxPriority;
   protected String assignee;
   protected String assigneeLike;
+  protected Set<String> assigneeIn;
   protected String involvedUser;
   protected String owner;
   protected Boolean unassigned;
@@ -217,6 +218,19 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery taskAssigneeLikeExpression(String assigneeLikeExpression) {
     ensureNotNull("Assignee like expression", assigneeLikeExpression);
     expressions.put("taskAssigneeLike", assigneeLikeExpression);
+    return this;
+  }
+
+  @Override
+  public TaskQuery taskAssigneeIn(String... assignees) {
+    ensureNotNull("Assignees", assignees);
+
+    Set<String> assigneeIn = new HashSet<>(assignees.length);
+    assigneeIn.addAll(Arrays.asList(assignees));
+
+    this.assigneeIn = assigneeIn;
+    expressions.remove("taskAssigneeIn");
+
     return this;
   }
 
@@ -1342,6 +1356,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public String getAssigneeLike() {
     return assigneeLike;
+  }
+
+  public Set<String> getAssigneeIn() {
+    return assigneeIn;
   }
 
   public String getInvolvedUser() {
