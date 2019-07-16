@@ -457,4 +457,24 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .post(SIGNAL_URL);
   }
 
+  @Test
+  public void shouldReturnInternalServerErrorResponseJsonWithTypeAndMessage() {
+    String message = "expected exception";
+    doThrow(new IllegalArgumentException(message)).when(signalBuilderMock).send();
+
+    Map<String, Object> requestBody = new HashMap<String, Object>();
+    requestBody.put("name", "aSignalName");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(requestBody)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(IllegalArgumentException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+      .post(SIGNAL_URL);
+  }
+
 }
