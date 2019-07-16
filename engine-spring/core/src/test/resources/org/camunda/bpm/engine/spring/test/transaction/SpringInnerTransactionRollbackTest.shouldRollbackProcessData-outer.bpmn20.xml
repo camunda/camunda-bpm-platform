@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1ys0ol0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.1.0">
+  <bpmn:process id="OuterTxNestedTransactionTest" name="Outer Transaction Process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start Outer TX">
+      <bpmn:outgoing>SequenceFlow_1xrn9u3</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1xrn9u3" sourceRef="StartEvent_1" targetRef="Task_0p68azq" />
+    <bpmn:endEvent id="EndEvent_115acy2" name="End Outer TX">
+      <bpmn:incoming>SequenceFlow_0n3vfv0</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0n3vfv0" sourceRef="Task_0p68azq" targetRef="EndEvent_115acy2" />
+    <bpmn:serviceTask id="Task_0p68azq" name="Do Nested Transaction" camunda:delegateExpression="${transactionTestDelegate}">
+      <bpmn:incoming>SequenceFlow_1xrn9u3</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0n3vfv0</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="OuterTxNestedTransactionTest">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="103" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="157" y="146" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1xrn9u3_di" bpmnElement="SequenceFlow_1xrn9u3">
+        <di:waypoint x="215" y="121" />
+        <di:waypoint x="265" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_115acy2_di" bpmnElement="EndEvent_115acy2">
+        <dc:Bounds x="415" y="103" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="397" y="146" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0n3vfv0_di" bpmnElement="SequenceFlow_0n3vfv0">
+        <di:waypoint x="365" y="121" />
+        <di:waypoint x="415" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0b42xu5_di" bpmnElement="Task_0p68azq">
+        <dc:Bounds x="265" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
