@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 
@@ -27,15 +28,16 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
   protected String errorCode;
-  private String errorMessage;
+  private ParameterValueProvider errorMessageExpression;
 
-  public ErrorEndEventActivityBehavior(String errorCode, String errorMessage) {
+  public ErrorEndEventActivityBehavior(String errorCode, ParameterValueProvider errorMessage) {
     this.errorCode = errorCode;
-    this.errorMessage = errorMessage;
+    this.errorMessageExpression = errorMessage;
   }
 
   public void execute(ActivityExecution execution) throws Exception {
-    BpmnExceptionHandler.propagateError(errorCode, errorMessage, null, execution);
+    String errorMessageValue = errorMessageExpression != null ? (String) errorMessageExpression.getValue(execution) : null;
+    BpmnExceptionHandler.propagateError(errorCode, errorMessageValue, null, execution);
   }
 
   public String getErrorCode() {
@@ -45,11 +47,11 @@ public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior 
     this.errorCode = errorCode;
   }
 
-  public String getErrorMessage() {
-    return errorMessage;
+  public ParameterValueProvider getErrorMessageExpression() {
+    return errorMessageExpression;
   }
 
-  public void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
+  public void setErrorMessageExpression(ParameterValueProvider errorMessage) {
+    this.errorMessageExpression = errorMessage;
   }
 }

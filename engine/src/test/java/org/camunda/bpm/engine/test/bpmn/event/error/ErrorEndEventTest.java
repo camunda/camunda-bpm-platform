@@ -88,6 +88,24 @@ public class ErrorEndEventTest {
     assertThat((String) variables.get("errorMessage"), is("This is the error message indicating what went wrong."));
   }
 
+  
+  @Test
+  @Deployment
+  public void testErrorMessageExpression() {
+    // given a process definition including an error with camunda:errorMessage property with an expression value
+    String errorMessage = "This is the error message indicating what went wrong.";
+    Map<String, Object> initialVariables = new HashMap<>();
+    initialVariables.put("errorMessageExpression", errorMessage);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("testErrorMessageExpression", initialVariables);
+
+    // when 
+    Map<String, Object> variables = runtimeService.getVariables(instance.getId());
+
+    // then the error message expression is resolved
+    assertThat((String) variables.get("errorCode"), is("123"));
+    assertThat((String) variables.get("errorMessage"), is(errorMessage));
+  }
+
   @Test
   @Deployment
   public void testError() {
@@ -101,5 +119,4 @@ public class ErrorEndEventTest {
     assertThat((String) variables.get("errorCode"), is("123"));
     assertNull(variables.get("errorMessage"));
   }
-
 }
