@@ -48,6 +48,11 @@ module.exports = function(config, browserifyConfig) {
       ['brfs', {global: true}]
       ],
       postBundleCB: function(err, src, next) {
+        if(err) {
+          console.log(err);
+        }
+
+
         var buildMode = config.grunt.config('buildMode');
         var livereloadPort = config.grunt.config(
           'pkg.gruntConfig.livereloadPort'

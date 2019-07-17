@@ -172,6 +172,11 @@ var criteria = [
         help: userExpLangHelp
       },
       {
+        name: 'assigneeIn',
+        label: 'Assignee in',
+        help: commaSeparatedValues
+      },
+      {
         name: 'assigneeLike',
         label: 'Assignee Like',
         expressionSupport: true,
