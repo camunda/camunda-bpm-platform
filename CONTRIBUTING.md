@@ -99,7 +99,7 @@ It should be noted that `Java` source files from a contribution, that do not con
 
 ## Contributor License Agreement
 
-In order to merge your contribution you have to sign our Contributor License Agreement (CLA) (which needs to be done only once). The CLA contains the terms and conditions under which the contribution has been submitted. Keep in mind without signed CLA the contribution will not be merged.
+In order to merge your contribution you have to sign our [Contributor License Agreement](https://cla-assistant.io/camunda/) (CLA) (which needs to be done only once). The CLA contains the terms and conditions under which the contribution has been submitted. Keep in mind without signed CLA the contribution will not be merged.
 
 ## Commit Message Conventions
 
