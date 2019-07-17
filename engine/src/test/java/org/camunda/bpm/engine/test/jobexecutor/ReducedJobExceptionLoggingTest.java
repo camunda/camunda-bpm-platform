@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -76,16 +75,13 @@ public class ReducedJobExceptionLoggingTest {
     // when
     runtimeService.startProcessInstanceByKey("failingProcess");
     processEngineConfiguration.getJobExecutor().start();
-    
-    try {
-      Thread.sleep(6000);
-    } catch (InterruptedException e) {}
+    testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
 
     // then
-    assertThat(filteredLogList.size(), is(3));
+    assertThat(filteredLogList.size()).isEqualTo(3);
   }
 
   @Test
@@ -97,15 +93,12 @@ public class ReducedJobExceptionLoggingTest {
     // when
     runtimeService.startProcessInstanceByKey("failingProcess");
     processEngineConfiguration.getJobExecutor().start();
-    
-    try {
-      Thread.sleep(6000);
-    } catch (InterruptedException e) {}
+    testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
     List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
 
     // then
-    assertThat(filteredLogList.size(), is(1));
+    assertThat(filteredLogList.size()).isEqualTo(1);
   }
 }

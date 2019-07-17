@@ -383,12 +383,12 @@ public abstract class ProcessEngineConfiguration {
   protected List<String> disabledPermissions = Collections.emptyList();
 
   /**
-   * If the value of this flag is set to <code>true</code> exceptions that occur
-   * during command execution will be logged before re-thrown. Note that this can
-   * lead to multiple logs of the same exception in case of exceptions that occur
-   * during job execution as these exceptions are logged in {@link ExecuteJobsRunnable}.
+   * If the value of this flag is set to <code>false</code> exceptions that occur
+   * during command execution will not be logged before re-thrown. This can prevent
+   * multiple logs of the same exception (e.g. exceptions that occur during job execution)
+   * but can also hide valuable debugging/rootcausing information.
    */
-  protected boolean enableCmdExceptionLogging = false;
+  protected boolean enableCmdExceptionLogging = true;
 
   /**
    * If the value of this flag is set to <code>true</code> exceptions that occur

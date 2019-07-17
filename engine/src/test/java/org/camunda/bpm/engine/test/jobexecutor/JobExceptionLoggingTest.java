@@ -16,25 +16,21 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,15 +47,14 @@ public class JobExceptionLoggingTest {
 
   public ProcessEngineRule engineRule = new ProcessEngineRule();
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().watch(CONTEXT_LOGGER, JOBEXECUTOR_LOGGER).level(Level.DEBUG);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(loggingRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(loggingRule);
 
   private RuntimeService runtimeService;
   private ManagementService managementService;
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  protected TweetNestedCommandExceptionHandler cmdExceptionHandler = new TweetNestedCommandExceptionHandler();
-  
   @Before
   public void init() {
     runtimeService = engineRule.getProcessEngine().getRuntimeService();
@@ -67,15 +62,13 @@ public class JobExceptionLoggingTest {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
 
     processEngineConfiguration.setDefaultNumberOfRetries(1);
-    processEngineConfiguration.getJobHandlers().put(cmdExceptionHandler.getType(), cmdExceptionHandler);
   }
 
   @After
   public void tearDown() {
     processEngineConfiguration.setDefaultNumberOfRetries(3);
-    processEngineConfiguration.setEnableCmdExceptionLogging(false);
-    processEngineConfiguration.getJobHandlers().remove(cmdExceptionHandler.getType());
-    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("testProcess").list();
+    processEngineConfiguration.setEnableCmdExceptionLogging(true);
+    List<Job> jobs = managementService.createJobQuery().list();
     for (Job job : jobs) {
       managementService.deleteJob(job.getId());
     }
@@ -83,7 +76,7 @@ public class JobExceptionLoggingTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/delegateThrowsException.bpmn20.xml")
-  public void shouldLogFailingJobOnlyOnce() {
+  public void shouldLogFailingJobOnlyOnceReducedLogging() {
     // given a job that always throws an Exception
     processEngineConfiguration.setEnableCmdExceptionLogging(false);
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -91,23 +84,20 @@ public class JobExceptionLoggingTest {
     // when executing the job and wait
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
-    try {
-      Thread.sleep(6000);
-    } catch (InterruptedException e) {
-    }
+    testRule.waitForJobExecutorToProcessAllJobs();
     jobExecutor.shutdown();
 
     List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
     List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
 
     // then
-    assertThat(jobLog.size(), is(1));
-    assertThat(ctxLog.size(), is(0));
+    assertThat(jobLog.size()).isEqualTo(1);
+    assertThat(ctxLog.size()).isEqualTo(0);
   }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/delegateThrowsException.bpmn20.xml")
-  public void shouldLogFailingJobTwice() {
+  public void shouldLogFailingJobTwiceDefaultLogging() {
     // given a job that always throws an Exception
     processEngineConfiguration.setEnableCmdExceptionLogging(true);
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -115,36 +105,36 @@ public class JobExceptionLoggingTest {
     // when executing the job and wait
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
-    try {
-      Thread.sleep(6000);
-    } catch (InterruptedException e) {
-    }
+    testRule.waitForJobExecutorToProcessAllJobs();
     jobExecutor.shutdown();
 
     List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
     List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
     
     // then
-    assertThat(jobLog.size(), is(1));
-    assertThat(ctxLog.size(), is(1));
+    assertThat(jobLog.size()).isEqualTo(1);
+    assertThat(ctxLog.size()).isEqualTo(1);
   }
 
   @Test
-  public void shouldNotLogExceptionWhenApiCall() {
+  public void shouldNotLogExceptionWhenApiCallReducedLogging() {
     // given
-    final String jobId = processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
-      public String execute(CommandContext commandContext) {
-        MessageEntity message = new MessageEntity();
-        message.setJobHandlerType(TweetNestedCommandExceptionHandler.TYPE);
-        commandContext.getJobManager().insertJob(message);
-        return message.getId();
-      }
-    });
+    processEngineConfiguration.setEnableCmdExceptionLogging(false);
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate")
+        .startEvent()
+        .serviceTask()
+          .camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
+          .camundaAsyncBefore()
+        .done();
+    testRule.deploy(modelInstance);
+
+    runtimeService.startProcessInstanceByKey("failingDelegate");
+    Job job = managementService.createJobQuery().singleResult();
 
     // when
     RuntimeException expectedException = null;
     try {
-      managementService.executeJob(jobId);
+      managementService.executeJob(job.getId());
     } catch (RuntimeException e) {
       expectedException = e;
     }
@@ -153,21 +143,40 @@ public class JobExceptionLoggingTest {
 
     // then
     // make sure the exceptions is thrown...
-    assertNotNull(expectedException);
-    assertThat(expectedException.getMessage(), containsString("nested command exception"));
+    assertThat(expectedException).isNotNull();
+    assertThat(expectedException.getMessage()).contains("Expected Exception");
     // ...but not logged
-    assertThat(jobLog.size(), is(0));
-    assertThat(ctxLog.size(), is(0));
+    assertThat(jobLog.size()).isEqualTo(0);
+    assertThat(ctxLog.size()).isEqualTo(0);
+  }
 
-    // clean
-    managementService.deleteJob(jobId);
+  @Test
+  public void shouldNotLogExceptionWhenUserApiCallReducedLogging() {
+    // given
+    processEngineConfiguration.setEnableCmdExceptionLogging(false);
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate")
+        .startEvent()
+        .serviceTask()
+          .camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
+        .done();
+    testRule.deploy(modelInstance);
 
-    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        return null;
-      }
-    });
+    // when
+    RuntimeException expectedException = null;
+    try {
+      runtimeService.startProcessInstanceByKey("failingDelegate");
+    } catch (RuntimeException e) {
+      expectedException = e;
+    }
+    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
+    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
+
+    // then
+    // make sure the exceptions is thrown...
+    assertThat(expectedException).isNotNull();
+    assertThat(expectedException.getMessage()).contains("Expected Exception");
+    // ...but not logged
+    assertThat(jobLog.size()).isEqualTo(0);
+    assertThat(ctxLog.size()).isEqualTo(0);
   }
 }
