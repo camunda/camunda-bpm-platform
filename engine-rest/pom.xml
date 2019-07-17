@@ -16,6 +16,7 @@
 
   <properties>
     <jackson.version>2.9.9</jackson.version>
+    <jackson.databind.version>2.9.9.1</jackson.databind.version>
   </properties>
 
   <modules>

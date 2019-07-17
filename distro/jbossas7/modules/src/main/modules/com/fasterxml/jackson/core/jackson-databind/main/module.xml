@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="com.fasterxml.jackson.core.jackson-databind">
   <resources>
-    <resource-root path="jackson-databind-2.9.9.jar" />
+    <resource-root path="jackson-databind-2.9.9.1.jar" />
   </resources>
 
   <dependencies>
