@@ -42,27 +42,10 @@ public class ErrorPageIT extends AbstractWebIntegrationTest {
 
     // then
     assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
-    assertEquals(MediaType.TEXT_HTML, response.getType().toString());
+    assertTrue(response.getType().toString().startsWith(MediaType.TEXT_HTML));
     String responseEntity = response.getEntity(String.class);
     assertTrue(responseEntity.contains("Camunda"));
     assertTrue(responseEntity.contains("Not Found"));
-
-    // cleanup
-    response.close();
-  }
-
-  @Test
-  public void shouldCheckInternalServerErrorResponse() {
-    // when
-    ClientResponse response = client.resource(APP_BASE_PATH + "app/adminX/default")
-        .get(ClientResponse.class);
-
-    // then
-    assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-    assertEquals(MediaType.TEXT_HTML, response.getType().toString());
-    String responceEntity = response.getEntity(String.class);
-    assertTrue(responceEntity.contains("Camunda"));
-    assertTrue(responceEntity.contains("Internal Server Error"));
 
     // cleanup
     response.close();
