@@ -6,7 +6,7 @@
   <dependencies>
 
     <module name="javax.api" />
-    <module name="com.fasterxml.jackson.core.jackson-databind" slot="@version.jackson@"/>
+    <module name="com.fasterxml.jackson.core.jackson-databind" slot="@version.jackson.databind@"/>
     <module name="org.slf4j" />
     <module name="net.minidev.json-smart" />
 

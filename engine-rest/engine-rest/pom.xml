@@ -39,6 +39,12 @@
       <version>${jackson.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.databind.version}</version>
+    </dependency>
+
     <!-- provided deps -->
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
