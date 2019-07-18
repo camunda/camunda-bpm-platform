@@ -23,13 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,53 +43,41 @@ public class JobExecutorExceptionLoggingHandlerTest {
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected ExecuteJobHelper.ExceptionLoggingHandler originalHandler;
-  protected TweetNestedCommandExceptionHandler cmdExceptionHandler = new TweetNestedCommandExceptionHandler();
   
   @Before
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     originalHandler = ExecuteJobHelper.LOGGING_HANDLER;
-    processEngineConfiguration.getJobHandlers().put(cmdExceptionHandler.getType(), cmdExceptionHandler);
   }
 
   @Test
   public void shouldBeAbleToReplaceLoggingHandler() {
+ // given
     CollectingHandler collectingHandler = new CollectingHandler();
     ExecuteJobHelper.LOGGING_HANDLER = collectingHandler;
-    
- // given
-    final String jobId = processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
-      public String execute(CommandContext commandContext) {
-        MessageEntity message = new MessageEntity();
-        message.setJobHandlerType(TweetNestedCommandExceptionHandler.TYPE);
-        commandContext.getJobManager().insertJob(message);
-        return message.getId();
-      }
-    });
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate")
+        .startEvent()
+        .serviceTask()
+          .camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
+          .camundaAsyncBefore()
+        .done();
+    testRule.deploy(modelInstance);
 
     // when
+    engineRule.getRuntimeService().startProcessInstanceByKey("failingDelegate");
+    final String jobId = engineRule.getManagementService().createJobQuery().singleResult().getId();
     processEngineConfiguration.getJobExecutor().start();
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
     Throwable collectedException = collectingHandler.collectedExceptions.get(jobId);
 
+    // then
     assertTrue(collectedException instanceof RuntimeException);
-    assertThat(collectedException.getMessage(), is("nested command exception"));
+    assertThat(collectedException.getMessage(), is("Expected Exception"));
 
     // cleanup
     ExecuteJobHelper.LOGGING_HANDLER = originalHandler;
-    engineRule.getManagementService().deleteJob(jobId);
-
-    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        return null;
-      }
-    });
-
-    processEngineConfiguration.getJobHandlers().remove(cmdExceptionHandler.getType());
   }
 
   static class CollectingHandler implements ExecuteJobHelper.ExceptionLoggingHandler {
