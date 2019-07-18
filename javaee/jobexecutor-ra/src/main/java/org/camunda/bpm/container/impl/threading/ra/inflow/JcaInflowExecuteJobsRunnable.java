@@ -27,8 +27,10 @@ import javax.resource.spi.endpoint.MessageEndpoint;
 
 import org.camunda.bpm.container.impl.threading.ra.JcaExecutorServiceConnector;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 
 
 /**
@@ -71,11 +73,13 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
       } catch (ResourceException e) {
         log.log(Level.WARNING, "ResourceException while invoking beforeDelivery() on MessageEndpoint '"+endpoint+"'", e);
       }
-
+      JobFailureCollector jobFailureCollector = null;
       try {
-        ((JobExecutionHandler)endpoint).executeJob(nextJobId, commandExecutor);
+        jobFailureCollector = ((JobExecutionHandler)endpoint).executeJob(nextJobId, commandExecutor);
       }catch (Exception e) {
-        log.log(Level.WARNING, "Exception while executing job with id '"+nextJobId+"'.", e);
+        if(ProcessEngineLogger.shouldLogJobException(processEngine.getProcessEngineConfiguration(), jobFailureCollector.getJob())) {
+          log.log(Level.WARNING, "Exception while executing job with id '"+nextJobId+"'.", e);
+        }
       }
 
       try {
