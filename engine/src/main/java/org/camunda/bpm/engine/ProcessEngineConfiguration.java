@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
@@ -382,18 +383,18 @@ public abstract class ProcessEngineConfiguration {
   protected List<String> disabledPermissions = Collections.emptyList();
 
   /**
-   * If the value of this flag is set to <code>true</code> exceptions that occur
-   * during command execution and are handled within the engine will not be logged.
-   * This flag does not affect exceptions during job execution. See 
-   * {@link #enableReducedJobExceptionLogging}.
+   * If the value of this flag is set to <code>false</code> exceptions that occur
+   * during command execution will not be logged before re-thrown. This can prevent
+   * multiple logs of the same exception (e.g. exceptions that occur during job execution)
+   * but can also hide valuable debugging/rootcausing information.
    */
-  protected boolean enableReducedCmdExceptionLogging = false;
+  protected boolean enableCmdExceptionLogging = true;
 
   /**
    * If the value of this flag is set to <code>true</code> exceptions that occur
    * during the execution of a job that still has retries left will not be logged.
    * If the job does not have any retries left, the exception will still be logged
-   * on logging level ERROR. Also see {@link #enableReducedCmdExceptionLogging}.
+   * on logging level ERROR.
    */
   protected boolean enableReducedJobExceptionLogging = false;
 
@@ -987,12 +988,12 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public boolean isEnableReducedCmdExceptionLogging() {
-    return enableReducedCmdExceptionLogging;
+  public boolean isEnableCmdExceptionLogging() {
+    return enableCmdExceptionLogging;
   }
 
-  public ProcessEngineConfiguration setEnableReducedCmdExceptionLogging(boolean enableReducedCmdExceptionLogging) {
-    this.enableReducedCmdExceptionLogging = enableReducedCmdExceptionLogging;
+  public ProcessEngineConfiguration setEnableCmdExceptionLogging(boolean enableCmdExceptionLogging) {
+    this.enableCmdExceptionLogging = enableCmdExceptionLogging;
     return this;
   }
 

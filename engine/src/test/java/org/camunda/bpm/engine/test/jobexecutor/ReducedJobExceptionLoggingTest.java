@@ -16,24 +16,18 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.apache.commons.lang3.time.DateUtils;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,23 +41,29 @@ public class ReducedJobExceptionLoggingTest {
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().watch("org.camunda.bpm.engine.context", Level.DEBUG);
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().watch("org.camunda.bpm.engine.jobexecutor", Level.DEBUG);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(loggingRule);
 
   private RuntimeService runtimeService;
-  private ProcessEngineConfiguration processEngineConfiguration;
+  private ManagementService managementService;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
   public void init() {
     runtimeService = engineRule.getRuntimeService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    managementService = engineRule.getProcessEngine().getManagementService();
   }
 
   @After
   public void tearDown() {
     processEngineConfiguration.setEnableReducedJobExceptionLogging(false);
+    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("failingProcess").list();
+    for (Job job : jobs) {
+      managementService.deleteJob(job.getId());
+    }
   }
 
   @Test
@@ -72,23 +72,16 @@ public class ReducedJobExceptionLoggingTest {
     // given
     processEngineConfiguration.setEnableReducedJobExceptionLogging(false);
 
+    // when
     runtimeService.startProcessInstanceByKey("failingProcess");
+    processEngineConfiguration.getJobExecutor().start();
+    testRule.waitForJobExecutorToProcessAllJobs();
+    processEngineConfiguration.getJobExecutor().shutdown();
 
-    // when the job is run several times till the incident creation
-    Job job = getJob();
-    while (job.getRetries() > 0 && ((JobEntity) job).getLockOwner() == null) {
-      try {
-        lockTheJob(job.getId());
-        engineRule.getManagementService().executeJob(job.getId());
-      } catch (Exception ex) {
-      }
-      job = getJob();
-    }
-
-    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while closing command context:");
+    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
 
     // then
-    assertThat(filteredLogList.size(), CoreMatchers.is(3));
+    assertThat(filteredLogList.size()).isEqualTo(3);
   }
 
   @Test
@@ -97,40 +90,15 @@ public class ReducedJobExceptionLoggingTest {
     // given
     processEngineConfiguration.setEnableReducedJobExceptionLogging(true);
 
+    // when
     runtimeService.startProcessInstanceByKey("failingProcess");
+    processEngineConfiguration.getJobExecutor().start();
+    testRule.waitForJobExecutorToProcessAllJobs();
+    processEngineConfiguration.getJobExecutor().shutdown();
 
-    // when the job is run several times till the incident creation
-    Job job = getJob();
-    while (job.getRetries() > 0 && ((JobEntity) job).getLockOwner() == null) {
-      try {
-        lockTheJob(job.getId());
-        engineRule.getManagementService().executeJob(job.getId());
-      } catch (Exception ex) {
-      }
-      job = getJob();
-    }
-
-    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while closing command context:");
+    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
 
     // then
-    assertThat(filteredLogList.size(), CoreMatchers.is(1));
-  }
-
-  private void lockTheJob(final String jobId) {
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        final JobEntity job = commandContext.getJobManager().findJobById(jobId);
-        job.setLockOwner("someLockOwner");
-        job.setLockExpirationTime(DateUtils.addHours(ClockUtil.getCurrentTime(), 1));
-        return null;
-      }
-    });
-  }
-
-  private Job getJob() {
-    List<Job> jobs = engineRule.getManagementService().createJobQuery().list();
-    assertEquals(1, jobs.size());
-    return jobs.get(0);
+    assertThat(filteredLogList.size()).isEqualTo(1);
   }
 }

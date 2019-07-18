@@ -36,7 +36,7 @@ import ch.qos.logback.core.read.ListAppender;
 
 public class ProcessEngineLoggingRule extends TestWatcher {
 
-  public static final String LOGGER_NOT_FOUND = "no logger found with name ";
+  public static final String LOGGER_NOT_FOUND_ERROR = "no logger found with name ";
   public static final String NOT_WATCHING_ERROR = "not watching any logger with name: ";
   private static final String APPENDER_NAME = "defaultAppender";
 
@@ -72,7 +72,7 @@ public class ProcessEngineLoggingRule extends TestWatcher {
         logger.setLevel(globalLevel);
       }
     } catch (ClassCastException e) {
-      throw new RuntimeException(LOGGER_NOT_FOUND + loggerName);
+      throw new RuntimeException(LOGGER_NOT_FOUND_ERROR + loggerName);
     }
     return logger;
   }
