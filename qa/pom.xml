@@ -65,6 +65,8 @@
         <module>jboss7-runtime</module>
         <module>wildfly-runtime</module>
         <module>tomcat-runtime</module>
+        <module>vanilla-runtimes/tomcat</module>
+        <module>vanilla-runtimes/wildfly</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
         <module>test-db-upgrade</module>
@@ -111,10 +113,31 @@
       </modules>
     </profile>
 
+    <profile>
+      <id>tomcat-vanilla</id>
+      <modules>
+        <module>vanilla-runtimes/tomcat</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>wildfly-vanilla</id>
+      <modules>
+        <module>vanilla-runtimes/wildfly</module>
+      </modules>
+    </profile>
+
     <!-- Testsuite profiles -->
 
     <profile>
       <id>webapps-integration</id>
+      <modules>
+        <module>integration-tests-webapps</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>webapps-integration-sa</id>
       <modules>
         <module>integration-tests-webapps</module>
       </modules>
