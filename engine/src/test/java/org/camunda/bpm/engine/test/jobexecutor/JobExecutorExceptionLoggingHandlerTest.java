@@ -16,45 +16,82 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.mockito.Mockito.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 public class JobExecutorExceptionLoggingHandlerTest {
+  
+  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ExecuteJobHelper.ExceptionLoggingHandler originalHandler;
+  protected TweetNestedCommandExceptionHandler cmdExceptionHandler = new TweetNestedCommandExceptionHandler();
+  
+  @Before
+  public void init() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    originalHandler = ExecuteJobHelper.LOGGING_HANDLER;
+    processEngineConfiguration.getJobHandlers().put(cmdExceptionHandler.getType(), cmdExceptionHandler);
+  }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void shouldBeAbleToReplaceLoggingHandler() {
-    ExecuteJobHelper.ExceptionLoggingHandler originalHandler = ExecuteJobHelper.LOGGING_HANDLER;
     CollectingHandler collectingHandler = new CollectingHandler();
-    RuntimeException exception = new RuntimeException();
+    ExecuteJobHelper.LOGGING_HANDLER = collectingHandler;
+    
+ // given
+    final String jobId = processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
+      public String execute(CommandContext commandContext) {
+        MessageEntity message = new MessageEntity();
+        message.setJobHandlerType(TweetNestedCommandExceptionHandler.TYPE);
+        commandContext.getJobManager().insertJob(message);
+        return message.getId();
+      }
+    });
 
-    try {
-      ExecuteJobHelper.LOGGING_HANDLER = collectingHandler;
-      CommandExecutor failingCommandExecutor = mock(CommandExecutor.class);
-      when(failingCommandExecutor.execute(any(Command.class))).thenThrow(exception);
+    // when
+    processEngineConfiguration.getJobExecutor().start();
+    testRule.waitForJobExecutorToProcessAllJobs();
+    processEngineConfiguration.getJobExecutor().shutdown();
 
-      // when
-      ExecuteJobHelper.executeJob("10", failingCommandExecutor);
+    Throwable collectedException = collectingHandler.collectedExceptions.get(jobId);
 
-      fail("exception expected");
-    }
-    catch (RuntimeException e) {
-      // then
-      Throwable collectedException = collectingHandler.collectedExceptions.get("10");
-      assertEquals(collectedException, e);
-      assertEquals(collectedException, exception);
-    }
-    finally {
-      ExecuteJobHelper.LOGGING_HANDLER = originalHandler;
-    }
+    assertTrue(collectedException instanceof RuntimeException);
+    assertThat(collectedException.getMessage(), is("nested command exception"));
+
+    // cleanup
+    ExecuteJobHelper.LOGGING_HANDLER = originalHandler;
+    engineRule.getManagementService().deleteJob(jobId);
+
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+        return null;
+      }
+    });
+
+    processEngineConfiguration.getJobHandlers().remove(cmdExceptionHandler.getType());
   }
 
   static class CollectingHandler implements ExecuteJobHelper.ExceptionLoggingHandler {
