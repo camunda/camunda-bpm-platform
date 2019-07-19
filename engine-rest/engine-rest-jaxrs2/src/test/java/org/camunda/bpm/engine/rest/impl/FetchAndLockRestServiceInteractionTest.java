@@ -320,7 +320,29 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     assertThat(argumentCaptor.getValue().getGroupIds(), is(groupIds));
     assertThat(argumentCaptor.getValue().getTenantIds(), is(tenantIds));
   }
-  
+
+  @Test
+  public void shouldReturnInternalServerErrorResponseJsonWithTypeAndMessage() {
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
+
+    when(fetchTopicBuilder.execute())
+      .thenThrow(new IllegalArgumentException("anExceptionMessage"));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(fetchExternalTasksDto)
+      .pathParam("name", "default")
+    .then()
+      .expect()
+        .body("type", equalTo(IllegalArgumentException.class.getSimpleName()))
+        .body("message", equalTo("anExceptionMessage"))
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+    .when()
+      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+
+    verify(fetchTopicBuilder, times(1)).execute();
+  }
+
   // helper /////////////////////////
 
   private FetchExternalTasksExtendedDto createDto(Long responseTimeout) {

@@ -403,6 +403,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <excludes>
+                <exclude>**/TaskRestServiceInteractionTest.java</exclude>
+                <exclude>**/NoServletEmptyBodyFilterTest.java</exclude>
+                <exclude>**/ServletEmptyBodyFilterTest.java</exclude>
+              </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
             <executions>
@@ -416,7 +421,7 @@
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
-                    <include>**/TaskRestServiceInteractionTest.java</include>
+                    <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
                   </includes>
                 </configuration>
               </execution>
