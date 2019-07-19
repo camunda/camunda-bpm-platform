@@ -337,7 +337,14 @@
               from
               ${prefix}ACT_RU_VARIABLE
               WHERE
-              NAME_= #{queryVariableValue.name}
+              <choose>
+                <when test="queryVariableValue.variableNameIgnoreCase">
+                  UPPER(NAME_)= UPPER(#{queryVariableValue.name})
+                </when>
+                <otherwise>
+                  NAME_= #{queryVariableValue.name}
+                </otherwise>
+              </choose>
 
               <choose>
                 <when test="queryVariableValue.local">

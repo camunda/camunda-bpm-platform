@@ -75,6 +75,8 @@ public class ProcessInstanceRestServiceQueryTest extends
 
   protected static final String PROCESS_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   protected static final String PROCESS_INSTANCE_COUNT_QUERY_URL = PROCESS_INSTANCE_QUERY_URL + "/count";
+  private static final String TEST_VAR_NAME = "varName";
+  private static final String TEST_VAR_VALUE = "varValue";
   protected ProcessInstanceQuery mockedQuery;
 
   @Before
@@ -412,6 +414,141 @@ public class ProcessInstanceRestServiceQueryTest extends
     Date date = DateTimeUtil.parseDate(variableValue);
 
     verify(mockedQuery).variableValueEquals(variableName, date);
+  }
+
+  @Test
+  public void testVariableValueEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", TEST_VAR_NAME);
+    variableJson.put("operator", "eq");
+    variableJson.put("value", TEST_VAR_VALUE.toLowerCase());
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableValuesIgnoreCase", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).variableValueEquals(TEST_VAR_NAME, TEST_VAR_VALUE.toLowerCase());
+  }
+
+  @Test
+  public void testVariableValueNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", TEST_VAR_NAME);
+    variableJson.put("operator", "neq");
+    variableJson.put("value", TEST_VAR_VALUE.toLowerCase());
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).variableValueNotEquals(TEST_VAR_NAME, TEST_VAR_VALUE.toLowerCase());
+  }
+
+  @Test
+  public void testVariableValueLikeIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", TEST_VAR_NAME);
+    variableJson.put("operator", "like");
+    variableJson.put("value", TEST_VAR_VALUE.toLowerCase());
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).variableValueLike(TEST_VAR_NAME, TEST_VAR_VALUE.toLowerCase());
+  }
+
+  @Test
+  public void testVariableNameEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", TEST_VAR_NAME.toLowerCase());
+    variableJson.put("operator", "eq");
+    variableJson.put("value", TEST_VAR_VALUE);
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableNamesIgnoreCase", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).variableValueEquals(TEST_VAR_NAME.toLowerCase(), TEST_VAR_VALUE);
+  }
+
+  @Test
+  public void testVariableNamesNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", TEST_VAR_NAME.toLowerCase());
+    variableJson.put("operator", "neq");
+    variableJson.put("value", TEST_VAR_VALUE);
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    json.put("variableNamesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).variableValueNotEquals(TEST_VAR_NAME.toLowerCase(), TEST_VAR_VALUE);
   }
 
   @Test
