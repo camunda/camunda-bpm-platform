@@ -314,6 +314,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.repository.DefaultDeploymentHandlerFactory;
 import org.camunda.bpm.engine.impl.runtime.ConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultConditionHandler;
@@ -350,6 +351,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionF
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
@@ -614,6 +616,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected Set<String> registeredDeployments;
 
+  protected DeploymentHandlerFactory deploymentHandlerFactory;
+
   protected ResourceAuthorizationProvider resourceAuthorizationProvider;
 
   protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<>();
@@ -846,6 +850,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIncidentHandlers();
     initPasswordDigest();
     initDeploymentRegistration();
+    initDeploymentHandlerFactory();
     initResourceAuthorizationProvider();
     initPermissionProvider();
     initMetrics();
@@ -1050,7 +1055,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       plugin.postProcessEngineBuild(engine);
     }
   }
-
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
 
@@ -2306,6 +2310,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  // deployment handler //////////////////////////////////////////////////////
+  protected void initDeploymentHandlerFactory() {
+    if (deploymentHandlerFactory == null) {
+      deploymentHandlerFactory = new DefaultDeploymentHandlerFactory();
+    }
+  }
+
   // history handlers /////////////////////////////////////////////////////
 
   protected void initHistoryEventProducer() {
@@ -3175,6 +3186,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setDeploymentCache(DeploymentCache deploymentCache) {
     this.deploymentCache = deploymentCache;
+  }
+
+  public DeploymentHandlerFactory getDeploymentHandlerFactory() {
+    return deploymentHandlerFactory;
+  }
+
+  public void setDeploymentHandlerFactory(DeploymentHandlerFactory deploymentHandlerFactory) {
+    this.deploymentHandlerFactory = deploymentHandlerFactory;
   }
 
   public ProcessEngineConfigurationImpl setDelegateInterceptor(DelegateInterceptor delegateInterceptor) {

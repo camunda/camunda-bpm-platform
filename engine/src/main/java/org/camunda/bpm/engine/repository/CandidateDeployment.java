@@ -16,18 +16,18 @@
  */
 package org.camunda.bpm.engine.repository;
 
-/**
- * @author kristin.polenz@camunda.com
- */
-public interface Resource {
+import java.util.Map;
 
 
-  String getId();
+public interface  CandidateDeployment {
 
+  /**
+   * @return the name to be used for the deployment
+   */
   String getName();
 
-  String getDeploymentId();
-
-  byte[] getBytes();
-
+  /**
+   * @return a map of all the resources provided for deployment
+   */
+  Map<String, Resource> getResources();
 }

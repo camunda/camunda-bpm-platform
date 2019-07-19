@@ -16,18 +16,19 @@
  */
 package org.camunda.bpm.engine.repository;
 
+import org.camunda.bpm.engine.ProcessEngine;
+
 /**
- * @author kristin.polenz@camunda.com
+ * <p>Builds the {@link DeploymentHandler} for determining of the deployment process for the
+ * Process Engine.</p>
  */
-public interface Resource {
+public interface DeploymentHandlerFactory {
 
-
-  String getId();
-
-  String getName();
-
-  String getDeploymentId();
-
-  byte[] getBytes();
-
+  /**
+   * Creates a {@link DeploymentHandler} instance.
+   *
+   * @param processEngine is the {@link ProcessEngine} where the Deployment is deployed to.
+   * @return the {@link DeploymentHandler} implementation.
+   */
+  DeploymentHandler buildDeploymentHandler(ProcessEngine processEngine);
 }
