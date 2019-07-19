@@ -11,6 +11,16 @@
     <relativePath>../</relativePath>
   </parent>
 
+  <dependencies>
+    <dependency>
+      <groupId>com.konghq</groupId>
+      <artifactId>unirest-java</artifactId>
+      <version>2.3.10</version>
+      <classifier>standalone</classifier>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
