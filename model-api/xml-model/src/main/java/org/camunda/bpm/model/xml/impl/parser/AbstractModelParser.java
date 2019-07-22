@@ -42,9 +42,13 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractModelParser {
 
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY = "javax.xml.accessExternalSchema";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA_ALL = "all";
+
   private final DocumentBuilderFactory documentBuilderFactory;
   protected SchemaFactory schemaFactory;
-  protected Map<String, Schema> schemas = new HashMap<String, Schema>();
+  protected Map<String, Schema> schemas = new HashMap<>();
 
   protected AbstractModelParser() {
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -97,9 +101,26 @@ public abstract class AbstractModelParser {
   private void enableSecureProcessing(final DocumentBuilderFactory dbf) {
     try {
       dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-      dbf.setAttribute("http://javax.xml.XMLConstants/property/accessExternalSchema", "file,http,https,jar,wsjar");
+      dbf.setAttribute(JAXP_ACCESS_EXTERNAL_SCHEMA, resolveAccessExternalSchemaProperty());
     } catch (ParserConfigurationException | IllegalArgumentException ignored) {
       // ignored
+    }
+  }
+
+  /*
+   * JAXP allows users to override the default value via system properties and
+   * a central properties file (see https://docs.oracle.com/javase/tutorial/jaxp/properties/scope.html).
+   * However, both are overridden by an explicit configuration in code, as we apply it.
+   * Since we want users to customize the value, we take the system property into account.
+   * The properties file is not supported at the moment.
+   */
+  protected String resolveAccessExternalSchemaProperty() {
+    String systemProperty = System.getProperty(JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY);
+
+    if (systemProperty != null) {
+      return systemProperty;
+    } else {
+      return JAXP_ACCESS_EXTERNAL_SCHEMA_ALL;
     }
   }
 

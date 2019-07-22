@@ -16,17 +16,23 @@
  */
 package org.camunda.bpm.model.xml.impl.parser;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 
+import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class ParserTest {
+
+  private static final String ACCESS_EXTERNAL_SCHEMA_PROP = "javax.xml.accessExternalSchema";
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   @Test
   public void shouldThrowExceptionForTooManyAttributes() {
@@ -36,21 +42,51 @@ public class ParserTest {
     try {
       modelParser.parseModelFromStream(testXmlAsStream);
     } catch (ModelParseException mpe) {
-      assertThat(mpe.getMessage(), is("SAXException while parsing input stream"));
-      assertThat(mpe.getCause().getMessage(), containsString("JAXP00010002"));
+      assertThat(mpe.getMessage()).isEqualTo("SAXException while parsing input stream");
+      assertThat(mpe.getCause()).hasMessageContaining("JAXP00010002");
     }
   }
 
   @Test
-  public void shouldNotOverrideExternalSchemaAccess() {
-    System.setProperty("javax.xml.accessExternalSchema", "");
+  public void shouldProhibitExternalSchemaAccessViaSystemProperty() {
+
+    // given
+    System.setProperty(ACCESS_EXTERNAL_SCHEMA_PROP, "");
+
     try {
       TestModelParser modelParser = new TestModelParser();
       String testXml = "org/camunda/bpm/model/xml/impl/parser/ExternalSchemaAccess.xml";
       InputStream testXmlAsStream = this.getClass().getClassLoader().getResourceAsStream(testXml);
+
+      // then
+      exception.expect(ModelParseException.class);
+      exception.expectMessage("SAXException while parsing input stream");
+
+      // when
       modelParser.parseModelFromStream(testXmlAsStream);
     } finally {
-      System.clearProperty("javax.xml.accessExternalSchema");
+      System.clearProperty(ACCESS_EXTERNAL_SCHEMA_PROP);
+    }
+  }
+
+  @Test
+  public void shouldAllowExternalSchemaAccessViaSystemProperty() {
+
+    // given
+    System.setProperty(ACCESS_EXTERNAL_SCHEMA_PROP, "all");
+
+    try {
+      TestModelParser modelParser = new TestModelParser();
+      String testXml = "org/camunda/bpm/model/xml/impl/parser/ExternalSchemaAccess.xml";
+      InputStream testXmlAsStream = this.getClass().getClassLoader().getResourceAsStream(testXml);
+
+      // when
+      ModelInstance modelInstance = modelParser.parseModelFromStream(testXmlAsStream);
+
+      // then
+      assertThat(modelInstance).isNotNull();
+    } finally {
+      System.clearProperty(ACCESS_EXTERNAL_SCHEMA_PROP);
     }
   }
 
@@ -62,9 +98,9 @@ public class ParserTest {
     try {
       modelParser.parseModelFromStream(testXmlAsStream);
     } catch (ModelParseException mpe) {
-      assertThat(mpe.getMessage(), is("SAXException while parsing input stream"));
-      assertThat(mpe.getCause().getMessage(), containsString("DOCTYPE"));
-      assertThat(mpe.getCause().getMessage(), containsString("http://apache.org/xml/features/disallow-doctype-decl"));
+      assertThat(mpe.getMessage()).isEqualTo("SAXException while parsing input stream");
+      assertThat(mpe.getCause()).hasMessageContaining("DOCTYPE");
+      assertThat(mpe.getCause()).hasMessageContaining("http://apache.org/xml/features/disallow-doctype-decl");
     }
   }
 
