@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,6 +49,12 @@ public class JobExecutorExceptionLoggingHandlerTest {
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     originalHandler = ExecuteJobHelper.LOGGING_HANDLER;
+  }
+
+  @After
+  public void tearDown() {
+    // cleanup
+    ExecuteJobHelper.LOGGING_HANDLER = originalHandler;
   }
 
   @Test
@@ -75,9 +82,6 @@ public class JobExecutorExceptionLoggingHandlerTest {
     // then
     assertTrue(collectedException instanceof RuntimeException);
     assertThat(collectedException.getMessage(), is("Expected Exception"));
-
-    // cleanup
-    ExecuteJobHelper.LOGGING_HANDLER = originalHandler;
   }
 
   static class CollectingHandler implements ExecuteJobHelper.ExceptionLoggingHandler {
