@@ -285,11 +285,11 @@
                 <configuration>
                   <rules>
                     <requireJavaVersion>
-                      <version>[1.6,1.8)</version>
+                      <version>[1.7,1.8)</version>
                       <message>
                         *************************************************
                         *                                               *
-                        * You must use JDK 6/7 to run JBoss AS 7.2.0!!! *
+                        * You must use JDK 7 to run JBoss AS 7.2.0!!!   *
                         *                                               *
                         *************************************************
                       </message>
