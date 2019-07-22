@@ -252,7 +252,7 @@
             from
               ${prefix}ACT_HI_VARINST
             WHERE
-              NAME_= #{queryVariableValue.name}
+              <include refid="variableNameEqualsCaseInsensitive" />
             AND CASE_INST_ID_ = RES.CASE_INST_ID_
 
           <bind name="varTypeField" value="'VAR_TYPE_'"/>

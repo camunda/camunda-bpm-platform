@@ -135,6 +135,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
   HistoricCaseInstanceQuery notClosed();
 
   /**
+   * The query will match the names of variables in a case-insensitive way.
+   */
+  HistoricCaseInstanceQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of variables in a case-insensitive way.
+   */
+  HistoricCaseInstanceQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select case instances which have a global variable with the given value.
    *
    * @param name the name of the variable

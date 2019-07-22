@@ -49,6 +49,16 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   ExecutionQuery activityId(String activityId);
 
   /**
+   * The query will match the names of variables in a case-insensitive way.
+   */
+  ExecutionQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of variables in a case-insensitive way.
+   */
+  ExecutionQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select executions which have a local variable with the given value. The type
    * of variable is determined based on the value, using types configured in
    * {@link ProcessEngineConfiguration#getVariableSerializers()}.

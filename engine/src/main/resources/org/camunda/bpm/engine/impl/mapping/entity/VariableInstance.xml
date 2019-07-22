@@ -334,7 +334,15 @@
 
             <!-- variableName -->
             <if test="variableName != null">
-              and RES.NAME_ = #{variableName}
+              and 
+            <choose>
+              <when test="queryVariableValue.variableNameIgnoreCase">
+                UPPER(RES.NAME_)= UPPER(#{variableName})
+              </when>
+              <otherwise>
+                RES.NAME_ = #{variableName}
+              </otherwise>
+            </choose>
             </if>
 
             <!-- variablesNames -->
@@ -348,7 +356,16 @@
 
             <!-- variableNameLike -->
             <if test="variableNameLike != null">
-              and RES.NAME_ like #{variableNameLike} ESCAPE ${escapeChar}
+              and
+              <choose>
+              <when test="queryVariableValue.variableNameIgnoreCase">
+                UPPER(RES.NAME_) like UPPER(#{variableNameLike})
+              </when>
+              <otherwise>
+                RES.NAME_ like #{variableNameLike}
+              </otherwise>
+            </choose>
+              ESCAPE ${escapeChar}
             </if>
 
             <!-- executionIds -->
@@ -432,7 +449,8 @@
 
             <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance & Execution, the same query object is used there! -->
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-              and RES.NAME_= #{queryVariableValue.name}
+              and 
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
               <bind name="varTypeField" value="'TYPE_'"/>
               <bind name="varPrefix" value="'RES.'"/>
               <if test="queryVariableValue.valueConditions != null">

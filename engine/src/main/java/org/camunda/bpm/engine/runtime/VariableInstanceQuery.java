@@ -65,6 +65,16 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   VariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
 
   /**
+   * The query will match the names of variables in a case-insensitive way.
+   */
+  VariableInstanceQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of variables in a case-insensitive way.
+   */
+  VariableInstanceQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select variables instances which have the given name and value. The type
    * of variable is determined based on the value, using types configured in
    * {@link ProcessEngineConfiguration#getVariableSerializers()}.
