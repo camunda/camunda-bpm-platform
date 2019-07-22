@@ -31,8 +31,8 @@ public class ExecuteJobHelper {
     @Override
     public void exceptionWhileExecutingJob(String jobId, Throwable exception) {
       
-      // Default behavior, don't log exception. It is logged in ExecuteJobsRunnable#run.
-      // hook for custom logging handler
+      // Default behavior, just log exception
+      LOG.exceptionWhileExecutingJob(jobId, exception);
     }
 
   };
@@ -99,7 +99,6 @@ public class ExecuteJobHelper {
   }
 
   protected static void handleJobFailure(final String nextJobId, final JobFailureCollector jobFailureCollector, Throwable exception) {
-    LOGGING_HANDLER.exceptionWhileExecutingJob(nextJobId, exception);
     jobFailureCollector.setFailure(exception);
   }
 

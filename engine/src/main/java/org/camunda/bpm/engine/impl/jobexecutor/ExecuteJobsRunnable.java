@@ -63,7 +63,7 @@ public class ExecuteJobsRunnable implements Runnable {
           }
           catch(Throwable t) {
             if(ProcessEngineLogger.shouldLogJobException(processEngine.getProcessEngineConfiguration(), jobFailureCollector.getJob())) {
-              LOG.exceptionWhileExecutingJob(nextJobId, t);
+              ExecuteJobHelper.LOGGING_HANDLER.exceptionWhileExecutingJob(nextJobId, t);
             }
           }
         } else {

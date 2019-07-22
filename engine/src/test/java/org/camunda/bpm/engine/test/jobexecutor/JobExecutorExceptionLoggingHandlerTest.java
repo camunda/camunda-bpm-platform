@@ -16,45 +16,72 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.mockito.Mockito.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 public class JobExecutorExceptionLoggingHandlerTest {
+  
+  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ExecuteJobHelper.ExceptionLoggingHandler originalHandler;
+  
+  @Before
+  public void init() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    originalHandler = ExecuteJobHelper.LOGGING_HANDLER;
+  }
+
+  @After
+  public void tearDown() {
+    // cleanup
+    ExecuteJobHelper.LOGGING_HANDLER = originalHandler;
+  }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void shouldBeAbleToReplaceLoggingHandler() {
-    ExecuteJobHelper.ExceptionLoggingHandler originalHandler = ExecuteJobHelper.LOGGING_HANDLER;
+ // given
     CollectingHandler collectingHandler = new CollectingHandler();
-    RuntimeException exception = new RuntimeException();
+    ExecuteJobHelper.LOGGING_HANDLER = collectingHandler;
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate")
+        .startEvent()
+        .serviceTask()
+          .camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
+          .camundaAsyncBefore()
+        .done();
+    testRule.deploy(modelInstance);
 
-    try {
-      ExecuteJobHelper.LOGGING_HANDLER = collectingHandler;
-      CommandExecutor failingCommandExecutor = mock(CommandExecutor.class);
-      when(failingCommandExecutor.execute(any(Command.class))).thenThrow(exception);
+    // when
+    engineRule.getRuntimeService().startProcessInstanceByKey("failingDelegate");
+    final String jobId = engineRule.getManagementService().createJobQuery().singleResult().getId();
+    processEngineConfiguration.getJobExecutor().start();
+    testRule.waitForJobExecutorToProcessAllJobs();
+    processEngineConfiguration.getJobExecutor().shutdown();
 
-      // when
-      ExecuteJobHelper.executeJob("10", failingCommandExecutor);
+    Throwable collectedException = collectingHandler.collectedExceptions.get(jobId);
 
-      fail("exception expected");
-    }
-    catch (RuntimeException e) {
-      // then
-      Throwable collectedException = collectingHandler.collectedExceptions.get("10");
-      assertEquals(collectedException, e);
-      assertEquals(collectedException, exception);
-    }
-    finally {
-      ExecuteJobHelper.LOGGING_HANDLER = originalHandler;
-    }
+    // then
+    assertTrue(collectedException instanceof RuntimeException);
+    assertThat(collectedException.getMessage(), is("Expected Exception"));
   }
 
   static class CollectingHandler implements ExecuteJobHelper.ExceptionLoggingHandler {
