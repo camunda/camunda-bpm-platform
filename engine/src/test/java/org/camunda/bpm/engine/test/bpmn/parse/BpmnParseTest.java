@@ -16,24 +16,31 @@
  */
 package org.camunda.bpm.engine.test.bpmn.parse;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
+import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartConditionalEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateConditionalEventBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.ActivityTypes;
-import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartConditionalEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateConditionalEventBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -47,15 +54,21 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.test.TestHelper;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.SystemPropertiesRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -69,6 +82,12 @@ public class BpmnParseTest {
 
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Rule
+  public SystemPropertiesRule systemProperties = SystemPropertiesRule.resetPropsAfterTest();
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   public RepositoryService repositoryService;
   public RuntimeService runtimeService;
@@ -1072,28 +1091,70 @@ public class BpmnParseTest {
 
   @Test
   public void testFeatureSecureProcessingAcceptsDefinitionWhenAttributeLimitOverridden() {
+    // given
     System.setProperty("jdk.xml.elementAttributeLimit", "0");
-    try {
-      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionFSP");
-      String deploymentId = repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy().getId();
-      assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-      repositoryService.deleteDeployment(deploymentId, true);
-    } finally {
-      System.clearProperty("jdk.xml.elementAttributeLimit");
-    }
+
+    String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionFSP");
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().name(resource).addClasspathResource(resource);
+
+    // when
+    testRule.deploy(deploymentBuilder);
+
+    // then
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }
 
   @Test
-  public void testFeatureSecureProcessingCannotOverrideExternalSchemaAccess() {
-    // system property will have no effect, schema access still allowed
-    System.setProperty("javax.xml.accessExternalSchema", "");
-    try {
-      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseIntermediateConditionalEvent");
-      String deploymentId = repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy().getId();
-      assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-      repositoryService.deleteDeployment(deploymentId, true);
-    } finally {
-      System.clearProperty("javax.xml.accessExternalSchema");
-    }
+  public void testFeatureSecureProcessingRestrictExternalSchemaAccess() {
+    // given
+    // the external schema access property is not supported on certain
+    // IBM JDK versions, in which case schema access cannot be restricted
+    Assume.assumeTrue(doesJdkSupportExternalSchemaAccessProperty());
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done();
+
+    System.setProperty("javax.xml.accessExternalSchema", ""); // empty string prohibits all external schema access
+
+    // then
+    exception.expect(ProcessEngineException.class);
+    exception.expectMessage("Failed to read schema document 'BPMNDI.xsd'");
+
+    // when
+    testRule.deploy(process);
+  }
+
+  @Test
+  public void testFeatureSecureProcessingAllowExternalSchemaAccess() {
+    // given
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done();
+
+    System.setProperty("javax.xml.accessExternalSchema", "all"); // empty string prohibits all external schema access
+
+    // when
+    DeploymentWithDefinitions deployment = testRule.deploy(process);
+
+    // then
+    assertThat(deployment).isNotNull();
+  }
+
+
+  protected boolean doesJdkSupportExternalSchemaAccessProperty() {
+    String jvmVendor = System.getProperty("java.vm.vendor");
+    String javaVersion = System.getProperty("java.version");
+
+    boolean isIbmJDK = jvmVendor != null && jvmVendor.contains("IBM");
+    boolean isJava6 = javaVersion != null && javaVersion.startsWith("1.6");
+    boolean isJava7 = javaVersion != null && javaVersion.startsWith("1.7");
+
+    return !isJava6 && !(isIbmJDK && isJava7);
+
   }
 }
