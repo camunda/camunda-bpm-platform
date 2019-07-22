@@ -219,4 +219,12 @@ public class EngineUtilLogger extends ProcessEngineLogger {
       "030",
       "Exception while parsing JSON: {}", e.getMessage(), e);
   }
+
+  public void logAccessExternalSchemaNotSupported(Exception e) {
+    logDebug(
+        "031",
+        "Could not restrict external schema access. "
+        + "This indicates that this is not supported by your JAXP implementation: {}",
+        e.getMessage());
+  }
 }
