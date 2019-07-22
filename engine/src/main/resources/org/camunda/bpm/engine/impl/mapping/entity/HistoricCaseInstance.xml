@@ -252,7 +252,7 @@
             from
               ${prefix}ACT_HI_VARINST
             WHERE
-              <include refid="variableNameEqualsCaseInsensitive" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
             AND CASE_INST_ID_ = RES.CASE_INST_ID_
 
           <bind name="varTypeField" value="'VAR_TYPE_'"/>

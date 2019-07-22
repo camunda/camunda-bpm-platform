@@ -336,7 +336,7 @@
             <if test="variableName != null">
               and 
             <choose>
-              <when test="queryVariableValue.variableNameIgnoreCase">
+              <when test="variableNamesIgnoreCase">
                 UPPER(RES.NAME_)= UPPER(#{variableName})
               </when>
               <otherwise>
@@ -358,7 +358,7 @@
             <if test="variableNameLike != null">
               and
               <choose>
-              <when test="queryVariableValue.variableNameIgnoreCase">
+              <when test="variableNamesIgnoreCase">
                 UPPER(RES.NAME_) like UPPER(#{variableNameLike})
               </when>
               <otherwise>

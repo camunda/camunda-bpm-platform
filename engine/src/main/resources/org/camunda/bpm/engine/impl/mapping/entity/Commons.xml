@@ -86,10 +86,10 @@
   <sql id="variableNameEqualsCaseInsensitive">
     <choose>
       <when test="queryVariableValue.variableNameIgnoreCase">
-        UPPER(RES.NAME_)= UPPER(#{queryVariableValue.name})
+        UPPER(NAME_)= UPPER(#{queryVariableValue.name})
       </when>
       <otherwise>
-        RES.NAME_= #{queryVariableValue.name}
+        NAME_= #{queryVariableValue.name}
       </otherwise>
     </choose>
   </sql>
