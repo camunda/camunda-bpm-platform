@@ -18,8 +18,11 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -31,13 +34,14 @@ import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
+
+import junit.framework.Assert;
 
 /**
  * @author Thorben Lindhauer
@@ -76,6 +80,99 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     }
   }
 
+//@Ignore("SUPPORT-6035")
+	@Deployment(resources = "org/camunda/bpm/engine/test/concurrency/SUPPORT-6035.bpmn")
+	public void testConcurrentMessageCorrelation() {
+		ProcessInstance instance = runtimeService.startProcessInstanceByKey("Process_1623vs0");
+
+		//		Job job = managementService.createJobQuery().singleResult();
+		//		managementService.executeJob(job.getId());
+
+		ThreadControl thread1 = executeControllableCommand(new Foo(managementService, runtimeService));
+		ThreadControl thread2 = executeControllableCommand(new Bar(managementService, runtimeService));
+
+		thread1.reportInterrupts();
+		thread2.reportInterrupts();
+
+		// 1) job is queried & cached
+		// 2) thread 1 is suspended
+		thread1.waitForSync();
+		
+		// 3) Thread 2: job is queried & cached
+		// 4) Thread 2 is suspended
+		thread2.waitForSync();
+
+		thread1.makeContinue(); // "waits" in conditional event (flush not performed)
+
+		thread2.makeContinue(); // sets variable but does not wait in conditional event (flush not performed)
+
+		thread1.waitForSync();
+		thread2.waitForSync();
+
+		// flush both threads
+		thread1.waitUntilDone();
+		thread2.waitUntilDone();
+		
+		Job job = managementService.createJobQuery().singleResult();
+		Assert.assertNotNull(job);
+	}
+
+
+
+	protected static class Foo extends ControllableCommand<Void> {
+
+		ManagementService managementService;
+		RuntimeService runtimeService;
+		public Foo(ManagementService managementService, RuntimeService runtimeService) {
+			this.managementService = managementService;
+			this.runtimeService = runtimeService;
+		}
+
+		@Override
+		public Void execute(CommandContext commandContext) {
+
+			final Job job = managementService.createJobQuery().singleResult();
+
+			monitor.sync();
+
+			managementService.executeJob(job.getId());
+			runtimeService.setVariable(job.getProcessInstanceId(), "technical-variable", "foo");
+			monitor.sync();
+
+			return null;
+		}
+
+	}
+
+	protected static class Bar extends ControllableCommand<Void> {
+
+		ManagementService managementService;
+		RuntimeService runtimeService;
+
+		public Bar(ManagementService managementService, RuntimeService runtimeService) {
+			this.managementService = managementService;
+			this.runtimeService = runtimeService;
+		}
+
+		@Override
+		public Void execute(CommandContext commandContext) {
+
+			final Job job = managementService.createJobQuery().singleResult();
+
+			monitor.sync();
+
+			runtimeService.createMessageCorrelation("Message_1hv8lda")
+			.setVariable("foo", true)
+			.correlate();
+			runtimeService.setVariable(job.getProcessInstanceId(), "technical-variable", "bar");
+
+
+			monitor.sync();
+
+			return null;
+		}
+
+	}
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   public void testConcurrentCorrelationFailsWithOptimisticLockingException() {
     InvocationLogListener.reset();
