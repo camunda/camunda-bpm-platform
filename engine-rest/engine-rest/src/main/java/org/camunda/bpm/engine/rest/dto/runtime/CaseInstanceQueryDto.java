@@ -74,6 +74,9 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
 
   protected List<VariableQueryParameterDto> variables;
 
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
+
   public CaseInstanceQueryDto() {
   }
 
@@ -156,6 +159,16 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
     this.variables = variables;
   }
 
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value = "variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -209,6 +222,12 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
     }
     if (terminated != null && terminated == true) {
       query.terminated();
+    }
+    if(Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if(Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
     if (variables != null) {
 
