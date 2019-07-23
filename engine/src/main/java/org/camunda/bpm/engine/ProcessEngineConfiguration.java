@@ -394,7 +394,7 @@ public abstract class ProcessEngineConfiguration {
    * If the value of this flag is set to <code>true</code> exceptions that occur
    * during the execution of a job that still has retries left will not be logged.
    * If the job does not have any retries left, the exception will still be logged
-   * on logging level ERROR.
+   * on logging level WARN.
    */
   protected boolean enableReducedJobExceptionLogging = false;
 

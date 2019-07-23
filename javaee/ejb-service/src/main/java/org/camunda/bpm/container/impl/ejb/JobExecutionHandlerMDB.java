@@ -21,8 +21,10 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandler;
+import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
+import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 
 
 /**
@@ -37,8 +39,10 @@ import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
 @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class JobExecutionHandlerMDB implements JobExecutionHandler {
 
-  public void executeJob(String job, CommandExecutor commandExecutor) {
-    ExecuteJobHelper.executeJob(job, commandExecutor);
+  public JobFailureCollector executeJob(String job, CommandExecutor commandExecutor) {
+    JobFailureCollector jobFailureCollector = new JobFailureCollector(job);
+    ExecuteJobHelper.executeJob(job, commandExecutor, jobFailureCollector, new ExecuteJobsCmd(job, jobFailureCollector));
+    return jobFailureCollector;
   }
 
 }
