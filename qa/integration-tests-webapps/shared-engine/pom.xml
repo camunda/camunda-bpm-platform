@@ -25,7 +25,7 @@
     <profile>
       <id>jboss</id>
       <properties>
-        <jboss.runtime>${basedir}/${jboss.runtime.location}</jboss.runtime>
+        <jboss.runtime>${basedir}/../${jboss.runtime.location}</jboss.runtime>
         <http.port>${jboss.http.port}</http.port>
       </properties>
       <dependencies>
@@ -164,7 +164,7 @@
     <profile>
       <id>wildfly</id>
       <properties>
-        <jboss.runtime>${basedir}/${wildfly.runtime.location}</jboss.runtime>
+        <jboss.runtime>${basedir}/../${wildfly.runtime.location}</jboss.runtime>
         <http.port>${jboss.http.port}</http.port>
       </properties>
       <dependencies>
@@ -480,6 +480,9 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <dependenciesToScan>
+                <dependency>org.camunda.bpm.qa:camunda-qa-integration-tests-webapps</dependency>
+              </dependenciesToScan>
               <skipTests>false</skipTests>
               <includes>
                 <include>**/EmbeddedEngineRest_WILDFLY.*</include>

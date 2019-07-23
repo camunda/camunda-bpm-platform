@@ -10,7 +10,7 @@
 
   <container qualifier="jboss" default="true">
     <configuration>
-      <property name="jbossHome">${wildfly.runtime.location}</property>
+      <property name="jbossHome">../${wildfly.runtime.location}</property>
       <property name="managementPort">${jboss.management-http.port}</property>
       <property name="serverConfig">standalone.xml</property>
       <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=320m</property>
