@@ -92,6 +92,7 @@
         NAME_= #{queryVariableValue.name}
       </otherwise>
     </choose>
+    ${collationForCaseSensitivity}
   </sql>
 
   <sql id="executionVariableOperator">
