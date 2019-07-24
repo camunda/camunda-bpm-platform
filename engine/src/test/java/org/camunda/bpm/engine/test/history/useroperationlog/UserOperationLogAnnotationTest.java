@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -47,6 +48,7 @@ public class UserOperationLogAnnotationTest {
   protected static final String ANNOTATION = "anAnnotation";
   protected static final String TASK_NAME = "aTaskName";
   protected static final String OPERATION_ID = "operationId";
+  protected final Date CREATE_TIME = new Date(1363608000000L);
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
@@ -109,6 +111,35 @@ public class UserOperationLogAnnotationTest {
 
     // then
     assertThat(userOperationLogEntry.getAnnotation()).isEqualTo(ANNOTATION);
+  }
+
+  /**
+   * See https://app.camunda.com/jira/browse/CAM-10664
+   */
+  @Test
+  public void shouldSetAnnotation_WithPreservedTimeStamp() {
+    // given
+    ClockUtil.setCurrentTime(CREATE_TIME);
+
+    createTask();
+
+    UserOperationLogEntry userOperationLogEntry = historyService
+        .createUserOperationLogQuery()
+        .singleResult();
+
+    // assume
+    assertThat(userOperationLogEntry).isNotNull();
+
+    // when
+    historyService.setAnnotationForOperationLogById(userOperationLogEntry.getOperationId(), ANNOTATION);
+
+    userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK)
+        .singleResult();
+
+    // then
+    assertThat(userOperationLogEntry.getAnnotation()).isEqualTo(ANNOTATION);
+    assertThat(userOperationLogEntry.getTimestamp()).isEqualTo(CREATE_TIME);
   }
 
   @Test
