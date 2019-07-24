@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -73,6 +74,10 @@ public class ParserTest {
   public void shouldAllowExternalSchemaAccessViaSystemProperty() {
 
     // given
+    // the external schema access property is not supported on certain
+    // IBM JDK versions, in which case schema access cannot be restricted
+    Assume.assumeTrue(doesJdkSupportExternalSchemaAccessProperty());
+
     System.setProperty(ACCESS_EXTERNAL_SCHEMA_PROP, "all");
 
     try {
@@ -102,6 +107,17 @@ public class ParserTest {
       assertThat(mpe.getCause()).hasMessageContaining("DOCTYPE");
       assertThat(mpe.getCause()).hasMessageContaining("http://apache.org/xml/features/disallow-doctype-decl");
     }
+  }
+
+  protected boolean doesJdkSupportExternalSchemaAccessProperty() {
+    String jvmVendor = System.getProperty("java.vm.vendor");
+    String javaVersion = System.getProperty("java.version");
+
+    boolean isIbmJDK = jvmVendor != null && jvmVendor.contains("IBM");
+    boolean isJava6or7 = javaVersion != null && (javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7"));
+
+    return !(isIbmJDK && isJava6or7);
+
   }
 
 }
