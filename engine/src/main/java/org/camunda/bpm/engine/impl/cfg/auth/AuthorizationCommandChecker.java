@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cfg.auth;
 
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -757,22 +758,23 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
-  @Override
-  public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
+  public void checkUserOperationLog(UserOperationLogEntry entry,
+                                    ProcessDefinitionPermissions processDefinitionPermission,
+                                    UserOperationLogCategoryPermissions operationLogCategoryPermission) {
     /*
      * (1) if entry has a category and a process definition key:
      *   => entry in context of process definition
      *   => check either 
-     *        DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey OR
-     *        DELETE on OPERATION_LOG_CATEGORY with category
+     *        UPDATE_/DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey OR
+     *        UPDATE/DELETE OPERATION_LOG_CATEGORY with category
      * 
      * (2) if entry has a category but no process definition key:
      *   => standalone entry (task, job, batch, ...), admin entry (user, tenant, ...) or CMMN related
-     *   => check DELETE on OPERATION_LOG_CATEGORY with category
+     *   => check UPDATE/DELETE on OPERATION_LOG_CATEGORY with category
      *   
      * (3) if entry has no category but a process definition key:
      *   => pre-7.11.0 entry in context of process definition 
-     *   => check DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey
+     *   => check UPDATE_/DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey
      *   
      * (4) if entry has no category and no process definition key:
      *   => pre-7.11.0 standalone entry (task, job, batch, ...) or CMMN related
@@ -786,25 +788,35 @@ public class AuthorizationCommandChecker implements CommandChecker {
         if (category == null) {
           // case (3)
           permissionCheck = new PermissionCheckBuilder()
-              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, DELETE_HISTORY)
+              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, processDefinitionPermission)
               .build();
         } else if (processDefinitionKey == null) {
           // case (2)
           permissionCheck = new PermissionCheckBuilder()
-              .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category, UserOperationLogCategoryPermissions.DELETE)
+              .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category, operationLogCategoryPermission)
               .build();
         } else {
           // case (1)
           permissionCheck = new PermissionCheckBuilder()
               .disjunctive()
-                .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, DELETE_HISTORY)
-                .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category, UserOperationLogCategoryPermissions.DELETE)
+                .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, processDefinitionPermission)
+                .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category, operationLogCategoryPermission)
               .build();
         }
         getAuthorizationManager().checkAuthorization(permissionCheck);
       }
       // case (4)
     }
+  }
+
+  @Override
+  public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
+    checkUserOperationLog(entry, ProcessDefinitionPermissions.DELETE_HISTORY, UserOperationLogCategoryPermissions.DELETE);
+  }
+
+  @Override
+  public void checkUpdateUserOperationLog(UserOperationLogEntry entry) {
+    checkUserOperationLog(entry, ProcessDefinitionPermissions.UPDATE_HISTORY, UserOperationLogCategoryPermissions.UPDATE);
   }
 
   @Override

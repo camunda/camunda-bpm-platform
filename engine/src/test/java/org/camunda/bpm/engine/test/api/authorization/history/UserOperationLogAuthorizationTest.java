@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.UPDATE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.OPERATION_LOG_CATEGORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions.DELETE;
@@ -30,8 +32,10 @@ import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -1403,6 +1407,271 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     
     // then
     assertNull(historyService.createUserOperationLogQuery().singleResult());
+  }
+
+  // update user operation log //////////////////////////////
+
+  public void testUpdateEntryWithUpdateHistoryPermissionOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    String taskId = selectSingleTask().getId();
+    setAssignee(taskId, "demo");
+
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE_HISTORY);
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    // when
+    historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+    disableAuthorization();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult();
+
+    enableAuthorization();
+
+    // then
+    assertTextPresent(userOperationLogEntry.getAnnotation(), "anAnnotation");
+  }
+
+  public void testUpdateEntryWithUpdateHistoryPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    String taskId = selectSingleTask().getId();
+    setAssignee(taskId, "demo");
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_HISTORY);
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    // when
+    historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+    disableAuthorization();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult();
+
+    enableAuthorization();
+
+    // then
+    assertTextPresent(userOperationLogEntry.getAnnotation(), "anAnnotation");
+  }
+
+
+  public void testUpdateEntryWithUpdateHistoryPermissionOnAnyProcessDefinition_Standalone() {
+    // given
+    createTask("aTaskId");
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_HISTORY);
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    try {
+      // when
+      historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+      fail("Exception expected: It should not be possible to update the user operation log");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(OPERATION_LOG_CATEGORY.resourceName(), message);
+      assertTextPresent(CATEGORY_TASK_WORKER, message);
+    }
+
+    // cleanup
+    deleteTask("aTaskId", true);
+  }
+
+  public void testUpdateEntryRelatedToProcessDefinitionWithUpdatePermissionOnCategory() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    String taskId = selectSingleTask().getId();
+    setAssignee(taskId, "demo");
+
+    createGrantAuthorization(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, UserOperationLogCategoryPermissions.UPDATE);
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    // when
+    historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+    disableAuthorization();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult();
+
+    enableAuthorization();
+
+    // then
+    assertTextPresent(userOperationLogEntry.getAnnotation(), "anAnnotation");
+  }
+
+  public void testUpdateEntryRelatedToProcessDefinitionWithUpdatePermissionOnAnyCategory() {
+    // given
+    startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+
+    String taskId = selectSingleTask().getId();
+    setAssignee(taskId, "demo");
+
+    createGrantAuthorization(OPERATION_LOG_CATEGORY, ANY, userId, UserOperationLogCategoryPermissions.UPDATE);
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    // when
+    historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+    disableAuthorization();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult();
+
+    enableAuthorization();
+
+    // then
+    assertTextPresent(userOperationLogEntry.getAnnotation(), "anAnnotation");
+  }
+
+  public void testUpdateEntryWithoutAuthorization() {
+    // given
+    createTask("aTaskId");
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    try {
+      // when
+      historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+      fail("Exception expected: It should not be possible to update the user operation log");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(OPERATION_LOG_CATEGORY.resourceName(), message);
+      assertTextPresent(CATEGORY_TASK_WORKER, message);
+    }
+
+    // cleanup
+    deleteTask("aTaskId", true);
+  }
+
+  public void testUpdateEntryWithUpdatePermissionOnCategory() {
+    // given
+    createTask("aTaskId");
+
+    createGrantAuthorization(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, UserOperationLogCategoryPermissions.UPDATE);
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    // when
+    historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+    disableAuthorization();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult();
+
+    enableAuthorization();
+
+    // then
+    assertTextPresent(userOperationLogEntry.getAnnotation(), "anAnnotation");
+
+    // cleanup
+    deleteTask("aTaskId", true);
+  }
+
+  public void testUpdateEntryWithUpdatePermissionOnAnyCategory() {
+    // given
+    createTask("aTaskId");
+
+    createGrantAuthorization(OPERATION_LOG_CATEGORY, ANY, userId, UserOperationLogCategoryPermissions.UPDATE);
+
+    disableAuthorization();
+
+    String operationId = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult()
+        .getOperationId();
+
+    enableAuthorization();
+
+    // when
+    historyService.setAnnotationForOperationLogById(operationId, "anAnnotation");
+
+    disableAuthorization();
+
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .entityType("Task")
+        .singleResult();
+
+    enableAuthorization();
+
+    // then
+    assertTextPresent(userOperationLogEntry.getAnnotation(), "anAnnotation");
+
+    // cleanup
+    deleteTask("aTaskId", true);
   }
 
   // helper ////////////////////////////////////////////////////////

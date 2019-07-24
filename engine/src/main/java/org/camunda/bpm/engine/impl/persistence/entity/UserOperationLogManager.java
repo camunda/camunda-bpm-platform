@@ -90,6 +90,15 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       .updatePreserveOrder(UserOperationLogEntryEventEntity.class, "updateUserOperationLogByProcessInstanceId", parameters);
   }
 
+  public void updateOperationLogAnnotationByOperationId(String operationId, String annotation) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("operationId", operationId);
+    parameters.put("annotation", annotation);
+
+    getDbEntityManager()
+        .updatePreserveOrder(UserOperationLogEntryEventEntity.class, "updateOperationLogAnnotationByOperationId", parameters);
+  }
+
   public void deleteOperationLogEntryById(String entryId) {
     if (isHistoryEventProduced()) {
       getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntryById", entryId);
@@ -627,7 +636,30 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       fireUserOperationLog(context);
     }
   }
-  
+
+  public void logSetAnnotationOperation(String operationId) {
+    logAnnotationOperation(operationId, UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION);
+  }
+
+  public void logClearAnnotationOperation(String operationId) {
+    logAnnotationOperation(operationId, UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION);
+  }
+
+  protected void logAnnotationOperation(String operationId, String operationType) {
+    if (isUserOperationLogEnabled()) {
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operationType, EntityTypes.OPERATION_LOG)
+              .propertyChanges(new PropertyChange("operationId", null, operationId))
+              .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+
+      UserOperationLogContext context = new UserOperationLogContext();
+      context.addEntry(entryBuilder.create());
+
+      fireUserOperationLog(context);
+    }
+  }
+
   public void logAuthorizationOperation(String operation, AuthorizationEntity authorization, AuthorizationEntity previousValues) {
     if (isUserOperationLogEnabled()) {
       List<PropertyChange> propertyChanges = new ArrayList<>();

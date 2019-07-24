@@ -46,6 +46,8 @@ import org.camunda.bpm.qa.upgrade.useroperationlog.CreateStandaloneTaskDeleteSce
 import org.camunda.bpm.qa.upgrade.useroperationlog.CreateStandaloneTaskScenario;
 import org.camunda.bpm.qa.upgrade.useroperationlog.SetAssigneeProcessInstanceTaskScenario;
 import org.camunda.bpm.qa.upgrade.useroperationlog.SuspendProcessDefinitionDeleteScenario;
+import org.camunda.bpm.qa.upgrade.useroperationlog.annotation.AuthorizationCheckProcessDefinitionScenario;
+import org.camunda.bpm.qa.upgrade.useroperationlog.annotation.NoAuthorizationCheckScenario;
 
 /**
  * @author Tassilo Weidner
@@ -92,6 +94,8 @@ public class TestFixture {
     runner.setupScenarios(SetAssigneeProcessInstanceTaskScenario.class);
     runner.setupScenarios(CreateStandaloneTaskDeleteScenario.class);
     runner.setupScenarios(SuspendProcessDefinitionDeleteScenario.class);
+    runner.setupScenarios(AuthorizationCheckProcessDefinitionScenario.class);
+    runner.setupScenarios(NoAuthorizationCheckScenario.class);
 
     processEngine.close();
   }
