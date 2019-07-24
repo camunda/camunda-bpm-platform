@@ -132,14 +132,6 @@ module.exports = function(config, copyConf) {
         cwd: 'node_modules/camunda-commons-ui/node_modules/dmn-js/fonts',
         src: ['*.{eot,svg,ttf,woff,woff2}'],
         dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/fonts/'
-      },
-
-      // placeholder shims
-      {
-        expand: true,
-        cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor',
-        src: ['placeholders.*'],
-        dest: '<%= pkg.gruntConfig.welcomeBuildTarget %>/scripts/'
       }
     ]
   };

@@ -133,14 +133,6 @@ module.exports = function(config, copyConf) {
           'node_modules/dmn-js/dist/assets/dmn-font/font/',
         src: ['*.{eot,svg,ttf,woff,woff2}'],
         dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
-      },
-
-      // placeholder shims
-      {
-        expand: true,
-        cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor',
-        src: ['placeholders.*'],
-        dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/'
       }
     ]
   };

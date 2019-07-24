@@ -158,14 +158,6 @@ module.exports = function(config, copyConf) {
         cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/styles',
         src: ['*.css'],
         dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/styles/'
-      },
-
-      // placeholder shims
-      {
-        expand: true,
-        cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor',
-        src: ['placeholders.*'],
-        dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/'
       }
     ]
   };

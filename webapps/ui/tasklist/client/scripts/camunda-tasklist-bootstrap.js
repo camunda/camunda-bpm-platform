@@ -15,29 +15,11 @@
  * limitations under the License.
  */
 
-var $ = (window.jQuery = window.$ = require('jquery'));
-
 window.__define(
   'camunda-tasklist-bootstrap',
   ['./scripts/camunda-tasklist-ui'],
   function() {
     'use strict';
-
-    function parseUriConfig() {
-      var $baseTag = $('base');
-      var config = {};
-      var names = [
-        'href',
-        'app-root',
-        'admin-api',
-        'tasklist-api',
-        'engine-api'
-      ];
-      for (var i = 0; i < names.length; i++) {
-        config[names[i]] = $baseTag.attr(names[i]);
-      }
-      return config;
-    }
 
     var camundaTasklistUi = window.CamundaTasklistUi;
 
@@ -162,33 +144,6 @@ window.__define(
         }
       });
     });
-
-    var uriConfig = parseUriConfig();
-
-    if (
-      typeof window.tasklistConf !== 'undefined' &&
-      window.tasklistConf.polyfills
-    ) {
-      var polyfills = window.tasklistConf.polyfills;
-
-      if (polyfills.indexOf('placeholder') > -1) {
-        var load = window.requirejs;
-        var appRoot = uriConfig['app-root'];
-
-        load(
-          [
-            appRoot + '/app/tasklist/scripts/placeholders.utils.js',
-            appRoot + '/app/tasklist/scripts/placeholders.main.js'
-          ],
-          function() {
-            load(
-              [appRoot + '/app/tasklist/scripts/placeholders.jquery.js'],
-              function() {}
-            );
-          }
-        );
-      }
-    }
   }
 );
 
