@@ -35,6 +35,7 @@ public class ProcessModels {
   public static final String EXTERNAL_TASK_TOPIC_FOO = "foo";
   public static final String EXTERNAL_TASK_TOPIC_BAR = "bar";
   public static final long EXTERNAL_TASK_PRIORITY = 4711L;
+  public static final String PROCESS_DEFINITION_VERSION_TAG = "versionTag";
 
   public static ProcessBuilder newModel() {
     return newModel(PROCESS_KEY);
@@ -87,6 +88,15 @@ public class ProcessModels {
       .endEvent("endEvent")
       .done();
 
+  public static final BpmnModelInstance ONE_EXTERNAL_TASK_WITH_VERSION_TAG = 
+      newModel(PROCESS_DEFINITION_VERSION_TAG)
+      .camundaVersionTag(PROCESS_DEFINITION_VERSION_TAG)
+      .startEvent()
+      .serviceTask(EXTERNAL_TASK_ID)
+        .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+      .endEvent()
+      .done();
+
   public static final BpmnModelInstance BPMN_ERROR_EXTERNAL_TASK_PROCESS =
       newModel()
       .startEvent()
@@ -101,5 +111,4 @@ public class ProcessModels {
       .userTask(USER_TASK_AFTER_BPMN_ERROR)
       .endEvent()
       .done();
-
 }

@@ -26,7 +26,6 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -239,6 +238,27 @@ public class TopicSubscriptionIT {
 
     List<ExternalTask> handledTasks = handler.getHandledTasks();
     assertThat(handledTasks.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldFilterByProcessDefinitionVersionTag() {
+    // given
+    ProcessDefinitionDto processDefinition3 = engineRule.deploy(ONE_EXTERNAL_TASK_WITH_VERSION_TAG).get(0);
+    engineRule.startProcessInstance(processDefinition.getId());
+    engineRule.startProcessInstance(processDefinition3.getId());
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .processDefinitionVersionTag(PROCESS_DEFINITION_VERSION_TAG)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    List<ExternalTask> handledTasks = handler.getHandledTasks();
+    assertThat(handledTasks.size()).isEqualTo(1);
+    assertThat(handledTasks.get(0).getProcessDefinitionKey()).isEqualTo(PROCESS_DEFINITION_VERSION_TAG);
   }
 
   @Test

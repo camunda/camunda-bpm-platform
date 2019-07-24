@@ -39,10 +39,12 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected List<String> processDefinitionIds;
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeys;
+  protected String processDefinitionVersionTag;
   protected boolean withoutTenantId;
   protected List<String> tenantIds;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
+
 
   public TopicSubscriptionBuilderImpl(String topicName, TopicSubscriptionManager topicSubscriptionManager) {
     this.topicName = topicName;
@@ -94,6 +96,12 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     return this;
   }
 
+  public TopicSubscriptionBuilder processDefinitionVersionTag(String processDefinitionVersionTag) {
+    ensureNotNull(processDefinitionVersionTag, "processDefinitionVersionTag");
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
+    return this;
+  }
+
   public TopicSubscriptionBuilder withoutTenantId() {
     withoutTenantId = true;
     return this;
@@ -136,6 +144,9 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     }
     if (tenantIds != null) {
       subscription.setTenantIdIn(tenantIds);
+    }
+    if(processDefinitionVersionTag != null) {
+      subscription.setProcessDefinitionVersionTag(processDefinitionVersionTag);
     }
     topicSubscriptionManager.subscribe(subscription);
 

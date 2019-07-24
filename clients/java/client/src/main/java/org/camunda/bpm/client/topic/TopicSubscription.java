@@ -84,6 +84,11 @@ public interface TopicSubscription {
   List<String> getProcessDefinitionKeyIn();
 
   /**
+   * @return the process definition version tag associated with the external task which are supposed to be fetched and locked
+   */
+  String getProcessDefinitionVersionTag();
+
+  /**
    * @return the tenant id presence for associated with the external tasks which are supposed to be fetched and locked
    */
   boolean isWithoutTenantId();

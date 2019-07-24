@@ -36,6 +36,7 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected List<String> processDefinitionIdIn;
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeyIn;
+  protected String processDefinitionVersionTag;
   protected boolean withoutTenantId;
   protected List<String> tenantIdIn;
 
@@ -109,6 +110,14 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   public TopicSubscription setProcessDefinitionKeyIn(List<String> processDefinitionKeys) {
     this.processDefinitionKeyIn = processDefinitionKeys;
     return this;
+  }
+
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
+  }
+
+  public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
   }
 
   public boolean isWithoutTenantId() {

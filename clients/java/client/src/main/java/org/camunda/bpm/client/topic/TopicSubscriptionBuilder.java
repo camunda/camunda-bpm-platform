@@ -80,6 +80,12 @@ public interface TopicSubscriptionBuilder {
   TopicSubscriptionBuilder processDefinitionKeyIn(String... processDefinitionKeys);
 
   /**
+   * @param processDefinitionKeys to filter for external tasks that are supposed to be fetched and locked
+   * @return the builder
+   */
+  TopicSubscriptionBuilder processDefinitionVersionTag(String processDefinitionVersionTag);
+
+  /**
    * Filter for external tasks without tenant
    * @return the builder
    */

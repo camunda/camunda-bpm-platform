@@ -33,6 +33,7 @@ public class TopicRequestDto {
   protected List<String> processDefinitionIdIn;
   protected String processDefinitionKey;
   protected List<String> processDefinitionKeyIn;
+  protected String processDefinitionVersionTag;
   protected boolean withoutTenantId;
   protected List<String> tenantIdIn;
 
@@ -91,6 +92,14 @@ public class TopicRequestDto {
     this.processDefinitionKeyIn = processDefinitionKeys;
   }
 
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
+  }
+
+  public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
+  }
+
   public boolean isWithoutTenantId() {
     return withoutTenantId;
   }
@@ -136,6 +145,9 @@ public class TopicRequestDto {
     }
     if (topicSubscription.getTenantIdIn() != null) {
       topicRequestDto.setTenantIdIn(topicSubscription.getTenantIdIn());
+    }
+    if(topicSubscription.getProcessDefinitionVersionTag() != null) {
+      topicRequestDto.setProcessDefinitionVersionTag(topicSubscription.getProcessDefinitionVersionTag());
     }
     return topicRequestDto;
   }
