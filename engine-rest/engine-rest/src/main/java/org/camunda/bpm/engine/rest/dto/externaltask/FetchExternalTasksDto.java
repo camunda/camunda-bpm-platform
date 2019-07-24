@@ -70,6 +70,7 @@ public class FetchExternalTasksDto {
     protected String[] processDefinitionIdIn;
     protected String processDefinitionKey;
     protected String[] processDefinitionKeyIn;
+    protected String processDefinitionVersionTag;
     protected long lockDuration;
     protected List<String> variables;
     protected HashMap<String, Object> processVariables;
@@ -114,6 +115,12 @@ public class FetchExternalTasksDto {
     }
     public void setProcessDefinitionKeyIn(String[] processDefinitionKeys) {
       this.processDefinitionKeyIn = processDefinitionKeys;
+    }
+    public String getProcessDefinitionVersionTag() {
+      return processDefinitionVersionTag;
+    }
+    public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
+      this.processDefinitionVersionTag = processDefinitionVersionTag;
     }
     public long getLockDuration() {
       return lockDuration;
@@ -211,6 +218,10 @@ public class FetchExternalTasksDto {
 
         if (topicDto.getTenantIdIn() != null) {
           topicFetchBuilder = topicFetchBuilder.tenantIdIn(topicDto.getTenantIdIn());
+        }
+
+        if(topicDto.getProcessDefinitionVersionTag() != null) {
+          topicFetchBuilder = topicFetchBuilder.processDefinitionVersionTag(topicDto.getProcessDefinitionVersionTag());
         }
 
         fetchBuilder = topicFetchBuilder;

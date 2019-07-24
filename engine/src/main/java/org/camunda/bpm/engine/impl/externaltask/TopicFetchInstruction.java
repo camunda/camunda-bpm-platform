@@ -40,6 +40,7 @@ public class TopicFetchInstruction implements Serializable {
   protected String[] processDefinitionIds;
   protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
+  protected String processDefinitionVersionTag;
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
   protected List<String> variablesToFetch;
@@ -101,6 +102,14 @@ public class TopicFetchInstruction implements Serializable {
 
   public String[] getProcessDefinitionKeys() {
     return processDefinitionKeys;
+  }
+
+  public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
+  }
+
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
   }
 
   public boolean isTenantIdSet() {

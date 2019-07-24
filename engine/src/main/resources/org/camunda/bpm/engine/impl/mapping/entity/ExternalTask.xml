@@ -166,9 +166,16 @@
     ${limitBetween}
     from (
     select RES.*, PI.BUSINESS_KEY_
+     <if test="parameter != null &amp;&amp; parameter.applyVersionTagFilter">
+      , PD.VERSION_TAG_
+    </if>
     from ${prefix}ACT_RU_EXT_TASK RES
 
     left join ${prefix}ACT_RU_EXECUTION PI on RES.PROC_INST_ID_ = PI.ID_
+
+    <if test="parameter != null &amp;&amp; parameter.applyVersionTagFilter">
+      left join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
+    </if>
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
@@ -249,6 +256,9 @@
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions" />
               </foreach>
               )
+          </if>
+          <if test="topicFilters.processDefinitionVersionTag != null">
+            and (PD.VERSION_TAG_ like #{topicFilters.processDefinitionVersionTag})
           </if>
         </foreach>
 

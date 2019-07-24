@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -3078,6 +3079,24 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
         fail("No other topic name values should be available!");
       }
     }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchAndLockByProcessDefinitionVersionTag.bpmn20.xml"})
+  public void testFetchAndLockByProcessDefinitionVersionTag() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess"); // no version tag
+    runtimeService.startProcessInstanceByKey("testFetchAndLockByProcessDefinitionVersionTag"); // version tag: version X.Y
+
+    // when
+    List<ExternalTask> totalExternalTasks = externalTaskService.createExternalTaskQuery().list();
+    List<LockedExternalTask> fetchedExternalTasks = externalTaskService.fetchAndLock(1, "workerID")
+        .topic("externalTaskTopic", 1000L).processDefinitionVersionTag("version X.Y").execute();
+
+    //then
+    assertThat(totalExternalTasks.size()).isEqualTo(2);
+    assertThat(fetchedExternalTasks.size()).isEqualTo(1);
+    assertThat(fetchedExternalTasks.get(0).getProcessDefinitionKey()).isEqualTo("testFetchAndLockByProcessDefinitionVersionTag");
   }
 
   protected Date nowPlus(long millis) {
