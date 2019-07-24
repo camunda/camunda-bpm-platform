@@ -52,6 +52,10 @@ public class ParserTest {
   public void shouldProhibitExternalSchemaAccessViaSystemProperty() {
 
     // given
+    // the external schema access property is not supported on certain
+    // IBM JDK versions, in which case schema access cannot be restricted
+    Assume.assumeTrue(doesJdkSupportExternalSchemaAccessProperty());
+
     System.setProperty(ACCESS_EXTERNAL_SCHEMA_PROP, "");
 
     try {
@@ -74,9 +78,6 @@ public class ParserTest {
   public void shouldAllowExternalSchemaAccessViaSystemProperty() {
 
     // given
-    // the external schema access property is not supported on certain
-    // IBM JDK versions, in which case schema access cannot be restricted
-    Assume.assumeTrue(doesJdkSupportExternalSchemaAccessProperty());
 
     System.setProperty(ACCESS_EXTERNAL_SCHEMA_PROP, "all");
 
