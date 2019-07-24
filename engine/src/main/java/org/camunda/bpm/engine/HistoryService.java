@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
@@ -648,5 +649,50 @@ public interface HistoryService {
    * @since 7.11
    */
   SetRemovalTimeSelectModeForHistoricBatchesBuilder setRemovalTimeToHistoricBatches();
+
+  /**
+   * <p>Set an annotation to user operation log entries.</p>
+   *
+   * @throws NotValidException when operation id is {@code null}
+   * @throws BadUserRequestException when no user operation could be found
+   * @throws AuthorizationException
+   * <ul>
+   *   <li>
+   *     when no {@link ProcessDefinitionPermissions#UPDATE_HISTORY} permission
+   *     is granted on {@link Resources#PROCESS_DEFINITION}</li>
+   *   <li>
+   *     or when no {@link UserOperationLogCategoryPermissions#UPDATE} permission
+   *     is granted on {@link Resources#OPERATION_LOG_CATEGORY}
+   *   </li>
+   * </ul>
+   *
+   * @param operationId of the user operation log entries that are updated
+   * @param annotation that is set to the user operation log entries
+   *
+   * @since 7.12
+   */
+  void setAnnotationForOperationLogById(String operationId, String annotation);
+
+  /**
+   * <p>Clear the annotation for user operation log entries.</p>
+   *
+   * @throws NotValidException when operation id is {@code null}
+   * @throws BadUserRequestException when no user operation could be found
+   * @throws AuthorizationException
+   * <ul>
+   *   <li>
+   *     when no {@link ProcessDefinitionPermissions#UPDATE_HISTORY} permission
+   *     is granted on {@link Resources#PROCESS_DEFINITION}</li>
+   *   <li>
+   *     or when no {@link UserOperationLogCategoryPermissions#UPDATE} permission
+   *     is granted on {@link Resources#OPERATION_LOG_CATEGORY}
+   *   </li>
+   * </ul>
+   *
+   * @param operationId of the user operation log entries that are updated
+   *
+   * @since 7.12
+   */
+  void clearAnnotationForOperationLogById(String operationId);
 
 }

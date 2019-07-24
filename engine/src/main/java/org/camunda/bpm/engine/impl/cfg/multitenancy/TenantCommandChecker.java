@@ -491,6 +491,11 @@ public class TenantCommandChecker implements CommandChecker {
   public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
     // tenant check is not available for user operation log
   }
+
+  @Override
+  public void checkUpdateUserOperationLog(UserOperationLogEntry entry) {
+    // tenant check is not available for user operation log
+  }
   
   @Override
   public void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog) {

@@ -348,6 +348,11 @@ public interface CommandChecker {
   void checkDeleteUserOperationLog(UserOperationLogEntry entry);
 
   /**
+   * Check if it is allowed to update the user operation log of the given user operation log entry.
+   */
+  void checkUpdateUserOperationLog(UserOperationLogEntry entry);
+
+  /**
    * Check if it is allowed to read a case instance of the given case execution.
    */
   void checkReadCaseInstance(CaseExecution caseExecution);

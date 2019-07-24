@@ -17,3 +17,7 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('100', CURRENT_TIMESTAMP, '7.12.0');
+
+-- https://app.camunda.com/jira/browse/CAM-10665
+ALTER TABLE ACT_HI_OP_LOG
+  ADD ANNOTATION_ NVARCHAR2(2000);

@@ -230,6 +230,7 @@ create table ACT_HI_OP_LOG (
     REMOVAL_TIME_ datetime2,
 	CATEGORY_ nvarchar(64),
 	EXTERNAL_TASK_ID_ nvarchar(64),
+	ANNOTATION_ nvarchar(4000),
     primary key (ID_)
 );
 

@@ -43,6 +43,9 @@ public enum UserOperationLogCategoryPermissions implements Permission {
 
   /** Indicates that READ interactions on defined categories are permitted. */
   READ("READ", 2),
+
+  /** Indicates that UPDATE interactions on defined categories are permitted. */
+  UPDATE("UPDATE", 4),
   
   /** Indicates that DELETE interactions on defined categories are permitted. */
   DELETE("DELETE", 16);

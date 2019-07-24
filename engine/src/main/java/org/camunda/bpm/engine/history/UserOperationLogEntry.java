@@ -127,6 +127,9 @@ public interface UserOperationLogEntry {
 
   public static String OPERATION_TYPE_SET_REMOVAL_TIME = "SetRemovalTime";
 
+  String OPERATION_TYPE_SET_ANNOTATION = "SetAnnotation";
+  String OPERATION_TYPE_CLEAR_ANNOTATION = "ClearAnnotation";
+
   public static String CATEGORY_ADMIN = "Admin";
   public static String CATEGORY_OPERATOR = "Operator";
   public static String CATEGORY_TASK_WORKER = "TaskWorker";
@@ -220,5 +223,8 @@ public interface UserOperationLogEntry {
   
   /** The category this entry is associated with */
   String getCategory();
+
+  /** An arbitrary annotation set by a user for auditing reasons */
+  String getAnnotation();
 
 }
