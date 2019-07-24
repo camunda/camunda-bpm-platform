@@ -173,31 +173,6 @@ module.exports = function(pluginDependencies) {
     }
   ]);
 
-  if (
-    typeof window.camAdminConf !== 'undefined' &&
-    window.camAdminConf.polyfills
-  ) {
-    var polyfills = window.camAdminConf.polyfills;
-
-    if (polyfills.indexOf('placeholder') > -1) {
-      var load = window.requirejs;
-      var appRoot = $('head base').attr('app-root');
-
-      load(
-        [
-          appRoot + '/app/admin/scripts/placeholders.utils.js',
-          appRoot + '/app/admin/scripts/placeholders.main.js'
-        ],
-        function() {
-          load(
-            [appRoot + '/app/admin/scripts/placeholders.jquery.js'],
-            function() {}
-          );
-        }
-      );
-    }
-  }
-
   $(document).ready(function() {
     angular.bootstrap(document.documentElement, [
       appNgModule.name,
