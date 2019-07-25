@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <connect.version.old>1.1.4</connect.version.old>
+    <connect.version.old>1.2.0</connect.version.old>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
