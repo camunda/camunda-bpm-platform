@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.spin</groupId>
   <artifactId>camunda-spin-bom</artifactId>
-  <version>1.6.8-SNAPSHOT</version>
+  <version>1.7.0</version>
   <name>camunda spin - bom</name>
   <packaging>pom</packaging>
 
@@ -48,7 +48,7 @@
     <url>https://github.com/camunda/camunda-spin</url>
     <connection>scm:git:git@github.com:camunda/camunda-spin.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-spin.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>1.7.0</tag>
   </scm>
 
 </project>
