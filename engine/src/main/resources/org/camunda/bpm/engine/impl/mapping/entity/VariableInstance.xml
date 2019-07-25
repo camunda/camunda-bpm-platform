@@ -334,15 +334,7 @@
 
             <!-- variableName -->
             <if test="variableName != null">
-              and 
-            <choose>
-              <when test="variableNamesIgnoreCase">
-                UPPER(RES.NAME_)= UPPER(#{variableName})
-              </when>
-              <otherwise>
-                RES.NAME_ = #{variableName}
-              </otherwise>
-            </choose>
+              and RES.NAME_ = #{variableName}
             </if>
 
             <!-- variablesNames -->
@@ -356,16 +348,7 @@
 
             <!-- variableNameLike -->
             <if test="variableNameLike != null">
-              and
-              <choose>
-              <when test="variableNamesIgnoreCase">
-                UPPER(RES.NAME_) like UPPER(#{variableNameLike})
-              </when>
-              <otherwise>
-                RES.NAME_ like #{variableNameLike}
-              </otherwise>
-            </choose>
-              ESCAPE ${escapeChar}
+              and RES.NAME_ like #{variableNameLike} ESCAPE ${escapeChar}
             </if>
 
             <!-- executionIds -->

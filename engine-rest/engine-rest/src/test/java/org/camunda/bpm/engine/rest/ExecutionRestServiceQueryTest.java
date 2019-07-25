@@ -387,6 +387,54 @@ public class ExecutionRestServiceQueryTest extends
   }
 
   @Test
+  public void testProcessVariableValuesEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+    given().queryParam("processVariables", queryValue).queryParam("variableValuesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(EXECUTION_QUERY_URL);
+    verify(mockedQuery).processVariableValueEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
+
+  @Test
+  public void testProcessVariableValuesNotEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
+    given().queryParam("processVariables", queryValue).queryParam("variableValuesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(EXECUTION_QUERY_URL);
+    verify(mockedQuery).processVariableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+  }
+
+  @Test
+  public void testProcessVariableNamesEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+    given().queryParam("processVariables", queryValue).queryParam("variableNamesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(EXECUTION_QUERY_URL);
+    verify(mockedQuery).processVariableValueEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+  }
+
+  @Test
+  public void testProcessVariableNamesNotEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
+    given().queryParam("processVariables", queryValue).queryParam("variableNamesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(EXECUTION_QUERY_URL);
+    verify(mockedQuery).processVariableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+  }
+
+  @Test
   public void testVariableValueEqualsAsPost() {
     Map<String, Object> variableJson = new HashMap<String, Object>();
     variableJson.put("name", "varName");
@@ -695,6 +743,114 @@ public class ExecutionRestServiceQueryTest extends
     
     verify(mockedQuery).matchVariableNamesIgnoreCase();
     verify(mockedQuery).variableValueNotEquals("varName", "varValue");
+  }
+
+  @Test
+  public void testProcessVariableValuesEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "eq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+    json.put("variableValuesIgnoreCase", true);
+
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(EXECUTION_QUERY_URL);
+
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).processVariableValueEquals("varName", "varValue");
+  }
+
+  @Test
+  public void testProcessVariableValuesNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "neq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+    json.put("variableValuesIgnoreCase", true);
+
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(EXECUTION_QUERY_URL);
+
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).processVariableValueNotEquals("varName", "varValue");
+  }
+
+  @Test
+  public void testProcessVariableNamesEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "eq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+    json.put("variableNamesIgnoreCase", true);
+
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(EXECUTION_QUERY_URL);
+
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).processVariableValueEquals("varName", "varValue");
+  }
+
+  @Test
+  public void testProcessVariableNamesNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "neq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processVariables", variables);
+    json.put("variableNamesIgnoreCase", true);
+
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(EXECUTION_QUERY_URL);
+
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).processVariableValueNotEquals("varName", "varValue");
   }
 
   @Test
