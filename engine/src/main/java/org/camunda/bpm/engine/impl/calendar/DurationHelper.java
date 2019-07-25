@@ -35,7 +35,9 @@ import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
  */
 public class DurationHelper {
 
-  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
+  public static final String PnW_PATTERN = "P\\d+W";
+  private static final int MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   Date start;
 
@@ -135,7 +137,16 @@ public class DurationHelper {
   }
 
   private Duration parsePeriod(String period) {
+    if (period.matches(PnW_PATTERN)) {
+      return parsePnWDuration(period);
+    }
     return datatypeFactory.newDuration(period);
+  }
+
+  private Duration parsePnWDuration(String period) {
+    String weeks = period.replaceAll("\\D", "");
+    int numberOfWeeks = Integer.parseInt(weeks);
+    return datatypeFactory.newDuration(numberOfWeeks * MS_PER_WEEK);
   }
 
   private boolean isDuration(String time) {

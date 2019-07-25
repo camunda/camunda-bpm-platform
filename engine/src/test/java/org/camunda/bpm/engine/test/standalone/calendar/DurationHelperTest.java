@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.standalone.calendar;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 
 import java.text.SimpleDateFormat;
@@ -97,7 +98,17 @@ public class DurationHelperTest {
 
     assertEquals(parse("19700101-00:00:40"), dh.getDateAfter(parse("19700101-00:00:35")));
   }
-
+  
+  @Test
+  public void shouldParseAllSupportedISO8601DurationPatterns() throws Exception {
+    // given
+    // when
+    DurationHelper PnYnMnDTnHnMnS = new DurationHelper("P1Y5M21DT19H47M55S", parse("19700101-00:00:00"));
+    DurationHelper PnW = new DurationHelper("P2W", parse("19700101-00:00:00"));
+    // then
+    assertThat(PnYnMnDTnHnMnS.getDateAfter()).isEqualTo(parse("19710622-19:47:55"));
+    assertThat(PnW.getDateAfter()).isEqualTo(parse("19700115-00:00:00"));
+  }
 
   private Date parse(String str) throws Exception {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
