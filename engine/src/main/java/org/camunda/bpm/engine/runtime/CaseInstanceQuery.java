@@ -117,6 +117,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
   CaseInstanceQuery terminated();
 
   /**
+   * The query will match the names of variables in a case-insensitive way.
+   */
+  CaseInstanceQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of variables in a case-insensitive way.
+   */
+  CaseInstanceQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select cases instances which have a global variable with the given value. The type
    * of variable is determined based on the value, using types configured in
    * {@link ProcessEngineConfigurationImpl#getVariableSerializers()}.

@@ -105,6 +105,16 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
   CaseExecutionQuery disabled();
 
   /**
+   * The query will match the names of variables in a case-insensitive way.
+   */
+  CaseExecutionQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of variables in a case-insensitive way.
+   */
+  CaseExecutionQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select case executions which have a local variable with the given value. The type
    * of variable is determined based on the value, using types configured in
    * {@link ProcessEngineConfigurationImpl#getVariableSerializers()}.

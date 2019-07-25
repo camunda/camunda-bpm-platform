@@ -94,6 +94,9 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
 
   protected List<VariableQueryParameterDto> variables;
 
+  protected Boolean variableValuesIgnoreCase;
+  protected Boolean variableNamesIgnoreCase;
+
   public HistoricCaseInstanceQueryDto() {}
 
   public HistoricCaseInstanceQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
@@ -230,6 +233,16 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     this.variables = variables;
   }
 
+  @CamundaQueryParam(value = "variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
+  }
+
   @CamundaQueryParam(value = "caseActivityIdIn", converter = StringListConverter.class)
   public void setCaseActivityIdIn(List<String> caseActivityIdIn) {
     this.caseActivityIdIn = caseActivityIdIn;
@@ -325,6 +338,12 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     }
     if (caseActivityIdIn != null && !caseActivityIdIn.isEmpty()) {
       query.caseActivityIdIn(caseActivityIdIn.toArray(new String[caseActivityIdIn.size()]));
+    }
+    if(Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if(Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

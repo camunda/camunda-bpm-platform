@@ -85,6 +85,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private Boolean leafProcessInstances;
   private Boolean isProcessDefinitionWithoutTenantId;
 
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
+
   private List<VariableQueryParameterDto> variables;
 
   private List<ProcessInstanceQueryDto> orQueries;
@@ -244,6 +247,24 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
+  }
+
+  public Boolean isVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesCaseInsensitive) {
+    this.variableNamesIgnoreCase = variableNamesCaseInsensitive;
+  }
+
+  public Boolean isVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value ="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesCaseInsensitive) {
+    this.variableValuesIgnoreCase = variableValuesCaseInsensitive;
   }
 
   public Boolean isWithIncident() {
@@ -447,6 +468,12 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (TRUE.equals(isProcessDefinitionWithoutTenantId)) {
       query.processDefinitionWithoutTenantId();
+    }
+    if(TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if(TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
@@ -57,6 +58,8 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   protected String variableName;
   protected String variableNameLike;
   protected List<VariableQueryParameterDto> variableValues;
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
   protected String[] executionIdIn;
   protected String[] processInstanceIdIn;
   protected String[] caseExecutionIdIn;
@@ -85,6 +88,16 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   @CamundaQueryParam(value = "variableValues", converter = VariableListConverter.class)
   public void setVariableValues(List<VariableQueryParameterDto> variableValues) {
     this.variableValues = variableValues;
+  }
+
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value = "variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
   }
 
   @CamundaQueryParam(value="executionIdIn", converter = StringArrayConverter.class)
@@ -145,6 +158,14 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
 
     if (variableNameLike != null) {
       query.variableNameLike(variableNameLike);
+    }
+
+    if(Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+
+    if(Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
 
     if (variableValues != null) {

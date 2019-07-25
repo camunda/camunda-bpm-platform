@@ -70,6 +70,9 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   protected List<VariableQueryParameterDto> variables;
   protected List<VariableQueryParameterDto> caseInstanceVariables;
 
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
+
   public CaseExecutionQueryDto() {
   }
 
@@ -137,6 +140,16 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
     this.variables = variables;
   }
 
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value = "variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+
   @CamundaQueryParam(value = "caseInstanceVariables", converter = VariableListConverter.class)
   public void setCaseInstanceVariables(List<VariableQueryParameterDto> caseInstanceVariables) {
     this.caseInstanceVariables = caseInstanceVariables;
@@ -196,6 +209,14 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
 
     if (disabled != null && disabled == true) {
       query.disabled();
+    }
+
+    if(Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+
+    if(Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
 
     if (variables != null) {
@@ -266,5 +287,4 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
       query.orderByTenantId();
     }
   }
-
 }

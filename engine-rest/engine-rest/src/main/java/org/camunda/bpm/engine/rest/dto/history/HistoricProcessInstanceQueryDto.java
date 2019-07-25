@@ -116,6 +116,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
   private List<VariableQueryParameterDto> variables;
 
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
+
   private List<HistoricProcessInstanceQueryDto> orQueries;
 
   public HistoricProcessInstanceQueryDto() {}
@@ -276,6 +279,16 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
+  }
+
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value = "variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
   }
 
   public String getIncidentType() {
@@ -469,7 +482,12 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (TRUE.equals(withoutTenantId)) {
       query.withoutTenantId();
     }
-
+    if(TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if(TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
+    }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
         String variableName = variableQueryParam.getName();

@@ -27,7 +27,6 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -493,7 +492,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
   }
 
   @Test
-  public void testVariableParameters() {
+  public void testVariableValueEquals() {
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_eq_" + variableValue;
@@ -501,46 +500,563 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    verify(mockedQuery).disableBinaryFetching();
 
-    queryValue = variableName + "_gt_" + variableValue;
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueGreaterThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_gt_" + variableValue;
     given().queryParam("variableValues", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueGreaterThan(variableName, variableValue);
+    verify(mockedQuery).disableBinaryFetching();
 
-    queryValue = variableName + "_gteq_" + variableValue;
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueGreaterThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_gteq_" + variableValue;
     given().queryParam("variableValues", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueGreaterThanOrEqual(variableName, variableValue);
+    verify(mockedQuery).disableBinaryFetching();
 
-    queryValue = variableName + "_lt_" + variableValue;
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueLessThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_lt_" + variableValue;
     given().queryParam("variableValues", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueLessThan(variableName, variableValue);
+    verify(mockedQuery).disableBinaryFetching();
 
-    queryValue = variableName + "_lteq_" + variableValue;
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueLessThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_lteq_" + variableValue;
     given().queryParam("variableValues", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueLessThanOrEqual(variableName, variableValue);
+    verify(mockedQuery).disableBinaryFetching();
 
-    queryValue = variableName + "_like_" + variableValue;
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueLike() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_like_" + variableValue;
     given().queryParam("variableValues", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueLike(variableName, variableValue);
+    verify(mockedQuery).disableBinaryFetching();
 
-    queryValue = variableName + "_neq_" + variableValue;
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueNotEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
     given().queryParam("variableValues", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(VARIABLE_INSTANCE_QUERY_URL);
     verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
-    verify(mockedQuery, times(7)).disableBinaryFetching();
+    verify(mockedQuery).disableBinaryFetching();
 
     // requirement to not break existing API; should be:
-    // verify(mockedQuery, times(7)).disableCustomObjectDeserialization();
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValuesEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+    given().queryParam("variableValues", queryValue).queryParam("variableValuesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(VARIABLE_INSTANCE_QUERY_URL);
+    verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValuesNotEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
+    given().queryParam("variableValues", queryValue).queryParam("variableValuesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(VARIABLE_INSTANCE_QUERY_URL);
+    verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValuesLikeIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_like_" + variableValue;
+    given().queryParam("variableValues", queryValue).queryParam("variableValuesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(VARIABLE_INSTANCE_QUERY_URL);
+    verify(mockedQuery).variableValueLike(variableName, variableValue);
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+
+  @Test
+  public void testVariableNamesEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+    given().queryParam("variableValues", queryValue).queryParam("variableNamesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(VARIABLE_INSTANCE_QUERY_URL);
+    verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableNamesNotEqualsIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_neq_" + variableValue;
+    given().queryParam("variableValues", queryValue).queryParam("variableNamesIgnoreCase", true)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(VARIABLE_INSTANCE_QUERY_URL);
+    verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueEqualsAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "eq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).variableValueEquals("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueGreaterThanAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "gt");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).variableValueGreaterThan("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueGreaterThanEqualsAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "gteq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).variableValueGreaterThanOrEqual("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueLessThanAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "lt");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).variableValueLessThan("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueLessThanEqualsAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "lteq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).variableValueLessThanOrEqual("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueLikeAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "like");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).variableValueLike("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValueNotEqualsAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "neq");
+
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(VARIABLE_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).variableValueNotEquals("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValuesEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "eq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(VARIABLE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).variableValueEquals("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValuesNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "neq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(VARIABLE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).variableValueNotEquals("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableValuesLikeIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "like");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+    json.put("variableValuesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(VARIABLE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).variableValueLike("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+
+  @Test
+  public void testVariableNamesEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "eq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+    json.put("variableNamesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(VARIABLE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).variableValueEquals("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+  }
+
+  @Test
+  public void testVariableNamesNotEqualsIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", "varName");
+    variableJson.put("value", "varValue");
+    variableJson.put("operator", "neq");
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableValues", variables);
+    json.put("variableNamesIgnoreCase", true);
+    
+    given()
+    .contentType(POST_JSON_CONTENT_TYPE)
+    .body(json)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .post(VARIABLE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).variableValueNotEquals("varName", "varValue");
+    verify(mockedQuery).disableBinaryFetching();
+
+    // requirement to not break existing API; should be:
+    // verify(variableInstanceQueryMock).disableCustomObjectDeserialization();
     verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 

@@ -595,16 +595,7 @@
               from
               ${prefix}ACT_RU_VARIABLE
               WHERE
-              <choose>
-                <when test="queryVariableValue.variableNameIgnoreCase">
-                  UPPER(NAME_)= UPPER(#{queryVariableValue.name})
-                </when>
-                <otherwise>
-                  NAME_= #{queryVariableValue.name}
-                </otherwise>
-              </choose>
-              ${collationForCaseSensitivity}
-
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
               <choose>
                 <when test="queryVariableValue.local">
                   and RES.ID_ = TASK_ID_

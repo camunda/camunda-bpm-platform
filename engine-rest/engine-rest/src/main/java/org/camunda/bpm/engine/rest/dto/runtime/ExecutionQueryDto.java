@@ -69,6 +69,9 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   private List<VariableQueryParameterDto> variables;
   private List<VariableQueryParameterDto> processVariables;
 
+  Boolean variableValuesIgnoreCase;
+  Boolean variableNamesIgnoreCase;
+
   public ExecutionQueryDto() {
 
   }
@@ -120,6 +123,16 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   @CamundaQueryParam(value = "processVariables", converter = VariableListConverter.class)
   public void setProcessVariables(List<VariableQueryParameterDto> processVariables) {
     this.processVariables = processVariables;
+  }
+
+  @CamundaQueryParam(value = "variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+  
+  @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
   }
 
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
@@ -211,7 +224,12 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     if (tenantIdIn != null && !tenantIdIn.isEmpty()) {
       query.tenantIdIn(tenantIdIn.toArray(new String[tenantIdIn.size()]));
     }
-
+    if(Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if(Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
+    }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
         String variableName = variableQueryParam.getName();

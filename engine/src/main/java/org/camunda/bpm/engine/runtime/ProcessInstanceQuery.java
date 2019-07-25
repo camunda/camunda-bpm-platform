@@ -114,6 +114,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery subCaseInstanceId(String subCaseInstanceId);
 
   /**
+   * The query will match the names of process-variables in a case-insensitive way.
+   */
+  ProcessInstanceQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of process-variables in a case-insensitive way.
+   */
+  ProcessInstanceQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select process instances which have a global variable with the given value. The type
    * of variable is determined based on the value, using types configured in
    * {@link ProcessEngineConfiguration#getVariableSerializers()}.

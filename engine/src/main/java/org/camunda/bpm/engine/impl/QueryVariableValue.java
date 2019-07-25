@@ -42,10 +42,16 @@ public class QueryVariableValue implements Serializable {
   protected boolean variableValueIgnoreCase;
 
   public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local) {
+    this(name, value, operator, local, false, false);
+  }
+
+  public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local, boolean variableNameIgnoreCase, boolean variableValueIgnoreCase) {
     this.name = name;
     this.value = Variables.untypedValue(value);
     this.operator = operator;
     this.local = local;
+    this.variableNameIgnoreCase = variableNameIgnoreCase;
+    this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
 
   public void initialize(VariableSerializers serializers) {

@@ -439,7 +439,7 @@
               from
               ${prefix}ACT_HI_VARINST
               WHERE
-              NAME_= #{queryVariableValue.name}
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
               AND PROC_INST_ID_ = SELF.PROC_INST_ID_
 
               <bind name="varTypeField" value="'VAR_TYPE_'"/>
