@@ -19,11 +19,13 @@ package org.camunda.bpm.engine.rest.impl.history;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.rest.dto.AnnotationDto;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogQueryDto;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
@@ -64,4 +66,23 @@ public class UserOperationLogRestServiceImpl implements UserOperationLogRestServ
       return UserOperationLogEntryDto.map(query.listPage(firstResult, maxResults));
     }
   }
+
+  @Override
+  public Response setAnnotation(String operationId, AnnotationDto annotationDto) {
+    String annotation = annotationDto.getAnnotation();
+
+    processEngine.getHistoryService()
+        .setAnnotationForOperationLogById(operationId, annotation);
+
+    return Response.noContent().build();
+  }
+
+  @Override
+  public Response clearAnnotation(String operationId) {
+    processEngine.getHistoryService()
+        .clearAnnotationForOperationLogById(operationId);
+
+    return Response.noContent().build();
+  }
+
 }

@@ -52,6 +52,7 @@ public class UserOperationLogEntryDto {
   protected Date removalTime;
   protected String rootProcessInstanceId;
   protected String category;
+  protected String annotation;
 
   public static UserOperationLogEntryDto map(UserOperationLogEntry entry) {
     UserOperationLogEntryDto dto = new UserOperationLogEntryDto();
@@ -81,6 +82,7 @@ public class UserOperationLogEntryDto {
     dto.removalTime = entry.getRemovalTime();
     dto.rootProcessInstanceId = entry.getRootProcessInstanceId();
     dto.category = entry.getCategory();
+    dto.annotation = entry.getAnnotation();
 
     return dto;
   }
@@ -191,6 +193,10 @@ public class UserOperationLogEntryDto {
   
   public String getCategory() {
     return category;
+  }
+
+  public String getAnnotation() {
+    return annotation;
   }
 
 }

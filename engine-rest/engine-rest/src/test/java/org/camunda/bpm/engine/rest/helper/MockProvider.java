@@ -583,6 +583,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_OPERATION_ORG_VALUE = "orgValue";
   public static final String EXAMPLE_USER_OPERATION_NEW_VALUE = "newValue";
   public static final String EXAMPLE_USER_OPERATION_TIMESTAMP = withTimezone("2014-02-20T16:53:37");
+  public static final String EXAMPLE_USER_OPERATION_ANNOTATION = "anAnnotation";
 
   // historic detail
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ID = "aHistoricVariableUpdateId";

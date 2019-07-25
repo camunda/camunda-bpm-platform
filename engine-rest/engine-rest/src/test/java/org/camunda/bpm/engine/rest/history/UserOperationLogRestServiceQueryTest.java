@@ -20,11 +20,14 @@ import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_OPERATION_ANNOTATION;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_OPERATION_LOG_ID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,9 +36,13 @@ import static org.mockito.Mockito.when;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -63,7 +70,17 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
 
   protected static final String USER_OPERATION_LOG_COUNT_RESOURCE_URL = USER_OPERATION_LOG_RESOURCE_URL + "/count";
 
+  protected static final String USER_OPERATION_LOG_ANNOTATION = USER_OPERATION_LOG_RESOURCE_URL + "/{operationId}";
+
+  protected static final String USER_OPERATION_LOG_SET_ANNOTATION_RESOURCE_URL =
+      USER_OPERATION_LOG_ANNOTATION + "/set-annotation";
+
+  protected static final String USER_OPERATION_LOG_CLEAR_ANNOTATION_RESOURCE_URL =
+      USER_OPERATION_LOG_ANNOTATION + "/clear-annotation";
+
   protected UserOperationLogQuery queryMock;
+
+  protected HistoryService historyService;
 
   @Before
   public void setUpMock() {
@@ -72,7 +89,10 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     when(queryMock.list()).thenReturn(entries);
     when(queryMock.listPage(anyInt(), anyInt())).thenReturn(entries);
     when(queryMock.count()).thenReturn((long) entries.size());
-    when(processEngine.getHistoryService().createUserOperationLogQuery()).thenReturn(queryMock);
+
+    historyService = mock(HistoryService.class);
+    when(processEngine.getHistoryService()).thenReturn(historyService);
+    when(historyService.createUserOperationLogQuery()).thenReturn(queryMock);
   }
 
   @Test
@@ -266,6 +286,64 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
         .expect().statusCode(Status.OK.getStatusCode())
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
     verify(queryMock).listPage(7, Integer.MAX_VALUE);
+  }
+
+  @Test
+  public void shouldSetAnnotation() {
+    given()
+        .pathParam("operationId", EXAMPLE_USER_OPERATION_LOG_ID)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body("{ \"annotation\": \"" + EXAMPLE_USER_OPERATION_ANNOTATION + "\" }")
+        .expect()
+          .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+          .put(USER_OPERATION_LOG_SET_ANNOTATION_RESOURCE_URL);
+
+    verify(historyService)
+        .setAnnotationForOperationLogById(EXAMPLE_USER_OPERATION_LOG_ID, EXAMPLE_USER_OPERATION_ANNOTATION);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenSetAnnotation() {
+    doThrow(NotValidException.class)
+        .when(historyService)
+        .setAnnotationForOperationLogById(anyString(), anyString());
+
+    given()
+        .pathParam("operationId", EXAMPLE_USER_OPERATION_LOG_ID)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body("{ \"annotation\": \"" + EXAMPLE_USER_OPERATION_ANNOTATION + "\" }")
+        .expect()
+          .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+          .put(USER_OPERATION_LOG_SET_ANNOTATION_RESOURCE_URL);
+  }
+
+  @Test
+  public void shouldClearAnnotation() {
+    given()
+        .pathParam("operationId", EXAMPLE_USER_OPERATION_LOG_ID)
+        .expect()
+          .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+          .put(USER_OPERATION_LOG_CLEAR_ANNOTATION_RESOURCE_URL);
+
+    verify(historyService)
+        .clearAnnotationForOperationLogById(EXAMPLE_USER_OPERATION_LOG_ID);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenClearAnnotation() {
+    doThrow(BadUserRequestException.class)
+        .when(historyService)
+        .clearAnnotationForOperationLogById(anyString());
+
+    Response response = given()
+        .pathParam("operationId", EXAMPLE_USER_OPERATION_LOG_ID)
+        .expect()
+          .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when()
+          .put(USER_OPERATION_LOG_CLEAR_ANNOTATION_RESOURCE_URL);
   }
 
 }
