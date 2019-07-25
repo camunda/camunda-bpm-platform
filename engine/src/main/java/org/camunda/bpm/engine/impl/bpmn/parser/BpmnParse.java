@@ -851,28 +851,33 @@ public class BpmnParse extends Parse {
   public void parseStartEvents(Element parentElement, ScopeImpl scope) {
     List<Element> startEventElements = parentElement.elements("startEvent");
     List<ActivityImpl> startEventActivities = new ArrayList<ActivityImpl>();
-    for (Element startEventElement : startEventElements) {
-
-      ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
-      parseAsynchronousContinuationForActivity(startEventElement, startEventActivity);
-
-      if (scope instanceof ProcessDefinitionEntity) {
-        parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);
-        startEventActivities.add(startEventActivity);
-      } else {
-        parseScopeStartEvent(startEventActivity, startEventElement, parentElement, (ActivityImpl) scope);
+    if(startEventElements.size() > 0) {
+      for (Element startEventElement : startEventElements) {
+  
+        ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
+        parseAsynchronousContinuationForActivity(startEventElement, startEventActivity);
+  
+        if (scope instanceof ProcessDefinitionEntity) {
+          parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);
+          startEventActivities.add(startEventActivity);
+        } else {
+          parseScopeStartEvent(startEventActivity, startEventElement, parentElement, (ActivityImpl) scope);
+        }
+  
+        ensureNoIoMappingDefined(startEventElement);
+  
+        parseExecutionListenersOnScope(startEventElement, startEventActivity);
+  
+        for (BpmnParseListener parseListener : parseListeners) {
+          parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
+        }
+  
       }
-
-      ensureNoIoMappingDefined(startEventElement);
-
-      parseExecutionListenersOnScope(startEventElement, startEventActivity);
-
-      for (BpmnParseListener parseListener : parseListeners) {
-        parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
+    } else {
+      if(parentElement.getTagName().equals("subProcess") ) {
+        addError("subProcess must define a startEvent element", parentElement);
       }
-
     }
-
     if (scope instanceof ProcessDefinitionEntity) {
       selectInitial(startEventActivities, (ProcessDefinitionEntity) scope, parentElement);
       parseStartFormHandlers(startEventElements, (ProcessDefinitionEntity) scope);

@@ -105,6 +105,17 @@ public class BpmnParseTest {
   }
 
   @Test
+  public void testInvalidSubProcessWithoutStartEvent() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithoutStartEvent");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process definition could be parsed, although the sub process did not contain a start event.");
+    } catch (ProcessEngineException e) {
+      testRule.assertTextPresent("subProcess must define a startEvent element", e.getMessage());
+    }
+  }
+
+  @Test
   public void testInvalidSubProcessWithConditionalStartEvent() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSubProcessWithConditionalStartEvent");
