@@ -6,6 +6,7 @@
         "value": "PROCESS_VARIABLE"
       },
       "extended": true,
+      "caseOptions": true,
       "allowDates": true
     },
     {
@@ -14,6 +15,7 @@
         "value": "TASK_VARIABLE"
       },
       "extended": true,
+      "caseOptions": true,
       "allowDates": true
     },
     {
@@ -22,6 +24,7 @@
         "value": "CASE_VARIABLE"
       },
       "extended": true,
+      "caseOptions": true,
       "allowDates": true
     },
     {
