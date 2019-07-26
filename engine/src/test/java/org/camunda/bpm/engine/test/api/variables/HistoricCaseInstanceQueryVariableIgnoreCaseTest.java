@@ -18,13 +18,16 @@ package org.camunda.bpm.engine.test.api.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.After;
 import org.junit.Before;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricCaseInstanceQueryVariableIgnoreCaseTest extends AbstractVariableIgnoreCaseTest<HistoricCaseInstanceQueryImpl, HistoricCaseInstance> {
 
   RepositoryService repositoryService;

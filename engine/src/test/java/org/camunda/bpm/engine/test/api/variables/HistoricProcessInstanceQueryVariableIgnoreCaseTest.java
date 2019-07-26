@@ -18,11 +18,14 @@ package org.camunda.bpm.engine.test.api.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.Before;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
 public class HistoricProcessInstanceQueryVariableIgnoreCaseTest
     extends AbstractVariableIgnoreCaseTest<HistoricProcessInstanceQueryImpl, HistoricProcessInstance> {
