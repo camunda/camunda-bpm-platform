@@ -1117,14 +1117,18 @@ public class BpmnParseTest {
         .endEvent()
         .done();
 
+    DeploymentBuilder builder = repositoryService.createDeployment()
+        .addModelInstance("process.bpmn", process);
+
     System.setProperty("javax.xml.accessExternalSchema", ""); // empty string prohibits all external schema access
 
     // then
+    // fails, because the BPMN XSD references other external XSDs, e.g. BPMNDI
     exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Failed to read schema document 'BPMNDI.xsd'");
+    exception.expectMessage("Could not parse 'process.bpmn'");
 
     // when
-    testRule.deploy(process);
+    testRule.deploy(builder);
   }
 
   @Test
