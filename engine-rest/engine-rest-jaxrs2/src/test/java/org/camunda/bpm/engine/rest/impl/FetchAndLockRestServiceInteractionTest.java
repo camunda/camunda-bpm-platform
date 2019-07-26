@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -112,6 +113,9 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
     when(fetchTopicBuilder.enableCustomObjectDeserialization())
       .thenReturn(fetchTopicBuilder);
+
+    when(fetchTopicBuilder.processDefinitionVersionTag(anyString()))
+    .thenReturn(fetchTopicBuilder);
 
     // for authentication
     when(processEngine.getIdentityService())
@@ -341,6 +345,28 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
 
     verify(fetchTopicBuilder, times(1)).execute();
+  }
+
+  @Test
+  public void shouldFetchAndLockByProcessDefinitionVersionTag() {
+    when(fetchTopicBuilder.execute())
+    .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
+
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
+    for (FetchExternalTaskTopicDto topic : fetchExternalTasksDto.getTopics()) {
+      topic.setProcessDefinitionVersionTag("version");
+    }
+
+    given()
+    .contentType(ContentType.JSON)
+    .body(fetchExternalTasksDto)
+  .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+  .when()
+    .post(FETCH_EXTERNAL_TASK_URL);
+
+    verify(fetchTopicBuilder).processDefinitionVersionTag("version");
   }
 
   // helper /////////////////////////
