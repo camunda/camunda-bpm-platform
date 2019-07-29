@@ -930,7 +930,7 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     json.put("variableName", "aVariableName");
     json.put("variableValue", "aVariableValue");
     json.put("variableNamesIgnoreCase", true);
-    json.put("variablevaluesIgnoreCase", true);
+    json.put("variableValuesIgnoreCase", true);
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
