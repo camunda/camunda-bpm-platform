@@ -39,11 +39,6 @@ public class CamundaBpmPropertiesTest {
   }
 
   @Test
-  public void application_defaults() throws Exception {
-    assertThat(new CamundaBpmProperties().getApplication().isDeleteUponUndeploy()).isFalse();
-  }
-
-  @Test
   public void restrict_allowed_values_for_dbUpdate() {
     new CamundaBpmProperties().getDatabase().setSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
     new CamundaBpmProperties().getDatabase().setSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);

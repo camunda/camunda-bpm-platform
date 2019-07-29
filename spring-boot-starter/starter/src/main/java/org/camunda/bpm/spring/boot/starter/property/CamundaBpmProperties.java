@@ -43,12 +43,12 @@ public class CamundaBpmProperties {
   public static final String[] DEFAULT_DMN_RESOURCE_SUFFIXES = new String[]{"dmn11.xml", "dmn" };
 
   static String[] initDeploymentResourcePattern() {
-    final Set<String> suffixes = new HashSet<String>();
+    final Set<String> suffixes = new HashSet<>();
     suffixes.addAll(Arrays.asList(DEFAULT_DMN_RESOURCE_SUFFIXES));
     suffixes.addAll(Arrays.asList(DEFAULT_BPMN_RESOURCE_SUFFIXES));
     suffixes.addAll(Arrays.asList(DEFAULT_CMMN_RESOURCE_SUFFIXES));
 
-    final Set<String> patterns = new HashSet<String>();
+    final Set<String> patterns = new HashSet<>();
     for (String suffix : suffixes) {
       patterns.add(String.format("%s**/*.%s", CLASSPATH_ALL_URL_PREFIX, suffix));
     }
@@ -146,12 +146,6 @@ public class CamundaBpmProperties {
    */
   @NestedConfigurationProperty
   private WebappProperty webapp = new WebappProperty();
-
-  /**
-   * process application/processes.xml configuration
-   */
-  @NestedConfigurationProperty
-  private ApplicationProperty application = new ApplicationProperty();
 
   @NestedConfigurationProperty
   private AuthorizationProperty authorization = new AuthorizationProperty();
@@ -269,14 +263,6 @@ public class CamundaBpmProperties {
     this.webapp = webapp;
   }
 
-  public ApplicationProperty getApplication() {
-    return application;
-  }
-
-  public void setApplication(ApplicationProperty application) {
-    this.application = application;
-  }
-
   public AuthorizationProperty getAuthorization() {
     return authorization;
   }
@@ -375,7 +361,6 @@ public class CamundaBpmProperties {
       .add("jpa=" + jpa)
       .add("jobExecution=" + jobExecution)
       .add("webapp=" + webapp)
-      .add("application=" + application)
       .add("authorization=" + authorization)
       .add("genericProperties=" + genericProperties)
       .add("adminUser=" + adminUser)
