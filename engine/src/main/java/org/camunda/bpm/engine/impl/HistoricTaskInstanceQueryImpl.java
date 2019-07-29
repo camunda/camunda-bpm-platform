@@ -76,6 +76,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected boolean processFinished;
   protected boolean processUnfinished;
   protected List<TaskQueryVariableValue> variables = new ArrayList<>();
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
   protected Date dueDate;
   protected Date dueAfter;
   protected Date dueBefore;
@@ -276,14 +278,32 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     this.unfinished = true;
     return this;
   }
+  
+  @Override
+  public HistoricTaskInstanceQuery matchVariableNamesIgnoreCase() {
+    this.variableNamesIgnoreCase = true;
+    for (QueryVariableValue variable : this.variables) {
+      variable.setVariableNameIgnoreCase(true);
+    }
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery matchVariableValuesIgnoreCase() {
+    this.variableValuesIgnoreCase = true;
+    for (QueryVariableValue variable : this.variables) {
+      variable.setVariableValueIgnoreCase(true);
+    }
+    return this;
+  }
 
   public HistoricTaskInstanceQueryImpl taskVariableValueEquals(String variableName, Object variableValue) {
-    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true, false));
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, true, false);
     return this;
   }
 
   public HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue) {
-    variables.add(new TaskQueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, false, true));
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, false, true);
     return this;
   }
 
@@ -419,7 +439,9 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
           break;
       }
     }
-    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
+    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+    boolean shouldMatchVariableNamesIgnoreCase = Boolean.TRUE.equals(variableNamesIgnoreCase);
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable, shouldMatchVariableNamesIgnoreCase, shouldMatchVariableValuesIgnoreCase));
   }
 
   protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
@@ -849,6 +871,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return variables;
   }
 
+  public Boolean getVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public Boolean getVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
+  }
+
   public String getTaskOwnerLike() {
     return taskOwnerLike;
   }
@@ -943,4 +973,5 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
     return queries.get(0);
   }
+
 }

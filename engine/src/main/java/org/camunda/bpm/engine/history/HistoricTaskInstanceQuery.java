@@ -236,6 +236,16 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery withoutCandidateGroups();
 
   /**
+   * The query will match the names of task and process variables in a case-insensitive way.
+   */
+  HistoricTaskInstanceQuery matchVariableNamesIgnoreCase();
+
+  /**
+   * The query will match the values of task and process variables in a case-insensitive way.
+   */
+  HistoricTaskInstanceQuery matchVariableValuesIgnoreCase();
+
+  /**
    * Only select historic task instances which have a local task variable with the
    * given name set to the given value. Make sure history-level is configured
    * >= AUDIT when this feature is used.

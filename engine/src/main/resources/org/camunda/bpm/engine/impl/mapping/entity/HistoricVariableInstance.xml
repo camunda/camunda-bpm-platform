@@ -316,10 +316,28 @@
         and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
       </if>
       <if test="variableName != null">
-        and RES.NAME_ = #{variableName}
+      and
+        <choose>
+          <when test="variableNamesIgnoreCase">
+            UPPER(RES.NAME_) = UPPER(#{variableName})
+          </when>
+          <otherwise>
+            RES.NAME_ = #{variableName}
+          </otherwise>
+        </choose>
+        ${collationForCaseSensitivity}
       </if>
       <if test="variableNameLike != null">
-        and RES.NAME_ like #{variableNameLike} ESCAPE ${escapeChar}
+        and
+        <choose>
+          <when test="variableNamesIgnoreCase">
+            UPPER(RES.NAME_) like UPPER(#{variableNameLike})
+          </when>
+          <otherwise>
+            RES.NAME_ like #{variableNameLike}
+          </otherwise>
+          </choose>
+          ESCAPE ${escapeChar}
       </if>
       <if test="includeDeleted == false">
         and (RES.STATE_ != 'DELETED' or RES.STATE_ is null)

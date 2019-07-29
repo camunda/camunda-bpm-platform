@@ -1672,6 +1672,71 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
+  public void testQueryByTaskVariableValueIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_eq_" + variableValue;
+    
+    String queryValue = variableParameter;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .queryParam("variableValuesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+    
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).taskVariableValueEquals(variableName, variableValue);
+  }
+
+  @Test
+  public void testQueryByTaskVariableNameIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_eq_" + variableValue;
+    
+    String queryValue = variableParameter;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .queryParam("variableNamesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).taskVariableValueEquals(variableName, variableValue);
+  }
+
+  @Test
+  public void testQueryByTaskVariableNameValueIgnoreCase() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_eq_" + variableValue;
+    
+    String queryValue = variableParameter;
+    
+    given()
+    .queryParam("taskVariables", queryValue)
+    .queryParam("variableNamesIgnoreCase", true)
+    .queryParam("variableValuesIgnoreCase", true)
+    .then()
+    .expect()
+    .statusCode(Status.OK.getStatusCode())
+    .when()
+    .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+    
+    verify(mockedQuery).matchVariableNamesIgnoreCase();
+    verify(mockedQuery).matchVariableValuesIgnoreCase();
+    verify(mockedQuery).taskVariableValueEquals(variableName, variableValue);
+  }
+
+  @Test
   public void testQueryByTaskVariableAsPost() {
     String variableName = "varName";
     String variableValue = "varValue";
@@ -1765,7 +1830,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
-  public void testQueryByProcessVariable() {
+  public void testQueryByProcessVariableEquals() {
     String variableName = "varName";
     String variableValue = "varValue";
     String variableParameter = variableName + "_eq_" + variableValue;
@@ -1781,9 +1846,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueEquals(variableName, variableValue);
+  }
 
-    // greater then
-    queryValue = variableName + "_gt_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableGreaterThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_gt_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1794,9 +1865,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueGreaterThan(variableName, variableValue);
+  }
 
-    // greater then equals
-    queryValue = variableName + "_gteq_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableGreaterThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_gteq_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1807,9 +1884,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueGreaterThanOrEquals(variableName, variableValue);
+  }
 
-    // lower then
-    queryValue = variableName + "_lt_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableLessThan() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_lt_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1820,9 +1903,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueLessThan(variableName, variableValue);
+  }
 
-    // lower then equals
-    queryValue = variableName + "_lteq_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableLessThanEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_lteq_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1833,9 +1922,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueLessThanOrEquals(variableName, variableValue);
+  }
 
-    // like
-    queryValue = variableName + "_like_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableLike() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_like_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)
@@ -1846,9 +1941,15 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueLike(variableName, variableValue);
+  }
 
-    // not equals
-    queryValue = variableName + "_neq_" + variableValue;
+  @Test
+  public void testQueryByProcessVariableNotEquals() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_neq_" + variableValue;
+
+    String queryValue = variableParameter;
 
     given()
       .queryParam("processVariables", queryValue)

@@ -511,7 +511,7 @@
                 from
                   ${prefix}ACT_HI_VARINST VAR
                 WHERE
-                  NAME_= #{queryVariableValue.name}
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
                 <choose>
                   <when test="queryVariableValue.local">
                     and TASK_ID_ = RES.ID_
