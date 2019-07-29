@@ -62,7 +62,9 @@ public class LazyDelegateFilter<T extends Filter> implements Filter {
 
   @Override
   public void destroy() {
-    delegate.destroy();
+    if (delegate != null) {
+      delegate.destroy();
+    }
   }
 
   public InitHook<T> getInitHook() {

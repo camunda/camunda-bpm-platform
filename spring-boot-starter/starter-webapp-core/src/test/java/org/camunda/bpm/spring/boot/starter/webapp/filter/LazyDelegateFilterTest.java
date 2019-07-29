@@ -20,6 +20,7 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -105,6 +106,13 @@ public class LazyDelegateFilterTest {
     delegateFilter.delegate = filterMock;
     delegateFilter.destroy();
     verify(filterMock).destroy();
+  }
+
+  @Test
+  public void destroyUninitializedDelegateTest() {
+    LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<Filter>(filterMock.getClass());
+    delegateFilter.destroy();
+    verify(filterMock, never()).destroy();
   }
 
   @Test
