@@ -219,6 +219,26 @@
 
   </dependencies>
 
+     <reporting>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <configLocation>${project.basedir}/checkstyle-configuration.xml</configLocation>
+          </configuration>
+          <reportSets>
+            <reportSet>
+              <reports>
+                <report>checkstyle</report>
+              </reports>
+            </reportSet>
+          </reportSets>
+        </plugin>
+      </plugins>
+    </reporting>
+
 
   <properties>
     <test.includes />
@@ -283,6 +303,12 @@
     </testResources>
 
     <plugins>
+      <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+    
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
