@@ -48,6 +48,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String variableName;
   protected String variableNameLike;
   protected QueryVariableValue queryVariableValue;
+  protected Boolean variableNamesIgnoreCase;
+  protected Boolean variableValuesIgnoreCase;
   protected String[] variableTypes;
   protected String[] taskIds;
   protected String[] executionIds;
@@ -101,6 +103,24 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public HistoricVariableInstanceQuery variableTypeIn(String... variableTypes) {
     ensureNotNull("Variable types", (Object[]) variableTypes);
     this.variableTypes = lowerCase(variableTypes);
+    return this;
+  }
+
+  @Override
+  public HistoricVariableInstanceQuery matchVariableNamesIgnoreCase() {
+    this.variableNamesIgnoreCase = true;
+    if (queryVariableValue != null) {
+      queryVariableValue.variableNameIgnoreCase = true;
+    }
+    return this;
+  }
+
+  @Override
+  public HistoricVariableInstanceQuery matchVariableValuesIgnoreCase() {
+    this.variableValuesIgnoreCase = true;
+    if (queryVariableValue != null) {
+      queryVariableValue.variableValueIgnoreCase = true;
+    }
     return this;
   }
 
@@ -158,7 +178,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     ensureNotNull("variableName", variableName);
     ensureNotNull("variableValue", variableValue);
     this.variableName = variableName;
-    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
+    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true, Boolean.TRUE.equals(variableNamesIgnoreCase), Boolean.TRUE.equals(variableValuesIgnoreCase));
     return this;
   }
 
@@ -290,6 +310,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public QueryVariableValue getQueryVariableValue() {
     return queryVariableValue;
+  }
+
+  public Boolean getVariableNamesIgnoreCase() {
+    return variableNamesIgnoreCase;
+  }
+
+  public Boolean getVariableValuesIgnoreCase() {
+    return variableValuesIgnoreCase;
   }
 
   @Override

@@ -55,6 +55,8 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String variableName;
   protected String variableNameLike;
   protected Object variableValue;
+  protected Boolean variableValuesIgnoreCase;
+  protected Boolean variableNamesIgnoreCase;
   protected String[] variableTypeIn;
   protected String[] executionIdIn;
   protected String[] taskIdIn;
@@ -110,6 +112,16 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   @CamundaQueryParam(value="variableTypeIn", converter = StringArrayConverter.class)
   public void setVariableTypeIn(String[] variableTypeIn) {
     this.variableTypeIn = variableTypeIn;
+  }
+
+  @CamundaQueryParam(value="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value="variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
   }
 
   @CamundaQueryParam(value="executionIdIn", converter = StringArrayConverter.class)
@@ -197,7 +209,12 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     if (variableTypeIn != null && variableTypeIn.length > 0) {
       query.variableTypeIn(variableTypeIn);
     }
-
+    if (Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+    if (Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
+    }
     if (executionIdIn != null && executionIdIn.length > 0) {
       query.executionIdIn(executionIdIn);
     }
@@ -234,5 +251,4 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
       query.orderByTenantId();
     }
   }
-
 }

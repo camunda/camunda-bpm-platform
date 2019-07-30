@@ -151,6 +151,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Boolean withoutCandidateGroups;
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
+  
+  protected Boolean variableValuesIgnoreCase;
+  protected Boolean variableNamesIgnoreCase;
 
   private List<HistoricTaskInstanceQueryDto> orQueries;
 
@@ -353,6 +356,16 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   @CamundaQueryParam(value="processVariables", converter = VariableListConverter.class)
   public void setProcessVariables(List<VariableQueryParameterDto> processVariables) {
     this.processVariables = processVariables;
+  }
+
+  @CamundaQueryParam(value="variableValuesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableValuesIgnoreCase(Boolean variableValuesIgnoreCase) {
+    this.variableValuesIgnoreCase = variableValuesIgnoreCase;
+  }
+
+  @CamundaQueryParam(value="variableNamesIgnoreCase", converter = BooleanConverter.class)
+  public void setVariableNamesIgnoreCase(Boolean variableNamesIgnoreCase) {
+    this.variableNamesIgnoreCase = variableNamesIgnoreCase;
   }
 
   @CamundaQueryParam("caseDefinitionId")
@@ -618,6 +631,14 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
 
     if (startedBefore != null) {
       query.startedBefore(startedBefore);
+    }
+
+    if (Boolean.TRUE.equals(variableNamesIgnoreCase)) {
+      query.matchVariableNamesIgnoreCase();
+    }
+
+    if (Boolean.TRUE.equals(variableValuesIgnoreCase)) {
+      query.matchVariableValuesIgnoreCase();
     }
 
     if (taskVariables != null) {

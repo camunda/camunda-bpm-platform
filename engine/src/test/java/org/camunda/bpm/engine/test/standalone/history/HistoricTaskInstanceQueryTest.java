@@ -16,9 +16,13 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -26,10 +30,12 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -38,6 +44,16 @@ import org.camunda.bpm.engine.variable.Variables;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCase {
 
+  protected static final String VARIABLE_NAME = "variableName";
+  protected static final String VARIABLE_NAME_LC = VARIABLE_NAME.toLowerCase();
+  protected static final String VARIABLE_VALUE = "variableValue";
+  protected static final String VARIABLE_VALUE_LC = VARIABLE_VALUE.toLowerCase();
+  protected static final String VARIABLE_VALUE_LC_LIKE = "%" + VARIABLE_VALUE_LC.substring(2, 10) + "%";
+  protected static final String VARIABLE_VALUE_NE = "nonExistent";
+  protected static Map<String, Object> VARIABLES = new HashMap<>();
+  static {
+    VARIABLES.put(VARIABLE_NAME, VARIABLE_VALUE);
+  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueEqualsNumber() throws Exception {
@@ -143,6 +159,137 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLessThanOrEquals("requestNumber", 124).count());
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableNameEqualsIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+
+    // when
+    List<HistoricTaskInstance> eq = queryNameIgnoreCase().processVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqNameLC = queryNameIgnoreCase().processVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqValueLC = queryNameIgnoreCase().processVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqNameValueLC = queryNameIgnoreCase().processVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+
+    // then
+    assertThatListContainsOnlyExpectedElement(eq, instance);
+    assertThatListContainsOnlyExpectedElement(eqNameLC, instance);
+    assertThat(eqValueLC).isEmpty();
+    assertThat(eqNameValueLC).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableNameNotEqualsIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> neq = queryNameIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> neqNameLC = queryNameIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> neqValueNE = queryNameIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<HistoricTaskInstance> neqNameLCValueNE = queryNameIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+
+    // then
+    assertThat(neq).isEmpty();
+    assertThat(neqNameLC).isEmpty();
+    assertThatListContainsOnlyExpectedElement(neqValueNE, instance);
+    assertThatListContainsOnlyExpectedElement(neqNameLCValueNE, instance);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueEqualsIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> eq = queryValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqNameLC = queryValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqValueLC = queryValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqNameValueLC = queryValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+
+    // then
+    assertThatListContainsOnlyExpectedElement(eq, instance);
+    assertThat(eqNameLC).isEmpty();
+    assertThatListContainsOnlyExpectedElement(eqValueLC, instance);
+    assertThat(eqNameValueLC).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueNotEqualsIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> neq = queryValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> neqNameLC = queryValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> neqValueNE = queryValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<HistoricTaskInstance> neqNameLCValueNE = queryValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+
+    // then
+    assertThat(neq).isEmpty();
+    assertThat(neqNameLC).isEmpty();
+    assertThatListContainsOnlyExpectedElement(neqValueNE, instance);
+    assertThat(neqNameLCValueNE).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueLikeIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> like = queryNameValueIgnoreCase().processVariableValueLike(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> likeValueLC = queryValueIgnoreCase().processVariableValueLike(VARIABLE_NAME, VARIABLE_VALUE_LC_LIKE).list();
+
+    // then
+    assertThatListContainsOnlyExpectedElement(like, instance);
+    assertThatListContainsOnlyExpectedElement(likeValueLC, instance);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableNameAndValueEqualsIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> eq = queryNameValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqNameLC = queryNameValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqValueLC = queryNameValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqValueNE = queryNameValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<HistoricTaskInstance> eqNameValueLC = queryNameValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqNameLCValueNE = queryNameValueIgnoreCase().processVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+
+    // then
+    assertThatListContainsOnlyExpectedElement(eq, instance);
+    assertThatListContainsOnlyExpectedElement(eqNameLC, instance);
+    assertThatListContainsOnlyExpectedElement(eqValueLC, instance);
+    assertThat(eqValueNE).isEmpty();
+    assertThatListContainsOnlyExpectedElement(eqNameValueLC, instance);
+    assertThat(eqNameLCValueNE).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableNameAndValueNotEqualsIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> neq = queryNameValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> neqNameLC = queryNameValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> neqValueLC = queryNameValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> neqValueNE = queryNameValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<HistoricTaskInstance> neqNameValueLC = queryNameValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> neqNameLCValueNE = queryNameValueIgnoreCase().processVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+
+    // then
+    assertThat(neq).isEmpty();
+    assertThat(neqNameLC).isEmpty();
+    assertThat(neqValueLC).isEmpty();
+    assertThatListContainsOnlyExpectedElement(neqValueNE, instance);
+    assertThat(neqNameValueLC).isEmpty();
+    assertThatListContainsOnlyExpectedElement(neqNameLCValueNE, instance);
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testTaskVariableValueEqualsNumber() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -171,6 +318,72 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     assertEquals(4, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue((short) 123)).count());
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(null)).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableValueEqualsNumberIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setVariablesLocal(task.getId(), VARIABLES);
+
+    // when
+    List<HistoricTaskInstance> eq =  queryValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqNameLC = queryValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqValueLC = queryValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqNameValueLC = queryValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+
+    // then
+    assertThatListContainsOnlyExpectedElement(eq, instance);
+    assertThat(eqNameLC).isEmpty();
+    assertThatListContainsOnlyExpectedElement(eqValueLC, instance);
+    assertThat(eqNameValueLC).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableNameEqualsIgnoreCase() {
+ // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setVariablesLocal(task.getId(), VARIABLES);
+
+    // when
+    List<HistoricTaskInstance> eq = queryNameIgnoreCase().taskVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqNameLC = queryNameIgnoreCase().taskVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqValueLC = queryNameIgnoreCase().taskVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqNameValueLC = queryNameIgnoreCase().taskVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+
+    // then
+    assertThatListContainsOnlyExpectedElement(eq, instance);
+    assertThatListContainsOnlyExpectedElement(eqNameLC, instance);
+    assertThat(eqValueLC).isEmpty();
+    assertThat(eqNameValueLC).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testTaskVariableNameAndValueEqualsIgnoreCase() {
+ // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setVariablesLocal(task.getId(), VARIABLES);
+
+    // when
+    List<HistoricTaskInstance> eq = queryNameValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqNameLC = queryNameValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> eqValueLC = queryNameValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqValueNE = queryNameValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<HistoricTaskInstance> eqNameValueLC = queryNameValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+    List<HistoricTaskInstance> eqNameLCValueNE = queryNameValueIgnoreCase().taskVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+
+    // then
+    assertThatListContainsOnlyExpectedElement(eq, instance);
+    assertThatListContainsOnlyExpectedElement(eqNameLC, instance);
+    assertThatListContainsOnlyExpectedElement(eqValueLC, instance);
+    assertThat(eqValueNE).isEmpty();
+    assertThatListContainsOnlyExpectedElement(eqNameValueLC, instance);
+    assertThat(eqNameLCValueNE).isEmpty();
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -446,4 +659,20 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     ClockUtil.reset();
   }
 
+  private void assertThatListContainsOnlyExpectedElement(List<HistoricTaskInstance> instances, ProcessInstance instance) {
+    assertThat(instances.size()).isEqualTo(1);
+    assertThat(instances.get(0).getProcessInstanceId()).isEqualTo(instance.getId());
+  }
+
+  private HistoricTaskInstanceQuery queryNameIgnoreCase() {
+    return historyService.createHistoricTaskInstanceQuery().matchVariableNamesIgnoreCase();
+  }
+
+  private HistoricTaskInstanceQuery queryValueIgnoreCase() {
+    return historyService.createHistoricTaskInstanceQuery().matchVariableValuesIgnoreCase();
+  }
+  
+  private HistoricTaskInstanceQuery queryNameValueIgnoreCase() {
+    return historyService.createHistoricTaskInstanceQuery().matchVariableNamesIgnoreCase().matchVariableValuesIgnoreCase();
+  }
 }
