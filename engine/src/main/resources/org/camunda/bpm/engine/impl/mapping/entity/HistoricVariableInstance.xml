@@ -338,6 +338,7 @@
           </otherwise>
           </choose>
           ESCAPE ${escapeChar}
+          ${collationForCaseSensitivity}
       </if>
       <if test="includeDeleted == false">
         and (RES.STATE_ != 'DELETED' or RES.STATE_ is null)
