@@ -117,7 +117,8 @@ module.exports = [
               'DELETE_HISTORY',
               'READ_INSTANCE_VARIABLE',
               'UPDATE_INSTANCE_VARIABLE',
-              'UPDATE_TASK_VARIABLE'
+              'UPDATE_TASK_VARIABLE',
+              'UPDATE_HISTORY'
             ],
             7: [
               'CREATE',
@@ -168,7 +169,7 @@ module.exports = [
               'CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND'
             ],
             14: ['READ'],
-            17: ['READ', 'DELETE'],
+            17: ['READ', 'DELETE', 'UPDATE'],
             18: ['EDIT', 'SHARE']
           };
 
