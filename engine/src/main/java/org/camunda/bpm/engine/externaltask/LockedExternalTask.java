@@ -69,14 +69,19 @@ public interface LockedExternalTask {
   String getActivityInstanceId();
 
   /**
-   * @return the id of the process definition the task's activity belongs to
+   * @return the id of the process definition the tasks activity belongs to
    */
   String getProcessDefinitionId();
 
   /**
-   * @return the key of the process definition the task's activity belongs to
+   * @return the key of the process definition the tasks activity belongs to
    */
   String getProcessDefinitionKey();
+
+  /**
+   * @return the version tag of the process definition the tasks activity belongs to
+   */
+  String getProcessDefinitionVersionTag();
 
   /**
    * @return the number of retries left. The number of retries is provided by
@@ -104,7 +109,7 @@ public interface LockedExternalTask {
 
   /**
    * @return a map of variables that contains an entry for every variable
-   *   that was specified at fetching time, if such a variable exists in the task's
+   *   that was specified at fetching time, if such a variable exists in the tasks
    *   ancestor execution hierarchy.
    */
   VariableMap getVariables();

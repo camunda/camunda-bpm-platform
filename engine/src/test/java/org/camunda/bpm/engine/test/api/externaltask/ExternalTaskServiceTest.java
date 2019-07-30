@@ -3089,14 +3089,15 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testFetchAndLockByProcessDefinitionVersionTag"); // version tag: version X.Y
 
     // when
-    List<ExternalTask> totalExternalTasks = externalTaskService.createExternalTaskQuery().list();
+    Long totalExternalTasks = externalTaskService.createExternalTaskQuery().count();
     List<LockedExternalTask> fetchedExternalTasks = externalTaskService.fetchAndLock(1, "workerID")
         .topic("externalTaskTopic", 1000L).processDefinitionVersionTag("version X.Y").execute();
 
     //then
-    assertThat(totalExternalTasks.size()).isEqualTo(2);
+    assertThat(totalExternalTasks).isEqualTo(2);
     assertThat(fetchedExternalTasks.size()).isEqualTo(1);
     assertThat(fetchedExternalTasks.get(0).getProcessDefinitionKey()).isEqualTo("testFetchAndLockByProcessDefinitionVersionTag");
+    assertThat(fetchedExternalTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo("version X.Y");
   }
 
   protected Date nowPlus(long millis) {

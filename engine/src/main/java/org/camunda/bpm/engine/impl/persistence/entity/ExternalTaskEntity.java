@@ -79,6 +79,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionVersionTag;
   protected String activityId;
   protected String activityInstanceId;
   protected String tenantId;
@@ -130,6 +131,12 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
+  }
+  public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
   }
   @Override
   public String getActivityId() {
@@ -234,6 +241,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("processInstanceId", processInstanceId);
     persistentState.put("processDefinitionId", processDefinitionId);
     persistentState.put("processDefinitionKey", processDefinitionKey);
+    persistentState.put("processDefinitionVersionTag", processDefinitionVersionTag);
     persistentState.put("activityId", activityId);
     persistentState.put("activityInstanceId", activityInstanceId);
     persistentState.put("suspensionState", suspensionState);

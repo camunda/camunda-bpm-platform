@@ -81,12 +81,6 @@ public class ExternalTaskManager extends AbstractManager {
     List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
     orderingProperties.add(EXT_TASK_PRIORITY_ORDERING_PROPERTY);
     parameters.put("orderingProperties", orderingProperties);
-    for (TopicFetchInstruction instruction : queryFilters) {
-      if(instruction.getProcessDefinitionVersionTag() != null && !instruction.getProcessDefinitionVersionTag().equals("")) {
-        parameters.put("applyVersionTagFilter", true);
-        break;
-      }
-    }
 
     ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureQuery(parameter);

@@ -70,14 +70,19 @@ public interface ExternalTask {
   String getActivityInstanceId();
 
   /**
-   * @return the id of the process definition the task's activity belongs to
+   * @return the id of the process definition the tasks activity belongs to
    */
   String getProcessDefinitionId();
 
   /**
-   * @return the key of the process definition the task's activity belongs to
+   * @return the key of the process definition the tasks activity belongs to
    */
   String getProcessDefinitionKey();
+
+  /**
+   * @return the version tag of the process definition the tasks activity belongs to
+   */
+  String getProcessDefinitionVersionTag();
 
   /**
    * @return the number of retries left. The number of retries is provided by

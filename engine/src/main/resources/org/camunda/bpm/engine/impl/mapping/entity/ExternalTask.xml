@@ -36,6 +36,7 @@
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionVersionTag" column="VERSION_TAG_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
@@ -165,17 +166,11 @@
     select ${distinct} RES.*
     ${limitBetween}
     from (
-    select RES.*, PI.BUSINESS_KEY_
-     <if test="parameter != null &amp;&amp; parameter.applyVersionTagFilter">
-      , PD.VERSION_TAG_
-    </if>
+    select RES.*, PI.BUSINESS_KEY_, PD.VERSION_TAG_
     from ${prefix}ACT_RU_EXT_TASK RES
 
     left join ${prefix}ACT_RU_EXECUTION PI on RES.PROC_INST_ID_ = PI.ID_
-
-    <if test="parameter != null &amp;&amp; parameter.applyVersionTagFilter">
-      left join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
-    </if>
+    inner join ${prefix}ACT_RE_PROCDEF PD on RES.PROC_DEF_ID_ = PD.ID_
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
