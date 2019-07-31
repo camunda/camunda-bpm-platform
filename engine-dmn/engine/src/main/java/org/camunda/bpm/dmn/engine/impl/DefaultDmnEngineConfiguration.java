@@ -37,6 +37,7 @@ import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
+import org.camunda.feel.integration.CamundaFeelEngineFactory;
 
 public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
@@ -61,10 +62,10 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   protected FeelEngineFactory feelEngineFactory;
   protected FeelEngine feelEngine;
 
-  protected String defaultInputExpressionExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
+  protected String defaultInputExpressionExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
   protected String defaultInputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
-  protected String defaultOutputEntryExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
-  protected String defaultLiteralExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
+  protected String defaultOutputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
+  protected String defaultLiteralExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
 
   protected DmnTransformer transformer = new DefaultDmnTransformer();
 
@@ -141,7 +142,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   protected void initFeelEngine() {
     if (feelEngineFactory == null) {
-      feelEngineFactory = new FeelEngineFactoryImpl();
+      feelEngineFactory = new CamundaFeelEngineFactory();
     }
 
     if (feelEngine == null) {

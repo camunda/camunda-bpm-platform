@@ -12,6 +12,20 @@
   <name>camunda DMN - engine</name>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.bpm.extension.feel.scala</groupId>
+      <artifactId>feel-engine-factory</artifactId>
+      <version>1.8.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-all</artifactId>
+      <version>1.7.0</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-utils</artifactId>
