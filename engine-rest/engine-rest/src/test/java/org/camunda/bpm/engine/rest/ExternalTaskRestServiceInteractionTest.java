@@ -149,6 +149,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.processDefinitionKey(any(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.processDefinitionKeyIn(any(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.processInstanceVariableEquals(anyMapOf(String.class, Object.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionVersionTag(anyString())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.withoutTenantId()).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.tenantIdIn(any(String.class))).thenReturn(fetchTopicBuilder);
 
@@ -355,6 +356,32 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).withoutTenantId();
     inOrder.verify(fetchTopicBuilder).tenantIdIn("tenant2");
+    inOrder.verify(fetchTopicBuilder).execute();
+    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+  }
+
+  @Test
+  public void testFetchAndLockByProcessDefinitionVersionTag() {
+    // given
+    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    
+    // when
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+    
+    Map<String, Object> topicParameter = new HashMap<String, Object>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("lockDuration", 12354L);
+    topicParameter.put("processDefinitionVersionTag", "versionTag");
+    parameters.put("topics", Arrays.asList(topicParameter));
+    
+    executePost(parameters);
+    
+    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).processDefinitionVersionTag("versionTag");
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }

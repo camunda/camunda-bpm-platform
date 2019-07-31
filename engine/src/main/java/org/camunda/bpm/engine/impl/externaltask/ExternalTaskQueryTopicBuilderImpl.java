@@ -115,6 +115,11 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     return this;
   }
 
+  public ExternalTaskQueryTopicBuilder processDefinitionVersionTag(String processDefinitionVersionTag) {
+    currentInstruction.setProcessDefinitionVersionTag(processDefinitionVersionTag);
+    return this;
+  }
+
   public ExternalTaskQueryTopicBuilder withoutTenantId() {
     currentInstruction.setTenantIds(null);
     return this;
@@ -140,6 +145,5 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     currentInstruction.setLocalVariables(true);
     return this;
   }
-
 
 }
