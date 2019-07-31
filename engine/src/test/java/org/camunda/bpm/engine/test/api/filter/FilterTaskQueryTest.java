@@ -150,6 +150,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskAssigneeExpression(testString);
     query.taskAssigneeLike(testString);
     query.taskAssigneeLikeExpression(testString);
+    query.taskAssigneeIn(testString);
     query.taskInvolvedUser(testString);
     query.taskInvolvedUserExpression(testString);
     query.taskOwner(testString);
@@ -247,6 +248,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testString, query.getExpressions().get("taskAssignee"));
     assertEquals(testString, query.getAssigneeLike());
     assertEquals(testString, query.getExpressions().get("taskAssigneeLike"));
+    assertTrue(query.getAssigneeIn().contains(testString));
     assertEquals(testString, query.getInvolvedUser());
     assertEquals(testString, query.getExpressions().get("taskInvolvedUser"));
     assertEquals(testString, query.getOwner());
@@ -1871,6 +1873,43 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     // then
     assertThat(filterService.count(filter.getId()), is(1L));
+  }
+
+  public void testAssigneeInPositive() {
+    // given
+    TaskQueryImpl taskQuery = new TaskQueryImpl();
+    taskQuery.taskAssigneeIn(testString);
+
+    // when
+    // save filter
+    filter.setQuery(taskQuery);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+    taskQuery = filter.getQuery();
+
+    // then
+    assertTrue(taskQuery.getAssigneeIn().contains(testString));
+  }
+
+  public void testAssigneeInNegative() {
+    // given
+    TaskQueryImpl taskQuery = new TaskQueryImpl();
+
+    // when
+    // save filter
+    filter.setQuery(taskQuery);
+    filterService.saveFilter(filter);
+
+    // fetch from db
+    filter = filterService.createTaskFilterQuery().singleResult();
+
+    // test query
+    taskQuery = filter.getQuery();
+
+    // then
+    assertNull(taskQuery.getAssigneeIn());
   }
 
   /**

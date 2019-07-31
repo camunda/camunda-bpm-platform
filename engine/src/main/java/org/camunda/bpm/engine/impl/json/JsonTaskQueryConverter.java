@@ -51,6 +51,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String MAX_PRIORITY = "maxPriority";
   public static final String ASSIGNEE = "assignee";
   public static final String ASSIGNEE_LIKE = "assigneeLike";
+  public static final String ASSIGNEE_IN = "assigneeIn";
   public static final String INVOLVED_USER = "involvedUser";
   public static final String OWNER = "owner";
   public static final String UNASSIGNED = "unassigned";
@@ -139,6 +140,12 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addField(json, MIN_PRIORITY, query.getMinPriority());
     JsonUtil.addField(json, MAX_PRIORITY, query.getMaxPriority());
     JsonUtil.addField(json, ASSIGNEE, query.getAssignee());
+
+    if (query.getAssigneeIn() != null) {
+      JsonUtil.addArrayField(json, ASSIGNEE_IN,
+          query.getAssigneeIn().toArray(new String[query.getAssigneeIn().size()]));
+    }
+
     JsonUtil.addField(json, ASSIGNEE_LIKE, query.getAssigneeLike());
     JsonUtil.addField(json, INVOLVED_USER, query.getInvolvedUser());
     JsonUtil.addField(json, OWNER, query.getOwner());
@@ -303,6 +310,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(ASSIGNEE_LIKE)) {
       query.taskAssigneeLike(JsonUtil.getString(json, ASSIGNEE_LIKE));
+    }
+    if (json.has(ASSIGNEE_IN)) {
+      query.taskAssigneeIn(getArray(JsonUtil.getArray(json, ASSIGNEE_IN)));
     }
     if (json.has(INVOLVED_USER)) {
       query.taskInvolvedUser(JsonUtil.getString(json, INVOLVED_USER));
