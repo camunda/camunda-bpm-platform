@@ -13,7 +13,7 @@
   
   <properties>
     <version.spring.framework>4.3.23.RELEASE</version.spring.framework>
-    <version.hibernate>5.1.16.Final</version.hibernate> <!-- latest version for Java 7 -->
+    <version.hibernate>5.4.4.Final</version.hibernate> <!-- latest version for Java 7 -->
   </properties>
   
   <dependencies>
