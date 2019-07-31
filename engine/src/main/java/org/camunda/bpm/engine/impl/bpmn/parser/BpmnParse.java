@@ -850,37 +850,45 @@ public class BpmnParse extends Parse {
    */
   public void parseStartEvents(Element parentElement, ScopeImpl scope) {
     List<Element> startEventElements = parentElement.elements("startEvent");
+    if (startEventElements.isEmpty() && parentElement.getTagName().equals("subProcess") ) {
+      addError("subProcess must define a startEvent element", parentElement);
+      return;
+    }
+
     List<ActivityImpl> startEventActivities = new ArrayList<ActivityImpl>();
-    if(startEventElements.size() > 0) {
-      for (Element startEventElement : startEventElements) {
-  
-        ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
-        parseAsynchronousContinuationForActivity(startEventElement, startEventActivity);
-  
-        if (scope instanceof ProcessDefinitionEntity) {
-          parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);
-          startEventActivities.add(startEventActivity);
-        } else {
-          parseScopeStartEvent(startEventActivity, startEventElement, parentElement, (ActivityImpl) scope);
-        }
-  
-        ensureNoIoMappingDefined(startEventElement);
-  
-        parseExecutionListenersOnScope(startEventElement, startEventActivity);
-  
-        for (BpmnParseListener parseListener : parseListeners) {
-          parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
-        }
-  
+    for (Element startEventElement : startEventElements) {
+
+      ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
+      parseAsynchronousContinuationForActivity(startEventElement, startEventActivity);
+
+      if (scope instanceof ProcessDefinitionEntity) {
+        parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);
+        startEventActivities.add(startEventActivity);
+      } else {
+        parseScopeStartEvent(startEventActivity, startEventElement, parentElement, (ActivityImpl) scope);
+      }
+
+      ensureNoIoMappingDefined(startEventElement);
+
+      parseExecutionListenersOnScope(startEventElement, startEventActivity);
+    }
+
+    if (scope instanceof ProcessDefinitionEntity) {
+      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) scope;
+      selectInitial(startEventActivities, processDefinition, parentElement);
+      Element startEventElement = parseStartFormHandler(startEventElements, processDefinition);
+
+      invokeStartEventParseListeners(scope, startEventElements);
+
+      StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
+      if (startEventElement != null && startFormHandler != null) {
+        // the start form handler may come from parseStartFormHandler, or it may have been overridden by a parse listener.
+        // either way: invoke its parseConfiguration method, and then wrap it in a DelegateTaskFormHandler.
+        startFormHandler.parseConfiguration(startEventElement, deployment, processDefinition, this);
+        processDefinition.setStartFormHandler(new DelegateStartFormHandler(startFormHandler, deployment));
       }
     } else {
-      if(parentElement.getTagName().equals("subProcess") ) {
-        addError("subProcess must define a startEvent element", parentElement);
-      }
-    }
-    if (scope instanceof ProcessDefinitionEntity) {
-      selectInitial(startEventActivities, (ProcessDefinitionEntity) scope, parentElement);
-      parseStartFormHandlers(startEventElements, (ProcessDefinitionEntity) scope);
+      invokeStartEventParseListeners(scope, startEventElements);
     }
   }
 
@@ -898,7 +906,7 @@ public class BpmnParse extends Parse {
         }
       }
     }
-    // if there is a single start event, select it as initial, regardless of it's type:
+    // if there is a single start event, select it as initial, regardless of its type:
     if (initial == null && startEventActivities.size() == 1) {
       initial = startEventActivities.get(0);
     }
@@ -949,7 +957,10 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseStartFormHandlers(List<Element> startEventElements, ProcessDefinitionEntity processDefinition) {
+  /**
+   * @return the initial start event element, which corresponds to the start form handler.
+   */
+  protected Element parseStartFormHandler(List<Element> startEventElements, ProcessDefinitionEntity processDefinition) {
     if (processDefinition.getInitial() != null) {
       for (Element startEventElement : startEventElements) {
 
@@ -962,11 +973,21 @@ public class BpmnParse extends Parse {
           } else {
             startFormHandler = new DefaultStartFormHandler();
           }
-          startFormHandler.parseConfiguration(startEventElement, deployment, processDefinition, this);
 
-          processDefinition.setStartFormHandler(new DelegateStartFormHandler(startFormHandler, deployment));
+          processDefinition.setStartFormHandler(startFormHandler);
+          return startEventElement;
         }
 
+      }
+    }
+    return null;
+  }
+
+  private void invokeStartEventParseListeners(ScopeImpl scope, List<Element> startEventElements) {
+    for (Element startEventElement : startEventElements) {
+      ActivityImpl startEventActivity = scope.getChildActivity(startEventElement.attribute("id"));
+      for (BpmnParseListener parseListener : parseListeners) {
+        parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
       }
     }
   }
@@ -2600,7 +2621,8 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuationForActivity(userTaskElement, activity);
 
-    TaskDefinition taskDefinition = parseTaskDefinition(userTaskElement, activity.getId(), (ProcessDefinitionEntity) scope.getProcessDefinition());
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) scope.getProcessDefinition();
+    TaskDefinition taskDefinition = parseTaskDefinition(userTaskElement, activity.getId(), processDefinition);
     TaskDecorator taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
 
     UserTaskActivityBehavior userTaskActivity = new UserTaskActivityBehavior(taskDecorator);
@@ -2612,6 +2634,13 @@ public class BpmnParse extends Parse {
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseUserTask(userTaskElement, scope, activity);
     }
+
+    // the task form handler may come from parseTaskDefinition, or it may have been overridden by a parse listener.
+    // either way: invoke its parseConfiguration method, and then wrap it in a DelegateTaskFormHandler.
+    TaskFormHandler taskFormHandler = taskDefinition.getTaskFormHandler();
+    taskFormHandler.parseConfiguration(userTaskElement, deployment, processDefinition, this);
+    taskDefinition.setTaskFormHandler(new DelegateTaskFormHandler(taskFormHandler, deployment));
+
     return activity;
   }
 
@@ -2623,9 +2652,7 @@ public class BpmnParse extends Parse {
     } else {
       taskFormHandler = new DefaultTaskFormHandler();
     }
-    taskFormHandler.parseConfiguration(taskElement, deployment, processDefinition, this);
-
-    TaskDefinition taskDefinition = new TaskDefinition(new DelegateTaskFormHandler(taskFormHandler, deployment));
+    TaskDefinition taskDefinition = new TaskDefinition(taskFormHandler);
 
     taskDefinition.setKey(taskDefinitionKey);
     processDefinition.getTaskDefinitions().put(taskDefinitionKey, taskDefinition);

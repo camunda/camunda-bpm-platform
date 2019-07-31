@@ -45,13 +45,13 @@ public abstract class DelegateFormHandler {
 
   public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
     // should not be called!
+    throw new UnsupportedOperationException();
   }
 
   protected <T> T performContextSwitch(final Callable<T> callable) {
-
     ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(deploymentId);
 
-    if(targetProcessApplication != null) {
+    if (targetProcessApplication != null) {
 
       return Context.executeWithinProcessApplication(new Callable<T>() {
         public T call() throws Exception {

@@ -16,11 +16,18 @@
  */
 package org.camunda.bpm.engine.test.standalone.deploy;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -33,15 +40,14 @@ public class BPMNParseListenerTest extends ResourceProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {
+  public void testAlterProcessDefinitionKeyWhenDeploying() {
     // Check if process-definition has different key
     assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
     assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
   }
 
   @Deployment
-  public void testAlterActivityBehaviors() throws Exception {
-
+  public void testAlterActivityBehaviors() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithIntermediateThrowEvent-modified");
     ProcessDefinitionImpl processDefinition = ((ProcessInstanceWithVariablesImpl) processInstance).getExecutionEntity().getProcessDefinition();
 
@@ -53,5 +59,57 @@ public class BPMNParseListenerTest extends ResourceProcessEngineTestCase {
 
     ActivityImpl endEvent = processDefinition.findActivity("theEnd");
     assertTrue(endEvent.getActivityBehavior() instanceof TestBPMNParseListener.TestNoneEndEventActivityBehavior);
+  }
+
+  @Deployment
+  public void testAlterFormHandlers() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("alterFormHandlersProcess-modified").singleResult();
+    assertNotNull(processDefinition);
+
+    // === verify start form handler ===
+
+    // the parse listener has access to the default/explicitly set form handler
+    assertTrue(TestBPMNParseListener.TestStartFormHandler.previousHandler instanceof DefaultStartFormHandler);
+
+    // parseConfiguration should have been called while processing the BPMN
+    assertTrue(TestBPMNParseListener.TestStartFormHandler.parseConfigurationCalled);
+
+    // createStartForm is called upon requesting a form
+    assertFalse(TestBPMNParseListener.TestStartFormHandler.createStartFormCalled);
+    formService.getRenderedStartForm(processDefinition.getId());
+    assertTrue(TestBPMNParseListener.TestStartFormHandler.createStartFormCalled);
+
+    assertFalse(TestBPMNParseListener.TestStartFormHandler.submitFormVariablesCalled);
+    assertNull(TestBPMNParseListener.TestStartFormHandler.submitFormVariableValue);
+    ProcessInstance processInstance = formService.submitStartForm(processDefinition.getId(), createFormProperties("this is a start form"));
+    assertTrue(TestBPMNParseListener.TestStartFormHandler.submitFormVariablesCalled);
+    assertEquals("this is a start form", TestBPMNParseListener.TestStartFormHandler.submitFormVariableValue);
+
+    // === verify task form handler ===
+
+    // the parse listener has access to the default/explicitly set form handler
+    assertTrue(TestBPMNParseListener.TestTaskFormHandler.previousHandler instanceof DefaultTaskFormHandler);
+
+    // parseConfiguration should have been called while processing the BPMN
+    assertTrue(TestBPMNParseListener.TestTaskFormHandler.parseConfigurationCalled);
+
+    // createTaskForm is called upon requesting a form
+    assertFalse(TestBPMNParseListener.TestTaskFormHandler.createTaskFormCalled);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    formService.getRenderedTaskForm(task.getId());
+    assertTrue(TestBPMNParseListener.TestTaskFormHandler.createTaskFormCalled);
+
+    // submitFormVariables is called upon submitting the form
+    assertFalse(TestBPMNParseListener.TestTaskFormHandler.submitFormVariablesCalled);
+    assertNull(TestBPMNParseListener.TestTaskFormHandler.submitFormVariableValue);
+    formService.submitTaskForm(task.getId(), createFormProperties("this is a task form"));
+    assertTrue(TestBPMNParseListener.TestTaskFormHandler.submitFormVariablesCalled);
+    assertEquals("this is a task form", TestBPMNParseListener.TestTaskFormHandler.submitFormVariableValue);
+  }
+
+  private Map<String, Object> createFormProperties(String value) {
+    Map<String, Object> properties = new HashMap<>();
+    properties.put("key", value);
+    return properties;
   }
 }

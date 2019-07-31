@@ -16,19 +16,30 @@
  */
 package org.camunda.bpm.engine.test.standalone.deploy;
 
-import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
-import org.camunda.bpm.engine.impl.bpmn.parser.CompensateEventDefinition;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.util.xml.Element;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.COMPENSATE_EVENT_DEFINITION;
 
 import java.util.List;
 
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.COMPENSATE_EVENT_DEFINITION;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.parser.CompensateEventDefinition;
+import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.task.TaskDefinition;
+import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Frederik Heremans
@@ -45,13 +56,22 @@ public class TestBPMNParseListener extends AbstractBpmnParseListener {
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
     // Change activity behavior
     startEventActivity.setActivityBehavior(new TestNoneStartEventActivityBehavior());
+
+    // Change start form handler for processes whose name starts with "alterFormHandlers"
+    if (scope instanceof ProcessDefinitionEntity) {
+      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) scope;
+      if (processDefinition.getName().startsWith("alterFormHandlers")) {
+        StartFormHandler previous = processDefinition.getStartFormHandler();
+        processDefinition.setStartFormHandler(new TestStartFormHandler(previous));
+      }
+    }
   }
 
   public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
     // Change activity behavior
     Element compensateEventDefinitionElement = intermediateEventElement.element(COMPENSATE_EVENT_DEFINITION);
     if (compensateEventDefinitionElement != null) {
-      final String activityRef = compensateEventDefinitionElement.attribute("activityRef");
+      String activityRef = compensateEventDefinitionElement.attribute("activityRef");
       CompensateEventDefinition compensateEventDefinition = new CompensateEventDefinition();
       compensateEventDefinition.setActivityRef(activityRef);
       compensateEventDefinition.setWaitForCompletion(false);
@@ -65,19 +85,97 @@ public class TestBPMNParseListener extends AbstractBpmnParseListener {
     activity.setActivityBehavior(new TestNoneEndEventActivityBehavior());
   }
 
-  public class TestNoneStartEventActivityBehavior extends NoneStartEventActivityBehavior {
+  @Override
+  public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
+    // Change task form handler for processes whose name starts with "alterFormHandlers"
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) scope;
+    if (processDefinition.getName().startsWith("alterFormHandlers")) {
+      TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition();
+      TaskFormHandler previous = taskDefinition.getTaskFormHandler();
+      taskDefinition.setTaskFormHandler(new TestTaskFormHandler(previous));
+    }
+  }
+
+  public static class TestNoneStartEventActivityBehavior extends NoneStartEventActivityBehavior {
 
   }
 
-  public class TestNoneEndEventActivityBehavior extends NoneEndEventActivityBehavior {
+  public static class TestNoneEndEventActivityBehavior extends NoneEndEventActivityBehavior {
 
   }
 
-  public class TestCompensationEventActivityBehavior extends CompensationEventActivityBehavior {
+  public static class TestCompensationEventActivityBehavior extends CompensationEventActivityBehavior {
 
     public TestCompensationEventActivityBehavior(CompensateEventDefinition compensateEventDefinition) {
       super(compensateEventDefinition);
     }
   }
+  
+  public static class TestStartFormHandler implements StartFormHandler {
+    public static StartFormHandler previousHandler  = null;
+    public static boolean parseConfigurationCalled  = false;
+    public static boolean createStartFormCalled     = false;
+    public static boolean submitFormVariablesCalled = false;
+    public static Object submitFormVariableValue    = null;
 
+    private final StartFormHandler previous;
+
+    public TestStartFormHandler(StartFormHandler previous) {
+      this.previous = previous;
+      previousHandler = previous;
+    }
+
+    @Override
+    public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
+      parseConfigurationCalled = true;
+      previous.parseConfiguration(activityElement, deployment, processDefinition, bpmnParse);
+    }
+
+    @Override
+    public StartFormData createStartFormData(ProcessDefinitionEntity processDefinition) {
+      createStartFormCalled = true;
+      return previous.createStartFormData(processDefinition);
+    }
+
+    @Override
+    public void submitFormVariables(VariableMap properties, VariableScope variableScope) {
+      submitFormVariablesCalled = true;
+      submitFormVariableValue = properties.get("key");
+      previous.submitFormVariables(properties, variableScope);
+    }
+  }
+
+  public static class TestTaskFormHandler implements TaskFormHandler {
+    public static TaskFormHandler previousHandler   = null;
+    public static boolean parseConfigurationCalled  = false;
+    public static boolean createTaskFormCalled      = false;
+    public static boolean submitFormVariablesCalled = false;
+    public static Object submitFormVariableValue    = null;
+
+    private final TaskFormHandler previous;
+
+    public TestTaskFormHandler(TaskFormHandler previous) {
+      this.previous = previous;
+      previousHandler = previous;
+    }
+
+    @Override
+    public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
+      parseConfigurationCalled = true;
+      previous.parseConfiguration(activityElement, deployment, processDefinition, bpmnParse);
+    }
+
+    @Override
+    public TaskFormData createTaskForm(TaskEntity task) {
+      createTaskFormCalled = true;
+      return previous.createTaskForm(task);
+    }
+
+    @Override
+    public void submitFormVariables(VariableMap properties, VariableScope variableScope) {
+      submitFormVariablesCalled = true;
+      submitFormVariableValue = properties.get("key");
+      previous.submitFormVariables(properties, variableScope);
+    }
+  }
 }
