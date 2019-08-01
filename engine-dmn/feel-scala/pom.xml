@@ -19,7 +19,7 @@
 
     <dependency>
       <groupId>com.github.nscala-time</groupId>
-      <artifactId>nscala-time_2.12</artifactId>
+      <artifactId>nscala-time_2.13</artifactId>
     </dependency>
 
     <dependency>
@@ -48,7 +48,7 @@
 
     <dependency>
       <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.12</artifactId>
+      <artifactId>scalatest_2.13</artifactId>
       <scope>test</scope>
     </dependency>
 
