@@ -4,8 +4,6 @@
           "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-  <property name="tabWidth" value="2"/>
-  <module name="JavadocPackage"/>
   <module name="TreeWalker">
 
     <module name="LineLength">
